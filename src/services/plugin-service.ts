@@ -35,8 +35,8 @@ export class PluginService {
   constructor(private db: D1Database) {}
 
   async getAllPlugins(): Promise<PluginData[]> {
-    // Ensure core plugins exist (auto-install if missing)
-    await this.ensureCorePluginsExist()
+    // Ensure all plugins from registry exist in database (auto-install if missing)
+    await this.ensureAllPluginsExist()
 
     const stmt = this.db.prepare(`
       SELECT * FROM plugins
@@ -47,49 +47,76 @@ export class PluginService {
     return (results || []).map(this.mapPluginFromDb)
   }
 
-  private async ensureCorePluginsExist(): Promise<void> {
+  /**
+   * Ensure all plugins from the registry exist in the database
+   * Auto-installs any newly detected plugins with inactive status
+   */
+  private async ensureAllPluginsExist(): Promise<void> {
     try {
-      // Check if any core plugins exist
-      const checkStmt = this.db.prepare('SELECT COUNT(*) as count FROM plugins WHERE is_core = TRUE')
-      const result = await checkStmt.first() as any
+      // Get all currently installed plugin IDs and names from database
+      const stmt = this.db.prepare('SELECT id, name FROM plugins')
+      const { results } = await stmt.all()
+      const installedPluginIds = new Set((results || []).map((row: any) => row.id))
+      const installedPluginNames = new Set((results || []).map((row: any) => row.name))
 
-      if (result && result.count > 0) {
-        // Core plugins already exist
+      // Get all plugin IDs from the registry
+      const registryPluginIds = Object.keys(PLUGIN_REGISTRY)
+
+      // Find plugins that are in the registry but not in the database (check both ID and name)
+      const newPlugins = registryPluginIds.filter(id =>
+        !installedPluginIds.has(id) && !installedPluginNames.has(id)
+      )
+
+      if (newPlugins.length === 0) {
+        console.log('[PluginService] All plugins from registry are already installed')
         return
       }
 
-      // Install core plugins from the auto-generated registry
-      console.log(`Installing ${CORE_PLUGIN_IDS.length} core plugins from registry...`)
+      console.log(`[PluginService] Installing ${newPlugins.length} new plugin(s) from registry...`)
 
-      for (const pluginId of CORE_PLUGIN_IDS) {
+      // Install each new plugin
+      for (const pluginId of newPlugins) {
         const manifest = PLUGIN_REGISTRY[pluginId]
         if (!manifest) {
-          console.warn(`Warning: Plugin ${pluginId} not found in registry`)
+          console.warn(`[PluginService] Warning: Plugin ${pluginId} not found in registry`)
           continue
         }
 
-        // Map manifest to PluginData format
-        const pluginData = {
-          id: manifest.id,
-          name: manifest.id, // Use ID as name for consistency
-          display_name: manifest.name,
-          description: manifest.description,
-          version: manifest.version,
-          author: manifest.author,
-          category: manifest.category,
-          icon: this.getCategoryIcon(manifest.category),
-          is_core: true,
-          permissions: manifest.permissions ? Object.keys(manifest.permissions) : [],
-          dependencies: manifest.dependencies || [],
-          settings: manifest.settings || {}
-        }
+        try {
+          // Determine if this is a core plugin
+          const isCore = CORE_PLUGIN_IDS.includes(pluginId)
 
-        await this.installPlugin(pluginData)
+          // Map manifest to PluginData format
+          const pluginData = {
+            id: manifest.id,
+            name: manifest.id, // Use ID as name for consistency
+            display_name: manifest.name,
+            description: manifest.description,
+            version: manifest.version,
+            author: manifest.author,
+            category: manifest.category,
+            icon: this.getCategoryIcon(manifest.category),
+            is_core: isCore,
+            permissions: manifest.permissions ? Object.keys(manifest.permissions) : [],
+            dependencies: manifest.dependencies || [],
+            settings: manifest.settings || {}
+          }
+
+          await this.installPlugin(pluginData)
+          console.log(`[PluginService] ✓ Installed plugin: ${manifest.name} (${pluginId}) - status: inactive`)
+        } catch (error: any) {
+          // Skip plugins that already exist (UNIQUE constraint errors)
+          if (error.message?.includes('UNIQUE constraint')) {
+            console.log(`[PluginService] Plugin ${manifest.name} (${pluginId}) already exists, skipping...`)
+          } else {
+            console.error(`[PluginService] Error installing plugin ${pluginId}:`, error)
+          }
+        }
       }
 
-      console.log('Core plugins installation complete')
+      console.log('[PluginService] Plugin installation complete')
     } catch (error) {
-      console.error('Error ensuring core plugins exist:', error)
+      console.error('[PluginService] Error ensuring plugins exist:', error)
       // Don't throw - just log the error and continue
     }
   }

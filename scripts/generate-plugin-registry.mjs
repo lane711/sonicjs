@@ -151,7 +151,7 @@ export const PLUGIN_IDS = Object.keys(PLUGIN_REGISTRY) as ReadonlyArray<string>
  */
 export const CORE_PLUGIN_IDS = PLUGIN_IDS.filter(id => {
   const manifest = PLUGIN_REGISTRY[id]
-  return id.startsWith('core-') || id === 'design' || id === 'database-tools'
+  return id.startsWith('core-') || id === 'design' || id === 'database-tools' || id === 'hello-world'
 }) as ReadonlyArray<string>
 
 /**

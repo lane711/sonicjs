@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
-import { Plugin } from '../types'
-import { PluginBuilder, PluginHelpers } from '../sdk/plugin-builder'
+import { Plugin } from '../../types'
+import { PluginBuilder, PluginHelpers } from '../../sdk/plugin-builder'
 
 const codeExampleSchema = z.object({
   id: z.number().optional(),

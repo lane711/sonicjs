@@ -1,5 +1,5 @@
-import { PluginBuilder } from '../sdk/plugin-builder'
-import type { Plugin, PluginContext, HookHandler } from '../types'
+import { PluginBuilder } from '../../sdk/plugin-builder'
+import type { Plugin, PluginContext, HookHandler } from '../../types'
 
 /**
  * Demo Login Plugin

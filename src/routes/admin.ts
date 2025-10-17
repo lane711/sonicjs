@@ -21,6 +21,7 @@ type Bindings = {
   CACHE_KV: KVNamespace
   MEDIA_BUCKET: R2Bucket
   ENVIRONMENT?: string
+  ENABLE_EXPERIMENTAL_FEATURES?: string
 }
 
 type Variables = {
@@ -127,6 +128,7 @@ adminRoutes.use('*', async (c, next) => {
 adminRoutes.get('/', async (c) => {
   const user = c.get('user')
   const dynamicMenuItems = c.get('dynamicMenuItems') || []
+  const enableExperimentalFeatures = c.env.ENABLE_EXPERIMENTAL_FEATURES === 'true'
 
   const pageData: DashboardPageData = {
     user: user ? {
@@ -134,7 +136,8 @@ adminRoutes.get('/', async (c) => {
       email: user.email,
       role: user.role
     } : undefined,
-    version: c.get('appVersion')
+    version: c.get('appVersion'),
+    enableExperimentalFeatures
   }
 
   return c.html(renderDashboardPageWithDynamicMenu(pageData, dynamicMenuItems))

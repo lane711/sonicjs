@@ -417,11 +417,13 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
                 <option value="date">Date</option>
                 <option value="select">Select</option>
                 <option value="media">Media</option>
+                <option value="guid">GUID (Auto-generated)</option>
               </select>
               <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-blue-600 dark:text-blue-400 sm:size-4">
                 <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
               </svg>
             </div>
+            <p id="field-type-help" class="text-xs text-zinc-500 dark:text-zinc-400 mt-1"></p>
           </div>
 
           <div>
@@ -562,10 +564,46 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         // Show/hide options container based on field type
         const fieldType = field.field_type;
         const optionsContainer = document.getElementById('field-options-container');
-        if (fieldType === 'select' || fieldType === 'media') {
+        const helpText = document.getElementById('field-type-help');
+
+        if (['select', 'media', 'richtext', 'guid'].includes(fieldType)) {
           optionsContainer.classList.remove('hidden');
+
+          // Set help text based on type
+          switch (fieldType) {
+            case 'select':
+              helpText.textContent = 'Create a dropdown select field with custom options';
+              break;
+            case 'media':
+              helpText.textContent = 'Upload and manage media files (images, videos, documents)';
+              break;
+            case 'richtext':
+              helpText.textContent = 'Full-featured WYSIWYG text editor with formatting options';
+              break;
+            case 'guid':
+              helpText.textContent = 'Automatically generates a unique identifier (UUID v4) for each content item';
+              break;
+          }
         } else {
           optionsContainer.classList.add('hidden');
+
+          // Set help text for other field types
+          switch (fieldType) {
+            case 'text':
+              helpText.textContent = 'Single-line text input for short content';
+              break;
+            case 'number':
+              helpText.textContent = 'Numeric input field for integers or decimals';
+              break;
+            case 'boolean':
+              helpText.textContent = 'True/false checkbox field';
+              break;
+            case 'date':
+              helpText.textContent = 'Date and time picker field';
+              break;
+            default:
+              helpText.textContent = '';
+          }
         }
 
         document.getElementById('field-modal').classList.remove('hidden');
@@ -651,26 +689,57 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
       document.getElementById('field-type').addEventListener('change', function() {
         const optionsContainer = document.getElementById('field-options-container');
         const fieldOptions = document.getElementById('field-options');
-        
+        const helpText = document.getElementById('field-type-help');
+        const fieldNameInput = document.getElementById('field-name');
+
         // Show/hide options based on field type
-        if (['select', 'media', 'richtext'].includes(this.value)) {
+        if (['select', 'media', 'richtext', 'guid'].includes(this.value)) {
           optionsContainer.classList.remove('hidden');
-          
-          // Set default options based on type
+
+          // Set default options and help text based on type
           switch (this.value) {
             case 'select':
               fieldOptions.value = '{"options": ["Option 1", "Option 2"], "multiple": false}';
+              helpText.textContent = 'Create a dropdown select field with custom options';
               break;
             case 'media':
               fieldOptions.value = '{"accept": "image/*", "maxSize": "10MB"}';
+              helpText.textContent = 'Upload and manage media files (images, videos, documents)';
               break;
             case 'richtext':
               fieldOptions.value = '{"toolbar": "full", "height": 400}';
+              helpText.textContent = 'Full-featured WYSIWYG text editor with formatting options';
+              break;
+            case 'guid':
+              fieldOptions.value = '{"autoGenerate": true, "format": "uuid-v4"}';
+              helpText.textContent = 'Automatically generates a unique identifier (UUID v4) for each content item';
+              // Suggest 'id' as field name for GUID fields
+              if (!fieldNameInput.value || fieldNameInput.value === '') {
+                fieldNameInput.value = 'id';
+              }
               break;
           }
         } else {
           optionsContainer.classList.add('hidden');
           fieldOptions.value = '{}';
+
+          // Set help text for other field types
+          switch (this.value) {
+            case 'text':
+              helpText.textContent = 'Single-line text input for short content';
+              break;
+            case 'number':
+              helpText.textContent = 'Numeric input field for integers or decimals';
+              break;
+            case 'boolean':
+              helpText.textContent = 'True/false checkbox field';
+              break;
+            case 'date':
+              helpText.textContent = 'Date and time picker field';
+              break;
+            default:
+              helpText.textContent = '';
+          }
         }
       });
 

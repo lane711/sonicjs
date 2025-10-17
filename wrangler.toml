@@ -30,6 +30,8 @@ binding = "ASSETS"
 ENVIRONMENT = "development"
 # Set to "true" to run E2E tests before every git push
 RUN_E2E_ON_PUSH = "false"
+# Enable experimental features (plugins menu, etc.)
+ENABLE_EXPERIMENTAL_FEATURES = "false"
 # Cloudflare Images configuration (optional)
 # IMAGES_ACCOUNT_ID = "your-account-id"
 # CDN_DOMAIN = "media.yourdomain.com"
@@ -59,6 +61,7 @@ name = "sonicjs-ai-preview"
 
 [env.preview.vars]
 ENVIRONMENT = "preview"
+ENABLE_EXPERIMENTAL_FEATURES = "false"
 # IMAGES_ACCOUNT_ID = "your-account-id"
 # CDN_DOMAIN = "media-preview.yourdomain.com"
 
@@ -87,6 +90,7 @@ name = "sonicjs-ai-prod"
 
 [env.production.vars]
 ENVIRONMENT = "production"
+ENABLE_EXPERIMENTAL_FEATURES = "false"
 
 # --- D1 Database (Production) ---
 [[env.production.d1_databases]]

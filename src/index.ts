@@ -11,6 +11,8 @@ import adminTestimonialsRoutes from './routes/admin-testimonials'
 import adminCodeExamplesRoutes from './routes/admin-code-examples'
 // Design plugin routes
 import { designRoutes } from './plugins/design/routes'
+// Hello World plugin
+import { helloWorldPlugin } from './plugins/core-plugins/hello-world-plugin'
 import { adminCheckboxRoutes } from './routes/admin-checkboxes'
 import { adminLogsRoutes } from './routes/admin-logs'
 import { docsRoutes } from './routes/docs'
@@ -219,6 +221,14 @@ app.route('/admin/logs', adminLogsRoutes)
 // Cache routes with plugin activation check
 app.use('/admin/cache/*', requireActivePlugin('cache'))
 app.route('/admin/cache', cacheRoutes)
+// Hello World routes with plugin activation check
+app.use('/admin/hello-world/*', requireActivePlugin('hello-world'))
+// Register Hello World plugin routes
+if (helloWorldPlugin.routes && helloWorldPlugin.routes.length > 0) {
+  for (const route of helloWorldPlugin.routes) {
+    app.route(route.path, route.handler)
+  }
+}
 
 // Test cleanup endpoint (unauthenticated, only for development/testing)
 app.post('/test-cleanup', async (c) => {

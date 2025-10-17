@@ -7,6 +7,7 @@ import { schemaDefinitions } from '../schemas'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
 import { QueryFilterBuilder, QueryFilter } from '../utils/query-filter'
 import { isPluginActive } from '../middleware/plugin-middleware'
+import { apiContentCrudRoutes } from './api-content-crud'
 
 type Bindings = {
   DB: D1Database
@@ -246,6 +247,288 @@ apiRoutes.get('/', (c) => {
             },
             '500': {
               description: 'Internal server error',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: { type: 'string' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        post: {
+          summary: 'Create new content',
+          description: 'Creates a new content item. Requires authentication.',
+          security: [{ bearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['collectionId', 'title'],
+                  properties: {
+                    collectionId: { type: 'string', description: 'ID of the collection this content belongs to' },
+                    title: { type: 'string', description: 'Title of the content' },
+                    slug: { type: 'string', description: 'URL-friendly slug (auto-generated from title if not provided)' },
+                    status: { type: 'string', enum: ['draft', 'published', 'archived'], default: 'draft' },
+                    data: { type: 'object', description: 'Custom data fields for the content' }
+                  }
+                }
+              }
+            }
+          },
+          responses: {
+            '201': {
+              description: 'Content created successfully',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      data: {
+                        type: 'object',
+                        properties: {
+                          id: { type: 'string' },
+                          title: { type: 'string' },
+                          slug: { type: 'string' },
+                          status: { type: 'string' },
+                          collectionId: { type: 'string' },
+                          data: { type: 'object' },
+                          created_at: { type: 'integer' },
+                          updated_at: { type: 'integer' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            '400': {
+              description: 'Bad request - validation error',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: { type: 'string' }
+                    }
+                  }
+                }
+              }
+            },
+            '401': {
+              description: 'Unauthorized - authentication required',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: { type: 'string' }
+                    }
+                  }
+                }
+              }
+            },
+            '409': {
+              description: 'Conflict - duplicate slug',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: { type: 'string' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      '/api/content/{id}': {
+        get: {
+          summary: 'Get content by ID',
+          description: 'Retrieves a single content item by its ID',
+          parameters: [
+            {
+              name: 'id',
+              in: 'path',
+              required: true,
+              schema: { type: 'string' },
+              description: 'Content ID'
+            }
+          ],
+          responses: {
+            '200': {
+              description: 'Content item',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      data: {
+                        type: 'object',
+                        properties: {
+                          id: { type: 'string' },
+                          title: { type: 'string' },
+                          slug: { type: 'string' },
+                          status: { type: 'string' },
+                          collectionId: { type: 'string' },
+                          data: { type: 'object' },
+                          created_at: { type: 'integer' },
+                          updated_at: { type: 'integer' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            '404': {
+              description: 'Content not found',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: { type: 'string' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        put: {
+          summary: 'Update content',
+          description: 'Updates an existing content item. Requires authentication.',
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            {
+              name: 'id',
+              in: 'path',
+              required: true,
+              schema: { type: 'string' },
+              description: 'Content ID'
+            }
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    title: { type: 'string' },
+                    slug: { type: 'string' },
+                    status: { type: 'string', enum: ['draft', 'published', 'archived'] },
+                    data: { type: 'object' }
+                  }
+                }
+              }
+            }
+          },
+          responses: {
+            '200': {
+              description: 'Content updated successfully',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      data: {
+                        type: 'object',
+                        properties: {
+                          id: { type: 'string' },
+                          title: { type: 'string' },
+                          slug: { type: 'string' },
+                          status: { type: 'string' },
+                          collectionId: { type: 'string' },
+                          data: { type: 'object' },
+                          created_at: { type: 'integer' },
+                          updated_at: { type: 'integer' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            '401': {
+              description: 'Unauthorized',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: { type: 'string' }
+                    }
+                  }
+                }
+              }
+            },
+            '404': {
+              description: 'Content not found',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: { type: 'string' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        delete: {
+          summary: 'Delete content',
+          description: 'Deletes a content item. Requires authentication.',
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            {
+              name: 'id',
+              in: 'path',
+              required: true,
+              schema: { type: 'string' },
+              description: 'Content ID'
+            }
+          ],
+          responses: {
+            '200': {
+              description: 'Content deleted successfully',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      success: { type: 'boolean' }
+                    }
+                  }
+                }
+              }
+            },
+            '401': {
+              description: 'Unauthorized',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      error: { type: 'string' }
+                    }
+                  }
+                }
+              }
+            },
+            '404': {
+              description: 'Content not found',
               content: {
                 'application/json': {
                   schema: {
@@ -737,3 +1020,5 @@ apiRoutes.get('/collections/:collection/content', async (c) => {
     }, 500)
   }
 })
+// Mount CRUD routes for content
+apiRoutes.route('/content', apiContentCrudRoutes)

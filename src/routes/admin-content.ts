@@ -484,13 +484,22 @@ adminContentRoutes.post('/', async (c) => {
     
     for (const field of fields) {
       const value = formData.get(field.field_name)
-      
+
+      // Auto-generate GUID for guid field types
+      if (field.field_type === 'guid') {
+        const options = field.field_options || {}
+        if (options.autoGenerate) {
+          data[field.field_name] = crypto.randomUUID()
+          continue
+        }
+      }
+
       // Validation
       if (field.is_required && (!value || value.toString().trim() === '')) {
         errors[field.field_name] = [`${field.field_label} is required`]
         continue
       }
-      
+
       // Type conversion and validation
       switch (field.field_type) {
         case 'number':
@@ -509,6 +518,10 @@ adminContentRoutes.post('/', async (c) => {
           } else {
             data[field.field_name] = value
           }
+          break
+        case 'guid':
+          // If guid field is not auto-generated, use provided value
+          data[field.field_name] = value || null
           break
         default:
           data[field.field_name] = value

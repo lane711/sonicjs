@@ -44,6 +44,7 @@ export interface DashboardPageData {
   };
   stats?: DashboardStats;
   version?: string;
+  enableExperimentalFeatures?: boolean;
 }
 
 export function renderDashboardPage(data: DashboardPageData): string {
@@ -219,6 +220,7 @@ export function renderDashboardPageWithDynamicMenu(
     currentPath: "/admin",
     user: data.user,
     version: data.version,
+    enableExperimentalFeatures: data.enableExperimentalFeatures,
     content: pageContent,
     dynamicMenuItems,
   };

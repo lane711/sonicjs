@@ -6,8 +6,8 @@
 
 import { Hono } from 'hono'
 import { z } from 'zod'
-import { PluginBuilder, PluginHelpers } from '../sdk/plugin-builder'
-import { Plugin, HOOKS } from '../types'
+import { PluginBuilder, PluginHelpers } from '../../sdk/plugin-builder'
+import { Plugin, HOOKS } from '../../types'
 
 export function createAnalyticsPlugin(): Plugin {
   const builder = PluginBuilder.create({

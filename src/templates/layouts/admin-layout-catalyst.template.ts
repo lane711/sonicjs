@@ -121,6 +121,7 @@ export interface AdminLayoutCatalystData {
   pageTitle?: string;
   currentPath?: string;
   version?: string;
+  enableExperimentalFeatures?: boolean;
   user?: {
     name: string;
     email: string;
@@ -246,7 +247,8 @@ export function renderAdminLayoutCatalyst(
         data.user,
         data.dynamicMenuItems,
         false,
-        data.version
+        data.version,
+        data.enableExperimentalFeatures
       )}
     </div>
 
@@ -258,7 +260,8 @@ export function renderAdminLayoutCatalyst(
         data.user,
         data.dynamicMenuItems,
         true,
-        data.version
+        data.version,
+        data.enableExperimentalFeatures
       )}
     </div>
 
@@ -364,9 +367,10 @@ function renderCatalystSidebar(
   user?: any,
   dynamicMenuItems?: Array<{ label: string; path: string; icon: string }>,
   isMobile: boolean = false,
-  version?: string
+  version?: string,
+  enableExperimentalFeatures?: boolean
 ): string {
-  const baseMenuItems = [
+  let baseMenuItems = [
     {
       label: "Dashboard",
       path: "/admin",
@@ -402,14 +406,18 @@ function renderCatalystSidebar(
         <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
       </svg>`,
     },
-    {
+  ];
+
+  // Only include Plugins menu if experimental features are enabled
+  if (enableExperimentalFeatures) {
+    baseMenuItems.push({
       label: "Plugins",
       path: "/admin/plugins",
       icon: `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
       </svg>`,
-    },
-  ];
+    });
+  }
 
   const settingsMenuItem = {
     label: "Settings",
