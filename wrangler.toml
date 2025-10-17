@@ -31,7 +31,7 @@ ENVIRONMENT = "development"
 # Set to "true" to run E2E tests before every git push
 RUN_E2E_ON_PUSH = "false"
 # Enable experimental features (plugins menu, etc.)
-ENABLE_EXPERIMENTAL_FEATURES = "false"
+ENABLE_EXPERIMENTAL_FEATURES = "true"
 # Cloudflare Images configuration (optional)
 # IMAGES_ACCOUNT_ID = "your-account-id"
 # CDN_DOMAIN = "media.yourdomain.com"
