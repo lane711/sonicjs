@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/services/index.ts"],"names":[],"mappings":";;;AAOO,IAAM,WAAA,GAAc","file":"services.js","sourcesContent":["/**\n * Services Module Exports\n *\n * Core business logic services for SonicJS\n */\n\n// Placeholder - will be populated in Phase 2 Week 2\nexport const placeholder = 'services'\n"]}

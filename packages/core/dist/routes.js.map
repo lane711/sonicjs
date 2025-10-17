@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/routes/index.ts"],"names":[],"mappings":";;;AAOO,IAAM,WAAA,GAAc","file":"routes.js","sourcesContent":["/**\n * Routes Module Exports\n *\n * HTTP route handlers for SonicJS\n */\n\n// Placeholder - will be populated in Phase 2 Week 3\nexport const placeholder = 'routes'\n"]}

@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/middleware/index.ts"],"names":[],"mappings":";;;AAOO,IAAM,WAAA,GAAc","file":"middleware.js","sourcesContent":["/**\n * Middleware Module Exports\n *\n * Request processing middleware for SonicJS\n */\n\n// Placeholder - will be populated in Phase 2 Week 2\nexport const placeholder = 'middleware'\n"]}

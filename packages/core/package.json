@@ -1,0 +1,131 @@
+{
+  "name": "@sonicjs/core",
+  "version": "1.0.0-alpha.1",
+  "description": "Core framework for SonicJS headless CMS - Edge-first, TypeScript-native CMS built for Cloudflare Workers",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./services": {
+      "import": "./dist/services/index.js",
+      "require": "./dist/services/index.cjs",
+      "types": "./dist/services/index.d.ts"
+    },
+    "./middleware": {
+      "import": "./dist/middleware/index.js",
+      "require": "./dist/middleware/index.cjs",
+      "types": "./dist/middleware/index.d.ts"
+    },
+    "./routes": {
+      "import": "./dist/routes/index.js",
+      "require": "./dist/routes/index.cjs",
+      "types": "./dist/routes/index.d.ts"
+    },
+    "./templates": {
+      "import": "./dist/templates/index.js",
+      "require": "./dist/templates/index.cjs",
+      "types": "./dist/templates/index.d.ts"
+    },
+    "./plugins": {
+      "import": "./dist/plugins/index.js",
+      "require": "./dist/plugins/index.cjs",
+      "types": "./dist/plugins/index.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils/index.js",
+      "require": "./dist/utils/index.cjs",
+      "types": "./dist/utils/index.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types/index.js",
+      "require": "./dist/types/index.cjs",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "migrations",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc --noEmit",
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "cms",
+    "headless-cms",
+    "cloudflare",
+    "workers",
+    "edge",
+    "typescript",
+    "hono",
+    "content-management",
+    "api",
+    "sonicjs"
+  ],
+  "author": "SonicJS Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sonicjs/sonicjs.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/sonicjs/sonicjs/issues"
+  },
+  "homepage": "https://sonicjs.com",
+  "peerDependencies": {
+    "@cloudflare/workers-types": "^4.0.0",
+    "hono": "^4.0.0",
+    "drizzle-orm": "^0.44.0",
+    "zod": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@cloudflare/workers-types": {
+      "optional": false
+    },
+    "hono": {
+      "optional": false
+    },
+    "drizzle-orm": {
+      "optional": false
+    },
+    "zod": {
+      "optional": false
+    }
+  },
+  "dependencies": {
+    "drizzle-zod": "^0.8.2",
+    "marked": "^15.0.12",
+    "highlight.js": "^11.11.1",
+    "semver": "^7.7.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250620.0",
+    "@types/node": "^20.19.1",
+    "drizzle-orm": "^0.44.2",
+    "hono": "^4.7.3",
+    "tsup": "^8.0.0",
+    "typescript": "^5.8.3",
+    "vitest": "^2.1.8",
+    "zod": "^3.25.67"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}
