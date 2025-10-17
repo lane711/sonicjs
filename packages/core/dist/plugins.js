@@ -1,8 +1,5 @@
-import './chunk-PZ5AY32C.js';
-
-// src/plugins/index.ts
-var placeholder = "plugins";
-
-export { placeholder };
+export { HookSystemImpl, HookUtils, PluginManager, PluginRegistryImpl, PluginValidator, ScopedHookSystem } from './chunk-NRSL6BQI.js';
+import './chunk-LOUJRBXV.js';
+import './chunk-G3PMV62Z.js';
 //# sourceMappingURL=plugins.js.map
 //# sourceMappingURL=plugins.js.map

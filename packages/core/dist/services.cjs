@@ -1,10 +1,74 @@
 'use strict';
 
-require('./chunk-Q7SFCCGT.cjs');
+require('./chunk-ALTMI5Y2.cjs');
+var chunkWJ7QYVR2_cjs = require('./chunk-WJ7QYVR2.cjs');
+require('./chunk-EMMSS5I5.cjs');
 
-// src/services/index.ts
-var placeholder = "services";
 
-exports.placeholder = placeholder;
+
+Object.defineProperty(exports, "Logger", {
+  enumerable: true,
+  get: function () { return chunkWJ7QYVR2_cjs.Logger; }
+});
+Object.defineProperty(exports, "MigrationService", {
+  enumerable: true,
+  get: function () { return chunkWJ7QYVR2_cjs.MigrationService; }
+});
+Object.defineProperty(exports, "PluginBootstrapService", {
+  enumerable: true,
+  get: function () { return chunkWJ7QYVR2_cjs.PluginBootstrapService; }
+});
+Object.defineProperty(exports, "PluginService", {
+  enumerable: true,
+  get: function () { return chunkWJ7QYVR2_cjs.PluginService; }
+});
+Object.defineProperty(exports, "cleanupRemovedCollections", {
+  enumerable: true,
+  get: function () { return chunkWJ7QYVR2_cjs.cleanupRemovedCollections; }
+});
+Object.defineProperty(exports, "fullCollectionSync", {
+  enumerable: true,
+  get: function () { return chunkWJ7QYVR2_cjs.fullCollectionSync; }
+});
+Object.defineProperty(exports, "getAvailableCollectionNames", {
+  enumerable: true,
+  get: function () { return chunkWJ7QYVR2_cjs.getAvailableCollectionNames; }
+});
+Object.defineProperty(exports, "getLogger", {
+  enumerable: true,
+  get: function () { return chunkWJ7QYVR2_cjs.getLogger; }
+});
+Object.defineProperty(exports, "getManagedCollections", {
+  enumerable: true,
+  get: function () { return chunkWJ7QYVR2_cjs.getManagedCollections; }
+});
+Object.defineProperty(exports, "initLogger", {
+  enumerable: true,
+  get: function () { return chunkWJ7QYVR2_cjs.initLogger; }
+});
+Object.defineProperty(exports, "isCollectionManaged", {
+  enumerable: true,
+  get: function () { return chunkWJ7QYVR2_cjs.isCollectionManaged; }
+});
+Object.defineProperty(exports, "loadCollectionConfig", {
+  enumerable: true,
+  get: function () { return chunkWJ7QYVR2_cjs.loadCollectionConfig; }
+});
+Object.defineProperty(exports, "loadCollectionConfigs", {
+  enumerable: true,
+  get: function () { return chunkWJ7QYVR2_cjs.loadCollectionConfigs; }
+});
+Object.defineProperty(exports, "syncCollection", {
+  enumerable: true,
+  get: function () { return chunkWJ7QYVR2_cjs.syncCollection; }
+});
+Object.defineProperty(exports, "syncCollections", {
+  enumerable: true,
+  get: function () { return chunkWJ7QYVR2_cjs.syncCollections; }
+});
+Object.defineProperty(exports, "validateCollectionConfig", {
+  enumerable: true,
+  get: function () { return chunkWJ7QYVR2_cjs.validateCollectionConfig; }
+});
 //# sourceMappingURL=services.cjs.map
 //# sourceMappingURL=services.cjs.map

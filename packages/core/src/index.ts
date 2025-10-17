@@ -5,8 +5,8 @@
  * Built for Cloudflare's edge platform with TypeScript
  *
  * Phase 2 Migration Status:
- * - Week 1: Types, Utils, Database (in progress)
- * - Week 2: Services, Middleware, Plugins (pending)
+ * - Week 1: Types, Utils, Database (COMPLETED ✓)
+ * - Week 2: Services, Middleware, Plugins (COMPLETED ✓)
  * - Week 3: Routes, Templates (pending)
  * - Week 4: Integration & Testing (pending)
  */
@@ -22,11 +22,77 @@ export type { SonicJSConfig, SonicJSApp, Bindings, Variables } from './app'
 // Placeholders - To be populated in Phase 2
 // ============================================================================
 
-// Services - Week 2
-// export { CollectionLoader, CollectionSync, MigrationService } from './services'
+// Services - Week 2 (COMPLETED)
+export {
+  // Collection Management
+  loadCollectionConfigs,
+  loadCollectionConfig,
+  getAvailableCollectionNames,
+  validateCollectionConfig,
+  syncCollections,
+  syncCollection,
+  isCollectionManaged,
+  getManagedCollections,
+  cleanupRemovedCollections,
+  fullCollectionSync,
+  // Database Migrations
+  MigrationService,
+  // Logging
+  Logger,
+  getLogger,
+  initLogger,
+  // Plugin Services - Class implementations
+  PluginService as PluginServiceClass,
+  PluginBootstrapService,
+} from './services'
 
-// Middleware - Week 2
-// export { requireAuth, optionalAuth, requireRole } from './middleware'
+export type { Migration, MigrationStatus, LogLevel, LogCategory, LogEntry, LogFilter, CorePlugin } from './services'
+
+// Middleware - Week 2 (COMPLETED)
+export {
+  // Authentication
+  AuthManager,
+  requireAuth,
+  requireRole,
+  optionalAuth,
+  // Logging
+  loggingMiddleware,
+  detailedLoggingMiddleware,
+  securityLoggingMiddleware,
+  performanceLoggingMiddleware,
+  // Performance
+  cacheHeaders,
+  compressionMiddleware,
+  securityHeaders,
+  // Permissions
+  PermissionManager,
+  requirePermission,
+  requireAnyPermission,
+  logActivity,
+  // Plugin middleware
+  requireActivePlugin,
+  requireActivePlugins,
+  getActivePlugins,
+  isPluginActive,
+  // Bootstrap
+  bootstrapMiddleware,
+} from './middleware'
+
+export type { Permission, UserPermissions } from './middleware'
+
+// Plugins - Week 2 (COMPLETED)
+export {
+  // Hook System - Class implementations
+  HookSystemImpl,
+  ScopedHookSystem as ScopedHookSystemClass,
+  HookUtils,
+  // Plugin Registry
+  PluginRegistryImpl,
+  // Plugin Manager - Class implementation
+  PluginManager as PluginManagerClass,
+  // Plugin Validator - Class implementation
+  PluginValidator as PluginValidatorClass,
+} from './plugins'
 
 // Routes - Week 3
 // export { apiRoutes, adminRoutes, authRoutes } from './routes'
@@ -180,7 +246,7 @@ export type {
 // Version
 // ============================================================================
 
-export const VERSION = '1.0.0-alpha.1'
+export const VERSION = '1.0.0-alpha.2'
 
 // ============================================================================
 // Phase 2 Migration Notes

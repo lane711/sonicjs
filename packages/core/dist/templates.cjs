@@ -1,6 +1,6 @@
 'use strict';
 
-require('./chunk-Q7SFCCGT.cjs');
+require('./chunk-EMMSS5I5.cjs');
 
 // src/templates/index.ts
 var placeholder = "templates";

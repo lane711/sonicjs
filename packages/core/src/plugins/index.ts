@@ -4,5 +4,14 @@
  * Plugin system and SDK for SonicJS
  */
 
-// Placeholder - will be populated in Phase 2 Week 2
-export const placeholder = 'plugins'
+// Hook System
+export { HookSystemImpl, ScopedHookSystem, HookUtils } from './hook-system'
+
+// Plugin Registry
+export { PluginRegistryImpl } from './plugin-registry'
+
+// Plugin Manager
+export { PluginManager } from './plugin-manager'
+
+// Plugin Validator
+export { PluginValidator } from './plugin-validator'

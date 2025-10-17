@@ -4,5 +4,40 @@
  * Request processing middleware for SonicJS
  */
 
-// Placeholder - will be populated in Phase 2 Week 2
-export const placeholder = 'middleware'
+// Authentication middleware
+export { AuthManager, requireAuth, requireRole, optionalAuth } from './auth'
+
+// Logging middleware
+export {
+  loggingMiddleware,
+  detailedLoggingMiddleware,
+  securityLoggingMiddleware,
+  performanceLoggingMiddleware,
+} from './logging'
+
+// Performance monitoring middleware
+export {
+  cacheHeaders,
+  compressionMiddleware,
+  securityHeaders,
+} from './performance'
+
+// Permissions middleware
+export {
+  PermissionManager,
+  requirePermission,
+  requireAnyPermission,
+  logActivity,
+} from './permissions'
+export type { Permission, UserPermissions } from './permissions'
+
+// Plugin middleware
+export {
+  requireActivePlugin,
+  requireActivePlugins,
+  getActivePlugins,
+  isPluginActive,
+} from './plugin-middleware'
+
+// Bootstrap middleware
+export { bootstrapMiddleware } from './bootstrap'

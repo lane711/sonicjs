@@ -4,5 +4,32 @@
  * Core business logic services for SonicJS
  */
 
-// Placeholder - will be populated in Phase 2 Week 2
-export const placeholder = 'services'
+// Collection Management
+export {
+  loadCollectionConfigs,
+  loadCollectionConfig,
+  getAvailableCollectionNames,
+  validateCollectionConfig,
+} from './collection-loader'
+
+export {
+  syncCollections,
+  syncCollection,
+  isCollectionManaged,
+  getManagedCollections,
+  cleanupRemovedCollections,
+  fullCollectionSync,
+} from './collection-sync'
+
+// Database Migrations
+export { MigrationService } from './migrations'
+export type { Migration, MigrationStatus } from './migrations'
+
+// Logging
+export { Logger, getLogger, initLogger } from './logger'
+export type { LogLevel, LogCategory, LogEntry, LogFilter } from './logger'
+
+// Plugin Services
+export { PluginService } from './plugin-service'
+export { PluginBootstrapService } from './plugin-bootstrap'
+export type { CorePlugin } from './plugin-bootstrap'

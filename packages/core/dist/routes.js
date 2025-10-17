@@ -1,4 +1,4 @@
-import './chunk-PZ5AY32C.js';
+import './chunk-G3PMV62Z.js';
 
 // src/routes/index.ts
 var placeholder = "routes";

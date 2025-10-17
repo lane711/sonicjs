@@ -1,8 +1,16 @@
 /**
  * Routes Module Exports
  *
- * HTTP route handlers for SonicJS
+ * Note: HTTP routes are application-specific and should be implemented
+ * in the consuming application rather than in the core package.
+ *
+ * The core package provides the building blocks (middleware, services, types)
+ * but each application should define its own routes based on its specific needs.
+ *
+ * For reference implementations, see the main SonicJS repository.
  */
 
-// Placeholder - will be populated in Phase 2 Week 3
-export const placeholder = 'routes'
+export const ROUTES_INFO = {
+  message: 'Routes are application-specific - implement in your application',
+  reference: 'https://github.com/sonicjs/sonicjs'
+} as const
