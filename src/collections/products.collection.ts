@@ -1,4 +1,4 @@
-import { CollectionConfig } from '../types/collection-config'
+import { CollectionConfig } from '@sonicjs-cms/core'
 
 /**
  * Products Collection (Example)

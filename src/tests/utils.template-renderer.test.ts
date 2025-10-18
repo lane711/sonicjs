@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { TemplateRenderer, templateRenderer, renderTemplate } from '../utils/template-renderer'
+import { TemplateRenderer, templateRenderer, renderTemplate } from '@sonicjs-cms/core'
 
 describe('Template Renderer', () => {
   let renderer: TemplateRenderer

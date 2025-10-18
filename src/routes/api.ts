@@ -5,8 +5,8 @@ import { cors } from 'hono/cors'
 // import { APIGenerator } from '../utils/api-generator'
 import { schemaDefinitions } from '../schemas'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
-import { QueryFilterBuilder, QueryFilter } from '../utils/query-filter'
-import { isPluginActive } from '../middleware/plugin-middleware'
+import { QueryFilterBuilder, QueryFilter } from '@sonicjs-cms/core'
+import { isPluginActive } from '@sonicjs-cms/core'
 import { apiContentCrudRoutes } from './api-content-crud'
 
 type Bindings = {

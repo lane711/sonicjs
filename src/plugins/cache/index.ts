@@ -8,7 +8,7 @@
  */
 
 import type { Context } from 'hono'
-import type { PluginContext } from '../types.js'
+import type { PluginContext } from '@sonicjs-cms/core'
 import { getCacheService, clearAllCaches, getAllCacheStats } from './services/cache.js'
 import { CACHE_CONFIGS } from './services/cache-config.js'
 import { setupCacheInvalidation } from './services/cache-invalidation.js'

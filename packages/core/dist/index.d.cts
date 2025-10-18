@@ -4,6 +4,8 @@ import { s as schema } from './index-D45jaIlr.cjs';
 export { aa as Collection, ac as Content, C as CorePlugin, ai as DbPlugin, ak as DbPluginHook, p as LogCategory, au as LogConfig, q as LogEntry, r as LogFilter, o as LogLevel, L as Logger, ae as Media, m as Migration, M as MigrationService, n as MigrationStatus, ab as NewCollection, ad as NewContent, av as NewLogConfig, af as NewMedia, aj as NewPlugin, ar as NewPluginActivityLog, ap as NewPluginAsset, al as NewPluginHook, an as NewPluginRoute, at as NewSystemLog, a9 as NewUser, ah as NewWorkflowHistory, aq as PluginActivityLog, ao as PluginAsset, k as PluginBootstrapService, am as PluginRoute, P as PluginServiceClass, as as SystemLog, a8 as User, ag as WorkflowHistory, z as apiTokens, e as cleanupRemovedCollections, t as collections, w as content, x as contentVersions, f as fullCollectionSync, g as getAvailableCollectionNames, h as getLogger, d as getManagedCollections, j as initLogger, N as insertCollectionSchema, Q as insertContentSchema, a6 as insertLogConfigSchema, S as insertMediaSchema, a2 as insertPluginActivityLogSchema, a0 as insertPluginAssetSchema, Y as insertPluginHookSchema, _ as insertPluginRouteSchema, W as insertPluginSchema, a4 as insertSystemLogSchema, J as insertUserSchema, U as insertWorkflowHistorySchema, i as isCollectionManaged, a as loadCollectionConfig, l as loadCollectionConfigs, I as logConfig, y as media, G as pluginActivityLog, F as pluginAssets, D as pluginHooks, E as pluginRoutes, B as plugins, O as selectCollectionSchema, R as selectContentSchema, a7 as selectLogConfigSchema, T as selectMediaSchema, a3 as selectPluginActivityLogSchema, a1 as selectPluginAssetSchema, Z as selectPluginHookSchema, $ as selectPluginRouteSchema, X as selectPluginSchema, a5 as selectSystemLogSchema, K as selectUserSchema, V as selectWorkflowHistorySchema, c as syncCollection, b as syncCollections, H as systemLogs, u as users, v as validateCollectionConfig, A as workflowHistory } from './index-D45jaIlr.cjs';
 export { AuthManager, Permission, PermissionManager, UserPermissions, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware } from './middleware.cjs';
 export { HookSystemImpl, HookUtils, PluginManager as PluginManagerClass, PluginRegistryImpl, PluginValidator as PluginValidatorClass, ScopedHookSystem as ScopedHookSystemClass } from './plugins.cjs';
+export { ROUTES_INFO } from './routes.cjs';
+export { AlertData, ConfirmationDialogOptions, Filter, FilterBarData, FilterOption, FormData, FormField, PaginationData, TableColumn, TableData, getConfirmationDialogScript, renderAlert, renderConfirmationDialog, renderFilterBar, renderForm, renderFormField, renderPagination, renderTable } from './templates.cjs';
 export { b as CollectionConfig, c as CollectionConfigModule, C as CollectionSchema, d as CollectionSyncResult, a as FieldConfig, F as FieldType } from './collection-config-FLlGtsh9.cjs';
 export { A as AuthService, C as ContentService, u as HOOKS, k as HookContext, H as HookHandler, t as HookName, l as HookSystem, M as MediaService, P as Plugin, g as PluginAdminPage, q as PluginBuilderOptions, h as PluginComponent, b as PluginConfig, a as PluginContext, j as PluginHook, p as PluginLogger, n as PluginManager, i as PluginMenuItem, d as PluginMiddleware, e as PluginModel, m as PluginRegistry, c as PluginRoutes, f as PluginService, o as PluginStatus, s as PluginValidationResult, r as PluginValidator, S as ScopedHookSystem } from './plugin-UzmDImQc.cjs';
 export { PluginManifest } from './types.cjs';
@@ -120,10 +122,15 @@ declare function createDb(d1: D1Database): drizzle_orm_d1.DrizzleD1Database<type
  * Phase 2 Migration Status:
  * - Week 1: Types, Utils, Database (COMPLETED ✓)
  * - Week 2: Services, Middleware, Plugins (COMPLETED ✓)
- * - Week 3: Routes, Templates (pending)
- * - Week 4: Integration & Testing (pending)
+ * - Week 3: Routes, Templates (COMPLETED ✓)
+ * - Week 4: Integration & Testing (COMPLETED ✓)
+ *
+ * Test Coverage:
+ * - Utilities: 48 tests (sanitize, query-filter, metrics)
+ * - Middleware: 51 tests (auth, logging, security, performance)
+ * - Total: 99 tests passing
  */
 
-declare const VERSION = "1.0.0-alpha.2";
+declare const VERSION = "1.0.0-alpha.4";
 
 export { type Bindings, type SonicJSApp, type SonicJSConfig, VERSION, type Variables, createDb, createSonicJSApp, setupCoreMiddleware, setupCoreRoutes };

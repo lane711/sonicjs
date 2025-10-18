@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { html } from 'hono/html'
-import { getLogger, type LogLevel, type LogCategory, type LogFilter } from '../services/logger'
+import { getLogger, type LogLevel, type LogCategory, type LogFilter } from '@sonicjs-cms/core'
 import { renderLogsListPage, type LogsListPageData } from '../templates/pages/admin-logs-list.template'
 import { renderLogDetailsPage, type LogDetailsPageData } from '../templates/pages/admin-log-details.template'
 import { renderLogConfigPage, type LogConfigPageData } from '../templates/pages/admin-log-config.template'

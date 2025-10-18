@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { PermissionManager, Permission, UserPermissions } from '../middleware/permissions'
+import { PermissionManager, Permission, UserPermissions } from '@sonicjs-cms/core'
 
 // Helper to create mock D1Database
 const createMockDb = () => ({

@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { requireAuth } from '../middleware/auth'
+import { requireAuth } from '@sonicjs-cms/core'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
 
 type Bindings = {

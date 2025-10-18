@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { nanoid } from 'nanoid'
-import { requireAuth } from '../middleware/auth'
+import { requireAuth } from '@sonicjs-cms/core'
 import { getCacheService, CACHE_CONFIGS, emitEvent } from '../plugins/cache'
 
 type Bindings = {

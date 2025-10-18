@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 // import { MediaStorage, FileMetadata, MEDIA_CONFIG, MEDIA_FOLDERS, getMediaConfigByType } from '../media/storage'
-import { requireAuth, requireRole } from '../middleware/auth'
+import { requireAuth, requireRole } from '@sonicjs-cms/core'
 import { 
   R2StorageManager, 
   CloudflareImagesManager,

@@ -28,11 +28,11 @@ import { createWorkflowRoutes } from './plugins/available/workflow-plugin/routes
 import { createWorkflowAdminRoutes } from './plugins/available/workflow-plugin/admin-routes'
 // Cache plugin routes
 import cacheRoutes from './plugins/cache/routes'
-import { requireAuth, requireRole, optionalAuth } from './middleware/auth'
-import { requireActivePlugin } from './middleware/plugin-middleware'
-import { bootstrapMiddleware } from './middleware/bootstrap'
-import { loggingMiddleware, securityLoggingMiddleware, performanceLoggingMiddleware } from './middleware/logging'
-import { compressionMiddleware, securityHeaders, cacheHeaders } from './middleware/performance'
+import { requireAuth, requireRole, optionalAuth } from '@sonicjs-cms/core'
+import { requireActivePlugin } from '@sonicjs-cms/core'
+import { bootstrapMiddleware } from '@sonicjs-cms/core'
+import { loggingMiddleware, securityLoggingMiddleware, performanceLoggingMiddleware } from '@sonicjs-cms/core'
+import { compressionMiddleware, securityHeaders, cacheHeaders } from '@sonicjs-cms/core'
 import packageJson from '../package.json'
 
 // Store app version globally at startup (not exported to avoid Wrangler treating it as a binding)
@@ -91,7 +91,7 @@ app.use('*', async (c, next) => {
                       !path.includes('/admin/api/system-status')
 
   if (shouldTrack) {
-    const { metricsTracker } = await import('./utils/metrics')
+    const { metricsTracker } = await import('@sonicjs-cms/core')
     metricsTracker.recordRequest()
   }
   await next()
@@ -338,7 +338,7 @@ app.onError(async (err, c) => {
   
   // Log the error using our logging system
   try {
-    const { getLogger } = await import('./services/logger')
+    const { getLogger } = await import('@sonicjs-cms/core')
     const logger = getLogger(c.env.DB)
     const user = c.get('user')
     

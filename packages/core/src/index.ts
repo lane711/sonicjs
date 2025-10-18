@@ -7,8 +7,13 @@
  * Phase 2 Migration Status:
  * - Week 1: Types, Utils, Database (COMPLETED ✓)
  * - Week 2: Services, Middleware, Plugins (COMPLETED ✓)
- * - Week 3: Routes, Templates (pending)
- * - Week 4: Integration & Testing (pending)
+ * - Week 3: Routes, Templates (COMPLETED ✓)
+ * - Week 4: Integration & Testing (COMPLETED ✓)
+ *
+ * Test Coverage:
+ * - Utilities: 48 tests (sanitize, query-filter, metrics)
+ * - Middleware: 51 tests (auth, logging, security, performance)
+ * - Total: 99 tests passing
  */
 
 // ============================================================================
@@ -94,11 +99,39 @@ export {
   PluginValidator as PluginValidatorClass,
 } from './plugins'
 
-// Routes - Week 3
-// export { apiRoutes, adminRoutes, authRoutes } from './routes'
+// Routes - Week 3 (COMPLETED)
+export { ROUTES_INFO } from './routes'
 
-// Templates - Week 3
-// export { renderDashboard } from './templates'
+// Templates - Week 3 (COMPLETED)
+export {
+  // Form templates
+  renderForm,
+  renderFormField,
+  // Table templates
+  renderTable,
+  // Pagination templates
+  renderPagination,
+  // Alert templates
+  renderAlert,
+  // Confirmation dialog templates
+  renderConfirmationDialog,
+  getConfirmationDialogScript,
+  // Filter bar templates
+  renderFilterBar,
+} from './templates'
+
+export type {
+  FormField,
+  FormData,
+  TableColumn,
+  TableData,
+  PaginationData,
+  AlertData,
+  ConfirmationDialogOptions,
+  FilterBarData,
+  Filter,
+  FilterOption,
+} from './templates'
 
 // Types - Week 1 (COMPLETED)
 export type {
@@ -246,7 +279,7 @@ export type {
 // Version
 // ============================================================================
 
-export const VERSION = '1.0.0-alpha.2'
+export const VERSION = '1.0.0-alpha.4'
 
 // ============================================================================
 // Phase 2 Migration Notes

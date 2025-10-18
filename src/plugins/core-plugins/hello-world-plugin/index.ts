@@ -7,7 +7,7 @@
 import { Hono } from 'hono'
 import { html } from 'hono/html'
 import { PluginBuilder } from '../../sdk/plugin-builder'
-import type { Plugin } from '../../types'
+import type { Plugin } from '@sonicjs-cms/core'
 
 export function createHelloWorldPlugin(): Plugin {
   const builder = PluginBuilder.create({

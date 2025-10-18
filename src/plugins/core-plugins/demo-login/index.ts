@@ -1,5 +1,5 @@
 import { PluginBuilder } from '../../sdk/plugin-builder'
-import type { Plugin, PluginContext, HookHandler } from '../../types'
+import type { Plugin, PluginContext, HookHandler } from '@sonicjs-cms/core'
 
 /**
  * Demo Login Plugin

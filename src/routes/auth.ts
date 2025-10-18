@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { setCookie } from 'hono/cookie'
 import { html } from 'hono/html'
-import { AuthManager, requireAuth } from '../middleware/auth'
+import { AuthManager, requireAuth } from '@sonicjs-cms/core'
 import { renderLoginPage, LoginPageData } from '../templates/pages/auth-login.template'
 import { renderRegisterPage, RegisterPageData } from '../templates/pages/auth-register.template'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
@@ -854,7 +854,7 @@ authRoutes.post('/accept-invitation', async (c) => {
 
     // Log the activity (need to import logActivity)
     try {
-      const { logActivity } = await import('../middleware/permissions')
+      const { logActivity } = await import('@sonicjs-cms/core')
       await logActivity(
         db, invitedUser.id, 'user.invitation_accepted', 'users', invitedUser.id,
         { email: invitedUser.email, username },
@@ -929,7 +929,7 @@ authRoutes.post('/request-password-reset', async (c) => {
 
     // Log the activity
     try {
-      const { logActivity } = await import('../middleware/permissions')
+      const { logActivity } = await import('@sonicjs-cms/core')
       await logActivity(
         db, user.id, 'user.password_reset_requested', 'users', user.id,
         { email },
@@ -1178,7 +1178,7 @@ authRoutes.post('/reset-password', async (c) => {
 
     // Log the activity
     try {
-      const { logActivity } = await import('../middleware/permissions')
+      const { logActivity } = await import('@sonicjs-cms/core')
       await logActivity(
         db, user.id, 'user.password_reset_completed', 'users', user.id,
         { email: user.email },

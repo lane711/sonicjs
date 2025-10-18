@@ -1,6 +1,6 @@
 import { html } from 'hono/html'
 import { adminLayoutV2 } from '../layouts/admin-layout-v2.template'
-import { LogConfig } from '../../db/schema'
+import { LogConfig } from '@sonicjs-cms/core'
 
 interface BaseUser {
   name: string

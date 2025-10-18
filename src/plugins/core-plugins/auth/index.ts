@@ -6,7 +6,7 @@
 
 import { Hono } from 'hono'
 import { PluginBuilder } from '../../sdk/plugin-builder'
-import { Plugin, HOOKS } from '../../types'
+import { Plugin, HOOKS } from '@sonicjs-cms/core'
 
 export function createAuthPlugin(): Plugin {
   const builder = PluginBuilder.create({

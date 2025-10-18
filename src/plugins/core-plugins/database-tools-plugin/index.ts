@@ -1,5 +1,5 @@
 import { PluginBuilder } from '../../sdk/plugin-builder'
-import { Plugin } from '../../types'
+import { Plugin } from '@sonicjs-cms/core'
 import { createDatabaseToolsAdminRoutes } from './admin-routes'
 import { DatabaseToolsService } from './services/database-service'
 

@@ -5,7 +5,7 @@
  */
 
 import { z } from 'zod'
-import { PluginConfig } from '../types'
+import { PluginConfig } from '@sonicjs-cms/core'
 
 // Configuration schema for plugin settings
 const PluginConfigSchema = z.object({

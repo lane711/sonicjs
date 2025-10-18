@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { Plugin } from '../../types'
+import { Plugin } from '@sonicjs-cms/core'
 import { PluginBuilder } from '../../sdk/plugin-builder'
 import { workflowMigration } from './migrations'
 import { createWorkflowRoutes } from './routes'

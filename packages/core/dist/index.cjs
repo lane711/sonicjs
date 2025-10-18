@@ -3,6 +3,8 @@
 require('./chunk-ALTMI5Y2.cjs');
 var chunk24PWAFUT_cjs = require('./chunk-24PWAFUT.cjs');
 var chunkWJ7QYVR2_cjs = require('./chunk-WJ7QYVR2.cjs');
+var chunkBOLQHE4J_cjs = require('./chunk-BOLQHE4J.cjs');
+var chunkBRC3F4CG_cjs = require('./chunk-BRC3F4CG.cjs');
 var chunkL3NXO7Y4_cjs = require('./chunk-L3NXO7Y4.cjs');
 var chunkRGCQSFKC_cjs = require('./chunk-RGCQSFKC.cjs');
 var chunkKYGRJCZM_cjs = require('./chunk-KYGRJCZM.cjs');
@@ -70,7 +72,7 @@ function createDb(d1$1) {
 }
 
 // src/index.ts
-var VERSION = "1.0.0-alpha.2";
+var VERSION = "1.0.0-alpha.4";
 
 Object.defineProperty(exports, "AuthManager", {
   enumerable: true,
@@ -367,6 +369,42 @@ Object.defineProperty(exports, "validateCollectionConfig", {
 Object.defineProperty(exports, "workflowHistory", {
   enumerable: true,
   get: function () { return chunkWJ7QYVR2_cjs.workflowHistory; }
+});
+Object.defineProperty(exports, "ROUTES_INFO", {
+  enumerable: true,
+  get: function () { return chunkBOLQHE4J_cjs.ROUTES_INFO; }
+});
+Object.defineProperty(exports, "getConfirmationDialogScript", {
+  enumerable: true,
+  get: function () { return chunkBRC3F4CG_cjs.getConfirmationDialogScript; }
+});
+Object.defineProperty(exports, "renderAlert", {
+  enumerable: true,
+  get: function () { return chunkBRC3F4CG_cjs.renderAlert; }
+});
+Object.defineProperty(exports, "renderConfirmationDialog", {
+  enumerable: true,
+  get: function () { return chunkBRC3F4CG_cjs.renderConfirmationDialog; }
+});
+Object.defineProperty(exports, "renderFilterBar", {
+  enumerable: true,
+  get: function () { return chunkBRC3F4CG_cjs.renderFilterBar; }
+});
+Object.defineProperty(exports, "renderForm", {
+  enumerable: true,
+  get: function () { return chunkBRC3F4CG_cjs.renderForm; }
+});
+Object.defineProperty(exports, "renderFormField", {
+  enumerable: true,
+  get: function () { return chunkBRC3F4CG_cjs.renderFormField; }
+});
+Object.defineProperty(exports, "renderPagination", {
+  enumerable: true,
+  get: function () { return chunkBRC3F4CG_cjs.renderPagination; }
+});
+Object.defineProperty(exports, "renderTable", {
+  enumerable: true,
+  get: function () { return chunkBRC3F4CG_cjs.renderTable; }
 });
 Object.defineProperty(exports, "HookSystemImpl", {
   enumerable: true,

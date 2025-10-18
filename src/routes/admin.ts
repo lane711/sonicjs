@@ -14,7 +14,7 @@ import { adminLogsRoutes } from './admin-logs'
 import { MigrationService } from '../services/migrations'
 import { createDatabaseToolsAdminRoutes } from '../plugins/core-plugins/database-tools-plugin/admin-routes'
 import { createSeedDataAdminRoutes } from '../plugins/core-plugins/seed-data-plugin/admin-routes'
-import { getActivePlugins } from '../middleware/plugin-middleware'
+import { getActivePlugins } from '@sonicjs-cms/core'
 
 type Bindings = {
   DB: D1Database
@@ -322,7 +322,7 @@ adminRoutes.get('/api/storage', async (c) => {
 // Metrics endpoint for real-time analytics
 adminRoutes.get('/api/metrics', async (c) => {
   try {
-    const { metricsTracker } = await import('../utils/metrics')
+    const { metricsTracker } = await import('@sonicjs-cms/core')
 
     const metrics = {
       requestsPerSecond: metricsTracker.getRequestsPerSecond(),

@@ -5,7 +5,7 @@ import { z } from 'zod'
 // import { ContentWorkflow, ContentStatus, WorkflowAction } from '../plugins/core-plugins/workflow-plugin/services/content-workflow'
 // import { ContentVersioning } from '../content/versioning'
 // import { RichTextProcessor } from '../content/rich-text'
-import { requireAuth, requireRole } from '../middleware/auth'
+import { requireAuth, requireRole } from '@sonicjs-cms/core'
 
 type Bindings = {
   DB: D1Database

@@ -3,7 +3,7 @@ import { html } from 'hono/html'
 import { renderContentFormPage, ContentFormData } from '../templates/pages/admin-content-form.template'
 import { renderContentListPage, ContentListPageData } from '../templates/pages/admin-content-list.template'
 import { renderVersionHistory, VersionHistoryData, ContentVersion } from '../templates/components/version-history.template'
-import { isPluginActive } from '../middleware/plugin-middleware'
+import { isPluginActive } from '@sonicjs-cms/core'
 import { getCacheService, CACHE_CONFIGS } from '../plugins/cache'
 
 type Bindings = {

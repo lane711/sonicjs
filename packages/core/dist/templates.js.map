@@ -1,1 +1,1 @@
-{"version":3,"sources":["../src/templates/index.ts"],"names":[],"mappings":";;;AAOO,IAAM,WAAA,GAAc","file":"templates.js","sourcesContent":["/**\n * Templates Module Exports\n *\n * UI templates for admin interface\n */\n\n// Placeholder - will be populated in Phase 2 Week 3\nexport const placeholder = 'templates'\n"]}
+{"version":3,"sources":[],"names":[],"mappings":"","file":"templates.js"}

@@ -1,8 +1,4 @@
+export { getConfirmationDialogScript, renderAlert, renderConfirmationDialog, renderFilterBar, renderForm, renderFormField, renderPagination, renderTable } from './chunk-KRJMGD4E.js';
 import './chunk-G3PMV62Z.js';
-
-// src/templates/index.ts
-var placeholder = "templates";
-
-export { placeholder };
 //# sourceMappingURL=templates.js.map
 //# sourceMappingURL=templates.js.map

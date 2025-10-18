@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
-import { Plugin } from '../../types'
+import { Plugin } from '@sonicjs-cms/core'
 import { PluginBuilder, PluginHelpers } from '../../sdk/plugin-builder'
 
 const testimonialSchema = z.object({

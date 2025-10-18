@@ -1,5 +1,5 @@
 import { PluginBuilder } from '../../sdk/plugin-builder'
-import { Plugin } from '../../types'
+import { Plugin } from '@sonicjs-cms/core'
 import { createSeedDataAdminRoutes } from './admin-routes'
 import { SeedDataService } from './services/seed-data-service'
 

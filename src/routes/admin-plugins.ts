@@ -2,8 +2,8 @@ import { Hono } from 'hono'
 import type { D1Database, KVNamespace } from '@cloudflare/workers-types'
 import { renderPluginsListPage, PluginsListPageData, Plugin } from '../templates/pages/admin-plugins-list.template'
 import { renderPluginSettingsPage, PluginSettingsPageData } from '../templates/pages/admin-plugin-settings.template'
-import { PluginService } from '../services/plugin-service'
-import { PermissionManager } from '../middleware/permissions'
+import { PluginServiceClass as PluginService } from '@sonicjs-cms/core'
+import { PermissionManager } from '@sonicjs-cms/core'
 import { authValidationService } from '../services/auth-validation'
 
 type Bindings = {

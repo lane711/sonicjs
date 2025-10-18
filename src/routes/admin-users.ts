@@ -1,14 +1,14 @@
 import { Hono } from 'hono'
-import { requireAuth } from '../middleware/auth'
-import { requirePermission, logActivity, PermissionManager } from '../middleware/permissions'
+import { requireAuth } from '@sonicjs-cms/core'
+import { requirePermission, logActivity, PermissionManager } from '@sonicjs-cms/core'
 import { renderProfilePage, UserProfile, ProfilePageData } from '../templates/pages/admin-profile.template'
 import { renderAlert } from '../templates/components/alert.template'
-import { AuthManager } from '../middleware/auth'
+import { AuthManager } from '@sonicjs-cms/core'
 import { renderActivityLogsPage, ActivityLogsPageData, ActivityLog } from '../templates/pages/admin-activity-logs.template'
 import { renderUserEditPage, UserEditPageData, UserEditData } from '../templates/pages/admin-user-edit.template'
 import { renderUserNewPage, UserNewPageData } from '../templates/pages/admin-user-new.template'
 import { renderUsersListPage, UsersListPageData, User } from '../templates/pages/admin-users-list.template'
-import { sanitizeInput } from '../utils/sanitize'
+import { sanitizeInput } from '@sonicjs-cms/core'
 
 type Bindings = {
   DB: D1Database

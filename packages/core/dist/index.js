@@ -2,6 +2,8 @@ import './chunk-4URGXJP7.js';
 export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware } from './chunk-PTQZ5FEI.js';
 import { schema_exports } from './chunk-CXZDAR6S.js';
 export { Logger, MigrationService, PluginBootstrapService, PluginService as PluginServiceClass, apiTokens, cleanupRemovedCollections, collections, content, contentVersions, fullCollectionSync, getAvailableCollectionNames, getLogger, getManagedCollections, initLogger, insertCollectionSchema, insertContentSchema, insertLogConfigSchema, insertMediaSchema, insertPluginActivityLogSchema, insertPluginAssetSchema, insertPluginHookSchema, insertPluginRouteSchema, insertPluginSchema, insertSystemLogSchema, insertUserSchema, insertWorkflowHistorySchema, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, logConfig, media, pluginActivityLog, pluginAssets, pluginHooks, pluginRoutes, plugins, selectCollectionSchema, selectContentSchema, selectLogConfigSchema, selectMediaSchema, selectPluginActivityLogSchema, selectPluginAssetSchema, selectPluginHookSchema, selectPluginRouteSchema, selectPluginSchema, selectSystemLogSchema, selectUserSchema, selectWorkflowHistorySchema, syncCollection, syncCollections, systemLogs, users, validateCollectionConfig, workflowHistory } from './chunk-CXZDAR6S.js';
+export { ROUTES_INFO } from './chunk-HD7R6T6I.js';
+export { getConfirmationDialogScript, renderAlert, renderConfirmationDialog, renderFilterBar, renderForm, renderFormField, renderPagination, renderTable } from './chunk-KRJMGD4E.js';
 export { HookSystemImpl, HookUtils, PluginManager as PluginManagerClass, PluginRegistryImpl, PluginValidator as PluginValidatorClass, ScopedHookSystem as ScopedHookSystemClass } from './chunk-NRSL6BQI.js';
 export { QueryFilterBuilder, TemplateRenderer, buildQuery, escapeHtml, metricsTracker, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer } from './chunk-JIINOD2W.js';
 export { HOOKS } from './chunk-LOUJRBXV.js';
@@ -69,7 +71,7 @@ function createDb(d1) {
 }
 
 // src/index.ts
-var VERSION = "1.0.0-alpha.2";
+var VERSION = "1.0.0-alpha.4";
 
 export { VERSION, createDb, createSonicJSApp, setupCoreMiddleware, setupCoreRoutes };
 //# sourceMappingURL=index.js.map

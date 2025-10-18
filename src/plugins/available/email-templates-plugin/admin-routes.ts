@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import { requireAuth, requireRole } from '../../../middleware/auth';
+import { requireAuth, requireRole } from '@sonicjs-cms/core';
 import { createEmailManagementService } from './services/email-management';
 import { createEmailService } from './services/email';
 import { EmailTemplateRenderer } from './services/email-renderer';
