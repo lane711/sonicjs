@@ -82,7 +82,7 @@ Details of our performance benchmark can be found at SonicJs.com. Here is a part
    ![Admin UI](https://sonicjs.com/images/sonicJs-admin-ui.png)
 
 ## Need Help?
-1. Reach out on [Disocrd](https://discord.gg/8bMy6bv3sZ)
+1. Reach out on [Discord](https://discord.gg/8bMy6bv3sZ)
 2. Open a [ticket in Github](https://github.com/lane711/sonicjs/issues)
 
 
