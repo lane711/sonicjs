@@ -1,16 +1,20 @@
 /**
  * Routes Module Exports
  *
- * Note: HTTP routes are application-specific and should be implemented
- * in the consuming application rather than in the core package.
- *
- * The core package provides the building blocks (middleware, services, types)
- * but each application should define its own routes based on its specific needs.
- *
- * For reference implementations, see the main SonicJS repository.
+ * Routes are being migrated incrementally from the monolith.
+ * Each route is refactored to remove monolith-specific dependencies.
  */
 
+// API routes
+export { default as apiRoutes } from './api'
+export { default as apiContentCrudRoutes } from './api-content-crud'
+
 export const ROUTES_INFO = {
-  message: 'Routes are application-specific - implement in your application',
+  message: 'Routes migration in progress',
+  available: [
+    'apiRoutes',
+    'apiContentCrudRoutes'
+  ],
+  status: 'Routes are being added incrementally',
   reference: 'https://github.com/sonicjs/sonicjs'
 } as const

@@ -7,6 +7,7 @@
 import { Hono } from 'hono'
 import type { Context } from 'hono'
 import type { D1Database, KVNamespace, R2Bucket } from '@cloudflare/workers-types'
+import { apiRoutes } from './routes'
 
 // ============================================================================
 // Type Definitions
@@ -146,10 +147,11 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   }
 
   // Core routes
-  // Note: Routes will be imported from routes/*
-  // This is a placeholder for the factory pattern
+  // Routes are being imported incrementally from routes/*
+  // Each route is tested and migrated one-by-one
+  app.route('/api', apiRoutes)
 
-  // Custom routes
+  // Custom routes - User-defined routes
   if (config.routes) {
     for (const route of config.routes) {
       app.route(route.path, route.handler)

@@ -1,9 +1,9 @@
 'use strict';
 
-require('./chunk-ALTMI5Y2.cjs');
+var chunkYF6OCX54_cjs = require('./chunk-YF6OCX54.cjs');
+require('./chunk-K6ZR653V.cjs');
 var chunk24PWAFUT_cjs = require('./chunk-24PWAFUT.cjs');
 var chunkWJ7QYVR2_cjs = require('./chunk-WJ7QYVR2.cjs');
-var chunkBOLQHE4J_cjs = require('./chunk-BOLQHE4J.cjs');
 var chunkBRC3F4CG_cjs = require('./chunk-BRC3F4CG.cjs');
 var chunkL3NXO7Y4_cjs = require('./chunk-L3NXO7Y4.cjs');
 var chunkRGCQSFKC_cjs = require('./chunk-RGCQSFKC.cjs');
@@ -39,6 +39,7 @@ function createSonicJSApp(config = {}) {
       app.use("*", middleware);
     }
   }
+  app.route("/api", chunkYF6OCX54_cjs.api_default);
   if (config.routes) {
     for (const route of config.routes) {
       app.route(route.path, route.handler);
@@ -74,6 +75,10 @@ function createDb(d1$1) {
 // src/index.ts
 var VERSION = "2.0.0-alpha.3";
 
+Object.defineProperty(exports, "ROUTES_INFO", {
+  enumerable: true,
+  get: function () { return chunkYF6OCX54_cjs.ROUTES_INFO; }
+});
 Object.defineProperty(exports, "AuthManager", {
   enumerable: true,
   get: function () { return chunk24PWAFUT_cjs.AuthManager; }
@@ -369,10 +374,6 @@ Object.defineProperty(exports, "validateCollectionConfig", {
 Object.defineProperty(exports, "workflowHistory", {
   enumerable: true,
   get: function () { return chunkWJ7QYVR2_cjs.workflowHistory; }
-});
-Object.defineProperty(exports, "ROUTES_INFO", {
-  enumerable: true,
-  get: function () { return chunkBOLQHE4J_cjs.ROUTES_INFO; }
 });
 Object.defineProperty(exports, "getConfirmationDialogScript", {
   enumerable: true,
