@@ -1,40 +1,49 @@
-# @sonicjs/core
+# @sonicjs-cms/core
 
-Core framework for SonicJS - A modern, TypeScript-first headless CMS built for Cloudflare's edge platform.
+> Core framework for SonicJS - A modern, TypeScript-first headless CMS built for Cloudflare's edge platform.
 
-## Features
+[![Version](https://img.shields.io/npm/v/@sonicjs-cms/core)](https://www.npmjs.com/package/@sonicjs-cms/core)
+[![License](https://img.shields.io/npm/l/@sonicjs-cms/core)](./LICENSE)
+
+## ✨ Features
 
 - 🚀 **Edge-First**: Runs on Cloudflare Workers for sub-50ms global response times
 - 📦 **Zero Cold Starts**: V8 isolates provide instant startup
-- 🔒 **Type-Safe**: Full TypeScript support with strict typing
+- 🔒 **Type-Safe**: Full TypeScript support with comprehensive type definitions
 - 🔌 **Plugin System**: Extensible architecture with hooks and middleware
 - ⚡ **Three-Tier Caching**: Memory, KV, and database layers for optimal performance
 - 🎨 **Admin Interface**: Beautiful glass morphism design system
 - 🔐 **Authentication**: JWT-based auth with role-based permissions
 - 📝 **Content Management**: Dynamic collections with versioning and workflows
-- 🖼️ **Media Management**: R2 storage with automatic CDN optimization
-- 📊 **API Documentation**: OpenAPI/Swagger with auto-generated docs
+- 🖼️ **Media Management**: R2 storage with automatic optimization
+- 🌐 **REST API**: Auto-generated endpoints for all collections
 
-## Installation
+## 📦 Installation
 
 ```bash
-npm install @sonicjs/core
+npm install @sonicjs-cms/core
 ```
 
-### Peer Dependencies
+### Required Peer Dependencies
 
 ```bash
 npm install @cloudflare/workers-types hono drizzle-orm zod
 ```
 
-## Quick Start
+### Optional Dependencies
 
-### 1. Create a new SonicJS project
+```bash
+npm install wrangler drizzle-kit  # For development
+```
+
+## 🚀 Quick Start
+
+### 1. Create Your Application
 
 ```typescript
 // src/index.ts
-import { createSonicJSApp } from '@sonicjs/core'
-import type { SonicJSConfig } from '@sonicjs/core'
+import { createSonicJSApp } from '@sonicjs-cms/core'
+import type { SonicJSConfig } from '@sonicjs-cms/core'
 
 const config: SonicJSConfig = {
   collections: {
@@ -43,243 +52,336 @@ const config: SonicJSConfig = {
   },
   plugins: {
     directory: './src/plugins',
-    autoLoad: true
+    autoLoad: false
   }
 }
 
-const app = createSonicJSApp(config)
-
-export default app
+export default createSonicJSApp(config)
 ```
 
-### 2. Define a collection
+### 2. Define Collections
 
 ```typescript
-// src/collections/posts.collection.ts
-import type { CollectionConfig } from '@sonicjs/core'
+// src/collections/blog-posts.collection.ts
+import type { CollectionConfig } from '@sonicjs-cms/core'
 
-export const postsCollection: CollectionConfig = {
-  name: 'posts',
-  fields: {
-    title: {
-      type: 'text',
-      required: true,
-      label: 'Title'
+export default {
+  name: 'blog-posts',
+  displayName: 'Blog Posts',
+  description: 'Manage your blog posts',
+
+  schema: {
+    type: 'object',
+    properties: {
+      title: {
+        type: 'string',
+        title: 'Title',
+        required: true,
+        maxLength: 200
+      },
+      content: {
+        type: 'markdown',
+        title: 'Content',
+        required: true
+      },
+      publishedAt: {
+        type: 'datetime',
+        title: 'Published Date'
+      },
+      status: {
+        type: 'select',
+        title: 'Status',
+        enum: ['draft', 'published', 'archived'],
+        default: 'draft'
+      }
     },
-    content: {
-      type: 'rich_text',
-      required: true,
-      label: 'Content'
-    },
-    published: {
-      type: 'boolean',
-      default: false,
-      label: 'Published'
-    }
+    required: ['title', 'content']
   }
-}
+} satisfies CollectionConfig
 ```
 
-### 3. Run migrations
+### 3. Configure Cloudflare Workers
+
+```toml
+# wrangler.toml
+name = "my-sonicjs-app"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "my-sonicjs-db"
+database_id = "your-database-id"
+migrations_dir = "./node_modules/@sonicjs-cms/core/migrations"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "my-sonicjs-media"
+```
+
+### 4. Start Development
 
 ```bash
-npm run db:migrate
+# Run migrations
+wrangler d1 migrations apply DB --local
+
+# Start dev server
+wrangler dev
 ```
 
-### 4. Start development server
+Visit `http://localhost:8787/admin` to access the admin interface.
 
-```bash
-npm run dev
-```
+## 📚 Core Exports
 
-## Usage
-
-### Importing Core Modules
+### Main Application
 
 ```typescript
-// Main API
-import { createSonicJSApp } from '@sonicjs/core'
-import type { SonicJSConfig } from '@sonicjs/core'
+import { createSonicJSApp } from '@sonicjs-cms/core'
+import type { SonicJSConfig, SonicJSApp, Bindings, Variables } from '@sonicjs-cms/core'
+```
 
-// Services
-import { CollectionService, MigrationService } from '@sonicjs/core/services'
+### Services
 
-// Middleware
-import { requireAuth, requireRole } from '@sonicjs/core/middleware'
+```typescript
+import {
+  loadCollectionConfigs,
+  syncCollections,
+  MigrationService,
+  Logger,
+  PluginService
+} from '@sonicjs-cms/core'
+```
 
-// Types
+### Middleware
+
+```typescript
+import {
+  requireAuth,
+  requireRole,
+  requirePermission,
+  loggingMiddleware,
+  cacheHeaders,
+  securityHeaders
+} from '@sonicjs-cms/core'
+```
+
+### Types
+
+```typescript
 import type {
   CollectionConfig,
-  PluginConfig,
+  FieldConfig,
+  Plugin,
+  PluginContext,
   User,
-  Bindings
-} from '@sonicjs/core'
-
-// Utilities
-import { validators, templateRenderer } from '@sonicjs/core/utils'
+  Content,
+  Media
+} from '@sonicjs-cms/core'
 ```
+
+### Templates
+
+```typescript
+import {
+  renderForm,
+  renderTable,
+  renderPagination,
+  renderAlert
+} from '@sonicjs-cms/core'
+```
+
+### Utilities
+
+```typescript
+import {
+  sanitizeInput,
+  TemplateRenderer,
+  QueryFilterBuilder,
+  metricsTracker
+} from '@sonicjs-cms/core'
+```
+
+### Database
+
+```typescript
+import {
+  createDb,
+  users,
+  collections,
+  content,
+  media
+} from '@sonicjs-cms/core'
+```
+
+## 🔌 Subpath Exports
+
+The package provides organized subpath exports:
+
+```typescript
+// Services only
+import { MigrationService } from '@sonicjs-cms/core/services'
+
+// Middleware only
+import { requireAuth } from '@sonicjs-cms/core/middleware'
+
+// Types only
+import type { CollectionConfig } from '@sonicjs-cms/core/types'
+
+// Templates only
+import { renderForm } from '@sonicjs-cms/core/templates'
+
+// Utilities only
+import { sanitizeInput } from '@sonicjs-cms/core/utils'
+
+// Plugins only
+import { HookSystemImpl } from '@sonicjs-cms/core/plugins'
+```
+
+## 🎯 Usage Examples
 
 ### Custom Routes
 
 ```typescript
 import { Hono } from 'hono'
-import { requireAuth } from '@sonicjs/core/middleware'
-import type { Bindings } from '@sonicjs/core'
+import { requireAuth } from '@sonicjs-cms/core/middleware'
+import type { Bindings } from '@sonicjs-cms/core'
 
-export const customRoutes = new Hono<{ Bindings: Bindings }>()
+const customRoutes = new Hono<{ Bindings: Bindings }>()
 
-customRoutes.get('/custom', requireAuth(), async (c) => {
-  return c.json({ message: 'Custom route' })
+customRoutes.get('/api/custom', requireAuth(), async (c) => {
+  const db = c.env.DB
+  // Your custom logic
+  return c.json({ message: 'Custom endpoint' })
+})
+
+// In your app config
+export default createSonicJSApp({
+  routes: [{ path: '/custom', handler: customRoutes }]
 })
 ```
 
-### Custom Plugins
+### Custom Plugin
 
 ```typescript
-import type { Plugin } from '@sonicjs/core/plugins'
+import type { Plugin } from '@sonicjs-cms/core'
 
-export class MyPlugin implements Plugin {
-  name = 'my-plugin'
-  version = '1.0.0'
-  description = 'My custom plugin'
+export default {
+  name: 'my-plugin',
+  version: '1.0.0',
+  description: 'My custom plugin',
 
   async onActivate() {
     console.log('Plugin activated!')
-  }
+  },
 
-  hooks = {
+  hooks: {
     'content.beforeSave': async (content) => {
-      // Modify content before saving
+      // Transform content before saving
+      content.metadata = { modified: new Date() }
       return content
     }
   }
-}
+} satisfies Plugin
 ```
 
-## Configuration
-
-### SonicJS Config
+### Accessing Services
 
 ```typescript
-interface SonicJSConfig {
-  // Collections configuration
-  collections?: {
-    directory: string
-    autoSync: boolean
-  }
+import { Logger, MigrationService } from '@sonicjs-cms/core'
 
-  // Plugins configuration
-  plugins?: {
-    directory: string
-    autoLoad: boolean
-  }
+const logger = new Logger({ category: 'custom', level: 'info' })
+logger.info('Application started')
 
-  // Custom routes
-  routes?: Array<{
-    path: string
-    handler: Hono
-  }>
-
-  // Custom middleware
-  middleware?: {
-    beforeAuth?: Array<MiddlewareHandler>
-    afterAuth?: Array<MiddlewareHandler>
-  }
-}
+const migrationService = new MigrationService(db)
+await migrationService.runAllMigrations()
 ```
 
-## API Reference
+## 🏗️ Architecture
 
-### Services
+```
+@sonicjs-cms/core
+├── src/
+│   ├── app.ts              # Application factory
+│   ├── db/                 # Database schemas & utilities
+│   ├── services/           # Business logic
+│   ├── middleware/         # Request processing
+│   ├── routes/             # HTTP handlers
+│   ├── templates/          # Admin UI components
+│   ├── plugins/            # Plugin system & core plugins
+│   ├── types/              # TypeScript definitions
+│   └── utils/              # Utility functions
+├── migrations/             # Core database migrations
+└── dist/                   # Compiled output
+```
 
-- **CollectionService**: Load and manage collections
-- **MigrationService**: Database migration management
-- **PluginService**: Plugin lifecycle management
-- **Logger**: Structured logging system
+## 🔄 Versioning
 
-### Middleware
+SonicJS follows semantic versioning:
 
-- **requireAuth()**: Require authentication
-- **requireRole(roles)**: Require specific roles
-- **requirePermission(permission)**: Require specific permission
-- **bootstrapMiddleware()**: Initialize application
+- **v2.x.x** - Current npm package (core extracted)
+- **v1.x.x** - Legacy monolith (deprecated)
 
-### Routes
+**Current Version**: `2.0.0-alpha.1`
 
-- **apiRoutes**: Public API endpoints
-- **adminRoutes**: Admin dashboard routes
-- **authRoutes**: Authentication routes
-
-## Migration from Standalone
-
-If you're migrating from a standalone SonicJS project:
+### Upgrade Path
 
 ```bash
-# 1. Install core package
-npm install @sonicjs/core
+# Install the new package
+npm install @sonicjs-cms/core@2.0.0-alpha.1
 
-# 2. Run migration tool
-npx @sonicjs/migrate --from=current --to=1.0.0
+# Run any new migrations
+wrangler d1 migrations apply DB
 
-# 3. Update src/index.ts with new config API
-# 4. Run database migrations
-npm run db:migrate
-
-# 5. Test
+# Test your application
 npm run dev
 ```
 
-See [Migration Guide](https://docs.sonicjs.com/migration) for detailed instructions.
+## 📖 Documentation
 
-## Documentation
+- [Getting Started](https://docs.sonicjs.com/getting-started)
+- [API Reference](https://docs.sonicjs.com/api)
+- [Collections Guide](https://docs.sonicjs.com/collections)
+- [Plugin Development](https://docs.sonicjs.com/plugins)
+- [Deployment](https://docs.sonicjs.com/deployment)
 
-- **Getting Started**: https://docs.sonicjs.com/getting-started
-- **API Reference**: https://docs.sonicjs.com/api
-- **Plugin Development**: https://docs.sonicjs.com/plugins
-- **Migration Guide**: https://docs.sonicjs.com/migration
+## 🤝 Contributing
 
-## Examples
+We welcome contributions! Please see [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
-See the [examples](../../examples) directory for complete examples:
+## 📄 License
 
-- **Basic Setup**: Simple SonicJS application
-- **Custom Plugin**: Building custom plugins
-- **API Integration**: Consuming the API
-- **Advanced Configuration**: Complex setups
+MIT © SonicJS Team - See [LICENSE](./LICENSE) for details.
 
-## Architecture
+## 💬 Support & Community
 
-```
-@sonicjs/core
-├── services/       # Business logic layer
-├── middleware/     # Request processing
-├── routes/         # HTTP handlers
-├── templates/      # Admin UI templates
-├── plugins/        # Plugin system
-├── types/          # TypeScript definitions
-├── utils/          # Utility functions
-└── migrations/     # Database migrations
-```
+- **Issues**: [GitHub Issues](https://github.com/sonicjs/sonicjs/issues)
+- **Discord**: [Join our community](https://discord.gg/sonicjs)
+- **Docs**: [docs.sonicjs.com](https://docs.sonicjs.com)
+- **Twitter**: [@sonicjscms](https://twitter.com/sonicjscms)
 
-## Contributing
+## 🔖 Resources
 
-Contributions welcome! See [CONTRIBUTING.md](../../CONTRIBUTING.md).
+- [Starter Template](../../templates/starter) - Greenfield project template
+- [Cloudflare Workers Docs](https://developers.cloudflare.com/workers/)
+- [D1 Database](https://developers.cloudflare.com/d1/)
+- [R2 Storage](https://developers.cloudflare.com/r2/)
 
-## License
+## ⚡ Performance
 
-MIT © SonicJS Team
+- Global edge deployment
+- Sub-50ms response times
+- Zero cold starts
+- Automatic scaling
+- Built-in caching
 
-## Support
+## 🛡️ Security
 
-- **GitHub Issues**: https://github.com/sonicjs/sonicjs/issues
-- **Discord**: https://discord.gg/sonicjs
-- **Documentation**: https://docs.sonicjs.com
-- **Twitter**: @sonicjscms
-
-## Changelog
-
-See [CHANGELOG.md](./CHANGELOG.md) for version history.
+- JWT authentication
+- Role-based access control (RBAC)
+- Permission system
+- Secure headers
+- Input sanitization
 
 ---
 
-**Built with ❤️ by the SonicJS Team**
+**Built with ❤️ for the edge** | v2.0.0-alpha.1

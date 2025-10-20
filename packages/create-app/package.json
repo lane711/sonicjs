@@ -1,0 +1,51 @@
+{
+  "name": "create-sonicjs",
+  "version": "2.0.0-alpha.6",
+  "description": "Create a new SonicJS application with zero configuration",
+  "type": "module",
+  "bin": {
+    "create-sonicjs": "./bin/create-sonicjs-app.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "templates/**/*",
+    "templates/starter/.gitignore"
+  ],
+  "scripts": {
+    "build": "echo 'No build needed for CLI'",
+    "test": "node test-cli.js"
+  },
+  "keywords": [
+    "sonicjs",
+    "cms",
+    "create-app",
+    "scaffolding",
+    "cloudflare",
+    "workers",
+    "edge",
+    "headless-cms"
+  ],
+  "author": "SonicJS Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sonicjs/sonicjs.git",
+    "directory": "packages/create-app"
+  },
+  "bugs": {
+    "url": "https://github.com/sonicjs/sonicjs/issues"
+  },
+  "homepage": "https://sonicjs.com",
+  "dependencies": {
+    "prompts": "^2.4.2",
+    "kleur": "^4.1.5",
+    "ora": "^8.0.1",
+    "execa": "^9.5.2",
+    "fs-extra": "^11.2.0",
+    "validate-npm-package-name": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

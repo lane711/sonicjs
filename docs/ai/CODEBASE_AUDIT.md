@@ -7,7 +7,7 @@
 ## Executive Summary
 
 The codebase consists of 211 TypeScript files totaling ~68,543 lines of code. The audit identifies:
-- **Core files** (~165 files): To be moved to `@sonicjs/core` package
+- **Core files** (~165 files): To be moved to `@sonicjs-cms/core` package
 - **User files** (~46 files): To remain in user project template
 - **17 database migrations**: To be managed separately (core vs user namespaces)
 
@@ -307,7 +307,7 @@ src/
 **Total Plugin Migrations**: 5 files
 
 **Migration Strategy**:
-- Core migrations: 001-099 (included in `@sonicjs/core`)
+- Core migrations: 001-099 (included in `@sonicjs-cms/core`)
 - User migrations: 100+ (user project)
 - Plugin migrations: Bundled with plugin packages
 
@@ -325,7 +325,7 @@ src/
 
 ### Core Package Contents
 
-**@sonicjs/core** will include:
+**@sonicjs-cms/core** will include:
 
 | Component | Files | Lines |
 |-----------|-------|-------|
@@ -425,15 +425,15 @@ import type { CollectionConfig } from '../types/collection-config'
 
 ```typescript
 // Package imports (future)
-import { requireAuth } from '@sonicjs/core/middleware'
-import { CollectionService } from '@sonicjs/core/services'
-import type { CollectionConfig } from '@sonicjs/core'
+import { requireAuth } from '@sonicjs-cms/core/middleware'
+import { CollectionService } from '@sonicjs-cms/core/services'
+import type { CollectionConfig } from '@sonicjs-cms/core'
 ```
 
 ### Import Rewrite Requirements
 
 - **~165 core files** need import path updates
-- **~46 user files** will import from `@sonicjs/core`
+- **~46 user files** will import from `@sonicjs-cms/core`
 - **Automated codemod required** for migration
 
 ## Recommendations

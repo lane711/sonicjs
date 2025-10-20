@@ -18,7 +18,7 @@ Phase 1 focuses on preparation and foundation work for extracting SonicJS core i
 5. ✅ Set up monorepo structure
 6. ✅ Configure build tooling
 7. ✅ Define public API surface
-8. ✅ Create package.json for @sonicjs/core
+8. ✅ Create package.json for @sonicjs-cms/core
 
 ## Phase 1 Tasks
 
@@ -62,7 +62,7 @@ find src/ -type f -name "*.ts" -exec wc -l {} \; | sort -rn | head -20
 **Goal**: Identify potential breaking changes in the extraction.
 
 **Categories**:
-1. **Import Path Changes**: `src/services/...` → `@sonicjs/core/services/...`
+1. **Import Path Changes**: `src/services/...` → `@sonicjs-cms/core/services/...`
 2. **API Changes**: Functions that need to be exported differently
 3. **Type Changes**: TypeScript types that need to be public
 4. **Configuration Changes**: How users configure SonicJS
@@ -78,7 +78,7 @@ find src/ -type f -name "*.ts" -exec wc -l {} \; | sort -rn | head -20
 ```
 sonicjs/
 ├── packages/
-│   ├── core/                    # @sonicjs/core package
+│   ├── core/                    # @sonicjs-cms/core package
 │   │   ├── src/                 # Core source code
 │   │   ├── migrations/          # Core migrations
 │   │   ├── package.json
@@ -140,7 +140,7 @@ export default defineConfig({
 
 ### Task 6: Public API Definition ✅
 
-**Goal**: Define what gets exported from `@sonicjs/core`.
+**Goal**: Define what gets exported from `@sonicjs-cms/core`.
 
 **Categories of Exports**:
 
@@ -188,12 +188,12 @@ export default defineConfig({
 
 ### Task 7: Package Configuration ✅
 
-**Goal**: Create proper package.json for @sonicjs/core.
+**Goal**: Create proper package.json for @sonicjs-cms/core.
 
 **Key Fields**:
 ```json
 {
-  "name": "@sonicjs/core",
+  "name": "@sonicjs-cms/core",
   "version": "1.0.0-alpha.1",
   "description": "Core framework for SonicJS headless CMS",
   "type": "module",
@@ -250,7 +250,7 @@ export default defineConfig({
 
 ## File Categorization
 
-### Core Files (Move to @sonicjs/core)
+### Core Files (Move to @sonicjs-cms/core)
 
 #### Database Layer
 - ✅ `src/db/schema.ts`
@@ -386,8 +386,8 @@ import { CollectionService } from '../services/collection-loader'
 
 **After (With Package)**:
 ```typescript
-import { requireAuth } from '@sonicjs/core/middleware'
-import { CollectionService } from '@sonicjs/core/services'
+import { requireAuth } from '@sonicjs-cms/core/middleware'
+import { CollectionService } from '@sonicjs-cms/core/services'
 ```
 
 **Migration Strategy**: Provide codemod script to automatically update imports.
@@ -405,7 +405,7 @@ app.use('*', bootstrapMiddleware())
 **After (With Package)**:
 ```typescript
 // src/index.ts
-import { createSonicJSApp } from '@sonicjs/core'
+import { createSonicJSApp } from '@sonicjs-cms/core'
 
 const app = createSonicJSApp({
   collections: './src/collections',
@@ -429,7 +429,7 @@ import type { CollectionConfig } from '../types/collection-config'
 **After (With Package)**:
 ```typescript
 // Types are public API
-import type { CollectionConfig } from '@sonicjs/core'
+import type { CollectionConfig } from '@sonicjs-cms/core'
 ```
 
 **Migration Strategy**: All types exported from main package entry point.

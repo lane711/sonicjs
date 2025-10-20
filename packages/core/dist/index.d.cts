@@ -131,6 +131,6 @@ declare function createDb(d1: D1Database): drizzle_orm_d1.DrizzleD1Database<type
  * - Total: 99 tests passing
  */
 
-declare const VERSION = "1.0.0-alpha.4";
+declare const VERSION = "2.0.0-alpha.3";
 
 export { type Bindings, type SonicJSApp, type SonicJSConfig, VERSION, type Variables, createDb, createSonicJSApp, setupCoreMiddleware, setupCoreRoutes };

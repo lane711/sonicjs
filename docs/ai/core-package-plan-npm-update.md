@@ -20,7 +20,7 @@ Developers must clone entire repository and manually manage core updates.
 
 ```bash
 # Future workflow - clean and simple
-npm update @sonicjs/core
+npm update @sonicjs-cms/core
 
 # Check what changed
 npm run sonicjs changelog
@@ -41,16 +41,16 @@ npm run deploy
 - ✅ Core updates via standard npm workflow
 - ✅ Clear separation: core vs custom code
 - ✅ Semantic versioning for predictable updates
-- ✅ Easy rollback: `npm install @sonicjs/core@1.2.3`
+- ✅ Easy rollback: `npm install @sonicjs-cms/core@1.2.3`
 - ✅ Automated migration scripts
 - ✅ Test compatibility before deploying
 
 ## Package Architecture
 
-### Core Package: `@sonicjs/core`
+### Core Package: `@sonicjs-cms/core`
 
 ```
-@sonicjs/core/
+@sonicjs-cms/core/
 ├── package.json                 # Published to npm
 ├── dist/                        # Compiled for distribution
 │   ├── index.js                # Main entry point
@@ -70,10 +70,10 @@ npm run deploy
 
 ```
 my-sonicjs-project/
-├── package.json                 # Depends on @sonicjs/core
+├── package.json                 # Depends on @sonicjs-cms/core
 │   {
 │     "dependencies": {
-│       "@sonicjs/core": "^1.2.3"
+│       "@sonicjs-cms/core": "^1.2.3"
 │     }
 │   }
 ├── src/
@@ -101,7 +101,7 @@ my-sonicjs-project/
 Following strict semantic versioning (MAJOR.MINOR.PATCH):
 
 ```
-@sonicjs/core@1.2.3
+@sonicjs-cms/core@1.2.3
               │ │ │
               │ │ └─ PATCH: Bug fixes (safe to update)
               │ └─── MINOR: New features (backward compatible)
@@ -117,7 +117,7 @@ Following strict semantic versioning (MAJOR.MINOR.PATCH):
 - Auto-update safe
 
 ```bash
-npm update @sonicjs/core
+npm update @sonicjs-cms/core
 # No migration needed, just restart
 npm run dev
 ```
@@ -129,7 +129,7 @@ npm run dev
 - Safe to update
 
 ```bash
-npm update @sonicjs/core
+npm update @sonicjs-cms/core
 npm run db:migrate    # Apply new optional features
 npm run dev
 ```
@@ -142,10 +142,10 @@ npm run dev
 
 ```bash
 # Read changelog first!
-npm info @sonicjs/core@2.0.0
+npm info @sonicjs-cms/core@2.0.0
 
 # Update when ready
-npm install @sonicjs/core@2.0.0
+npm install @sonicjs-cms/core@2.0.0
 npm run sonicjs migrate --from=1.x --to=2.0.0
 npm run test
 npm run dev
@@ -161,17 +161,17 @@ npm outdated
 
 # Output:
 # Package          Current  Wanted  Latest  Location
-# @sonicjs/core    1.2.3    1.2.5   2.0.0   my-project
+# @sonicjs-cms/core    1.2.3    1.2.5   2.0.0   my-project
 
 # View changelog for specific version
-npm show @sonicjs/core@1.2.5 changelog
+npm show @sonicjs-cms/core@1.2.5 changelog
 ```
 
 ### 2. Safe Update (Patch/Minor)
 
 ```bash
 # Update to latest compatible version
-npm update @sonicjs/core
+npm update @sonicjs-cms/core
 
 # This updates within your semver range:
 # ^1.2.3 → updates to latest 1.x.x
@@ -194,10 +194,10 @@ npm run dev
 wrangler d1 backup DB
 
 # 2. Review breaking changes
-npm show @sonicjs/core@2.0.0
+npm show @sonicjs-cms/core@2.0.0
 
 # 3. Install new major version
-npm install @sonicjs/core@2.0.0
+npm install @sonicjs-cms/core@2.0.0
 
 # 4. Run database migrations
 npm run db:migrate
@@ -224,7 +224,7 @@ npm run deploy:production
 # If something breaks after update, rollback:
 
 # 1. Reinstall previous version
-npm install @sonicjs/core@1.2.3
+npm install @sonicjs-cms/core@1.2.3
 
 # 2. Restore database (if migrations ran)
 wrangler d1 restore DB --backup=<backup-id>
@@ -243,8 +243,8 @@ npm run dev
 
 ```sql
 -- Core migrations: 001-099
--- migrations/001_initial_schema.sql (from @sonicjs/core)
--- migrations/002_add_collections.sql (from @sonicjs/core)
+-- migrations/001_initial_schema.sql (from @sonicjs-cms/core)
+-- migrations/002_add_collections.sql (from @sonicjs-cms/core)
 
 -- User migrations: 100+
 -- migrations/100_add_custom_fields.sql (in user project)
@@ -266,7 +266,7 @@ CREATE TABLE IF NOT EXISTS migrations (
 ### Automated Migration Runner
 
 ```typescript
-// From @sonicjs/core
+// From @sonicjs-cms/core
 export class MigrationManager {
   async runAllMigrations() {
     // 1. Run core migrations first
@@ -400,7 +400,7 @@ Breaking changes are clearly documented in changelog with upgrade notes:
 
 ### Upgrade Instructions
 
-1. Update to v2.0.0: `npm install @sonicjs/core@2.0.0`
+1. Update to v2.0.0: `npm install @sonicjs-cms/core@2.0.0`
 2. Run database migrations: `npm run db:migrate`
 3. Review breaking changes above and update your code
 4. Test your application thoroughly
@@ -411,9 +411,9 @@ Breaking changes are clearly documented in changelog with upgrade notes:
 ### Peer Dependencies
 
 ```json
-// @sonicjs/core/package.json
+// @sonicjs-cms/core/package.json
 {
-  "name": "@sonicjs/core",
+  "name": "@sonicjs-cms/core",
   "version": "2.0.0-alpha.1",
   "peerDependencies": {
     "hono": "^4.0.0",
@@ -436,7 +436,7 @@ All plugins are included in the core package, so no separate plugin versioning i
 
 ```bash
 # Install pre-release version
-npm install @sonicjs/core@2.0.0-beta.1
+npm install @sonicjs-cms/core@2.0.0-beta.1
 
 # Run full test suite
 npm run test           # Unit tests
@@ -493,7 +493,7 @@ git push --tags
 ### Build Configuration
 
 ```typescript
-// @sonicjs/core/tsup.config.ts
+// @sonicjs-cms/core/tsup.config.ts
 
 import { defineConfig } from 'tsup'
 
@@ -565,12 +565,12 @@ export default defineConfig({
 ### Update Notification System
 
 ```typescript
-// Built into @sonicjs/core
+// Built into @sonicjs-cms/core
 
 export class UpdateChecker {
   async checkForUpdates(): Promise<UpdateInfo | null> {
     const currentVersion = require('../package.json').version
-    const response = await fetch('https://registry.npmjs.org/@sonicjs/core/latest')
+    const response = await fetch('https://registry.npmjs.org/@sonicjs-cms/core/latest')
     const data = await response.json()
     const latestVersion = data.version
 
@@ -602,8 +602,8 @@ app.get('/admin', async (c) => {
 ### Installation
 
 ```bash
-# Installed with @sonicjs/core
-npm install @sonicjs/core
+# Installed with @sonicjs-cms/core
+npm install @sonicjs-cms/core
 
 # Available commands
 npx sonicjs --help
@@ -624,7 +624,7 @@ npx sonicjs check-updates
 # - Fixed authentication bug
 # - Added new field types
 #
-# To update: npm update @sonicjs/core
+# To update: npm update @sonicjs-cms/core
 
 # Update with migration
 npx sonicjs update
@@ -659,25 +659,25 @@ npx sonicjs validate
 - Extract core to separate package
 - Set up build system
 - Internal testing only
-- Tag: `@sonicjs/core@1.0.0-alpha.1`
+- Tag: `@sonicjs-cms/core@1.0.0-alpha.1`
 
 ### Phase 2: Beta (Month 2-3)
 - Public beta release
 - Early adopter testing
 - Gather feedback
-- Tag: `@sonicjs/core@1.0.0-beta.1`
+- Tag: `@sonicjs-cms/core@1.0.0-beta.1`
 
 ### Phase 3: Release Candidate (Month 4)
 - Feature freeze
 - Bug fixes only
 - Documentation finalized
-- Tag: `@sonicjs/core@1.0.0-rc.1`
+- Tag: `@sonicjs-cms/core@1.0.0-rc.1`
 
 ### Phase 4: Stable Release (Month 5)
 - Official v1.0.0 release
 - Migration guide published
 - Announcement and promotion
-- Tag: `@sonicjs/core@1.0.0`
+- Tag: `@sonicjs-cms/core@1.0.0`
 
 ### Phase 5: Ecosystem Growth (Month 6+)
 - Plugin packages published

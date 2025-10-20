@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-Extraction of SonicJS into `@sonicjs/core` package introduces **4 categories** of breaking changes affecting **~46 user project files**. All changes have clear migration paths and can be partially automated.
+Extraction of SonicJS into `@sonicjs-cms/core` package introduces **4 categories** of breaking changes affecting **~46 user project files**. All changes have clear migration paths and can be partially automated.
 
 **Breaking Change Categories**:
 1. **Import Paths** (High Impact) - All user files affected
@@ -35,11 +35,11 @@ import { renderDashboard } from '../templates/pages/admin-dashboard.template'
 ### New Import Pattern
 
 ```typescript
-// After: Package imports from @sonicjs/core
-import { requireAuth } from '@sonicjs/core/middleware'
-import { CollectionService } from '@sonicjs/core/services'
-import type { CollectionConfig } from '@sonicjs/core'
-import { renderDashboard } from '@sonicjs/core/templates'
+// After: Package imports from @sonicjs-cms/core
+import { requireAuth } from '@sonicjs-cms/core/middleware'
+import { CollectionService } from '@sonicjs-cms/core/services'
+import type { CollectionConfig } from '@sonicjs-cms/core'
+import { renderDashboard } from '@sonicjs-cms/core/templates'
 ```
 
 ### Migration Examples
@@ -63,8 +63,8 @@ customRoutes.get('/data', requireAuth(), async (c) => {
 **After** (`user-project/src/routes/custom-api.ts`):
 ```typescript
 import { Hono } from 'hono'
-import { requireAuth, requireRole } from '@sonicjs/core/middleware'
-import type { Bindings } from '@sonicjs/core'
+import { requireAuth, requireRole } from '@sonicjs-cms/core/middleware'
+import type { Bindings } from '@sonicjs-cms/core'
 
 export const customRoutes = new Hono<{ Bindings: Bindings }>()
 
@@ -95,7 +95,7 @@ export const productsCollection: CollectionConfig = {
 
 **After** (`user-project/src/collections/products.collection.ts`):
 ```typescript
-import type { CollectionConfig } from '@sonicjs/core'
+import type { CollectionConfig } from '@sonicjs-cms/core'
 
 export const productsCollection: CollectionConfig = {
   name: 'products',
@@ -130,7 +130,7 @@ export class MyCustomPlugin implements Plugin {
 
 **After** (`user-project/src/plugins/my-plugin/index.ts`):
 ```typescript
-import type { Plugin, HookSystem } from '@sonicjs/core/plugins'
+import type { Plugin, HookSystem } from '@sonicjs-cms/core/plugins'
 
 export class MyCustomPlugin implements Plugin {
   name = 'my-custom-plugin'
@@ -150,19 +150,19 @@ import { readFileSync, writeFileSync } from 'fs'
 import { globSync } from 'glob'
 
 const importMap = {
-  '../middleware/auth': '@sonicjs/core/middleware',
-  '../middleware/permissions': '@sonicjs/core/middleware',
-  '../middleware/bootstrap': '@sonicjs/core/middleware',
-  '../services/collection-loader': '@sonicjs/core/services',
-  '../services/plugin-service': '@sonicjs/core/services',
-  '../services/migrations': '@sonicjs/core/services',
-  '../types/collection-config': '@sonicjs/core',
-  '../types/plugin': '@sonicjs/core',
-  '../types': '@sonicjs/core',
-  '../plugins/types': '@sonicjs/core/plugins',
-  '../plugins/core/hook-system': '@sonicjs/core/plugins',
-  '../utils/validators': '@sonicjs/core/utils',
-  '../utils/string-utils': '@sonicjs/core/utils',
+  '../middleware/auth': '@sonicjs-cms/core/middleware',
+  '../middleware/permissions': '@sonicjs-cms/core/middleware',
+  '../middleware/bootstrap': '@sonicjs-cms/core/middleware',
+  '../services/collection-loader': '@sonicjs-cms/core/services',
+  '../services/plugin-service': '@sonicjs-cms/core/services',
+  '../services/migrations': '@sonicjs-cms/core/services',
+  '../types/collection-config': '@sonicjs-cms/core',
+  '../types/plugin': '@sonicjs-cms/core',
+  '../types': '@sonicjs-cms/core',
+  '../plugins/types': '@sonicjs-cms/core/plugins',
+  '../plugins/core/hook-system': '@sonicjs-cms/core/plugins',
+  '../utils/validators': '@sonicjs-cms/core/utils',
+  '../utils/string-utils': '@sonicjs-cms/core/utils',
 }
 
 function migrateFile(filePath) {
@@ -244,8 +244,8 @@ export default app
 
 **After** (`src/index.ts`):
 ```typescript
-import { createSonicJSApp } from '@sonicjs/core'
-import type { SonicJSConfig } from '@sonicjs/core'
+import { createSonicJSApp } from '@sonicjs-cms/core'
+import type { SonicJSConfig } from '@sonicjs-cms/core'
 
 // User custom routes (optional)
 import { customRoutes } from './routes/custom-api'
@@ -300,7 +300,7 @@ export default app
 
 1. **Install core package**:
    ```bash
-   npm install @sonicjs/core@1.0.0-alpha.1
+   npm install @sonicjs-cms/core@1.0.0-alpha.1
    ```
 
 2. **Create config object**:
@@ -332,12 +332,12 @@ For gradual migration, support both patterns:
 
 ```typescript
 // Option 1: New API (recommended)
-import { createSonicJSApp } from '@sonicjs/core'
+import { createSonicJSApp } from '@sonicjs-cms/core'
 const app = createSonicJSApp(config)
 
 // Option 2: Keep existing pattern (compatibility)
 import { Hono } from 'hono'
-import { setupCoreRoutes, setupCoreMiddleware } from '@sonicjs/core'
+import { setupCoreRoutes, setupCoreMiddleware } from '@sonicjs-cms/core'
 
 const app = new Hono()
 setupCoreMiddleware(app)  // Adds bootstrap, auth, etc.
@@ -374,17 +374,17 @@ import type {
   Role,
   Bindings,
   Variables
-} from '@sonicjs/core'
+} from '@sonicjs-cms/core'
 
 // Or from specific modules
-import type { CollectionConfig } from '@sonicjs/core/types'
-import type { PluginConfig } from '@sonicjs/core/plugins'
+import type { CollectionConfig } from '@sonicjs-cms/core/types'
+import type { PluginConfig } from '@sonicjs-cms/core/plugins'
 ```
 
 ### Public Type Exports
 
 ```typescript
-// @sonicjs/core/index.ts
+// @sonicjs-cms/core/index.ts
 export type {
   // Collection types
   CollectionConfig,
@@ -425,10 +425,10 @@ export type {
 ```javascript
 // Part of migrate-imports.mjs
 const typeImportMap = {
-  "from '../types/collection-config'": "from '@sonicjs/core'",
-  "from '../types/plugin'": "from '@sonicjs/core'",
-  "from '../types/auth'": "from '@sonicjs/core'",
-  "from '../types'": "from '@sonicjs/core'"
+  "from '../types/collection-config'": "from '@sonicjs-cms/core'",
+  "from '../types/plugin'": "from '@sonicjs-cms/core'",
+  "from '../types/auth'": "from '@sonicjs-cms/core'",
+  "from '../types'": "from '@sonicjs-cms/core'"
 }
 
 // Apply transformations
@@ -456,9 +456,9 @@ migrations/
 
 **After**: Separated by namespace:
 
-**Core Package** (`@sonicjs/core/migrations/`):
+**Core Package** (`@sonicjs-cms/core/migrations/`):
 ```
-@sonicjs/core/migrations/
+@sonicjs-cms/core/migrations/
 ├── 001_initial_schema.sql
 ├── 002_collections.sql
 ├── 003_user_management.sql
@@ -512,7 +512,7 @@ for (const file of migrations) {
 **After**:
 ```typescript
 // New: Multi-source migration runner
-import { MigrationService } from '@sonicjs/core'
+import { MigrationService } from '@sonicjs-cms/core'
 
 const migrationService = new MigrationService(db)
 
@@ -539,7 +539,7 @@ await migrationService.runUserMigrations('./migrations')
 ### Migration API
 
 ```typescript
-// @sonicjs/core/services/migrations
+// @sonicjs-cms/core/services/migrations
 export class MigrationService {
   /**
    * Run migrations from core package
@@ -582,7 +582,7 @@ export class MigrationService {
 
 ### Phase 2: Package Installation (Day 1)
 ```bash
-npm install @sonicjs/core@1.0.0-alpha.1
+npm install @sonicjs-cms/core@1.0.0-alpha.1
 ```
 
 ### Phase 3: Automated Fixes (Day 1)
@@ -658,7 +658,7 @@ npx @sonicjs/migrate --fix=import-paths
 npx @sonicjs/validate
 
 # Output:
-# ✓ Core package installed (@sonicjs/core@1.0.0)
+# ✓ Core package installed (@sonicjs-cms/core@1.0.0)
 # ✓ TypeScript configured
 # ✓ Collections directory exists
 # ✓ Migrations directory exists
@@ -675,7 +675,7 @@ npx @sonicjs/validate
 npx @sonicjs/compat-check
 
 # Output:
-# Checking compatibility with @sonicjs/core@1.0.0...
+# Checking compatibility with @sonicjs-cms/core@1.0.0...
 #
 # ✓ Import paths: 43/46 files updated
 # ⚠ Configuration: src/index.ts needs manual update

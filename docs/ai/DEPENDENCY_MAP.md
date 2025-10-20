@@ -496,7 +496,7 @@ import { renderContentList } from '../templates/pages/content-list.template'  //
 
 ## Package Boundaries
 
-### Core Package (`@sonicjs/core`)
+### Core Package (`@sonicjs-cms/core`)
 
 **Includes**:
 - Tiers 0-6 (all core modules)
@@ -554,9 +554,9 @@ export {
 
 **Imports from Core**:
 ```typescript
-import { createSonicJSApp } from '@sonicjs/core'
-import type { CollectionConfig } from '@sonicjs/core'
-import { requireAuth } from '@sonicjs/core/middleware'
+import { createSonicJSApp } from '@sonicjs-cms/core'
+import type { CollectionConfig } from '@sonicjs-cms/core'
+import { requireAuth } from '@sonicjs-cms/core/middleware'
 ```
 
 ## Migration Impact Analysis
@@ -573,7 +573,7 @@ import type { CollectionConfig } from '../types/collection-config'
 
 **After Package** (package paths):
 ```typescript
-// In @sonicjs/core/routes/api.ts
+// In @sonicjs-cms/core/routes/api.ts
 import { requireAuth } from '../middleware/auth'  // Still relative (internal)
 import { ContentService } from '../services/content'  // Still relative (internal)
 import type { CollectionConfig } from '../types/collection-config'  // Still relative (internal)
@@ -582,9 +582,9 @@ import type { CollectionConfig } from '../types/collection-config'  // Still rel
 **User Project** (package imports):
 ```typescript
 // In user-project/src/index.ts
-import { createSonicJSApp } from '@sonicjs/core'
-import { requireAuth } from '@sonicjs/core/middleware'
-import type { CollectionConfig } from '@sonicjs/core'
+import { createSonicJSApp } from '@sonicjs-cms/core'
+import { requireAuth } from '@sonicjs-cms/core/middleware'
+import type { CollectionConfig } from '@sonicjs-cms/core'
 ```
 
 ### Files Requiring Import Updates
@@ -597,7 +597,7 @@ import type { CollectionConfig } from '@sonicjs/core'
 
 **Codemod Script Needed**:
 ```javascript
-// Transform: '../middleware/auth' → '@sonicjs/core/middleware'
+// Transform: '../middleware/auth' → '@sonicjs-cms/core/middleware'
 // Only in user project files, not in core package
 ```
 

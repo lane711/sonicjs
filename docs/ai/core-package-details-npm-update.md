@@ -2,9 +2,9 @@
 
 ## Executive Summary
 
-Extract core SonicJS functionality into an npm package (`@sonicjs/core`) to enable:
+Extract core SonicJS functionality into an npm package (`@sonicjs-cms/core`) to enable:
 
-- Easy upgrades via `npm update @sonicjs/core`
+- Easy upgrades via `npm update @sonicjs-cms/core`
 - Version control of core features
 - Separation of framework code from user customizations
 - Faster bug fixes and feature releases
@@ -20,10 +20,10 @@ Extract core SonicJS functionality into an npm package (`@sonicjs/core`) to enab
 
 ## Package Structure
 
-### Core Package: `@sonicjs/core`
+### Core Package: `@sonicjs-cms/core`
 
 ```
-@sonicjs/core/
+@sonicjs-cms/core/
 ├── src/
 │   ├── db/                     # Database schemas and utilities
 │   │   ├── schema.ts
@@ -90,7 +90,7 @@ my-sonicjs-site/
 │   │   └── custom.ts
 │   └── index.ts                # USER: App entry point
 ├── wrangler.toml               # USER: Cloudflare config
-├── package.json                # Depends on @sonicjs/core
+├── package.json                # Depends on @sonicjs-cms/core
 └── README.md
 ```
 
@@ -213,7 +213,7 @@ Users can enable/disable plugins via configuration.
    - Set up CI/CD for package publishing
 
 3. **Define Public API**
-   - Document exports from `@sonicjs/core`
+   - Document exports from `@sonicjs-cms/core`
    - Create TypeScript definitions
    - Version all breaking changes
 
@@ -272,7 +272,7 @@ Users can enable/disable plugins via configuration.
 
 ## Package API Design
 
-### Main Export (`@sonicjs/core`)
+### Main Export (`@sonicjs-cms/core`)
 
 ```typescript
 import {
@@ -302,7 +302,7 @@ import {
   adminRoutes,
   apiRoutes,
   authRoutes
-} from '@sonicjs/core'
+} from '@sonicjs-cms/core'
 
 // User's index.ts
 const app = createSonicJSApp({
@@ -319,7 +319,7 @@ export default app
 
 ```typescript
 // sonicjs.config.ts
-import { SonicJSConfig } from '@sonicjs/core'
+import { SonicJSConfig } from '@sonicjs-cms/core'
 
 export default {
   collections: {
@@ -375,7 +375,7 @@ npx create-sonicjs-app my-app
 
 # Or manually
 npm init
-npm install @sonicjs/core
+npm install @sonicjs-cms/core
 
 # Run migrations
 npm run db:migrate
@@ -388,7 +388,7 @@ npm run dev
 
 ```bash
 # Simple npm update
-npm update @sonicjs/core
+npm update @sonicjs-cms/core
 
 # Run any new migrations
 npm run db:migrate
@@ -424,7 +424,7 @@ Database migrations are tracked and versioned in the core package.
 
 ### For Users
 
-✅ **Easy upgrades**: `npm update @sonicjs/core`
+✅ **Easy upgrades**: `npm update @sonicjs-cms/core`
 ✅ **Stable projects**: Core changes don't affect user code
 ✅ **Better DX**: Clear separation of user vs framework code
 ✅ **Faster bug fixes**: Update package, not entire codebase
@@ -490,7 +490,7 @@ Database migrations are tracked and versioned in the core package.
 ### Core Package Testing
 
 ```typescript
-// @sonicjs/core/tests/
+// @sonicjs-cms/core/tests/
 ├── unit/
 │   ├── services/
 │   ├── middleware/

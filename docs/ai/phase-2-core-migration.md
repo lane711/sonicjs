@@ -7,7 +7,7 @@
 
 ## Week 1 Objectives
 
-Move the foundation layers to `@sonicjs/core`:
+Move the foundation layers to `@sonicjs-cms/core`:
 - ✅ Types (Tier 1) - Zero dependencies
 - ✅ Utils (Tier 2) - Depends on types only
 - ✅ Database (Tier 1) - Independent layer

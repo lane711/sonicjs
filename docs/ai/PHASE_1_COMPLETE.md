@@ -17,14 +17,14 @@ Phase 1 of the SonicJS core package extraction is **complete**. All foundation w
 
 **Key Findings**:
 - **211 TypeScript files** analyzed
-- **165 core files** (54% of codebase) to move to `@sonicjs/core`
+- **165 core files** (54% of codebase) to move to `@sonicjs-cms/core`
 - **46 user files** (9% of codebase) to stay in user template
 - **17 database migrations** identified and categorized
 - **Zero blocking issues** found
 
 **File Categorization**:
 ```
-Core Package (@sonicjs/core):
+Core Package (@sonicjs-cms/core):
 ├── Routes:      13 files,  14,956 lines
 ├── Templates:   17 files,  11,025 lines
 ├── Services:     7 files,   2,544 lines
@@ -106,7 +106,7 @@ Tier 6: Main App (entry point)
 ```
 sonicjs/
 ├── packages/
-│   └── core/                    # @sonicjs/core package
+│   └── core/                    # @sonicjs-cms/core package
 │       ├── src/
 │       │   ├── index.ts        # Main exports
 │       │   └── app.ts          # Application factory
@@ -258,7 +258,7 @@ export { PluginBuilder, HookSystem, PluginRegistry } from './plugins/sdk'
 **Deliverable**: `packages/core/package.json`
 
 **Package Details**:
-- **Name**: `@sonicjs/core`
+- **Name**: `@sonicjs-cms/core`
 - **Version**: `1.0.0-alpha.1`
 - **License**: MIT
 - **Access**: Public (npm)
@@ -394,14 +394,14 @@ export { PluginBuilder, HookSystem, PluginRegistry } from './plugins/sdk'
 
 ### Week 4: Integration & Testing
 **Tasks**:
-- [ ] Build @sonicjs/core package
+- [ ] Build @sonicjs-cms/core package
 - [ ] Create example user project
 - [ ] Integration testing
 - [ ] E2E testing
 - [ ] Performance testing
 - [ ] Documentation review
 
-**Expected Output**: Working @sonicjs/core package with example
+**Expected Output**: Working @sonicjs-cms/core package with example
 
 ## Key Decisions Made
 

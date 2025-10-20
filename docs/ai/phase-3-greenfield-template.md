@@ -6,7 +6,7 @@
 
 ## Objectives Completed
 
-Created a greenfield starter template for new SonicJS projects that use the `@sonicjs/core` npm package.
+Created a greenfield starter template for new SonicJS projects that use the `@sonicjs-cms/core` npm package.
 
 ## Tasks Completed
 
