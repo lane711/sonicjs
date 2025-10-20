@@ -6,35 +6,17 @@ This document outlines the strategy for enabling seamless npm-based updates for 
 
 ## Current State vs Future State
 
-### Current Update Process (Git-Based)
+### Current State (Git-Based Monolith)
 
-```bash
-# Current workflow - painful and error-prone
-git remote add upstream https://github.com/sonicjs/sonicjs.git
-git fetch upstream
-git merge upstream/main
-
-# Resolve conflicts in:
-# - Core files (that you shouldn't have modified)
-# - Your custom files (that got mixed with core)
-# - Package.json dependencies
-# - Migration files
-# - Configuration files
-
-# Hours of manual conflict resolution
-# Risk of breaking your customizations
-# No clear separation of concerns
-```
+Developers must clone entire repository and manually manage core updates.
 
 **Pain Points:**
 - ❌ Core updates mixed with custom code
 - ❌ Difficult to identify what changed in core
-- ❌ High risk of breaking changes
-- ❌ Time-consuming manual conflict resolution
 - ❌ No version control of core functionality
 - ❌ Can't easily rollback core updates
 
-### Future Update Process (NPM-Based)
+### Future Experience (NPM-Based, Greenfield)
 
 ```bash
 # Future workflow - clean and simple
@@ -217,35 +199,22 @@ npm show @sonicjs/core@2.0.0
 # 3. Install new major version
 npm install @sonicjs/core@2.0.0
 
-# 4. Run migration tool
-npx @sonicjs/migrate --from=1.x --to=2.0.0
-
-# Output:
-# ✓ Analyzed project
-# ✓ Found 3 breaking changes
-# ✓ Applied 2 automatic fixes
-# ⚠ 1 manual change required:
-#   - Update collection field type from "string" to "text"
-#   - See: docs/migration/v2-field-types.md
-
-# 5. Make manual changes (if needed)
-
-# 6. Run database migrations
+# 4. Run database migrations
 npm run db:migrate
 
-# 7. Test thoroughly
+# 5. Test thoroughly
 npm run test
 npm run test:e2e
 
-# 8. Test in dev mode
+# 6. Test in dev mode
 npm run dev
 
-# 9. Deploy to preview
+# 7. Deploy to preview
 npm run deploy:preview
 
-# 10. Test preview environment
+# 8. Test preview environment
 
-# 11. Deploy to production
+# 9. Deploy to production
 npm run deploy:production
 ```
 
@@ -409,52 +378,32 @@ grep -r "c.get('user')" src/
 ```
 ```
 
-## Automated Migration Tools
+## Breaking Changes Communication
 
-### CLI Migration Tool
+### Changelog Format
 
-```bash
-npx @sonicjs/migrate --from=1.x --to=2.0.0
+Breaking changes are clearly documented in changelog with upgrade notes:
 
-# Output:
-# 🔍 Analyzing project...
-#    Found 23 TypeScript files
-#    Found 5 collection configs
-#    Found 2 custom plugins
-#
-# 🔧 Applying automatic fixes...
-#    ✓ Updated collection field types (5 files)
-#    ✓ Updated API imports (12 files)
-#    ✓ Updated middleware calls (8 files)
-#
-# ⚠️  Manual changes required:
-#    1. Update custom plugin hooks (2 files)
-#       - See: src/plugins/my-plugin/index.ts:42
-#       - Guide: https://docs.sonicjs.com/migration/v2-hooks
-#
-#    2. Review deprecated API usage (3 files)
-#       - See: src/routes/custom.ts:15
-#       - Guide: https://docs.sonicjs.com/migration/v2-api
-#
-# 📝 Next steps:
-#    1. Review changes: git diff
-#    2. Make manual changes (if needed)
-#    3. Run tests: npm run test
-#    4. Run migrations: npm run db:migrate
-```
+```markdown
+# Changelog
 
-### Code Mod Scripts
+## [2.0.0] - 2025-03-01
 
-```javascript
-// @sonicjs/migrate/codemods/v2-field-types.js
+### 🚨 Breaking Changes
 
-export function transformFieldTypes(code) {
-  return code
-    .replace(
-      /type:\s*['"]string['"]/g,
-      "type: 'text'"
-    )
-}
+- **Collections**: Field type `string` renamed to `text`
+  - Update your collection configs manually
+  - Example: Change `type: 'string'` to `type: 'text'`
+
+- **Auth**: `requireAuth()` signature changed
+  - See documentation for new usage
+
+### Upgrade Instructions
+
+1. Update to v2.0.0: `npm install @sonicjs/core@2.0.0`
+2. Run database migrations: `npm run db:migrate`
+3. Review breaking changes above and update your code
+4. Test your application thoroughly
 ```
 
 ## Dependency Management
@@ -465,7 +414,7 @@ export function transformFieldTypes(code) {
 // @sonicjs/core/package.json
 {
   "name": "@sonicjs/core",
-  "version": "1.2.3",
+  "version": "2.0.0-alpha.1",
   "peerDependencies": {
     "hono": "^4.0.0",
     "drizzle-orm": "^0.44.0",
@@ -479,27 +428,7 @@ export function transformFieldTypes(code) {
 }
 ```
 
-### Plugin Dependencies
-
-```json
-// @sonicjs/plugin-workflow/package.json
-{
-  "name": "@sonicjs/plugin-workflow",
-  "version": "1.0.0",
-  "peerDependencies": {
-    "@sonicjs/core": "^1.2.0"
-  }
-}
-```
-
-**Version Compatibility Matrix:**
-
-| Core Version | Workflow Plugin | Cache Plugin | FAQ Plugin |
-|--------------|----------------|--------------|------------|
-| 1.0.x        | 1.0.x          | 1.0.x        | 1.0.x      |
-| 1.1.x        | 1.0.x - 1.1.x  | 1.0.x        | 1.0.x      |
-| 1.2.x        | 1.1.x - 1.2.x  | 1.1.x        | 1.0.x      |
-| 2.0.x        | 2.0.x          | 2.0.x        | 2.0.x      |
+All plugins are included in the core package, so no separate plugin versioning is needed.
 
 ## Testing Strategy
 

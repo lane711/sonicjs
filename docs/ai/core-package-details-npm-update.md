@@ -12,11 +12,11 @@ Extract core SonicJS functionality into an npm package (`@sonicjs/core`) to enab
 
 ## Goals
 
-1. **Easy Upgrades**: Developers run `npm update` to get latest core
-2. **Clean Separation**: User code stays separate from framework code
-3. **Customization**: Developers can override/extend core functionality
-4. **Backward Compatibility**: Minimize breaking changes
-5. **Developer Experience**: Clear upgrade path and migration guides
+1. **Easy Installation**: Quick start with `npx create-sonicjs-app`
+2. **Easy Upgrades**: Developers run `npm update` to get latest core
+3. **Clean Separation**: User code stays separate from framework code
+4. **Customization**: Developers can override/extend core functionality
+5. **Developer Experience**: Standard npm workflow for greenfield projects
 
 ## Package Structure
 
@@ -58,10 +58,15 @@ Extract core SonicJS functionality into an npm package (`@sonicjs/core`) to enab
 │   │   ├── collection-config.ts
 │   │   ├── plugin.ts
 │   │   └── index.ts
-│   ├── plugins/                # Core plugins
-│   │   └── core-plugins/
-│   │       ├── database-tools-plugin/
-│   │       └── seed-data-plugin/
+│   ├── plugins/                # All plugins
+│   │   ├── core-plugins/       # Core essential plugins
+│   │   │   ├── database-tools-plugin/
+│   │   │   └── seed-data-plugin/
+│   │   └── available/          # Optional plugins
+│   │       ├── workflow-plugin/
+│   │       ├── cache-plugin/
+│   │       ├── faq-plugin/
+│   │       └── email-plugin/
 │   └── index.ts                # Main export
 ├── migrations/                 # Core migrations
 ├── package.json
@@ -161,7 +166,7 @@ my-sonicjs-site/
 #### User-Specific
 
 - `src/collections/` - User collection configs
-- `src/plugins/available/` - User/optional plugins (workflow, cache, FAQ, etc.)
+- `src/plugins/` - User custom plugins only
 - Custom routes
 - Custom templates (unless overriding core)
 
@@ -177,29 +182,21 @@ my-sonicjs-site/
 - `tsconfig.json` - User TypeScript config (extends core)
 - `.env` files
 
-## Optional Plugins
+## Included Plugins
 
-These should be separate packages that users can install:
+All plugins are included in the core package:
 
-### `@sonicjs/plugin-workflow`
+### Core Plugins
+- Database tools plugin
+- Seed data plugin
 
+### Optional Plugins (included but opt-in)
 - Workflow automation plugin
-- Install: `npm install @sonicjs/plugin-workflow`
+- Three-tier caching plugin
+- FAQ management plugin
+- Email templates plugin
 
-### `@sonicjs/plugin-cache`
-
-- Three-tier caching system
-- Install: `npm install @sonicjs/plugin-cache`
-
-### `@sonicjs/plugin-faq`
-
-- FAQ management
-- Install: `npm install @sonicjs/plugin-faq`
-
-### `@sonicjs/plugin-email`
-
-- Email templates and sending
-- Install: `npm install @sonicjs/plugin-email`
+Users can enable/disable plugins via configuration.
 
 ## Migration Strategy
 
@@ -240,45 +237,38 @@ These should be separate packages that users can install:
 ### Phase 3: User Project Template (Week 3-4)
 
 1. **Create Starter Template**
-   - Minimal project structure
+   - Minimal greenfield project structure
    - Example collections
    - Sample custom plugin
    - Documentation
 
-2. **Migration Guide**
-   - Step-by-step upgrade instructions
-   - Breaking changes documentation
-   - Code examples
-
-3. **CLI Tool** (Optional)
+2. **CLI Tool** (Optional)
    - `npx create-sonicjs-app my-app`
    - Project scaffolding
-   - Upgrade utilities
 
-### Phase 4: Plugin Ecosystem (Week 4-5)
+### Phase 4: Testing & Polish (Week 4-5)
 
-1. **Extract Optional Plugins**
-   - Move to separate packages
-   - Document plugin API
-   - Publish to npm
+1. **Comprehensive Testing**
+   - Test all plugins included in core
+   - Integration testing
+   - E2E testing with plugins
 
-2. **Plugin Registry**
-   - List available plugins
-   - Installation instructions
-   - Version compatibility
+2. **Documentation**
+   - Document all included plugins
+   - Plugin development guide
+   - API reference
 
 ### Phase 5: Documentation & Launch (Week 5-6)
 
 1. **Documentation**
    - API reference
-   - Migration guides
+   - Getting started guide
    - Tutorials
    - Examples
 
 2. **Release**
    - Semantic versioning
    - Changelog
-   - Upgrade path
 
 ## Package API Design
 
@@ -354,15 +344,19 @@ export default {
 
 ### Semantic Versioning
 
-- **Major (1.0.0)**: Breaking changes
-- **Minor (0.1.0)**: New features (backward compatible)
-- **Patch (0.0.1)**: Bug fixes
+Starting at v2.0.0 to differentiate from v1.x (monolith):
+
+- **Major (2.0.0)**: Breaking changes
+- **Minor (2.1.0)**: New features (backward compatible)
+- **Patch (2.0.1)**: Bug fixes
 
 ### Release Cadence
 
+Starting at v2.0.0 (v1.x was the monolith):
+
 - **Patch**: As needed (bug fixes)
 - **Minor**: Monthly (new features)
-- **Major**: Quarterly or as needed (breaking changes)
+- **Major**: As needed (breaking changes)
 
 ### Deprecation Policy
 
@@ -371,28 +365,32 @@ export default {
 3. Remove in next major version
 4. Provide migration path
 
-## Upgrade Experience
+## Installation Experience (Greenfield Only)
 
-### Current (Without Package)
+### Create New Project
 
 ```bash
-# User must manually merge changes from upstream
-git pull upstream main
-# Resolve conflicts manually
-# Test everything
-# Hope nothing breaks
+# Create new SonicJS project
+npx create-sonicjs-app my-app
+
+# Or manually
+npm init
+npm install @sonicjs/core
+
+# Run migrations
+npm run db:migrate
+
+# Start development
+npm run dev
 ```
 
-### Future (With Package)
+### Update Core
 
 ```bash
 # Simple npm update
 npm update @sonicjs/core
 
-# Check changelog
-npm run sonicjs changelog
-
-# Run migrations if needed
+# Run any new migrations
 npm run db:migrate
 
 # Done!
@@ -400,47 +398,19 @@ npm run db:migrate
 
 ## Breaking Changes Management
 
-### Migration Scripts
+### Database Migrations Only
 
-```typescript
-// @sonicjs/core/migrations/upgrade-scripts/
-export const v1_to_v2 = {
-  name: 'Upgrade from v1.x to v2.0',
-
-  async up(project: Project) {
-    // Rename old APIs
-    project.replaceImports(
-      'oldFunction',
-      'newFunction'
-    )
-
-    // Update configs
-    project.updateConfig({
-      oldKey: 'newKey'
-    })
-
-    // Run code mods
-    project.applyCodemod('v2-migration')
-  },
-
-  instructions: `
-    # Manual Steps
-    1. Update collection configs to use new field types
-    2. Review deprecated middleware usage
-    3. Test all custom plugins
-  `
-}
-```
-
-### CLI Migration Tool
+Since we're targeting greenfield projects only:
 
 ```bash
-npx @sonicjs/migrate v1 v2
-# Analyzes project
-# Shows breaking changes
-# Applies automatic fixes
-# Lists manual steps
+# Core migrations run automatically on startup
+npm run dev
+
+# Or run manually
+npm run db:migrate
 ```
+
+Database migrations are tracked and versioned in the core package.
 
 ## Benefits Analysis
 
@@ -557,13 +527,10 @@ docs/
 │   ├── services/
 │   ├── middleware/
 │   └── utilities/
-├── guides/
-│   ├── creating-collections.md
-│   ├── building-plugins.md
-│   └── customizing-admin.md
-└── migration/
-    ├── v1-to-v2.md
-    └── upgrade-guide.md
+└── guides/
+    ├── creating-collections.md
+    ├── building-plugins.md
+    └── customizing-admin.md
 ```
 
 ## Rollout Plan
@@ -613,8 +580,8 @@ docs/
 
 ### User Metrics
 
-- ✅ Upgrade time < 15 minutes
-- ✅ Breaking changes per major version < 10
+- ✅ Setup time < 5 minutes (greenfield)
+- ✅ Upgrade time < 5 minutes (npm update)
 - ✅ Documentation completeness > 90%
 - ✅ Community satisfaction > 80%
 
@@ -631,17 +598,17 @@ docs/
 
 **Mitigation**:
 
-- Clear migration path
+- Clear getting started guide
 - Demonstrate value
 - Excellent documentation
 - Community support
 
-### Risk 2: Breaking Existing Projects
+### Risk 2: Limited Ecosystem Initially
 
 **Mitigation**:
 
-- Maintain backward compatibility layer
-- Provide automated migration tools
+- Start with strong core functionality
+- Provide plugin examples
 - Extensive testing
 - Beta period for feedback
 
@@ -679,16 +646,16 @@ docs/
 - Write tests
 - Create TypeScript definitions
 
-### Month 3: User Template
+### Month 3: Greenfield Template
 
-- Create starter template
-- Build CLI tool
-- Write documentation
+- Create starter template for new projects
+- Build CLI scaffolding tool
+- Write getting started documentation
 - Alpha testing
 
-### Month 4: Plugin Ecosystem
+### Month 4: Testing & Polish
 
-- Extract optional plugins
+- Test all included plugins
 - Document plugin API
 - Beta testing
 - Gather feedback
@@ -697,7 +664,7 @@ docs/
 
 - Final bug fixes
 - Complete documentation
-- Migration guides
+- Getting started guides
 - Release v1.0
 
 ### Month 6+: Iterate

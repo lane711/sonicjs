@@ -71,7 +71,7 @@ function createDb(d1) {
 }
 
 // src/index.ts
-var VERSION = "1.0.0-alpha.4";
+var VERSION = "2.0.0-alpha.1";
 
 export { VERSION, createDb, createSonicJSApp, setupCoreMiddleware, setupCoreRoutes };
 //# sourceMappingURL=index.js.map

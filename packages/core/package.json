@@ -1,6 +1,6 @@
 {
   "name": "@sonicjs-cms/core",
-  "version": "1.0.0-alpha.4",
+  "version": "2.0.0-alpha.1",
   "description": "Core framework for SonicJS headless CMS - Edge-first, TypeScript-native CMS built for Cloudflare Workers",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -8,44 +8,44 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     },
     "./services": {
-      "import": "./dist/services/index.js",
-      "require": "./dist/services/index.cjs",
-      "types": "./dist/services/index.d.ts"
+      "types": "./dist/services.d.ts",
+      "import": "./dist/services.js",
+      "require": "./dist/services.cjs"
     },
     "./middleware": {
-      "import": "./dist/middleware/index.js",
-      "require": "./dist/middleware/index.cjs",
-      "types": "./dist/middleware/index.d.ts"
+      "types": "./dist/middleware.d.ts",
+      "import": "./dist/middleware.js",
+      "require": "./dist/middleware.cjs"
     },
     "./routes": {
-      "import": "./dist/routes/index.js",
-      "require": "./dist/routes/index.cjs",
-      "types": "./dist/routes/index.d.ts"
+      "types": "./dist/routes.d.ts",
+      "import": "./dist/routes.js",
+      "require": "./dist/routes.cjs"
     },
     "./templates": {
-      "import": "./dist/templates/index.js",
-      "require": "./dist/templates/index.cjs",
-      "types": "./dist/templates/index.d.ts"
+      "types": "./dist/templates.d.ts",
+      "import": "./dist/templates.js",
+      "require": "./dist/templates.cjs"
     },
     "./plugins": {
-      "import": "./dist/plugins/index.js",
-      "require": "./dist/plugins/index.cjs",
-      "types": "./dist/plugins/index.d.ts"
+      "types": "./dist/plugins.d.ts",
+      "import": "./dist/plugins.js",
+      "require": "./dist/plugins.cjs"
     },
     "./utils": {
-      "import": "./dist/utils/index.js",
-      "require": "./dist/utils/index.cjs",
-      "types": "./dist/utils/index.d.ts"
+      "types": "./dist/utils.d.ts",
+      "import": "./dist/utils.js",
+      "require": "./dist/utils.cjs"
     },
     "./types": {
-      "import": "./dist/types/index.js",
-      "require": "./dist/types/index.cjs",
-      "types": "./dist/types/index.d.ts"
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "require": "./dist/types.cjs"
     }
   },
   "files": [

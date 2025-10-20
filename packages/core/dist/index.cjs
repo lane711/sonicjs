@@ -72,7 +72,7 @@ function createDb(d1$1) {
 }
 
 // src/index.ts
-var VERSION = "1.0.0-alpha.4";
+var VERSION = "2.0.0-alpha.1";
 
 Object.defineProperty(exports, "AuthManager", {
   enumerable: true,
