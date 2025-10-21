@@ -1,7 +1,7 @@
-import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
-import { renderTable } from '../components/table.template'
-import { renderAlert } from '../components/alert.template'
-import { renderPagination } from '../components/pagination.template'
+import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '@sonicjs-cms/core/templates'
+import { renderTable } from '@sonicjs-cms/core/templates'
+import { renderAlert } from '@sonicjs-cms/core/templates'
+import { renderPagination } from '@sonicjs-cms/core/templates'
 
 interface FAQ {
   id: number

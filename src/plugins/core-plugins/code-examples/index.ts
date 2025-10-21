@@ -342,7 +342,7 @@ export function createCodeExamplesPlugin(): Plugin {
     }
   })
 
-  return builder.build()
+  return builder.build() as Plugin
 }
 
 export const codeExamplesPlugin = createCodeExamplesPlugin()

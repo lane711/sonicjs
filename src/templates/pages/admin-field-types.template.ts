@@ -1,4 +1,4 @@
-import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
+import { renderAdminLayout, AdminLayoutData } from '@sonicjs-cms/core/templates'
 
 export interface FieldTypeDefinition {
   name: string

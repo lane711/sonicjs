@@ -29,6 +29,7 @@
   ],
   "exclude": [
     "node_modules",
+    "packages",
     "dist",
     "src/utils/api-generator.ts",
     "src/utils/openapi-generator.ts",

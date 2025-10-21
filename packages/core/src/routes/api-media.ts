@@ -45,13 +45,15 @@ apiMediaRoutes.use('*', requireAuth())
 // Upload single file
 apiMediaRoutes.post('/upload', async (c) => {
   try {
-    const user = c.get('user')
+    const user = c.get('user')!
     const formData = await c.req.formData()
-    const file = formData.get('file') as File
-    
-    if (!file) {
+    const fileData = formData.get('file')
+
+    if (!fileData || typeof fileData === 'string') {
       return c.json({ error: 'No file provided' }, 400)
     }
+
+    const file = fileData as File
 
     // Validate file
     const validation = fileValidationSchema.safeParse({
@@ -184,10 +186,18 @@ apiMediaRoutes.post('/upload', async (c) => {
 // Upload multiple files
 apiMediaRoutes.post('/upload-multiple', async (c) => {
   try {
-    const user = c.get('user')
+    const user = c.get('user')!
     const formData = await c.req.formData()
-    const files = formData.getAll('files') as File[]
-    
+    const filesData = formData.getAll('files')
+
+    // Filter out strings and ensure we only have File objects
+    const files: File[] = []
+    for (const f of filesData) {
+      if (typeof f !== 'string') {
+        files.push(f as File)
+      }
+    }
+
     if (!files || files.length === 0) {
       return c.json({ error: 'No files provided' }, 400)
     }
@@ -351,7 +361,7 @@ apiMediaRoutes.post('/upload-multiple', async (c) => {
 // Bulk delete files
 apiMediaRoutes.post('/bulk-delete', async (c) => {
   try {
-    const user = c.get('user')
+    const user = c.get('user')!
     const body = await c.req.json()
     const fileIds = body.fileIds as string[]
     
@@ -446,7 +456,6 @@ apiMediaRoutes.post('/bulk-delete', async (c) => {
 // Create folder
 apiMediaRoutes.post('/create-folder', async (c) => {
   try {
-    const user = c.get('user')
     const body = await c.req.json()
     const folderName = body.folderName as string
 
@@ -484,7 +493,7 @@ apiMediaRoutes.post('/create-folder', async (c) => {
 // Bulk move files to folder
 apiMediaRoutes.post('/bulk-move', async (c) => {
   try {
-    const user = c.get('user')
+    const user = c.get('user')!
     const body = await c.req.json()
     const fileIds = body.fileIds as string[]
     const targetFolder = body.folder as string
@@ -619,7 +628,7 @@ apiMediaRoutes.post('/bulk-move', async (c) => {
 // Delete file
 apiMediaRoutes.delete('/:id', async (c) => {
   try {
-    const user = c.get('user')
+    const user = c.get('user')!
     const fileId = c.req.param('id')
     
     // Get file record
@@ -660,7 +669,7 @@ apiMediaRoutes.delete('/:id', async (c) => {
 // Update file metadata
 apiMediaRoutes.patch('/:id', async (c) => {
   try {
-    const user = c.get('user')
+    const user = c.get('user')!
     const fileId = c.req.param('id')
     const body = await c.req.json()
     

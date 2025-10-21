@@ -1,5 +1,5 @@
-import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
-import { renderAlert } from '../components/alert.template'
+import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '@sonicjs-cms/core/templates'
+import { renderAlert } from '@sonicjs-cms/core/templates'
 
 export interface ContentModel {
   name: string

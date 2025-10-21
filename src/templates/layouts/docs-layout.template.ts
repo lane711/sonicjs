@@ -1,4 +1,4 @@
-import { renderLogo } from '../components/logo.template'
+import { renderLogo } from '@sonicjs-cms/core/templates'
 
 export interface DocsLayoutData {
   title: string

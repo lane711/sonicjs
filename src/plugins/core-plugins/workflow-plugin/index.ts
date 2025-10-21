@@ -201,7 +201,7 @@ export function createWorkflowPlugin(): Plugin {
     }
   })
 
-  return builder.build()
+  return builder.build() as Plugin
 }
 
 export const workflowPlugin = createWorkflowPlugin()

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { renderTable, TableData } from '../templates/components/table.template'
+import { renderTable, TableData } from '@sonicjs-cms/core/templates'
 
 describe('Table Sorting Functionality', () => {
   const sampleData: TableData = {

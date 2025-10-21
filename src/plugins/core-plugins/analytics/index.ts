@@ -388,7 +388,7 @@ export function createAnalyticsPlugin(): Plugin {
     }
   })
 
-  return builder.build()
+  return builder.build() as Plugin
 }
 
 // Export the plugin instance

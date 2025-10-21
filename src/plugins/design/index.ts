@@ -6,11 +6,11 @@ export const designPlugin: Plugin = {
   version: '1.0.0',
   description: 'Design system management including themes, components, and UI customization',
 
-  async activate(context) {
+  async activate(context: any) {
     console.log('Design plugin activated')
   },
 
-  async deactivate(context) {
+  async deactivate(context: any) {
     console.log('Design plugin deactivated')
   }
 }

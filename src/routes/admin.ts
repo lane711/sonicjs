@@ -3,14 +3,11 @@ import { html, raw } from 'hono/html'
 import { renderDashboardPage, renderDashboardPageWithDynamicMenu, renderStatsCards, DashboardPageData, DashboardStats } from '../templates/pages/admin-dashboard.template'
 import { renderCollectionsListPage, CollectionsListPageData, Collection } from '../templates/pages/admin-collections-list.template'
 import { renderCollectionFormPage, CollectionFormData } from '../templates/pages/admin-collections-form.template'
-import { renderPluginsListPage, PluginsListPageData, generateMockPlugins } from '../templates/pages/admin-plugins-list.template'
 import { renderSettingsPage, SettingsPageData } from '../templates/pages/admin-settings.template'
 import { renderAPIReferencePage, APIReferencePageData, APIEndpoint } from '../templates/pages/admin-api-reference.template'
 import { renderFieldTypesPage, FieldTypesPageData, getFieldTypeDefinitions } from '../templates/pages/admin-field-types.template'
-import { userRoutes } from './admin-users'
+// User routes, plugin routes, and logs routes are now imported from core package and mounted in index.ts
 // Workflow admin routes are now loaded dynamically through plugin system
-import { adminPluginRoutes } from './admin-plugins'
-import { adminLogsRoutes } from './admin-logs'
 import { MigrationService } from '../services/migrations'
 import { createDatabaseToolsAdminRoutes } from '../plugins/core-plugins/database-tools-plugin/admin-routes'
 import { createSeedDataAdminRoutes } from '../plugins/core-plugins/seed-data-plugin/admin-routes'
@@ -1097,22 +1094,7 @@ adminRoutes.post('/collections/:collectionId/fields/reorder', async (c) => {
   }
 })
 
-// Mount user management routes FIRST so they take precedence
-console.log('[INFO] About to mount user routes at /')
-adminRoutes.route('/', userRoutes)
-console.log('[INFO] User routes mounted at /')
-
-// Debug logging for all admin routes (AFTER mounting userRoutes)
-adminRoutes.use('*', async (c, next) => {
-  console.log('[DEBUG admin.ts POST-MOUNT] Request:', c.req.method, c.req.path)
-  await next()
-})
-
-// Plugins management
-adminRoutes.route('/plugins', adminPluginRoutes)
-
-// Logs management
-adminRoutes.route('/logs', adminLogsRoutes)
+// User routes, plugin routes, and logs routes are now mounted in index.ts from core package
 
 // Database tools
 adminRoutes.route('/database-tools', createDatabaseToolsAdminRoutes())

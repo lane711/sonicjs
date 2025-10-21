@@ -1,6 +1,6 @@
 {
   "name": "@sonicjs-cms/core",
-  "version": "2.0.0-alpha.3",
+  "version": "2.0.0-alpha.10",
   "description": "Core framework for SonicJS headless CMS - Edge-first, TypeScript-native CMS built for Cloudflare Workers",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -115,7 +115,7 @@
     "@cloudflare/workers-types": "^4.20250620.0",
     "@types/node": "^20.19.1",
     "drizzle-orm": "^0.44.2",
-    "hono": "^4.7.3",
+    "hono": "^4.10.1",
     "tsup": "^8.0.0",
     "typescript": "^5.8.3",
     "vitest": "^2.1.8",

@@ -322,7 +322,7 @@ export function createFAQPlugin(): Plugin {
     }
   })
 
-  return builder.build()
+  return builder.build() as Plugin
 }
 
 export const faqPlugin = createFAQPlugin()

@@ -329,7 +329,7 @@ export function createTestimonialPlugin(): Plugin {
     }
   })
 
-  return builder.build()
+  return builder.build() as Plugin
 }
 
 export const testimonialsPlugin = createTestimonialPlugin()

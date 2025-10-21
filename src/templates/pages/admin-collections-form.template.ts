@@ -1,7 +1,7 @@
-import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
+import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '@sonicjs-cms/core/templates'
 import { renderForm, FormData, FormField } from '../components/form.template'
-import { renderAlert } from '../components/alert.template'
-import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
+import { renderAlert } from '@sonicjs-cms/core/templates'
+import { renderConfirmationDialog, getConfirmationDialogScript } from '@sonicjs-cms/core/templates'
 
 export interface CollectionField {
   id: string

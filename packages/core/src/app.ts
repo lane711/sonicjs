@@ -7,7 +7,7 @@
 import { Hono } from 'hono'
 import type { Context } from 'hono'
 import type { D1Database, KVNamespace, R2Bucket } from '@cloudflare/workers-types'
-import { apiRoutes, apiMediaRoutes, apiSystemRoutes, adminApiRoutes, authRoutes, adminContentRoutes } from './routes'
+import { apiRoutes, apiMediaRoutes, apiSystemRoutes, adminApiRoutes, authRoutes, adminContentRoutes, adminUsersRoutes, adminMediaRoutes, adminPluginRoutes, adminLogsRoutes } from './routes'
 
 // ============================================================================
 // Type Definitions
@@ -24,6 +24,7 @@ export interface Bindings {
   IMAGES_ACCOUNT_ID?: string
   IMAGES_API_TOKEN?: string
   ENVIRONMENT?: string
+  BUCKET_NAME?: string
 }
 
 export interface Variables {
@@ -154,6 +155,10 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   app.route('/api/system', apiSystemRoutes)
   app.route('/admin/api', adminApiRoutes)
   app.route('/admin/content', adminContentRoutes)
+  app.route('/admin/media', adminMediaRoutes)
+  app.route('/admin/plugins', adminPluginRoutes)
+  app.route('/admin/logs', adminLogsRoutes)
+  app.route('/admin', adminUsersRoutes)
   app.route('/auth', authRoutes)
 
   // Custom routes - User-defined routes
@@ -162,6 +167,11 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
       app.route(route.path, route.handler)
     }
   }
+
+  // Root redirect to login
+  app.get('/', (c) => {
+    return c.redirect('/auth/login')
+  })
 
   // Health check
   app.get('/health', (c) => {

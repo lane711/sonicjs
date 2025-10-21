@@ -391,7 +391,7 @@ authRoutes.post('/register/form', async (c) => {
         Account created successfully! Redirecting to admin dashboard...
         <script>
           setTimeout(() => {
-            window.location.href = '/admin';
+            window.location.href = '/admin/content';
           }, 2000);
         </script>
       </div>
@@ -481,7 +481,7 @@ authRoutes.post('/login/form', async (c) => {
           </div>
           <script>
             setTimeout(() => {
-              window.location.href = '/admin';
+              window.location.href = '/admin/content';
             }, 2000);
           </script>
         </div>
@@ -829,7 +829,7 @@ authRoutes.post('/accept-invitation', async (c) => {
     // Activity logging is deferred until utils/log-activity is implemented
 
     // Redirect to admin dashboard
-    return c.redirect('/admin?welcome=true')
+    return c.redirect('/admin/content?welcome=true')
 
   } catch (error) {
     console.error('Accept invitation error:', error)

@@ -1,4 +1,4 @@
-import { renderAdminLayout } from '../../../../templates/layouts/admin-layout-v2.template'
+import { renderAdminLayout } from '@sonicjs-cms/core/templates'
 
 export interface WorkflowDashboardData {
   user: any

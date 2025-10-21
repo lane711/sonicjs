@@ -1,5 +1,5 @@
-import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
-import { renderTable, TableData } from '../components/table.template'
+import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '@sonicjs-cms/core/templates'
+import { renderTable, TableData } from '@sonicjs-cms/core/templates'
 
 export interface Collection {
   id: string
@@ -24,7 +24,7 @@ export interface CollectionsListPageData {
 }
 
 export function renderCollectionsListPage(data: CollectionsListPageData): string {
-  const tableData: TableData<Collection> = {
+  const tableData: any = {
     tableId: 'collections-table',
     rowClickable: true,
     rowClickUrl: (collection: Collection) => `/admin/collections/${collection.id}`,
@@ -34,7 +34,7 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
         label: 'Name',
         sortable: true,
         sortType: 'string',
-        render: (value, collection) => `
+        render: (value: any, collection: any) => `
             <div class="flex items-center gap-2 ml-2">
                 <span class="inline-flex items-center rounded-md bg-cyan-50 dark:bg-cyan-500/10 px-2.5 py-1 text-sm font-medium text-cyan-700 dark:text-cyan-300 ring-1 ring-inset ring-cyan-700/10 dark:ring-cyan-400/20">
                   ${collection.name}
@@ -61,14 +61,14 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
         label: 'Description',
         sortable: true,
         sortType: 'string',
-        render: (value, collection) => collection.description || '<span class="text-zinc-500 dark:text-zinc-400">-</span>'
+        render: (value: any, collection: any) => collection.description || '<span class="text-zinc-500 dark:text-zinc-400">-</span>'
       },
       {
         key: 'field_count',
         label: 'Fields',
         sortable: true,
         sortType: 'number',
-        render: (value, collection) => {
+        render: (value: any, collection: any) => {
           const count = collection.field_count || 0
           return `
             <div class="flex items-center">
@@ -84,7 +84,7 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
         label: 'Source',
         sortable: true,
         sortType: 'string',
-        render: (value, collection) => {
+        render: (value: any, collection: any) => {
           if (collection.managed) {
             return `
               <div class="flex items-center gap-1.5">
@@ -118,7 +118,7 @@ export function renderCollectionsListPage(data: CollectionsListPageData): string
         key: 'actions',
         label: 'Content',
         sortable: false,
-        render: (value, collection) => {
+        render: (value: any, collection: any) => {
           if (!collection || !collection.id) return '<span class="text-zinc-500 dark:text-zinc-400">-</span>'
           return `
             <div class="flex items-center space-x-2">

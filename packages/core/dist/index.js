@@ -1,14 +1,15 @@
-import { api_default, api_media_default, api_system_default, admin_api_default, admin_content_default, auth_default } from './chunk-5XKH6PBR.js';
-export { ROUTES_INFO } from './chunk-5XKH6PBR.js';
+import { api_default, api_media_default, api_system_default, admin_api_default, admin_content_default, adminMediaRoutes, adminPluginRoutes, adminLogsRoutes, userRoutes, auth_default } from './chunk-FDUDHGI6.js';
+export { ROUTES_INFO, admin_content_default as adminContentRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, userRoutes as adminUsersRoutes, api_media_default as apiMediaRoutes, api_default as apiRoutes, auth_default as authRoutes } from './chunk-FDUDHGI6.js';
 import './chunk-3MNMOLSA.js';
-export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware } from './chunk-PTQZ5FEI.js';
-import { schema_exports } from './chunk-CXZDAR6S.js';
-export { Logger, MigrationService, PluginBootstrapService, PluginService as PluginServiceClass, apiTokens, cleanupRemovedCollections, collections, content, contentVersions, fullCollectionSync, getAvailableCollectionNames, getLogger, getManagedCollections, initLogger, insertCollectionSchema, insertContentSchema, insertLogConfigSchema, insertMediaSchema, insertPluginActivityLogSchema, insertPluginAssetSchema, insertPluginHookSchema, insertPluginRouteSchema, insertPluginSchema, insertSystemLogSchema, insertUserSchema, insertWorkflowHistorySchema, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, logConfig, media, pluginActivityLog, pluginAssets, pluginHooks, pluginRoutes, plugins, selectCollectionSchema, selectContentSchema, selectLogConfigSchema, selectMediaSchema, selectPluginActivityLogSchema, selectPluginAssetSchema, selectPluginHookSchema, selectPluginRouteSchema, selectPluginSchema, selectSystemLogSchema, selectUserSchema, selectWorkflowHistorySchema, syncCollection, syncCollections, systemLogs, users, validateCollectionConfig, workflowHistory } from './chunk-CXZDAR6S.js';
-export { getConfirmationDialogScript, renderAlert, renderConfirmationDialog, renderFilterBar, renderForm, renderFormField, renderPagination, renderTable } from './chunk-KRJMGD4E.js';
-export { HookSystemImpl, HookUtils, PluginManager as PluginManagerClass, PluginRegistryImpl, PluginValidator as PluginValidatorClass, ScopedHookSystem as ScopedHookSystemClass } from './chunk-NRSL6BQI.js';
+export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware } from './chunk-WESS2U3K.js';
+import { schema_exports } from './chunk-7N3HK7ZK.js';
+export { Logger, MigrationService, PluginBootstrapService, PluginService as PluginServiceClass, apiTokens, cleanupRemovedCollections, collections, content, contentVersions, fullCollectionSync, getAvailableCollectionNames, getLogger, getManagedCollections, initLogger, insertCollectionSchema, insertContentSchema, insertLogConfigSchema, insertMediaSchema, insertPluginActivityLogSchema, insertPluginAssetSchema, insertPluginHookSchema, insertPluginRouteSchema, insertPluginSchema, insertSystemLogSchema, insertUserSchema, insertWorkflowHistorySchema, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, logConfig, media, pluginActivityLog, pluginAssets, pluginHooks, pluginRoutes, plugins, selectCollectionSchema, selectContentSchema, selectLogConfigSchema, selectMediaSchema, selectPluginActivityLogSchema, selectPluginAssetSchema, selectPluginHookSchema, selectPluginRouteSchema, selectPluginSchema, selectSystemLogSchema, selectUserSchema, selectWorkflowHistorySchema, syncCollection, syncCollections, systemLogs, users, validateCollectionConfig, workflowHistory } from './chunk-7N3HK7ZK.js';
+export { getConfirmationDialogScript, renderAlert, renderConfirmationDialog, renderFilterBar, renderForm, renderFormField, renderPagination, renderTable } from './chunk-FZYF43TN.js';
+import './chunk-G4JGVZAF.js';
+export { HookSystemImpl, HookUtils, PluginManager as PluginManagerClass, PluginRegistryImpl, PluginValidator as PluginValidatorClass, ScopedHookSystem as ScopedHookSystemClass } from './chunk-BITQ4MFX.js';
 export { QueryFilterBuilder, TemplateRenderer, buildQuery, escapeHtml, metricsTracker, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer } from './chunk-JIINOD2W.js';
 export { HOOKS } from './chunk-LOUJRBXV.js';
-import './chunk-G3PMV62Z.js';
+import './chunk-V4OQ3NZ2.js';
 import { Hono } from 'hono';
 import { drizzle } from 'drizzle-orm/d1';
 
@@ -44,12 +45,19 @@ function createSonicJSApp(config = {}) {
   app.route("/api/system", api_system_default);
   app.route("/admin/api", admin_api_default);
   app.route("/admin/content", admin_content_default);
+  app.route("/admin/media", adminMediaRoutes);
+  app.route("/admin/plugins", adminPluginRoutes);
+  app.route("/admin/logs", adminLogsRoutes);
+  app.route("/admin", userRoutes);
   app.route("/auth", auth_default);
   if (config.routes) {
     for (const route of config.routes) {
       app.route(route.path, route.handler);
     }
   }
+  app.get("/", (c) => {
+    return c.redirect("/auth/login");
+  });
   app.get("/health", (c) => {
     return c.json({
       name: appName,

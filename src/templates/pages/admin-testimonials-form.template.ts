@@ -1,6 +1,6 @@
-import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
+import { renderAdminLayout, AdminLayoutData } from '@sonicjs-cms/core/templates'
 import { renderForm } from '../components/form.template'
-import { renderAlert } from '../components/alert.template'
+import { renderAlert } from '@sonicjs-cms/core/templates'
 
 interface Testimonial {
   id?: number

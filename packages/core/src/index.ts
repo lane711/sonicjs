@@ -100,7 +100,17 @@ export {
 } from './plugins'
 
 // Routes - Week 3 (COMPLETED)
-export { ROUTES_INFO } from './routes'
+export {
+  ROUTES_INFO,
+  apiRoutes,
+  apiMediaRoutes,
+  authRoutes,
+  adminContentRoutes,
+  adminUsersRoutes,
+  adminMediaRoutes,
+  adminLogsRoutes,
+  adminPluginRoutes,
+} from './routes'
 
 // Templates - Week 3 (COMPLETED)
 export {

@@ -38,7 +38,7 @@ export function createSeedDataPlugin(): Plugin {
     singleton: true
   })
 
-  return builder.build()
+  return builder.build() as Plugin
 }
 
 export const seedDataPlugin = createSeedDataPlugin()

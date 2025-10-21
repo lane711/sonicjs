@@ -38,7 +38,7 @@ export function createDatabaseToolsPlugin(): Plugin {
     singleton: true
   })
 
-  return builder.build()
+  return builder.build() as Plugin
 }
 
 export const databaseToolsPlugin = createDatabaseToolsPlugin()

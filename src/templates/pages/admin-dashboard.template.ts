@@ -1,7 +1,7 @@
 import {
   AdminLayoutData,
   renderAdminLayout,
-} from "../layouts/admin-layout-v2.template";
+} from "@sonicjs-cms/core/templates";
 
 export interface DashboardStats {
   collections: number;

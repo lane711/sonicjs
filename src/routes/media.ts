@@ -524,7 +524,7 @@ mediaRoutes.put('/:id',
     try {
       const id = c.req.param('id')
       const user = c.get('user')
-      const updates = c.req.valid('json')
+      const updates: any = c.req.valid('json')
       const db = c.env.DB
       
       // Check if media file exists
@@ -649,7 +649,7 @@ mediaRoutes.post('/bulk',
   async (c) => {
     try {
       const user = c.get('user')
-      const { operation, mediaIds, folder, tags } = c.req.valid('json')
+      const { operation, mediaIds, folder, tags }: any = c.req.valid('json')
       const db = c.env.DB
       
       const results = []

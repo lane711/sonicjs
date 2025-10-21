@@ -1,8 +1,8 @@
 'use strict';
 
 var chunkAGOE25LF_cjs = require('./chunk-AGOE25LF.cjs');
-var chunkWJ7QYVR2_cjs = require('./chunk-WJ7QYVR2.cjs');
-require('./chunk-EMMSS5I5.cjs');
+var chunkRNR4HA23_cjs = require('./chunk-RNR4HA23.cjs');
+require('./chunk-IGJUBJBW.cjs');
 
 
 
@@ -20,67 +20,67 @@ Object.defineProperty(exports, "getCacheService", {
 });
 Object.defineProperty(exports, "Logger", {
   enumerable: true,
-  get: function () { return chunkWJ7QYVR2_cjs.Logger; }
+  get: function () { return chunkRNR4HA23_cjs.Logger; }
 });
 Object.defineProperty(exports, "MigrationService", {
   enumerable: true,
-  get: function () { return chunkWJ7QYVR2_cjs.MigrationService; }
+  get: function () { return chunkRNR4HA23_cjs.MigrationService; }
 });
 Object.defineProperty(exports, "PluginBootstrapService", {
   enumerable: true,
-  get: function () { return chunkWJ7QYVR2_cjs.PluginBootstrapService; }
+  get: function () { return chunkRNR4HA23_cjs.PluginBootstrapService; }
 });
 Object.defineProperty(exports, "PluginService", {
   enumerable: true,
-  get: function () { return chunkWJ7QYVR2_cjs.PluginService; }
+  get: function () { return chunkRNR4HA23_cjs.PluginService; }
 });
 Object.defineProperty(exports, "cleanupRemovedCollections", {
   enumerable: true,
-  get: function () { return chunkWJ7QYVR2_cjs.cleanupRemovedCollections; }
+  get: function () { return chunkRNR4HA23_cjs.cleanupRemovedCollections; }
 });
 Object.defineProperty(exports, "fullCollectionSync", {
   enumerable: true,
-  get: function () { return chunkWJ7QYVR2_cjs.fullCollectionSync; }
+  get: function () { return chunkRNR4HA23_cjs.fullCollectionSync; }
 });
 Object.defineProperty(exports, "getAvailableCollectionNames", {
   enumerable: true,
-  get: function () { return chunkWJ7QYVR2_cjs.getAvailableCollectionNames; }
+  get: function () { return chunkRNR4HA23_cjs.getAvailableCollectionNames; }
 });
 Object.defineProperty(exports, "getLogger", {
   enumerable: true,
-  get: function () { return chunkWJ7QYVR2_cjs.getLogger; }
+  get: function () { return chunkRNR4HA23_cjs.getLogger; }
 });
 Object.defineProperty(exports, "getManagedCollections", {
   enumerable: true,
-  get: function () { return chunkWJ7QYVR2_cjs.getManagedCollections; }
+  get: function () { return chunkRNR4HA23_cjs.getManagedCollections; }
 });
 Object.defineProperty(exports, "initLogger", {
   enumerable: true,
-  get: function () { return chunkWJ7QYVR2_cjs.initLogger; }
+  get: function () { return chunkRNR4HA23_cjs.initLogger; }
 });
 Object.defineProperty(exports, "isCollectionManaged", {
   enumerable: true,
-  get: function () { return chunkWJ7QYVR2_cjs.isCollectionManaged; }
+  get: function () { return chunkRNR4HA23_cjs.isCollectionManaged; }
 });
 Object.defineProperty(exports, "loadCollectionConfig", {
   enumerable: true,
-  get: function () { return chunkWJ7QYVR2_cjs.loadCollectionConfig; }
+  get: function () { return chunkRNR4HA23_cjs.loadCollectionConfig; }
 });
 Object.defineProperty(exports, "loadCollectionConfigs", {
   enumerable: true,
-  get: function () { return chunkWJ7QYVR2_cjs.loadCollectionConfigs; }
+  get: function () { return chunkRNR4HA23_cjs.loadCollectionConfigs; }
 });
 Object.defineProperty(exports, "syncCollection", {
   enumerable: true,
-  get: function () { return chunkWJ7QYVR2_cjs.syncCollection; }
+  get: function () { return chunkRNR4HA23_cjs.syncCollection; }
 });
 Object.defineProperty(exports, "syncCollections", {
   enumerable: true,
-  get: function () { return chunkWJ7QYVR2_cjs.syncCollections; }
+  get: function () { return chunkRNR4HA23_cjs.syncCollections; }
 });
 Object.defineProperty(exports, "validateCollectionConfig", {
   enumerable: true,
-  get: function () { return chunkWJ7QYVR2_cjs.validateCollectionConfig; }
+  get: function () { return chunkRNR4HA23_cjs.validateCollectionConfig; }
 });
 //# sourceMappingURL=services.cjs.map
 //# sourceMappingURL=services.cjs.map

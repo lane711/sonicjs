@@ -213,7 +213,7 @@ export function createAuthPlugin(): Plugin {
     }
   })
 
-  return builder.build()
+  return builder.build() as Plugin as Plugin
 }
 
 // Export the plugin instance

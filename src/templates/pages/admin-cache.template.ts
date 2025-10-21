@@ -1,5 +1,5 @@
-import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
-import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
+import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '@sonicjs-cms/core/templates'
+import { renderConfirmationDialog, getConfirmationDialogScript } from '@sonicjs-cms/core/templates'
 
 export interface CacheStats {
   memoryHits: number

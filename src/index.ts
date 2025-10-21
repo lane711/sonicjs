@@ -3,9 +3,19 @@ import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { prettyJSON } from 'hono/pretty-json'
 import { serveStatic } from 'hono/cloudflare-workers'
-import { apiRoutes } from './routes/api'
+// Import migrated routes from core package
+import {
+  apiRoutes,
+  apiMediaRoutes,
+  authRoutes,
+  adminContentRoutes,
+  adminUsersRoutes,
+  adminMediaRoutes,
+  adminLogsRoutes,
+  adminPluginRoutes
+} from '@sonicjs-cms/core'
+// Monolith-specific routes (not yet migrated)
 import { adminRoutes } from './routes/admin'
-import { adminContentRoutes } from './routes/admin-content'
 import adminFAQRoutes from './routes/admin-faq'
 import adminTestimonialsRoutes from './routes/admin-testimonials'
 import adminCodeExamplesRoutes from './routes/admin-code-examples'
@@ -14,15 +24,9 @@ import { designRoutes } from './plugins/design/routes'
 // Hello World plugin
 import { helloWorldPlugin } from './plugins/core-plugins/hello-world-plugin'
 import { adminCheckboxRoutes } from './routes/admin-checkboxes'
-import { adminLogsRoutes } from './routes/admin-logs'
 import { docsRoutes } from './routes/docs'
-import { authRoutes } from './routes/auth'
 import { contentRoutes } from './routes/content'
 import { mediaRoutes } from './routes/media'
-import { adminMediaRoutes } from './routes/admin-media'
-import { apiMediaRoutes } from './routes/api-media'
-// import emailRoutes from './routes/admin/email'
-import { userRoutes } from './routes/admin-users'
 // Workflow routes are loaded dynamically through plugin system
 import { createWorkflowRoutes } from './plugins/available/workflow-plugin/routes'
 import { createWorkflowAdminRoutes } from './plugins/available/workflow-plugin/admin-routes'
@@ -133,13 +137,13 @@ app.get('/images/*', async (c) => {
 })
 
 // Public routes
-app.route('/auth', authRoutes)
+app.route('/auth', authRoutes as any)
 app.route('/docs', docsRoutes)
 
 // API routes with optional auth (for public content)
 app.use('/api/*', optionalAuth())
-app.route('/api', apiRoutes)
-app.route('/api/media', apiMediaRoutes)
+app.route('/api', apiRoutes as any)
+app.route('/api/media', apiMediaRoutes as any)
 // Workflow API routes are loaded dynamically through plugin system
 
 // Content API routes with optional auth
@@ -195,8 +199,11 @@ app.use('/admin/*', requireRole(['admin', 'editor']))
 // Add caching for admin pages (60 second cache)
 app.use('/admin/*', cacheHeaders(60))
 app.route('/admin', adminRoutes)
-app.route('/admin/media', adminMediaRoutes)
-app.route('/admin/content', adminContentRoutes)
+app.route('/admin', adminUsersRoutes as any) // User profile, user management, activity logs
+app.route('/admin/media', adminMediaRoutes as any)
+app.route('/admin/content', adminContentRoutes as any)
+app.route('/admin/plugins', adminPluginRoutes as any)
+app.route('/admin/logs', adminLogsRoutes as any)
 // FAQ routes with plugin activation check
 app.use('/admin/faq/*', requireActivePlugin('faq'))
 app.route('/admin/faq', adminFAQRoutes)
@@ -215,9 +222,7 @@ app.route('/api/workflow', createWorkflowRoutes())
 app.use('/admin/design/*', requireActivePlugin('design'))
 app.route('/admin/design', designRoutes)
 app.route('/admin/checkboxes', adminCheckboxRoutes)
-app.route('/admin/logs', adminLogsRoutes)
 // app.route('/admin/email', emailRoutes)
-// User routes are now mounted within adminRoutes (see admin.ts)
 // Cache routes with plugin activation check
 app.use('/admin/cache/*', requireActivePlugin('cache'))
 app.route('/admin/cache', cacheRoutes)

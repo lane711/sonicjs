@@ -1,5 +1,5 @@
-import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
-import { renderAlert } from '../components/alert.template'
+import { renderAdminLayout, AdminLayoutData } from '@sonicjs-cms/core/templates'
+import { renderAlert } from '@sonicjs-cms/core/templates'
 
 interface CodeExample {
   id?: number
