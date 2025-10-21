@@ -1,6 +1,6 @@
 'use strict';
 
-var chunkYF6OCX54_cjs = require('./chunk-YF6OCX54.cjs');
+var chunkPCFNAPA4_cjs = require('./chunk-PCFNAPA4.cjs');
 require('./chunk-K6ZR653V.cjs');
 var chunk24PWAFUT_cjs = require('./chunk-24PWAFUT.cjs');
 var chunkWJ7QYVR2_cjs = require('./chunk-WJ7QYVR2.cjs');
@@ -39,7 +39,11 @@ function createSonicJSApp(config = {}) {
       app.use("*", middleware);
     }
   }
-  app.route("/api", chunkYF6OCX54_cjs.api_default);
+  app.route("/api", chunkPCFNAPA4_cjs.api_default);
+  app.route("/api/media", chunkPCFNAPA4_cjs.api_media_default);
+  app.route("/api/system", chunkPCFNAPA4_cjs.api_system_default);
+  app.route("/admin/api", chunkPCFNAPA4_cjs.admin_api_default);
+  app.route("/auth", chunkPCFNAPA4_cjs.auth_default);
   if (config.routes) {
     for (const route of config.routes) {
       app.route(route.path, route.handler);
@@ -77,7 +81,7 @@ var VERSION = "2.0.0-alpha.3";
 
 Object.defineProperty(exports, "ROUTES_INFO", {
   enumerable: true,
-  get: function () { return chunkYF6OCX54_cjs.ROUTES_INFO; }
+  get: function () { return chunkPCFNAPA4_cjs.ROUTES_INFO; }
 });
 Object.defineProperty(exports, "AuthManager", {
   enumerable: true,

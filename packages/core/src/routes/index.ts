@@ -8,12 +8,22 @@
 // API routes
 export { default as apiRoutes } from './api'
 export { default as apiContentCrudRoutes } from './api-content-crud'
+export { default as apiMediaRoutes } from './api-media'
+export { default as apiSystemRoutes } from './api-system'
+export { default as adminApiRoutes } from './admin-api'
+
+// Auth routes
+export { default as authRoutes } from './auth'
 
 export const ROUTES_INFO = {
   message: 'Routes migration in progress',
   available: [
     'apiRoutes',
-    'apiContentCrudRoutes'
+    'apiContentCrudRoutes',
+    'apiMediaRoutes',
+    'apiSystemRoutes',
+    'adminApiRoutes',
+    'authRoutes'
   ],
   status: 'Routes are being added incrementally',
   reference: 'https://github.com/sonicjs/sonicjs'

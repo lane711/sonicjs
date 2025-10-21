@@ -1,5 +1,5 @@
-import { api_default } from './chunk-ZK235C7B.js';
-export { ROUTES_INFO } from './chunk-ZK235C7B.js';
+import { api_default, api_media_default, api_system_default, admin_api_default, auth_default } from './chunk-S5XOD67B.js';
+export { ROUTES_INFO } from './chunk-S5XOD67B.js';
 import './chunk-ISN4UVUT.js';
 export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware } from './chunk-PTQZ5FEI.js';
 import { schema_exports } from './chunk-CXZDAR6S.js';
@@ -40,6 +40,10 @@ function createSonicJSApp(config = {}) {
     }
   }
   app.route("/api", api_default);
+  app.route("/api/media", api_media_default);
+  app.route("/api/system", api_system_default);
+  app.route("/admin/api", admin_api_default);
+  app.route("/auth", auth_default);
   if (config.routes) {
     for (const route of config.routes) {
       app.route(route.path, route.handler);
