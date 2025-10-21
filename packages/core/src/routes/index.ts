@@ -15,6 +15,9 @@ export { default as adminApiRoutes } from './admin-api'
 // Auth routes
 export { default as authRoutes } from './auth'
 
+// Admin UI routes
+export { default as adminContentRoutes } from './admin-content'
+
 export const ROUTES_INFO = {
   message: 'Routes migration in progress',
   available: [
@@ -23,7 +26,8 @@ export const ROUTES_INFO = {
     'apiMediaRoutes',
     'apiSystemRoutes',
     'adminApiRoutes',
-    'authRoutes'
+    'authRoutes',
+    'adminContentRoutes'
   ],
   status: 'Routes are being added incrementally',
   reference: 'https://github.com/sonicjs/sonicjs'

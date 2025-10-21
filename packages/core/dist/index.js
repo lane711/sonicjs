@@ -1,6 +1,6 @@
-import { api_default, api_media_default, api_system_default, admin_api_default, auth_default } from './chunk-S5XOD67B.js';
-export { ROUTES_INFO } from './chunk-S5XOD67B.js';
-import './chunk-ISN4UVUT.js';
+import { api_default, api_media_default, api_system_default, admin_api_default, admin_content_default, auth_default } from './chunk-5XKH6PBR.js';
+export { ROUTES_INFO } from './chunk-5XKH6PBR.js';
+import './chunk-3MNMOLSA.js';
 export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware } from './chunk-PTQZ5FEI.js';
 import { schema_exports } from './chunk-CXZDAR6S.js';
 export { Logger, MigrationService, PluginBootstrapService, PluginService as PluginServiceClass, apiTokens, cleanupRemovedCollections, collections, content, contentVersions, fullCollectionSync, getAvailableCollectionNames, getLogger, getManagedCollections, initLogger, insertCollectionSchema, insertContentSchema, insertLogConfigSchema, insertMediaSchema, insertPluginActivityLogSchema, insertPluginAssetSchema, insertPluginHookSchema, insertPluginRouteSchema, insertPluginSchema, insertSystemLogSchema, insertUserSchema, insertWorkflowHistorySchema, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, logConfig, media, pluginActivityLog, pluginAssets, pluginHooks, pluginRoutes, plugins, selectCollectionSchema, selectContentSchema, selectLogConfigSchema, selectMediaSchema, selectPluginActivityLogSchema, selectPluginAssetSchema, selectPluginHookSchema, selectPluginRouteSchema, selectPluginSchema, selectSystemLogSchema, selectUserSchema, selectWorkflowHistorySchema, syncCollection, syncCollections, systemLogs, users, validateCollectionConfig, workflowHistory } from './chunk-CXZDAR6S.js';
@@ -43,6 +43,7 @@ function createSonicJSApp(config = {}) {
   app.route("/api/media", api_media_default);
   app.route("/api/system", api_system_default);
   app.route("/admin/api", admin_api_default);
+  app.route("/admin/content", admin_content_default);
   app.route("/auth", auth_default);
   if (config.routes) {
     for (const route of config.routes) {

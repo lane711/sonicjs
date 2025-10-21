@@ -7,7 +7,7 @@
 import { Hono } from 'hono'
 import type { Context } from 'hono'
 import type { D1Database, KVNamespace, R2Bucket } from '@cloudflare/workers-types'
-import { apiRoutes, apiMediaRoutes, apiSystemRoutes, adminApiRoutes, authRoutes } from './routes'
+import { apiRoutes, apiMediaRoutes, apiSystemRoutes, adminApiRoutes, authRoutes, adminContentRoutes } from './routes'
 
 // ============================================================================
 // Type Definitions
@@ -153,6 +153,7 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   app.route('/api/media', apiMediaRoutes)
   app.route('/api/system', apiSystemRoutes)
   app.route('/admin/api', adminApiRoutes)
+  app.route('/admin/content', adminContentRoutes)
   app.route('/auth', authRoutes)
 
   // Custom routes - User-defined routes

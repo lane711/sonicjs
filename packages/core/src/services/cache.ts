@@ -125,6 +125,21 @@ export class CacheService {
   async clear(): Promise<void> {
     this.memoryCache.clear()
   }
+
+  /**
+   * Get value from cache or set it using a callback
+   */
+  async getOrSet<T>(key: string, callback: () => Promise<T>, ttl?: number): Promise<T> {
+    const cached = await this.get<T>(key)
+
+    if (cached !== null) {
+      return cached
+    }
+
+    const value = await callback()
+    await this.set(key, value, ttl)
+    return value
+  }
 }
 
 /**

@@ -91,6 +91,18 @@ var CacheService = class {
   async clear() {
     this.memoryCache.clear();
   }
+  /**
+   * Get value from cache or set it using a callback
+   */
+  async getOrSet(key, callback, ttl) {
+    const cached = await this.get(key);
+    if (cached !== null) {
+      return cached;
+    }
+    const value = await callback();
+    await this.set(key, value, ttl);
+    return value;
+  }
 };
 var CACHE_CONFIGS = {
   api: {
@@ -121,5 +133,5 @@ function getCacheService(config) {
 exports.CACHE_CONFIGS = CACHE_CONFIGS;
 exports.CacheService = CacheService;
 exports.getCacheService = getCacheService;
-//# sourceMappingURL=chunk-K6ZR653V.cjs.map
-//# sourceMappingURL=chunk-K6ZR653V.cjs.map
+//# sourceMappingURL=chunk-AGOE25LF.cjs.map
+//# sourceMappingURL=chunk-AGOE25LF.cjs.map
