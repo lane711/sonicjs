@@ -37,5 +37,11 @@ export type { AdminLayoutCatalystData } from './layouts/admin-layout-catalyst.te
 // Component templates
 export { renderLogo } from './components/logo.template'
 
-// Re-export commonly used template types for convenience
-export type { TableData } from './table.template'
+// Page templates - Admin
+export { renderDesignPage } from './pages/admin-design.template'
+export type { DesignPageData } from './pages/admin-design.template'
+export { renderCheckboxPage } from './pages/admin-checkboxes.template'
+export type { CheckboxPageData } from './pages/admin-checkboxes.template'
+export { renderFAQList } from './pages/admin-faq-list.template'
+export { renderTestimonialsList } from './pages/admin-testimonials-list.template'
+export { renderCodeExamplesList } from './pages/admin-code-examples-list.template'

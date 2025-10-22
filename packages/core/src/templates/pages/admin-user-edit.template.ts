@@ -1,5 +1,5 @@
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
-import { renderAlert } from '../components/alert.template'
+import { renderAlert } from '../alert.template'
 import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
 import { escapeHtml } from '../../utils/sanitize'
 

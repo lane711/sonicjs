@@ -1,5 +1,5 @@
 import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
-import { renderAlert } from '../components/alert.template'
+import { renderAlert } from '../alert.template'
 
 export interface UserProfile {
   id: string

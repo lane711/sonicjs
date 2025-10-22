@@ -12,21 +12,22 @@ import {
   adminUsersRoutes,
   adminMediaRoutes,
   adminLogsRoutes,
-  adminPluginRoutes
+  adminPluginRoutes,
+  adminDesignRoutes,
+  adminCheckboxRoutes,
+  adminFAQRoutes,
+  adminTestimonialsRoutes,
+  adminCodeExamplesRoutes
 } from '@sonicjs-cms/core'
-// Monolith-specific routes (not yet migrated)
+// Monolith-specific routes (not migrated - have heavy dependencies)
 import { adminRoutes } from './routes/admin'
-import adminFAQRoutes from './routes/admin-faq'
-import adminTestimonialsRoutes from './routes/admin-testimonials'
-import adminCodeExamplesRoutes from './routes/admin-code-examples'
+import { docsRoutes } from './routes/docs'
+import { contentRoutes } from './routes/content'
+import { mediaRoutes } from './routes/media'
 // Design plugin routes
 import { designRoutes } from './plugins/design/routes'
 // Hello World plugin
 import { helloWorldPlugin } from './plugins/core-plugins/hello-world-plugin'
-import { adminCheckboxRoutes } from './routes/admin-checkboxes'
-import { docsRoutes } from './routes/docs'
-import { contentRoutes } from './routes/content'
-import { mediaRoutes } from './routes/media'
 // Workflow routes are loaded dynamically through plugin system
 import { createWorkflowRoutes } from './plugins/available/workflow-plugin/routes'
 import { createWorkflowAdminRoutes } from './plugins/available/workflow-plugin/admin-routes'
@@ -204,24 +205,25 @@ app.route('/admin/media', adminMediaRoutes as any)
 app.route('/admin/content', adminContentRoutes as any)
 app.route('/admin/plugins', adminPluginRoutes as any)
 app.route('/admin/logs', adminLogsRoutes as any)
-// FAQ routes with plugin activation check
+// FAQ routes with plugin activation check (from core)
 app.use('/admin/faq/*', requireActivePlugin('faq'))
-app.route('/admin/faq', adminFAQRoutes)
-// Testimonials routes with plugin activation check
+app.route('/admin/faq', adminFAQRoutes as any)
+// Testimonials routes with plugin activation check (from core)
 app.use('/admin/testimonials/*', requireActivePlugin('testimonials'))
-app.route('/admin/testimonials', adminTestimonialsRoutes)
-// Code Examples routes with plugin activation check
+app.route('/admin/testimonials', adminTestimonialsRoutes as any)
+// Code Examples routes with plugin activation check (from core)
 app.use('/admin/code-examples/*', requireActivePlugin('code-examples'))
-app.route('/admin/code-examples', adminCodeExamplesRoutes)
+app.route('/admin/code-examples', adminCodeExamplesRoutes as any)
 // Workflow routes with plugin activation check
 app.use('/admin/workflow/*', requireActivePlugin('workflow'))
 app.route('/admin/workflow', createWorkflowAdminRoutes())
 app.use('/api/workflow/*', requireActivePlugin('workflow'))
 app.route('/api/workflow', createWorkflowRoutes())
-// Design routes with plugin activation check
+// Design routes with plugin activation check (from core)
 app.use('/admin/design/*', requireActivePlugin('design'))
-app.route('/admin/design', designRoutes)
-app.route('/admin/checkboxes', adminCheckboxRoutes)
+app.route('/admin/design', adminDesignRoutes as any)
+// Checkboxes demo route (from core)
+app.route('/admin/checkboxes', adminCheckboxRoutes as any)
 // app.route('/admin/email', emailRoutes)
 // Cache routes with plugin activation check
 app.use('/admin/cache/*', requireActivePlugin('cache'))

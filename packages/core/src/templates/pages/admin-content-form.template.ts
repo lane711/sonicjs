@@ -1,7 +1,7 @@
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
+import { renderAlert } from '../alert.template'
 import { renderDynamicField, renderFieldGroup, FieldDefinition } from '../components/dynamic-field.template'
-import { renderAlert } from '../components/alert.template'
-import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
+import { renderConfirmationDialog, getConfirmationDialogScript } from '../confirmation-dialog.template'
 
 export interface Collection {
   id: string

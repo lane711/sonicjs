@@ -1,20 +1,18 @@
-'use strict';
-
-var chunkAGOE25LF_cjs = require('./chunk-AGOE25LF.cjs');
-var chunkBUKT6HP5_cjs = require('./chunk-BUKT6HP5.cjs');
-var chunkRNR4HA23_cjs = require('./chunk-RNR4HA23.cjs');
-var chunkLEGKJ5DI_cjs = require('./chunk-LEGKJ5DI.cjs');
-var chunkRGCQSFKC_cjs = require('./chunk-RGCQSFKC.cjs');
-var hono = require('hono');
-var cors = require('hono/cors');
-var zod = require('zod');
-var validator = require('hono/validator');
-var cookie = require('hono/cookie');
-var html = require('hono/html');
+import { getCacheService, CACHE_CONFIGS } from './chunk-3MNMOLSA.js';
+import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity, requirePermission } from './chunk-WESS2U3K.js';
+import { PluginService, getLogger } from './chunk-7N3HK7ZK.js';
+import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderFAQList, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2 } from './chunk-P3VS4DV3.js';
+import { QueryFilterBuilder, sanitizeInput, escapeHtml } from './chunk-JIINOD2W.js';
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { z } from 'zod';
+import { validator } from 'hono/validator';
+import { setCookie } from 'hono/cookie';
+import { html, raw } from 'hono/html';
 
 // src/schemas/index.ts
 var schemaDefinitions = [];
-var apiContentCrudRoutes = new hono.Hono();
+var apiContentCrudRoutes = new Hono();
 apiContentCrudRoutes.get("/:id", async (c) => {
   try {
     const id = c.req.param("id");
@@ -43,7 +41,7 @@ apiContentCrudRoutes.get("/:id", async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.post("/", chunkBUKT6HP5_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.post("/", requireAuth(), async (c) => {
   try {
     const db = c.env.DB;
     const user = c.get("user");
@@ -84,7 +82,7 @@ apiContentCrudRoutes.post("/", chunkBUKT6HP5_cjs.requireAuth(), async (c) => {
       now,
       now
     ).run();
-    const cache = chunkAGOE25LF_cjs.getCacheService(chunkAGOE25LF_cjs.CACHE_CONFIGS.api);
+    const cache = getCacheService(CACHE_CONFIGS.api);
     await cache.invalidate(`content:list:${collectionId}:*`);
     await cache.invalidate("content-filtered:*");
     const getStmt = db.prepare("SELECT * FROM content WHERE id = ?");
@@ -109,7 +107,7 @@ apiContentCrudRoutes.post("/", chunkBUKT6HP5_cjs.requireAuth(), async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.put("/:id", chunkBUKT6HP5_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.put("/:id", requireAuth(), async (c) => {
   try {
     const id = c.req.param("id");
     const db = c.env.DB;
@@ -147,7 +145,7 @@ apiContentCrudRoutes.put("/:id", chunkBUKT6HP5_cjs.requireAuth(), async (c) => {
       WHERE id = ?
     `);
     await updateStmt.bind(...params).run();
-    const cache = chunkAGOE25LF_cjs.getCacheService(chunkAGOE25LF_cjs.CACHE_CONFIGS.api);
+    const cache = getCacheService(CACHE_CONFIGS.api);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existing.collection_id}:*`);
     await cache.invalidate("content-filtered:*");
@@ -173,7 +171,7 @@ apiContentCrudRoutes.put("/:id", chunkBUKT6HP5_cjs.requireAuth(), async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.delete("/:id", chunkBUKT6HP5_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.delete("/:id", requireAuth(), async (c) => {
   try {
     const id = c.req.param("id");
     const db = c.env.DB;
@@ -184,7 +182,7 @@ apiContentCrudRoutes.delete("/:id", chunkBUKT6HP5_cjs.requireAuth(), async (c) =
     }
     const deleteStmt = db.prepare("DELETE FROM content WHERE id = ?");
     await deleteStmt.bind(id).run();
-    const cache = chunkAGOE25LF_cjs.getCacheService(chunkAGOE25LF_cjs.CACHE_CONFIGS.api);
+    const cache = getCacheService(CACHE_CONFIGS.api);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existing.collection_id}:*`);
     await cache.invalidate("content-filtered:*");
@@ -200,7 +198,7 @@ apiContentCrudRoutes.delete("/:id", chunkBUKT6HP5_cjs.requireAuth(), async (c) =
 var api_content_crud_default = apiContentCrudRoutes;
 
 // src/routes/api.ts
-var apiRoutes = new hono.Hono();
+var apiRoutes = new Hono();
 apiRoutes.use("*", async (c, next) => {
   const startTime = Date.now();
   c.set("startTime", startTime);
@@ -209,11 +207,11 @@ apiRoutes.use("*", async (c, next) => {
   c.header("X-Response-Time", `${totalTime}ms`);
 });
 apiRoutes.use("*", async (c, next) => {
-  const cacheEnabled = await chunkBUKT6HP5_cjs.isPluginActive(c.env.DB, "core-cache");
+  const cacheEnabled = await isPluginActive(c.env.DB, "core-cache");
   c.set("cacheEnabled", cacheEnabled);
   await next();
 });
-apiRoutes.use("*", cors.cors({
+apiRoutes.use("*", cors({
   origin: "*",
   allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowHeaders: ["Content-Type", "Authorization"]
@@ -257,7 +255,7 @@ apiRoutes.get("/collections", async (c) => {
   try {
     const db = c.env.DB;
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunkAGOE25LF_cjs.getCacheService(chunkAGOE25LF_cjs.CACHE_CONFIGS.api);
+    const cache = getCacheService(CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("collections", "all");
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -334,12 +332,12 @@ apiRoutes.get("/content", async (c) => {
         });
       }
     }
-    const filter = chunkRGCQSFKC_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.limit) {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder = new chunkRGCQSFKC_cjs.QueryFilterBuilder();
+    const builder = new QueryFilterBuilder();
     const queryResult = builder.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -348,7 +346,7 @@ apiRoutes.get("/content", async (c) => {
       }, 400);
     }
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunkAGOE25LF_cjs.getCacheService(chunkAGOE25LF_cjs.CACHE_CONFIGS.api);
+    const cache = getCacheService(CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("content-filtered", JSON.stringify({ filter, query: queryResult.sql }));
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -426,7 +424,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
     if (!collectionResult) {
       return c.json({ error: "Collection not found" }, 404);
     }
-    const filter = chunkRGCQSFKC_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.where) {
       filter.where = { and: [] };
     }
@@ -442,7 +440,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder = new chunkRGCQSFKC_cjs.QueryFilterBuilder();
+    const builder = new QueryFilterBuilder();
     const queryResult = builder.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -451,7 +449,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
       }, 400);
     }
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunkAGOE25LF_cjs.getCacheService(chunkAGOE25LF_cjs.CACHE_CONFIGS.api);
+    const cache = getCacheService(CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("collection-content-filtered", `${collection}:${JSON.stringify({ filter, query: queryResult.sql })}`);
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -530,9 +528,9 @@ function generateId() {
 async function emitEvent(eventName, data) {
   console.log(`[Event] ${eventName}:`, data);
 }
-var fileValidationSchema = zod.z.object({
-  name: zod.z.string().min(1).max(255),
-  type: zod.z.string().refine(
+var fileValidationSchema = z.object({
+  name: z.string().min(1).max(255),
+  type: z.string().refine(
     (type) => {
       const allowedTypes = [
         // Images
@@ -563,11 +561,11 @@ var fileValidationSchema = zod.z.object({
     },
     { message: "Unsupported file type" }
   ),
-  size: zod.z.number().min(1).max(50 * 1024 * 1024)
+  size: z.number().min(1).max(50 * 1024 * 1024)
   // 50MB max
 });
-var apiMediaRoutes = new hono.Hono();
-apiMediaRoutes.use("*", chunkBUKT6HP5_cjs.requireAuth());
+var apiMediaRoutes = new Hono();
+apiMediaRoutes.use("*", requireAuth());
 apiMediaRoutes.post("/upload", async (c) => {
   try {
     const user = c.get("user");
@@ -1140,7 +1138,7 @@ function getPNGDimensions(uint8Array) {
   };
 }
 var api_media_default = apiMediaRoutes;
-var apiSystemRoutes = new hono.Hono();
+var apiSystemRoutes = new Hono();
 apiSystemRoutes.get("/health", async (c) => {
   try {
     const startTime = Date.now();
@@ -1303,7 +1301,7 @@ apiSystemRoutes.get("/env", (c) => {
 var api_system_default = apiSystemRoutes;
 var zValidator = (target, schema, hook, options) => (
   // @ts-expect-error not typed well
-  validator.validator(target, async (value, c) => {
+  validator(target, async (value, c) => {
     let validatorValue = value;
     const result = (
       // @ts-expect-error z4.$ZodType has safeParseAsync
@@ -1317,9 +1315,9 @@ var zValidator = (target, schema, hook, options) => (
 );
 
 // src/routes/admin-api.ts
-var adminApiRoutes = new hono.Hono();
-adminApiRoutes.use("*", chunkBUKT6HP5_cjs.requireAuth());
-adminApiRoutes.use("*", chunkBUKT6HP5_cjs.requireRole(["admin", "editor"]));
+var adminApiRoutes = new Hono();
+adminApiRoutes.use("*", requireAuth());
+adminApiRoutes.use("*", requireRole(["admin", "editor"]));
 adminApiRoutes.get("/stats", async (c) => {
   try {
     const db = c.env.DB;
@@ -1449,15 +1447,15 @@ adminApiRoutes.get("/activity", async (c) => {
     return c.json({ error: "Failed to fetch recent activity" }, 500);
   }
 });
-var createCollectionSchema = zod.z.object({
-  name: zod.z.string().min(1).max(255).regex(/^[a-z0-9_]+$/, "Must contain only lowercase letters, numbers, and underscores"),
-  display_name: zod.z.string().min(1).max(255),
-  description: zod.z.string().optional()
+var createCollectionSchema = z.object({
+  name: z.string().min(1).max(255).regex(/^[a-z0-9_]+$/, "Must contain only lowercase letters, numbers, and underscores"),
+  display_name: z.string().min(1).max(255),
+  description: z.string().optional()
 });
-var updateCollectionSchema = zod.z.object({
-  display_name: zod.z.string().min(1).max(255).optional(),
-  description: zod.z.string().optional(),
-  is_active: zod.z.boolean().optional()
+var updateCollectionSchema = z.object({
+  display_name: z.string().min(1).max(255).optional(),
+  description: z.string().optional(),
+  is_active: z.boolean().optional()
 });
 adminApiRoutes.get("/collections", async (c) => {
   try {
@@ -1711,79 +1709,6 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
   }
 });
 var admin_api_default = adminApiRoutes;
-
-// src/templates/components/alert.template.ts
-function renderAlert(data) {
-  const typeClasses = {
-    success: "bg-green-50 dark:bg-green-500/10 border border-green-600/20 dark:border-green-500/20",
-    error: "bg-error/10 border border-red-600/20 dark:border-red-500/20",
-    warning: "bg-amber-50 dark:bg-amber-500/10 border border-amber-600/20 dark:border-amber-500/20",
-    info: "bg-blue-50 dark:bg-blue-500/10 border border-blue-600/20 dark:border-blue-500/20"
-  };
-  const iconClasses = {
-    success: "text-green-600 dark:text-green-400",
-    error: "text-red-600 dark:text-red-400",
-    warning: "text-amber-600 dark:text-amber-400",
-    info: "text-blue-600 dark:text-blue-400"
-  };
-  const textClasses = {
-    success: "text-green-900 dark:text-green-300",
-    error: "text-red-900 dark:text-red-300",
-    warning: "text-amber-900 dark:text-amber-300",
-    info: "text-blue-900 dark:text-blue-300"
-  };
-  const messageTextClasses = {
-    success: "text-green-700 dark:text-green-400",
-    error: "text-red-700 dark:text-red-400",
-    warning: "text-amber-700 dark:text-amber-400",
-    info: "text-blue-700 dark:text-blue-400"
-  };
-  const icons = {
-    success: `<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />`,
-    error: `<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />`,
-    warning: `<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />`,
-    info: `<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />`
-  };
-  return `
-    <div class="rounded-lg p-4 ${typeClasses[data.type]} ${data.className || ""}" ${data.dismissible ? 'id="dismissible-alert"' : ""}>
-      <div class="flex">
-        ${data.icon !== false ? `
-          <div class="flex-shrink-0">
-            <svg class="h-5 w-5 ${iconClasses[data.type]}" viewBox="0 0 20 20" fill="currentColor">
-              ${icons[data.type]}
-            </svg>
-          </div>
-        ` : ""}
-        <div class="${data.icon !== false ? "ml-3" : ""}">
-          ${data.title ? `
-            <h3 class="text-sm font-semibold ${textClasses[data.type]}">
-              ${data.title}
-            </h3>
-          ` : ""}
-          <div class="${data.title ? "mt-1 text-sm" : "text-sm"} ${messageTextClasses[data.type]}">
-            <p>${data.message}</p>
-          </div>
-        </div>
-        ${data.dismissible ? `
-          <div class="ml-auto pl-3">
-            <div class="-mx-1.5 -my-1.5">
-              <button
-                type="button"
-                class="inline-flex rounded-md p-1.5 ${iconClasses[data.type]} hover:bg-opacity-20 focus:outline-none focus:ring-2 focus:ring-offset-2"
-                onclick="document.getElementById('dismissible-alert').remove()"
-              >
-                <span class="sr-only">Dismiss</span>
-                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        ` : ""}
-      </div>
-    </div>
-  `;
-}
 
 // src/templates/pages/auth-login.template.ts
 function renderLoginPage(data, demoLoginActive = false) {
@@ -2192,7 +2117,7 @@ var AuthValidationService = class _AuthValidationService {
     const validation = settings.validation;
     const schemaFields = {};
     if (fields.email.required) {
-      let emailSchema = zod.z.string();
+      let emailSchema = z.string();
       if (validation.emailFormat) {
         emailSchema = emailSchema.email("Valid email is required");
       }
@@ -2204,10 +2129,10 @@ var AuthValidationService = class _AuthValidationService {
       }
       schemaFields.email = emailSchema;
     } else {
-      schemaFields.email = zod.z.string().email().optional();
+      schemaFields.email = z.string().email().optional();
     }
     if (fields.password.required) {
-      let passwordSchema = zod.z.string().min(
+      let passwordSchema = z.string().min(
         fields.password.minLength,
         `Password must be at least ${fields.password.minLength} characters`
       );
@@ -2237,33 +2162,33 @@ var AuthValidationService = class _AuthValidationService {
       }
       schemaFields.password = passwordSchema;
     } else {
-      schemaFields.password = zod.z.string().min(fields.password.minLength).optional();
+      schemaFields.password = z.string().min(fields.password.minLength).optional();
     }
     if (fields.username.required) {
-      schemaFields.username = zod.z.string().min(
+      schemaFields.username = z.string().min(
         fields.username.minLength,
         `Username must be at least ${fields.username.minLength} characters`
       );
     } else {
-      schemaFields.username = zod.z.string().min(fields.username.minLength).optional();
+      schemaFields.username = z.string().min(fields.username.minLength).optional();
     }
     if (fields.firstName.required) {
-      schemaFields.firstName = zod.z.string().min(
+      schemaFields.firstName = z.string().min(
         fields.firstName.minLength,
         `First name must be at least ${fields.firstName.minLength} characters`
       );
     } else {
-      schemaFields.firstName = zod.z.string().optional();
+      schemaFields.firstName = z.string().optional();
     }
     if (fields.lastName.required) {
-      schemaFields.lastName = zod.z.string().min(
+      schemaFields.lastName = z.string().min(
         fields.lastName.minLength,
         `Last name must be at least ${fields.lastName.minLength} characters`
       );
     } else {
-      schemaFields.lastName = zod.z.string().optional();
+      schemaFields.lastName = z.string().optional();
     }
-    return zod.z.object(schemaFields);
+    return z.object(schemaFields);
   }
   /**
    * Validate registration data against settings
@@ -2274,7 +2199,7 @@ var AuthValidationService = class _AuthValidationService {
       await schema.parseAsync(data);
       return { valid: true, errors: [] };
     } catch (error) {
-      if (error instanceof zod.z.ZodError) {
+      if (error instanceof z.ZodError) {
         return {
           valid: false,
           errors: error.errors.map((e) => e.message)
@@ -2325,7 +2250,7 @@ var AuthValidationService = class _AuthValidationService {
 var authValidationService = AuthValidationService.getInstance();
 
 // src/routes/auth.ts
-var authRoutes = new hono.Hono();
+var authRoutes = new Hono();
 authRoutes.get("/login", async (c) => {
   const error = c.req.query("error");
   const message = c.req.query("message");
@@ -2350,9 +2275,9 @@ authRoutes.get("/register", (c) => {
   };
   return c.html(renderRegisterPage(pageData));
 });
-var loginSchema = zod.z.object({
-  email: zod.z.string().email("Valid email is required"),
-  password: zod.z.string().min(1, "Password is required")
+var loginSchema = z.object({
+  email: z.string().email("Valid email is required"),
+  password: z.string().min(1, "Password is required")
 });
 authRoutes.post(
   "/register",
@@ -2379,7 +2304,7 @@ authRoutes.post(
       if (existingUser) {
         return c.json({ error: "User with this email or username already exists" }, 400);
       }
-      const passwordHash = await chunkBUKT6HP5_cjs.AuthManager.hashPassword(password);
+      const passwordHash = await AuthManager.hashPassword(password);
       const userId = crypto.randomUUID();
       const now = /* @__PURE__ */ new Date();
       await db.prepare(`
@@ -2399,8 +2324,8 @@ authRoutes.post(
         now.getTime(),
         now.getTime()
       ).run();
-      const token = await chunkBUKT6HP5_cjs.AuthManager.generateToken(userId, normalizedEmail, "viewer");
-      cookie.setCookie(c, "auth_token", token, {
+      const token = await AuthManager.generateToken(userId, normalizedEmail, "viewer");
+      setCookie(c, "auth_token", token, {
         httpOnly: true,
         secure: true,
         sameSite: "Strict",
@@ -2432,7 +2357,7 @@ authRoutes.post(
       const { email, password } = c.req.valid("json");
       const db = c.env.DB;
       const normalizedEmail = email.toLowerCase();
-      const cache = chunkAGOE25LF_cjs.getCacheService(chunkAGOE25LF_cjs.CACHE_CONFIGS.user);
+      const cache = getCacheService(CACHE_CONFIGS.user);
       let user = await cache.get(cache.generateKey("user", `email:${normalizedEmail}`));
       if (!user) {
         user = await db.prepare("SELECT * FROM users WHERE email = ? AND is_active = 1").bind(normalizedEmail).first();
@@ -2444,12 +2369,12 @@ authRoutes.post(
       if (!user) {
         return c.json({ error: "Invalid email or password" }, 401);
       }
-      const isValidPassword = await chunkBUKT6HP5_cjs.AuthManager.verifyPassword(password, user.password_hash);
+      const isValidPassword = await AuthManager.verifyPassword(password, user.password_hash);
       if (!isValidPassword) {
         return c.json({ error: "Invalid email or password" }, 401);
       }
-      const token = await chunkBUKT6HP5_cjs.AuthManager.generateToken(user.id, user.email, user.role);
-      cookie.setCookie(c, "auth_token", token, {
+      const token = await AuthManager.generateToken(user.id, user.email, user.role);
+      setCookie(c, "auth_token", token, {
         httpOnly: true,
         secure: true,
         sameSite: "Strict",
@@ -2477,7 +2402,7 @@ authRoutes.post(
   }
 );
 authRoutes.post("/logout", (c) => {
-  cookie.setCookie(c, "auth_token", "", {
+  setCookie(c, "auth_token", "", {
     httpOnly: true,
     secure: false,
     // Set to true in production with HTTPS
@@ -2488,7 +2413,7 @@ authRoutes.post("/logout", (c) => {
   return c.json({ message: "Logged out successfully" });
 });
 authRoutes.get("/logout", (c) => {
-  cookie.setCookie(c, "auth_token", "", {
+  setCookie(c, "auth_token", "", {
     httpOnly: true,
     secure: false,
     // Set to true in production with HTTPS
@@ -2498,7 +2423,7 @@ authRoutes.get("/logout", (c) => {
   });
   return c.redirect("/auth/login?message=You have been logged out successfully");
 });
-authRoutes.get("/me", chunkBUKT6HP5_cjs.requireAuth(), async (c) => {
+authRoutes.get("/me", requireAuth(), async (c) => {
   try {
     const user = c.get("user");
     if (!user) {
@@ -2515,14 +2440,14 @@ authRoutes.get("/me", chunkBUKT6HP5_cjs.requireAuth(), async (c) => {
     return c.json({ error: "Failed to get user" }, 500);
   }
 });
-authRoutes.post("/refresh", chunkBUKT6HP5_cjs.requireAuth(), async (c) => {
+authRoutes.post("/refresh", requireAuth(), async (c) => {
   try {
     const user = c.get("user");
     if (!user) {
       return c.json({ error: "Not authenticated" }, 401);
     }
-    const token = await chunkBUKT6HP5_cjs.AuthManager.generateToken(user.userId, user.email, user.role);
-    cookie.setCookie(c, "auth_token", token, {
+    const token = await AuthManager.generateToken(user.userId, user.email, user.role);
+    setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: true,
       sameSite: "Strict",
@@ -2551,7 +2476,7 @@ authRoutes.post("/register/form", async (c) => {
     const validationSchema = await authValidationService.buildRegistrationSchema(db);
     const validation = await validationSchema.safeParseAsync(requestData);
     if (!validation.success) {
-      return c.html(html.html`
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           ${validation.error.errors.map((err) => err.message).join(", ")}
         </div>
@@ -2565,13 +2490,13 @@ authRoutes.post("/register/form", async (c) => {
     const lastName = validatedData.lastName || authValidationService.generateDefaultValue("lastName", validatedData);
     const existingUser = await db.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind(normalizedEmail, username).first();
     if (existingUser) {
-      return c.html(html.html`
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           User with this email or username already exists
         </div>
       `);
     }
-    const passwordHash = await chunkBUKT6HP5_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await AuthManager.hashPassword(password);
     const userId = crypto.randomUUID();
     const now = /* @__PURE__ */ new Date();
     await db.prepare(`
@@ -2591,8 +2516,8 @@ authRoutes.post("/register/form", async (c) => {
       now.getTime(),
       now.getTime()
     ).run();
-    const token = await chunkBUKT6HP5_cjs.AuthManager.generateToken(userId, normalizedEmail, "admin");
-    cookie.setCookie(c, "auth_token", token, {
+    const token = await AuthManager.generateToken(userId, normalizedEmail, "admin");
+    setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: false,
       // Set to true in production with HTTPS
@@ -2600,7 +2525,7 @@ authRoutes.post("/register/form", async (c) => {
       maxAge: 60 * 60 * 24
       // 24 hours
     });
-    return c.html(html.html`
+    return c.html(html`
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
         Account created successfully! Redirecting to admin dashboard...
         <script>
@@ -2612,7 +2537,7 @@ authRoutes.post("/register/form", async (c) => {
     `);
   } catch (error) {
     console.error("Registration error:", error);
-    return c.html(html.html`
+    return c.html(html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         Registration failed. Please try again.
       </div>
@@ -2627,7 +2552,7 @@ authRoutes.post("/login/form", async (c) => {
     const normalizedEmail = email.toLowerCase();
     const validation = loginSchema.safeParse({ email: normalizedEmail, password });
     if (!validation.success) {
-      return c.html(html.html`
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           ${validation.error.errors.map((err) => err.message).join(", ")}
         </div>
@@ -2636,22 +2561,22 @@ authRoutes.post("/login/form", async (c) => {
     const db = c.env.DB;
     const user = await db.prepare("SELECT * FROM users WHERE email = ? AND is_active = 1").bind(normalizedEmail).first();
     if (!user) {
-      return c.html(html.html`
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Invalid email or password
         </div>
       `);
     }
-    const isValidPassword = await chunkBUKT6HP5_cjs.AuthManager.verifyPassword(password, user.password_hash);
+    const isValidPassword = await AuthManager.verifyPassword(password, user.password_hash);
     if (!isValidPassword) {
-      return c.html(html.html`
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Invalid email or password
         </div>
       `);
     }
-    const token = await chunkBUKT6HP5_cjs.AuthManager.generateToken(user.id, user.email, user.role);
-    cookie.setCookie(c, "auth_token", token, {
+    const token = await AuthManager.generateToken(user.id, user.email, user.role);
+    setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: false,
       // Set to true in production with HTTPS
@@ -2660,7 +2585,7 @@ authRoutes.post("/login/form", async (c) => {
       // 24 hours
     });
     await db.prepare("UPDATE users SET last_login_at = ? WHERE id = ?").bind((/* @__PURE__ */ new Date()).getTime(), user.id).run();
-    return c.html(html.html`
+    return c.html(html`
       <div id="form-response">
         <div class="rounded-lg bg-green-100 dark:bg-lime-500/10 p-4 ring-1 ring-green-400 dark:ring-lime-500/20">
           <div class="flex items-start gap-x-3">
@@ -2681,7 +2606,7 @@ authRoutes.post("/login/form", async (c) => {
     `);
   } catch (error) {
     console.error("Login error:", error);
-    return c.html(html.html`
+    return c.html(html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         Login failed. Please try again.
       </div>
@@ -2719,7 +2644,7 @@ authRoutes.post("/seed-admin", async (c) => {
         }
       });
     }
-    const passwordHash = await chunkBUKT6HP5_cjs.AuthManager.hashPassword("admin123");
+    const passwordHash = await AuthManager.hashPassword("admin123");
     const userId = "admin-user-id";
     const now = Date.now();
     const adminEmail = "admin@sonicjs.com".toLowerCase();
@@ -2939,7 +2864,7 @@ authRoutes.post("/accept-invitation", async (c) => {
     if (existingUsername) {
       return c.json({ error: "Username is already taken" }, 400);
     }
-    const passwordHash = await chunkBUKT6HP5_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await AuthManager.hashPassword(password);
     const updateStmt = db.prepare(`
       UPDATE users SET 
         username = ?,
@@ -2958,8 +2883,8 @@ authRoutes.post("/accept-invitation", async (c) => {
       Date.now(),
       invitedUser.id
     ).run();
-    const authToken = await chunkBUKT6HP5_cjs.AuthManager.generateToken(invitedUser.id, invitedUser.email, invitedUser.role);
-    cookie.setCookie(c, "auth_token", authToken, {
+    const authToken = await AuthManager.generateToken(invitedUser.id, invitedUser.email, invitedUser.role);
+    setCookie(c, "auth_token", authToken, {
       httpOnly: true,
       secure: true,
       sameSite: "Strict",
@@ -3188,7 +3113,7 @@ authRoutes.post("/reset-password", async (c) => {
     if (Date.now() > user.password_reset_expires) {
       return c.json({ error: "Reset token has expired" }, 400);
     }
-    const newPasswordHash = await chunkBUKT6HP5_cjs.AuthManager.hashPassword(password);
+    const newPasswordHash = await AuthManager.hashPassword(password);
     try {
       const historyStmt = db.prepare(`
         INSERT INTO password_history (id, user_id, password_hash, created_at)
@@ -3225,7 +3150,7 @@ authRoutes.post("/reset-password", async (c) => {
 var auth_default = authRoutes;
 
 // src/templates/pages/admin-content-form.template.ts
-chunkLEGKJ5DI_cjs.init_admin_layout_catalyst_template();
+init_admin_layout_catalyst_template();
 
 // src/templates/components/dynamic-field.template.ts
 function renderDynamicField(field, options = {}) {
@@ -3562,86 +3487,6 @@ function escapeHtml2(text) {
     '"': "&quot;",
     "'": "&#39;"
   })[char] || char);
-}
-
-// src/templates/components/confirmation-dialog.template.ts
-function renderConfirmationDialog(options) {
-  const {
-    id,
-    title,
-    message,
-    confirmText = "Confirm",
-    cancelText = "Cancel",
-    confirmClass = "bg-red-500 hover:bg-red-400",
-    iconColor = "red",
-    onConfirm = ""
-  } = options;
-  const iconColorClasses = {
-    red: "bg-red-500/10 text-red-400",
-    yellow: "bg-yellow-500/10 text-yellow-400",
-    blue: "bg-blue-500/10 text-blue-400"
-  };
-  return `
-    <el-dialog>
-      <dialog
-        id="${id}"
-        aria-labelledby="${id}-title"
-        class="fixed inset-0 m-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent p-0 backdrop:bg-transparent"
-      >
-        <el-dialog-backdrop class="fixed inset-0 bg-gray-900/50 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"></el-dialog-backdrop>
-
-        <div tabindex="0" class="flex min-h-full items-end justify-center p-4 text-center focus:outline focus:outline-0 sm:items-center sm:p-0">
-          <el-dialog-panel class="relative transform overflow-hidden rounded-lg bg-gray-800 px-4 pb-4 pt-5 text-left shadow-xl outline outline-1 -outline-offset-1 outline-white/10 transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-lg sm:p-6 data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95">
-            <div class="sm:flex sm:items-start">
-              <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full ${iconColorClasses[iconColor]} sm:mx-0 sm:size-10">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" data-slot="icon" aria-hidden="true" class="size-6">
-                  <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </div>
-              <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                <h3 id="${id}-title" class="text-base font-semibold text-white">${title}</h3>
-                <div class="mt-2">
-                  <p class="text-sm text-gray-400">${message}</p>
-                </div>
-              </div>
-            </div>
-            <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-              <button
-                type="button"
-                onclick="${onConfirm}; document.getElementById('${id}').close()"
-                command="close"
-                commandfor="${id}"
-                class="confirm-button inline-flex w-full justify-center rounded-md ${confirmClass} px-3 py-2 text-sm font-semibold text-white sm:ml-3 sm:w-auto"
-              >
-                ${confirmText}
-              </button>
-              <button
-                type="button"
-                command="close"
-                commandfor="${id}"
-                class="mt-3 inline-flex w-full justify-center rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-white ring-1 ring-inset ring-white/5 hover:bg-white/20 sm:mt-0 sm:w-auto"
-              >
-                ${cancelText}
-              </button>
-            </div>
-          </el-dialog-panel>
-        </div>
-      </dialog>
-    </el-dialog>
-  `;
-}
-function getConfirmationDialogScript() {
-  return `
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
-    <script>
-      function showConfirmDialog(dialogId) {
-        const dialog = document.getElementById(dialogId);
-        if (dialog) {
-          dialog.showModal();
-        }
-      }
-    </script>
-  `;
 }
 
 // src/templates/pages/admin-content-form.template.ts
@@ -4255,387 +4100,11 @@ function renderContentFormPage(data) {
     content: pageContent,
     version: data.version
   };
-  return chunkLEGKJ5DI_cjs.renderAdminLayoutCatalyst(layoutData);
+  return renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/pages/admin-content-list.template.ts
-chunkLEGKJ5DI_cjs.init_admin_layout_catalyst_template();
-
-// src/templates/components/table.template.ts
-function renderTable(data) {
-  const tableId = data.tableId || `table-${Math.random().toString(36).substr(2, 9)}`;
-  if (data.rows.length === 0) {
-    return `
-      <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-8 text-center">
-        <div class="text-zinc-500 dark:text-zinc-400">
-          <svg class="mx-auto h-12 w-12 text-zinc-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">${data.emptyMessage || "No data available"}</p>
-        </div>
-      </div>
-    `;
-  }
-  return `
-    <div class="${data.className || ""}" id="${tableId}">
-      ${data.title ? `
-        <div class="px-4 sm:px-0 mb-4">
-          <h3 class="text-base font-semibold text-zinc-950 dark:text-white">${data.title}</h3>
-        </div>
-      ` : ""}
-      <div class="overflow-x-auto">
-        <table class="min-w-full sortable-table">
-          <thead>
-            <tr>
-              ${data.selectable ? `
-                <th class="px-4 py-3.5 text-center sm:pl-0">
-                  <div class="flex items-center justify-center">
-                    <div class="group grid size-4 grid-cols-1">
-                      <input type="checkbox" id="select-all-${tableId}" class="col-start-1 row-start-1 appearance-none rounded border border-white/10 bg-white/5 checked:border-cyan-500 checked:bg-cyan-500 indeterminate:border-cyan-500 indeterminate:bg-cyan-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 disabled:border-white/5 disabled:bg-white/10 disabled:checked:bg-white/10 forced-colors:appearance-auto row-checkbox" />
-                      <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-white/25">
-                        <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
-                        <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:indeterminate]:opacity-100" />
-                      </svg>
-                    </div>
-                  </div>
-                </th>
-              ` : ""}
-              ${data.columns.map((column, index) => {
-    const isFirst = index === 0 && !data.selectable;
-    const isLast = index === data.columns.length - 1;
-    return `
-                <th class="px-4 py-3.5 text-left text-sm font-semibold text-zinc-950 dark:text-white ${isFirst ? "sm:pl-0" : ""} ${isLast ? "sm:pr-0" : ""} ${column.className || ""}">
-                  ${column.sortable ? `
-                    <button
-                      class="flex items-center gap-x-2 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors sort-btn text-left"
-                      data-column="${column.key}"
-                      data-sort-type="${column.sortType || "string"}"
-                      data-sort-direction="none"
-                      onclick="sortTable('${tableId}', '${column.key}', '${column.sortType || "string"}')"
-                    >
-                      <span>${column.label}</span>
-                      <div class="sort-icons flex flex-col">
-                        <svg class="w-3 h-3 sort-up opacity-30" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                        </svg>
-                        <svg class="w-3 h-3 sort-down opacity-30 -mt-1" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                      </div>
-                    </button>
-                  ` : column.label}
-                </th>
-              `;
-  }).join("")}
-            </tr>
-          </thead>
-          <tbody>
-            ${data.rows.map((row, rowIndex) => {
-    if (!row) return "";
-    const clickableClass = data.rowClickable ? "cursor-pointer" : "";
-    const clickHandler = data.rowClickable && data.rowClickUrl ? `onclick="window.location.href='${data.rowClickUrl(row)}'"` : "";
-    return `
-                <tr class="group border-t border-zinc-950/5 dark:border-white/5 hover:bg-gradient-to-r hover:from-cyan-50/50 hover:via-blue-50/30 hover:to-purple-50/50 dark:hover:from-cyan-900/20 dark:hover:via-blue-900/10 dark:hover:to-purple-900/20 hover:shadow-sm hover:shadow-cyan-500/5 dark:hover:shadow-cyan-400/5 transition-all duration-300 ${clickableClass}" ${clickHandler}>
-                  ${data.selectable ? `
-                    <td class="px-4 py-4 sm:pl-0" onclick="event.stopPropagation()">
-                      <div class="flex items-center justify-center">
-                        <div class="group grid size-4 grid-cols-1">
-                          <input type="checkbox" value="${row.id || ""}" class="col-start-1 row-start-1 appearance-none rounded border border-white/10 bg-white/5 checked:border-cyan-500 checked:bg-cyan-500 indeterminate:border-cyan-500 indeterminate:bg-cyan-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 disabled:border-white/5 disabled:bg-white/10 disabled:checked:bg-white/10 forced-colors:appearance-auto row-checkbox" />
-                          <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-white/25">
-                            <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:checked]:opacity-100" />
-                            <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-[:indeterminate]:opacity-100" />
-                          </svg>
-                        </div>
-                      </div>
-                    </td>
-                  ` : ""}
-                  ${data.columns.map((column, colIndex) => {
-      const value = row[column.key];
-      const displayValue = column.render ? column.render(value, row) : value;
-      const stopPropagation = column.key === "actions" ? 'onclick="event.stopPropagation()"' : "";
-      const isFirst = colIndex === 0 && !data.selectable;
-      const isLast = colIndex === data.columns.length - 1;
-      return `
-                      <td class="px-4 py-4 text-sm text-zinc-500 dark:text-zinc-400 ${isFirst ? "sm:pl-0 font-medium text-zinc-950 dark:text-white" : ""} ${isLast ? "sm:pr-0" : ""} ${column.className || ""}" ${stopPropagation}>
-                        ${displayValue || ""}
-                      </td>
-                    `;
-    }).join("")}
-                </tr>
-              `;
-  }).join("")}
-          </tbody>
-        </table>
-      </div>
-
-      <script>
-        // Table sorting functionality
-        window.sortTable = function(tableId, column, sortType) {
-          const tableContainer = document.getElementById(tableId);
-          const table = tableContainer.querySelector('.sortable-table');
-          const tbody = table.querySelector('tbody');
-          const rows = Array.from(tbody.querySelectorAll('tr'));
-          const headerBtn = table.querySelector(\`[data-column="\${column}"]\`);
-
-          // Get current sort direction
-          let direction = headerBtn.getAttribute('data-sort-direction');
-
-          // Reset all sort indicators
-          table.querySelectorAll('.sort-btn').forEach(btn => {
-            btn.setAttribute('data-sort-direction', 'none');
-            btn.querySelectorAll('.sort-up, .sort-down').forEach(icon => {
-              icon.classList.add('opacity-30');
-              icon.classList.remove('opacity-100', 'text-zinc-950', 'dark:text-white');
-            });
-          });
-
-          // Determine new direction
-          if (direction === 'none' || direction === 'desc') {
-            direction = 'asc';
-          } else {
-            direction = 'desc';
-          }
-
-          // Update current header
-          headerBtn.setAttribute('data-sort-direction', direction);
-          const upIcon = headerBtn.querySelector('.sort-up');
-          const downIcon = headerBtn.querySelector('.sort-down');
-
-          if (direction === 'asc') {
-            upIcon.classList.remove('opacity-30');
-            upIcon.classList.add('opacity-100', 'text-zinc-950', 'dark:text-white');
-            downIcon.classList.add('opacity-30');
-            downIcon.classList.remove('opacity-100', 'text-zinc-950', 'dark:text-white');
-          } else {
-            downIcon.classList.remove('opacity-30');
-            downIcon.classList.add('opacity-100', 'text-zinc-950', 'dark:text-white');
-            upIcon.classList.add('opacity-30');
-            upIcon.classList.remove('opacity-100', 'text-zinc-950', 'dark:text-white');
-          }
-
-          // Find column index (accounting for potential select column)
-          const headers = Array.from(table.querySelectorAll('th'));
-          const selectableOffset = table.querySelector('input[id^="select-all"]') ? 1 : 0;
-          const columnIndex = headers.findIndex(th => th.querySelector(\`[data-column="\${column}"]\`)) - selectableOffset;
-
-          // Sort rows
-          rows.sort((a, b) => {
-            const aCell = a.children[columnIndex + selectableOffset];
-            const bCell = b.children[columnIndex + selectableOffset];
-
-            if (!aCell || !bCell) return 0;
-
-            let aValue = aCell.textContent.trim();
-            let bValue = bCell.textContent.trim();
-
-            // Handle different sort types
-            switch (sortType) {
-              case 'number':
-                aValue = parseFloat(aValue.replace(/[^0-9.-]/g, '')) || 0;
-                bValue = parseFloat(bValue.replace(/[^0-9.-]/g, '')) || 0;
-                break;
-              case 'date':
-                aValue = new Date(aValue).getTime() || 0;
-                bValue = new Date(bValue).getTime() || 0;
-                break;
-              case 'boolean':
-                aValue = aValue.toLowerCase() === 'true' || aValue.toLowerCase() === 'published' || aValue.toLowerCase() === 'active';
-                bValue = bValue.toLowerCase() === 'true' || bValue.toLowerCase() === 'published' || bValue.toLowerCase() === 'active';
-                break;
-              default: // string
-                aValue = aValue.toLowerCase();
-                bValue = bValue.toLowerCase();
-            }
-
-            if (aValue < bValue) return direction === 'asc' ? -1 : 1;
-            if (aValue > bValue) return direction === 'asc' ? 1 : -1;
-            return 0;
-          });
-
-          // Re-append sorted rows
-          rows.forEach(row => tbody.appendChild(row));
-        };
-
-        // Select all functionality
-        document.addEventListener('DOMContentLoaded', function() {
-          document.querySelectorAll('[id^="select-all"]').forEach(selectAll => {
-            selectAll.addEventListener('change', function() {
-              const tableId = this.id.replace('select-all-', '');
-              const table = document.getElementById(tableId);
-              if (table) {
-                const checkboxes = table.querySelectorAll('.row-checkbox');
-                checkboxes.forEach(checkbox => {
-                  checkbox.checked = this.checked;
-                });
-              }
-            });
-          });
-        });
-      </script>
-    </div>
-  `;
-}
-
-// src/templates/components/pagination.template.ts
-function renderPagination(data) {
-  const shouldShowPagination = data.totalPages > 1 || data.showPageSizeSelector !== false && data.totalItems > 0;
-  if (!shouldShowPagination) {
-    return "";
-  }
-  const buildUrl = (page, limit) => {
-    const params = new URLSearchParams(data.queryParams || {});
-    params.set("page", page.toString());
-    if (data.itemsPerPage !== 20) {
-      params.set("limit", data.itemsPerPage.toString());
-    }
-    return `${data.baseUrl}?${params.toString()}`;
-  };
-  const buildPageSizeUrl = (limit) => {
-    const params = new URLSearchParams(data.queryParams || {});
-    params.set("page", "1");
-    params.set("limit", limit.toString());
-    return `${data.baseUrl}?${params.toString()}`;
-  };
-  const generatePageNumbers = () => {
-    const maxNumbers = data.maxPageNumbers || 5;
-    const half = Math.floor(maxNumbers / 2);
-    let start = Math.max(1, data.currentPage - half);
-    let end = Math.min(data.totalPages, start + maxNumbers - 1);
-    if (end - start + 1 < maxNumbers) {
-      start = Math.max(1, end - maxNumbers + 1);
-    }
-    const pages = [];
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-    return pages;
-  };
-  return `
-    <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 px-4 py-3 flex items-center justify-between mt-4">
-      ${data.totalPages > 1 ? `
-        <!-- Mobile Pagination -->
-        <div class="flex-1 flex justify-between sm:hidden">
-          ${data.currentPage > 1 ? `
-            <a href="${buildUrl(data.currentPage - 1)}" class="inline-flex items-center rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
-              Previous
-            </a>
-          ` : `
-            <span class="inline-flex items-center rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-400 dark:text-zinc-600 shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 opacity-50 cursor-not-allowed">Previous</span>
-          `}
-
-          ${data.currentPage < data.totalPages ? `
-            <a href="${buildUrl(data.currentPage + 1)}" class="inline-flex items-center rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
-              Next
-            </a>
-          ` : `
-            <span class="inline-flex items-center rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-400 dark:text-zinc-600 shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 opacity-50 cursor-not-allowed">Next</span>
-          `}
-        </div>
-      ` : ""}
-
-      <!-- Desktop Pagination -->
-      <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-        <div class="flex items-center gap-4">
-          <p class="text-sm text-zinc-500 dark:text-zinc-400">
-            Showing <span class="font-medium text-zinc-950 dark:text-white">${data.startItem}</span> to
-            <span class="font-medium text-zinc-950 dark:text-white">${data.endItem}</span> of
-            <span class="font-medium text-zinc-950 dark:text-white">${data.totalItems}</span> results
-          </p>
-          ${data.showPageSizeSelector !== false ? `
-            <div class="flex items-center gap-2">
-              <label for="page-size" class="text-sm text-zinc-500 dark:text-zinc-400">Per page:</label>
-              <div class="grid grid-cols-1">
-                <select
-                  id="page-size"
-                  onchange="window.location.href = this.value"
-                  class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-sm text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-zinc-500/30 dark:outline-zinc-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-500 dark:focus-visible:outline-zinc-400"
-                >
-                  ${(data.pageSizeOptions || [10, 20, 50, 100]).map((size) => `
-                    <option value="${buildPageSizeUrl(size)}" ${size === data.itemsPerPage ? "selected" : ""}>
-                      ${size}
-                    </option>
-                  `).join("")}
-                </select>
-                <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-4 self-center justify-self-end text-zinc-600 dark:text-zinc-400">
-                  <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
-                </svg>
-              </div>
-            </div>
-          ` : ""}
-        </div>
-
-        ${data.totalPages > 1 ? `
-          <div class="flex items-center gap-x-1">
-            <!-- Previous Button -->
-            ${data.currentPage > 1 ? `
-            <a href="${buildUrl(data.currentPage - 1)}"
-               class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
-              Previous
-            </a>
-          ` : ""}
-
-          <!-- Page Numbers -->
-          ${data.showPageNumbers !== false ? `
-            <!-- First page if not in range -->
-            ${(() => {
-    const pageNumbers = generatePageNumbers();
-    const firstPage = pageNumbers.length > 0 ? pageNumbers[0] : null;
-    return firstPage && firstPage > 1 ? `
-                <a href="${buildUrl(1)}"
-                   class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
-                  1
-                </a>
-                ${firstPage > 2 ? `
-                  <span class="px-2 text-sm text-zinc-500 dark:text-zinc-400">...</span>
-                ` : ""}
-              ` : "";
-  })()}
-
-            <!-- Page number buttons -->
-            ${generatePageNumbers().map((pageNum) => `
-              ${pageNum === data.currentPage ? `
-                <span class="rounded-lg bg-zinc-950 dark:bg-white px-3 py-2 text-sm font-semibold text-white dark:text-zinc-950">
-                  ${pageNum}
-                </span>
-              ` : `
-                <a href="${buildUrl(pageNum)}"
-                   class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
-                  ${pageNum}
-                </a>
-              `}
-            `).join("")}
-
-            <!-- Last page if not in range -->
-            ${(() => {
-    const pageNumbers = generatePageNumbers();
-    const lastPageNum = pageNumbers.length > 0 ? pageNumbers.slice(-1)[0] : null;
-    return lastPageNum && lastPageNum < data.totalPages ? `
-                ${lastPageNum < data.totalPages - 1 ? `
-                  <span class="px-2 text-sm text-zinc-500 dark:text-zinc-400">...</span>
-                ` : ""}
-                <a href="${buildUrl(data.totalPages)}"
-                   class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
-                  ${data.totalPages}
-                </a>
-              ` : "";
-  })()}
-          ` : ""}
-
-          <!-- Next Button -->
-          ${data.currentPage < data.totalPages ? `
-            <a href="${buildUrl(data.currentPage + 1)}"
-               class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
-              Next
-            </a>
-          ` : ""}
-          </div>
-        ` : ""}
-      </div>
-    </div>
-  `;
-}
-
-// src/templates/pages/admin-content-list.template.ts
+init_admin_layout_catalyst_template();
 function renderContentListPage(data) {
   const urlParams = new URLSearchParams();
   if (data.modelName && data.modelName !== "all") urlParams.set("model", data.modelName);
@@ -5263,7 +4732,7 @@ function renderContentListPage(data) {
     version: data.version,
     content: pageContent
   };
-  return chunkLEGKJ5DI_cjs.renderAdminLayoutCatalyst(layoutData);
+  return renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/components/version-history.template.ts
@@ -5445,9 +4914,9 @@ function escapeHtml3(text) {
 }
 
 // src/routes/admin-content.ts
-var adminContentRoutes = new hono.Hono();
+var adminContentRoutes = new Hono();
 async function getCollectionFields(db, collectionId) {
-  const cache = chunkAGOE25LF_cjs.getCacheService(chunkAGOE25LF_cjs.CACHE_CONFIGS.collection);
+  const cache = getCacheService(CACHE_CONFIGS.collection);
   return cache.getOrSet(
     cache.generateKey("fields", collectionId),
     async () => {
@@ -5471,7 +4940,7 @@ async function getCollectionFields(db, collectionId) {
   );
 }
 async function getCollection(db, collectionId) {
-  const cache = chunkAGOE25LF_cjs.getCacheService(chunkAGOE25LF_cjs.CACHE_CONFIGS.collection);
+  const cache = getCacheService(CACHE_CONFIGS.collection);
   return cache.getOrSet(
     cache.generateKey("collection", collectionId),
     async () => {
@@ -5692,7 +5161,7 @@ adminContentRoutes.get("/new", async (c) => {
       return c.html(renderContentFormPage(formData2));
     }
     const fields = await getCollectionFields(db, collectionId);
-    const workflowEnabled = await chunkBUKT6HP5_cjs.isPluginActive(db, "workflow");
+    const workflowEnabled = await isPluginActive(db, "workflow");
     const formData = {
       collection,
       fields,
@@ -5727,7 +5196,7 @@ adminContentRoutes.get("/:id/edit", async (c) => {
     const db = c.env.DB;
     const url = new URL(c.req.url);
     const referrerParams = url.searchParams.get("ref") || "";
-    const cache = chunkAGOE25LF_cjs.getCacheService(chunkAGOE25LF_cjs.CACHE_CONFIGS.content);
+    const cache = getCacheService(CACHE_CONFIGS.content);
     const content = await cache.getOrSet(
       cache.generateKey("content", id),
       async () => {
@@ -5764,7 +5233,7 @@ adminContentRoutes.get("/:id/edit", async (c) => {
     };
     const fields = await getCollectionFields(db, content.collection_id);
     const contentData = content.data ? JSON.parse(content.data) : {};
-    const workflowEnabled = await chunkBUKT6HP5_cjs.isPluginActive(db, "workflow");
+    const workflowEnabled = await isPluginActive(db, "workflow");
     const formData = {
       id: content.id,
       title: content.title,
@@ -5811,7 +5280,7 @@ adminContentRoutes.post("/", async (c) => {
     const collectionId = formData.get("collection_id");
     const action = formData.get("action");
     if (!collectionId) {
-      return c.html(html.html`
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Collection ID is required.
         </div>
@@ -5820,7 +5289,7 @@ adminContentRoutes.post("/", async (c) => {
     const db = c.env.DB;
     const collection = await getCollection(db, collectionId);
     if (!collection) {
-      return c.html(html.html`
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Collection not found.
         </div>
@@ -5917,7 +5386,7 @@ adminContentRoutes.post("/", async (c) => {
       now,
       now
     ).run();
-    const cache = chunkAGOE25LF_cjs.getCacheService(chunkAGOE25LF_cjs.CACHE_CONFIGS.content);
+    const cache = getCacheService(CACHE_CONFIGS.content);
     await cache.invalidate(`content:list:${collectionId}:*`);
     const versionStmt = db.prepare(`
       INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
@@ -5956,7 +5425,7 @@ adminContentRoutes.post("/", async (c) => {
     }
   } catch (error) {
     console.error("Error creating content:", error);
-    return c.html(html.html`
+    return c.html(html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         Failed to create content. Please try again.
       </div>
@@ -5973,7 +5442,7 @@ adminContentRoutes.put("/:id", async (c) => {
     const contentStmt = db.prepare("SELECT * FROM content WHERE id = ?");
     const existingContent = await contentStmt.bind(id).first();
     if (!existingContent) {
-      return c.html(html.html`
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Content not found.
         </div>
@@ -5981,7 +5450,7 @@ adminContentRoutes.put("/:id", async (c) => {
     }
     const collection = await getCollection(db, existingContent.collection_id);
     if (!collection) {
-      return c.html(html.html`
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Collection not found.
         </div>
@@ -6065,7 +5534,7 @@ adminContentRoutes.put("/:id", async (c) => {
       now,
       id
     ).run();
-    const cache = chunkAGOE25LF_cjs.getCacheService(chunkAGOE25LF_cjs.CACHE_CONFIGS.content);
+    const cache = getCacheService(CACHE_CONFIGS.content);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existingContent.collection_id}:*`);
     const existingData = JSON.parse(existingContent.data || "{}");
@@ -6113,7 +5582,7 @@ adminContentRoutes.put("/:id", async (c) => {
     }
   } catch (error) {
     console.error("Error updating content:", error);
-    return c.html(html.html`
+    return c.html(html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         Failed to update content. Please try again.
       </div>
@@ -6358,7 +5827,7 @@ adminContentRoutes.post("/bulk-action", async (c) => {
     } else {
       return c.json({ success: false, error: "Invalid action" });
     }
-    const cache = chunkAGOE25LF_cjs.getCacheService(chunkAGOE25LF_cjs.CACHE_CONFIGS.content);
+    const cache = getCacheService(CACHE_CONFIGS.content);
     for (const contentId of ids) {
       await cache.delete(cache.generateKey("content", contentId));
     }
@@ -6386,7 +5855,7 @@ adminContentRoutes.delete("/:id", async (c) => {
       WHERE id = ?
     `);
     await deleteStmt.bind(now, id).run();
-    const cache = chunkAGOE25LF_cjs.getCacheService(chunkAGOE25LF_cjs.CACHE_CONFIGS.content);
+    const cache = getCacheService(CACHE_CONFIGS.content);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate("content:list:*");
     return c.html(`
@@ -6976,7 +6445,80 @@ function renderProfilePage(data) {
     user: data.user,
     content: pageContent
   };
-  return chunkLEGKJ5DI_cjs.renderAdminLayout(layoutData);
+  return renderAdminLayout(layoutData);
+}
+
+// src/templates/components/alert.template.ts
+function renderAlert2(data) {
+  const typeClasses = {
+    success: "bg-green-50 dark:bg-green-500/10 border border-green-600/20 dark:border-green-500/20",
+    error: "bg-error/10 border border-red-600/20 dark:border-red-500/20",
+    warning: "bg-amber-50 dark:bg-amber-500/10 border border-amber-600/20 dark:border-amber-500/20",
+    info: "bg-blue-50 dark:bg-blue-500/10 border border-blue-600/20 dark:border-blue-500/20"
+  };
+  const iconClasses = {
+    success: "text-green-600 dark:text-green-400",
+    error: "text-red-600 dark:text-red-400",
+    warning: "text-amber-600 dark:text-amber-400",
+    info: "text-blue-600 dark:text-blue-400"
+  };
+  const textClasses = {
+    success: "text-green-900 dark:text-green-300",
+    error: "text-red-900 dark:text-red-300",
+    warning: "text-amber-900 dark:text-amber-300",
+    info: "text-blue-900 dark:text-blue-300"
+  };
+  const messageTextClasses = {
+    success: "text-green-700 dark:text-green-400",
+    error: "text-red-700 dark:text-red-400",
+    warning: "text-amber-700 dark:text-amber-400",
+    info: "text-blue-700 dark:text-blue-400"
+  };
+  const icons = {
+    success: `<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />`,
+    error: `<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />`,
+    warning: `<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />`,
+    info: `<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />`
+  };
+  return `
+    <div class="rounded-lg p-4 ${typeClasses[data.type]} ${data.className || ""}" ${data.dismissible ? 'id="dismissible-alert"' : ""}>
+      <div class="flex">
+        ${data.icon !== false ? `
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 ${iconClasses[data.type]}" viewBox="0 0 20 20" fill="currentColor">
+              ${icons[data.type]}
+            </svg>
+          </div>
+        ` : ""}
+        <div class="${data.icon !== false ? "ml-3" : ""}">
+          ${data.title ? `
+            <h3 class="text-sm font-semibold ${textClasses[data.type]}">
+              ${data.title}
+            </h3>
+          ` : ""}
+          <div class="${data.title ? "mt-1 text-sm" : "text-sm"} ${messageTextClasses[data.type]}">
+            <p>${data.message}</p>
+          </div>
+        </div>
+        ${data.dismissible ? `
+          <div class="ml-auto pl-3">
+            <div class="-mx-1.5 -my-1.5">
+              <button
+                type="button"
+                class="inline-flex rounded-md p-1.5 ${iconClasses[data.type]} hover:bg-opacity-20 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                onclick="document.getElementById('dismissible-alert').remove()"
+              >
+                <span class="sr-only">Dismiss</span>
+                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        ` : ""}
+      </div>
+    </div>
+  `;
 }
 
 // src/templates/pages/admin-activity-logs.template.ts
@@ -7186,7 +6728,7 @@ function renderActivityLogsPage(data) {
     user: data.user,
     content: pageContent
   };
-  return chunkLEGKJ5DI_cjs.renderAdminLayout(layoutData);
+  return renderAdminLayout(layoutData);
 }
 function getActionBadgeClass(action) {
   if (action.includes("login") || action.includes("logout")) {
@@ -7206,7 +6748,89 @@ function formatAction(action) {
 }
 
 // src/templates/pages/admin-user-edit.template.ts
-chunkLEGKJ5DI_cjs.init_admin_layout_catalyst_template();
+init_admin_layout_catalyst_template();
+
+// src/templates/components/confirmation-dialog.template.ts
+function renderConfirmationDialog2(options) {
+  const {
+    id,
+    title,
+    message,
+    confirmText = "Confirm",
+    cancelText = "Cancel",
+    confirmClass = "bg-red-500 hover:bg-red-400",
+    iconColor = "red",
+    onConfirm = ""
+  } = options;
+  const iconColorClasses = {
+    red: "bg-red-500/10 text-red-400",
+    yellow: "bg-yellow-500/10 text-yellow-400",
+    blue: "bg-blue-500/10 text-blue-400"
+  };
+  return `
+    <el-dialog>
+      <dialog
+        id="${id}"
+        aria-labelledby="${id}-title"
+        class="fixed inset-0 m-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent p-0 backdrop:bg-transparent"
+      >
+        <el-dialog-backdrop class="fixed inset-0 bg-gray-900/50 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"></el-dialog-backdrop>
+
+        <div tabindex="0" class="flex min-h-full items-end justify-center p-4 text-center focus:outline focus:outline-0 sm:items-center sm:p-0">
+          <el-dialog-panel class="relative transform overflow-hidden rounded-lg bg-gray-800 px-4 pb-4 pt-5 text-left shadow-xl outline outline-1 -outline-offset-1 outline-white/10 transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-lg sm:p-6 data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95">
+            <div class="sm:flex sm:items-start">
+              <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full ${iconColorClasses[iconColor]} sm:mx-0 sm:size-10">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" data-slot="icon" aria-hidden="true" class="size-6">
+                  <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </div>
+              <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                <h3 id="${id}-title" class="text-base font-semibold text-white">${title}</h3>
+                <div class="mt-2">
+                  <p class="text-sm text-gray-400">${message}</p>
+                </div>
+              </div>
+            </div>
+            <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+              <button
+                type="button"
+                onclick="${onConfirm}; document.getElementById('${id}').close()"
+                command="close"
+                commandfor="${id}"
+                class="confirm-button inline-flex w-full justify-center rounded-md ${confirmClass} px-3 py-2 text-sm font-semibold text-white sm:ml-3 sm:w-auto"
+              >
+                ${confirmText}
+              </button>
+              <button
+                type="button"
+                command="close"
+                commandfor="${id}"
+                class="mt-3 inline-flex w-full justify-center rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-white ring-1 ring-inset ring-white/5 hover:bg-white/20 sm:mt-0 sm:w-auto"
+              >
+                ${cancelText}
+              </button>
+            </div>
+          </el-dialog-panel>
+        </div>
+      </dialog>
+    </el-dialog>
+  `;
+}
+function getConfirmationDialogScript2() {
+  return `
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
+    <script>
+      function showConfirmDialog(dialogId) {
+        const dialog = document.getElementById(dialogId);
+        if (dialog) {
+          dialog.showModal();
+        }
+      }
+    </script>
+  `;
+}
+
+// src/templates/pages/admin-user-edit.template.ts
 function renderUserEditPage(data) {
   const pageContent = `
     <div>
@@ -7265,7 +6889,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="first_name"
-                      value="${chunkRGCQSFKC_cjs.escapeHtml(data.userToEdit.firstName || "")}"
+                      value="${escapeHtml(data.userToEdit.firstName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -7276,7 +6900,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="last_name"
-                      value="${chunkRGCQSFKC_cjs.escapeHtml(data.userToEdit.lastName || "")}"
+                      value="${escapeHtml(data.userToEdit.lastName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -7287,7 +6911,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="username"
-                      value="${chunkRGCQSFKC_cjs.escapeHtml(data.userToEdit.username || "")}"
+                      value="${escapeHtml(data.userToEdit.username || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -7298,7 +6922,7 @@ function renderUserEditPage(data) {
                     <input
                       type="email"
                       name="email"
-                      value="${chunkRGCQSFKC_cjs.escapeHtml(data.userToEdit.email || "")}"
+                      value="${escapeHtml(data.userToEdit.email || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -7309,7 +6933,7 @@ function renderUserEditPage(data) {
                     <input
                       type="tel"
                       name="phone"
-                      value="${chunkRGCQSFKC_cjs.escapeHtml(data.userToEdit.phone || "")}"
+                      value="${escapeHtml(data.userToEdit.phone || "")}"
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
                   </div>
@@ -7323,7 +6947,7 @@ function renderUserEditPage(data) {
                         class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-zinc-500/30 dark:outline-zinc-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-500 dark:focus-visible:outline-zinc-400 sm:text-sm/6"
                       >
                         ${data.roles.map((role) => `
-                          <option value="${chunkRGCQSFKC_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunkRGCQSFKC_cjs.escapeHtml(role.label)}</option>
+                          <option value="${escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${escapeHtml(role.label)}</option>
                         `).join("")}
                       </select>
                       <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-zinc-600 dark:text-zinc-400 sm:size-4">
@@ -7339,7 +6963,7 @@ function renderUserEditPage(data) {
                     name="bio"
                     rows="3"
                     class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-                  >${chunkRGCQSFKC_cjs.escapeHtml(data.userToEdit.bio || "")}</textarea>
+                  >${escapeHtml(data.userToEdit.bio || "")}</textarea>
                 </div>
               </div>
 
@@ -7519,7 +7143,7 @@ function renderUserEditPage(data) {
     </script>
 
     <!-- Confirmation Dialogs -->
-    ${renderConfirmationDialog({
+    ${renderConfirmationDialog2({
     id: "delete-user-confirm",
     title: "Delete User",
     message: 'Are you sure you want to delete this user? Check the "Hard Delete" option to permanently remove all data from the database. This action cannot be undone!',
@@ -7530,7 +7154,7 @@ function renderUserEditPage(data) {
     onConfirm: "performDeleteUser()"
   })}
 
-    ${getConfirmationDialogScript()}
+    ${getConfirmationDialogScript2()}
   `;
   const layoutData = {
     title: "Edit User",
@@ -7539,11 +7163,11 @@ function renderUserEditPage(data) {
     user: data.user,
     content: pageContent
   };
-  return chunkLEGKJ5DI_cjs.renderAdminLayoutCatalyst(layoutData);
+  return renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/pages/admin-user-new.template.ts
-chunkLEGKJ5DI_cjs.init_admin_layout_catalyst_template();
+init_admin_layout_catalyst_template();
 function renderUserNewPage(data) {
   const pageContent = `
     <div>
@@ -7827,11 +7451,11 @@ function renderUserNewPage(data) {
     user: data.user,
     content: pageContent
   };
-  return chunkLEGKJ5DI_cjs.renderAdminLayoutCatalyst(layoutData);
+  return renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/pages/admin-users-list.template.ts
-chunkLEGKJ5DI_cjs.init_admin_layout_catalyst_template();
+init_admin_layout_catalyst_template();
 function renderUsersListPage(data) {
   const columns = [
     {
@@ -7857,7 +7481,7 @@ function renderUsersListPage(data) {
       sortable: true,
       sortType: "string",
       render: (value, row) => {
-        const escapeHtml4 = (text) => text.replace(/[&<>"']/g, (char) => ({
+        const escapeHtml7 = (text) => text.replace(/[&<>"']/g, (char) => ({
           "&": "&amp;",
           "<": "&lt;",
           ">": "&gt;",
@@ -7866,9 +7490,9 @@ function renderUsersListPage(data) {
         })[char] || char);
         const truncatedFirstName = row.firstName.length > 25 ? row.firstName.substring(0, 25) + "..." : row.firstName;
         const truncatedLastName = row.lastName.length > 25 ? row.lastName.substring(0, 25) + "..." : row.lastName;
-        const fullName = escapeHtml4(`${truncatedFirstName} ${truncatedLastName}`);
+        const fullName = escapeHtml7(`${truncatedFirstName} ${truncatedLastName}`);
         const truncatedUsername = row.username.length > 100 ? row.username.substring(0, 100) + "..." : row.username;
-        const username = escapeHtml4(truncatedUsername);
+        const username = escapeHtml7(truncatedUsername);
         const statusBadge = row.isActive ? '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-lime-50 dark:bg-lime-500/10 text-lime-700 dark:text-lime-300 ring-1 ring-inset ring-lime-700/10 dark:ring-lime-400/20 ml-2">Active</span>' : '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-700/10 dark:ring-red-500/20 ml-2">Inactive</span>';
         return `
           <div>
@@ -7884,14 +7508,14 @@ function renderUsersListPage(data) {
       sortable: true,
       sortType: "string",
       render: (value) => {
-        const escapeHtml4 = (text) => text.replace(/[&<>"']/g, (char) => ({
+        const escapeHtml7 = (text) => text.replace(/[&<>"']/g, (char) => ({
           "&": "&amp;",
           "<": "&lt;",
           ">": "&gt;",
           '"': "&quot;",
           "'": "&#39;"
         })[char] || char);
-        const escapedEmail = escapeHtml4(value);
+        const escapedEmail = escapeHtml7(value);
         return `<a href="mailto:${escapedEmail}" class="text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors">${escapedEmail}</a>`;
       }
     },
@@ -8213,7 +7837,7 @@ function renderUsersListPage(data) {
     </script>
 
     <!-- Confirmation Dialogs -->
-    ${renderConfirmationDialog({
+    ${renderConfirmationDialog2({
     id: "toggle-user-status-confirm",
     title: "Toggle User Status",
     message: "Are you sure you want to activate/deactivate this user?",
@@ -8224,7 +7848,7 @@ function renderUsersListPage(data) {
     onConfirm: "performToggleUserStatus()"
   })}
 
-    ${getConfirmationDialogScript()}
+    ${getConfirmationDialogScript2()}
   `;
   const layoutData = {
     title: "Users",
@@ -8234,12 +7858,12 @@ function renderUsersListPage(data) {
     version: data.version,
     content: pageContent
   };
-  return chunkLEGKJ5DI_cjs.renderAdminLayoutCatalyst(layoutData);
+  return renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/routes/admin-users.ts
-var userRoutes = new hono.Hono();
-userRoutes.use("*", chunkBUKT6HP5_cjs.requireAuth());
+var userRoutes = new Hono();
+userRoutes.use("*", requireAuth());
 var TIMEZONES = [
   { value: "UTC", label: "UTC" },
   { value: "America/New_York", label: "Eastern Time" },
@@ -8335,17 +7959,17 @@ userRoutes.put("/profile", async (c) => {
   const db = c.env.DB;
   try {
     const formData = await c.req.formData();
-    const firstName = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = sanitizeInput(formData.get("last_name")?.toString());
+    const username = sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = sanitizeInput(formData.get("bio")?.toString()) || null;
     const timezone = formData.get("timezone")?.toString() || "UTC";
     const language = formData.get("language")?.toString() || "en";
     const emailNotifications = formData.get("email_notifications") === "1";
     if (!firstName || !lastName || !username || !email) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "First name, last name, username, and email are required.",
         dismissible: true
@@ -8353,7 +7977,7 @@ userRoutes.put("/profile", async (c) => {
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "Please enter a valid email address.",
         dismissible: true
@@ -8365,7 +7989,7 @@ userRoutes.put("/profile", async (c) => {
     `);
     const existingUser = await checkStmt.bind(username, email, user.userId).first();
     if (existingUser) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "Username or email is already taken by another user.",
         dismissible: true
@@ -8391,7 +8015,7 @@ userRoutes.put("/profile", async (c) => {
       Date.now(),
       user.userId
     ).run();
-    await chunkBUKT6HP5_cjs.logActivity(
+    await logActivity(
       db,
       user.userId,
       "profile.update",
@@ -8401,14 +8025,14 @@ userRoutes.put("/profile", async (c) => {
       c.req.header("x-forwarded-for") || c.req.header("cf-connecting-ip"),
       c.req.header("user-agent")
     );
-    return c.html(renderAlert({
+    return c.html(renderAlert2({
       type: "success",
       message: "Profile updated successfully!",
       dismissible: true
     }));
   } catch (error) {
     console.error("Profile update error:", error);
-    return c.html(renderAlert({
+    return c.html(renderAlert2({
       type: "error",
       message: "Failed to update profile. Please try again.",
       dismissible: true
@@ -8422,7 +8046,7 @@ userRoutes.post("/profile/avatar", async (c) => {
     const formData = await c.req.formData();
     const avatarFile = formData.get("avatar");
     if (!avatarFile || !avatarFile.name) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "Please select an image file.",
         dismissible: true
@@ -8430,7 +8054,7 @@ userRoutes.post("/profile/avatar", async (c) => {
     }
     const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     if (!allowedTypes.includes(avatarFile.type)) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "Please upload a valid image file (JPEG, PNG, GIF, or WebP).",
         dismissible: true
@@ -8438,7 +8062,7 @@ userRoutes.post("/profile/avatar", async (c) => {
     }
     const maxSize = 5 * 1024 * 1024;
     if (avatarFile.size > maxSize) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "Image file must be smaller than 5MB.",
         dismissible: true
@@ -8450,7 +8074,7 @@ userRoutes.post("/profile/avatar", async (c) => {
       WHERE id = ?
     `);
     await updateStmt.bind(avatarUrl, Date.now(), user.userId).run();
-    await chunkBUKT6HP5_cjs.logActivity(
+    await logActivity(
       db,
       user.userId,
       "profile.avatar_update",
@@ -8460,14 +8084,14 @@ userRoutes.post("/profile/avatar", async (c) => {
       c.req.header("x-forwarded-for") || c.req.header("cf-connecting-ip"),
       c.req.header("user-agent")
     );
-    return c.html(renderAlert({
+    return c.html(renderAlert2({
       type: "success",
       message: "Profile picture updated successfully!",
       dismissible: true
     }));
   } catch (error) {
     console.error("Avatar upload error:", error);
-    return c.html(renderAlert({
+    return c.html(renderAlert2({
       type: "error",
       message: "Failed to upload profile picture. Please try again.",
       dismissible: true
@@ -8483,21 +8107,21 @@ userRoutes.post("/profile/password", async (c) => {
     const newPassword = formData.get("new_password")?.toString() || "";
     const confirmPassword = formData.get("confirm_password")?.toString() || "";
     if (!currentPassword || !newPassword || !confirmPassword) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "All password fields are required.",
         dismissible: true
       }));
     }
     if (newPassword !== confirmPassword) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "New passwords do not match.",
         dismissible: true
       }));
     }
     if (newPassword.length < 8) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "New password must be at least 8 characters long.",
         dismissible: true
@@ -8508,21 +8132,21 @@ userRoutes.post("/profile/password", async (c) => {
     `);
     const userData = await userStmt.bind(user.userId).first();
     if (!userData) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "User not found.",
         dismissible: true
       }));
     }
-    const validPassword = await chunkBUKT6HP5_cjs.AuthManager.verifyPassword(currentPassword, userData.password_hash);
+    const validPassword = await AuthManager.verifyPassword(currentPassword, userData.password_hash);
     if (!validPassword) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "Current password is incorrect.",
         dismissible: true
       }));
     }
-    const newPasswordHash = await chunkBUKT6HP5_cjs.AuthManager.hashPassword(newPassword);
+    const newPasswordHash = await AuthManager.hashPassword(newPassword);
     const historyStmt = db.prepare(`
       INSERT INTO password_history (id, user_id, password_hash, created_at)
       VALUES (?, ?, ?, ?)
@@ -8538,7 +8162,7 @@ userRoutes.post("/profile/password", async (c) => {
       WHERE id = ?
     `);
     await updateStmt.bind(newPasswordHash, Date.now(), user.userId).run();
-    await chunkBUKT6HP5_cjs.logActivity(
+    await logActivity(
       db,
       user.userId,
       "profile.password_change",
@@ -8548,21 +8172,21 @@ userRoutes.post("/profile/password", async (c) => {
       c.req.header("x-forwarded-for") || c.req.header("cf-connecting-ip"),
       c.req.header("user-agent")
     );
-    return c.html(renderAlert({
+    return c.html(renderAlert2({
       type: "success",
       message: "Password updated successfully!",
       dismissible: true
     }));
   } catch (error) {
     console.error("Password change error:", error);
-    return c.html(renderAlert({
+    return c.html(renderAlert2({
       type: "error",
       message: "Failed to update password. Please try again.",
       dismissible: true
     }));
   }
 });
-userRoutes.get("/users", chunkBUKT6HP5_cjs.requirePermission("users.read"), async (c) => {
+userRoutes.get("/users", requirePermission("users.read"), async (c) => {
   const db = c.env.DB;
   const user = c.get("user");
   try {
@@ -8605,7 +8229,7 @@ userRoutes.get("/users", chunkBUKT6HP5_cjs.requirePermission("users.read"), asyn
     `);
     const countResult = await countStmt.bind(...params).first();
     const totalUsers = countResult?.total || 0;
-    await chunkBUKT6HP5_cjs.logActivity(
+    await logActivity(
       db,
       user.userId,
       "users.list_view",
@@ -8674,14 +8298,14 @@ userRoutes.get("/users", chunkBUKT6HP5_cjs.requirePermission("users.read"), asyn
     if (isApiRequest) {
       return c.json({ error: "Failed to load users" }, 500);
     }
-    return c.html(renderAlert({
+    return c.html(renderAlert2({
       type: "error",
       message: "Failed to load users. Please try again.",
       dismissible: true
     }), 500);
   }
 });
-userRoutes.get("/users/new", chunkBUKT6HP5_cjs.requirePermission("users.create"), async (c) => {
+userRoutes.get("/users/new", requirePermission("users.create"), async (c) => {
   const user = c.get("user");
   try {
     const pageData = {
@@ -8695,31 +8319,31 @@ userRoutes.get("/users/new", chunkBUKT6HP5_cjs.requirePermission("users.create")
     return c.html(renderUserNewPage(pageData));
   } catch (error) {
     console.error("User new page error:", error);
-    return c.html(renderAlert({
+    return c.html(renderAlert2({
       type: "error",
       message: "Failed to load user creation page. Please try again.",
       dismissible: true
     }), 500);
   }
 });
-userRoutes.post("/users/new", chunkBUKT6HP5_cjs.requirePermission("users.create"), async (c) => {
+userRoutes.post("/users/new", requirePermission("users.create"), async (c) => {
   const db = c.env.DB;
   const user = c.get("user");
   try {
     const formData = await c.req.formData();
-    const firstName = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = sanitizeInput(formData.get("last_name")?.toString());
+    const username = sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const password = formData.get("password")?.toString() || "";
     const confirmPassword = formData.get("confirm_password")?.toString() || "";
     const isActive = formData.get("is_active") === "1";
     const emailVerified = formData.get("email_verified") === "1";
     if (!firstName || !lastName || !username || !email || !password) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "First name, last name, username, email, and password are required.",
         dismissible: true
@@ -8727,21 +8351,21 @@ userRoutes.post("/users/new", chunkBUKT6HP5_cjs.requirePermission("users.create"
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "Please enter a valid email address.",
         dismissible: true
       }));
     }
     if (password.length < 8) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "Password must be at least 8 characters long.",
         dismissible: true
       }));
     }
     if (password !== confirmPassword) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "Passwords do not match.",
         dismissible: true
@@ -8753,13 +8377,13 @@ userRoutes.post("/users/new", chunkBUKT6HP5_cjs.requirePermission("users.create"
     `);
     const existingUser = await checkStmt.bind(username, email).first();
     if (existingUser) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "Username or email is already taken.",
         dismissible: true
       }));
     }
-    const passwordHash = await chunkBUKT6HP5_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await AuthManager.hashPassword(password);
     const userId = globalThis.crypto.randomUUID();
     const createStmt = db.prepare(`
       INSERT INTO users (
@@ -8782,7 +8406,7 @@ userRoutes.post("/users/new", chunkBUKT6HP5_cjs.requirePermission("users.create"
       Date.now(),
       Date.now()
     ).run();
-    await chunkBUKT6HP5_cjs.logActivity(
+    await logActivity(
       db,
       user.userId,
       "user.create",
@@ -8795,14 +8419,14 @@ userRoutes.post("/users/new", chunkBUKT6HP5_cjs.requirePermission("users.create"
     return c.redirect(`/admin/users/${userId}/edit?success=User created successfully`);
   } catch (error) {
     console.error("User creation error:", error);
-    return c.html(renderAlert({
+    return c.html(renderAlert2({
       type: "error",
       message: "Failed to create user. Please try again.",
       dismissible: true
     }));
   }
 });
-userRoutes.get("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.read"), async (c) => {
+userRoutes.get("/users/:id", requirePermission("users.read"), async (c) => {
   if (c.req.path.endsWith("/edit")) {
     return c.notFound();
   }
@@ -8820,7 +8444,7 @@ userRoutes.get("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.read"), 
     if (!userRecord) {
       return c.json({ error: "User not found" }, 404);
     }
-    await chunkBUKT6HP5_cjs.logActivity(
+    await logActivity(
       db,
       user.userId,
       "user.view",
@@ -8853,7 +8477,7 @@ userRoutes.get("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.read"), 
     return c.json({ error: "Failed to fetch user" }, 500);
   }
 });
-userRoutes.get("/users/:id/edit", chunkBUKT6HP5_cjs.requirePermission("users.update"), async (c) => {
+userRoutes.get("/users/:id/edit", requirePermission("users.update"), async (c) => {
   const db = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
@@ -8866,7 +8490,7 @@ userRoutes.get("/users/:id/edit", chunkBUKT6HP5_cjs.requirePermission("users.upd
     `);
     const userToEdit = await userStmt.bind(userId).first();
     if (!userToEdit) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "User not found",
         dismissible: true
@@ -8900,30 +8524,30 @@ userRoutes.get("/users/:id/edit", chunkBUKT6HP5_cjs.requirePermission("users.upd
     return c.html(renderUserEditPage(pageData));
   } catch (error) {
     console.error("User edit page error:", error);
-    return c.html(renderAlert({
+    return c.html(renderAlert2({
       type: "error",
       message: "Failed to load user. Please try again.",
       dismissible: true
     }), 500);
   }
 });
-userRoutes.put("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.update"), async (c) => {
+userRoutes.put("/users/:id", requirePermission("users.update"), async (c) => {
   const db = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
   try {
     const formData = await c.req.formData();
-    const firstName = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = sanitizeInput(formData.get("last_name")?.toString());
+    const username = sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const isActive = formData.get("is_active") === "1";
     const emailVerified = formData.get("email_verified") === "1";
     if (!firstName || !lastName || !username || !email) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "First name, last name, username, and email are required.",
         dismissible: true
@@ -8931,7 +8555,7 @@ userRoutes.put("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.update")
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "Please enter a valid email address.",
         dismissible: true
@@ -8943,7 +8567,7 @@ userRoutes.put("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.update")
     `);
     const existingUser = await checkStmt.bind(username, email, userId).first();
     if (existingUser) {
-      return c.html(renderAlert({
+      return c.html(renderAlert2({
         type: "error",
         message: "Username or email is already taken by another user.",
         dismissible: true
@@ -8969,7 +8593,7 @@ userRoutes.put("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.update")
       Date.now(),
       userId
     ).run();
-    await chunkBUKT6HP5_cjs.logActivity(
+    await logActivity(
       db,
       user.userId,
       "user.update",
@@ -8979,21 +8603,21 @@ userRoutes.put("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.update")
       c.req.header("x-forwarded-for") || c.req.header("cf-connecting-ip"),
       c.req.header("user-agent")
     );
-    return c.html(renderAlert({
+    return c.html(renderAlert2({
       type: "success",
       message: "User updated successfully!",
       dismissible: true
     }));
   } catch (error) {
     console.error("User update error:", error);
-    return c.html(renderAlert({
+    return c.html(renderAlert2({
       type: "error",
       message: "Failed to update user. Please try again.",
       dismissible: true
     }));
   }
 });
-userRoutes.delete("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.delete"), async (c) => {
+userRoutes.delete("/users/:id", requirePermission("users.delete"), async (c) => {
   const db = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
@@ -9015,7 +8639,7 @@ userRoutes.delete("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.delet
         DELETE FROM users WHERE id = ?
       `);
       await deleteStmt.bind(userId).run();
-      await chunkBUKT6HP5_cjs.logActivity(
+      await logActivity(
         db,
         user.userId,
         "user.hard_delete",
@@ -9034,7 +8658,7 @@ userRoutes.delete("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.delet
         UPDATE users SET is_active = 0, updated_at = ? WHERE id = ?
       `);
       await deleteStmt.bind(Date.now(), userId).run();
-      await chunkBUKT6HP5_cjs.logActivity(
+      await logActivity(
         db,
         user.userId,
         "user.soft_delete",
@@ -9054,15 +8678,15 @@ userRoutes.delete("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.delet
     return c.json({ error: "Failed to delete user" }, 500);
   }
 });
-userRoutes.post("/invite-user", chunkBUKT6HP5_cjs.requirePermission("users.create"), async (c) => {
+userRoutes.post("/invite-user", requirePermission("users.create"), async (c) => {
   const db = c.env.DB;
   const user = c.get("user");
   try {
     const formData = await c.req.formData();
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
     const role = formData.get("role")?.toString()?.trim() || "viewer";
-    const firstName = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const firstName = sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = sanitizeInput(formData.get("last_name")?.toString());
     if (!email || !firstName || !lastName) {
       return c.json({ error: "Email, first name, and last name are required" }, 400);
     }
@@ -9101,7 +8725,7 @@ userRoutes.post("/invite-user", chunkBUKT6HP5_cjs.requirePermission("users.creat
       Date.now(),
       Date.now()
     ).run();
-    await chunkBUKT6HP5_cjs.logActivity(
+    await logActivity(
       db,
       user.userId,
       "user.invite_sent",
@@ -9130,7 +8754,7 @@ userRoutes.post("/invite-user", chunkBUKT6HP5_cjs.requirePermission("users.creat
     return c.json({ error: "Failed to send user invitation" }, 500);
   }
 });
-userRoutes.post("/resend-invitation/:id", chunkBUKT6HP5_cjs.requirePermission("users.create"), async (c) => {
+userRoutes.post("/resend-invitation/:id", requirePermission("users.create"), async (c) => {
   const db = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
@@ -9158,7 +8782,7 @@ userRoutes.post("/resend-invitation/:id", chunkBUKT6HP5_cjs.requirePermission("u
       Date.now(),
       userId
     ).run();
-    await chunkBUKT6HP5_cjs.logActivity(
+    await logActivity(
       db,
       user.userId,
       "user.invitation_resent",
@@ -9179,7 +8803,7 @@ userRoutes.post("/resend-invitation/:id", chunkBUKT6HP5_cjs.requirePermission("u
     return c.json({ error: "Failed to resend invitation" }, 500);
   }
 });
-userRoutes.delete("/cancel-invitation/:id", chunkBUKT6HP5_cjs.requirePermission("users.delete"), async (c) => {
+userRoutes.delete("/cancel-invitation/:id", requirePermission("users.delete"), async (c) => {
   const db = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
@@ -9194,7 +8818,7 @@ userRoutes.delete("/cancel-invitation/:id", chunkBUKT6HP5_cjs.requirePermission(
     }
     const deleteStmt = db.prepare(`DELETE FROM users WHERE id = ?`);
     await deleteStmt.bind(userId).run();
-    await chunkBUKT6HP5_cjs.logActivity(
+    await logActivity(
       db,
       user.userId,
       "user.invitation_cancelled",
@@ -9213,7 +8837,7 @@ userRoutes.delete("/cancel-invitation/:id", chunkBUKT6HP5_cjs.requirePermission(
     return c.json({ error: "Failed to cancel invitation" }, 500);
   }
 });
-userRoutes.get("/activity-logs", chunkBUKT6HP5_cjs.requirePermission("activity.read"), async (c) => {
+userRoutes.get("/activity-logs", requirePermission("activity.read"), async (c) => {
   const db = c.env.DB;
   const user = c.get("user");
   try {
@@ -9277,7 +8901,7 @@ userRoutes.get("/activity-logs", chunkBUKT6HP5_cjs.requirePermission("activity.r
       ...log,
       details: log.details ? JSON.parse(log.details) : null
     }));
-    await chunkBUKT6HP5_cjs.logActivity(
+    await logActivity(
       db,
       user.userId,
       "activity.logs_viewed",
@@ -9319,7 +8943,7 @@ userRoutes.get("/activity-logs", chunkBUKT6HP5_cjs.requirePermission("activity.r
     return c.html(renderActivityLogsPage(pageData));
   }
 });
-userRoutes.get("/activity-logs/export", chunkBUKT6HP5_cjs.requirePermission("activity.read"), async (c) => {
+userRoutes.get("/activity-logs/export", requirePermission("activity.read"), async (c) => {
   const db = c.env.DB;
   const user = c.get("user");
   try {
@@ -9384,7 +9008,7 @@ userRoutes.get("/activity-logs/export", chunkBUKT6HP5_cjs.requirePermission("act
       csvRows.push(row.join(","));
     }
     const csvContent = csvRows.join("\n");
-    await chunkBUKT6HP5_cjs.logActivity(
+    await logActivity(
       db,
       user.userId,
       "activity.logs_exported",
@@ -9602,7 +9226,7 @@ function getFileIcon(mimeType) {
 }
 
 // src/templates/pages/admin-media-library.template.ts
-chunkLEGKJ5DI_cjs.init_admin_layout_catalyst_template();
+init_admin_layout_catalyst_template();
 function renderMediaLibraryPage(data) {
   const pageContent = `
     <div>
@@ -10505,7 +10129,7 @@ function renderMediaLibraryPage(data) {
     </script>
 
     <!-- Confirmation Dialog for Bulk Delete -->
-    ${renderConfirmationDialog({
+    ${renderConfirmationDialog2({
     id: "media-bulk-delete-confirm",
     title: "Delete Selected Files",
     message: `Are you sure you want to delete ${data.files.length > 0 ? "the selected files" : "these files"}? This action cannot be undone and the files will be permanently removed.`,
@@ -10517,7 +10141,7 @@ function renderMediaLibraryPage(data) {
   })}
 
     <!-- Confirmation Dialog Script -->
-    ${getConfirmationDialogScript()}
+    ${getConfirmationDialogScript2()}
   `;
   function buildPageUrl(page, folder, type) {
     const params = new URLSearchParams();
@@ -10534,7 +10158,7 @@ function renderMediaLibraryPage(data) {
     version: data.version,
     content: pageContent
   };
-  return chunkLEGKJ5DI_cjs.renderAdminLayoutCatalyst(layoutData);
+  return renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/components/media-file-details.template.ts
@@ -10683,9 +10307,9 @@ function renderMediaFileDetails(data) {
 }
 
 // src/routes/admin-media.ts
-var fileValidationSchema2 = zod.z.object({
-  name: zod.z.string().min(1).max(255),
-  type: zod.z.string().refine(
+var fileValidationSchema2 = z.object({
+  name: z.string().min(1).max(255),
+  type: z.string().refine(
     (type) => {
       const allowedTypes = [
         // Images
@@ -10716,10 +10340,10 @@ var fileValidationSchema2 = zod.z.object({
     },
     { message: "Unsupported file type" }
   ),
-  size: zod.z.number().min(1).max(50 * 1024 * 1024)
+  size: z.number().min(1).max(50 * 1024 * 1024)
   // 50MB max
 });
-var adminMediaRoutes = new hono.Hono();
+var adminMediaRoutes = new Hono();
 adminMediaRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -10826,7 +10450,7 @@ adminMediaRoutes.get("/", async (c) => {
     return c.html(renderMediaLibraryPage(pageData));
   } catch (error) {
     console.error("Error loading media library:", error);
-    return c.html(html.html`<p>Error loading media library</p>`);
+    return c.html(html`<p>Error loading media library</p>`);
   }
 });
 adminMediaRoutes.get("/selector", async (c) => {
@@ -10861,7 +10485,7 @@ adminMediaRoutes.get("/selector", async (c) => {
       isVideo: row.mime_type.startsWith("video/"),
       isDocument: !row.mime_type.startsWith("image/") && !row.mime_type.startsWith("video/")
     }));
-    return c.html(html.html`
+    return c.html(html`
       <div class="mb-4">
         <input
           type="search"
@@ -10876,7 +10500,7 @@ adminMediaRoutes.get("/selector", async (c) => {
       </div>
 
       <div id="media-selector-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
-        ${html.raw(mediaFiles.map((file) => `
+        ${raw(mediaFiles.map((file) => `
           <div
             class="relative group cursor-pointer rounded-lg overflow-hidden bg-zinc-50 dark:bg-zinc-800 shadow-sm hover:shadow-md transition-shadow"
             data-media-id="${file.id}"
@@ -10929,7 +10553,7 @@ adminMediaRoutes.get("/selector", async (c) => {
         `).join(""))}
       </div>
 
-      ${mediaFiles.length === 0 ? html.html`
+      ${mediaFiles.length === 0 ? html`
         <div class="text-center py-12 text-zinc-500 dark:text-zinc-400">
           <svg class="mx-auto h-12 w-12 text-zinc-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -10940,7 +10564,7 @@ adminMediaRoutes.get("/selector", async (c) => {
     `);
   } catch (error) {
     console.error("Error loading media selector:", error);
-    return c.html(html.html`<div class="text-red-500 dark:text-red-400">Error loading media files</div>`);
+    return c.html(html`<div class="text-red-500 dark:text-red-400">Error loading media files</div>`);
   }
 });
 adminMediaRoutes.get("/search", async (c) => {
@@ -10996,7 +10620,7 @@ adminMediaRoutes.get("/search", async (c) => {
       isDocument: !row.mime_type.startsWith("image/") && !row.mime_type.startsWith("video/")
     }));
     const gridHTML = mediaFiles.map((file) => generateMediaItemHTML(file)).join("");
-    return c.html(html.raw(gridHTML));
+    return c.html(raw(gridHTML));
   } catch (error) {
     console.error("Error searching media:", error);
     return c.html('<div class="text-red-500">Error searching files</div>');
@@ -11045,7 +10669,7 @@ adminMediaRoutes.post("/upload", async (c) => {
     const formData = await c.req.formData();
     const files = formData.getAll("files");
     if (!files || files.length === 0) {
-      return c.html(html.html`
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           No files provided
         </div>
@@ -11168,25 +10792,25 @@ adminMediaRoutes.post("/upload", async (c) => {
         console.error("Error fetching updated media list:", error);
       }
     }
-    return c.html(html.html`
-      ${uploadResults.length > 0 ? html.html`
+    return c.html(html`
+      ${uploadResults.length > 0 ? html`
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
           Successfully uploaded ${uploadResults.length} file${uploadResults.length > 1 ? "s" : ""}
         </div>
       ` : ""}
 
-      ${errors.length > 0 ? html.html`
+      ${errors.length > 0 ? html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           <p class="font-medium">Upload errors:</p>
           <ul class="list-disc list-inside mt-2">
-            ${errors.map((error) => html.html`
+            ${errors.map((error) => html`
               <li>${error.filename}: ${error.error}</li>
             `)}
           </ul>
         </div>
       ` : ""}
 
-      ${uploadResults.length > 0 ? html.html`
+      ${uploadResults.length > 0 ? html`
         <script>
           // Close modal and refresh page after successful upload with cache busting
           setTimeout(() => {
@@ -11198,7 +10822,7 @@ adminMediaRoutes.post("/upload", async (c) => {
     `);
   } catch (error) {
     console.error("Upload error:", error);
-    return c.html(html.html`
+    return c.html(html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         Upload failed: ${error instanceof Error ? error.message : "Unknown error"}
       </div>
@@ -11235,14 +10859,14 @@ adminMediaRoutes.put("/:id", async (c) => {
     const stmt = c.env.DB.prepare("SELECT * FROM media WHERE id = ? AND deleted_at IS NULL");
     const fileRecord = await stmt.bind(fileId).first();
     if (!fileRecord) {
-      return c.html(html.html`
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           File not found
         </div>
       `);
     }
     if (fileRecord.uploaded_by !== user.userId && user.role !== "admin") {
-      return c.html(html.html`
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           Permission denied
         </div>
@@ -11264,7 +10888,7 @@ adminMediaRoutes.put("/:id", async (c) => {
       Math.floor(Date.now() / 1e3),
       fileId
     ).run();
-    return c.html(html.html`
+    return c.html(html`
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
         File updated successfully
       </div>
@@ -11277,7 +10901,7 @@ adminMediaRoutes.put("/:id", async (c) => {
     `);
   } catch (error) {
     console.error("Update error:", error);
-    return c.html(html.html`
+    return c.html(html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
         Update failed: ${error instanceof Error ? error.message : "Unknown error"}
       </div>
@@ -11291,14 +10915,14 @@ adminMediaRoutes.delete("/:id", async (c) => {
     const stmt = c.env.DB.prepare("SELECT * FROM media WHERE id = ? AND deleted_at IS NULL");
     const fileRecord = await stmt.bind(fileId).first();
     if (!fileRecord) {
-      return c.html(html.html`
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           File not found
         </div>
       `);
     }
     if (fileRecord.uploaded_by !== user.userId && user.role !== "admin") {
-      return c.html(html.html`
+      return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           Permission denied
         </div>
@@ -11311,7 +10935,7 @@ adminMediaRoutes.delete("/:id", async (c) => {
     }
     const deleteStmt = c.env.DB.prepare("UPDATE media SET deleted_at = ? WHERE id = ?");
     await deleteStmt.bind(Math.floor(Date.now() / 1e3), fileId).run();
-    return c.html(html.html`
+    return c.html(html`
       <script>
         // Close modal if open
         const modal = document.getElementById('file-modal');
@@ -11324,7 +10948,7 @@ adminMediaRoutes.delete("/:id", async (c) => {
     `);
   } catch (error) {
     console.error("Delete error:", error);
-    return c.html(html.html`
+    return c.html(html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
         Delete failed: ${error instanceof Error ? error.message : "Unknown error"}
       </div>
@@ -11452,7 +11076,7 @@ function formatFileSize(bytes) {
 }
 
 // src/templates/pages/admin-plugins-list.template.ts
-chunkLEGKJ5DI_cjs.init_admin_layout_catalyst_template();
+init_admin_layout_catalyst_template();
 function renderPluginsListPage(data) {
   const pageContent = `
     <div>
@@ -11805,7 +11429,7 @@ function renderPluginsListPage(data) {
     </script>
 
     <!-- Confirmation Dialogs -->
-    ${renderConfirmationDialog({
+    ${renderConfirmationDialog2({
     id: "uninstall-plugin-confirm",
     title: "Uninstall Plugin",
     message: "Are you sure you want to uninstall this plugin? This action cannot be undone.",
@@ -11816,7 +11440,7 @@ function renderPluginsListPage(data) {
     onConfirm: "performUninstallPlugin()"
   })}
 
-    ${getConfirmationDialogScript()}
+    ${getConfirmationDialogScript2()}
   `;
   const layoutData = {
     title: "Plugins",
@@ -11826,7 +11450,7 @@ function renderPluginsListPage(data) {
     version: data.version,
     content: pageContent
   };
-  return chunkLEGKJ5DI_cjs.renderAdminLayoutCatalyst(layoutData);
+  return renderAdminLayoutCatalyst(layoutData);
 }
 function renderPluginCard(plugin) {
   const statusColors = {
@@ -12476,7 +12100,7 @@ function renderPluginSettingsPage(data) {
     user,
     content: pageContent
   };
-  return chunkLEGKJ5DI_cjs.renderAdminLayout(layoutData);
+  return renderAdminLayout(layoutData);
 }
 function renderStatusBadge(status) {
   const statusColors = {
@@ -12738,7 +12362,7 @@ function formatTimestamp(timestamp) {
 }
 
 // src/routes/admin-plugins.ts
-var adminPluginRoutes = new hono.Hono();
+var adminPluginRoutes = new Hono();
 adminPluginRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -12746,7 +12370,7 @@ adminPluginRoutes.get("/", async (c) => {
     if (user?.role !== "admin") {
       return c.text("Access denied", 403);
     }
-    const pluginService = new chunkRNR4HA23_cjs.PluginService(db);
+    const pluginService = new PluginService(db);
     let plugins = [];
     let stats = { total: 0, active: 0, inactive: 0, errors: 0 };
     try {
@@ -12796,7 +12420,7 @@ adminPluginRoutes.get("/:id", async (c) => {
     if (user?.role !== "admin") {
       return c.redirect("/admin/plugins");
     }
-    const pluginService = new chunkRNR4HA23_cjs.PluginService(db);
+    const pluginService = new PluginService(db);
     const plugin = await pluginService.getPlugin(pluginId);
     if (!plugin) {
       return c.text("Plugin not found", 404);
@@ -12850,7 +12474,7 @@ adminPluginRoutes.post("/:id/activate", async (c) => {
     if (user?.role !== "admin") {
       return c.json({ error: "Access denied" }, 403);
     }
-    const pluginService = new chunkRNR4HA23_cjs.PluginService(db);
+    const pluginService = new PluginService(db);
     await pluginService.activatePlugin(pluginId);
     return c.json({ success: true });
   } catch (error) {
@@ -12867,7 +12491,7 @@ adminPluginRoutes.post("/:id/deactivate", async (c) => {
     if (user?.role !== "admin") {
       return c.json({ error: "Access denied" }, 403);
     }
-    const pluginService = new chunkRNR4HA23_cjs.PluginService(db);
+    const pluginService = new PluginService(db);
     await pluginService.deactivatePlugin(pluginId);
     return c.json({ success: true });
   } catch (error) {
@@ -12884,7 +12508,7 @@ adminPluginRoutes.post("/install", async (c) => {
       return c.json({ error: "Access denied" }, 403);
     }
     const body = await c.req.json();
-    const pluginService = new chunkRNR4HA23_cjs.PluginService(db);
+    const pluginService = new PluginService(db);
     if (body.name === "faq-plugin") {
       const faqPlugin = await pluginService.installPlugin({
         id: "third-party-faq",
@@ -13034,7 +12658,7 @@ adminPluginRoutes.post("/:id/uninstall", async (c) => {
     if (user?.role !== "admin") {
       return c.json({ error: "Access denied" }, 403);
     }
-    const pluginService = new chunkRNR4HA23_cjs.PluginService(db);
+    const pluginService = new PluginService(db);
     await pluginService.uninstallPlugin(pluginId);
     return c.json({ success: true });
   } catch (error) {
@@ -13052,7 +12676,7 @@ adminPluginRoutes.post("/:id/settings", async (c) => {
       return c.json({ error: "Access denied" }, 403);
     }
     const settings = await c.req.json();
-    const pluginService = new chunkRNR4HA23_cjs.PluginService(db);
+    const pluginService = new PluginService(db);
     await pluginService.updatePluginSettings(pluginId, settings);
     return c.json({ success: true });
   } catch (error) {
@@ -13073,7 +12697,7 @@ function formatLastUpdated(timestamp) {
 }
 
 // src/templates/pages/admin-logs-list.template.ts
-chunkLEGKJ5DI_cjs.init_admin_layout_catalyst_template();
+init_admin_layout_catalyst_template();
 function renderLogsListPage(data) {
   const { logs, pagination, filters, user } = data;
   const content = `
@@ -13384,11 +13008,11 @@ function renderLogsListPage(data) {
     user,
     content
   };
-  return chunkLEGKJ5DI_cjs.renderAdminLayoutCatalyst(layoutData);
+  return renderAdminLayoutCatalyst(layoutData);
 }
 function renderLogDetailsPage(data) {
   const { log, user } = data;
-  const content = html.html`
+  const content = html`
     <div class="px-4 sm:px-6 lg:px-8">
       <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
@@ -13449,59 +13073,59 @@ function renderLogDetailsPage(data) {
               </dd>
             </div>
             
-            ${log.source ? html.html`
+            ${log.source ? html`
               <div>
                 <dt class="text-sm font-medium text-gray-500">Source</dt>
                 <dd class="mt-1 text-sm text-gray-900">${log.source}</dd>
               </div>
             ` : ""}
             
-            ${log.userId ? html.html`
+            ${log.userId ? html`
               <div>
                 <dt class="text-sm font-medium text-gray-500">User ID</dt>
                 <dd class="mt-1 text-sm text-gray-900 font-mono">${log.userId}</dd>
               </div>
             ` : ""}
             
-            ${log.sessionId ? html.html`
+            ${log.sessionId ? html`
               <div>
                 <dt class="text-sm font-medium text-gray-500">Session ID</dt>
                 <dd class="mt-1 text-sm text-gray-900 font-mono">${log.sessionId}</dd>
               </div>
             ` : ""}
             
-            ${log.requestId ? html.html`
+            ${log.requestId ? html`
               <div>
                 <dt class="text-sm font-medium text-gray-500">Request ID</dt>
                 <dd class="mt-1 text-sm text-gray-900 font-mono">${log.requestId}</dd>
               </div>
             ` : ""}
             
-            ${log.ipAddress ? html.html`
+            ${log.ipAddress ? html`
               <div>
                 <dt class="text-sm font-medium text-gray-500">IP Address</dt>
                 <dd class="mt-1 text-sm text-gray-900">${log.ipAddress}</dd>
               </div>
             ` : ""}
             
-            ${log.method && log.url ? html.html`
+            ${log.method && log.url ? html`
               <div class="sm:col-span-2">
                 <dt class="text-sm font-medium text-gray-500">HTTP Request</dt>
                 <dd class="mt-1 text-sm text-gray-900">
                   <span class="font-medium">${log.method}</span> ${log.url}
-                  ${log.statusCode ? html.html`<span class="ml-2 text-gray-500">(${log.statusCode})</span>` : ""}
+                  ${log.statusCode ? html`<span class="ml-2 text-gray-500">(${log.statusCode})</span>` : ""}
                 </dd>
               </div>
             ` : ""}
             
-            ${log.duration ? html.html`
+            ${log.duration ? html`
               <div>
                 <dt class="text-sm font-medium text-gray-500">Duration</dt>
                 <dd class="mt-1 text-sm text-gray-900">${log.formattedDuration}</dd>
               </div>
             ` : ""}
             
-            ${log.userAgent ? html.html`
+            ${log.userAgent ? html`
               <div class="sm:col-span-2">
                 <dt class="text-sm font-medium text-gray-500">User Agent</dt>
                 <dd class="mt-1 text-sm text-gray-900 break-all">${log.userAgent}</dd>
@@ -13524,14 +13148,14 @@ function renderLogDetailsPage(data) {
       </div>
 
       <!-- Tags -->
-      ${log.tags && log.tags.length > 0 ? html.html`
+      ${log.tags && log.tags.length > 0 ? html`
         <div class="mt-6 bg-white shadow rounded-lg overflow-hidden">
           <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Tags</h3>
           </div>
           <div class="px-6 py-4">
             <div class="flex flex-wrap gap-2">
-              ${log.tags.map((tag) => html.html`
+              ${log.tags.map((tag) => html`
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                   ${tag}
                 </span>
@@ -13542,7 +13166,7 @@ function renderLogDetailsPage(data) {
       ` : ""}
 
       <!-- Additional Data -->
-      ${log.data ? html.html`
+      ${log.data ? html`
         <div class="mt-6 bg-white shadow rounded-lg overflow-hidden">
           <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Additional Data</h3>
@@ -13554,7 +13178,7 @@ function renderLogDetailsPage(data) {
       ` : ""}
 
       <!-- Stack Trace -->
-      ${log.stackTrace ? html.html`
+      ${log.stackTrace ? html`
         <div class="mt-6 bg-white shadow rounded-lg overflow-hidden">
           <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Stack Trace</h3>
@@ -13575,7 +13199,7 @@ function renderLogDetailsPage(data) {
         </a>
         
         <div class="flex space-x-3">
-          ${log.level === "error" || log.level === "fatal" ? html.html`
+          ${log.level === "error" || log.level === "fatal" ? html`
             <button
               type="button"
               class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
@@ -13596,7 +13220,7 @@ function renderLogDetailsPage(data) {
       </div>
     </div>
   `;
-  return chunkLEGKJ5DI_cjs.adminLayoutV2({
+  return adminLayoutV2({
     title: `Log Details - ${log.id}`,
     user,
     content
@@ -13604,7 +13228,7 @@ function renderLogDetailsPage(data) {
 }
 function renderLogConfigPage(data) {
   const { configs, user } = data;
-  const content = html.html`
+  const content = html`
     <div class="px-4 sm:px-6 lg:px-8">
       <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
@@ -13676,17 +13300,17 @@ function renderLogConfigPage(data) {
 
       <!-- Configuration Cards -->
       <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        ${configs.map((config) => html.html`
+        ${configs.map((config) => html`
           <div class="bg-white shadow rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200">
               <div class="flex items-center justify-between">
                 <h3 class="text-lg font-medium text-gray-900 capitalize">${config.category}</h3>
                 <div class="flex items-center">
-                  ${config.enabled ? html.html`
+                  ${config.enabled ? html`
                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                       Enabled
                     </span>
-                  ` : html.html`
+                  ` : html`
                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                       Disabled
                     </span>
@@ -13839,7 +13463,7 @@ function renderLogConfigPage(data) {
 
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
   `;
-  return chunkLEGKJ5DI_cjs.adminLayoutV2({
+  return adminLayoutV2({
     title: "Log Configuration",
     user,
     content
@@ -13847,11 +13471,11 @@ function renderLogConfigPage(data) {
 }
 
 // src/routes/admin-logs.ts
-var adminLogsRoutes = new hono.Hono();
+var adminLogsRoutes = new Hono();
 adminLogsRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
-    const logger = chunkRNR4HA23_cjs.getLogger(c.env.DB);
+    const logger = getLogger(c.env.DB);
     const query = c.req.query();
     const page = parseInt(query.page || "1");
     const limit = parseInt(query.limit || "50");
@@ -13924,14 +13548,14 @@ adminLogsRoutes.get("/", async (c) => {
     return c.html(renderLogsListPage(pageData));
   } catch (error) {
     console.error("Error fetching logs:", error);
-    return c.html(html.html`<p>Error loading logs: ${error}</p>`);
+    return c.html(html`<p>Error loading logs: ${error}</p>`);
   }
 });
 adminLogsRoutes.get("/:id", async (c) => {
   try {
     const id = c.req.param("id");
     const user = c.get("user");
-    const logger = chunkRNR4HA23_cjs.getLogger(c.env.DB);
+    const logger = getLogger(c.env.DB);
     const { logs } = await logger.getLogs({
       limit: 1,
       offset: 0,
@@ -13940,7 +13564,7 @@ adminLogsRoutes.get("/:id", async (c) => {
     });
     const log = logs.find((l) => l.id === id);
     if (!log) {
-      return c.html(html.html`<p>Log entry not found</p>`);
+      return c.html(html`<p>Log entry not found</p>`);
     }
     const formattedLog = {
       ...log,
@@ -13962,13 +13586,13 @@ adminLogsRoutes.get("/:id", async (c) => {
     return c.html(renderLogDetailsPage(pageData));
   } catch (error) {
     console.error("Error fetching log details:", error);
-    return c.html(html.html`<p>Error loading log details: ${error}</p>`);
+    return c.html(html`<p>Error loading log details: ${error}</p>`);
   }
 });
 adminLogsRoutes.get("/config", async (c) => {
   try {
     const user = c.get("user");
-    const logger = chunkRNR4HA23_cjs.getLogger(c.env.DB);
+    const logger = getLogger(c.env.DB);
     const configs = await logger.getAllConfigs();
     const pageData = {
       configs,
@@ -13981,7 +13605,7 @@ adminLogsRoutes.get("/config", async (c) => {
     return c.html(renderLogConfigPage(pageData));
   } catch (error) {
     console.error("Error fetching log config:", error);
-    return c.html(html.html`<p>Error loading log configuration: ${error}</p>`);
+    return c.html(html`<p>Error loading log configuration: ${error}</p>`);
   }
 });
 adminLogsRoutes.post("/config/:category", async (c) => {
@@ -13992,21 +13616,21 @@ adminLogsRoutes.post("/config/:category", async (c) => {
     const level = formData.get("level");
     const retention = parseInt(formData.get("retention"));
     const maxSize = parseInt(formData.get("max_size"));
-    const logger = chunkRNR4HA23_cjs.getLogger(c.env.DB);
+    const logger = getLogger(c.env.DB);
     await logger.updateConfig(category, {
       enabled,
       level,
       retention,
       maxSize
     });
-    return c.html(html.html`
+    return c.html(html`
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
         Configuration updated successfully!
       </div>
     `);
   } catch (error) {
     console.error("Error updating log config:", error);
-    return c.html(html.html`
+    return c.html(html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         Failed to update configuration. Please try again.
       </div>
@@ -14021,7 +13645,7 @@ adminLogsRoutes.get("/export", async (c) => {
     const category = query.category;
     const startDate = query.start_date;
     const endDate = query.end_date;
-    const logger = chunkRNR4HA23_cjs.getLogger(c.env.DB);
+    const logger = getLogger(c.env.DB);
     const filter = {
       limit: 1e4,
       // Export up to 10k logs
@@ -14102,16 +13726,16 @@ adminLogsRoutes.post("/cleanup", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const logger = chunkRNR4HA23_cjs.getLogger(c.env.DB);
+    const logger = getLogger(c.env.DB);
     await logger.cleanupByRetention();
-    return c.html(html.html`
+    return c.html(html`
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
         Log cleanup completed successfully!
       </div>
     `);
   } catch (error) {
     console.error("Error cleaning up logs:", error);
-    return c.html(html.html`
+    return c.html(html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         Failed to clean up logs. Please try again.
       </div>
@@ -14124,7 +13748,7 @@ adminLogsRoutes.post("/search", async (c) => {
     const search = formData.get("search");
     const level = formData.get("level");
     const category = formData.get("category");
-    const logger = chunkRNR4HA23_cjs.getLogger(c.env.DB);
+    const logger = getLogger(c.env.DB);
     const filter = {
       limit: 20,
       offset: 0,
@@ -14168,7 +13792,7 @@ adminLogsRoutes.post("/search", async (c) => {
     return c.html(rows);
   } catch (error) {
     console.error("Error searching logs:", error);
-    return c.html(html.html`<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Error searching logs</td></tr>`);
+    return c.html(html`<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Error searching logs</td></tr>`);
   }
 });
 function getLevelClass(level) {
@@ -14209,10 +13833,1943 @@ function getCategoryClass(category) {
       return "bg-gray-100 text-gray-800";
   }
 }
+var adminDesignRoutes = new Hono();
+adminDesignRoutes.get("/", (c) => {
+  const user = c.get("user");
+  const pageData = {
+    user: user ? {
+      name: user.email,
+      email: user.email,
+      role: user.role
+    } : void 0
+  };
+  return c.html(renderDesignPage(pageData));
+});
+var adminCheckboxRoutes = new Hono();
+adminCheckboxRoutes.get("/", (c) => {
+  const user = c.get("user");
+  const pageData = {
+    user: user ? {
+      name: user.email,
+      email: user.email,
+      role: user.role
+    } : void 0
+  };
+  return c.html(renderCheckboxPage(pageData));
+});
+
+// src/templates/pages/admin-faq-form.template.ts
+function renderFAQForm(data) {
+  const { faq, isEdit, errors, message, messageType } = data;
+  const pageTitle = isEdit ? "Edit FAQ" : "New FAQ";
+  const pageContent = `
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-semibold text-white">${pageTitle}</h1>
+          <p class="mt-2 text-sm text-gray-300">
+            ${isEdit ? "Update the FAQ details below" : "Create a new frequently asked question"}
+          </p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <a href="/admin/faq" 
+             class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/10 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all">
+            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to List
+          </a>
+        </div>
+      </div>
+
+      ${message ? renderAlert({ type: messageType || "info", message, dismissible: true }) : ""}
+
+      <!-- Form -->
+      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl">
+        <form ${isEdit ? `hx-put="/admin/faq/${faq?.id}"` : 'hx-post="/admin/faq"'} 
+              hx-target="body" 
+              hx-swap="outerHTML"
+              class="space-y-6 p-6">
+          
+          <!-- Question -->
+          <div>
+            <label for="question" class="block text-sm font-medium text-white">
+              Question <span class="text-red-400">*</span>
+            </label>
+            <div class="mt-1">
+              <textarea name="question" 
+                        id="question" 
+                        rows="3" 
+                        required
+                        maxlength="500"
+                        class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full"
+                        placeholder="Enter the frequently asked question...">${faq?.question || ""}</textarea>
+              <p class="mt-1 text-sm text-gray-300">
+                <span id="question-count">0</span>/500 characters
+              </p>
+            </div>
+            ${errors?.question ? `
+              <div class="mt-1">
+                ${errors.question.map((error) => `
+                  <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
+                `).join("")}
+              </div>
+            ` : ""}
+          </div>
+
+          <!-- Answer -->
+          <div>
+            <label for="answer" class="block text-sm font-medium text-white">
+              Answer <span class="text-red-400">*</span>
+            </label>
+            <div class="mt-1">
+              <textarea name="answer" 
+                        id="answer" 
+                        rows="6" 
+                        required
+                        maxlength="2000"
+                        class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full"
+                        placeholder="Enter the detailed answer...">${faq?.answer || ""}</textarea>
+              <p class="mt-1 text-sm text-gray-300">
+                <span id="answer-count">0</span>/2000 characters. You can use basic HTML for formatting.
+              </p>
+            </div>
+            ${errors?.answer ? `
+              <div class="mt-1">
+                ${errors.answer.map((error) => `
+                  <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
+                `).join("")}
+              </div>
+            ` : ""}
+          </div>
+
+          <!-- Category and Tags Row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Category -->
+            <div>
+              <label for="category" class="block text-sm font-medium text-white">Category</label>
+              <div class="mt-1">
+                <select name="category" 
+                        id="category" 
+                        class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
+                  <option value="">Select a category</option>
+                  <option value="general" ${faq?.category === "general" ? "selected" : ""}>General</option>
+                  <option value="technical" ${faq?.category === "technical" ? "selected" : ""}>Technical</option>
+                  <option value="billing" ${faq?.category === "billing" ? "selected" : ""}>Billing</option>
+                  <option value="support" ${faq?.category === "support" ? "selected" : ""}>Support</option>
+                  <option value="account" ${faq?.category === "account" ? "selected" : ""}>Account</option>
+                  <option value="features" ${faq?.category === "features" ? "selected" : ""}>Features</option>
+                </select>
+              </div>
+              ${errors?.category ? `
+                <div class="mt-1">
+                  ${errors.category.map((error) => `
+                    <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
+                  `).join("")}
+                </div>
+              ` : ""}
+            </div>
+
+            <!-- Tags -->
+            <div>
+              <label for="tags" class="block text-sm font-medium text-white">Tags</label>
+              <div class="mt-1">
+                <input type="text" 
+                       name="tags" 
+                       id="tags" 
+                       value="${faq?.tags || ""}"
+                       class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                       placeholder="e.g., payment, setup, troubleshooting">
+                <p class="mt-1 text-sm text-gray-300">Separate multiple tags with commas</p>
+              </div>
+              ${errors?.tags ? `
+                <div class="mt-1">
+                  ${errors.tags.map((error) => `
+                    <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
+                  `).join("")}
+                </div>
+              ` : ""}
+            </div>
+          </div>
+
+          <!-- Status and Sort Order Row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Published Status -->
+            <div>
+              <label class="block text-sm font-medium text-white">Status</label>
+              <div class="mt-2 space-y-2">
+                <div class="flex items-center">
+                  <input id="published" 
+                         name="isPublished" 
+                         type="radio" 
+                         value="true"
+                         ${!faq || faq.isPublished ? "checked" : ""}
+                         class="h-4 w-4 text-blue-600 focus:ring-blue-600 border-gray-600 bg-gray-700">
+                  <label for="published" class="ml-2 block text-sm text-white">
+                    Published <span class="text-gray-300">(visible to users)</span>
+                  </label>
+                </div>
+                <div class="flex items-center">
+                  <input id="draft" 
+                         name="isPublished" 
+                         type="radio" 
+                         value="false"
+                         ${faq && !faq.isPublished ? "checked" : ""}
+                         class="h-4 w-4 text-blue-600 focus:ring-blue-600 border-gray-600 bg-gray-700">
+                  <label for="draft" class="ml-2 block text-sm text-white">
+                    Draft <span class="text-gray-300">(not visible to users)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sort Order -->
+            <div>
+              <label for="sortOrder" class="block text-sm font-medium text-white">Sort Order</label>
+              <div class="mt-1">
+                <input type="number" 
+                       name="sortOrder" 
+                       id="sortOrder" 
+                       value="${faq?.sortOrder || 0}"
+                       min="0"
+                       step="1"
+                       class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
+                <p class="mt-1 text-sm text-gray-300">Lower numbers appear first (0 = highest priority)</p>
+              </div>
+              ${errors?.sortOrder ? `
+                <div class="mt-1">
+                  ${errors.sortOrder.map((error) => `
+                    <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
+                  `).join("")}
+                </div>
+              ` : ""}
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="flex items-center justify-end space-x-3 pt-6 border-t border-white/20">
+            <a href="/admin/faq" 
+               class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/10 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all">
+              Cancel
+            </a>
+            <button type="submit" 
+                    class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-blue-500/80 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-blue-500 transition-all">
+              <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              ${isEdit ? "Update FAQ" : "Create FAQ"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Character count for question
+      const questionTextarea = document.getElementById('question');
+      const questionCount = document.getElementById('question-count');
+      
+      function updateQuestionCount() {
+        questionCount.textContent = questionTextarea.value.length;
+      }
+      
+      questionTextarea.addEventListener('input', updateQuestionCount);
+      updateQuestionCount(); // Initial count
+
+      // Character count for answer
+      const answerTextarea = document.getElementById('answer');
+      const answerCount = document.getElementById('answer-count');
+      
+      function updateAnswerCount() {
+        answerCount.textContent = answerTextarea.value.length;
+      }
+      
+      answerTextarea.addEventListener('input', updateAnswerCount);
+      updateAnswerCount(); // Initial count
+    </script>
+  `;
+  const layoutData = {
+    title: `${pageTitle} - Admin`,
+    pageTitle,
+    currentPath: isEdit ? `/admin/faq/${faq?.id}` : "/admin/faq/new",
+    user: data.user,
+    content: pageContent
+  };
+  return renderAdminLayout(layoutData);
+}
+function escapeHtml4(unsafe) {
+  return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+// src/routes/admin-faq.ts
+var faqSchema = z.object({
+  question: z.string().min(1, "Question is required").max(500, "Question must be under 500 characters"),
+  answer: z.string().min(1, "Answer is required").max(2e3, "Answer must be under 2000 characters"),
+  category: z.string().optional(),
+  tags: z.string().optional(),
+  isPublished: z.string().transform((val) => val === "true"),
+  sortOrder: z.string().transform((val) => parseInt(val, 10)).pipe(z.number().min(0))
+});
+var adminFAQRoutes = new Hono();
+adminFAQRoutes.get("/", async (c) => {
+  try {
+    const user = c.get("user");
+    const { category, published, search, page = "1" } = c.req.query();
+    const currentPage = parseInt(page, 10) || 1;
+    const limit = 20;
+    const offset = (currentPage - 1) * limit;
+    const db = c.env?.DB;
+    if (!db) {
+      return c.html(renderFAQList({
+        faqs: [],
+        totalCount: 0,
+        currentPage: 1,
+        totalPages: 1,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "Database not available",
+        messageType: "error"
+      }));
+    }
+    let whereClause = "WHERE 1=1";
+    const params = [];
+    if (category) {
+      whereClause += " AND category = ?";
+      params.push(category);
+    }
+    if (published !== void 0) {
+      whereClause += " AND isPublished = ?";
+      params.push(published === "true" ? 1 : 0);
+    }
+    if (search) {
+      whereClause += " AND (question LIKE ? OR answer LIKE ? OR tags LIKE ?)";
+      const searchTerm = `%${search}%`;
+      params.push(searchTerm, searchTerm, searchTerm);
+    }
+    const countQuery = `SELECT COUNT(*) as count FROM faqs ${whereClause}`;
+    const { results: countResults } = await db.prepare(countQuery).bind(...params).all();
+    const totalCount = countResults?.[0]?.count || 0;
+    const dataQuery = `
+      SELECT * FROM faqs 
+      ${whereClause} 
+      ORDER BY sortOrder ASC, created_at DESC 
+      LIMIT ? OFFSET ?
+    `;
+    const { results: faqs } = await db.prepare(dataQuery).bind(...params, limit, offset).all();
+    const totalPages = Math.ceil(totalCount / limit);
+    return c.html(renderFAQList({
+      faqs: faqs || [],
+      totalCount,
+      currentPage,
+      totalPages,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0
+    }));
+  } catch (error) {
+    console.error("Error fetching FAQs:", error);
+    const user = c.get("user");
+    return c.html(renderFAQList({
+      faqs: [],
+      totalCount: 0,
+      currentPage: 1,
+      totalPages: 1,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0,
+      message: "Failed to load FAQs",
+      messageType: "error"
+    }));
+  }
+});
+adminFAQRoutes.get("/new", async (c) => {
+  const user = c.get("user");
+  return c.html(renderFAQForm({
+    isEdit: false,
+    user: user ? {
+      name: user.email,
+      email: user.email,
+      role: user.role
+    } : void 0
+  }));
+});
+adminFAQRoutes.post("/", async (c) => {
+  try {
+    const formData = await c.req.formData();
+    const data = Object.fromEntries(formData.entries());
+    const validatedData = faqSchema.parse(data);
+    const user = c.get("user");
+    const db = c.env?.DB;
+    if (!db) {
+      return c.html(renderFAQForm({
+        isEdit: false,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "Database not available",
+        messageType: "error"
+      }));
+    }
+    const { results } = await db.prepare(`
+      INSERT INTO faqs (question, answer, category, tags, isPublished, sortOrder)
+      VALUES (?, ?, ?, ?, ?, ?)
+      RETURNING *
+    `).bind(
+      validatedData.question,
+      validatedData.answer,
+      validatedData.category || null,
+      validatedData.tags || null,
+      validatedData.isPublished ? 1 : 0,
+      validatedData.sortOrder
+    ).all();
+    if (results && results.length > 0) {
+      return c.redirect("/admin/faq?message=FAQ created successfully");
+    } else {
+      return c.html(renderFAQForm({
+        isEdit: false,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "Failed to create FAQ",
+        messageType: "error"
+      }));
+    }
+  } catch (error) {
+    console.error("Error creating FAQ:", error);
+    const user = c.get("user");
+    if (error instanceof z.ZodError) {
+      const errors = {};
+      error.errors.forEach((err) => {
+        const field = err.path[0];
+        if (!errors[field]) errors[field] = [];
+        errors[field].push(err.message);
+      });
+      return c.html(renderFAQForm({
+        isEdit: false,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        errors,
+        message: "Please correct the errors below",
+        messageType: "error"
+      }));
+    }
+    return c.html(renderFAQForm({
+      isEdit: false,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0,
+      message: "Failed to create FAQ",
+      messageType: "error"
+    }));
+  }
+});
+adminFAQRoutes.get("/:id", async (c) => {
+  try {
+    const id = parseInt(c.req.param("id"));
+    const user = c.get("user");
+    const db = c.env?.DB;
+    if (!db) {
+      return c.html(renderFAQForm({
+        isEdit: true,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "Database not available",
+        messageType: "error"
+      }));
+    }
+    const { results } = await db.prepare("SELECT * FROM faqs WHERE id = ?").bind(id).all();
+    if (!results || results.length === 0) {
+      return c.redirect("/admin/faq?message=FAQ not found&type=error");
+    }
+    const faq = results[0];
+    return c.html(renderFAQForm({
+      faq: {
+        id: faq.id,
+        question: faq.question,
+        answer: faq.answer,
+        category: faq.category,
+        tags: faq.tags,
+        isPublished: Boolean(faq.isPublished),
+        sortOrder: faq.sortOrder
+      },
+      isEdit: true,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0
+    }));
+  } catch (error) {
+    console.error("Error fetching FAQ:", error);
+    const user = c.get("user");
+    return c.html(renderFAQForm({
+      isEdit: true,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0,
+      message: "Failed to load FAQ",
+      messageType: "error"
+    }));
+  }
+});
+adminFAQRoutes.put("/:id", async (c) => {
+  try {
+    const id = parseInt(c.req.param("id"));
+    const formData = await c.req.formData();
+    const data = Object.fromEntries(formData.entries());
+    const validatedData = faqSchema.parse(data);
+    const user = c.get("user");
+    const db = c.env?.DB;
+    if (!db) {
+      return c.html(renderFAQForm({
+        isEdit: true,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "Database not available",
+        messageType: "error"
+      }));
+    }
+    const { results } = await db.prepare(`
+      UPDATE faqs 
+      SET question = ?, answer = ?, category = ?, tags = ?, isPublished = ?, sortOrder = ?
+      WHERE id = ?
+      RETURNING *
+    `).bind(
+      validatedData.question,
+      validatedData.answer,
+      validatedData.category || null,
+      validatedData.tags || null,
+      validatedData.isPublished ? 1 : 0,
+      validatedData.sortOrder,
+      id
+    ).all();
+    if (results && results.length > 0) {
+      return c.redirect("/admin/faq?message=FAQ updated successfully");
+    } else {
+      return c.html(renderFAQForm({
+        faq: {
+          id,
+          question: validatedData.question,
+          answer: validatedData.answer,
+          category: validatedData.category,
+          tags: validatedData.tags,
+          isPublished: validatedData.isPublished,
+          sortOrder: validatedData.sortOrder
+        },
+        isEdit: true,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "FAQ not found",
+        messageType: "error"
+      }));
+    }
+  } catch (error) {
+    console.error("Error updating FAQ:", error);
+    const user = c.get("user");
+    const id = parseInt(c.req.param("id"));
+    if (error instanceof z.ZodError) {
+      const errors = {};
+      error.errors.forEach((err) => {
+        const field = err.path[0];
+        if (!errors[field]) errors[field] = [];
+        errors[field].push(err.message);
+      });
+      return c.html(renderFAQForm({
+        faq: {
+          id,
+          question: "",
+          answer: "",
+          category: "",
+          tags: "",
+          isPublished: true,
+          sortOrder: 0
+        },
+        isEdit: true,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        errors,
+        message: "Please correct the errors below",
+        messageType: "error"
+      }));
+    }
+    return c.html(renderFAQForm({
+      faq: {
+        id,
+        question: "",
+        answer: "",
+        category: "",
+        tags: "",
+        isPublished: true,
+        sortOrder: 0
+      },
+      isEdit: true,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0,
+      message: "Failed to update FAQ",
+      messageType: "error"
+    }));
+  }
+});
+adminFAQRoutes.delete("/:id", async (c) => {
+  try {
+    const id = parseInt(c.req.param("id"));
+    const db = c.env?.DB;
+    if (!db) {
+      return c.json({ error: "Database not available" }, 500);
+    }
+    const { changes } = await db.prepare("DELETE FROM faqs WHERE id = ?").bind(id).run();
+    if (changes === 0) {
+      return c.json({ error: "FAQ not found" }, 404);
+    }
+    return c.redirect("/admin/faq?message=FAQ deleted successfully");
+  } catch (error) {
+    console.error("Error deleting FAQ:", error);
+    return c.json({ error: "Failed to delete FAQ" }, 500);
+  }
+});
+var admin_faq_default = adminFAQRoutes;
+
+// src/templates/pages/admin-testimonials-form.template.ts
+function renderTestimonialsForm(data) {
+  const { testimonial, isEdit, errors, message, messageType } = data;
+  const pageTitle = isEdit ? "Edit Testimonial" : "New Testimonial";
+  const pageContent = `
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-semibold text-white">${pageTitle}</h1>
+          <p class="mt-2 text-sm text-gray-300">
+            ${isEdit ? "Update the testimonial details below" : "Create a new customer testimonial"}
+          </p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <a href="/admin/testimonials"
+             class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/10 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all">
+            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to List
+          </a>
+        </div>
+      </div>
+
+      ${message ? renderAlert({ type: messageType || "info", message, dismissible: true }) : ""}
+
+      <!-- Form -->
+      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl">
+        <form ${isEdit ? `hx-put="/admin/testimonials/${testimonial?.id}"` : 'hx-post="/admin/testimonials"'}
+              hx-target="body"
+              hx-swap="outerHTML"
+              class="space-y-6 p-6">
+
+          <!-- Author Information Section -->
+          <div>
+            <h2 class="text-lg font-medium text-white mb-4">Author Information</h2>
+
+            <!-- Author Name -->
+            <div class="mb-4">
+              <label for="authorName" class="block text-sm font-medium text-white">
+                Author Name <span class="text-red-400">*</span>
+              </label>
+              <div class="mt-1">
+                <input type="text"
+                       name="authorName"
+                       id="authorName"
+                       value="${testimonial?.authorName || ""}"
+                       required
+                       maxlength="100"
+                       class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                       placeholder="John Doe">
+              </div>
+              ${errors?.authorName ? `
+                <div class="mt-1">
+                  ${errors.authorName.map((error) => `
+                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                  `).join("")}
+                </div>
+              ` : ""}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Author Title -->
+              <div>
+                <label for="authorTitle" class="block text-sm font-medium text-white">Title/Position</label>
+                <div class="mt-1">
+                  <input type="text"
+                         name="authorTitle"
+                         id="authorTitle"
+                         value="${testimonial?.authorTitle || ""}"
+                         maxlength="100"
+                         class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                         placeholder="CEO">
+                </div>
+                ${errors?.authorTitle ? `
+                  <div class="mt-1">
+                    ${errors.authorTitle.map((error) => `
+                      <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                    `).join("")}
+                  </div>
+                ` : ""}
+              </div>
+
+              <!-- Author Company -->
+              <div>
+                <label for="authorCompany" class="block text-sm font-medium text-white">Company</label>
+                <div class="mt-1">
+                  <input type="text"
+                         name="authorCompany"
+                         id="authorCompany"
+                         value="${testimonial?.authorCompany || ""}"
+                         maxlength="100"
+                         class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                         placeholder="Acme Corp">
+                </div>
+                ${errors?.authorCompany ? `
+                  <div class="mt-1">
+                    ${errors.authorCompany.map((error) => `
+                      <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                    `).join("")}
+                  </div>
+                ` : ""}
+              </div>
+            </div>
+          </div>
+
+          <!-- Testimonial Content Section -->
+          <div>
+            <h2 class="text-lg font-medium text-white mb-4">Testimonial</h2>
+
+            <!-- Testimonial Text -->
+            <div class="mb-4">
+              <label for="testimonialText" class="block text-sm font-medium text-white">
+                Testimonial <span class="text-red-400">*</span>
+              </label>
+              <div class="mt-1">
+                <textarea name="testimonialText"
+                          id="testimonialText"
+                          rows="6"
+                          required
+                          maxlength="1000"
+                          class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full"
+                          placeholder="Enter the customer's testimonial...">${testimonial?.testimonialText || ""}</textarea>
+                <p class="mt-1 text-sm text-gray-300">
+                  <span id="testimonial-count">0</span>/1000 characters
+                </p>
+              </div>
+              ${errors?.testimonialText ? `
+                <div class="mt-1">
+                  ${errors.testimonialText.map((error) => `
+                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                  `).join("")}
+                </div>
+              ` : ""}
+            </div>
+
+            <!-- Rating -->
+            <div>
+              <label for="rating" class="block text-sm font-medium text-white">Rating (Optional)</label>
+              <div class="mt-1">
+                <select name="rating"
+                        id="rating"
+                        class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
+                  <option value="">No rating</option>
+                  <option value="5" ${testimonial?.rating === 5 ? "selected" : ""}>\u2B50\u2B50\u2B50\u2B50\u2B50 (5 stars)</option>
+                  <option value="4" ${testimonial?.rating === 4 ? "selected" : ""}>\u2B50\u2B50\u2B50\u2B50 (4 stars)</option>
+                  <option value="3" ${testimonial?.rating === 3 ? "selected" : ""}>\u2B50\u2B50\u2B50 (3 stars)</option>
+                  <option value="2" ${testimonial?.rating === 2 ? "selected" : ""}>\u2B50\u2B50 (2 stars)</option>
+                  <option value="1" ${testimonial?.rating === 1 ? "selected" : ""}>\u2B50 (1 star)</option>
+                </select>
+              </div>
+              ${errors?.rating ? `
+                <div class="mt-1">
+                  ${errors.rating.map((error) => `
+                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                  `).join("")}
+                </div>
+              ` : ""}
+            </div>
+          </div>
+
+          <!-- Status and Sort Order Row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Published Status -->
+            <div>
+              <label class="block text-sm font-medium text-white">Status</label>
+              <div class="mt-2 space-y-2">
+                <div class="flex items-center">
+                  <input id="published"
+                         name="isPublished"
+                         type="radio"
+                         value="true"
+                         ${!testimonial || testimonial.isPublished ? "checked" : ""}
+                         class="h-4 w-4 text-blue-600 focus:ring-blue-600 border-gray-600 bg-gray-700">
+                  <label for="published" class="ml-2 block text-sm text-white">
+                    Published <span class="text-gray-300">(visible to users)</span>
+                  </label>
+                </div>
+                <div class="flex items-center">
+                  <input id="draft"
+                         name="isPublished"
+                         type="radio"
+                         value="false"
+                         ${testimonial && !testimonial.isPublished ? "checked" : ""}
+                         class="h-4 w-4 text-blue-600 focus:ring-blue-600 border-gray-600 bg-gray-700">
+                  <label for="draft" class="ml-2 block text-sm text-white">
+                    Draft <span class="text-gray-300">(not visible to users)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sort Order -->
+            <div>
+              <label for="sortOrder" class="block text-sm font-medium text-white">Sort Order</label>
+              <div class="mt-1">
+                <input type="number"
+                       name="sortOrder"
+                       id="sortOrder"
+                       value="${testimonial?.sortOrder || 0}"
+                       min="0"
+                       step="1"
+                       class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
+                <p class="mt-1 text-sm text-gray-300">Lower numbers appear first (0 = highest priority)</p>
+              </div>
+              ${errors?.sortOrder ? `
+                <div class="mt-1">
+                  ${errors.sortOrder.map((error) => `
+                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                  `).join("")}
+                </div>
+              ` : ""}
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="flex items-center justify-end space-x-3 pt-6 border-t border-white/20">
+            <a href="/admin/testimonials"
+               class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/10 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all">
+              Cancel
+            </a>
+            <button type="submit"
+                    class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-blue-500/80 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-blue-500 transition-all">
+              <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              ${isEdit ? "Update Testimonial" : "Create Testimonial"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Character count for testimonial
+      const testimonialTextarea = document.getElementById('testimonialText');
+      const testimonialCount = document.getElementById('testimonial-count');
+
+      function updateTestimonialCount() {
+        testimonialCount.textContent = testimonialTextarea.value.length;
+      }
+
+      testimonialTextarea.addEventListener('input', updateTestimonialCount);
+      updateTestimonialCount(); // Initial count
+    </script>
+  `;
+  const layoutData = {
+    title: `${pageTitle} - Admin`,
+    pageTitle,
+    currentPath: isEdit ? `/admin/testimonials/${testimonial?.id}` : "/admin/testimonials/new",
+    user: data.user,
+    content: pageContent
+  };
+  return renderAdminLayout(layoutData);
+}
+function escapeHtml5(unsafe) {
+  return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+// src/routes/admin-testimonials.ts
+var testimonialSchema = z.object({
+  authorName: z.string().min(1, "Author name is required").max(100, "Author name must be under 100 characters"),
+  authorTitle: z.string().optional(),
+  authorCompany: z.string().optional(),
+  testimonialText: z.string().min(1, "Testimonial is required").max(1e3, "Testimonial must be under 1000 characters"),
+  rating: z.string().transform((val) => val ? parseInt(val, 10) : void 0).pipe(z.number().min(1).max(5).optional()),
+  isPublished: z.string().transform((val) => val === "true"),
+  sortOrder: z.string().transform((val) => parseInt(val, 10)).pipe(z.number().min(0))
+});
+var adminTestimonialsRoutes = new Hono();
+adminTestimonialsRoutes.get("/", async (c) => {
+  try {
+    const user = c.get("user");
+    const { published, minRating, search, page = "1" } = c.req.query();
+    const currentPage = parseInt(page, 10) || 1;
+    const limit = 20;
+    const offset = (currentPage - 1) * limit;
+    const db = c.env?.DB;
+    if (!db) {
+      return c.html(renderTestimonialsList({
+        testimonials: [],
+        totalCount: 0,
+        currentPage: 1,
+        totalPages: 1,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "Database not available",
+        messageType: "error"
+      }));
+    }
+    let whereClause = "WHERE 1=1";
+    const params = [];
+    if (published !== void 0) {
+      whereClause += " AND isPublished = ?";
+      params.push(published === "true" ? 1 : 0);
+    }
+    if (minRating) {
+      whereClause += " AND rating >= ?";
+      params.push(parseInt(minRating, 10));
+    }
+    if (search) {
+      whereClause += " AND (author_name LIKE ? OR testimonial_text LIKE ? OR author_company LIKE ?)";
+      const searchTerm = `%${search}%`;
+      params.push(searchTerm, searchTerm, searchTerm);
+    }
+    const countQuery = `SELECT COUNT(*) as count FROM testimonials ${whereClause}`;
+    const { results: countResults } = await db.prepare(countQuery).bind(...params).all();
+    const totalCount = countResults?.[0]?.count || 0;
+    const dataQuery = `
+      SELECT * FROM testimonials
+      ${whereClause}
+      ORDER BY sortOrder ASC, created_at DESC
+      LIMIT ? OFFSET ?
+    `;
+    const { results: testimonials } = await db.prepare(dataQuery).bind(...params, limit, offset).all();
+    const totalPages = Math.ceil(totalCount / limit);
+    return c.html(renderTestimonialsList({
+      testimonials: testimonials || [],
+      totalCount,
+      currentPage,
+      totalPages,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0
+    }));
+  } catch (error) {
+    console.error("Error fetching testimonials:", error);
+    const user = c.get("user");
+    return c.html(renderTestimonialsList({
+      testimonials: [],
+      totalCount: 0,
+      currentPage: 1,
+      totalPages: 1,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0,
+      message: "Failed to load testimonials",
+      messageType: "error"
+    }));
+  }
+});
+adminTestimonialsRoutes.get("/new", async (c) => {
+  const user = c.get("user");
+  return c.html(renderTestimonialsForm({
+    isEdit: false,
+    user: user ? {
+      name: user.email,
+      email: user.email,
+      role: user.role
+    } : void 0
+  }));
+});
+adminTestimonialsRoutes.post("/", async (c) => {
+  try {
+    const formData = await c.req.formData();
+    const data = Object.fromEntries(formData.entries());
+    const validatedData = testimonialSchema.parse(data);
+    const user = c.get("user");
+    const db = c.env?.DB;
+    if (!db) {
+      return c.html(renderTestimonialsForm({
+        isEdit: false,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "Database not available",
+        messageType: "error"
+      }));
+    }
+    const { results } = await db.prepare(`
+      INSERT INTO testimonials (author_name, author_title, author_company, testimonial_text, rating, isPublished, sortOrder)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+      RETURNING *
+    `).bind(
+      validatedData.authorName,
+      validatedData.authorTitle || null,
+      validatedData.authorCompany || null,
+      validatedData.testimonialText,
+      validatedData.rating || null,
+      validatedData.isPublished ? 1 : 0,
+      validatedData.sortOrder
+    ).all();
+    if (results && results.length > 0) {
+      return c.redirect("/admin/testimonials?message=Testimonial created successfully");
+    } else {
+      return c.html(renderTestimonialsForm({
+        isEdit: false,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "Failed to create testimonial",
+        messageType: "error"
+      }));
+    }
+  } catch (error) {
+    console.error("Error creating testimonial:", error);
+    const user = c.get("user");
+    if (error instanceof z.ZodError) {
+      const errors = {};
+      error.errors.forEach((err) => {
+        const field = err.path[0];
+        if (!errors[field]) errors[field] = [];
+        errors[field].push(err.message);
+      });
+      return c.html(renderTestimonialsForm({
+        isEdit: false,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        errors,
+        message: "Please correct the errors below",
+        messageType: "error"
+      }));
+    }
+    return c.html(renderTestimonialsForm({
+      isEdit: false,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0,
+      message: "Failed to create testimonial",
+      messageType: "error"
+    }));
+  }
+});
+adminTestimonialsRoutes.get("/:id", async (c) => {
+  try {
+    const id = parseInt(c.req.param("id"));
+    const user = c.get("user");
+    const db = c.env?.DB;
+    if (!db) {
+      return c.html(renderTestimonialsForm({
+        isEdit: true,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "Database not available",
+        messageType: "error"
+      }));
+    }
+    const { results } = await db.prepare("SELECT * FROM testimonials WHERE id = ?").bind(id).all();
+    if (!results || results.length === 0) {
+      return c.redirect("/admin/testimonials?message=Testimonial not found&type=error");
+    }
+    const testimonial = results[0];
+    return c.html(renderTestimonialsForm({
+      testimonial: {
+        id: testimonial.id,
+        authorName: testimonial.author_name,
+        authorTitle: testimonial.author_title,
+        authorCompany: testimonial.author_company,
+        testimonialText: testimonial.testimonial_text,
+        rating: testimonial.rating,
+        isPublished: Boolean(testimonial.isPublished),
+        sortOrder: testimonial.sortOrder
+      },
+      isEdit: true,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0
+    }));
+  } catch (error) {
+    console.error("Error fetching testimonial:", error);
+    const user = c.get("user");
+    return c.html(renderTestimonialsForm({
+      isEdit: true,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0,
+      message: "Failed to load testimonial",
+      messageType: "error"
+    }));
+  }
+});
+adminTestimonialsRoutes.put("/:id", async (c) => {
+  try {
+    const id = parseInt(c.req.param("id"));
+    const formData = await c.req.formData();
+    const data = Object.fromEntries(formData.entries());
+    const validatedData = testimonialSchema.parse(data);
+    const user = c.get("user");
+    const db = c.env?.DB;
+    if (!db) {
+      return c.html(renderTestimonialsForm({
+        isEdit: true,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "Database not available",
+        messageType: "error"
+      }));
+    }
+    const { results } = await db.prepare(`
+      UPDATE testimonials
+      SET author_name = ?, author_title = ?, author_company = ?, testimonial_text = ?, rating = ?, isPublished = ?, sortOrder = ?
+      WHERE id = ?
+      RETURNING *
+    `).bind(
+      validatedData.authorName,
+      validatedData.authorTitle || null,
+      validatedData.authorCompany || null,
+      validatedData.testimonialText,
+      validatedData.rating || null,
+      validatedData.isPublished ? 1 : 0,
+      validatedData.sortOrder,
+      id
+    ).all();
+    if (results && results.length > 0) {
+      return c.redirect("/admin/testimonials?message=Testimonial updated successfully");
+    } else {
+      return c.html(renderTestimonialsForm({
+        testimonial: {
+          id,
+          authorName: validatedData.authorName,
+          authorTitle: validatedData.authorTitle,
+          authorCompany: validatedData.authorCompany,
+          testimonialText: validatedData.testimonialText,
+          rating: validatedData.rating,
+          isPublished: validatedData.isPublished,
+          sortOrder: validatedData.sortOrder
+        },
+        isEdit: true,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "Testimonial not found",
+        messageType: "error"
+      }));
+    }
+  } catch (error) {
+    console.error("Error updating testimonial:", error);
+    const user = c.get("user");
+    const id = parseInt(c.req.param("id"));
+    if (error instanceof z.ZodError) {
+      const errors = {};
+      error.errors.forEach((err) => {
+        const field = err.path[0];
+        if (!errors[field]) errors[field] = [];
+        errors[field].push(err.message);
+      });
+      return c.html(renderTestimonialsForm({
+        testimonial: {
+          id,
+          authorName: "",
+          authorTitle: "",
+          authorCompany: "",
+          testimonialText: "",
+          rating: void 0,
+          isPublished: true,
+          sortOrder: 0
+        },
+        isEdit: true,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        errors,
+        message: "Please correct the errors below",
+        messageType: "error"
+      }));
+    }
+    return c.html(renderTestimonialsForm({
+      testimonial: {
+        id,
+        authorName: "",
+        authorTitle: "",
+        authorCompany: "",
+        testimonialText: "",
+        rating: void 0,
+        isPublished: true,
+        sortOrder: 0
+      },
+      isEdit: true,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0,
+      message: "Failed to update testimonial",
+      messageType: "error"
+    }));
+  }
+});
+adminTestimonialsRoutes.delete("/:id", async (c) => {
+  try {
+    const id = parseInt(c.req.param("id"));
+    const db = c.env?.DB;
+    if (!db) {
+      return c.json({ error: "Database not available" }, 500);
+    }
+    const { changes } = await db.prepare("DELETE FROM testimonials WHERE id = ?").bind(id).run();
+    if (changes === 0) {
+      return c.json({ error: "Testimonial not found" }, 404);
+    }
+    return c.redirect("/admin/testimonials?message=Testimonial deleted successfully");
+  } catch (error) {
+    console.error("Error deleting testimonial:", error);
+    return c.json({ error: "Failed to delete testimonial" }, 500);
+  }
+});
+var admin_testimonials_default = adminTestimonialsRoutes;
+
+// src/templates/pages/admin-code-examples-form.template.ts
+function renderCodeExamplesForm(data) {
+  const { codeExample, isEdit, errors, message, messageType } = data;
+  const pageTitle = isEdit ? "Edit Code Example" : "New Code Example";
+  const pageContent = `
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-semibold text-white">${pageTitle}</h1>
+          <p class="mt-2 text-sm text-gray-300">
+            ${isEdit ? "Update the code example details below" : "Create a new code snippet or example"}
+          </p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <a href="/admin/code-examples"
+             class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/10 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all">
+            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to List
+          </a>
+        </div>
+      </div>
+
+      ${message ? renderAlert({ type: messageType || "info", message, dismissible: true }) : ""}
+
+      <!-- Form -->
+      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl">
+        <form ${isEdit ? `hx-put="/admin/code-examples/${codeExample?.id}"` : 'hx-post="/admin/code-examples"'}
+              hx-target="body"
+              hx-swap="outerHTML"
+              class="space-y-6 p-6">
+
+          <!-- Basic Information Section -->
+          <div>
+            <h2 class="text-lg font-medium text-white mb-4">Basic Information</h2>
+
+            <!-- Title -->
+            <div class="mb-4">
+              <label for="title" class="block text-sm font-medium text-white">
+                Title <span class="text-red-400">*</span>
+              </label>
+              <div class="mt-1">
+                <input type="text"
+                       name="title"
+                       id="title"
+                       value="${codeExample?.title || ""}"
+                       required
+                       maxlength="200"
+                       class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-purple-600 sm:text-sm sm:leading-6"
+                       placeholder="e.g., React useState Hook Example">
+              </div>
+              ${errors?.title ? `
+                <div class="mt-1">
+                  ${errors.title.map((error) => `
+                    <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                  `).join("")}
+                </div>
+              ` : ""}
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+              <label for="description" class="block text-sm font-medium text-white">Description</label>
+              <div class="mt-1">
+                <textarea name="description"
+                          id="description"
+                          rows="3"
+                          maxlength="500"
+                          class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-purple-400 focus:outline-none transition-colors w-full"
+                          placeholder="Briefly describe what this code example demonstrates...">${codeExample?.description || ""}</textarea>
+                <p class="mt-1 text-sm text-gray-300">
+                  <span id="description-count">0</span>/500 characters
+                </p>
+              </div>
+              ${errors?.description ? `
+                <div class="mt-1">
+                  ${errors.description.map((error) => `
+                    <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                  `).join("")}
+                </div>
+              ` : ""}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <!-- Language -->
+              <div>
+                <label for="language" class="block text-sm font-medium text-white">
+                  Language <span class="text-red-400">*</span>
+                </label>
+                <div class="mt-1">
+                  <select name="language"
+                          id="language"
+                          required
+                          class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-purple-600 sm:text-sm sm:leading-6">
+                    <option value="">Select language...</option>
+                    <option value="javascript" ${codeExample?.language === "javascript" ? "selected" : ""}>JavaScript</option>
+                    <option value="typescript" ${codeExample?.language === "typescript" ? "selected" : ""}>TypeScript</option>
+                    <option value="python" ${codeExample?.language === "python" ? "selected" : ""}>Python</option>
+                    <option value="go" ${codeExample?.language === "go" ? "selected" : ""}>Go</option>
+                    <option value="rust" ${codeExample?.language === "rust" ? "selected" : ""}>Rust</option>
+                    <option value="java" ${codeExample?.language === "java" ? "selected" : ""}>Java</option>
+                    <option value="php" ${codeExample?.language === "php" ? "selected" : ""}>PHP</option>
+                    <option value="ruby" ${codeExample?.language === "ruby" ? "selected" : ""}>Ruby</option>
+                    <option value="sql" ${codeExample?.language === "sql" ? "selected" : ""}>SQL</option>
+                  </select>
+                </div>
+                ${errors?.language ? `
+                  <div class="mt-1">
+                    ${errors.language.map((error) => `
+                      <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                    `).join("")}
+                  </div>
+                ` : ""}
+              </div>
+
+              <!-- Category -->
+              <div>
+                <label for="category" class="block text-sm font-medium text-white">Category</label>
+                <div class="mt-1">
+                  <input type="text"
+                         name="category"
+                         id="category"
+                         value="${codeExample?.category || ""}"
+                         maxlength="50"
+                         class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-purple-600 sm:text-sm sm:leading-6"
+                         placeholder="e.g., frontend, backend">
+                </div>
+                ${errors?.category ? `
+                  <div class="mt-1">
+                    ${errors.category.map((error) => `
+                      <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                    `).join("")}
+                  </div>
+                ` : ""}
+              </div>
+
+              <!-- Tags -->
+              <div>
+                <label for="tags" class="block text-sm font-medium text-white">Tags</label>
+                <div class="mt-1">
+                  <input type="text"
+                         name="tags"
+                         id="tags"
+                         value="${codeExample?.tags || ""}"
+                         maxlength="200"
+                         class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-purple-600 sm:text-sm sm:leading-6"
+                         placeholder="e.g., react, hooks, state">
+                  <p class="mt-1 text-sm text-gray-300">Comma-separated tags</p>
+                </div>
+                ${errors?.tags ? `
+                  <div class="mt-1">
+                    ${errors.tags.map((error) => `
+                      <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                    `).join("")}
+                  </div>
+                ` : ""}
+              </div>
+            </div>
+          </div>
+
+          <!-- Code Section -->
+          <div>
+            <h2 class="text-lg font-medium text-white mb-4">Code</h2>
+
+            <!-- Code Editor -->
+            <div class="mb-4">
+              <label for="code" class="block text-sm font-medium text-white">
+                Code <span class="text-red-400">*</span>
+              </label>
+              <div class="mt-1">
+                <textarea name="code"
+                          id="code"
+                          rows="20"
+                          required
+                          class="backdrop-blur-sm bg-gray-800/90 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-purple-400 focus:outline-none transition-colors w-full font-mono text-sm"
+                          placeholder="Paste your code here...">${codeExample?.code || ""}</textarea>
+                <p class="mt-1 text-sm text-gray-300">
+                  <span id="code-count">0</span> characters
+                </p>
+              </div>
+              ${errors?.code ? `
+                <div class="mt-1">
+                  ${errors.code.map((error) => `
+                    <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                  `).join("")}
+                </div>
+              ` : ""}
+            </div>
+          </div>
+
+          <!-- Status and Sort Order Row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Published Status -->
+            <div>
+              <label class="block text-sm font-medium text-white">Status</label>
+              <div class="mt-2 space-y-2">
+                <div class="flex items-center">
+                  <input id="published"
+                         name="isPublished"
+                         type="radio"
+                         value="true"
+                         ${!codeExample || codeExample.isPublished ? "checked" : ""}
+                         class="h-4 w-4 text-purple-600 focus:ring-purple-600 border-gray-600 bg-gray-700">
+                  <label for="published" class="ml-2 block text-sm text-white">
+                    Published <span class="text-gray-300">(visible to users)</span>
+                  </label>
+                </div>
+                <div class="flex items-center">
+                  <input id="draft"
+                         name="isPublished"
+                         type="radio"
+                         value="false"
+                         ${codeExample && !codeExample.isPublished ? "checked" : ""}
+                         class="h-4 w-4 text-purple-600 focus:ring-purple-600 border-gray-600 bg-gray-700">
+                  <label for="draft" class="ml-2 block text-sm text-white">
+                    Draft <span class="text-gray-300">(not visible to users)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sort Order -->
+            <div>
+              <label for="sortOrder" class="block text-sm font-medium text-white">Sort Order</label>
+              <div class="mt-1">
+                <input type="number"
+                       name="sortOrder"
+                       id="sortOrder"
+                       value="${codeExample?.sortOrder || 0}"
+                       min="0"
+                       step="1"
+                       class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-purple-600 sm:text-sm sm:leading-6">
+                <p class="mt-1 text-sm text-gray-300">Lower numbers appear first (0 = highest priority)</p>
+              </div>
+              ${errors?.sortOrder ? `
+                <div class="mt-1">
+                  ${errors.sortOrder.map((error) => `
+                    <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                  `).join("")}
+                </div>
+              ` : ""}
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="flex items-center justify-end space-x-3 pt-6 border-t border-white/20">
+            <a href="/admin/code-examples"
+               class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/10 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all">
+              Cancel
+            </a>
+            <button type="submit"
+                    class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-purple-500/80 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-purple-500 transition-all">
+              <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              ${isEdit ? "Update Code Example" : "Create Code Example"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Character count for description
+      const descriptionTextarea = document.getElementById('description');
+      const descriptionCount = document.getElementById('description-count');
+
+      function updateDescriptionCount() {
+        descriptionCount.textContent = descriptionTextarea.value.length;
+      }
+
+      descriptionTextarea.addEventListener('input', updateDescriptionCount);
+      updateDescriptionCount(); // Initial count
+
+      // Character count for code
+      const codeTextarea = document.getElementById('code');
+      const codeCount = document.getElementById('code-count');
+
+      function updateCodeCount() {
+        codeCount.textContent = codeTextarea.value.length;
+      }
+
+      codeTextarea.addEventListener('input', updateCodeCount);
+      updateCodeCount(); // Initial count
+    </script>
+  `;
+  const layoutData = {
+    title: `${pageTitle} - Admin`,
+    pageTitle,
+    currentPath: isEdit ? `/admin/code-examples/${codeExample?.id}` : "/admin/code-examples/new",
+    user: data.user,
+    content: pageContent
+  };
+  return renderAdminLayout(layoutData);
+}
+function escapeHtml6(unsafe) {
+  return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+// src/routes/admin-code-examples.ts
+var codeExampleSchema = z.object({
+  title: z.string().min(1, "Title is required").max(200, "Title must be under 200 characters"),
+  description: z.string().max(500, "Description must be under 500 characters").optional(),
+  code: z.string().min(1, "Code is required"),
+  language: z.string().min(1, "Language is required"),
+  category: z.string().max(50, "Category must be under 50 characters").optional(),
+  tags: z.string().max(200, "Tags must be under 200 characters").optional(),
+  isPublished: z.string().transform((val) => val === "true"),
+  sortOrder: z.string().transform((val) => parseInt(val, 10)).pipe(z.number().min(0))
+});
+var adminCodeExamplesRoutes = new Hono();
+adminCodeExamplesRoutes.get("/", async (c) => {
+  try {
+    const user = c.get("user");
+    const { published, language, search, page = "1" } = c.req.query();
+    const currentPage = parseInt(page, 10) || 1;
+    const limit = 20;
+    const offset = (currentPage - 1) * limit;
+    const db = c.env?.DB;
+    if (!db) {
+      return c.html(renderCodeExamplesList({
+        codeExamples: [],
+        totalCount: 0,
+        currentPage: 1,
+        totalPages: 1,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "Database not available",
+        messageType: "error"
+      }));
+    }
+    let whereClause = "WHERE 1=1";
+    const params = [];
+    if (published !== void 0) {
+      whereClause += " AND isPublished = ?";
+      params.push(published === "true" ? 1 : 0);
+    }
+    if (language) {
+      whereClause += " AND language = ?";
+      params.push(language);
+    }
+    if (search) {
+      whereClause += " AND (title LIKE ? OR description LIKE ? OR code LIKE ? OR tags LIKE ?)";
+      const searchTerm = `%${search}%`;
+      params.push(searchTerm, searchTerm, searchTerm, searchTerm);
+    }
+    const countQuery = `SELECT COUNT(*) as count FROM code_examples ${whereClause}`;
+    const { results: countResults } = await db.prepare(countQuery).bind(...params).all();
+    const totalCount = countResults?.[0]?.count || 0;
+    const dataQuery = `
+      SELECT * FROM code_examples
+      ${whereClause}
+      ORDER BY sortOrder ASC, created_at DESC
+      LIMIT ? OFFSET ?
+    `;
+    const { results: codeExamples } = await db.prepare(dataQuery).bind(...params, limit, offset).all();
+    const totalPages = Math.ceil(totalCount / limit);
+    return c.html(renderCodeExamplesList({
+      codeExamples: codeExamples || [],
+      totalCount,
+      currentPage,
+      totalPages,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0
+    }));
+  } catch (error) {
+    console.error("Error fetching code examples:", error);
+    const user = c.get("user");
+    return c.html(renderCodeExamplesList({
+      codeExamples: [],
+      totalCount: 0,
+      currentPage: 1,
+      totalPages: 1,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0,
+      message: "Failed to load code examples",
+      messageType: "error"
+    }));
+  }
+});
+adminCodeExamplesRoutes.get("/new", async (c) => {
+  const user = c.get("user");
+  return c.html(renderCodeExamplesForm({
+    isEdit: false,
+    user: user ? {
+      name: user.email,
+      email: user.email,
+      role: user.role
+    } : void 0
+  }));
+});
+adminCodeExamplesRoutes.post("/", async (c) => {
+  try {
+    const formData = await c.req.formData();
+    const data = Object.fromEntries(formData.entries());
+    const validatedData = codeExampleSchema.parse(data);
+    const user = c.get("user");
+    const db = c.env?.DB;
+    if (!db) {
+      return c.html(renderCodeExamplesForm({
+        isEdit: false,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "Database not available",
+        messageType: "error"
+      }));
+    }
+    const { results } = await db.prepare(`
+      INSERT INTO code_examples (title, description, code, language, category, tags, isPublished, sortOrder)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      RETURNING *
+    `).bind(
+      validatedData.title,
+      validatedData.description || null,
+      validatedData.code,
+      validatedData.language,
+      validatedData.category || null,
+      validatedData.tags || null,
+      validatedData.isPublished ? 1 : 0,
+      validatedData.sortOrder
+    ).all();
+    if (results && results.length > 0) {
+      return c.redirect("/admin/code-examples?message=Code example created successfully");
+    } else {
+      return c.html(renderCodeExamplesForm({
+        isEdit: false,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "Failed to create code example",
+        messageType: "error"
+      }));
+    }
+  } catch (error) {
+    console.error("Error creating code example:", error);
+    const user = c.get("user");
+    if (error instanceof z.ZodError) {
+      const errors = {};
+      error.errors.forEach((err) => {
+        const field = err.path[0];
+        if (!errors[field]) errors[field] = [];
+        errors[field].push(err.message);
+      });
+      return c.html(renderCodeExamplesForm({
+        isEdit: false,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        errors,
+        message: "Please correct the errors below",
+        messageType: "error"
+      }));
+    }
+    return c.html(renderCodeExamplesForm({
+      isEdit: false,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0,
+      message: "Failed to create code example",
+      messageType: "error"
+    }));
+  }
+});
+adminCodeExamplesRoutes.get("/:id", async (c) => {
+  try {
+    const id = parseInt(c.req.param("id"));
+    const user = c.get("user");
+    const db = c.env?.DB;
+    if (!db) {
+      return c.html(renderCodeExamplesForm({
+        isEdit: true,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "Database not available",
+        messageType: "error"
+      }));
+    }
+    const { results } = await db.prepare("SELECT * FROM code_examples WHERE id = ?").bind(id).all();
+    if (!results || results.length === 0) {
+      return c.redirect("/admin/code-examples?message=Code example not found&type=error");
+    }
+    const example = results[0];
+    return c.html(renderCodeExamplesForm({
+      codeExample: {
+        id: example.id,
+        title: example.title,
+        description: example.description,
+        code: example.code,
+        language: example.language,
+        category: example.category,
+        tags: example.tags,
+        isPublished: Boolean(example.isPublished),
+        sortOrder: example.sortOrder
+      },
+      isEdit: true,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0
+    }));
+  } catch (error) {
+    console.error("Error fetching code example:", error);
+    const user = c.get("user");
+    return c.html(renderCodeExamplesForm({
+      isEdit: true,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0,
+      message: "Failed to load code example",
+      messageType: "error"
+    }));
+  }
+});
+adminCodeExamplesRoutes.put("/:id", async (c) => {
+  try {
+    const id = parseInt(c.req.param("id"));
+    const formData = await c.req.formData();
+    const data = Object.fromEntries(formData.entries());
+    const validatedData = codeExampleSchema.parse(data);
+    const user = c.get("user");
+    const db = c.env?.DB;
+    if (!db) {
+      return c.html(renderCodeExamplesForm({
+        isEdit: true,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "Database not available",
+        messageType: "error"
+      }));
+    }
+    const { results } = await db.prepare(`
+      UPDATE code_examples
+      SET title = ?, description = ?, code = ?, language = ?, category = ?, tags = ?, isPublished = ?, sortOrder = ?
+      WHERE id = ?
+      RETURNING *
+    `).bind(
+      validatedData.title,
+      validatedData.description || null,
+      validatedData.code,
+      validatedData.language,
+      validatedData.category || null,
+      validatedData.tags || null,
+      validatedData.isPublished ? 1 : 0,
+      validatedData.sortOrder,
+      id
+    ).all();
+    if (results && results.length > 0) {
+      return c.redirect("/admin/code-examples?message=Code example updated successfully");
+    } else {
+      return c.html(renderCodeExamplesForm({
+        codeExample: {
+          id,
+          title: validatedData.title,
+          description: validatedData.description,
+          code: validatedData.code,
+          language: validatedData.language,
+          category: validatedData.category,
+          tags: validatedData.tags,
+          isPublished: validatedData.isPublished,
+          sortOrder: validatedData.sortOrder
+        },
+        isEdit: true,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        message: "Code example not found",
+        messageType: "error"
+      }));
+    }
+  } catch (error) {
+    console.error("Error updating code example:", error);
+    const user = c.get("user");
+    const id = parseInt(c.req.param("id"));
+    if (error instanceof z.ZodError) {
+      const errors = {};
+      error.errors.forEach((err) => {
+        const field = err.path[0];
+        if (!errors[field]) errors[field] = [];
+        errors[field].push(err.message);
+      });
+      return c.html(renderCodeExamplesForm({
+        codeExample: {
+          id,
+          title: "",
+          description: "",
+          code: "",
+          language: "",
+          category: "",
+          tags: "",
+          isPublished: true,
+          sortOrder: 0
+        },
+        isEdit: true,
+        user: user ? {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        } : void 0,
+        errors,
+        message: "Please correct the errors below",
+        messageType: "error"
+      }));
+    }
+    return c.html(renderCodeExamplesForm({
+      codeExample: {
+        id,
+        title: "",
+        description: "",
+        code: "",
+        language: "",
+        category: "",
+        tags: "",
+        isPublished: true,
+        sortOrder: 0
+      },
+      isEdit: true,
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0,
+      message: "Failed to update code example",
+      messageType: "error"
+    }));
+  }
+});
+adminCodeExamplesRoutes.delete("/:id", async (c) => {
+  try {
+    const id = parseInt(c.req.param("id"));
+    const db = c.env?.DB;
+    if (!db) {
+      return c.json({ error: "Database not available" }, 500);
+    }
+    const { changes } = await db.prepare("DELETE FROM code_examples WHERE id = ?").bind(id).run();
+    if (changes === 0) {
+      return c.json({ error: "Code example not found" }, 404);
+    }
+    return c.redirect("/admin/code-examples?message=Code example deleted successfully");
+  } catch (error) {
+    console.error("Error deleting code example:", error);
+    return c.json({ error: "Failed to delete code example" }, 500);
+  }
+});
+var admin_code_examples_default = adminCodeExamplesRoutes;
 
 // src/routes/index.ts
 var ROUTES_INFO = {
-  message: "Routes migration in progress",
+  message: "Core routes available",
   available: [
     "apiRoutes",
     "apiContentCrudRoutes",
@@ -14224,23 +15781,17 @@ var ROUTES_INFO = {
     "adminUsersRoutes",
     "adminMediaRoutes",
     "adminPluginRoutes",
-    "adminLogsRoutes"
+    "adminLogsRoutes",
+    "adminDesignRoutes",
+    "adminCheckboxRoutes",
+    "adminFAQRoutes",
+    "adminTestimonialsRoutes",
+    "adminCodeExamplesRoutes"
   ],
-  status: "Routes are being added incrementally",
+  status: "Core package routes ready",
   reference: "https://github.com/sonicjs/sonicjs"
 };
 
-exports.ROUTES_INFO = ROUTES_INFO;
-exports.adminLogsRoutes = adminLogsRoutes;
-exports.adminMediaRoutes = adminMediaRoutes;
-exports.adminPluginRoutes = adminPluginRoutes;
-exports.admin_api_default = admin_api_default;
-exports.admin_content_default = admin_content_default;
-exports.api_content_crud_default = api_content_crud_default;
-exports.api_default = api_default;
-exports.api_media_default = api_media_default;
-exports.api_system_default = api_system_default;
-exports.auth_default = auth_default;
-exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-DG4INX36.cjs.map
-//# sourceMappingURL=chunk-DG4INX36.cjs.map
+export { ROUTES_INFO, adminCheckboxRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_faq_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, userRoutes };
+//# sourceMappingURL=chunk-Y3JLAQSP.js.map
+//# sourceMappingURL=chunk-Y3JLAQSP.js.map

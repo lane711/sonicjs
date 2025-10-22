@@ -6,7 +6,6 @@ import { requireAuth, requireRole } from '../middleware'
 import { renderMediaLibraryPage, MediaLibraryPageData, FolderStats, TypeStats } from '../templates/pages/admin-media-library.template'
 import { renderMediaFileDetails, MediaFileDetailsData } from '../templates/components/media-file-details.template'
 import { MediaFile, renderMediaFileCard } from '../templates/components/media-grid.template'
-import { createCDNService } from '../services/cdn'
 import type { Bindings, Variables } from '../app'
 
 // File validation schema
@@ -149,9 +148,9 @@ adminMediaRoutes.get('/', async (c) => {
       totalFiles: results.length,
       hasNextPage: results.length === limit,
       user: {
-        name: user.email,
-        email: user.email,
-        role: user.role
+        name: user!.email,
+        email: user!.email,
+        role: user!.role
       },
       version: c.get('appVersion')
     }

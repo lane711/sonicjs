@@ -1,8 +1,8 @@
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
-import { renderTable, TableData, TableColumn } from '../components/table.template'
-import { renderFilterBar, FilterBarData } from '../components/filter-bar.template'
-import { renderPagination, PaginationData } from '../components/pagination.template'
-import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
+import { renderPagination, PaginationData } from '../pagination.template'
+import { renderTable, TableData, TableColumn } from '../table.template'
+import { renderFilterBar, FilterBarData } from '../filter-bar.template'
+import { renderConfirmationDialog, getConfirmationDialogScript } from '../confirmation-dialog.template'
 
 export interface ContentItem {
   id: string

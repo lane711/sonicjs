@@ -1,7 +1,7 @@
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
-import { renderTable, TableColumn, TableData } from '../components/table.template'
-import { renderPagination, PaginationData } from '../components/pagination.template'
-import { renderAlert } from '../components/alert.template'
+import { renderPagination, PaginationData } from '../pagination.template'
+import { renderAlert } from '../alert.template'
+import { renderTable, TableColumn, TableData } from '../table.template'
 import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
 
 export interface User {

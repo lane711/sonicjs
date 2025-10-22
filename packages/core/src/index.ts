@@ -110,6 +110,11 @@ export {
   adminMediaRoutes,
   adminLogsRoutes,
   adminPluginRoutes,
+  adminDesignRoutes,
+  adminCheckboxRoutes,
+  adminFAQRoutes,
+  adminTestimonialsRoutes,
+  adminCodeExamplesRoutes,
 } from './routes'
 
 // Templates - Week 3 (COMPLETED)

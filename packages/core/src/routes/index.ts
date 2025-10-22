@@ -21,9 +21,14 @@ export { userRoutes as adminUsersRoutes } from './admin-users'
 export { adminMediaRoutes } from './admin-media'
 export { adminPluginRoutes } from './admin-plugins'
 export { adminLogsRoutes } from './admin-logs'
+export { adminDesignRoutes } from './admin-design'
+export { adminCheckboxRoutes } from './admin-checkboxes'
+export { default as adminFAQRoutes } from './admin-faq'
+export { default as adminTestimonialsRoutes } from './admin-testimonials'
+export { default as adminCodeExamplesRoutes } from './admin-code-examples'
 
 export const ROUTES_INFO = {
-  message: 'Routes migration in progress',
+  message: 'Core routes available',
   available: [
     'apiRoutes',
     'apiContentCrudRoutes',
@@ -35,8 +40,13 @@ export const ROUTES_INFO = {
     'adminUsersRoutes',
     'adminMediaRoutes',
     'adminPluginRoutes',
-    'adminLogsRoutes'
+    'adminLogsRoutes',
+    'adminDesignRoutes',
+    'adminCheckboxRoutes',
+    'adminFAQRoutes',
+    'adminTestimonialsRoutes',
+    'adminCodeExamplesRoutes'
   ],
-  status: 'Routes are being added incrementally',
+  status: 'Core package routes ready',
   reference: 'https://github.com/sonicjs/sonicjs'
 } as const
