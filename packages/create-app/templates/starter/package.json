@@ -12,7 +12,9 @@
     "db:studio": "drizzle-kit studio",
     "type-check": "tsc --noEmit",
     "test": "vitest --run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "update": "npm install @sonicjs-cms/core@latest",
+    "update:beta": "npm install @sonicjs-cms/core@beta"
   },
   "dependencies": {
   },
