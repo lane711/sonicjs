@@ -7993,7 +7993,7 @@ userRoutes.put("/profile", async (c) => {
     if (existingUser) {
       return c.html(renderAlert2({
         type: "error",
-        message: "Username or email is already taken by another user.",
+        message: "Username or email is already taken by another user!.",
         dismissible: true
       }));
     }
@@ -8411,7 +8411,7 @@ userRoutes.post("/users/new", chunkBUKT6HP5_cjs.requirePermission("users.create"
     await chunkBUKT6HP5_cjs.logActivity(
       db,
       user.userId,
-      "user.create",
+      "user!.create",
       "users",
       userId,
       { email, username, role },
@@ -8423,7 +8423,7 @@ userRoutes.post("/users/new", chunkBUKT6HP5_cjs.requirePermission("users.create"
     console.error("User creation error:", error);
     return c.html(renderAlert2({
       type: "error",
-      message: "Failed to create user. Please try again.",
+      message: "Failed to create user!. Please try again.",
       dismissible: true
     }));
   }
@@ -8449,7 +8449,7 @@ userRoutes.get("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.read"), 
     await chunkBUKT6HP5_cjs.logActivity(
       db,
       user.userId,
-      "user.view",
+      "user!.view",
       "users",
       userId,
       null,
@@ -8528,7 +8528,7 @@ userRoutes.get("/users/:id/edit", chunkBUKT6HP5_cjs.requirePermission("users.upd
     console.error("User edit page error:", error);
     return c.html(renderAlert2({
       type: "error",
-      message: "Failed to load user. Please try again.",
+      message: "Failed to load user!. Please try again.",
       dismissible: true
     }), 500);
   }
@@ -8571,7 +8571,7 @@ userRoutes.put("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.update")
     if (existingUser) {
       return c.html(renderAlert2({
         type: "error",
-        message: "Username or email is already taken by another user.",
+        message: "Username or email is already taken by another user!.",
         dismissible: true
       }));
     }
@@ -8598,7 +8598,7 @@ userRoutes.put("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.update")
     await chunkBUKT6HP5_cjs.logActivity(
       db,
       user.userId,
-      "user.update",
+      "user!.update",
       "users",
       userId,
       { fields: ["first_name", "last_name", "username", "email", "phone", "bio", "role", "is_active", "email_verified"] },
@@ -8614,7 +8614,7 @@ userRoutes.put("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.update")
     console.error("User update error:", error);
     return c.html(renderAlert2({
       type: "error",
-      message: "Failed to update user. Please try again.",
+      message: "Failed to update user!. Please try again.",
       dismissible: true
     }));
   }
@@ -8644,7 +8644,7 @@ userRoutes.delete("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.delet
       await chunkBUKT6HP5_cjs.logActivity(
         db,
         user.userId,
-        "user.hard_delete",
+        "user!.hard_delete",
         "users",
         userId,
         { email: userToDelete.email, permanent: true },
@@ -8663,7 +8663,7 @@ userRoutes.delete("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.delet
       await chunkBUKT6HP5_cjs.logActivity(
         db,
         user.userId,
-        "user.soft_delete",
+        "user!.soft_delete",
         "users",
         userId,
         { email: userToDelete.email },
@@ -8730,7 +8730,7 @@ userRoutes.post("/invite-user", chunkBUKT6HP5_cjs.requirePermission("users.creat
     await chunkBUKT6HP5_cjs.logActivity(
       db,
       user.userId,
-      "user.invite_sent",
+      "user!.invite_sent",
       "users",
       userId,
       { email, role, invited_user_id: userId },
@@ -8787,7 +8787,7 @@ userRoutes.post("/resend-invitation/:id", chunkBUKT6HP5_cjs.requirePermission("u
     await chunkBUKT6HP5_cjs.logActivity(
       db,
       user.userId,
-      "user.invitation_resent",
+      "user!.invitation_resent",
       "users",
       userId,
       { email: invitedUser.email },
@@ -8823,7 +8823,7 @@ userRoutes.delete("/cancel-invitation/:id", chunkBUKT6HP5_cjs.requirePermission(
     await chunkBUKT6HP5_cjs.logActivity(
       db,
       user.userId,
-      "user.invitation_cancelled",
+      "user!.invitation_cancelled",
       "users",
       userId,
       { email: invitedUser.email },
@@ -15811,5 +15811,5 @@ exports.api_media_default = api_media_default;
 exports.api_system_default = api_system_default;
 exports.auth_default = auth_default;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-NMKGKVIF.cjs.map
-//# sourceMappingURL=chunk-NMKGKVIF.cjs.map
+//# sourceMappingURL=chunk-SQFPM4LY.cjs.map
+//# sourceMappingURL=chunk-SQFPM4LY.cjs.map

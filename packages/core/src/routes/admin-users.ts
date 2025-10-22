@@ -68,7 +68,7 @@ userRoutes.get('/profile', async (c) => {
       WHERE id = ? AND is_active = 1
     `)
     
-    const userProfile = await userStmt.bind(user.userId).first() as any
+    const userProfile = await userStmt.bind(user!.userId).first() as any
 
     if (!userProfile) {
       return c.json({ error: 'User not found' }, 404)
@@ -99,9 +99,9 @@ userRoutes.get('/profile', async (c) => {
       timezones: TIMEZONES,
       languages: LANGUAGES,
       user: {
-        name: `${profile.first_name} ${profile.last_name}`.trim() || profile.username || user.email,
-        email: user.email,
-        role: user.role
+        name: `${profile.first_name} ${profile.last_name}`.trim() || profile.username || user!.email,
+        email: user!.email,
+        role: user!.role
       }
     }
 
@@ -115,9 +115,9 @@ userRoutes.get('/profile', async (c) => {
       languages: LANGUAGES,
       error: 'Failed to load profile. Please try again.',
       user: {
-        name: user.email,
-        email: user.email,
-        role: user.role
+        name: user!.email,
+        email: user!.email,
+        role: user!.role
       }
     }
 
@@ -170,12 +170,12 @@ userRoutes.put('/profile', async (c) => {
       SELECT id FROM users 
       WHERE (username = ? OR email = ?) AND id != ? AND is_active = 1
     `)
-    const existingUser = await checkStmt.bind(username, email, user.userId).first()
+    const existingUser = await checkStmt.bind(username, email, user!.userId).first()
 
     if (existingUser) {
       return c.html(renderAlert({ 
         type: 'error', 
-        message: 'Username or email is already taken by another user.',
+        message: 'Username or email is already taken by another user!.',
         dismissible: true 
       }))
     }
@@ -193,12 +193,12 @@ userRoutes.put('/profile', async (c) => {
       firstName, lastName, username, email,
       phone, bio, timezone, language,
       emailNotifications ? 1 : 0, Date.now(),
-      user.userId
+      user!.userId
     ).run()
 
     // Log the activity
     await logActivity(
-      db, user.userId, 'profile.update', 'users', user.userId,
+      db, user!.userId, 'profile.update', 'users', user!.userId,
       { fields: ['first_name', 'last_name', 'username', 'email', 'phone', 'bio', 'timezone', 'language', 'email_notifications'] },
       c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
       c.req.header('user-agent')
@@ -261,7 +261,7 @@ userRoutes.post('/profile/avatar', async (c) => {
 
     // For now, we'll simulate storing the avatar
     // In a real implementation, you'd upload to cloud storage (R2, S3, etc.)
-    const avatarUrl = `/uploads/avatars/${user.userId}-${Date.now()}.${avatarFile.type.split('/')[1]}`
+    const avatarUrl = `/uploads/avatars/${user!.userId}-${Date.now()}.${avatarFile.type.split('/')[1]}`
 
     // Update user avatar URL in database
     const updateStmt = db.prepare(`
@@ -269,11 +269,11 @@ userRoutes.post('/profile/avatar', async (c) => {
       WHERE id = ?
     `)
 
-    await updateStmt.bind(avatarUrl, Date.now(), user.userId).run()
+    await updateStmt.bind(avatarUrl, Date.now(), user!.userId).run()
 
     // Log the activity
     await logActivity(
-      db, user.userId, 'profile.avatar_update', 'users', user.userId,
+      db, user!.userId, 'profile.avatar_update', 'users', user!.userId,
       { avatar_url: avatarUrl },
       c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
       c.req.header('user-agent')
@@ -338,7 +338,7 @@ userRoutes.post('/profile/password', async (c) => {
     const userStmt = db.prepare(`
       SELECT password_hash FROM users WHERE id = ? AND is_active = 1
     `)
-    const userData = await userStmt.bind(user.userId).first() as any
+    const userData = await userStmt.bind(user!.userId).first() as any
 
     if (!userData) {
       return c.html(renderAlert({ 
@@ -368,7 +368,7 @@ userRoutes.post('/profile/password', async (c) => {
     `)
     await historyStmt.bind(
       globalThis.crypto.randomUUID(),
-      user.userId,
+      user!.userId,
       userData.password_hash,
       Date.now()
     ).run()
@@ -378,11 +378,11 @@ userRoutes.post('/profile/password', async (c) => {
       UPDATE users SET password_hash = ?, updated_at = ?
       WHERE id = ?
     `)
-    await updateStmt.bind(newPasswordHash, Date.now(), user.userId).run()
+    await updateStmt.bind(newPasswordHash, Date.now(), user!.userId).run()
 
     // Log the activity
     await logActivity(
-      db, user.userId, 'profile.password_change', 'users', user.userId,
+      db, user!.userId, 'profile.password_change', 'users', user!.userId,
       null,
       c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
       c.req.header('user-agent')
@@ -468,7 +468,7 @@ userRoutes.get('/users', requirePermission('users.read'), async (c) => {
 
     // Log the activity
     await logActivity(
-      db, user.userId, 'users.list_view', 'users', undefined,
+      db, user!.userId, 'users.list_view', 'users', undefined,
       { search, page, limit },
       c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
       c.req.header('user-agent')
@@ -526,9 +526,9 @@ userRoutes.get('/users', requirePermission('users.read'), async (c) => {
         baseUrl: '/admin/users'
       },
       user: {
-        name: user.email.split('@')[0] || user.email,
-        email: user.email,
-        role: user.role
+        name: user!.email.split('@')[0] || user!.email,
+        email: user!.email,
+        role: user!.role
       }
     }
 
@@ -562,9 +562,9 @@ userRoutes.get('/users/new', requirePermission('users.create'), async (c) => {
     const pageData: UserNewPageData = {
       roles: ROLES,
       user: {
-        name: user.email.split('@')[0] || user.email,
-        email: user.email,
-        role: user.role
+        name: user!.email.split('@')[0] || user!.email,
+        email: user!.email,
+        role: user!.role
       }
     }
 
@@ -674,7 +674,7 @@ userRoutes.post('/users/new', requirePermission('users.create'), async (c) => {
 
     // Log the activity
     await logActivity(
-      db, user.userId, 'user.create', 'users', userId,
+      db, user!.userId, 'user!.create', 'users', userId,
       { email, username, role },
       c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
       c.req.header('user-agent')
@@ -687,7 +687,7 @@ userRoutes.post('/users/new', requirePermission('users.create'), async (c) => {
     console.error('User creation error:', error)
     return c.html(renderAlert({
       type: 'error',
-      message: 'Failed to create user. Please try again.',
+      message: 'Failed to create user!. Please try again.',
       dismissible: true
     }))
   }
@@ -724,7 +724,7 @@ userRoutes.get('/users/:id', requirePermission('users.read'), async (c) => {
 
     // Log the activity
     await logActivity(
-      db, user.userId, 'user.view', 'users', userId,
+      db, user!.userId, 'user!.view', 'users', userId,
       null,
       c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
       c.req.header('user-agent')
@@ -804,9 +804,9 @@ userRoutes.get('/users/:id/edit', requirePermission('users.update'), async (c) =
       userToEdit: editData,
       roles: ROLES,
       user: {
-        name: user.email.split('@')[0] || user.email,
-        email: user.email,
-        role: user.role
+        name: user!.email.split('@')[0] || user!.email,
+        email: user!.email,
+        role: user!.role
       }
     }
 
@@ -816,7 +816,7 @@ userRoutes.get('/users/:id/edit', requirePermission('users.update'), async (c) =
 
     return c.html(renderAlert({
       type: 'error',
-      message: 'Failed to load user. Please try again.',
+      message: 'Failed to load user!. Please try again.',
       dismissible: true
     }), 500)
   }
@@ -873,7 +873,7 @@ userRoutes.put('/users/:id', requirePermission('users.update'), async (c) => {
     if (existingUser) {
       return c.html(renderAlert({
         type: 'error',
-        message: 'Username or email is already taken by another user.',
+        message: 'Username or email is already taken by another user!.',
         dismissible: true
       }))
     }
@@ -895,7 +895,7 @@ userRoutes.put('/users/:id', requirePermission('users.update'), async (c) => {
 
     // Log the activity
     await logActivity(
-      db, user.userId, 'user.update', 'users', userId,
+      db, user!.userId, 'user!.update', 'users', userId,
       { fields: ['first_name', 'last_name', 'username', 'email', 'phone', 'bio', 'role', 'is_active', 'email_verified'] },
       c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
       c.req.header('user-agent')
@@ -911,7 +911,7 @@ userRoutes.put('/users/:id', requirePermission('users.update'), async (c) => {
     console.error('User update error:', error)
     return c.html(renderAlert({
       type: 'error',
-      message: 'Failed to update user. Please try again.',
+      message: 'Failed to update user!. Please try again.',
       dismissible: true
     }))
   }
@@ -931,7 +931,7 @@ userRoutes.delete('/users/:id', requirePermission('users.delete'), async (c) => 
     const hardDelete = body.hardDelete === true
 
     // Prevent self-deletion
-    if (userId === user.userId) {
+    if (userId === user!.userId) {
       return c.json({ error: 'You cannot delete your own account' }, 400)
     }
 
@@ -954,7 +954,7 @@ userRoutes.delete('/users/:id', requirePermission('users.delete'), async (c) => 
 
       // Log the activity
       await logActivity(
-        db, user.userId, 'user.hard_delete', 'users', userId,
+        db, user!.userId, 'user!.hard_delete', 'users', userId,
         { email: userToDelete.email, permanent: true },
         c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
         c.req.header('user-agent')
@@ -973,7 +973,7 @@ userRoutes.delete('/users/:id', requirePermission('users.delete'), async (c) => 
 
       // Log the activity
       await logActivity(
-        db, user.userId, 'user.soft_delete', 'users', userId,
+        db, user!.userId, 'user!.soft_delete', 'users', userId,
         { email: userToDelete.email },
         c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
         c.req.header('user-agent')
@@ -1044,13 +1044,13 @@ userRoutes.post('/invite-user', requirePermission('users.create'), async (c) => 
 
     await createUserStmt.bind(
       userId, email, firstName, lastName, role,
-      invitationToken, user.userId, Date.now(),
+      invitationToken, user!.userId, Date.now(),
       0, 0, Date.now(), Date.now()
     ).run()
 
     // Log the activity
     await logActivity(
-      db, user.userId, 'user.invite_sent', 'users', userId,
+      db, user!.userId, 'user!.invite_sent', 'users', userId,
       { email, role, invited_user_id: userId },
       c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
       c.req.header('user-agent')
@@ -1121,7 +1121,7 @@ userRoutes.post('/resend-invitation/:id', requirePermission('users.create'), asy
 
     // Log the activity
     await logActivity(
-      db, user.userId, 'user.invitation_resent', 'users', userId,
+      db, user!.userId, 'user!.invitation_resent', 'users', userId,
       { email: invitedUser.email },
       c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
       c.req.header('user-agent')
@@ -1168,7 +1168,7 @@ userRoutes.delete('/cancel-invitation/:id', requirePermission('users.delete'), a
 
     // Log the activity
     await logActivity(
-      db, user.userId, 'user.invitation_cancelled', 'users', userId,
+      db, user!.userId, 'user!.invitation_cancelled', 'users', userId,
       { email: invitedUser.email },
       c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
       c.req.header('user-agent')
@@ -1273,7 +1273,7 @@ userRoutes.get('/activity-logs', requirePermission('activity.read'), async (c) =
 
     // Log the activity
     await logActivity(
-      db, user.userId, 'activity.logs_viewed', undefined, undefined,
+      db, user!.userId, 'activity.logs_viewed', undefined, undefined,
       { filters, page, limit },
       c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
       c.req.header('user-agent')
@@ -1289,9 +1289,9 @@ userRoutes.get('/activity-logs', requirePermission('activity.read'), async (c) =
       },
       filters,
       user: {
-        name: user.email.split('@')[0] || user.email, // Use email username as fallback
-        email: user.email,
-        role: user.role
+        name: user!.email.split('@')[0] || user!.email, // Use email username as fallback
+        email: user!.email,
+        role: user!.role
       }
     }
 
@@ -1305,9 +1305,9 @@ userRoutes.get('/activity-logs', requirePermission('activity.read'), async (c) =
       pagination: { page: 1, limit: 50, total: 0, pages: 0 },
       filters: {},
       user: {
-        name: user.email,
-        email: user.email,
-        role: user.role
+        name: user!.email,
+        email: user!.email,
+        role: user!.role
       }
     }
 
@@ -1403,7 +1403,7 @@ userRoutes.get('/activity-logs/export', requirePermission('activity.read'), asyn
 
     // Log the export activity
     await logActivity(
-      db, user.userId, 'activity.logs_exported', undefined, undefined,
+      db, user!.userId, 'activity.logs_exported', undefined, undefined,
       { filters, count: logs?.length || 0 },
       c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
       c.req.header('user-agent')

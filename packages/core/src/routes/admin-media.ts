@@ -455,7 +455,7 @@ adminMediaRoutes.post('/upload', async (c) => {
           },
           customMetadata: {
             originalName: file.name,
-            uploadedBy: user.userId,
+            uploadedBy: user!.userId,
             uploadedAt: new Date().toISOString()
           }
         })
@@ -506,7 +506,7 @@ adminMediaRoutes.post('/upload', async (c) => {
           r2Key,
           publicUrl,
           thumbnailUrl,
-          user.userId,
+          user!.userId,
           Math.floor(Date.now() / 1000)
         ).run()
 
@@ -650,7 +650,7 @@ adminMediaRoutes.put('/:id', async (c) => {
     }
 
     // Check permissions (only allow updates by uploader or admin)
-    if (fileRecord.uploaded_by !== user.userId && user.role !== 'admin') {
+    if (fileRecord.uploaded_by !== user!.userId && user!.role !== 'admin') {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           Permission denied
@@ -720,7 +720,7 @@ adminMediaRoutes.delete('/:id', async (c) => {
     }
 
     // Check permissions (only allow deletion by uploader or admin)
-    if (fileRecord.uploaded_by !== user.userId && user.role !== 'admin') {
+    if (fileRecord.uploaded_by !== user!.userId && user!.role !== 'admin') {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           Permission denied

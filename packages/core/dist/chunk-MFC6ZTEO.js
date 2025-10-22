@@ -7991,7 +7991,7 @@ userRoutes.put("/profile", async (c) => {
     if (existingUser) {
       return c.html(renderAlert2({
         type: "error",
-        message: "Username or email is already taken by another user.",
+        message: "Username or email is already taken by another user!.",
         dismissible: true
       }));
     }
@@ -8409,7 +8409,7 @@ userRoutes.post("/users/new", requirePermission("users.create"), async (c) => {
     await logActivity(
       db,
       user.userId,
-      "user.create",
+      "user!.create",
       "users",
       userId,
       { email, username, role },
@@ -8421,7 +8421,7 @@ userRoutes.post("/users/new", requirePermission("users.create"), async (c) => {
     console.error("User creation error:", error);
     return c.html(renderAlert2({
       type: "error",
-      message: "Failed to create user. Please try again.",
+      message: "Failed to create user!. Please try again.",
       dismissible: true
     }));
   }
@@ -8447,7 +8447,7 @@ userRoutes.get("/users/:id", requirePermission("users.read"), async (c) => {
     await logActivity(
       db,
       user.userId,
-      "user.view",
+      "user!.view",
       "users",
       userId,
       null,
@@ -8526,7 +8526,7 @@ userRoutes.get("/users/:id/edit", requirePermission("users.update"), async (c) =
     console.error("User edit page error:", error);
     return c.html(renderAlert2({
       type: "error",
-      message: "Failed to load user. Please try again.",
+      message: "Failed to load user!. Please try again.",
       dismissible: true
     }), 500);
   }
@@ -8569,7 +8569,7 @@ userRoutes.put("/users/:id", requirePermission("users.update"), async (c) => {
     if (existingUser) {
       return c.html(renderAlert2({
         type: "error",
-        message: "Username or email is already taken by another user.",
+        message: "Username or email is already taken by another user!.",
         dismissible: true
       }));
     }
@@ -8596,7 +8596,7 @@ userRoutes.put("/users/:id", requirePermission("users.update"), async (c) => {
     await logActivity(
       db,
       user.userId,
-      "user.update",
+      "user!.update",
       "users",
       userId,
       { fields: ["first_name", "last_name", "username", "email", "phone", "bio", "role", "is_active", "email_verified"] },
@@ -8612,7 +8612,7 @@ userRoutes.put("/users/:id", requirePermission("users.update"), async (c) => {
     console.error("User update error:", error);
     return c.html(renderAlert2({
       type: "error",
-      message: "Failed to update user. Please try again.",
+      message: "Failed to update user!. Please try again.",
       dismissible: true
     }));
   }
@@ -8642,7 +8642,7 @@ userRoutes.delete("/users/:id", requirePermission("users.delete"), async (c) => 
       await logActivity(
         db,
         user.userId,
-        "user.hard_delete",
+        "user!.hard_delete",
         "users",
         userId,
         { email: userToDelete.email, permanent: true },
@@ -8661,7 +8661,7 @@ userRoutes.delete("/users/:id", requirePermission("users.delete"), async (c) => 
       await logActivity(
         db,
         user.userId,
-        "user.soft_delete",
+        "user!.soft_delete",
         "users",
         userId,
         { email: userToDelete.email },
@@ -8728,7 +8728,7 @@ userRoutes.post("/invite-user", requirePermission("users.create"), async (c) => 
     await logActivity(
       db,
       user.userId,
-      "user.invite_sent",
+      "user!.invite_sent",
       "users",
       userId,
       { email, role, invited_user_id: userId },
@@ -8785,7 +8785,7 @@ userRoutes.post("/resend-invitation/:id", requirePermission("users.create"), asy
     await logActivity(
       db,
       user.userId,
-      "user.invitation_resent",
+      "user!.invitation_resent",
       "users",
       userId,
       { email: invitedUser.email },
@@ -8821,7 +8821,7 @@ userRoutes.delete("/cancel-invitation/:id", requirePermission("users.delete"), a
     await logActivity(
       db,
       user.userId,
-      "user.invitation_cancelled",
+      "user!.invitation_cancelled",
       "users",
       userId,
       { email: invitedUser.email },
@@ -15793,5 +15793,5 @@ var ROUTES_INFO = {
 };
 
 export { ROUTES_INFO, adminCheckboxRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_faq_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, userRoutes };
-//# sourceMappingURL=chunk-Y3JLAQSP.js.map
-//# sourceMappingURL=chunk-Y3JLAQSP.js.map
+//# sourceMappingURL=chunk-MFC6ZTEO.js.map
+//# sourceMappingURL=chunk-MFC6ZTEO.js.map
