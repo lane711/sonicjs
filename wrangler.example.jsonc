@@ -1,0 +1,20 @@
+{
+	"name": "my-sonicjs",
+	"main": "src/index.js",
+	"compatibility_date": "2022-07-12",
+	"workers_dev": false,
+	"kv_namespaces": [
+		{
+			"binding": "sonicjs",
+			"id": "id-of-binding"
+		}
+	],
+    "d1_databases": [
+        {
+			// make sure the name stays as D1
+            "binding": "D1",
+            "database_name": "sonicjs",
+            "database_id": "id-of-binding"
+        }
+    ]
+}

@@ -49,35 +49,42 @@ Details of our performance benchmark can be found at SonicJs.com. Here is a part
    cd sonicjs
    npm install
    ```
-1. Create your own wrangler.toml (Cloudflare configuration file) using the example:
+2. Create your own wrangler.jsonc (Cloudflare configuration file) using the example:
    ```sh
-   cp wrangler.example.toml wrangler.toml
+   cp wrangler.example.jsonc wrangler.jsonc
    ```
-   
-1. Create your Cloudflare D1 database with the following command:
+
+3. Create your Cloudflare D1 database with the following command:
    ```sh
    npx wrangler d1 create sonicjs
+   npx wrangler kv create sonicjs
    ```
    You will be prompted to login to your Cloudflare account, follow the prompts.
-   
+
    The output of the above command will include a database id, **copy it to your clipboard**.
+   wrangler can add the database bindings directly to your wrangler.jsonc file, allow it when prompted
    <br>
-2. Update your `wrangler.toml` file to include the datbase id from step #3. It should look something like this:
-   ```sh
-   [[d1_databases]]
-   binding = "D1"
-   database_name = "sonicjs"
-   database_id = "ba4f63aa-161d-4d12-aca7-b59761701871"
+
+4. Update your `wrangler.jsonc` file to include the datbase id from step #3. It should look something like this:
+   ```json
+   "d1_databases": [
+        {
+			// make sure the binding name stays as D1
+            "binding": "D1",
+            "database_name": "sonicjs",
+            "database_id": "id-of-binding"
+        }
+    ]
    ```
-1. Apply the default database schema to your database:
+5. Apply the default database schema to your database:
    ```sh
    npm run up
    ```
-2. Run the app:
+6. Run the app:
    ```sh
    npm run dev
    ```
-3. Visit the Admin UI in your browser:
+7. Visit the Admin UI in your browser:
    [http://localhost:4321](http://localhost:4321)
    ![Admin UI](https://sonicjs.com/images/sonicJs-admin-ui.png)
 
@@ -92,7 +99,7 @@ We gladly accept Pull Requests (PRs) from the community.
 ## Road Map
 Curious what's on the horizon for SonicJs? Check out our [Project Backlog](https://github.com/users/lane711/projects/2).
 
-While you're there, please consider picking up a story in the backlog. 
+While you're there, please consider picking up a story in the backlog.
 
 ## Licensing (MIT)
 This project is licensed under the MIT License. This means you are free to use, modify, and distribute this software under the  conditions specified.

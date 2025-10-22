@@ -8,7 +8,6 @@ import { convertFormDataToObject } from "@services/utils";
 
 //check if there is an admin account, if not redirect admin to register
 let isAdminAccount = await doesAdminAccountExist(Astro.locals.runtime.env.D1);
-console.log("isAdminAccount login", isAdminAccount);
 
 if (isAdminAccount === false) {
   return Astro.redirect(`/admin/register`);
