@@ -21,6 +21,7 @@ interface CollectionFormData {
   display_name?: string
   description?: string
   fields?: CollectionField[]
+  managed?: boolean
   isEdit?: boolean
   error?: string
   success?: string
