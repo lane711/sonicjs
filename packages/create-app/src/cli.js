@@ -12,7 +12,7 @@ import validatePackageName from 'validate-npm-package-name'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // Version
-const VERSION = '2.0.0-beta.5'
+const VERSION = '2.0.0-beta.6'
 
 // Templates available
 const TEMPLATES = {
@@ -277,6 +277,11 @@ async function createProject(answers, flags) {
       spinner.start('Installing dependencies...')
       await installDependencies(targetDir)
       spinner.succeed('Installed dependencies')
+
+      // Copy migrations after install
+      spinner.start('Copying database migrations...')
+      await copyMigrationsFromCore(targetDir)
+      spinner.succeed('Copied database migrations')
     }
 
     // 5. Initialize git
@@ -470,6 +475,34 @@ seed()
   await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 })
 }
 
+async function copyMigrationsFromCore(targetDir) {
+  // The migrations are in @sonicjs-cms/core/migrations
+  // After npm install, they'll be in node_modules/@sonicjs-cms/core/migrations
+  const coreMigrationsPath = path.join(targetDir, 'node_modules', '@sonicjs-cms', 'core', 'migrations')
+  const projectMigrationsPath = path.join(targetDir, 'migrations')
+
+  // Check if core migrations exist (they should after npm install)
+  if (fs.existsSync(coreMigrationsPath)) {
+    // Copy migrations to project directory
+    await fs.copy(coreMigrationsPath, projectMigrationsPath)
+  } else {
+    // If migrations don't exist yet (npm install hasn't run), create a note file
+    await fs.ensureDir(projectMigrationsPath)
+    const noteContent = `# Migrations
+
+Migrations will be copied from @sonicjs-cms/core after running npm install.
+
+To manually copy migrations:
+1. Install dependencies: npm install
+2. Copy from: node_modules/@sonicjs-cms/core/migrations/
+3. Copy to: migrations/
+
+Or they should be automatically available after installation.
+`
+    await fs.writeFile(path.join(projectMigrationsPath, 'README.md'), noteContent)
+  }
+}
+
 async function createCloudflareResources(databaseName, bucketName, targetDir) {
   // Check if wrangler is installed
   try {
@@ -602,6 +635,9 @@ function printSuccessMessage(answers) {
 
   if (skipInstall) {
     console.log(kleur.cyan('  npm install'))
+    console.log()
+    console.log(kleur.yellow('⚠ Important: After npm install, copy migrations:'))
+    console.log(kleur.dim('  cp -r node_modules/@sonicjs-cms/core/migrations ./'))
   }
 
   // Show resource creation steps if they weren't created or failed
@@ -616,9 +652,11 @@ function printSuccessMessage(answers) {
   }
 
   console.log()
-  console.log(kleur.bold('Run migrations and seed admin user:'))
+  console.log(kleur.bold('⚡ IMPORTANT - Run migrations and seed admin user:'))
   console.log(kleur.cyan('  npm run db:migrate:local'))
   console.log(kleur.cyan('  npm run seed'))
+  console.log()
+  console.log(kleur.dim('  Without migrations, you will get "no such table" errors!'))
 
   console.log()
   console.log(kleur.bold('Start development:'))
