@@ -41,9 +41,9 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^9.6.0",
-    "@playwright/test": "^1.50.1",
+    "@playwright/test": "^1.56.1",
     "@tailwindcss/forms": "^0.5.10",
-    "@types/node": "^22.7.3",
+    "@types/node": "^24.9.1",
     "drizzle-kit": "^0.31.4",
     "react-email": "3.0.7",
     "vitest": "^4.0.1",

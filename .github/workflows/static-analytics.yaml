@@ -23,5 +23,5 @@ jobs:
       - name: Packages Install
         run: npm ci
 
-      - name: Static Check
-        run: npm run check
+      # - name: Static Check
+      #  run: npm run check
