@@ -12,7 +12,7 @@ import validatePackageName from 'validate-npm-package-name'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // Version
-const VERSION = '2.0.0-beta.2'
+const VERSION = '2.0.0-beta.3'
 
 // Templates available
 const TEMPLATES = {
@@ -135,6 +135,32 @@ async function getProjectDetails(initialName) {
     })
   }
 
+  // Admin email
+  questions.push({
+    type: 'text',
+    name: 'adminEmail',
+    message: 'Admin email:',
+    validate: (value) => {
+      if (!value) return 'Admin email is required'
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(value)) return 'Please enter a valid email address'
+      return true
+    }
+  })
+
+  // Admin password
+  questions.push({
+    type: 'password',
+    name: 'adminPassword',
+    message: 'Admin password:',
+    validate: (value) => {
+      if (!value) return 'Admin password is required'
+      if (value.length < 8) return 'Password must be at least 8 characters'
+      return true
+    }
+  })
+
   // Include example collection (only ask if neither flag is set)
   if (!flags.skipExample && !flags.includeExample) {
     questions.push({
@@ -176,6 +202,8 @@ async function getProjectDetails(initialName) {
     template: flags.template || answers.template,
     databaseName: flags.databaseName || answers.databaseName || `${initialName || answers.projectName}-db`,
     bucketName: flags.bucketName || answers.bucketName || `${initialName || answers.projectName}-media`,
+    adminEmail: answers.adminEmail,
+    adminPassword: answers.adminPassword,
     includeExample: flags.skipExample ? false : (flags.includeExample ? true : (answers.includeExample !== undefined ? answers.includeExample : true)),
     createResources: flags.skipCloudflare ? false : answers.createResources,
     initGit: flags.skipGit ? false : answers.initGit,
@@ -189,6 +217,8 @@ async function createProject(answers, flags) {
     template,
     databaseName,
     bucketName,
+    adminEmail,
+    adminPassword,
     includeExample,
     createResources,
     initGit,
@@ -207,6 +237,8 @@ async function createProject(answers, flags) {
       projectName,
       databaseName,
       bucketName,
+      adminEmail,
+      adminPassword,
       includeExample
     })
     spinner.succeed('Copied template files')
@@ -302,6 +334,129 @@ async function copyTemplate(templateName, targetDir, options) {
       await fs.remove(examplePath)
     }
   }
+
+  // Create admin seed script with provided credentials
+  await createAdminSeedScript(targetDir, {
+    email: options.adminEmail,
+    password: options.adminPassword
+  })
+}
+
+async function createAdminSeedScript(targetDir, { email, password }) {
+  const seedScriptContent = `import { createDb, users } from '@sonicjs-cms/core'
+import { eq } from 'drizzle-orm'
+import bcrypt from 'bcryptjs'
+
+/**
+ * Seed script to create initial admin user
+ *
+ * Run this script after migrations:
+ * npm run db:migrate:local
+ * npm run seed
+ *
+ * Admin credentials:
+ * Email: ${email}
+ * Password: [as entered during setup]
+ */
+
+interface Env {
+  DB: D1Database
+}
+
+async function seed() {
+  // Get D1 database from Cloudflare environment
+  // @ts-ignore - getPlatformProxy is available in wrangler
+  const { env } = await import('@cloudflare/workers-types/experimental')
+  const platform = (env as any).getPlatformProxy?.() || { env: {} }
+
+  if (!platform.env?.DB) {
+    console.error('❌ Error: DB binding not found')
+    console.error('')
+    console.error('Make sure you have:')
+    console.error('1. Created your D1 database: wrangler d1 create <database-name>')
+    console.error('2. Updated wrangler.toml with the database_id')
+    console.error('3. Run migrations: npm run db:migrate:local')
+    console.error('')
+    process.exit(1)
+  }
+
+  const db = createDb(platform.env.DB)
+
+  try {
+    // Check if admin user already exists
+    const existingUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, '${email}'))
+      .get()
+
+    if (existingUser) {
+      console.log('✓ Admin user already exists')
+      console.log(\`  Email: ${email}\`)
+      console.log(\`  Role: \${existingUser.role}\`)
+      return
+    }
+
+    // Hash password using bcrypt
+    const passwordHash = await bcrypt.hash('${password}', 10)
+
+    // Create admin user
+    await db
+      .insert(users)
+      .values({
+        email: '${email}',
+        username: '${email.split('@')[0]}',
+        password: passwordHash,
+        role: 'admin',
+        isActive: 1,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      })
+      .run()
+
+    console.log('✓ Admin user created successfully')
+    console.log(\`  Email: ${email}\`)
+    console.log(\`  Role: admin\`)
+    console.log('')
+    console.log('You can now login at: http://localhost:8787/auth/login')
+  } catch (error) {
+    console.error('❌ Error creating admin user:', error)
+    process.exit(1)
+  }
+}
+
+// Run seed
+seed()
+  .then(() => {
+    console.log('')
+    console.log('✓ Seeding complete')
+    process.exit(0)
+  })
+  .catch((error) => {
+    console.error('❌ Seeding failed:', error)
+    process.exit(1)
+  })
+`
+
+  // Create scripts directory
+  const scriptsDir = path.join(targetDir, 'scripts')
+  await fs.ensureDir(scriptsDir)
+
+  // Write seed script
+  const seedScriptPath = path.join(scriptsDir, 'seed-admin.ts')
+  await fs.writeFile(seedScriptPath, seedScriptContent)
+
+  // Add seed script to package.json
+  const packageJsonPath = path.join(targetDir, 'package.json')
+  const packageJson = await fs.readJson(packageJsonPath)
+
+  if (!packageJson.scripts) {
+    packageJson.scripts = {}
+  }
+
+  packageJson.scripts.seed = 'tsx scripts/seed-admin.ts'
+
+  await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 })
 }
 
 async function createCloudflareResources(databaseName, bucketName, targetDir) {
@@ -419,12 +574,18 @@ function printSuccessMessage(answers) {
   }
 
   console.log()
-  console.log(kleur.bold('Run migrations:'))
+  console.log(kleur.bold('Run migrations and seed admin user:'))
   console.log(kleur.cyan('  npm run db:migrate:local'))
+  console.log(kleur.cyan('  npm run seed'))
 
   console.log()
   console.log(kleur.bold('Start development:'))
   console.log(kleur.cyan('  npm run dev'))
+
+  console.log()
+  console.log(kleur.bold('Login credentials:'))
+  console.log(kleur.cyan(`  Email: ${answers.adminEmail}`))
+  console.log(kleur.dim(`  Password: [as entered]`))
 
   console.log()
   console.log(kleur.bold('Visit:'))
