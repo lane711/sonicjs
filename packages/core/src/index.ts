@@ -103,7 +103,10 @@ export {
 export {
   ROUTES_INFO,
   apiRoutes,
+  apiContentCrudRoutes,
   apiMediaRoutes,
+  apiSystemRoutes,
+  adminApiRoutes,
   authRoutes,
   adminContentRoutes,
   adminUsersRoutes,
@@ -294,7 +297,9 @@ export type {
 // Version
 // ============================================================================
 
-export const VERSION = '2.0.0-alpha.3'
+// Import version from package.json
+import packageJson from '../package.json'
+export const VERSION = packageJson.version
 
 // ============================================================================
 // Phase 2 Migration Notes

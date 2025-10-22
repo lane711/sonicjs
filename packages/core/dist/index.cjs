@@ -85,12 +85,20 @@ function createDb(d1$1) {
   return d1.drizzle(d1$1, { schema: chunkRNR4HA23_cjs.schema_exports });
 }
 
+// package.json
+var package_default = {
+  version: "2.0.0-alpha.12"};
+
 // src/index.ts
-var VERSION = "2.0.0-alpha.3";
+var VERSION = package_default.version;
 
 Object.defineProperty(exports, "ROUTES_INFO", {
   enumerable: true,
   get: function () { return chunkQUMBDPNJ_cjs.ROUTES_INFO; }
+});
+Object.defineProperty(exports, "adminApiRoutes", {
+  enumerable: true,
+  get: function () { return chunkQUMBDPNJ_cjs.admin_api_default; }
 });
 Object.defineProperty(exports, "adminCheckboxRoutes", {
   enumerable: true,
@@ -132,6 +140,10 @@ Object.defineProperty(exports, "adminUsersRoutes", {
   enumerable: true,
   get: function () { return chunkQUMBDPNJ_cjs.userRoutes; }
 });
+Object.defineProperty(exports, "apiContentCrudRoutes", {
+  enumerable: true,
+  get: function () { return chunkQUMBDPNJ_cjs.api_content_crud_default; }
+});
 Object.defineProperty(exports, "apiMediaRoutes", {
   enumerable: true,
   get: function () { return chunkQUMBDPNJ_cjs.api_media_default; }
@@ -139,6 +151,10 @@ Object.defineProperty(exports, "apiMediaRoutes", {
 Object.defineProperty(exports, "apiRoutes", {
   enumerable: true,
   get: function () { return chunkQUMBDPNJ_cjs.api_default; }
+});
+Object.defineProperty(exports, "apiSystemRoutes", {
+  enumerable: true,
+  get: function () { return chunkQUMBDPNJ_cjs.api_system_default; }
 });
 Object.defineProperty(exports, "authRoutes", {
   enumerable: true,

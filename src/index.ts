@@ -3,7 +3,7 @@ import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { prettyJSON } from 'hono/pretty-json'
 import { serveStatic } from 'hono/cloudflare-workers'
-// Import migrated routes from core package
+// Import all routes from core package
 import {
   apiRoutes,
   apiContentCrudRoutes,
@@ -22,13 +22,12 @@ import {
   adminTestimonialsRoutes,
   adminCodeExamplesRoutes
 } from '@sonicjs-cms/core'
-// Monolith-specific routes (not migrated - have heavy dependencies)
-import { adminRoutes } from './routes/admin'
-import { docsRoutes } from './routes/docs'
-import { contentRoutes } from './routes/content'
-import { mediaRoutes } from './routes/media'
 // Design plugin routes
 import { designRoutes } from './plugins/design/routes'
+// Collections routes (monolith-specific, will be migrated to core later)
+import { adminCollectionsRoutes } from './routes/admin-collections'
+// Settings routes (monolith-specific, will be migrated to core later)
+import { adminSettingsRoutes } from './routes/admin-settings'
 // Hello World plugin
 import { helloWorldPlugin } from './plugins/core-plugins/hello-world-plugin'
 // Workflow routes are loaded dynamically through plugin system
@@ -36,15 +35,17 @@ import { createWorkflowRoutes } from './plugins/available/workflow-plugin/routes
 import { createWorkflowAdminRoutes } from './plugins/available/workflow-plugin/admin-routes'
 // Cache plugin routes
 import cacheRoutes from './plugins/cache/routes'
+// Database Tools plugin routes
+import { createDatabaseToolsAdminRoutes } from './plugins/core-plugins/database-tools-plugin/admin-routes'
 import { requireAuth, requireRole, optionalAuth } from '@sonicjs-cms/core'
 import { requireActivePlugin } from '@sonicjs-cms/core'
 import { bootstrapMiddleware } from '@sonicjs-cms/core'
 import { loggingMiddleware, securityLoggingMiddleware, performanceLoggingMiddleware } from '@sonicjs-cms/core'
 import { compressionMiddleware, securityHeaders, cacheHeaders } from '@sonicjs-cms/core'
-import packageJson from '../package.json'
+import { VERSION } from '@sonicjs-cms/core'
 
-// Store app version globally at startup (not exported to avoid Wrangler treating it as a binding)
-const APP_VERSION = `v${packageJson.version}`
+// Store app version globally at startup (use core package version)
+const APP_VERSION = `v${VERSION}`
 
 // Define the Cloudflare Workers environment
 type Bindings = {
@@ -142,7 +143,6 @@ app.get('/images/*', async (c) => {
 
 // Public routes
 app.route('/auth', authRoutes as any)
-app.route('/docs', docsRoutes)
 
 // API routes with optional auth (for public content)
 app.use('/api/*', optionalAuth())
@@ -151,14 +151,6 @@ app.route('/api', apiContentCrudRoutes as any) // CRUD operations for content
 app.route('/api/media', apiMediaRoutes as any)
 app.route('/api', apiSystemRoutes as any) // System API endpoints
 // Workflow API routes are loaded dynamically through plugin system
-
-// Content API routes with optional auth
-app.use('/content/*', optionalAuth())
-app.route('/content', contentRoutes)
-
-// Media API routes (require auth for uploads)
-app.use('/media/*', requireAuth())
-app.route('/media', mediaRoutes)
 
 // Public media file serving (no auth required for viewing uploaded files)
 app.get('/files/*', async (c) => {
@@ -204,13 +196,16 @@ app.use('/admin/*', async (c, next) => {
 app.use('/admin/*', requireRole(['admin', 'editor']))
 // Add caching for admin pages (60 second cache)
 app.use('/admin/*', cacheHeaders(60))
-app.route('/admin', adminRoutes)
 app.route('/admin/api', adminApiRoutes as any) // Admin API endpoints for collections, fields, etc.
 app.route('/admin', adminUsersRoutes as any) // User profile, user management, activity logs
 app.route('/admin/media', adminMediaRoutes as any)
 app.route('/admin/content', adminContentRoutes as any)
 app.route('/admin/plugins', adminPluginRoutes as any)
 app.route('/admin/logs', adminLogsRoutes as any)
+// Collections routes (monolith-specific until templates are migrated to core)
+app.route('/admin', adminCollectionsRoutes)
+// Settings routes (monolith-specific)
+app.route('/admin', adminSettingsRoutes)
 // FAQ routes with plugin activation check (from core)
 app.use('/admin/faq/*', requireActivePlugin('faq'))
 app.route('/admin/faq', adminFAQRoutes as any)
@@ -234,6 +229,9 @@ app.route('/admin/checkboxes', adminCheckboxRoutes as any)
 // Cache routes with plugin activation check
 app.use('/admin/cache/*', requireActivePlugin('cache'))
 app.route('/admin/cache', cacheRoutes)
+// Database Tools routes with plugin activation check
+app.use('/admin/database-tools/*', requireActivePlugin('database-tools'))
+app.route('/admin/database-tools', createDatabaseToolsAdminRoutes())
 // Hello World routes with plugin activation check
 app.use('/admin/hello-world/*', requireActivePlugin('hello-world'))
 // Register Hello World plugin routes
