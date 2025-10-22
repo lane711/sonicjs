@@ -88,7 +88,7 @@ function createDb(d1) {
 
 // package.json
 var package_default = {
-  version: "2.0.0-beta.2"};
+  version: "2.0.0-beta.3"};
 
 // src/index.ts
 var VERSION = package_default.version;
