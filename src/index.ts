@@ -6,7 +6,10 @@ import { serveStatic } from 'hono/cloudflare-workers'
 // Import migrated routes from core package
 import {
   apiRoutes,
+  apiContentCrudRoutes,
   apiMediaRoutes,
+  apiSystemRoutes,
+  adminApiRoutes,
   authRoutes,
   adminContentRoutes,
   adminUsersRoutes,
@@ -144,7 +147,9 @@ app.route('/docs', docsRoutes)
 // API routes with optional auth (for public content)
 app.use('/api/*', optionalAuth())
 app.route('/api', apiRoutes as any)
+app.route('/api', apiContentCrudRoutes as any) // CRUD operations for content
 app.route('/api/media', apiMediaRoutes as any)
+app.route('/api', apiSystemRoutes as any) // System API endpoints
 // Workflow API routes are loaded dynamically through plugin system
 
 // Content API routes with optional auth
@@ -200,6 +205,7 @@ app.use('/admin/*', requireRole(['admin', 'editor']))
 // Add caching for admin pages (60 second cache)
 app.use('/admin/*', cacheHeaders(60))
 app.route('/admin', adminRoutes)
+app.route('/admin/api', adminApiRoutes as any) // Admin API endpoints for collections, fields, etc.
 app.route('/admin', adminUsersRoutes as any) // User profile, user management, activity logs
 app.route('/admin/media', adminMediaRoutes as any)
 app.route('/admin/content', adminContentRoutes as any)

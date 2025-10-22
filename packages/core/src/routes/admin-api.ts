@@ -320,11 +320,14 @@ adminApiRoutes.get('/collections/:id', async (c) => {
  * Create collection
  * POST /admin/api/collections
  */
-adminApiRoutes.post('/collections',
-  zValidator('json', createCollectionSchema),
-  async (c) => {
+adminApiRoutes.post('/collections', async (c) => {
     try {
-      const validatedData = c.req.valid('json')
+      const body = await c.req.json()
+      const validation = createCollectionSchema.safeParse(body)
+      if (!validation.success) {
+        return c.json({ error: 'Validation failed', details: validation.error.errors }, 400)
+      }
+      const validatedData = validation.data
       const db = c.env.DB
       const user = c.get('user')
 
@@ -400,19 +403,21 @@ adminApiRoutes.post('/collections',
       console.error('Error creating collection:', error)
       return c.json({ error: 'Failed to create collection' }, 500)
     }
-  }
-)
+})
 
 /**
  * Update collection
  * PATCH /admin/api/collections/:id
  */
-adminApiRoutes.patch('/collections/:id',
-  zValidator('json', updateCollectionSchema),
-  async (c) => {
+adminApiRoutes.patch('/collections/:id', async (c) => {
     try {
       const id = c.req.param('id')
-      const validatedData = c.req.valid('json')
+      const body = await c.req.json()
+      const validation = updateCollectionSchema.safeParse(body)
+      if (!validation.success) {
+        return c.json({ error: 'Validation failed', details: validation.error.errors }, 400)
+      }
+      const validatedData = validation.data
       const db = c.env.DB
 
       // Check if collection exists
@@ -471,8 +476,7 @@ adminApiRoutes.patch('/collections/:id',
       console.error('Error updating collection:', error)
       return c.json({ error: 'Failed to update collection' }, 500)
     }
-  }
-)
+})
 
 /**
  * Delete collection

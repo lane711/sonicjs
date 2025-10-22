@@ -147,11 +147,14 @@ authRoutes.post('/register',
 )
 
 // Login user
-authRoutes.post('/login',
-  zValidator('json', loginSchema),
-  async (c) => {
+authRoutes.post('/login', async (c) => {
     try {
-      const { email, password } = c.req.valid('json')
+      const body = await c.req.json()
+      const validation = loginSchema.safeParse(body)
+      if (!validation.success) {
+        return c.json({ error: 'Validation failed', details: validation.error.errors }, 400)
+      }
+      const { email, password } = validation.data
       const db = c.env.DB
       
       // Normalize email to lowercase
@@ -218,8 +221,7 @@ authRoutes.post('/login',
       console.error('Login error:', error)
       return c.json({ error: 'Login failed' }, 500)
     }
-  }
-)
+})
 
 // Logout user (both GET and POST for convenience)
 authRoutes.post('/logout', (c) => {

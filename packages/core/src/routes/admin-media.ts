@@ -621,7 +621,7 @@ adminMediaRoutes.get('/file/*', async (c) => {
     object.httpMetadata?.contentDisposition && headers.set('Content-Disposition', object.httpMetadata.contentDisposition)
     headers.set('Cache-Control', 'public, max-age=31536000') // 1 year cache
     
-    return new Response(object.body, {
+    return new Response(object.body as any, {
       headers
     })
   } catch (error) {
