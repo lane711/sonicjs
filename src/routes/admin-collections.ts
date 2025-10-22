@@ -355,6 +355,7 @@ adminCollectionsRoutes.get('/collections/:id', async (c) => {
       display_name: collection.display_name,
       description: collection.description,
       fields: fields,
+      managed: collection.managed === 1,
       isEdit: true,
       user: user ? {
         name: user.email,

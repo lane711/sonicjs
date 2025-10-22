@@ -20,6 +20,7 @@ export interface CollectionFormData {
   display_name?: string
   description?: string
   fields?: CollectionField[]
+  managed?: boolean
   isEdit?: boolean
   error?: string
   success?: string
@@ -45,7 +46,9 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
       type: 'text',
       value: data.display_name || '',
       placeholder: 'Blog Posts',
-      required: true
+      required: true,
+      readonly: data.managed,
+      className: data.managed ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 cursor-not-allowed' : ''
     },
     {
       name: 'name',
@@ -64,7 +67,9 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
       type: 'textarea',
       value: data.description || '',
       placeholder: 'Description of this collection...',
-      rows: 3
+      rows: 3,
+      readonly: data.managed,
+      className: data.managed ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 cursor-not-allowed' : ''
     }
   ]
 
@@ -77,7 +82,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
     ),
     hxTarget: '#form-messages',
     fields: fields,
-    submitButtons: [
+    submitButtons: data.managed ? [] : [
       {
         label: isEdit ? 'Update Collection' : 'Create Collection',
         type: 'submit',
@@ -88,6 +93,34 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
 
   const pageContent = `
     <div class="space-y-6">
+      <!-- Config-Managed Collection Banner -->
+      ${data.managed ? `
+        <div class="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/30 p-4">
+          <div class="flex items-start gap-x-3">
+            <svg class="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+            <div class="flex-1">
+              <h3 class="text-sm/6 font-semibold text-amber-900 dark:text-amber-300">
+                Config-Managed Collection
+              </h3>
+              <div class="text-sm/6 text-amber-800 dark:text-amber-400 mt-1 space-y-1">
+                <p>This collection is managed by a configuration file and cannot be edited through the admin interface.</p>
+                <p class="mt-2">
+                  <span class="font-medium">Config file:</span>
+                  <code class="ml-2 px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-300 font-mono text-xs">
+                    src/collections/${data.name}.collection.ts
+                  </code>
+                </p>
+                <p class="mt-2 text-xs">
+                  To modify this collection's schema, edit the configuration file directly in your code editor.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ` : ''}
+
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -238,7 +271,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
           
           ${renderForm(formData)}
           
-          ${isEdit ? `
+          ${isEdit && !data.managed ? `
             <!-- Fields Management Section -->
             <div class="mt-8 pt-8 border-t border-zinc-950/5 dark:border-white/10">
               <div class="flex items-center justify-between mb-6">
@@ -347,10 +380,10 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
               <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
               </svg>
-              Cancel
+              ${data.managed ? 'Back to Collections' : 'Cancel'}
             </a>
 
-            ${isEdit ? `
+            ${isEdit && !data.managed ? `
               <button
                 type="button"
                 hx-delete="/admin/collections/${data.id}"
