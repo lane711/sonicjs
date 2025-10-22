@@ -46,7 +46,7 @@
     "@types/node": "^22.7.3",
     "drizzle-kit": "^0.31.4",
     "react-email": "3.0.7",
-    "vitest": "^2.1.1",
+    "vitest": "^4.0.1",
     "wrangler": "^4.0.0"
   },
   "optionalDependencies": {

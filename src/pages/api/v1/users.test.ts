@@ -30,6 +30,7 @@ describe('User Registration Endpoint', () => {
       runtime: {
         env: {
           D1: {},
+          USERS_CAN_REGISTER: "true",
           isAdminAccountCreated: true
         }
       }
@@ -105,7 +106,8 @@ describe('User Registration Endpoint', () => {
     });
 
     // Mock the access control to return false
-    const createAccess = apiConfig[0].access.operation.create as ReturnType<typeof vi.fn>;
+    const userConfig = apiConfig.find(_c => _c.table === context.params.table);
+    const createAccess = vi.spyOn(userConfig.access.operation, "create", "get");
     createAccess.mockReturnValue(false);
 
     const response = await POST(context);
