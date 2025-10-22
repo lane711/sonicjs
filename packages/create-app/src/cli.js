@@ -12,7 +12,7 @@ import validatePackageName from 'validate-npm-package-name'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // Version
-const VERSION = '2.0.0-beta.6'
+const VERSION = '2.0.0-beta.7'
 
 // Templates available
 const TEMPLATES = {
@@ -181,6 +181,22 @@ async function getProjectDetails(initialName) {
     })
   }
 
+  // Run migrations
+  questions.push({
+    type: 'confirm',
+    name: 'runMigrations',
+    message: 'Run database migrations now?',
+    initial: true
+  })
+
+  // Seed admin user
+  questions.push({
+    type: 'confirm',
+    name: 'seedAdmin',
+    message: 'Seed admin user now?',
+    initial: true
+  })
+
   // Initialize git
   if (!flags.skipGit) {
     questions.push({
@@ -206,6 +222,8 @@ async function getProjectDetails(initialName) {
     adminPassword: answers.adminPassword,
     includeExample: flags.skipExample ? false : (flags.includeExample ? true : (answers.includeExample !== undefined ? answers.includeExample : true)),
     createResources: flags.skipCloudflare ? false : answers.createResources,
+    runMigrations: answers.runMigrations !== undefined ? answers.runMigrations : true,
+    seedAdmin: answers.seedAdmin !== undefined ? answers.seedAdmin : true,
     initGit: flags.skipGit ? false : answers.initGit,
     skipInstall: flags.skipInstall
   }
@@ -221,6 +239,8 @@ async function createProject(answers, flags) {
     adminPassword,
     includeExample,
     createResources,
+    runMigrations,
+    seedAdmin,
     initGit,
     skipInstall
   } = answers
@@ -289,6 +309,45 @@ async function createProject(answers, flags) {
       spinner.start('Initializing git repository...')
       await initializeGit(targetDir)
       spinner.succeed('Initialized git repository')
+    }
+
+    // 6. Run migrations
+    if (runMigrations && !skipInstall && resourcesCreated) {
+      spinner.start('Running database migrations...')
+      try {
+        await runDatabaseMigrations(targetDir)
+        spinner.succeed('Database migrations completed')
+        answers.migrationsRan = true
+      } catch (error) {
+        spinner.warn('Failed to run migrations')
+        console.log(kleur.dim(`  ${error.message}`))
+        console.log(kleur.dim('  You can run them manually with: npm run db:migrate:local'))
+        answers.migrationsRan = false
+      }
+    } else if (runMigrations && skipInstall) {
+      spinner.info('Skipping migrations - run after npm install')
+      answers.migrationsRan = false
+    } else if (runMigrations && !resourcesCreated) {
+      spinner.info('Skipping migrations - database not created yet')
+      answers.migrationsRan = false
+    }
+
+    // 7. Seed admin user
+    if (seedAdmin && !skipInstall && answers.migrationsRan) {
+      spinner.start('Seeding admin user...')
+      try {
+        await seedAdminUser(targetDir)
+        spinner.succeed('Admin user created')
+        answers.adminSeeded = true
+      } catch (error) {
+        spinner.warn('Failed to seed admin user')
+        console.log(kleur.dim(`  ${error.message}`))
+        console.log(kleur.dim('  You can run it manually with: npm run seed'))
+        answers.adminSeeded = false
+      }
+    } else if (seedAdmin && !answers.migrationsRan) {
+      spinner.info('Skipping seed - migrations not completed')
+      answers.adminSeeded = false
     }
 
     spinner.succeed(kleur.bold().green('✓ Project created successfully!'))
@@ -623,8 +682,42 @@ async function initializeGit(targetDir) {
   }
 }
 
+async function runDatabaseMigrations(targetDir) {
+  try {
+    const { stdout, stderr } = await execa('npm', ['run', 'db:migrate:local'], {
+      cwd: targetDir
+    })
+
+    // Check if migrations were successful
+    if (stderr && stderr.includes('error')) {
+      throw new Error(stderr)
+    }
+
+    return stdout
+  } catch (error) {
+    throw new Error(`Migration failed: ${error.message}`)
+  }
+}
+
+async function seedAdminUser(targetDir) {
+  try {
+    const { stdout, stderr } = await execa('npm', ['run', 'seed'], {
+      cwd: targetDir
+    })
+
+    // Check if seeding was successful
+    if (stderr && stderr.includes('error')) {
+      throw new Error(stderr)
+    }
+
+    return stdout
+  } catch (error) {
+    throw new Error(`Seeding failed: ${error.message}`)
+  }
+}
+
 function printSuccessMessage(answers) {
-  const { projectName, createResources, skipInstall, resourcesCreated, databaseIdSet } = answers
+  const { projectName, createResources, skipInstall, resourcesCreated, databaseIdSet, migrationsRan, adminSeeded } = answers
 
   console.log()
   console.log(kleur.bold().green('🎉 Success!'))
@@ -651,21 +744,42 @@ function printSuccessMessage(answers) {
     console.log(kleur.cyan(`  wrangler r2 bucket create ${answers.bucketName}`))
   }
 
-  console.log()
-  console.log(kleur.bold('⚡ IMPORTANT - Run migrations and seed admin user:'))
-  console.log(kleur.cyan('  npm run db:migrate:local'))
-  console.log(kleur.cyan('  npm run seed'))
-  console.log()
-  console.log(kleur.dim('  Without migrations, you will get "no such table" errors!'))
+  // Only show migration/seed steps if they weren't completed
+  const needsMigrations = !migrationsRan
+  const needsSeeding = !adminSeeded
+
+  if (needsMigrations || needsSeeding) {
+    console.log()
+    console.log(kleur.bold('⚡ IMPORTANT - Setup database:'))
+    if (needsMigrations) {
+      console.log(kleur.cyan('  npm run db:migrate:local'))
+    }
+    if (needsSeeding) {
+      console.log(kleur.cyan('  npm run seed'))
+    }
+    if (needsMigrations) {
+      console.log()
+      console.log(kleur.dim('  Without migrations, you will get "no such table" errors!'))
+    }
+  }
 
   console.log()
-  console.log(kleur.bold('Start development:'))
+  if (migrationsRan && adminSeeded) {
+    console.log(kleur.bold().green('✓ Database is ready! Start development:'))
+  } else {
+    console.log(kleur.bold('Start development:'))
+  }
   console.log(kleur.cyan('  npm run dev'))
 
   console.log()
   console.log(kleur.bold('Login credentials:'))
   console.log(kleur.cyan(`  Email: ${answers.adminEmail}`))
   console.log(kleur.dim(`  Password: [as entered]`))
+
+  if (migrationsRan && adminSeeded) {
+    console.log()
+    console.log(kleur.green('✓ Everything is set up! Just run npm run dev and login.'))
+  }
 
   console.log()
   console.log(kleur.bold('Visit:'))
