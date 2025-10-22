@@ -23,8 +23,8 @@ jobs:
       - name: Packages Install
         run: npm ci
 
-      - name: Copy wrangler.toml
-        run: cp wrangler.example.toml wrangler.toml
+      - name: Copy wrangler.jsonc
+        run: cp wrangler.example.jsonc wrangler.jsonc
 
       - name: Unit Test
         run: npm run test
