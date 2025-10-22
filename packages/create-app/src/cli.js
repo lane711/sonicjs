@@ -12,7 +12,7 @@ import validatePackageName from 'validate-npm-package-name'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // Version
-const VERSION = '2.0.0-alpha.6'
+const VERSION = '2.0.0-alpha.7'
 
 // Templates available
 const TEMPLATES = {
@@ -253,11 +253,12 @@ async function createProject(answers, flags) {
 
 async function copyTemplate(templateName, targetDir, options) {
   // Templates are in the package: node_modules/create-sonicjs/templates/starter
-  const templateDir = path.resolve(__dirname, '../templates/starter')
+  // __dirname points to src/, so we go up one level to get to templates/
+  const templateDir = path.resolve(__dirname, '..', 'templates', templateName)
 
   // Check if template exists
   if (!fs.existsSync(templateDir)) {
-    throw new Error(`Template "${templateName}" not found`)
+    throw new Error(`Template "${templateName}" not found at path: ${templateDir}`)
   }
 
   // Copy template
