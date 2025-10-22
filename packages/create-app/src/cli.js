@@ -12,7 +12,7 @@ import validatePackageName from 'validate-npm-package-name'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // Version
-const VERSION = '2.0.0-alpha.7'
+const VERSION = '2.0.0'
 
 // Templates available
 const TEMPLATES = {
@@ -282,7 +282,7 @@ async function copyTemplate(templateName, targetDir, options) {
 
   // Add @sonicjs-cms/core dependency
   packageJson.dependencies = {
-    '@sonicjs-cms/core': '^2.0.0-alpha.3',
+    '@sonicjs-cms/core': '^2.0.0',
     ...packageJson.dependencies
   }
 
