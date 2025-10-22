@@ -208,6 +208,9 @@ export {
   buildQuery,
   // Metrics
   metricsTracker,
+  // Version
+  SONICJS_VERSION,
+  getCoreVersion,
 } from './utils'
 
 export type {

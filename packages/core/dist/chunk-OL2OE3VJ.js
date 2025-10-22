@@ -466,6 +466,12 @@ var MetricsTracker = class {
 };
 var metricsTracker = new MetricsTracker();
 
-export { QueryFilterBuilder, TemplateRenderer, buildQuery, escapeHtml, metricsTracker, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer };
-//# sourceMappingURL=chunk-JIINOD2W.js.map
-//# sourceMappingURL=chunk-JIINOD2W.js.map
+// src/utils/version.ts
+var SONICJS_VERSION = "2.0.0-beta.2";
+function getCoreVersion() {
+  return SONICJS_VERSION;
+}
+
+export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, metricsTracker, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer };
+//# sourceMappingURL=chunk-OL2OE3VJ.js.map
+//# sourceMappingURL=chunk-OL2OE3VJ.js.map

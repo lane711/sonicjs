@@ -23,3 +23,6 @@ export {
 
 // Metrics Tracking
 export { metricsTracker } from './metrics'
+
+// Version Info
+export { SONICJS_VERSION, getCoreVersion } from './version'

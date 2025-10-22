@@ -1,5 +1,5 @@
-import { api_default, api_media_default, api_system_default, admin_api_default, admin_content_default, adminMediaRoutes, adminPluginRoutes, adminLogsRoutes, userRoutes, auth_default } from './chunk-JETM2U2D.js';
-export { ROUTES_INFO, admin_api_default as adminApiRoutes, adminCheckboxRoutes, admin_code_examples_default as adminCodeExamplesRoutes, admin_content_default as adminContentRoutes, adminDesignRoutes, admin_faq_default as adminFAQRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, admin_testimonials_default as adminTestimonialsRoutes, userRoutes as adminUsersRoutes, api_content_crud_default as apiContentCrudRoutes, api_media_default as apiMediaRoutes, api_default as apiRoutes, api_system_default as apiSystemRoutes, auth_default as authRoutes } from './chunk-JETM2U2D.js';
+import { api_default, api_media_default, api_system_default, admin_api_default, admin_content_default, adminMediaRoutes, adminPluginRoutes, adminLogsRoutes, userRoutes, auth_default } from './chunk-Q3KCKPHE.js';
+export { ROUTES_INFO, admin_api_default as adminApiRoutes, adminCheckboxRoutes, admin_code_examples_default as adminCodeExamplesRoutes, admin_content_default as adminContentRoutes, adminDesignRoutes, admin_faq_default as adminFAQRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, admin_testimonials_default as adminTestimonialsRoutes, userRoutes as adminUsersRoutes, api_content_crud_default as apiContentCrudRoutes, api_media_default as apiMediaRoutes, api_default as apiRoutes, api_system_default as apiSystemRoutes, auth_default as authRoutes } from './chunk-Q3KCKPHE.js';
 import './chunk-3MNMOLSA.js';
 export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware } from './chunk-WESS2U3K.js';
 import { schema_exports } from './chunk-7N3HK7ZK.js';
@@ -7,7 +7,8 @@ export { Logger, MigrationService, PluginBootstrapService, PluginService as Plug
 export { renderFilterBar, renderForm, renderFormField } from './chunk-LU6J53IX.js';
 export { getConfirmationDialogScript, renderAlert, renderConfirmationDialog, renderPagination, renderTable } from './chunk-P3VS4DV3.js';
 export { HookSystemImpl, HookUtils, PluginManager as PluginManagerClass, PluginRegistryImpl, PluginValidator as PluginValidatorClass, ScopedHookSystem as ScopedHookSystemClass } from './chunk-BITQ4MFX.js';
-export { QueryFilterBuilder, TemplateRenderer, buildQuery, escapeHtml, metricsTracker, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer } from './chunk-JIINOD2W.js';
+import { getCoreVersion } from './chunk-OL2OE3VJ.js';
+export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, metricsTracker, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer } from './chunk-OL2OE3VJ.js';
 export { HOOKS } from './chunk-LOUJRBXV.js';
 import './chunk-V4OQ3NZ2.js';
 import { Hono } from 'hono';
@@ -15,7 +16,7 @@ import { drizzle } from 'drizzle-orm/d1';
 
 function createSonicJSApp(config = {}) {
   const app = new Hono();
-  const appVersion = config.version || "1.0.0";
+  const appVersion = config.version || getCoreVersion();
   const appName = config.name || "SonicJS";
   app.use("*", async (c, next) => {
     c.set("appVersion", appVersion);
@@ -87,7 +88,7 @@ function createDb(d1) {
 
 // package.json
 var package_default = {
-  version: "2.0.0-alpha.12"};
+  version: "2.0.0-beta.2"};
 
 // src/index.ts
 var VERSION = package_default.version;

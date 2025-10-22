@@ -8,6 +8,7 @@ import { Hono } from 'hono'
 import type { Context } from 'hono'
 import type { D1Database, KVNamespace, R2Bucket } from '@cloudflare/workers-types'
 import { apiRoutes, apiMediaRoutes, apiSystemRoutes, adminApiRoutes, authRoutes, adminContentRoutes, adminUsersRoutes, adminMediaRoutes, adminPluginRoutes, adminLogsRoutes } from './routes'
+import { getCoreVersion } from './utils/version'
 
 // ============================================================================
 // Type Definitions
@@ -104,7 +105,7 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   const app = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
   // Set app metadata
-  const appVersion = config.version || '1.0.0'
+  const appVersion = config.version || getCoreVersion()
   const appName = config.name || 'SonicJS'
 
   // App version middleware

@@ -468,14 +468,22 @@ var MetricsTracker = class {
 };
 var metricsTracker = new MetricsTracker();
 
+// src/utils/version.ts
+var SONICJS_VERSION = "2.0.0-beta.2";
+function getCoreVersion() {
+  return SONICJS_VERSION;
+}
+
 exports.QueryFilterBuilder = QueryFilterBuilder;
+exports.SONICJS_VERSION = SONICJS_VERSION;
 exports.TemplateRenderer = TemplateRenderer;
 exports.buildQuery = buildQuery;
 exports.escapeHtml = escapeHtml;
+exports.getCoreVersion = getCoreVersion;
 exports.metricsTracker = metricsTracker;
 exports.renderTemplate = renderTemplate;
 exports.sanitizeInput = sanitizeInput;
 exports.sanitizeObject = sanitizeObject;
 exports.templateRenderer = templateRenderer;
-//# sourceMappingURL=chunk-RGCQSFKC.cjs.map
-//# sourceMappingURL=chunk-RGCQSFKC.cjs.map
+//# sourceMappingURL=chunk-NK6FN5R5.cjs.map
+//# sourceMappingURL=chunk-NK6FN5R5.cjs.map

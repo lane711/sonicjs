@@ -4,7 +4,7 @@ var chunkAGOE25LF_cjs = require('./chunk-AGOE25LF.cjs');
 var chunkBUKT6HP5_cjs = require('./chunk-BUKT6HP5.cjs');
 var chunkRNR4HA23_cjs = require('./chunk-RNR4HA23.cjs');
 var chunkET5I4GBD_cjs = require('./chunk-ET5I4GBD.cjs');
-var chunkRGCQSFKC_cjs = require('./chunk-RGCQSFKC.cjs');
+var chunkNK6FN5R5_cjs = require('./chunk-NK6FN5R5.cjs');
 var hono = require('hono');
 var cors = require('hono/cors');
 var zod = require('zod');
@@ -333,12 +333,12 @@ apiRoutes.get("/content", async (c) => {
         });
       }
     }
-    const filter = chunkRGCQSFKC_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunkNK6FN5R5_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.limit) {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder = new chunkRGCQSFKC_cjs.QueryFilterBuilder();
+    const builder = new chunkNK6FN5R5_cjs.QueryFilterBuilder();
     const queryResult = builder.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -425,7 +425,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
     if (!collectionResult) {
       return c.json({ error: "Collection not found" }, 404);
     }
-    const filter = chunkRGCQSFKC_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunkNK6FN5R5_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.where) {
       filter.where = { and: [] };
     }
@@ -441,7 +441,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder = new chunkRGCQSFKC_cjs.QueryFilterBuilder();
+    const builder = new chunkNK6FN5R5_cjs.QueryFilterBuilder();
     const queryResult = builder.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -6877,7 +6877,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="first_name"
-                      value="${chunkRGCQSFKC_cjs.escapeHtml(data.userToEdit.firstName || "")}"
+                      value="${chunkNK6FN5R5_cjs.escapeHtml(data.userToEdit.firstName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -6888,7 +6888,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="last_name"
-                      value="${chunkRGCQSFKC_cjs.escapeHtml(data.userToEdit.lastName || "")}"
+                      value="${chunkNK6FN5R5_cjs.escapeHtml(data.userToEdit.lastName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -6899,7 +6899,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="username"
-                      value="${chunkRGCQSFKC_cjs.escapeHtml(data.userToEdit.username || "")}"
+                      value="${chunkNK6FN5R5_cjs.escapeHtml(data.userToEdit.username || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -6910,7 +6910,7 @@ function renderUserEditPage(data) {
                     <input
                       type="email"
                       name="email"
-                      value="${chunkRGCQSFKC_cjs.escapeHtml(data.userToEdit.email || "")}"
+                      value="${chunkNK6FN5R5_cjs.escapeHtml(data.userToEdit.email || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -6921,7 +6921,7 @@ function renderUserEditPage(data) {
                     <input
                       type="tel"
                       name="phone"
-                      value="${chunkRGCQSFKC_cjs.escapeHtml(data.userToEdit.phone || "")}"
+                      value="${chunkNK6FN5R5_cjs.escapeHtml(data.userToEdit.phone || "")}"
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
                   </div>
@@ -6935,7 +6935,7 @@ function renderUserEditPage(data) {
                         class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-zinc-500/30 dark:outline-zinc-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-500 dark:focus-visible:outline-zinc-400 sm:text-sm/6"
                       >
                         ${data.roles.map((role) => `
-                          <option value="${chunkRGCQSFKC_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunkRGCQSFKC_cjs.escapeHtml(role.label)}</option>
+                          <option value="${chunkNK6FN5R5_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunkNK6FN5R5_cjs.escapeHtml(role.label)}</option>
                         `).join("")}
                       </select>
                       <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-zinc-600 dark:text-zinc-400 sm:size-4">
@@ -6951,7 +6951,7 @@ function renderUserEditPage(data) {
                     name="bio"
                     rows="3"
                     class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-                  >${chunkRGCQSFKC_cjs.escapeHtml(data.userToEdit.bio || "")}</textarea>
+                  >${chunkNK6FN5R5_cjs.escapeHtml(data.userToEdit.bio || "")}</textarea>
                 </div>
               </div>
 
@@ -7947,12 +7947,12 @@ userRoutes.put("/profile", async (c) => {
   const db = c.env.DB;
   try {
     const formData = await c.req.formData();
-    const firstName = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkNK6FN5R5_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkNK6FN5R5_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkNK6FN5R5_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkNK6FN5R5_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkNK6FN5R5_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const timezone = formData.get("timezone")?.toString() || "UTC";
     const language = formData.get("language")?.toString() || "en";
     const emailNotifications = formData.get("email_notifications") === "1";
@@ -8319,12 +8319,12 @@ userRoutes.post("/users/new", chunkBUKT6HP5_cjs.requirePermission("users.create"
   const user = c.get("user");
   try {
     const formData = await c.req.formData();
-    const firstName = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkNK6FN5R5_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkNK6FN5R5_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkNK6FN5R5_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkNK6FN5R5_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkNK6FN5R5_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const password = formData.get("password")?.toString() || "";
     const confirmPassword = formData.get("confirm_password")?.toString() || "";
@@ -8525,12 +8525,12 @@ userRoutes.put("/users/:id", chunkBUKT6HP5_cjs.requirePermission("users.update")
   const userId = c.req.param("id");
   try {
     const formData = await c.req.formData();
-    const firstName = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkNK6FN5R5_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkNK6FN5R5_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkNK6FN5R5_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkNK6FN5R5_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkNK6FN5R5_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const isActive = formData.get("is_active") === "1";
     const emailVerified = formData.get("email_verified") === "1";
@@ -8673,8 +8673,8 @@ userRoutes.post("/invite-user", chunkBUKT6HP5_cjs.requirePermission("users.creat
     const formData = await c.req.formData();
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
     const role = formData.get("role")?.toString()?.trim() || "viewer";
-    const firstName = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkRGCQSFKC_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const firstName = chunkNK6FN5R5_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkNK6FN5R5_cjs.sanitizeInput(formData.get("last_name")?.toString());
     if (!email || !firstName || !lastName) {
       return c.json({ error: "Email, first name, and last name are required" }, 400);
     }
@@ -15797,5 +15797,5 @@ exports.api_media_default = api_media_default;
 exports.api_system_default = api_system_default;
 exports.auth_default = auth_default;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-QUMBDPNJ.cjs.map
-//# sourceMappingURL=chunk-QUMBDPNJ.cjs.map
+//# sourceMappingURL=chunk-4MZPFGLT.cjs.map
+//# sourceMappingURL=chunk-4MZPFGLT.cjs.map
