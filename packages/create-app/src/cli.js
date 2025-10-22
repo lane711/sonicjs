@@ -12,7 +12,7 @@ import validatePackageName from 'validate-npm-package-name'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // Version
-const VERSION = '2.0.0-beta.4'
+const VERSION = '2.0.0-beta.5'
 
 // Templates available
 const TEMPLATES = {
@@ -245,16 +245,27 @@ async function createProject(answers, flags) {
 
     // 2. Create Cloudflare resources
     let databaseId = 'YOUR_DATABASE_ID'
+    let resourcesCreated = false
     if (createResources) {
       spinner.start('Creating Cloudflare resources...')
       try {
-        databaseId = await createCloudflareResources(databaseName, bucketName, targetDir)
-        spinner.succeed('Created Cloudflare resources')
+        const result = await createCloudflareResources(databaseName, bucketName, targetDir)
+        databaseId = result.databaseId || 'YOUR_DATABASE_ID'
+        resourcesCreated = result.success
+        if (resourcesCreated) {
+          spinner.succeed('Created Cloudflare resources')
+        } else {
+          spinner.warn('Cloudflare resources partially created - see details above')
+        }
       } catch (error) {
         spinner.warn('Failed to create Cloudflare resources')
         console.log(kleur.dim('  You can create them manually later'))
       }
     }
+
+    // Store resources status for success message
+    answers.resourcesCreated = resourcesCreated
+    answers.databaseIdSet = databaseId !== 'YOUR_DATABASE_ID'
 
     // 3. Update wrangler.toml with database ID
     spinner.start('Updating configuration...')
@@ -467,10 +478,13 @@ async function createCloudflareResources(databaseName, bucketName, targetDir) {
     throw new Error('wrangler is not installed. Install with: npm install -g wrangler')
   }
 
-  // Create D1 database
   let databaseId
+  let dbCreated = false
+  let bucketCreated = false
+
+  // Create D1 database
   try {
-    const { stdout } = await execa('wrangler', ['d1', 'create', databaseName], {
+    const { stdout, stderr } = await execa('wrangler', ['d1', 'create', databaseName], {
       cwd: targetDir
     })
 
@@ -478,9 +492,22 @@ async function createCloudflareResources(databaseName, bucketName, targetDir) {
     const match = stdout.match(/database_id\s*=\s*["']([^"']+)["']/)
     if (match) {
       databaseId = match[1]
+      dbCreated = true
+    } else {
+      console.log('')
+      console.log(kleur.yellow('⚠ Warning: Could not parse database_id from wrangler output'))
+      console.log(kleur.dim('  You may need to manually update wrangler.toml'))
     }
   } catch (error) {
-    console.log(kleur.yellow('  D1 database creation failed'))
+    console.log('')
+    console.log(kleur.yellow('⚠ D1 database creation failed:'))
+    console.log(kleur.dim(`  ${error.message}`))
+    if (error.stderr) {
+      console.log(kleur.dim(`  ${error.stderr}`))
+    }
+    console.log('')
+    console.log(kleur.dim('  Create manually with:'))
+    console.log(kleur.dim(`  wrangler d1 create ${databaseName}`))
   }
 
   // Create R2 bucket
@@ -488,11 +515,23 @@ async function createCloudflareResources(databaseName, bucketName, targetDir) {
     await execa('wrangler', ['r2', 'bucket', 'create', bucketName], {
       cwd: targetDir
     })
+    bucketCreated = true
   } catch (error) {
-    console.log(kleur.yellow('  R2 bucket creation failed'))
+    console.log('')
+    console.log(kleur.yellow('⚠ R2 bucket creation failed:'))
+    console.log(kleur.dim(`  ${error.message}`))
+    if (error.stderr) {
+      console.log(kleur.dim(`  ${error.stderr}`))
+    }
+    console.log('')
+    console.log(kleur.dim('  Create manually with:'))
+    console.log(kleur.dim(`  wrangler r2 bucket create ${bucketName}`))
   }
 
-  return databaseId
+  return {
+    databaseId,
+    success: dbCreated && bucketCreated
+  }
 }
 
 async function updateWranglerConfig(targetDir, { databaseName, databaseId, bucketName }) {
@@ -552,7 +591,7 @@ async function initializeGit(targetDir) {
 }
 
 function printSuccessMessage(answers) {
-  const { projectName, createResources, skipInstall } = answers
+  const { projectName, createResources, skipInstall, resourcesCreated, databaseIdSet } = answers
 
   console.log()
   console.log(kleur.bold().green('🎉 Success!'))
@@ -565,11 +604,14 @@ function printSuccessMessage(answers) {
     console.log(kleur.cyan('  npm install'))
   }
 
-  if (!createResources) {
+  // Show resource creation steps if they weren't created or failed
+  if (!createResources || !resourcesCreated) {
     console.log()
     console.log(kleur.bold('Create Cloudflare resources:'))
-    console.log(kleur.cyan(`  wrangler d1 create ${answers.databaseName}`))
-    console.log(kleur.dim('  # Copy database_id to wrangler.toml'))
+    if (!databaseIdSet) {
+      console.log(kleur.cyan(`  wrangler d1 create ${answers.databaseName}`))
+      console.log(kleur.dim('  # Copy database_id to wrangler.toml'))
+    }
     console.log(kleur.cyan(`  wrangler r2 bucket create ${answers.bucketName}`))
   }
 
