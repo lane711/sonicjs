@@ -97,9 +97,10 @@ app.use('*', async (c, next) => {
   // Don't track polling endpoints to avoid noise and feedback loops
   const path = c.req.path
   const shouldTrack = !path.includes('/admin/api/metrics') &&
-                      !path.includes('/admin/api/stats') &&
-                      !path.includes('/admin/api/recent-activity') &&
-                      !path.includes('/admin/api/system-status')
+                      !path.includes('/admin/dashboard/stats') &&
+                      !path.includes('/admin/dashboard/recent-activity') &&
+                      !path.includes('/admin/dashboard/system-status') &&
+                      !path.includes('/admin/dashboard/storage')
 
   if (shouldTrack) {
     const { metricsTracker } = await import('@sonicjs-cms/core')
@@ -113,9 +114,10 @@ app.use('*', async (c, next) => {
   // Skip logger for high-frequency endpoints to reduce noise
   const path = c.req.path
   const skipLogger = path.includes('/admin/api/metrics') ||
-                     path.includes('/admin/api/stats') ||
-                     path.includes('/admin/api/recent-activity') ||
-                     path.includes('/admin/api/system-status')
+                     path.includes('/admin/dashboard/stats') ||
+                     path.includes('/admin/dashboard/recent-activity') ||
+                     path.includes('/admin/dashboard/system-status') ||
+                     path.includes('/admin/dashboard/storage')
 
   if (skipLogger) {
     return next()

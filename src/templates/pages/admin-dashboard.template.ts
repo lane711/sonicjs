@@ -80,7 +80,7 @@ export function renderDashboardPage(data: DashboardPageData): string {
     <div
       id="stats-container"
       class="mb-8"
-      hx-get="/admin/api/stats"
+      hx-get="/admin/dashboard/stats"
       hx-trigger="load"
       hx-swap="innerHTML"
     >
@@ -98,7 +98,7 @@ export function renderDashboardPage(data: DashboardPageData): string {
       <div
         class="xl:col-span-1"
         id="recent-activity-container"
-        hx-get="/admin/api/recent-activity"
+        hx-get="/admin/dashboard/recent-activity"
         hx-trigger="load"
         hx-swap="innerHTML"
       >
@@ -115,7 +115,7 @@ export function renderDashboardPage(data: DashboardPageData): string {
       ${renderSystemStatus()}
 
       <!-- Storage Usage -->
-      <div id="storage-usage-container" hx-get="/admin/api/storage" hx-trigger="load" hx-swap="innerHTML">
+      <div id="storage-usage-container" hx-get="/admin/dashboard/storage" hx-trigger="load" hx-swap="innerHTML">
         ${renderStorageUsage()}
       </div>
     </div>
@@ -166,7 +166,7 @@ export function renderDashboardPageWithDynamicMenu(
       </div>
     </div>
 
-    <div id="stats-container" class="mb-8" hx-get="/admin/api/stats" hx-trigger="load">
+    <div id="stats-container" class="mb-8" hx-get="/admin/dashboard/stats" hx-trigger="load">
       ${renderStatsCards({
         collections: 0,
         contentItems: 0,
@@ -185,7 +185,7 @@ export function renderDashboardPageWithDynamicMenu(
       <div
         class="xl:col-span-1"
         id="recent-activity-container"
-        hx-get="/admin/api/recent-activity"
+        hx-get="/admin/dashboard/recent-activity"
         hx-trigger="load"
         hx-swap="innerHTML"
       >
@@ -201,7 +201,7 @@ export function renderDashboardPageWithDynamicMenu(
       ${renderSystemStatus()}
 
       <!-- Storage Usage -->
-      <div id="storage-usage-container" hx-get="/admin/api/storage" hx-trigger="load" hx-swap="innerHTML">
+      <div id="storage-usage-container" hx-get="/admin/dashboard/storage" hx-trigger="load" hx-swap="innerHTML">
         ${renderStorageUsage()}
       </div>
     </div>
@@ -692,7 +692,7 @@ function renderSystemStatus(): string {
       <div
         id="system-status-container"
         class="p-6"
-        hx-get="/admin/api/system-status"
+        hx-get="/admin/dashboard/system-status"
         hx-trigger="load, every 30s"
         hx-swap="innerHTML"
       >

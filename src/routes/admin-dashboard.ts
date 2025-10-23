@@ -65,9 +65,9 @@ router.get('/', async (c) => {
 })
 
 /**
- * GET /admin/api/stats - Dashboard stats (HTMX endpoint)
+ * GET /admin/dashboard/stats - Dashboard stats HTML fragment (HTMX endpoint)
  */
-router.get('/api/stats', async (c) => {
+router.get('/dashboard/stats', async (c) => {
   try {
     const db = c.env.DB
 
@@ -129,9 +129,9 @@ router.get('/api/stats', async (c) => {
 })
 
 /**
- * GET /admin/api/storage - Storage usage (HTMX endpoint)
+ * GET /admin/dashboard/storage - Storage usage HTML fragment (HTMX endpoint)
  */
-router.get('/api/storage', async (c) => {
+router.get('/dashboard/storage', async (c) => {
   try {
     const db = c.env.DB
 
@@ -163,9 +163,9 @@ router.get('/api/storage', async (c) => {
 })
 
 /**
- * GET /admin/api/recent-activity - Recent activity (HTMX endpoint)
+ * GET /admin/dashboard/recent-activity - Recent activity HTML fragment (HTMX endpoint)
  */
-router.get('/api/recent-activity', async (c) => {
+router.get('/dashboard/recent-activity', async (c) => {
   try {
     const db = c.env.DB
     const limit = parseInt(c.req.query('limit') || '5')
@@ -228,9 +228,9 @@ router.get('/api/recent-activity', async (c) => {
 })
 
 /**
- * GET /admin/api/system-status - System status (HTMX endpoint)
+ * GET /admin/dashboard/system-status - System status HTML fragment (HTMX endpoint)
  */
-router.get('/api/system-status', async (c) => {
+router.get('/dashboard/system-status', async (c) => {
   try {
     const html = `
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
