@@ -28,6 +28,8 @@ import { designRoutes } from './plugins/design/routes'
 import { adminCollectionsRoutes } from './routes/admin-collections'
 // Settings routes (monolith-specific, will be migrated to core later)
 import { adminSettingsRoutes } from './routes/admin-settings'
+// Dashboard route (monolith-specific)
+import { adminDashboardRoutes } from './routes/admin-dashboard'
 // Hello World plugin
 import { helloWorldPlugin } from './plugins/core-plugins/hello-world-plugin'
 // Workflow routes are loaded dynamically through plugin system
@@ -197,6 +199,7 @@ app.use('/admin/*', requireRole(['admin', 'editor']))
 // Add caching for admin pages (60 second cache)
 app.use('/admin/*', cacheHeaders(60))
 app.route('/admin/api', adminApiRoutes as any) // Admin API endpoints for collections, fields, etc.
+app.route('/admin', adminDashboardRoutes) // Admin dashboard (must be before other /admin routes to catch root)
 app.route('/admin', adminUsersRoutes as any) // User profile, user management, activity logs
 app.route('/admin/media', adminMediaRoutes as any)
 app.route('/admin/content', adminContentRoutes as any)
