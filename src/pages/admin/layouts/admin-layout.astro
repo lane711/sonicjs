@@ -1,5 +1,4 @@
 ---
-import "../../../styles/global.css";
 import { apiConfig, type ApiConfig } from "../../../db/routes";
 
 export const prerender = true;
@@ -25,7 +24,7 @@ console.log(version)
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <title>{title}</title>
-  <!-- <link rel="stylesheet" href="style.css" /> -->
+  <link rel="stylesheet" href="/src/styles/global.css" />
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
 
   <script is:inline>

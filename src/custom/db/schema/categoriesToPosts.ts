@@ -31,9 +31,9 @@ export const table = sqliteTable(
     ...definition,
     ...auditSchema
   },
-  (table) => ({
-    pk: primaryKey(table.postId, table.categoryId)
-  })
+  (table) => [
+    primaryKey({ columns: [table.postId, table.categoryId]})
+  ]
 );
 
 export const relation = relations(table, ({ one }) => ({

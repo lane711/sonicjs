@@ -23,11 +23,9 @@ export const definition = {
 
 export const table = sqliteTable(tableName, {
   ...definition,
-}, (table) => {
-  return {
-    urlIdx: uniqueIndex("url").on(table.url),
-  };
-});
+}, (table) => [
+  uniqueIndex("url").on(table.url)
+]);
 
 export const access: ApiConfig["access"] = {
   operation: {

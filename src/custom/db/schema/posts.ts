@@ -32,11 +32,9 @@ export const table = sqliteTable(
     ...definition,
     ...auditSchema,
   },
-  (table) => {
-    return {
-      userIdIndex: index("postUserIdIndex").on(table.userId),
-    };
-  }
+  (table) => [
+    index("postUserIdIndex").on(table.userId)
+  ]
 );
 
 export const relation = relations(table, ({ one, many }) => ({

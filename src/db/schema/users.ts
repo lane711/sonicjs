@@ -42,11 +42,9 @@ export const table = sqliteTable(
     ...definition,
     ...auditSchema,
   },
-  (table) => {
-    return {
-      emailIndex: uniqueIndex("email_idx").on(table.email),
-    };
-  }
+  (table) => [
+    uniqueIndex("email_idx").on(table.email)
+  ]
 );
 
 export type User = InferSelectModel<typeof table>;
