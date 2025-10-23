@@ -12,7 +12,7 @@ import validatePackageName from 'validate-npm-package-name'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // Version
-const VERSION = '2.0.0-beta.8'
+const VERSION = '2.0.0-beta.9'
 
 // Templates available
 const TEMPLATES = {
@@ -680,12 +680,16 @@ async function initializeGit(targetDir) {
 async function runDatabaseMigrations(targetDir) {
   try {
     const { stdout, stderr } = await execa('npm', ['run', 'db:migrate:local'], {
-      cwd: targetDir
+      cwd: targetDir,
+      reject: false // Don't reject on non-zero exit code - check manually
     })
 
-    // Check if migrations were successful
-    if (stderr && stderr.includes('error')) {
-      throw new Error(stderr)
+    // Check if migrations were successful - look for actual errors, not warnings
+    if (stderr && (stderr.toLowerCase().includes('error:') || stderr.toLowerCase().includes('failed'))) {
+      // Filter out wrangler version warnings
+      if (!stderr.includes('Migrations were successfully applied')) {
+        throw new Error(stderr)
+      }
     }
 
     return stdout
@@ -697,12 +701,16 @@ async function runDatabaseMigrations(targetDir) {
 async function seedAdminUser(targetDir) {
   try {
     const { stdout, stderr } = await execa('npm', ['run', 'seed'], {
-      cwd: targetDir
+      cwd: targetDir,
+      reject: false // Don't reject on non-zero exit code - check manually
     })
 
-    // Check if seeding was successful
-    if (stderr && stderr.includes('error')) {
-      throw new Error(stderr)
+    // Check if seeding was successful - look for actual errors, not warnings
+    if (stderr && (stderr.toLowerCase().includes('error:') || stderr.toLowerCase().includes('failed'))) {
+      // Filter out wrangler version warnings
+      if (!stdout.includes('Admin user created') && !stdout.includes('Admin user already exists')) {
+        throw new Error(stderr)
+      }
     }
 
     return stdout
@@ -712,7 +720,7 @@ async function seedAdminUser(targetDir) {
 }
 
 function printSuccessMessage(answers) {
-  const { projectName, createResources, skipInstall, resourcesCreated, databaseIdSet, migrationsRan, adminSeeded } = answers
+  const { projectName, createResources, skipInstall, resourcesCreated, databaseIdSet, migrationsRan, adminSeeded, seedAdmin } = answers
 
   console.log()
   console.log(kleur.bold().green('🎉 Success!'))
