@@ -347,8 +347,10 @@ export async function loginAsAdmin(page: Page) {
  * Navigate to a specific admin section
  */
 export async function navigateToAdminSection(page: Page, section: 'collections' | 'content' | 'media' | 'users') {
-  await page.click(`a[href="/admin/${section}"]`);
-  await page.waitForURL(`/admin/${section}`);
+  // Navigate directly instead of clicking navigation links
+  // This is more reliable as admin navigation may vary
+  await page.goto(`/admin/${section}`);
+  await page.waitForLoadState('networkidle');
 }
 
 /**
