@@ -12,7 +12,7 @@ import validatePackageName from 'validate-npm-package-name'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // Version
-const VERSION = '2.0.0-beta.7'
+const VERSION = '2.0.0-beta.8'
 
 // Templates available
 const TEMPLATES = {
@@ -135,9 +135,17 @@ async function getProjectDetails(initialName) {
     })
   }
 
-  // Admin email
+  // Seed admin user
   questions.push({
-    type: 'text',
+    type: 'confirm',
+    name: 'seedAdmin',
+    message: 'Create admin user?',
+    initial: true
+  })
+
+  // Admin email (only if seeding)
+  questions.push({
+    type: (prev, values) => values.seedAdmin ? 'text' : null,
     name: 'adminEmail',
     message: 'Admin email:',
     validate: (value) => {
@@ -149,9 +157,9 @@ async function getProjectDetails(initialName) {
     }
   })
 
-  // Admin password
+  // Admin password (only if seeding)
   questions.push({
-    type: 'password',
+    type: (prev, values) => values.seedAdmin ? 'password' : null,
     name: 'adminPassword',
     message: 'Admin password:',
     validate: (value) => {
@@ -181,22 +189,6 @@ async function getProjectDetails(initialName) {
     })
   }
 
-  // Run migrations
-  questions.push({
-    type: 'confirm',
-    name: 'runMigrations',
-    message: 'Run database migrations now?',
-    initial: true
-  })
-
-  // Seed admin user
-  questions.push({
-    type: 'confirm',
-    name: 'seedAdmin',
-    message: 'Seed admin user now?',
-    initial: true
-  })
-
   // Initialize git
   if (!flags.skipGit) {
     questions.push({
@@ -218,12 +210,12 @@ async function getProjectDetails(initialName) {
     template: flags.template || answers.template,
     databaseName: flags.databaseName || answers.databaseName || `${initialName || answers.projectName}-db`,
     bucketName: flags.bucketName || answers.bucketName || `${initialName || answers.projectName}-media`,
+    seedAdmin: answers.seedAdmin !== undefined ? answers.seedAdmin : true,
     adminEmail: answers.adminEmail,
     adminPassword: answers.adminPassword,
     includeExample: flags.skipExample ? false : (flags.includeExample ? true : (answers.includeExample !== undefined ? answers.includeExample : true)),
     createResources: flags.skipCloudflare ? false : answers.createResources,
-    runMigrations: answers.runMigrations !== undefined ? answers.runMigrations : true,
-    seedAdmin: answers.seedAdmin !== undefined ? answers.seedAdmin : true,
+    runMigrations: true, // Always run migrations automatically
     initGit: flags.skipGit ? false : answers.initGit,
     skipInstall: flags.skipInstall
   }
@@ -257,6 +249,7 @@ async function createProject(answers, flags) {
       projectName,
       databaseName,
       bucketName,
+      seedAdmin,
       adminEmail,
       adminPassword,
       includeExample
@@ -410,11 +403,13 @@ async function copyTemplate(templateName, targetDir, options) {
     }
   }
 
-  // Create admin seed script with provided credentials
-  await createAdminSeedScript(targetDir, {
-    email: options.adminEmail,
-    password: options.adminPassword
-  })
+  // Create admin seed script with provided credentials (only if creating admin user)
+  if (options.seedAdmin && options.adminEmail && options.adminPassword) {
+    await createAdminSeedScript(targetDir, {
+      email: options.adminEmail,
+      password: options.adminPassword
+    })
+  }
 }
 
 async function createAdminSeedScript(targetDir, { email, password }) {
@@ -744,39 +739,37 @@ function printSuccessMessage(answers) {
     console.log(kleur.cyan(`  wrangler r2 bucket create ${answers.bucketName}`))
   }
 
-  // Only show migration/seed steps if they weren't completed
+  // Only show migration/seed steps if they weren't completed (shouldn't normally happen)
   const needsMigrations = !migrationsRan
-  const needsSeeding = !adminSeeded
+  const needsSeeding = seedAdmin && !adminSeeded
 
   if (needsMigrations || needsSeeding) {
     console.log()
-    console.log(kleur.bold('⚡ IMPORTANT - Setup database:'))
+    console.log(kleur.bold('Complete setup:'))
     if (needsMigrations) {
       console.log(kleur.cyan('  npm run db:migrate:local'))
     }
     if (needsSeeding) {
       console.log(kleur.cyan('  npm run seed'))
     }
-    if (needsMigrations) {
-      console.log()
-      console.log(kleur.dim('  Without migrations, you will get "no such table" errors!'))
-    }
   }
 
   console.log()
-  if (migrationsRan && adminSeeded) {
+  if (migrationsRan && (!seedAdmin || adminSeeded)) {
     console.log(kleur.bold().green('✓ Database is ready! Start development:'))
   } else {
     console.log(kleur.bold('Start development:'))
   }
   console.log(kleur.cyan('  npm run dev'))
 
-  console.log()
-  console.log(kleur.bold('Login credentials:'))
-  console.log(kleur.cyan(`  Email: ${answers.adminEmail}`))
-  console.log(kleur.dim(`  Password: [as entered]`))
+  if (seedAdmin && answers.adminEmail) {
+    console.log()
+    console.log(kleur.bold('Login credentials:'))
+    console.log(kleur.cyan(`  Email: ${answers.adminEmail}`))
+    console.log(kleur.dim(`  Password: [as entered]`))
+  }
 
-  if (migrationsRan && adminSeeded) {
+  if (migrationsRan && (!seedAdmin || adminSeeded)) {
     console.log()
     console.log(kleur.green('✓ Everything is set up! Just run npm run dev and login.'))
   }
