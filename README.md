@@ -87,6 +87,19 @@ Details of our performance benchmark can be found at SonicJs.com. Here is a part
 7. Visit the Admin UI in your browser:
    [http://localhost:4321](http://localhost:4321)
    ![Admin UI](https://sonicjs.com/images/sonicJs-admin-ui.png)
+## Deployment to Cloudflare
+1. Apply the default database schema to your remote database:
+   ```sh
+   npm run up:prod
+   ```
+2. Upload your environment variables to secret via wrangler
+   ```sh
+   npx wrangler secret bulk .env.production
+   ```
+3. Deploy
+   ```sh
+   npm run deploy:prod
+   ```
 
 ## Need Help?
 1. Reach out on [Disocrd](https://discord.gg/8bMy6bv3sZ)

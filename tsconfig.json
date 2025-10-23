@@ -6,8 +6,6 @@
     "jsxImportSource": "react",
     "module": "es2020",
     "target": "es2017",  // had to change this to "es2017"
-    "include": [".astro/types.d.ts", "**/*"],
-    "exclude": ["dist"],
     "paths": {
       "@services/*": ["./services/*"],
       "@schema/*": ["./db/schema/*"],
@@ -15,5 +13,7 @@
       "@custom/*": ["./custom/*"],
       "@emails/*": ["./emails/*"],
     }
-  }
+  },
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist"],
 }

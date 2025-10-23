@@ -1,8 +1,15 @@
 {
 	"name": "my-sonicjs",
-	"main": "src/index.js",
-	"compatibility_date": "2022-07-12",
-	"workers_dev": false,
+	"main": "./dist/_worker.js/index.js",
+	"compatibility_date": "2025-08-15",
+	"compatibility_flags": ["nodejs_compat"],
+	"assets": {
+		"binding": "ASSETS",
+		"directory": "./dist"
+	},
+	"observability": {
+		"enabled": true
+	},
 	"kv_namespaces": [
 		{
 			"binding": "sonicjs",
