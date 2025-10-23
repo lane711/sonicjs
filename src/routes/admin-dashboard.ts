@@ -228,6 +228,31 @@ router.get('/dashboard/recent-activity', async (c) => {
 })
 
 /**
+ * GET /admin/api/metrics - Real-time metrics for analytics chart
+ * Returns JSON with current requests per second
+ */
+router.get('/api/metrics', async (c) => {
+  try {
+    const { metricsTracker } = await import('@sonicjs-cms/core')
+
+    return c.json({
+      requestsPerSecond: metricsTracker.getRequestsPerSecond(),
+      totalRequests: metricsTracker.getTotalRequests(),
+      averageRPS: metricsTracker.getAverageRPS(),
+      timestamp: new Date().toISOString()
+    })
+  } catch (error) {
+    console.error('Error fetching metrics:', error)
+    return c.json({
+      requestsPerSecond: 0,
+      totalRequests: 0,
+      averageRPS: 0,
+      timestamp: new Date().toISOString()
+    })
+  }
+})
+
+/**
  * GET /admin/dashboard/system-status - System status HTML fragment (HTMX endpoint)
  */
 router.get('/dashboard/system-status', async (c) => {
