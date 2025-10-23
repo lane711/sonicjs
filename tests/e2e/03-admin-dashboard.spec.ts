@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin, navigateToAdminSection } from './utils/test-helpers';
-import packageJson from '../../package.json';
+import corePackageJson from '../../packages/core/package.json';
 
 test.describe('Admin Dashboard', () => {
   test.beforeEach(async ({ page }) => {
@@ -9,7 +9,7 @@ test.describe('Admin Dashboard', () => {
 
   test('should display correct version from package.json', async ({ page }) => {
     // The version should be displayed in the layout (usually in the sidebar or footer)
-    const expectedVersion = `v${packageJson.version}`;
+    const expectedVersion = `v${corePackageJson.version}`;
 
     // Look for the version text anywhere in the page (there may be multiple instances)
     const versionElement = page.getByText(expectedVersion).first();
@@ -90,15 +90,15 @@ test.describe('Admin Dashboard', () => {
     const systemStatusContainer = page.locator('#system-status-container');
     await expect(systemStatusContainer).toBeVisible();
 
-    // Verify status indicators are present
-    const operationalIndicators = page.locator('text=/●\\s*Operational/');
-    await expect(operationalIndicators.first()).toBeVisible({ timeout: 5000 });
+    // Verify status indicators are present (text like "Operational", "Connected", etc.)
+    await expect(page.getByText('Operational', { exact: false })).toBeVisible({ timeout: 5000 });
 
-    // Check for the main system components
-    await expect(page.getByText('Webserver', { exact: false })).toBeVisible();
-    await expect(page.getByText('D1 Database', { exact: false })).toBeVisible();
-    await expect(page.getByText('KV Storage', { exact: false })).toBeVisible();
-    await expect(page.getByText('R2 Storage', { exact: false })).toBeVisible();
+    // Check for the main system components (as they appear in the actual template)
+    // Scope to system status container to avoid conflicts with storage section
+    await expect(systemStatusContainer.getByText('API Status', { exact: false })).toBeVisible();
+    await expect(systemStatusContainer.getByText('Database', { exact: false })).toBeVisible();
+    await expect(systemStatusContainer.getByText('KV Cache', { exact: false })).toBeVisible();
+    await expect(systemStatusContainer.getByText('R2 Storage', { exact: false })).toBeVisible();
   });
 
   test('should navigate to collections page', async ({ page }) => {
@@ -180,7 +180,7 @@ test.describe('Admin Dashboard', () => {
   test('should load recent activity via HTMX endpoint', async ({ page }) => {
     // Intercept the HTMX request to the recent activity endpoint
     const responsePromise = page.waitForResponse(
-      response => response.url().includes('/admin/api/recent-activity') && response.status() === 200,
+      response => response.url().includes('/admin/dashboard/recent-activity') && response.status() === 200,
       { timeout: 10000 }
     );
 

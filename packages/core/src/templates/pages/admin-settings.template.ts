@@ -1,5 +1,5 @@
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
-import { renderConfirmationDialog, getConfirmationDialogScript } from '../layouts/admin-layout-catalyst.template'
+import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
 
 export interface SettingsPageData {
   user?: {
@@ -651,6 +651,21 @@ function renderGeneralSettings(settings?: GeneralSettings): string {
 function renderAppearanceSettings(settings?: AppearanceSettings): string {
   return `
     <div class="space-y-6">
+      <!-- WIP Notice -->
+      <div class="rounded-lg bg-blue-50 dark:bg-blue-950/20 p-6 ring-1 ring-inset ring-blue-600/20 dark:ring-blue-500/30">
+        <div class="flex items-start space-x-3">
+          <svg class="w-6 h-6 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <div class="flex-1">
+            <h4 class="text-base/7 font-semibold text-blue-900 dark:text-blue-300">Work in Progress</h4>
+            <p class="mt-1 text-sm/6 text-blue-700 dark:text-blue-200">
+              This settings section is currently under development and provided for reference and design feedback only. Changes made here will not be saved.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div>
         <h3 class="text-lg font-semibold text-white mb-4">Appearance Settings</h3>
         <p class="text-gray-300 mb-6">Customize the look and feel of your application.</p>
@@ -754,6 +769,21 @@ function renderAppearanceSettings(settings?: AppearanceSettings): string {
 function renderSecuritySettings(settings?: SecuritySettings): string {
   return `
     <div class="space-y-6">
+      <!-- WIP Notice -->
+      <div class="rounded-lg bg-blue-50 dark:bg-blue-950/20 p-6 ring-1 ring-inset ring-blue-600/20 dark:ring-blue-500/30">
+        <div class="flex items-start space-x-3">
+          <svg class="w-6 h-6 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <div class="flex-1">
+            <h4 class="text-base/7 font-semibold text-blue-900 dark:text-blue-300">Work in Progress</h4>
+            <p class="mt-1 text-sm/6 text-blue-700 dark:text-blue-200">
+              This settings section is currently under development and provided for reference and design feedback only. Changes made here will not be saved.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div>
         <h3 class="text-lg font-semibold text-white mb-4">Security Settings</h3>
         <p class="text-gray-300 mb-6">Configure security and authentication settings.</p>
@@ -895,6 +925,21 @@ function renderSecuritySettings(settings?: SecuritySettings): string {
 function renderNotificationSettings(settings?: NotificationSettings): string {
   return `
     <div class="space-y-6">
+      <!-- WIP Notice -->
+      <div class="rounded-lg bg-blue-50 dark:bg-blue-950/20 p-6 ring-1 ring-inset ring-blue-600/20 dark:ring-blue-500/30">
+        <div class="flex items-start space-x-3">
+          <svg class="w-6 h-6 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <div class="flex-1">
+            <h4 class="text-base/7 font-semibold text-blue-900 dark:text-blue-300">Work in Progress</h4>
+            <p class="mt-1 text-sm/6 text-blue-700 dark:text-blue-200">
+              This settings section is currently under development and provided for reference and design feedback only. Changes made here will not be saved.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div>
         <h3 class="text-lg font-semibold text-white mb-4">Notification Settings</h3>
         <p class="text-gray-300 mb-6">Configure how and when you receive notifications.</p>
@@ -1027,6 +1072,21 @@ function renderNotificationSettings(settings?: NotificationSettings): string {
 function renderStorageSettings(settings?: StorageSettings): string {
   return `
     <div class="space-y-6">
+      <!-- WIP Notice -->
+      <div class="rounded-lg bg-blue-50 dark:bg-blue-950/20 p-6 ring-1 ring-inset ring-blue-600/20 dark:ring-blue-500/30">
+        <div class="flex items-start space-x-3">
+          <svg class="w-6 h-6 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <div class="flex-1">
+            <h4 class="text-base/7 font-semibold text-blue-900 dark:text-blue-300">Work in Progress</h4>
+            <p class="mt-1 text-sm/6 text-blue-700 dark:text-blue-200">
+              This settings section is currently under development and provided for reference and design feedback only. Changes made here will not be saved.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div>
         <h3 class="text-lg font-semibold text-white mb-4">Storage Settings</h3>
         <p class="text-gray-300 mb-6">Configure file storage and backup settings.</p>

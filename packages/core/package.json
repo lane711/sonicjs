@@ -1,6 +1,6 @@
 {
   "name": "@sonicjs-cms/core",
-  "version": "2.0.0-beta.3",
+  "version": "2.0.1",
   "description": "Core framework for SonicJS headless CMS - Edge-first, TypeScript-native CMS built for Cloudflare Workers",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -78,7 +78,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sonicjs/sonicjs.git",
+    "url": "git+https://github.com/sonicjs/sonicjs.git",
     "directory": "packages/core"
   },
   "bugs": {
@@ -90,20 +90,6 @@
     "hono": "^4.0.0",
     "drizzle-orm": "^0.44.0",
     "zod": "^3.0.0"
-  },
-  "peerDependenciesMeta": {
-    "@cloudflare/workers-types": {
-      "optional": false
-    },
-    "hono": {
-      "optional": false
-    },
-    "drizzle-orm": {
-      "optional": false
-    },
-    "zod": {
-      "optional": false
-    }
   },
   "dependencies": {
     "drizzle-zod": "^0.8.2",

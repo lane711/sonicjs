@@ -26,6 +26,9 @@ export { adminCheckboxRoutes } from './admin-checkboxes'
 export { default as adminFAQRoutes } from './admin-faq'
 export { default as adminTestimonialsRoutes } from './admin-testimonials'
 export { default as adminCodeExamplesRoutes } from './admin-code-examples'
+export { adminDashboardRoutes } from './admin-dashboard'
+export { adminCollectionsRoutes } from './admin-collections'
+export { adminSettingsRoutes } from './admin-settings'
 
 export const ROUTES_INFO = {
   message: 'Core routes available',
@@ -45,7 +48,10 @@ export const ROUTES_INFO = {
     'adminCheckboxRoutes',
     'adminFAQRoutes',
     'adminTestimonialsRoutes',
-    'adminCodeExamplesRoutes'
+    'adminCodeExamplesRoutes',
+    'adminDashboardRoutes',
+    'adminCollectionsRoutes',
+    'adminSettingsRoutes'
   ],
   status: 'Core package routes ready',
   reference: 'https://github.com/sonicjs/sonicjs'

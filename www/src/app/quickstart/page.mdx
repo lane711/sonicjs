@@ -1,0 +1,202 @@
+export const metadata = {
+  title: 'Quickstart - SonicJS',
+  description:
+    'Get SonicJS up and running in under 60 seconds. Learn how to install, configure, and create your first content.',
+}
+
+export const sections = [
+  { title: 'Prerequisites', id: 'prerequisites' },
+  { title: 'Quick Start', id: 'quick-start' },
+  { title: 'First Steps', id: 'first-steps' },
+  { title: 'Next Steps', id: 'next-steps' },
+]
+
+# Quickstart
+
+Get SonicJS running in under 60 seconds and create your first content-driven application. {{ className: 'lead' }}
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+- **Node.js** (version 18 or higher)
+- **npm** or **pnpm**
+- **Git**
+
+<Note>
+For production deployment, you'll also need a **Cloudflare account** with access to Workers, D1, KV, and R2.
+</Note>
+
+---
+
+## Quick Start
+
+Get SonicJS running locally with these simple commands:
+
+<CodeGroup title="60-Second Setup">
+
+```bash
+# Clone the repository
+git clone https://github.com/lane711/sonicjs.git
+cd sonicjs
+
+# Install dependencies
+npm install
+
+# Run database migrations
+npm run db:migrate
+
+# Start development server
+npm run dev
+
+# Your CMS is now running at http://localhost:8787
+```
+
+</CodeGroup>
+
+Your SonicJS instance will be available at **http://localhost:8787**
+
+<Note>
+Access the admin dashboard at [http://localhost:8787/admin](http://localhost:8787/admin)
+
+Default credentials: `admin@sonicjs.com` / `admin123`
+</Note>
+
+---
+
+## First Steps
+
+### Access the Admin Dashboard
+
+Navigate to **http://localhost:8787/admin** and log in with the default credentials.
+
+The admin interface provides:
+
+- **System Overview** - Real-time health checks and activity feed
+- **Content Management** - Create, edit, and publish content
+- **Media Library** - Upload and manage media files
+- **Plugin Management** - Install and configure plugins
+- **User Management** - Manage users, roles, and permissions
+
+### Create Your First Content
+
+**Via Admin UI:**
+
+1. Navigate to **Content** → **New Content**
+2. Select a collection (e.g., "Blog Posts")
+3. Fill in the fields and click **Save**
+
+**Via API:**
+
+<CodeGroup title="Create Content">
+
+```bash {{ title: 'cURL' }}
+# Get auth token
+curl -X POST http://localhost:8787/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@sonicjs.com","password":"admin123"}'
+
+# Create content
+curl -X POST http://localhost:8787/admin/content \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "collection": "blog_posts",
+    "title": "My First Post",
+    "data": {
+      "slug": "my-first-post",
+      "content": "<p>Hello World!</p>",
+      "status": "published"
+    }
+  }'
+```
+
+```javascript
+// Get auth token
+const authResponse = await fetch('http://localhost:8787/auth/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 'admin@sonicjs.com',
+    password: 'admin123'
+  })
+});
+const { token } = await authResponse.json();
+
+// Create content
+const response = await fetch('http://localhost:8787/admin/content', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+  body: JSON.stringify({
+    collection: 'blog_posts',
+    title: 'My First Post',
+    data: {
+      slug: 'my-first-post',
+      content: '<p>Hello World!</p>',
+      status: 'published'
+    }
+  })
+});
+```
+
+</CodeGroup>
+
+### Fetch Content via API
+
+<CodeGroup title="Fetch Content">
+
+```bash {{ title: 'cURL' }}
+# Get all content
+curl http://localhost:8787/api/content
+
+# Get content by collection
+curl http://localhost:8787/api/collections/blog_posts/content
+
+# Get single content item
+curl http://localhost:8787/api/content/:id
+```
+
+```javascript
+// Get all content
+const response = await fetch('http://localhost:8787/api/content');
+const data = await response.json();
+
+// Get content by collection
+const posts = await fetch('http://localhost:8787/api/collections/blog_posts/content');
+const blogPosts = await posts.json();
+```
+
+</CodeGroup>
+
+---
+
+## Next Steps
+
+Now that you have SonicJS running, explore these guides:
+
+<div className="not-prose">
+  <Button href="/collections" variant="text" arrow="right">
+    <>Define custom collections</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/architecture" variant="text" arrow="right">
+    <>Learn about the architecture</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/api" variant="text" arrow="right">
+    <>Explore the API reference</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/deployment" variant="text" arrow="right">
+    <>Deploy to production</>
+  </Button>
+</div>

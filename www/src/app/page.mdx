@@ -1,0 +1,107 @@
+import { Guides } from '@/components/Guides'
+import { Resources } from '@/components/Resources'
+import { HeroPattern } from '@/components/HeroPattern'
+
+export const metadata = {
+  title: 'SonicJS - AI-Powered Headless CMS',
+  description:
+    'Build content-driven apps at lightning speed. TypeScript-first headless CMS built on Cloudflare Workers with AI integration, edge deployment, and enterprise-grade performance.',
+}
+
+export const sections = [
+  { title: 'Introduction', id: 'introduction' },
+  { title: 'Key Features', id: 'key-features' },
+  { title: 'Quick Start', id: 'quick-start' },
+  { title: 'Resources', id: 'resources' },
+]
+
+<HeroPattern />
+
+# Build Content-Driven Apps at Lightning Speed
+
+The AI-powered headless CMS that turns your content ideas into production-ready applications in minutes, not months. Built by developers, for developers. {{ className: 'lead' }}
+
+<div className="not-prose mt-6 mb-16 flex gap-3">
+  <Button href="/quickstart" arrow="right">
+    <>Get Started</>
+  </Button>
+  <Button href="/architecture" variant="outline">
+    <>Learn More</>
+  </Button>
+</div>
+
+## Stop Wrestling with Complex CMSs {{ anchor: false }}
+
+Tired of bloated content management systems, endless plugin configurations, and slow deployments? **SonicJS eliminates the friction** between your brilliant content strategy and working applications. {{ className: 'lead' }}
+
+<FeatureGrid
+  features={[
+    {
+      icon: '⚡',
+      title: 'Lightning Fast',
+      description: 'Built on Cloudflare Workers for global edge deployment. Your content loads instantly, anywhere in the world.',
+      link: '/architecture'
+    },
+    {
+      icon: '🤖',
+      title: 'AI-Powered',
+      description: 'Intelligent content generation, SEO optimization, and management. Let AI handle the heavy lifting while you focus on building.',
+      link: '/plugins'
+    },
+    {
+      icon: '🎯',
+      title: 'TypeScript First',
+      description: 'Full type safety throughout the stack. No more runtime surprises or missing content fields.',
+      link: '/collections'
+    },
+    {
+      icon: '📱',
+      title: 'API-Driven',
+      description: 'RESTful APIs with OpenAPI documentation. Integrate with any frontend framework or mobile app.',
+      link: '/api'
+    },
+    {
+      icon: '🚀',
+      title: 'Edge Deployment',
+      description: 'Deploy to 300+ cities worldwide with Cloudflare Workers. Zero DevOps, instant scaling.',
+      link: '/deployment'
+    },
+    {
+      icon: '🔒',
+      title: 'Enterprise Ready',
+      description: 'Built-in authentication, RBAC, caching, and security. Production-ready from day one.',
+      link: '/authentication'
+    },
+  ]}
+/>
+
+## Quick Start in 60 Seconds {{ id: 'quick-start' }}
+
+Get SonicJS running locally in under a minute:
+
+```bash {{ title: 'Installation' }}
+# Clone the repository
+git clone https://github.com/lane711/sonicjs.git
+cd sonicjs
+
+# Install dependencies
+npm install
+
+# Run migrations and start dev server
+npm run db:migrate
+npm run dev
+
+# Your CMS is now running at http://localhost:8787
+```
+
+Visit the [Quickstart guide](/quickstart) for detailed instructions and next steps.
+
+<div className="not-prose">
+  <Button href="/quickstart" variant="text" arrow="right">
+    <>Read the quickstart guide</>
+  </Button>
+</div>
+
+<Guides />
+
+<Resources />

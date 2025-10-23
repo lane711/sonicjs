@@ -22,7 +22,7 @@ export function renderLogo(data: LogoData = {}): string {
     variant = 'default',
     showText = true,
     showVersion = true,
-    version = 'v0.1.0',
+    version,
     className = '',
     href
   } = data
@@ -44,7 +44,7 @@ export function renderLogo(data: LogoData = {}): string {
     </svg>
   `
 
-  const versionBadge = showVersion ? `
+  const versionBadge = showVersion && version ? `
     <span class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${
       variant === 'white'
         ? 'bg-white/10 text-white/80 ring-white/20'

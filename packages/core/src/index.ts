@@ -118,6 +118,9 @@ export {
   adminFAQRoutes,
   adminTestimonialsRoutes,
   adminCodeExamplesRoutes,
+  adminDashboardRoutes,
+  adminCollectionsRoutes,
+  adminSettingsRoutes,
 } from './routes'
 
 // Templates - Week 3 (COMPLETED)

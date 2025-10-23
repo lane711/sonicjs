@@ -1,0 +1,546 @@
+export const metadata = {
+  title: 'Architecture - SonicJS',
+  description:
+    'Comprehensive guide to the SonicJS system architecture, covering Cloudflare Workers, request lifecycle, plugin system, caching, and data flow patterns.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Cloudflare Workers', id: 'cloudflare-workers' },
+  { title: 'System Architecture', id: 'system-architecture' },
+  { title: 'Request Lifecycle', id: 'request-lifecycle' },
+  { title: 'Middleware Pipeline', id: 'middleware-pipeline' },
+  { title: 'Plugin System', id: 'plugin-system' },
+  { title: 'Caching Strategy', id: 'caching-strategy' },
+  { title: 'Performance', id: 'performance' },
+]
+
+# Architecture
+
+Comprehensive guide to the SonicJS system architecture, covering the Cloudflare Workers platform, request lifecycle, plugin system, and data flow patterns. {{ className: 'lead' }}
+
+## Overview
+
+SonicJS is a modern, TypeScript-first headless CMS built specifically for Cloudflare's edge platform. It leverages Cloudflare Workers, D1 database, R2 storage, and KV cache to deliver exceptional performance at the edge.
+
+### Key Architectural Principles
+
+- **Edge-First** - Runs entirely on Cloudflare's global edge network
+- **Zero Cold Starts** - V8 isolates provide instant startup
+- **TypeScript-Native** - Fully typed for developer experience
+- **Plugin-Driven** - Extensible through a robust plugin system
+- **Performance-Optimized** - Three-tier caching for sub-millisecond response times
+
+### Technology Stack
+
+<FeatureGrid
+  features={[
+    {
+      icon: '⚡',
+      title: 'Cloudflare Workers',
+      description: 'Serverless execution at the edge with V8 isolates',
+    },
+    {
+      icon: '🗃️',
+      title: 'D1 Database',
+      description: 'SQLite with global replication and Drizzle ORM',
+    },
+    {
+      icon: '📦',
+      title: 'R2 Storage',
+      description: 'S3-compatible object storage for media files',
+    },
+    {
+      icon: '⚡',
+      title: 'KV Cache',
+      description: 'Global key-value store for distributed caching',
+    },
+    {
+      icon: '🎯',
+      title: 'Hono Framework',
+      description: 'Ultra-fast web framework for routing and middleware',
+    },
+    {
+      icon: '🔧',
+      title: 'Drizzle ORM',
+      description: 'Type-safe database queries with automatic migrations',
+    },
+  ]}
+  columns={3}
+/>
+
+---
+
+## Cloudflare Workers
+
+### V8 Isolates Model
+
+SonicJS runs in V8 isolates, providing:
+
+- **Instant startup** (no cold starts)
+- **Memory isolation** between requests
+- **Automatic scaling** to handle traffic spikes
+- **Global distribution** across 300+ locations
+
+<CodeGroup title="Worker Entry Point">
+
+```typescript
+// Worker bindings configuration
+type Bindings = {
+  DB: D1Database          // Cloudflare D1 database
+  KV: KVNamespace         // Key-value cache
+  MEDIA_BUCKET: R2Bucket  // Object storage
+  ASSETS: Fetcher         // Static assets
+  EMAIL_QUEUE?: Queue     // Email queue (optional)
+  ENVIRONMENT?: string    // Environment flag
+}
+
+type Variables = {
+  user?: {
+    userId: string
+    email: string
+    role: string
+    exp: number
+    iat: number
+  }
+  requestId?: string
+  startTime?: number
+}
+
+const app = new Hono<{ Bindings: Bindings; Variables: Variables }>()
+```
+
+</CodeGroup>
+
+### Resource Access Pattern
+
+<CodeGroup title="Accessing Cloudflare Resources">
+
+```typescript
+// Accessing D1, KV, and R2 in routes
+app.get('/api/data', async (c) => {
+  // Access D1 database
+  const db = c.env.DB
+  const result = await db.prepare('SELECT * FROM content').all()
+
+  // Access KV cache
+  const kv = c.env.KV
+  const cached = await kv.get('key', 'json')
+
+  // Access R2 storage
+  const bucket = c.env.MEDIA_BUCKET
+  const file = await bucket.get('image.jpg')
+
+  return c.json(result)
+})
+```
+
+</CodeGroup>
+
+---
+
+## System Architecture
+
+### High-Level Overview
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Cloudflare Edge Network                   │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │              Middleware Pipeline                       │  │
+│  │  Bootstrap → Logging → Auth → Permissions → Plugin    │  │
+│  └───────────────────────────────────────────────────────┘  │
+│                             ↓                                │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │              Route Handler                             │  │
+│  │  API Routes | Admin Routes | Auth Routes | Plugins    │  │
+│  └───────────────────────────────────────────────────────┘  │
+│                             ↓                                │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │              Service Layer                             │  │
+│  │  Cache | Content | Auth | Plugin Services             │  │
+│  └───────────────────────────────────────────────────────┘  │
+│                             ↓                                │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │              Data Layer                                │  │
+│  │  Memory Cache | KV Cache | D1 Database                │  │
+│  └───────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Layer Responsibilities
+
+**1. Middleware Pipeline**
+- Request preprocessing
+- Authentication and authorization
+- Security headers
+- Performance monitoring
+- Logging
+
+**2. Route Handler**
+- Request routing
+- Parameter validation
+- Response formatting
+- Error handling
+
+**3. Service Layer**
+- Business logic
+- Data transformation
+- Cache management
+- External integrations
+
+**4. Data Layer**
+- Data persistence
+- Cache storage
+- Query execution
+
+---
+
+## Request Lifecycle
+
+### Complete Request Flow
+
+1. **Request arrives at Cloudflare edge**
+2. **Bootstrap Middleware** - Run migrations, sync collections, bootstrap plugins
+3. **Logging Middleware** - Generate request ID, record start time
+4. **Security Middleware** - Check suspicious patterns, add security headers
+5. **Authentication Middleware** - Extract JWT, verify token, set user context
+6. **Permission Middleware** - Check user permissions and roles
+7. **Plugin Middleware** - Execute plugin hooks
+8. **Route Handler** - Execute route logic, check cache, process business logic
+9. **Response Processing** - Add cache headers, timing metadata, log metrics
+10. **Return to client**
+
+<CodeGroup title="Middleware Configuration">
+
+```typescript
+// Application middleware setup
+app.use('*', bootstrapMiddleware())
+app.use('*', loggingMiddleware())
+app.use('*', securityLoggingMiddleware())
+app.use('*', logger())
+app.use('*', cors())
+app.use('*', securityHeaders())
+
+// Route-specific middleware
+app.use('/admin/*', async (c, next) => {
+  return await requireAuth()(c, next)
+})
+app.use('/admin/*', requireRole(['admin', 'editor']))
+
+// Routes
+app.route('/api', apiRoutes)
+app.route('/admin', adminRoutes)
+app.route('/auth', authRoutes)
+```
+
+</CodeGroup>
+
+---
+
+## Middleware Pipeline
+
+### Execution Order
+
+1. **Bootstrap** (Priority: 0) - System initialization
+2. **Logging** (Priority: 1) - Request tracking
+3. **Security** (Priority: 2) - Headers, validation
+4. **CORS** (Priority: 3) - Cross-origin
+5. **Authentication** (Priority: 10) - JWT verification
+6. **Authorization** (Priority: 11) - Permission checks
+7. **Plugin Middleware** (Priority: 50+) - Custom logic
+8. **Route Handler** (Priority: 100)
+
+### Bootstrap Middleware
+
+Ensures system initialization on first request:
+
+<CodeGroup title="Bootstrap Process">
+
+```typescript
+export function bootstrapMiddleware() {
+  return async (c: Context<{ Bindings: Bindings }>, next: Next) => {
+    if (bootstrapComplete) {
+      return next()
+    }
+
+    try {
+      // 1. Run database migrations
+      const migrationService = new MigrationService(c.env.DB)
+      await migrationService.runPendingMigrations()
+
+      // 2. Sync collection configurations
+      await syncCollections(c.env.DB)
+
+      // 3. Bootstrap core plugins
+      const bootstrapService = new PluginBootstrapService(c.env.DB)
+      if (await bootstrapService.isBootstrapNeeded()) {
+        await bootstrapService.bootstrapCorePlugins()
+        await bootstrapService.installDemoPlugins()
+      }
+
+      bootstrapComplete = true
+    } catch (error) {
+      console.error('[Bootstrap] Error:', error)
+    }
+
+    return next()
+  }
+}
+```
+
+</CodeGroup>
+
+### Authentication Middleware
+
+JWT-based authentication with KV caching:
+
+<CodeGroup title="Auth Middleware">
+
+```typescript
+export const requireAuth = () => {
+  return async (c: Context, next: Next) => {
+    // Get token from header or cookie
+    let token = c.req.header('Authorization')?.replace('Bearer ', '')
+    if (!token) {
+      token = getCookie(c, 'auth_token')
+    }
+
+    if (!token) {
+      return c.json({ error: 'Authentication required' }, 401)
+    }
+
+    // Try KV cache first (5-minute TTL)
+    const kv = c.env?.KV
+    let payload: JWTPayload | null = null
+
+    if (kv) {
+      const cacheKey = `auth:${token.substring(0, 20)}`
+      const cached = await kv.get(cacheKey, 'json')
+      if (cached) {
+        payload = cached as JWTPayload
+      }
+    }
+
+    // Verify token if not cached
+    if (!payload) {
+      payload = await AuthManager.verifyToken(token)
+
+      // Cache for 5 minutes
+      if (payload && kv) {
+        await kv.put(cacheKey, JSON.stringify(payload), {
+          expirationTtl: 300
+        })
+      }
+    }
+
+    if (!payload) {
+      return c.json({ error: 'Invalid or expired token' }, 401)
+    }
+
+    c.set('user', payload)
+    return await next()
+  }
+}
+```
+
+</CodeGroup>
+
+---
+
+## Plugin System
+
+### Architecture
+
+SonicJS features a powerful plugin architecture:
+
+**Core Components:**
+
+- **Plugin Registry** - Registers and manages plugins
+- **Hook System** - Event-driven architecture with priority-based execution
+- **Plugin Manager** - Orchestrates plugin lifecycle
+
+**Plugin Types:**
+
+- **Core Plugins** (auto-installed): auth, media, cache, database-tools, seed-data
+- **Demo Plugins** (optional): workflow, FAQ, demo-login
+- **Custom Plugins** - Your own extensions
+
+<CodeGroup title="Plugin Lifecycle">
+
+```typescript
+// Plugin lifecycle
+install() -> activate() -> [running] -> deactivate() -> uninstall()
+
+// Hook registration
+export class HookSystemImpl implements HookSystem {
+  register(hookName: string, handler: HookHandler, priority: number = 10): void {
+    if (!this.hooks.has(hookName)) {
+      this.hooks.set(hookName, [])
+    }
+
+    const hooks = this.hooks.get(hookName)!
+    const hook: PluginHook = { name: hookName, handler, priority }
+
+    // Insert in priority order
+    const insertIndex = hooks.findIndex(h => h.priority! > priority)
+    if (insertIndex === -1) {
+      hooks.push(hook)
+    } else {
+      hooks.splice(insertIndex, 0, hook)
+    }
+  }
+
+  async execute(hookName: string, data: any, context?: any): Promise<any> {
+    const hooks = this.hooks.get(hookName)
+    if (!hooks || hooks.length === 0) {
+      return data
+    }
+
+    let result = data
+    for (const hook of hooks) {
+      result = await hook.handler(result, context)
+    }
+    return result
+  }
+}
+```
+
+</CodeGroup>
+
+---
+
+## Caching Strategy
+
+### Three-Tiered System
+
+SonicJS implements intelligent caching across three tiers:
+
+**Tier 1: In-Memory Cache**
+- Fastest access (< 1ms)
+- 50MB size limit per worker
+- LRU eviction policy
+
+**Tier 2: Cloudflare KV**
+- Global distribution
+- Eventually consistent
+- 5-60 minute TTLs
+
+**Tier 3: D1 Database**
+- Source of truth
+- Strong consistency
+- Full query capabilities
+
+### Cache Flow
+
+```
+Request
+   ↓
+Memory Cache? ──Yes──→ Return (< 1ms)
+   ↓ No
+KV Cache? ──Yes──→ Populate Memory → Return (10-50ms)
+   ↓ No
+Database ──→ Populate KV → Populate Memory → Return (100-200ms)
+```
+
+<CodeGroup title="Cache Service">
+
+```typescript
+export class CacheService {
+  async get<T>(key: string): Promise<T | null> {
+    this.stats.totalRequests++
+
+    // Try memory cache first (Tier 1)
+    if (this.config.memoryEnabled) {
+      const memoryValue = this.memoryCache.get<T>(key)
+      if (memoryValue !== null) {
+        this.stats.memoryHits++
+        return memoryValue
+      }
+      this.stats.memoryMisses++
+    }
+
+    // Try KV cache (Tier 2)
+    if (this.config.kvEnabled && this.kvNamespace) {
+      const kvValue = await this.kvNamespace.get(key, 'json')
+      if (kvValue !== null) {
+        this.stats.kvHits++
+
+        // Populate memory cache
+        if (this.config.memoryEnabled) {
+          this.memoryCache.set(key, kvValue as T, this.config.ttl)
+        }
+
+        return kvValue as T
+      }
+      this.stats.kvMisses++
+    }
+
+    return null
+  }
+
+  async set<T>(key: string, value: T): Promise<void> {
+    // Store in memory (Tier 1)
+    if (this.config.memoryEnabled) {
+      this.memoryCache.set(key, value, this.config.ttl)
+    }
+
+    // Store in KV (Tier 2)
+    if (this.config.kvEnabled && this.kvNamespace) {
+      await this.kvNamespace.put(key, JSON.stringify(value), {
+        expirationTtl: this.config.ttl
+      })
+    }
+  }
+}
+```
+
+</CodeGroup>
+
+---
+
+## Performance
+
+### Edge Performance Metrics
+
+- **First request (cold)**: 50-100ms
+- **Cached request (memory)**: 1-5ms
+- **Cached request (KV)**: 10-50ms
+- **Database query**: 100-200ms
+
+### Optimization Strategies
+
+1. **Cache Aggressively** - Use three-tier caching for all frequently accessed data
+2. **Minimize Database Queries** - Batch operations when possible
+3. **Use KV for Authentication** - Cache JWT verification results
+4. **Optimize Middleware Order** - Fast checks first (auth cache before DB)
+5. **Lazy Load Plugins** - Only load plugins when needed
+
+<Callout type="tip" title="Performance Best Practices">
+- Enable all three cache tiers for maximum performance
+- Set appropriate TTLs based on data volatility
+- Use pagination for large datasets
+- Implement proper cache invalidation strategies
+</Callout>
+
+---
+
+## Next Steps
+
+<div className="not-prose">
+  <Button href="/caching" variant="text" arrow="right">
+    <>Learn about the caching system</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/plugins" variant="text" arrow="right">
+    <>Explore the plugin system</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/database" variant="text" arrow="right">
+    <>Read the database documentation</>
+  </Button>
+</div>

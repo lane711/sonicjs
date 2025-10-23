@@ -20,16 +20,13 @@ import {
   adminCheckboxRoutes,
   adminFAQRoutes,
   adminTestimonialsRoutes,
-  adminCodeExamplesRoutes
+  adminCodeExamplesRoutes,
+  adminDashboardRoutes,
+  adminCollectionsRoutes,
+  adminSettingsRoutes
 } from '@sonicjs-cms/core'
 // Design plugin routes
 import { designRoutes } from './plugins/design/routes'
-// Collections routes (monolith-specific, will be migrated to core later)
-import { adminCollectionsRoutes } from './routes/admin-collections'
-// Settings routes (monolith-specific, will be migrated to core later)
-import { adminSettingsRoutes } from './routes/admin-settings'
-// Dashboard route (monolith-specific)
-import { adminDashboardRoutes } from './routes/admin-dashboard'
 // Hello World plugin
 import { helloWorldPlugin } from './plugins/core-plugins/hello-world-plugin'
 // Workflow routes are loaded dynamically through plugin system
@@ -201,16 +198,16 @@ app.use('/admin/*', requireRole(['admin', 'editor']))
 // Add caching for admin pages (60 second cache)
 app.use('/admin/*', cacheHeaders(60))
 app.route('/admin/api', adminApiRoutes as any) // Admin API endpoints for collections, fields, etc.
-app.route('/admin', adminDashboardRoutes) // Admin dashboard (must be before other /admin routes to catch root)
+app.route('/admin', adminDashboardRoutes as any) // Admin dashboard (must be before other /admin routes to catch root)
 app.route('/admin', adminUsersRoutes as any) // User profile, user management, activity logs
 app.route('/admin/media', adminMediaRoutes as any)
 app.route('/admin/content', adminContentRoutes as any)
 app.route('/admin/plugins', adminPluginRoutes as any)
 app.route('/admin/logs', adminLogsRoutes as any)
-// Collections routes (monolith-specific until templates are migrated to core)
-app.route('/admin', adminCollectionsRoutes)
-// Settings routes (monolith-specific)
-app.route('/admin', adminSettingsRoutes)
+// Collections routes (from core)
+app.route('/admin', adminCollectionsRoutes as any)
+// Settings routes (from core)
+app.route('/admin', adminSettingsRoutes as any)
 // FAQ routes with plugin activation check (from core)
 app.use('/admin/faq/*', requireActivePlugin('faq'))
 app.route('/admin/faq', adminFAQRoutes as any)

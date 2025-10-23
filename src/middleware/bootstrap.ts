@@ -1,7 +1,5 @@
 import { Context, Next } from "hono";
-import { syncCollections } from "../services/collection-sync";
-import { MigrationService } from "@sonicjs-cms/core";
-import { PluginBootstrapService } from "@sonicjs-cms/core";
+import { syncCollections, MigrationService, PluginBootstrapService } from "@sonicjs-cms/core";
 
 type Bindings = {
   DB: D1Database;

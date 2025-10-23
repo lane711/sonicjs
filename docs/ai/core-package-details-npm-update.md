@@ -187,10 +187,12 @@ my-sonicjs-site/
 All plugins are included in the core package:
 
 ### Core Plugins
+
 - Database tools plugin
 - Seed data plugin
 
 ### Optional Plugins (included but opt-in)
+
 - Workflow automation plugin
 - Three-tier caching plugin
 - FAQ management plugin

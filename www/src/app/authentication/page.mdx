@@ -1,0 +1,228 @@
+export const metadata = {
+  title: 'Authentication - SonicJS',
+  description:
+    'Secure your SonicJS application with JWT authentication, role-based access control, and user management.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'JWT Authentication', id: 'jwt-authentication' },
+  { title: 'User Management', id: 'user-management' },
+  { title: 'RBAC', id: 'rbac' },
+  { title: 'API Usage', id: 'api-usage' },
+]
+
+# Authentication
+
+Secure your SonicJS application with JWT authentication and role-based access control. {{ className: 'lead' }}
+
+## Overview
+
+SonicJS uses JWT (JSON Web Tokens) for authentication with:
+
+- **24-hour token expiration**
+- **HTTP-only cookie storage** for web clients
+- **Bearer token support** for API clients
+- **KV-based token caching** (5-minute TTL)
+- **Role-based access control** (RBAC)
+- **Permission system** for fine-grained access
+
+<FeatureGrid
+  features={[
+    {
+      icon: '🔐',
+      title: 'JWT Tokens',
+      description: 'Secure, stateless authentication with automatic expiration',
+    },
+    {
+      icon: '👥',
+      title: 'User Roles',
+      description: 'Admin, Editor, Author, and Viewer roles with different permissions',
+    },
+    {
+      icon: '⚡',
+      title: 'Fast Verification',
+      description: 'KV cache for sub-millisecond token verification',
+    },
+    {
+      icon: '🔒',
+      title: 'Secure by Default',
+      description: 'HTTP-only cookies, CSRF protection, and rate limiting',
+    },
+  ]}
+  columns={2}
+/>
+
+---
+
+## JWT Authentication
+
+### Login
+
+<ApiEndpoint method="POST" path="/auth/login" description="Authenticate user and receive JWT token" auth={false} />
+
+<CodeGroup title="Login Request">
+
+```bash {{title:'cURL'}}
+curl -X POST http://localhost:8787/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@sonicjs.com",
+    "password": "admin123"
+  }'
+```
+
+```javascript
+const response = await fetch('http://localhost:8787/auth/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 'admin@sonicjs.com',
+    password: 'admin123'
+  })
+});
+
+const { user, token } = await response.json();
+```
+
+</CodeGroup>
+
+**Response (200 OK):**
+
+```json
+{
+  "user": {
+    "id": "admin-user-id",
+    "email": "admin@sonicjs.com",
+    "username": "admin",
+    "firstName": "Admin",
+    "lastName": "User",
+    "role": "admin"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+### Using the Token
+
+Include the token in the Authorization header for authenticated requests:
+
+<CodeGroup title="Authenticated Request">
+
+```bash {{title:'cURL'}}
+curl http://localhost:8787/admin/content \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+```javascript
+const response = await fetch('http://localhost:8787/admin/content', {
+  headers: {
+    'Authorization': `Bearer ${token}`
+  }
+});
+```
+
+</CodeGroup>
+
+For browser-based applications, the token is automatically stored as an HTTP-only cookie named `auth_token`.
+
+---
+
+## User Management
+
+### User Registration
+
+<ApiEndpoint method="POST" path="/auth/register" description="Create new user account" auth={false} />
+
+<CodeGroup title="Register User">
+
+```bash {{title:'cURL'}}
+curl -X POST http://localhost:8787/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "securepassword123",
+    "username": "newuser",
+    "firstName": "John",
+    "lastName": "Doe"
+  }'
+```
+
+```javascript
+const response = await fetch('http://localhost:8787/auth/register', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 'user@example.com',
+    password: 'securepassword123',
+    username: 'newuser',
+    firstName: 'John',
+    lastName: 'Doe'
+  })
+});
+
+const { user, token } = await response.json();
+```
+
+</CodeGroup>
+
+---
+
+## RBAC
+
+### User Roles
+
+SonicJS supports four built-in roles:
+
+<Properties>
+  <Property name="admin" type="string">
+    Full system access. Can manage users, content, settings, and plugins.
+  </Property>
+  <Property name="editor" type="string">
+    Content management. Can create, edit, publish, and delete content.
+  </Property>
+  <Property name="author" type="string">
+    Content creation. Can create and edit own content, but not publish.
+  </Property>
+  <Property name="viewer" type="string">
+    Read-only access. Can view content but not modify.
+  </Property>
+</Properties>
+
+### Middleware
+
+Protect routes with authentication and role-based middleware:
+
+<CodeGroup title="Middleware Protection">
+
+```typescript
+// Require authentication
+app.use('/admin/*', requireAuth())
+
+// Require specific role
+app.use('/admin/*', requireRole(['admin', 'editor']))
+
+// Require permission
+app.use('/admin/settings/*', requirePermission('manage:settings'))
+
+// Optional authentication
+app.use('/api/*', optionalAuth())
+```
+
+</CodeGroup>
+
+---
+
+## Next Steps
+
+<div className="not-prose">
+  <Button href="/api" variant="text" arrow="right">
+    <>Explore the full API reference</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/deployment" variant="text" arrow="right">
+    <>Deploy to production</>
+  </Button>
+</div>
