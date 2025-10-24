@@ -1,6 +1,7 @@
 'use strict';
 
 var chunkLEG4KNFP_cjs = require('./chunk-LEG4KNFP.cjs');
+var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 var jwt = require('hono/jwt');
 var cookie = require('hono/cookie');
 
@@ -168,6 +169,17 @@ var optionalAuth = () => {
   };
 };
 
+// src/middleware/metrics.ts
+var metricsMiddleware = () => {
+  return async (c, next) => {
+    const path = new URL(c.req.url).pathname;
+    if (path !== "/admin/dashboard/api/metrics") {
+      chunkRCQ2HIQD_cjs.metricsTracker.recordRequest();
+    }
+    await next();
+  };
+};
+
 // src/middleware/index.ts
 var loggingMiddleware = () => {
 };
@@ -209,6 +221,7 @@ exports.getActivePlugins = getActivePlugins;
 exports.isPluginActive = isPluginActive;
 exports.logActivity = logActivity;
 exports.loggingMiddleware = loggingMiddleware;
+exports.metricsMiddleware = metricsMiddleware;
 exports.optionalAuth = optionalAuth;
 exports.performanceLoggingMiddleware = performanceLoggingMiddleware;
 exports.requireActivePlugin = requireActivePlugin;
@@ -219,5 +232,5 @@ exports.requirePermission = requirePermission;
 exports.requireRole = requireRole;
 exports.securityHeaders = securityHeaders;
 exports.securityLoggingMiddleware = securityLoggingMiddleware;
-//# sourceMappingURL=chunk-SYQBA562.cjs.map
-//# sourceMappingURL=chunk-SYQBA562.cjs.map
+//# sourceMappingURL=chunk-4BJGEGX5.cjs.map
+//# sourceMappingURL=chunk-4BJGEGX5.cjs.map

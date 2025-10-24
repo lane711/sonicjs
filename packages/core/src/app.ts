@@ -24,6 +24,7 @@ import {
 } from './routes'
 import { getCoreVersion } from './utils/version'
 import { bootstrapMiddleware } from './middleware/bootstrap'
+import { metricsMiddleware } from './middleware/metrics'
 
 // ============================================================================
 // Type Definitions
@@ -128,6 +129,9 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
     c.set('appVersion', appVersion)
     await next()
   })
+
+  // Metrics middleware - track all requests for real-time analytics
+  app.use('*', metricsMiddleware())
 
   // Bootstrap middleware - runs migrations, syncs collections, and initializes plugins
   app.use('*', bootstrapMiddleware())

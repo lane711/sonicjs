@@ -10,6 +10,7 @@ import {
   type ActivityItem
 } from '../templates/pages/admin-dashboard.template'
 import { getCoreVersion } from '../utils/version'
+import { metricsTracker } from '../utils/metrics'
 
 const VERSION = getCoreVersion()
 
@@ -231,15 +232,13 @@ router.get('/recent-activity', async (c) => {
 
 /**
  * GET /admin/api/metrics - Real-time metrics for analytics chart
- * Returns JSON with current requests per second
- * TODO: Implement metrics tracker
+ * Returns JSON with current requests per second from the metrics tracker
  */
 router.get('/api/metrics', async (c) => {
-  // Metrics tracker not yet implemented
   return c.json({
-    requestsPerSecond: 0,
-    totalRequests: 0,
-    averageRPS: 0,
+    requestsPerSecond: metricsTracker.getRequestsPerSecond(),
+    totalRequests: metricsTracker.getTotalRequests(),
+    averageRPS: Number(metricsTracker.getAverageRPS().toFixed(2)),
     timestamp: new Date().toISOString()
   })
 })

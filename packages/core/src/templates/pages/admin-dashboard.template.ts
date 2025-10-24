@@ -437,9 +437,12 @@ function renderAnalyticsChart(): string {
 
         // Listen for metrics updates from HTMX
         window.addEventListener('htmx:afterRequest', function(event) {
+          console.log('[Dashboard] HTMX request completed:', event.detail.pathInfo.requestPath);
+
           if (event.detail.pathInfo.requestPath === '/admin/dashboard/api/metrics') {
             try {
               const metrics = JSON.parse(event.detail.xhr.responseText);
+              console.log('[Dashboard] Metrics received:', metrics);
 
               // Update current RPS display
               const rpsElement = document.getElementById('current-rps');
@@ -460,8 +463,9 @@ function renderAnalyticsChart(): string {
               chart.data.labels = newLabels;
 
               chart.update('none'); // Update without animation for smoother real-time updates
+              console.log('[Dashboard] Chart updated with RPS:', metrics.requestsPerSecond);
             } catch (e) {
-              console.error('Error updating metrics:', e);
+              console.error('[Dashboard] Error updating metrics:', e);
             }
           }
         });

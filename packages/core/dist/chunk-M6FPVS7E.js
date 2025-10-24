@@ -1,4 +1,5 @@
 import { MigrationService, syncCollections, PluginBootstrapService } from './chunk-CDBVZEWR.js';
+import { metricsTracker } from './chunk-FICTAGD4.js';
 import { sign, verify } from 'hono/jwt';
 import { getCookie } from 'hono/cookie';
 
@@ -166,6 +167,17 @@ var optionalAuth = () => {
   };
 };
 
+// src/middleware/metrics.ts
+var metricsMiddleware = () => {
+  return async (c, next) => {
+    const path = new URL(c.req.url).pathname;
+    if (path !== "/admin/dashboard/api/metrics") {
+      metricsTracker.recordRequest();
+    }
+    await next();
+  };
+};
+
 // src/middleware/index.ts
 var loggingMiddleware = () => {
 };
@@ -197,6 +209,6 @@ var getActivePlugins = () => {
 var isPluginActive = () => {
 };
 
-export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware };
-//# sourceMappingURL=chunk-4OEAHT4Q.js.map
-//# sourceMappingURL=chunk-4OEAHT4Q.js.map
+export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, metricsMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware };
+//# sourceMappingURL=chunk-M6FPVS7E.js.map
+//# sourceMappingURL=chunk-M6FPVS7E.js.map
