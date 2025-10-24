@@ -410,10 +410,11 @@ userRoutes.post('/profile/password', async (c) => {
 })
 
 /**
- * GET /admin/users - List all users (requires users.read permission)
+ * GET /admin/users - List all users
  * Returns HTML for browser requests and JSON for API requests
+ * Note: Already protected by requireAuth() and requireRole(['admin', 'editor'])
  */
-userRoutes.get('/users', requirePermission('users.read'), async (c) => {
+userRoutes.get('/users', async (c) => {
   const db = c.env.DB
   const user = c.get('user')
 
@@ -558,9 +559,9 @@ userRoutes.get('/users', requirePermission('users.read'), async (c) => {
 })
 
 /**
- * GET /admin/users/new - Show new user creation page (requires users.create permission)
+ * GET /admin/users/new - Show new user creation page
  */
-userRoutes.get('/users/new', requirePermission('users.create'), async (c) => {
+userRoutes.get('/users/new', async (c) => {
   const user = c.get('user')
 
   try {
@@ -586,9 +587,9 @@ userRoutes.get('/users/new', requirePermission('users.create'), async (c) => {
 })
 
 /**
- * POST /admin/users/new - Create new user (requires users.create permission)
+ * POST /admin/users/new - Create new user
  */
-userRoutes.post('/users/new', requirePermission('users.create'), async (c) => {
+userRoutes.post('/users/new', async (c) => {
   const db = c.env.DB
   const user = c.get('user')
 
@@ -699,10 +700,10 @@ userRoutes.post('/users/new', requirePermission('users.create'), async (c) => {
 })
 
 /**
- * GET /admin/users/:id - Get user by ID (requires users.read permission)
+ * GET /admin/users/:id - Get user by ID
  * Note: This endpoint returns users regardless of is_active status for admin purposes
  */
-userRoutes.get('/users/:id', requirePermission('users.read'), async (c) => {
+userRoutes.get('/users/:id', async (c) => {
   // Check if this is actually the edit route
   if (c.req.path.endsWith('/edit')) {
     return c.notFound()
@@ -761,9 +762,9 @@ userRoutes.get('/users/:id', requirePermission('users.read'), async (c) => {
 })
 
 /**
- * GET /admin/users/:id/edit - Show user edit page (requires users.update permission)
+ * GET /admin/users/:id/edit - Show user edit page
  */
-userRoutes.get('/users/:id/edit', requirePermission('users.update'), async (c) => {
+userRoutes.get('/users/:id/edit', async (c) => {
   const db = c.env.DB
   const user = c.get('user')
   const userId = c.req.param('id')
@@ -828,9 +829,9 @@ userRoutes.get('/users/:id/edit', requirePermission('users.update'), async (c) =
 })
 
 /**
- * PUT /admin/users/:id - Update user (requires users.update permission)
+ * PUT /admin/users/:id - Update user
  */
-userRoutes.put('/users/:id', requirePermission('users.update'), async (c) => {
+userRoutes.put('/users/:id', async (c) => {
   const db = c.env.DB
   const user = c.get('user')
   const userId = c.req.param('id')
@@ -923,9 +924,9 @@ userRoutes.put('/users/:id', requirePermission('users.update'), async (c) => {
 })
 
 /**
- * DELETE /admin/users/:id - Delete user (requires users.delete permission)
+ * DELETE /admin/users/:id - Delete user
  */
-userRoutes.delete('/users/:id', requirePermission('users.delete'), async (c) => {
+userRoutes.delete('/users/:id', async (c) => {
   const db = c.env.DB
   const user = c.get('user')
   const userId = c.req.param('id')
@@ -997,9 +998,9 @@ userRoutes.delete('/users/:id', requirePermission('users.delete'), async (c) => 
 })
 
 /**
- * POST /admin/invite-user - Invite a new user (requires users.create permission)
+ * POST /admin/invite-user - Invite a new user
  */
-userRoutes.post('/invite-user', requirePermission('users.create'), async (c) => {
+userRoutes.post('/invite-user', async (c) => {
   const db = c.env.DB
   const user = c.get('user')
 
@@ -1085,9 +1086,9 @@ userRoutes.post('/invite-user', requirePermission('users.create'), async (c) => 
 })
 
 /**
- * POST /admin/resend-invitation/:id - Resend invitation (requires users.create permission)
+ * POST /admin/resend-invitation/:id - Resend invitation
  */
-userRoutes.post('/resend-invitation/:id', requirePermission('users.create'), async (c) => {
+userRoutes.post('/resend-invitation/:id', async (c) => {
   const db = c.env.DB
   const user = c.get('user')
   const userId = c.req.param('id')
@@ -1148,9 +1149,9 @@ userRoutes.post('/resend-invitation/:id', requirePermission('users.create'), asy
 })
 
 /**
- * DELETE /admin/cancel-invitation/:id - Cancel invitation (requires users.delete permission)
+ * DELETE /admin/cancel-invitation/:id - Cancel invitation
  */
-userRoutes.delete('/cancel-invitation/:id', requirePermission('users.delete'), async (c) => {
+userRoutes.delete('/cancel-invitation/:id', async (c) => {
   const db = c.env.DB
   const user = c.get('user')
   const userId = c.req.param('id')
@@ -1191,9 +1192,9 @@ userRoutes.delete('/cancel-invitation/:id', requirePermission('users.delete'), a
 })
 
 /**
- * GET /admin/activity-logs - View activity logs (requires activity.read permission)
+ * GET /admin/activity-logs - View activity logs
  */
-userRoutes.get('/activity-logs', requirePermission('activity.read'), async (c) => {
+userRoutes.get('/activity-logs', async (c) => {
   const db = c.env.DB
   const user = c.get('user')
 
@@ -1321,9 +1322,9 @@ userRoutes.get('/activity-logs', requirePermission('activity.read'), async (c) =
 })
 
 /**
- * GET /admin/activity-logs/export - Export activity logs to CSV (requires activity.read permission)
+ * GET /admin/activity-logs/export - Export activity logs to CSV
  */
-userRoutes.get('/activity-logs/export', requirePermission('activity.read'), async (c) => {
+userRoutes.get('/activity-logs/export', async (c) => {
   const db = c.env.DB
   const user = c.get('user')
 
