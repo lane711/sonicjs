@@ -1,14 +1,15 @@
-import { api_default, api_media_default, api_system_default, admin_api_default, admin_content_default, adminMediaRoutes, adminPluginRoutes, adminLogsRoutes, userRoutes, auth_default } from './chunk-KD6FMRJE.js';
-export { ROUTES_INFO, admin_api_default as adminApiRoutes, adminCheckboxRoutes, admin_code_examples_default as adminCodeExamplesRoutes, adminCollectionsRoutes, admin_content_default as adminContentRoutes, router as adminDashboardRoutes, adminDesignRoutes, admin_faq_default as adminFAQRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_testimonials_default as adminTestimonialsRoutes, userRoutes as adminUsersRoutes, api_content_crud_default as apiContentCrudRoutes, api_media_default as apiMediaRoutes, api_default as apiRoutes, api_system_default as apiSystemRoutes, auth_default as authRoutes } from './chunk-KD6FMRJE.js';
+import { api_default, api_media_default, api_system_default, admin_api_default, router, adminCollectionsRoutes, adminSettingsRoutes, admin_content_default, adminMediaRoutes, adminPluginRoutes, adminLogsRoutes, userRoutes, auth_default } from './chunk-GNP4WP7N.js';
+export { ROUTES_INFO, admin_api_default as adminApiRoutes, adminCheckboxRoutes, admin_code_examples_default as adminCodeExamplesRoutes, adminCollectionsRoutes, admin_content_default as adminContentRoutes, router as adminDashboardRoutes, adminDesignRoutes, admin_faq_default as adminFAQRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_testimonials_default as adminTestimonialsRoutes, userRoutes as adminUsersRoutes, api_content_crud_default as apiContentCrudRoutes, api_media_default as apiMediaRoutes, api_default as apiRoutes, api_system_default as apiSystemRoutes, auth_default as authRoutes } from './chunk-GNP4WP7N.js';
 import { schema_exports } from './chunk-LH4Z7QID.js';
 export { Logger, apiTokens, collections, content, contentVersions, getLogger, initLogger, insertCollectionSchema, insertContentSchema, insertLogConfigSchema, insertMediaSchema, insertPluginActivityLogSchema, insertPluginAssetSchema, insertPluginHookSchema, insertPluginRouteSchema, insertPluginSchema, insertSystemLogSchema, insertUserSchema, insertWorkflowHistorySchema, logConfig, media, pluginActivityLog, pluginAssets, pluginHooks, pluginRoutes, plugins, selectCollectionSchema, selectContentSchema, selectLogConfigSchema, selectMediaSchema, selectPluginActivityLogSchema, selectPluginAssetSchema, selectPluginHookSchema, selectPluginRouteSchema, selectPluginSchema, selectSystemLogSchema, selectUserSchema, selectWorkflowHistorySchema, systemLogs, users, workflowHistory } from './chunk-LH4Z7QID.js';
-export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware } from './chunk-TY3NHEBN.js';
+import { bootstrapMiddleware } from './chunk-4OEAHT4Q.js';
+export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware } from './chunk-4OEAHT4Q.js';
 export { MigrationService, PluginBootstrapService, PluginService as PluginServiceClass, cleanupRemovedCollections, fullCollectionSync, getAvailableCollectionNames, getManagedCollections, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, syncCollection, syncCollections, validateCollectionConfig } from './chunk-CDBVZEWR.js';
 export { renderFilterBar } from './chunk-P2PTTBO5.js';
 export { getConfirmationDialogScript, renderAlert, renderConfirmationDialog, renderForm, renderFormField, renderPagination, renderTable } from './chunk-O46XKBFM.js';
 export { HookSystemImpl, HookUtils, PluginManager as PluginManagerClass, PluginRegistryImpl, PluginValidator as PluginValidatorClass, ScopedHookSystem as ScopedHookSystemClass } from './chunk-EAELJXRV.js';
-import { getCoreVersion } from './chunk-OL2OE3VJ.js';
-export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, metricsTracker, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer } from './chunk-OL2OE3VJ.js';
+import { getCoreVersion } from './chunk-D4YC6G5B.js';
+export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, metricsTracker, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer } from './chunk-D4YC6G5B.js';
 export { HOOKS } from './chunk-LOUJRBXV.js';
 import './chunk-V4OQ3NZ2.js';
 import { Hono } from 'hono';
@@ -22,9 +23,7 @@ function createSonicJSApp(config = {}) {
     c.set("appVersion", appVersion);
     await next();
   });
-  app.use("*", async (_c, next) => {
-    await next();
-  });
+  app.use("*", bootstrapMiddleware());
   if (config.middleware?.beforeAuth) {
     for (const middleware of config.middleware.beforeAuth) {
       app.use("*", middleware);
@@ -45,6 +44,9 @@ function createSonicJSApp(config = {}) {
   app.route("/api/media", api_media_default);
   app.route("/api/system", api_system_default);
   app.route("/admin/api", admin_api_default);
+  app.route("/admin/dashboard", router);
+  app.route("/admin/collections", adminCollectionsRoutes);
+  app.route("/admin/settings", adminSettingsRoutes);
   app.route("/admin/content", admin_content_default);
   app.route("/admin/media", adminMediaRoutes);
   app.route("/admin/plugins", adminPluginRoutes);

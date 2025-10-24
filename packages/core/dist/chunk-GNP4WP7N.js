@@ -1,8 +1,8 @@
 import { getCacheService, CACHE_CONFIGS, getLogger } from './chunk-LH4Z7QID.js';
-import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity, requirePermission } from './chunk-TY3NHEBN.js';
+import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity, requirePermission } from './chunk-4OEAHT4Q.js';
 import { PluginService, MigrationService } from './chunk-CDBVZEWR.js';
 import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderFAQList, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-O46XKBFM.js';
-import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-OL2OE3VJ.js';
+import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-D4YC6G5B.js';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { z } from 'zod';
@@ -7653,6 +7653,9 @@ function renderUsersListPage(data) {
 // src/routes/admin-users.ts
 var userRoutes = new Hono();
 userRoutes.use("*", requireAuth());
+userRoutes.get("/", (c) => {
+  return c.redirect("/admin/dashboard");
+});
 var TIMEZONES = [
   { value: "UTC", label: "UTC" },
   { value: "America/New_York", label: "Eastern Time" },
@@ -19809,5 +19812,5 @@ var ROUTES_INFO = {
 };
 
 export { ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_faq_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, userRoutes };
-//# sourceMappingURL=chunk-KD6FMRJE.js.map
-//# sourceMappingURL=chunk-KD6FMRJE.js.map
+//# sourceMappingURL=chunk-GNP4WP7N.js.map
+//# sourceMappingURL=chunk-GNP4WP7N.js.map

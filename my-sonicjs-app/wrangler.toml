@@ -1,0 +1,32 @@
+name = "my-sonicjs-app"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Cloudflare Workers settings
+workers_dev = true
+
+# D1 Database
+[[d1_databases]]
+binding = "DB"
+database_name = "my-sonicjs-app-db"
+database_id = "d395e191-efb8-410b-8951-8cc4d028166c" # Run: wrangler d1 create my-sonicjs-db
+migrations_dir = "./node_modules/@sonicjs-cms/core/migrations"
+
+# R2 Bucket for media storage
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "my-sonicjs-app-media"
+
+# Environment variables
+[vars]
+ENVIRONMENT = "development"
+
+# Production environment
+[env.production]
+name = "my-sonicjs-app-production"
+vars = { ENVIRONMENT = "production" }
+
+# Observability
+[observability]
+enabled = true

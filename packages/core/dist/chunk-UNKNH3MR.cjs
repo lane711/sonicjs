@@ -1,3 +1,5 @@
+'use strict';
+
 // src/utils/sanitize.ts
 function escapeHtml(text) {
   if (typeof text !== "string") {
@@ -467,11 +469,21 @@ var MetricsTracker = class {
 var metricsTracker = new MetricsTracker();
 
 // src/utils/version.ts
-var SONICJS_VERSION = "2.0.0-beta.2";
+var SONICJS_VERSION = "2.0.1";
 function getCoreVersion() {
   return SONICJS_VERSION;
 }
 
-export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, metricsTracker, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer };
-//# sourceMappingURL=chunk-OL2OE3VJ.js.map
-//# sourceMappingURL=chunk-OL2OE3VJ.js.map
+exports.QueryFilterBuilder = QueryFilterBuilder;
+exports.SONICJS_VERSION = SONICJS_VERSION;
+exports.TemplateRenderer = TemplateRenderer;
+exports.buildQuery = buildQuery;
+exports.escapeHtml = escapeHtml;
+exports.getCoreVersion = getCoreVersion;
+exports.metricsTracker = metricsTracker;
+exports.renderTemplate = renderTemplate;
+exports.sanitizeInput = sanitizeInput;
+exports.sanitizeObject = sanitizeObject;
+exports.templateRenderer = templateRenderer;
+//# sourceMappingURL=chunk-UNKNH3MR.cjs.map
+//# sourceMappingURL=chunk-UNKNH3MR.cjs.map

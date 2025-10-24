@@ -15,6 +15,11 @@ const userRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 // Apply authentication middleware to all routes
 userRoutes.use('*', requireAuth())
 
+// Redirect /admin to /admin/dashboard
+userRoutes.get('/', (c) => {
+  return c.redirect('/admin/dashboard')
+})
+
 // Timezone options for profile form
 const TIMEZONES = [
   { value: 'UTC', label: 'UTC' },

@@ -7,8 +7,23 @@
 import { Hono } from 'hono'
 import type { Context } from 'hono'
 import type { D1Database, KVNamespace, R2Bucket } from '@cloudflare/workers-types'
-import { apiRoutes, apiMediaRoutes, apiSystemRoutes, adminApiRoutes, authRoutes, adminContentRoutes, adminUsersRoutes, adminMediaRoutes, adminPluginRoutes, adminLogsRoutes } from './routes'
+import {
+  apiRoutes,
+  apiMediaRoutes,
+  apiSystemRoutes,
+  adminApiRoutes,
+  authRoutes,
+  adminContentRoutes,
+  adminUsersRoutes,
+  adminMediaRoutes,
+  adminPluginRoutes,
+  adminLogsRoutes,
+  adminDashboardRoutes,
+  adminCollectionsRoutes,
+  adminSettingsRoutes
+} from './routes'
 import { getCoreVersion } from './utils/version'
+import { bootstrapMiddleware } from './middleware/bootstrap'
 
 // ============================================================================
 // Type Definitions
@@ -114,13 +129,8 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
     await next()
   })
 
-  // Bootstrap middleware
-  // Note: Implementation will be imported from middleware/bootstrap
-  // This is a placeholder for the factory pattern
-  app.use('*', async (_c, next) => {
-    // Bootstrap logic here (migrations, collections, plugins)
-    await next()
-  })
+  // Bootstrap middleware - runs migrations, syncs collections, and initializes plugins
+  app.use('*', bootstrapMiddleware())
 
   // Custom middleware - before auth
   if (config.middleware?.beforeAuth) {
@@ -155,6 +165,9 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   app.route('/api/media', apiMediaRoutes)
   app.route('/api/system', apiSystemRoutes)
   app.route('/admin/api', adminApiRoutes)
+  app.route('/admin/dashboard', adminDashboardRoutes)
+  app.route('/admin/collections', adminCollectionsRoutes)
+  app.route('/admin/settings', adminSettingsRoutes)
   app.route('/admin/content', adminContentRoutes)
   app.route('/admin/media', adminMediaRoutes)
   app.route('/admin/plugins', adminPluginRoutes)
