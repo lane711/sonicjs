@@ -232,26 +232,16 @@ router.get('/dashboard/recent-activity', async (c) => {
 /**
  * GET /admin/api/metrics - Real-time metrics for analytics chart
  * Returns JSON with current requests per second
+ * TODO: Implement metrics tracker
  */
 router.get('/api/metrics', async (c) => {
-  try {
-    const { metricsTracker } = await import('../utils/metrics-tracker')
-
-    return c.json({
-      requestsPerSecond: metricsTracker.getRequestsPerSecond(),
-      totalRequests: metricsTracker.getTotalRequests(),
-      averageRPS: metricsTracker.getAverageRPS(),
-      timestamp: new Date().toISOString()
-    })
-  } catch (error) {
-    console.error('Error fetching metrics:', error)
-    return c.json({
-      requestsPerSecond: 0,
-      totalRequests: 0,
-      averageRPS: 0,
-      timestamp: new Date().toISOString()
-    })
-  }
+  // Metrics tracker not yet implemented
+  return c.json({
+    requestsPerSecond: 0,
+    totalRequests: 0,
+    averageRPS: 0,
+    timestamp: new Date().toISOString()
+  })
 })
 
 /**

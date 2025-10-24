@@ -13,7 +13,7 @@ export function renderAuthSettingsForm(settings: AuthSettings): string {
         <p class="text-sm text-gray-400 mb-6">Configure which fields are required during user registration and their minimum lengths.</p>
 
         <div class="space-y-6">
-          ${Object.entries(fields).map(([fieldName, config]) => `
+          ${Object.entries(fields).map(([fieldName, config]: [string, any]) => `
             <div class="border-b border-white/10 pb-6 last:border-b-0 last:pb-0">
               <div class="flex items-start justify-between mb-4">
                 <div>

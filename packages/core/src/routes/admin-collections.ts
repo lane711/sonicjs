@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { html } from 'hono/html'
+import { requireAuth } from '../middleware'
 import { renderCollectionsListPage } from '../templates/pages/admin-collections-list.template'
 import { renderCollectionFormPage } from '../templates/pages/admin-collections-form.template'
 
@@ -82,6 +83,9 @@ type Variables = {
 }
 
 export const adminCollectionsRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
+
+// Apply authentication middleware
+adminCollectionsRoutes.use('*', requireAuth())
 
 // Collections management - List all collections
 adminCollectionsRoutes.get('/collections', async (c) => {

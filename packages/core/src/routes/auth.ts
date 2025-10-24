@@ -69,7 +69,7 @@ authRoutes.post('/register',
       if (!validationResult.success) {
         return c.json({
           error: 'Validation failed',
-          details: validationResult.error.errors.map(e => e.message)
+          details: validationResult.error.errors.map((e: { message: string }) => e.message)
         }, 400)
       }
 
@@ -327,7 +327,7 @@ authRoutes.post('/register/form', async (c) => {
     if (!validation.success) {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          ${validation.error.errors.map(err => err.message).join(', ')}
+          ${validation.error.errors.map((err: { message: string }) => err.message).join(', ')}
         </div>
       `)
     }
@@ -424,7 +424,7 @@ authRoutes.post('/login/form', async (c) => {
     if (!validation.success) {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          ${validation.error.errors.map(err => err.message).join(', ')}
+          ${validation.error.errors.map((err: { message: string }) => err.message).join(', ')}
         </div>
       `)
     }
