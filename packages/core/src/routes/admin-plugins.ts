@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import type { D1Database, KVNamespace } from '@cloudflare/workers-types'
+import { requireAuth } from '../middleware'
 import { renderPluginsListPage, PluginsListPageData, Plugin } from '../templates/pages/admin-plugins-list.template'
 import { renderPluginSettingsPage, PluginSettingsPageData } from '../templates/pages/admin-plugin-settings.template'
 import { PluginService } from '../services'
@@ -8,6 +9,9 @@ import { PluginService } from '../services'
 import type { Bindings, Variables } from '../app'
 
 const adminPluginRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
+
+// Apply authentication middleware
+adminPluginRoutes.use('*', requireAuth())
 
 // Plugin list page
 adminPluginRoutes.get('/', async (c) => {

@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { html } from 'hono/html'
 import type { D1Database, KVNamespace } from '@cloudflare/workers-types'
+import { requireAuth } from '../middleware'
 import { getLogger, type LogLevel, type LogCategory, type LogFilter } from '../services'
 import { renderLogsListPage, type LogsListPageData } from '../templates/pages/admin-logs-list.template'
 import { renderLogDetailsPage, type LogDetailsPageData } from '../templates/pages/admin-log-details.template'
@@ -8,6 +9,9 @@ import { renderLogConfigPage, type LogConfigPageData } from '../templates/pages/
 import type { Bindings, Variables } from '../app'
 
 const adminLogsRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
+
+// Apply authentication middleware
+adminLogsRoutes.use('*', requireAuth())
 
 // Main logs listing page
 adminLogsRoutes.get('/', async (c) => {

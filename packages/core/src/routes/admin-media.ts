@@ -33,6 +33,9 @@ const fileValidationSchema = z.object({
 
 const adminMediaRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
+// Apply authentication middleware
+adminMediaRoutes.use('*', requireAuth())
+
 // Media library main page
 adminMediaRoutes.get('/', async (c) => {
   try {

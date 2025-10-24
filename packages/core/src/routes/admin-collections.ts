@@ -88,7 +88,7 @@ export const adminCollectionsRoutes = new Hono<{ Bindings: Bindings; Variables: 
 adminCollectionsRoutes.use('*', requireAuth())
 
 // Collections management - List all collections
-adminCollectionsRoutes.get('/collections', async (c) => {
+adminCollectionsRoutes.get('/', async (c) => {
   try {
     const user = c.get('user')
     const db = c.env.DB
@@ -154,7 +154,7 @@ adminCollectionsRoutes.get('/collections', async (c) => {
 })
 
 // New collection form
-adminCollectionsRoutes.get('/collections/new', (c) => {
+adminCollectionsRoutes.get('/new', (c) => {
   const user = c.get('user')
 
   const formData: CollectionFormData = {
@@ -171,7 +171,7 @@ adminCollectionsRoutes.get('/collections/new', (c) => {
 })
 
 // Create collection
-adminCollectionsRoutes.post('/collections', async (c) => {
+adminCollectionsRoutes.post('/', async (c) => {
   try {
     const formData = await c.req.formData()
     const name = formData.get('name') as string
@@ -313,7 +313,7 @@ adminCollectionsRoutes.post('/collections', async (c) => {
 })
 
 // Edit collection form
-adminCollectionsRoutes.get('/collections/:id', async (c) => {
+adminCollectionsRoutes.get('/:id', async (c) => {
   try {
     const id = c.req.param('id')
     const user = c.get('user')
@@ -389,7 +389,7 @@ adminCollectionsRoutes.get('/collections/:id', async (c) => {
 })
 
 // Update collection
-adminCollectionsRoutes.put('/collections/:id', async (c) => {
+adminCollectionsRoutes.put('/:id', async (c) => {
   try {
     const id = c.req.param('id')
     const formData = await c.req.formData()
@@ -430,7 +430,7 @@ adminCollectionsRoutes.put('/collections/:id', async (c) => {
 })
 
 // Delete collection
-adminCollectionsRoutes.delete('/collections/:id', async (c) => {
+adminCollectionsRoutes.delete('/:id', async (c) => {
   try {
     const id = c.req.param('id')
     const db = c.env.DB
@@ -471,7 +471,7 @@ adminCollectionsRoutes.delete('/collections/:id', async (c) => {
 })
 
 // Add field to collection
-adminCollectionsRoutes.post('/collections/:id/fields', async (c) => {
+adminCollectionsRoutes.post('/:id/fields', async (c) => {
   try {
     const collectionId = c.req.param('id')
     const formData = await c.req.formData()
@@ -540,7 +540,7 @@ adminCollectionsRoutes.post('/collections/:id/fields', async (c) => {
 })
 
 // Update field
-adminCollectionsRoutes.put('/collections/:collectionId/fields/:fieldId', async (c) => {
+adminCollectionsRoutes.put('/:collectionId/fields/:fieldId', async (c) => {
   try {
     const fieldId = c.req.param('fieldId')
     const formData = await c.req.formData()
@@ -571,7 +571,7 @@ adminCollectionsRoutes.put('/collections/:collectionId/fields/:fieldId', async (
 })
 
 // Delete field
-adminCollectionsRoutes.delete('/collections/:collectionId/fields/:fieldId', async (c) => {
+adminCollectionsRoutes.delete('/:collectionId/fields/:fieldId', async (c) => {
   try {
     const fieldId = c.req.param('fieldId')
     const db = c.env.DB
@@ -587,7 +587,7 @@ adminCollectionsRoutes.delete('/collections/:collectionId/fields/:fieldId', asyn
 })
 
 // Update field order
-adminCollectionsRoutes.post('/collections/:collectionId/fields/reorder', async (c) => {
+adminCollectionsRoutes.post('/:collectionId/fields/reorder', async (c) => {
   try {
     const body = await c.req.json()
     const fieldIds = body.fieldIds as string[]

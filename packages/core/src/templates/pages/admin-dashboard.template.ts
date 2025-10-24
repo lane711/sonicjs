@@ -334,7 +334,7 @@ function renderAnalyticsChart(): string {
 
       <!-- Hidden div to trigger HTMX polling -->
       <div
-        hx-get="/admin/api/metrics"
+        hx-get="/admin/dashboard/api/metrics"
         hx-trigger="every 1s"
         hx-swap="none"
         style="display: none;"
@@ -437,7 +437,7 @@ function renderAnalyticsChart(): string {
 
         // Listen for metrics updates from HTMX
         window.addEventListener('htmx:afterRequest', function(event) {
-          if (event.detail.pathInfo.requestPath === '/admin/api/metrics') {
+          if (event.detail.pathInfo.requestPath === '/admin/dashboard/api/metrics') {
             try {
               const metrics = JSON.parse(event.detail.xhr.responseText);
 

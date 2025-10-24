@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { html } from 'hono/html'
+import { requireAuth } from '../middleware'
 import { renderSettingsPage, SettingsPageData } from '../templates/pages/admin-settings.template'
 import { MigrationService } from '../services/migrations'
 
@@ -30,6 +31,9 @@ type Variables = {
 }
 
 export const adminSettingsRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
+
+// Apply authentication middleware
+adminSettingsRoutes.use('*', requireAuth())
 
 // Helper function to get mock settings data
 function getMockSettings(user: any) {
@@ -92,12 +96,12 @@ function getMockSettings(user: any) {
 }
 
 // Settings page (redirects to general settings)
-adminSettingsRoutes.get('/settings', (c) => {
+adminSettingsRoutes.get('/', (c) => {
   return c.redirect('/admin/settings/general')
 })
 
 // General settings
-adminSettingsRoutes.get('/settings/general', (c) => {
+adminSettingsRoutes.get('/general', (c) => {
   const user = c.get('user')
   const pageData: SettingsPageData = {
     user: user ? {
@@ -113,7 +117,7 @@ adminSettingsRoutes.get('/settings/general', (c) => {
 })
 
 // Appearance settings
-adminSettingsRoutes.get('/settings/appearance', (c) => {
+adminSettingsRoutes.get('/appearance', (c) => {
   const user = c.get('user')
   const pageData: SettingsPageData = {
     user: user ? {
@@ -129,7 +133,7 @@ adminSettingsRoutes.get('/settings/appearance', (c) => {
 })
 
 // Security settings
-adminSettingsRoutes.get('/settings/security', (c) => {
+adminSettingsRoutes.get('/security', (c) => {
   const user = c.get('user')
   const pageData: SettingsPageData = {
     user: user ? {
@@ -145,7 +149,7 @@ adminSettingsRoutes.get('/settings/security', (c) => {
 })
 
 // Notifications settings
-adminSettingsRoutes.get('/settings/notifications', (c) => {
+adminSettingsRoutes.get('/notifications', (c) => {
   const user = c.get('user')
   const pageData: SettingsPageData = {
     user: user ? {
@@ -161,7 +165,7 @@ adminSettingsRoutes.get('/settings/notifications', (c) => {
 })
 
 // Storage settings
-adminSettingsRoutes.get('/settings/storage', (c) => {
+adminSettingsRoutes.get('/storage', (c) => {
   const user = c.get('user')
   const pageData: SettingsPageData = {
     user: user ? {
@@ -177,7 +181,7 @@ adminSettingsRoutes.get('/settings/storage', (c) => {
 })
 
 // Migrations settings
-adminSettingsRoutes.get('/settings/migrations', (c) => {
+adminSettingsRoutes.get('/migrations', (c) => {
   const user = c.get('user')
   const pageData: SettingsPageData = {
     user: user ? {
@@ -193,7 +197,7 @@ adminSettingsRoutes.get('/settings/migrations', (c) => {
 })
 
 // Database tools settings
-adminSettingsRoutes.get('/settings/database-tools', (c) => {
+adminSettingsRoutes.get('/database-tools', (c) => {
   const user = c.get('user')
   const pageData: SettingsPageData = {
     user: user ? {
@@ -280,7 +284,7 @@ adminSettingsRoutes.get('/api/migrations/validate', async (c) => {
 })
 
 // Save settings
-adminSettingsRoutes.post('/settings', async (c) => {
+adminSettingsRoutes.post('/', async (c) => {
   try {
     const formData = await c.req.formData()
 

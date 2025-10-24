@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { html } from 'hono/html'
 import type { D1Database, KVNamespace } from '@cloudflare/workers-types'
+import { requireAuth } from '../middleware'
 import { renderContentFormPage, ContentFormData } from '../templates/pages/admin-content-form.template'
 import { renderContentListPage, ContentListPageData } from '../templates/pages/admin-content-list.template'
 import { renderVersionHistory, VersionHistoryData, ContentVersion } from '../templates/components/version-history.template'
@@ -9,6 +10,9 @@ import { getCacheService, CACHE_CONFIGS } from '../services/cache'
 import type { Bindings, Variables } from '../app'
 
 const adminContentRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
+
+// Apply authentication middleware
+adminContentRoutes.use('*', requireAuth())
 
 // Get collection fields
 async function getCollectionFields(db: D1Database, collectionId: string) {
