@@ -12,6 +12,9 @@ compatibility_flags = ["nodejs_compat"]
 [dev]
 port = 8787
 persist_to = ".wrangler/state/v3"
+# Reduce logging verbosity to avoid noise from high-frequency endpoints
+# Set WRANGLER_LOG environment variable to control log level
+# Options: "none", "error", "warn", "info", "log", "debug"
 
 [build]
 command = ""

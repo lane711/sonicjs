@@ -7,7 +7,7 @@
     "www"
   ],
   "scripts": {
-    "dev": "npm run plugins:generate && wrangler dev 2>&1 | grep -v '/admin/api/metrics'",
+    "dev": "npm run plugins:generate && wrangler dev 2>&1 | grep -v '/admin/dashboard/api/metrics'",
     "dev:www": "npm run dev --workspace=www",
     "prebuild": "npm run plugins:generate",
     "build": "tsc && wrangler deploy --dry-run",
