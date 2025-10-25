@@ -2,17 +2,22 @@
 
 ## Executive Summary
 
-Extract core SonicJS functionality into an npm package (`@sonicjs-cms/core`) to enable:
+**Status: ACTIVE - Core Package v2.0.2**
 
-- Easy upgrades via `npm update @sonicjs-cms/core`
-- Version control of core features
-- Separation of framework code from user customizations
-- Faster bug fixes and feature releases
-- Better testing and stability
+The core SonicJS functionality has been successfully extracted into an npm package (`@sonicjs-cms/core` v2.0.2) to enable:
+
+- ✅ Easy upgrades via `npm update @sonicjs-cms/core`
+- ✅ Version control of core features
+- ✅ Separation of framework code from user customizations
+- ✅ Faster bug fixes and feature releases
+- ✅ Better testing and stability
+
+**Current Version**: 2.0.2 (Published to npm)
+**Latest Updates**: User management routes, permission system integration, admin route consolidation
 
 ## Goals
 
-1. **Easy Installation**: Quick start with `npx create-sonicjs-app`
+1. **Easy Installation**: Quick start with `npx create-sonicjs`
 2. **Easy Upgrades**: Developers run `npm update` to get latest core
 3. **Clean Separation**: User code stays separate from framework code
 4. **Customization**: Developers can override/extend core functionality
@@ -244,8 +249,8 @@ Users can enable/disable plugins via configuration.
    - Sample custom plugin
    - Documentation
 
-2. **CLI Tool** (Optional)
-   - `npx create-sonicjs-app my-app`
+2. **CLI Tool**
+   - `npx create-sonicjs my-app`
    - Project scaffolding
 
 ### Phase 4: Testing & Polish (Week 4-5)
@@ -350,7 +355,7 @@ Starting at v2.0.0 to differentiate from v1.x (monolith):
 
 - **Major (2.0.0)**: Breaking changes
 - **Minor (2.1.0)**: New features (backward compatible)
-- **Patch (2.0.1)**: Bug fixes
+- **Patch (2.0.2)**: Bug fixes (current version)
 
 ### Release Cadence
 
@@ -373,7 +378,7 @@ Starting at v2.0.0 (v1.x was the monolith):
 
 ```bash
 # Create new SonicJS project
-npx create-sonicjs-app my-app
+npx create-sonicjs my-app
 
 # Or manually
 npm init
@@ -557,12 +562,14 @@ docs/
 - Documentation review
 - Final bug fixes
 
-### Phase 4: v1.0 Release
+### Phase 4: v2.0.2 Release (CURRENT)
 
-- Stable release to npm
-- Migration guide published
-- Announcement and marketing
-- Support channels established
+- ✅ Stable release to npm (v2.0.2)
+- ✅ Core package published and functional
+- ✅ User routes fully implemented
+- ✅ Permission system integrated
+- 🔄 Documentation in progress
+- 🔄 Community support channels active
 
 ### Phase 5: Ongoing
 
@@ -650,10 +657,10 @@ docs/
 
 ### Month 3: Greenfield Template
 
-- Create starter template for new projects
-- Build CLI scaffolding tool
-- Write getting started documentation
-- Alpha testing
+- ✅ Create starter template for new projects
+- ✅ Build CLI scaffolding tool (`create-sonicjs`)
+- ✅ Write getting started documentation
+- ✅ Alpha testing complete
 
 ### Month 4: Testing & Polish
 

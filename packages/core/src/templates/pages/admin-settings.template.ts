@@ -320,7 +320,7 @@ export function renderSettingsPage(data: SettingsPageData): string {
       // Database Tools functions
       window.refreshDatabaseStats = async function() {
         try {
-          const response = await fetch('/admin/database-tools/api/stats');
+          const response = await fetch('/admin/settings/api/database-tools/stats');
           const result = await response.json();
           
           if (result.success) {
@@ -341,7 +341,7 @@ export function renderSettingsPage(data: SettingsPageData): string {
         btn.innerHTML = 'Creating Backup...';
         
         try {
-          const response = await fetch('/admin/database-tools/api/backup', {
+          const response = await fetch('/admin/settings/api/database-tools/backup', {
             method: 'POST'
           });
           const result = await response.json();
@@ -380,7 +380,7 @@ export function renderSettingsPage(data: SettingsPageData): string {
         btn.innerHTML = 'Truncating...';
         
         try {
-          const response = await fetch('/admin/database-tools/api/truncate', {
+          const response = await fetch('/admin/settings/api/database-tools/truncate', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -411,7 +411,7 @@ export function renderSettingsPage(data: SettingsPageData): string {
 
       window.validateDatabase = async function() {
         try {
-          const response = await fetch('/admin/database-tools/api/validate');
+          const response = await fetch('/admin/settings/api/database-tools/validate');
           const result = await response.json();
           
           if (result.success) {
