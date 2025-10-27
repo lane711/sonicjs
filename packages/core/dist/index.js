@@ -19,7 +19,7 @@ import { drizzle } from 'drizzle-orm/d1';
 function createSonicJSApp(config = {}) {
   const app = new Hono();
   const appVersion = config.version || getCoreVersion();
-  const appName = config.name || "SonicJS";
+  const appName = config.name || "SonicJS AI";
   app.use("*", async (c, next) => {
     c.set("appVersion", appVersion);
     await next();

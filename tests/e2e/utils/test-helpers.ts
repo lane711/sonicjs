@@ -318,8 +318,9 @@ export async function loginAsAdmin(page: Page) {
   await expect(page.locator('#form-response .bg-green-100')).toBeVisible();
 
   // Wait for JavaScript redirect to admin dashboard (up to 15 seconds)
+  // The app redirects /admin to /admin/dashboard, so we accept any /admin/* URL
   try {
-    await page.waitForURL('/admin', { timeout: 15000 });
+    await page.waitForURL(/\/admin/, { timeout: 15000 });
     await page.waitForLoadState('networkidle');
   } catch (error) {
     // If redirect doesn't happen automatically, try navigating manually
@@ -328,9 +329,9 @@ export async function loginAsAdmin(page: Page) {
     await page.waitForLoadState('networkidle');
   }
 
-  // Simply verify we're on the admin page - don't check for specific elements
-  // as the layout might vary
-  await expect(page).toHaveURL('/admin');
+  // Simply verify we're on an admin page - accept /admin or /admin/*
+  // The app redirects /admin -> /admin/dashboard
+  await expect(page).toHaveURL(/\/admin/);
 
   // Ensure workflow tables exist for workflow tests (after login)
   await ensureWorkflowTablesExist(page);

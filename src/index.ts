@@ -1,3 +1,4 @@
+console.log('[MAIN APP] Loading src/index.ts - THIS SHOULD BE THE MAIN APP')
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
@@ -329,8 +330,9 @@ app.get('/', (c) => {
   return c.redirect('/auth/login')
 })
 
-// Health check
+// Health check - Must be registered after all other routes to override core package's health endpoint
 app.get('/health', (c) => {
+  console.log('[MAIN APP] Health endpoint called from src/index.ts!')
   return c.json({
     name: 'SonicJS AI',
     version: '0.1.0',

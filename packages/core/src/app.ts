@@ -122,7 +122,7 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
 
   // Set app metadata
   const appVersion = config.version || getCoreVersion()
-  const appName = config.name || 'SonicJS'
+  const appName = config.name || 'SonicJS AI'
 
   // App version middleware
   app.use('*', async (c, next) => {
