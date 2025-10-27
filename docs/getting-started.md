@@ -686,7 +686,8 @@ npm run sync-collections
 
 | Command | Description |
 |---------|-------------|
-| `npm run sync-collections` | Manually sync collection configs to DB |
+| `npm run plugins:generate` | Regenerate plugin registry from manifests |
+| `npm run plugins:watch` | Watch plugin manifests and auto-regenerate |
 | `npm run sonicjs` | Run SonicJS CLI commands |
 
 ## Troubleshooting

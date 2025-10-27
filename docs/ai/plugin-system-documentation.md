@@ -451,7 +451,7 @@ Every plugin requires a `manifest.json` file:
 
 ### Plugin Registry
 
-All plugins are auto-discovered and registered at build time via `scripts/generate-plugin-registry.mjs`:
+All plugins are auto-discovered and registered at build time via `packages/scripts/generate-plugin-registry.mjs`:
 
 ```typescript
 import { PLUGIN_REGISTRY, PLUGIN_IDS, CORE_PLUGIN_IDS } from './plugins/plugin-registry'

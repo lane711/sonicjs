@@ -104,7 +104,6 @@ export default defineConfig({
       exclude: [
         'src/**/*.{test,spec}.{js,ts}',
         'src/**/*.d.ts',
-        'src/cli/**',
         'src/scripts/**',
         'src/templates/**'
       ],
@@ -936,7 +935,6 @@ The following directories are excluded from coverage:
 
 - Test files (`**/*.{test,spec}.{js,ts}`)
 - Type definitions (`**/*.d.ts`)
-- CLI tools (`src/cli/**`)
 - Scripts (`src/scripts/**`)
 - Templates (`src/templates/**`)
 

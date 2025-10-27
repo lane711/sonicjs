@@ -1043,9 +1043,6 @@ export async function syncCollection(db: D1Database, config: CollectionConfig): 
 ```bash
 # Sync collections from config files
 npm run sync-collections
-
-# Or via CLI
-npm run sonicjs collections sync
 ```
 
 ---

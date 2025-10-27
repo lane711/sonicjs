@@ -10,7 +10,7 @@ import { getAllCacheStats, clearAllCaches, getCacheService } from './services/ca
 import { CACHE_CONFIGS, parseCacheKey } from './services/cache-config.js'
 import { getRecentInvalidations, getCacheInvalidationStats } from './services/cache-invalidation.js'
 import { warmCommonCaches, warmNamespace } from './services/cache-warming.js'
-import { renderCacheDashboard, CacheDashboardData } from '../../templates/pages/admin-cache.template.js'
+import { renderCacheDashboard, CacheDashboardData } from '@sonicjs-cms/templates/pages/admin-cache.template'
 
 const app = new Hono()
 

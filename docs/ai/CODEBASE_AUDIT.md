@@ -265,7 +265,7 @@ src/
 
 | File | Lines | Category | Notes |
 |------|-------|----------|-------|
-| `scripts/generate-plugin-registry.mjs` | 120 | CORE | Auto-generate registry |
+| `packages/scripts/generate-plugin-registry.mjs` | 120 | CORE | Auto-generate registry |
 | `scripts/sync-collections.ts` | 95 | CORE | Collection sync |
 | Other scripts | ~300 | USER | Build scripts |
 

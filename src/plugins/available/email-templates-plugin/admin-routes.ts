@@ -5,7 +5,7 @@ import { requireAuth, requireRole } from '@sonicjs-cms/core';
 import { createEmailManagementService } from './services/email-management';
 import { createEmailService } from './services/email';
 import { EmailTemplateRenderer } from './services/email-renderer';
-import { renderAdminLayout } from '../../../templates/layouts/admin-layout-v2.template';
+import { renderAdminLayout } from '@sonicjs-cms/templates/layouts/admin-layout-v2.template';
 
 type Bindings = {
   DB: D1Database;

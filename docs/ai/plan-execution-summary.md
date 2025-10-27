@@ -277,7 +277,7 @@ Successfully completed comprehensive documentation and verification of the Sonic
 
 ### Plugin Registry Generation ✅
 
-**Command**: `node scripts/generate-plugin-registry.mjs`
+**Command**: `node packages/scripts/generate-plugin-registry.mjs`
 **Result**: ✅ PASS
 **Output**:
 ```

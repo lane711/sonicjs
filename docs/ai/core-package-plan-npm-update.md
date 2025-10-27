@@ -23,7 +23,7 @@ Developers must clone entire repository and manually manage core updates.
 npm update @sonicjs-cms/core
 
 # Check what changed
-npm run sonicjs changelog
+npm show @sonicjs-cms/core changelog
 
 # Run any new migrations
 npm run db:migrate
@@ -146,7 +146,7 @@ npm info @sonicjs-cms/core@2.0.0
 
 # Update when ready
 npm install @sonicjs-cms/core@2.0.0
-npm run sonicjs migrate --from=1.x --to=2.0.0
+npm run db:migrate
 npm run test
 npm run dev
 ```

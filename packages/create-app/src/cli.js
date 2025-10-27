@@ -382,7 +382,7 @@ async function copyTemplate(templateName, targetDir, options) {
 
   // Add @sonicjs-cms/core dependency
   packageJson.dependencies = {
-    '@sonicjs-cms/core': '^2.0.0-beta.3',
+    '@sonicjs-cms/core': '^2.0.3',
     ...packageJson.dependencies
   }
 

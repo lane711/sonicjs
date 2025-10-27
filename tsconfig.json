@@ -22,7 +22,14 @@
     "useDefineForClassFields": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "types": ["@cloudflare/workers-types", "vitest/globals"]
+    "types": ["@cloudflare/workers-types", "vitest/globals"],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@sonicjs-cms/core": ["./packages/core/src/index.ts"],
+      "@sonicjs-cms/core/*": ["./packages/core/src/*"],
+      "@sonicjs-cms/templates": ["./packages/templates/src/index.ts"],
+      "@sonicjs-cms/templates/*": ["./packages/templates/src/*"]
+    }
   },
   "include": [
     "src/**/*"

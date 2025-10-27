@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { DatabaseToolsService } from './services/database-service'
-import { renderDatabaseTablePage, DatabaseTablePageData } from '../../../templates/pages/admin-database-table.template'
+import { renderDatabaseTablePage, DatabaseTablePageData } from '@sonicjs-cms/templates/pages/admin-database-table.template'
 
 type Bindings = {
   DB: D1Database

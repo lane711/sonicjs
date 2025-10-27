@@ -2,12 +2,9 @@
 
 /**
  * Email System Initialization Script
- * 
+ *
  * This script initializes the email system with default themes, templates, and variables.
  * Run this after the database migration to set up the email system.
- * 
- * Usage:
- *   npm run sonicjs init-email
  */
 
 import { createEmailManagementService } from './services/email-management';
@@ -91,18 +88,11 @@ if (require.main === module) {
         console.log(`
 Email System Initialization
 
-Usage: npm run sonicjs init-email [options]
-
 Options:
   --db-url <url>        Database connection URL
   --admin-email <email> Admin email address
   --force              Force initialization even if data exists
   --help               Show this help message
-
-Examples:
-  npm run sonicjs init-email
-  npm run sonicjs init-email --admin-email admin@example.com
-  npm run sonicjs init-email --force
         `);
         process.exit(0);
         break;
