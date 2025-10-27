@@ -4,8 +4,9 @@
  * Provides the current version of @sonicjs-cms/core package
  */
 
-// This will be replaced at build time by tsup with the actual version
-export const SONICJS_VERSION = '2.0.1'
+import pkg from '../../package.json'
+
+export const SONICJS_VERSION = pkg.version
 
 /**
  * Get the current SonicJS core version

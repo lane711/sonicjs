@@ -1,10 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { 
-  insertCollectionSchema, 
+import {
+  insertCollectionSchema,
   selectCollectionSchema,
-  collections 
+  collections
 } from '../db/schema'
-import { collectionSchema } from '../schemas'
 
 describe('Collections Schema Validation', () => {
   describe('Database Schema', () => {
@@ -196,80 +195,8 @@ describe('Collections Schema Validation', () => {
     })
   })
 
-  describe('API Schema Validation', () => {
-    describe('collectionSchema', () => {
-      it('should validate valid collection API input', () => {
-        const validInput = {
-          name: 'test_collection',
-          displayName: 'Test Collection',
-          description: 'A test collection'
-        }
-
-        const result = collectionSchema.safeParse(validInput)
-        expect(result.success).toBe(true)
-      })
-
-      it('should validate collection name format for API', () => {
-        const validInputs = [
-          { name: 'simple', displayName: 'Simple' },
-          { name: 'with_underscore', displayName: 'With Underscore' },
-          { name: 'with-dash', displayName: 'With Dash' },
-          { name: 'with123numbers', displayName: 'With Numbers' },
-          { name: 'complex_name-with123_all', displayName: 'Complex Name' }
-        ]
-
-        validInputs.forEach(input => {
-          const result = collectionSchema.safeParse(input)
-          expect(result.success).toBe(true)
-        })
-      })
-
-      it('should reject invalid collection names for API', () => {
-        const invalidInputs = [
-          { name: 'With Spaces', displayName: 'Invalid' },
-          { name: 'WithCamelCase', displayName: 'Invalid' },
-          { name: 'with@special', displayName: 'Invalid' },
-          { name: 'with.dots', displayName: 'Invalid' },
-          { name: 'with/slash', displayName: 'Invalid' },
-          { name: '', displayName: 'Empty Name' }
-        ]
-
-        invalidInputs.forEach(input => {
-          const result = collectionSchema.safeParse(input)
-          expect(result.success).toBe(false)
-        })
-      })
-
-      it('should require display name', () => {
-        const invalidInput = {
-          name: 'test_collection'
-        }
-
-        const result = collectionSchema.safeParse(invalidInput)
-        expect(result.success).toBe(false)
-        if (!result.success) {
-          expect(result.error.issues).toEqual(
-            expect.arrayContaining([
-              expect.objectContaining({
-                path: ['displayName'],
-                code: 'invalid_type'
-              })
-            ])
-          )
-        }
-      })
-
-      it('should allow optional description in API', () => {
-        const validInput = {
-          name: 'test_collection',
-          displayName: 'Test Collection'
-        }
-
-        const result = collectionSchema.safeParse(validInput)
-        expect(result.success).toBe(true)
-      })
-    })
-  })
+  // API Schema Validation tests removed - schemas moved to core package
+  // Tests now focus on database schema validation only
 
   describe('Schema JSON Validation', () => {
     it('should handle complex JSON schema objects', () => {

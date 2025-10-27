@@ -1,3 +1,5 @@
+'use strict';
+
 // src/utils/sanitize.ts
 function escapeHtml(text) {
   if (typeof text !== "string") {
@@ -410,12 +412,141 @@ function buildQuery(table, filter) {
   return builder.build(table, filter);
 }
 
+// package.json
+var package_default = {
+  name: "@sonicjs-cms/core",
+  version: "2.0.3",
+  description: "Core framework for SonicJS headless CMS - Edge-first, TypeScript-native CMS built for Cloudflare Workers",
+  type: "module",
+  main: "./dist/index.cjs",
+  module: "./dist/index.js",
+  types: "./dist/index.d.ts",
+  exports: {
+    ".": {
+      types: "./dist/index.d.ts",
+      import: "./dist/index.js",
+      require: "./dist/index.cjs"
+    },
+    "./services": {
+      types: "./dist/services.d.ts",
+      import: "./dist/services.js",
+      require: "./dist/services.cjs"
+    },
+    "./middleware": {
+      types: "./dist/middleware.d.ts",
+      import: "./dist/middleware.js",
+      require: "./dist/middleware.cjs"
+    },
+    "./routes": {
+      types: "./dist/routes.d.ts",
+      import: "./dist/routes.js",
+      require: "./dist/routes.cjs"
+    },
+    "./templates": {
+      types: "./dist/templates.d.ts",
+      import: "./dist/templates.js",
+      require: "./dist/templates.cjs"
+    },
+    "./plugins": {
+      types: "./dist/plugins.d.ts",
+      import: "./dist/plugins.js",
+      require: "./dist/plugins.cjs"
+    },
+    "./utils": {
+      types: "./dist/utils.d.ts",
+      import: "./dist/utils.js",
+      require: "./dist/utils.cjs"
+    },
+    "./types": {
+      types: "./dist/types.d.ts",
+      import: "./dist/types.js",
+      require: "./dist/types.cjs"
+    }
+  },
+  files: [
+    "dist",
+    "migrations",
+    "README.md",
+    "LICENSE"
+  ],
+  scripts: {
+    build: "tsup",
+    dev: "tsup --watch",
+    "type-check": "tsc --noEmit",
+    test: "vitest --run",
+    "test:watch": "vitest",
+    prepublishOnly: "npm run build"
+  },
+  keywords: [
+    "cms",
+    "headless-cms",
+    "cloudflare",
+    "workers",
+    "edge",
+    "typescript",
+    "hono",
+    "content-management",
+    "api",
+    "sonicjs"
+  ],
+  author: "SonicJS Team",
+  license: "MIT",
+  repository: {
+    type: "git",
+    url: "git+https://github.com/sonicjs/sonicjs.git",
+    directory: "packages/core"
+  },
+  bugs: {
+    url: "https://github.com/sonicjs/sonicjs/issues"
+  },
+  homepage: "https://sonicjs.com",
+  peerDependencies: {
+    "@cloudflare/workers-types": "^4.0.0",
+    hono: "^4.0.0",
+    "drizzle-orm": "^0.44.0",
+    zod: "^3.0.0"
+  },
+  dependencies: {
+    "drizzle-zod": "^0.8.2",
+    marked: "^15.0.12",
+    "highlight.js": "^11.11.1",
+    semver: "^7.7.2"
+  },
+  devDependencies: {
+    "@cloudflare/workers-types": "^4.20250620.0",
+    "@types/node": "^20.19.1",
+    "drizzle-orm": "^0.44.2",
+    hono: "^4.10.1",
+    tsup: "^8.0.0",
+    typescript: "^5.8.3",
+    vitest: "^2.1.8",
+    zod: "^3.25.67"
+  },
+  engines: {
+    node: ">=18.0.0"
+  },
+  publishConfig: {
+    access: "public",
+    registry: "https://registry.npmjs.org/"
+  }
+};
+
 // src/utils/version.ts
-var SONICJS_VERSION = "2.0.1";
+var SONICJS_VERSION = package_default.version;
 function getCoreVersion() {
   return SONICJS_VERSION;
 }
 
-export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer };
-//# sourceMappingURL=chunk-XJETEIRU.js.map
-//# sourceMappingURL=chunk-XJETEIRU.js.map
+exports.QueryFilterBuilder = QueryFilterBuilder;
+exports.SONICJS_VERSION = SONICJS_VERSION;
+exports.TemplateRenderer = TemplateRenderer;
+exports.buildQuery = buildQuery;
+exports.escapeHtml = escapeHtml;
+exports.getCoreVersion = getCoreVersion;
+exports.package_default = package_default;
+exports.renderTemplate = renderTemplate;
+exports.sanitizeInput = sanitizeInput;
+exports.sanitizeObject = sanitizeObject;
+exports.templateRenderer = templateRenderer;
+//# sourceMappingURL=chunk-OQFE3DSZ.cjs.map
+//# sourceMappingURL=chunk-OQFE3DSZ.cjs.map
