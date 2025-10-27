@@ -9,7 +9,15 @@ export interface CatalystCheckboxProps {
   disabled?: boolean;
   label?: string;
   description?: string;
-  color?: 'dark/zinc' | 'dark/white' | 'white' | 'dark' | 'zinc' | 'blue' | 'green' | 'red';
+  color?:
+    | "dark/zinc"
+    | "dark/white"
+    | "white"
+    | "dark"
+    | "zinc"
+    | "blue"
+    | "green"
+    | "red";
   className?: string;
 }
 
@@ -21,35 +29,49 @@ export function renderCatalystCheckbox(props: CatalystCheckboxProps): string {
     disabled = false,
     label,
     description,
-    color = 'dark/zinc',
-    className = ''
+    color = "dark/zinc",
+    className = "",
   } = props;
 
   const colorConfig = {
-    'dark/zinc': { bg: '#18181b', border: '#09090b', check: '#ffffff', darkBg: '#52525b' },
-    'dark/white': { bg: '#18181b', border: '#09090b', check: '#ffffff', darkBg: '#ffffff', darkCheck: '#18181b' },
-    'white': { bg: '#ffffff', border: '#09090b', check: '#18181b' },
-    'dark': { bg: '#18181b', border: '#09090b', check: '#ffffff' },
-    'zinc': { bg: '#52525b', border: '#3f3f46', check: '#ffffff' },
-    'blue': { bg: '#2563eb', border: '#1d4ed8', check: '#ffffff' },
-    'green': { bg: '#16a34a', border: '#15803d', check: '#ffffff' },
-    'red': { bg: '#dc2626', border: '#b91c1c', check: '#ffffff' }
+    "dark/zinc": {
+      bg: "#18181b",
+      border: "#09090b",
+      check: "#ffffff",
+      darkBg: "#52525b",
+    },
+    "dark/white": {
+      bg: "#18181b",
+      border: "#09090b",
+      check: "#ffffff",
+      darkBg: "#ffffff",
+      darkCheck: "#18181b",
+    },
+    white: { bg: "#ffffff", border: "#09090b", check: "#18181b" },
+    dark: { bg: "#18181b", border: "#09090b", check: "#ffffff" },
+    zinc: { bg: "#52525b", border: "#3f3f46", check: "#ffffff" },
+    blue: { bg: "#2563eb", border: "#1d4ed8", check: "#ffffff" },
+    green: { bg: "#16a34a", border: "#15803d", check: "#ffffff" },
+    red: { bg: "#dc2626", border: "#b91c1c", check: "#ffffff" },
   };
 
-  const config = colorConfig[color] || colorConfig['dark/zinc'];
+  const config = colorConfig[color] || colorConfig["dark/zinc"];
 
   const colorClasses = {
-    'dark/zinc': 'peer-checked:bg-zinc-900 peer-checked:before:bg-zinc-900 dark:peer-checked:bg-zinc-600',
-    'dark/white': 'peer-checked:bg-zinc-900 peer-checked:before:bg-zinc-900 dark:peer-checked:bg-white',
-    'white': 'peer-checked:bg-white peer-checked:before:bg-white',
-    'dark': 'peer-checked:bg-zinc-900 peer-checked:before:bg-zinc-900',
-    'zinc': 'peer-checked:bg-zinc-600 peer-checked:before:bg-zinc-600',
-    'blue': 'peer-checked:bg-blue-600 peer-checked:before:bg-blue-600',
-    'green': 'peer-checked:bg-green-600 peer-checked:before:bg-green-600',
-    'red': 'peer-checked:bg-red-600 peer-checked:before:bg-red-600'
+    "dark/zinc":
+      "peer-checked:bg-zinc-900 peer-checked:before:bg-zinc-900 dark:peer-checked:bg-zinc-600",
+    "dark/white":
+      "peer-checked:bg-zinc-900 peer-checked:before:bg-zinc-900 dark:peer-checked:bg-white",
+    white: "peer-checked:bg-white peer-checked:before:bg-white",
+    dark: "peer-checked:bg-zinc-900 peer-checked:before:bg-zinc-900",
+    zinc: "peer-checked:bg-zinc-600 peer-checked:before:bg-zinc-600",
+    blue: "peer-checked:bg-blue-600 peer-checked:before:bg-blue-600",
+    green: "peer-checked:bg-green-600 peer-checked:before:bg-green-600",
+    red: "peer-checked:bg-red-600 peer-checked:before:bg-red-600",
   };
 
-  const checkColor = color === 'dark/white' ? 'dark:text-zinc-900' : 'text-white';
+  const checkColor =
+    color === "dark/white" ? "dark:text-zinc-900" : "text-white";
 
   const baseClasses = `
     relative isolate flex w-4 h-4 items-center justify-center rounded-[0.3125rem]
@@ -62,11 +84,15 @@ export function renderCatalystCheckbox(props: CatalystCheckboxProps): string {
     peer-disabled:opacity-50
     peer-disabled:border-zinc-950/25 peer-disabled:bg-zinc-950/5
     dark:peer-disabled:border-white/20 dark:peer-disabled:bg-white/2.5
-  `.trim().replace(/\s+/g, ' ');
+  `
+    .trim()
+    .replace(/\s+/g, " ");
 
   const checkIconClasses = `
     w-4 h-4 opacity-0 peer-checked:opacity-100 pointer-events-none
-  `.trim().replace(/\s+/g, ' ');
+  `
+    .trim()
+    .replace(/\s+/g, " ");
 
   if (description) {
     // Field layout with description
@@ -77,20 +103,20 @@ export function renderCatalystCheckbox(props: CatalystCheckboxProps): string {
             type="checkbox"
             id="${id}"
             name="${name}"
-            ${checked ? 'checked' : ''}
-            ${disabled ? 'disabled' : ''}
+            ${checked ? "checked" : ""}
+            ${disabled ? "disabled" : ""}
             class="peer sr-only"
           />
           <label for="${id}" class="inline-flex cursor-pointer">
-            <span class="${baseClasses} ${colorClasses[color] || colorClasses['dark/zinc']}">
+            <span class="${baseClasses} ${colorClasses[color] || colorClasses["dark/zinc"]}">
               <svg class="${checkIconClasses} ${checkColor}" viewBox="0 0 14 14" fill="none" stroke="currentColor">
                 <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </span>
           </label>
         </div>
-        ${label ? `<label for="${id}" class="col-start-2 row-start-1 text-sm/6 font-medium text-zinc-950 dark:text-white cursor-pointer">${label}</label>` : ''}
-        ${description ? `<p class="col-start-2 row-start-2 text-sm/6 text-zinc-500 dark:text-zinc-400">${description}</p>` : ''}
+        ${label ? `<label for="${id}" class="col-start-2 row-start-1 text-sm/6 font-medium text-zinc-950 dark:text-white cursor-pointer">${label}</label>` : ""}
+        ${description ? `<p class="col-start-2 row-start-2 text-sm/6 text-zinc-500 dark:text-zinc-400">${description}</p>` : ""}
       </div>
     `;
   } else {
@@ -101,16 +127,16 @@ export function renderCatalystCheckbox(props: CatalystCheckboxProps): string {
           type="checkbox"
           id="${id}"
           name="${name}"
-          ${checked ? 'checked' : ''}
-          ${disabled ? 'disabled' : ''}
+          ${checked ? "checked" : ""}
+          ${disabled ? "disabled" : ""}
           class="peer sr-only"
         />
-        <span class="${baseClasses} ${colorClasses[color] || colorClasses['dark/zinc']}">
+        <span class="${baseClasses} ${colorClasses[color] || colorClasses["dark/zinc"]}">
           <svg class="${checkIconClasses} ${checkColor}" viewBox="0 0 14 14" fill="none" stroke="currentColor">
             <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </span>
-        ${label ? `<span class="text-sm/6 font-medium text-zinc-950 dark:text-white">${label}</span>` : ''}
+        ${label ? `<span class="text-sm/6 font-medium text-zinc-950 dark:text-white">${label}</span>` : ""}
       </label>
     `;
   }
@@ -590,13 +616,6 @@ function renderCatalystSidebar(
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                   </svg>
                   My Profile
-                </a>
-                <a href="/admin/settings" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-zinc-950 hover:bg-zinc-950/5 dark:text-white dark:hover:bg-white/5">
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                  </svg>
-                  Settings
                 </a>
                 <a href="/auth/logout" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10">
                   <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

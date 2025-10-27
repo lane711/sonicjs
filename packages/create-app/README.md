@@ -1,21 +1,21 @@
-# create-sonicjs-app
+# create-sonicjs
 
 > The easiest way to create a new SonicJS application
 
-[![Version](https://img.shields.io/npm/v/create-sonicjs-app)](https://www.npmjs.com/package/create-sonicjs-app)
-[![License](https://img.shields.io/npm/l/create-sonicjs-app)](./LICENSE)
+[![Version](https://img.shields.io/npm/v/create-sonicjs)](https://www.npmjs.com/package/create-sonicjs)
+[![License](https://img.shields.io/npm/l/create-sonicjs)](./LICENSE)
 
 ## Quick Start
 
 ```bash
-npx create-sonicjs-app my-app
+npx create-sonicjs my-app
 ```
 
 That's it! Follow the interactive prompts and you'll have a running SonicJS application in minutes.
 
 ## What It Does
 
-`create-sonicjs-app` sets up everything you need for a modern headless CMS on Cloudflare's edge:
+`create-sonicjs` sets up everything you need for a modern headless CMS on Cloudflare's edge:
 
 - ✅ **Project scaffolding** - Complete project structure
 - ✅ **Template selection** - Choose from pre-built templates
@@ -30,7 +30,7 @@ That's it! Follow the interactive prompts and you'll have a running SonicJS appl
 ### Interactive Mode (Recommended)
 
 ```bash
-npx create-sonicjs-app
+npx create-sonicjs
 ```
 
 You'll be prompted for:
@@ -45,13 +45,13 @@ You'll be prompted for:
 ### With Project Name
 
 ```bash
-npx create-sonicjs-app my-blog
+npx create-sonicjs my-blog
 ```
 
 ### Command Line Options
 
 ```bash
-npx create-sonicjs-app my-app --template=starter --skip-install
+npx create-sonicjs my-app --template=starter --skip-install
 ```
 
 **Available flags:**
@@ -144,13 +144,13 @@ Works with all major package managers:
 
 ```bash
 # npm
-npx create-sonicjs-app my-app
+npx create-sonicjs my-app
 
 # yarn
-yarn create sonicjs-app my-app
+yarn create sonicjs my-app
 
 # pnpm
-pnpm create sonicjs-app my-app
+pnpm create sonicjs my-app
 ```
 
 The CLI automatically detects your package manager from lock files.
@@ -217,7 +217,7 @@ You can create resources manually after project creation. See the [After Creatio
 ### Skip All Prompts (Non-Interactive Mode)
 
 ```bash
-npx create-sonicjs-app my-app \
+npx create-sonicjs my-app \
   --template=starter \
   --database=my-app-db \
   --bucket=my-app-media \
@@ -230,7 +230,7 @@ npx create-sonicjs-app my-app \
 ### Use in CI/CD
 
 ```bash
-npx create-sonicjs-app test-app \
+npx create-sonicjs test-app \
   --template=starter \
   --database=test-db \
   --bucket=test-bucket \
@@ -254,7 +254,7 @@ npx create-sonicjs-app test-app \
 ### Create a blog
 
 ```bash
-npx create-sonicjs-app my-blog
+npx create-sonicjs my-blog
 # Select "Starter" template
 # Include example collection: Yes
 ```
@@ -262,7 +262,7 @@ npx create-sonicjs-app my-blog
 ### Create without examples
 
 ```bash
-npx create-sonicjs-app my-app
+npx create-sonicjs my-app
 # Include example collection: No
 ```
 

@@ -75,12 +75,12 @@ function renderCatalystCheckbox(props) {
   const colorClasses = {
     "dark/zinc": "peer-checked:bg-zinc-900 peer-checked:before:bg-zinc-900 dark:peer-checked:bg-zinc-600",
     "dark/white": "peer-checked:bg-zinc-900 peer-checked:before:bg-zinc-900 dark:peer-checked:bg-white",
-    "white": "peer-checked:bg-white peer-checked:before:bg-white",
-    "dark": "peer-checked:bg-zinc-900 peer-checked:before:bg-zinc-900",
-    "zinc": "peer-checked:bg-zinc-600 peer-checked:before:bg-zinc-600",
-    "blue": "peer-checked:bg-blue-600 peer-checked:before:bg-blue-600",
-    "green": "peer-checked:bg-green-600 peer-checked:before:bg-green-600",
-    "red": "peer-checked:bg-red-600 peer-checked:before:bg-red-600"
+    white: "peer-checked:bg-white peer-checked:before:bg-white",
+    dark: "peer-checked:bg-zinc-900 peer-checked:before:bg-zinc-900",
+    zinc: "peer-checked:bg-zinc-600 peer-checked:before:bg-zinc-600",
+    blue: "peer-checked:bg-blue-600 peer-checked:before:bg-blue-600",
+    green: "peer-checked:bg-green-600 peer-checked:before:bg-green-600",
+    red: "peer-checked:bg-red-600 peer-checked:before:bg-red-600"
   };
   const checkColor = color === "dark/white" ? "dark:text-zinc-900" : "text-white";
   const baseClasses = `
@@ -517,13 +517,6 @@ function renderCatalystSidebar(currentPath = "", user, dynamicMenuItems, isMobil
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                   </svg>
                   My Profile
-                </a>
-                <a href="/admin/settings" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-zinc-950 hover:bg-zinc-950/5 dark:text-white dark:hover:bg-white/5">
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                  </svg>
-                  Settings
                 </a>
                 <a href="/auth/logout" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10">
                   <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1075,7 +1068,9 @@ function renderTable(data) {
 // src/templates/layouts/admin-layout-v2.template.ts
 init_logo_template();
 function renderAdminLayout(data) {
-  const { renderAdminLayoutCatalyst: renderAdminLayoutCatalyst2 } = (init_admin_layout_catalyst_template(), chunkIGJUBJBW_cjs.__toCommonJS(admin_layout_catalyst_template_exports));
+  const {
+    renderAdminLayoutCatalyst: renderAdminLayoutCatalyst2
+  } = (init_admin_layout_catalyst_template(), chunkIGJUBJBW_cjs.__toCommonJS(admin_layout_catalyst_template_exports));
   return renderAdminLayoutCatalyst2(data);
 }
 function adminLayoutV2(data) {
@@ -1637,7 +1632,9 @@ function renderSidebar(currentPath, user, dynamicMenuItems) {
   ];
   const allMenuItems = [...baseMenuItems];
   if (dynamicMenuItems && dynamicMenuItems.length > 0) {
-    const usersIndex = allMenuItems.findIndex((item) => item.path === "/admin/users");
+    const usersIndex = allMenuItems.findIndex(
+      (item) => item.path === "/admin/users"
+    );
     if (usersIndex !== -1) {
       allMenuItems.splice(usersIndex + 1, 0, ...dynamicMenuItems);
     } else {
@@ -1833,13 +1830,6 @@ function renderTopBar(pageTitle, user) {
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                       </svg>
                       My Profile
-                    </a>
-                    <a href="/admin/settings" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                      </svg>
-                      Settings
                     </a>
                     <a href="/auth/logout" class="flex items-center gap-3 px-4 py-2 text-sm text-red-300 hover:bg-red-500/10 hover:text-red-200 transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3701,5 +3691,5 @@ exports.renderLogo = renderLogo;
 exports.renderPagination = renderPagination;
 exports.renderTable = renderTable;
 exports.renderTestimonialsList = renderTestimonialsList;
-//# sourceMappingURL=chunk-ALOS2CBJ.cjs.map
-//# sourceMappingURL=chunk-ALOS2CBJ.cjs.map
+//# sourceMappingURL=chunk-3SPQ3J4N.cjs.map
+//# sourceMappingURL=chunk-3SPQ3J4N.cjs.map

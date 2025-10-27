@@ -193,7 +193,7 @@ export function renderSettingsPage(data: SettingsPageData): string {
       // Migration functions
       window.refreshMigrationStatus = async function() {
         try {
-          const response = await fetch('/admin/api/migrations/status');
+          const response = await fetch('/admin/settings/api/migrations/status');
           const result = await response.json();
           
           if (result.success) {
@@ -221,7 +221,7 @@ export function renderSettingsPage(data: SettingsPageData): string {
         btn.innerHTML = 'Running...';
 
         try {
-          const response = await fetch('/admin/api/migrations/run', {
+          const response = await fetch('/admin/settings/api/migrations/run', {
             method: 'POST'
           });
           const result = await response.json();
@@ -242,7 +242,7 @@ export function renderSettingsPage(data: SettingsPageData): string {
 
       window.validateSchema = async function() {
         try {
-          const response = await fetch('/admin/api/migrations/validate');
+          const response = await fetch('/admin/settings/api/migrations/validate');
           const result = await response.json();
           
           if (result.success) {
@@ -1278,7 +1278,7 @@ function renderMigrationSettings(settings?: MigrationSettings): string {
       if (typeof refreshMigrationStatus === 'undefined') {
         window.refreshMigrationStatus = async function() {
           try {
-            const response = await fetch('/admin/api/migrations/status');
+            const response = await fetch('/admin/settings/api/migrations/status');
             const result = await response.json();
             
             if (result.success) {

@@ -30,7 +30,29 @@ Before you begin, ensure you have the following installed:
 
 ## Quick Start
 
-Get SonicJS running in under 60 seconds:
+### Option 1: Create New Project (Recommended)
+
+Get started in under 60 seconds with the official CLI:
+
+```bash
+# Create a new SonicJS project
+npx create-sonicjs my-cms
+
+# Navigate to project
+cd my-cms
+
+# Run database migrations
+npm run db:migrate
+
+# Start development server
+npm run dev
+```
+
+Your SonicJS instance will be available at **<http://localhost:8787>**
+
+### Option 2: Clone Repository (Development)
+
+For contributing or developing SonicJS itself:
 
 ```bash
 # Clone the repository
@@ -46,8 +68,6 @@ npm run db:migrate
 # Start development server
 npm run dev
 ```
-
-Your SonicJS instance will be available at **<http://localhost:8787>**
 
 ## Development Setup
 
