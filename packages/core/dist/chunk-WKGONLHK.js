@@ -413,7 +413,7 @@ function buildQuery(table, filter) {
 // package.json
 var package_default = {
   name: "@sonicjs-cms/core",
-  version: "2.0.3",
+  version: "2.0.4",
   description: "Core framework for SonicJS headless CMS - Edge-first, TypeScript-native CMS built for Cloudflare Workers",
   type: "module",
   main: "./dist/index.cjs",
@@ -536,5 +536,5 @@ function getCoreVersion() {
 }
 
 export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, package_default, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer };
-//# sourceMappingURL=chunk-OSEURPFJ.js.map
-//# sourceMappingURL=chunk-OSEURPFJ.js.map
+//# sourceMappingURL=chunk-WKGONLHK.js.map
+//# sourceMappingURL=chunk-WKGONLHK.js.map

@@ -23,18 +23,22 @@ export type UserPermissions = {
   userId: string
   permissions: Permission[]
 }
-export const loggingMiddleware: any = () => {}
-export const detailedLoggingMiddleware: any = () => {}
-export const securityLoggingMiddleware: any = () => {}
-export const performanceLoggingMiddleware: any = () => {}
-export const cacheHeaders: any = () => {}
-export const compressionMiddleware: any = () => {}
-export const securityHeaders: any = () => {}
+
+// Middleware stubs - these return pass-through middleware that call next()
+export const loggingMiddleware: any = () => async (c: any, next: any) => await next()
+export const detailedLoggingMiddleware: any = () => async (c: any, next: any) => await next()
+export const securityLoggingMiddleware: any = () => async (c: any, next: any) => await next()
+export const performanceLoggingMiddleware: any = () => async (c: any, next: any) => await next()
+export const cacheHeaders: any = () => async (c: any, next: any) => await next()
+export const compressionMiddleware: any = async (c: any, next: any) => await next()
+export const securityHeaders: any = () => async (c: any, next: any) => await next()
+
+// Other stubs
 export const PermissionManager: any = {}
-export const requirePermission: any = () => {}
-export const requireAnyPermission: any = () => {}
+export const requirePermission: any = () => async (c: any, next: any) => await next()
+export const requireAnyPermission: any = () => async (c: any, next: any) => await next()
 export const logActivity: any = () => {}
-export const requireActivePlugin: any = () => {}
-export const requireActivePlugins: any = () => {}
-export const getActivePlugins: any = () => {}
-export const isPluginActive: any = () => {}
+export const requireActivePlugin: any = () => async (c: any, next: any) => await next()
+export const requireActivePlugins: any = () => async (c: any, next: any) => await next()
+export const getActivePlugins: any = () => []
+export const isPluginActive: any = () => false

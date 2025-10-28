@@ -181,35 +181,22 @@ var metricsMiddleware = () => {
 };
 
 // src/middleware/index.ts
-var loggingMiddleware = () => {
-};
-var detailedLoggingMiddleware = () => {
-};
-var securityLoggingMiddleware = () => {
-};
-var performanceLoggingMiddleware = () => {
-};
-var cacheHeaders = () => {
-};
-var compressionMiddleware = () => {
-};
-var securityHeaders = () => {
-};
+var loggingMiddleware = () => async (c, next) => await next();
+var detailedLoggingMiddleware = () => async (c, next) => await next();
+var securityLoggingMiddleware = () => async (c, next) => await next();
+var performanceLoggingMiddleware = () => async (c, next) => await next();
+var cacheHeaders = () => async (c, next) => await next();
+var compressionMiddleware = async (c, next) => await next();
+var securityHeaders = () => async (c, next) => await next();
 var PermissionManager = {};
-var requirePermission = () => {
-};
-var requireAnyPermission = () => {
-};
+var requirePermission = () => async (c, next) => await next();
+var requireAnyPermission = () => async (c, next) => await next();
 var logActivity = () => {
 };
-var requireActivePlugin = () => {
-};
-var requireActivePlugins = () => {
-};
-var getActivePlugins = () => {
-};
-var isPluginActive = () => {
-};
+var requireActivePlugin = () => async (c, next) => await next();
+var requireActivePlugins = () => async (c, next) => await next();
+var getActivePlugins = () => [];
+var isPluginActive = () => false;
 
 exports.AuthManager = AuthManager;
 exports.PermissionManager = PermissionManager;
@@ -232,5 +219,5 @@ exports.requirePermission = requirePermission;
 exports.requireRole = requireRole;
 exports.securityHeaders = securityHeaders;
 exports.securityLoggingMiddleware = securityLoggingMiddleware;
-//# sourceMappingURL=chunk-4BJGEGX5.cjs.map
-//# sourceMappingURL=chunk-4BJGEGX5.cjs.map
+//# sourceMappingURL=chunk-K5BK5S3Y.cjs.map
+//# sourceMappingURL=chunk-K5BK5S3Y.cjs.map

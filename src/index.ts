@@ -29,7 +29,7 @@ import {
 // Design plugin routes
 import { designRoutes } from './plugins/design/routes'
 // Hello World plugin
-import { helloWorldPlugin } from './plugins/core-plugins/hello-world-plugin'
+import { helloWorldPlugin } from './plugins/core-plugins/hello-world-plugin/index'
 // Workflow routes are loaded dynamically through plugin system
 import { createWorkflowRoutes } from './plugins/available/workflow-plugin/routes'
 import { createWorkflowAdminRoutes } from './plugins/available/workflow-plugin/admin-routes'
