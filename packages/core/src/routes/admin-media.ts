@@ -92,23 +92,25 @@ adminMediaRoutes.get('/', async (c) => {
     // Get folder statistics
     const foldersStmt = db.prepare(`
       SELECT folder, COUNT(*) as count, SUM(size) as totalSize
-      FROM media 
-      GROUP BY folder 
+      FROM media
+      WHERE deleted_at IS NULL
+      GROUP BY folder
       ORDER BY folder
     `)
     const { results: folders } = await foldersStmt.all()
     
     // Get type statistics
     const typesStmt = db.prepare(`
-      SELECT 
-        CASE 
+      SELECT
+        CASE
           WHEN mime_type LIKE 'image/%' THEN 'images'
           WHEN mime_type LIKE 'video/%' THEN 'videos'
           WHEN mime_type IN ('application/pdf', 'text/plain') THEN 'documents'
           ELSE 'other'
         END as type,
         COUNT(*) as count
-      FROM media 
+      FROM media
+      WHERE deleted_at IS NULL
       GROUP BY type
     `)
     const { results: types } = await typesStmt.all()

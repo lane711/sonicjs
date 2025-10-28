@@ -158,17 +158,27 @@ app.route('/api', apiSystemRoutes as any) // System API endpoints
 app.get('/files/*', async (c) => {
   try {
     const r2Key = c.req.path.replace('/files/', '')
+    console.log('[FILE SERVE] Requested path:', c.req.path)
+    console.log('[FILE SERVE] Extracted R2 key:', r2Key)
 
     if (!r2Key) {
+      console.log('[FILE SERVE] No R2 key provided')
       return c.notFound()
     }
+
+    // Check if MEDIA_BUCKET is available
+    console.log('[FILE SERVE] MEDIA_BUCKET available?', !!c.env.MEDIA_BUCKET)
 
     // Get file from R2
     const object = await c.env.MEDIA_BUCKET.get(r2Key)
+    console.log('[FILE SERVE] Object found?', !!object)
 
     if (!object) {
+      console.log('[FILE SERVE] File not found in R2:', r2Key)
       return c.notFound()
     }
+
+    console.log('[FILE SERVE] Serving file:', r2Key, 'Content-Type:', object.httpMetadata?.contentType)
 
     // Set appropriate headers
     const headers = new Headers()
@@ -181,7 +191,7 @@ app.get('/files/*', async (c) => {
       headers
     })
   } catch (error) {
-    console.error('Error serving file:', error)
+    console.error('[FILE SERVE] Error serving file:', error)
     return c.notFound()
   }
 })

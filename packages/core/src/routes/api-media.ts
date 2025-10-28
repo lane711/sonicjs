@@ -476,13 +476,20 @@ apiMediaRoutes.post('/create-folder', async (c) => {
     const checkStmt = c.env.DB.prepare('SELECT COUNT(*) as count FROM media WHERE folder = ? AND deleted_at IS NULL')
     const existingFolder = await checkStmt.bind(folderName).first() as any
 
-    // Note: We allow folder creation even if it exists, as R2 folders are virtual
-    // The folder will be created when files are uploaded to it
+    if (existingFolder && existingFolder.count > 0) {
+      return c.json({
+        success: false,
+        error: `Folder "${folderName}" already exists`
+      }, 400)
+    }
 
+    // Note: R2 folders are virtual - they only exist when files are uploaded to them
+    // Return success message explaining this behavior
     return c.json({
       success: true,
-      message: `Folder "${folderName}" created successfully`,
-      folder: folderName
+      message: `Folder "${folderName}" is ready. Upload files to this folder to make it appear in the media library.`,
+      folder: folderName,
+      note: 'Folders appear automatically when you upload files to them'
     })
   } catch (error) {
     console.error('Create folder error:', error)
