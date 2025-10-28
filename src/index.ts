@@ -44,12 +44,6 @@ import { loggingMiddleware, securityLoggingMiddleware, performanceLoggingMiddlew
 import { compressionMiddleware, securityHeaders, cacheHeaders } from '@sonicjs-cms/core'
 import { VERSION } from '@sonicjs-cms/core'
 
-// Debug: Check if routes are imported correctly
-console.log('[DEBUG] authRoutes:', typeof authRoutes, authRoutes ? 'defined' : 'undefined')
-console.log('[DEBUG] apiRoutes:', typeof apiRoutes, apiRoutes ? 'defined' : 'undefined')
-console.log('[DEBUG] authRoutes.fetch?:', typeof authRoutes.fetch)
-console.log('[DEBUG] authRoutes.routes?:', authRoutes.routes ? authRoutes.routes.length : 'undefined')
-
 // Store app version globally at startup (use core package version)
 const APP_VERSION = `v${VERSION}`
 
@@ -81,13 +75,6 @@ type Variables = {
 }
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>()
-
-// Debug fetch handler
-app.use('*', async (c, next) => {
-  console.log('[FETCH] Request received:', c.req.method, c.req.url, c.req.path)
-  await next()
-  console.log('[FETCH] Response sent')
-})
 
 // Set app version globally from package.json
 app.use('*', async (c, next) => {
@@ -161,12 +148,6 @@ app.get('/images/*', async (c) => {
   }
 })
 
-// Test route to verify routing works
-app.get('/test-simple', (c) => {
-  console.log('[TEST] Simple test route hit!')
-  return c.json({ test: 'working' })
-})
-
 // Public routes
 app.route('/auth', authRoutes as any)
 
@@ -182,27 +163,17 @@ app.route('/api', apiSystemRoutes as any) // System API endpoints
 app.get('/files/*', async (c) => {
   try {
     const r2Key = c.req.path.replace('/files/', '')
-    console.log('[FILE SERVE] Requested path:', c.req.path)
-    console.log('[FILE SERVE] Extracted R2 key:', r2Key)
 
     if (!r2Key) {
-      console.log('[FILE SERVE] No R2 key provided')
       return c.notFound()
     }
-
-    // Check if MEDIA_BUCKET is available
-    console.log('[FILE SERVE] MEDIA_BUCKET available?', !!c.env.MEDIA_BUCKET)
 
     // Get file from R2
     const object = await c.env.MEDIA_BUCKET.get(r2Key)
-    console.log('[FILE SERVE] Object found?', !!object)
 
     if (!object) {
-      console.log('[FILE SERVE] File not found in R2:', r2Key)
       return c.notFound()
     }
-
-    console.log('[FILE SERVE] Serving file:', r2Key, 'Content-Type:', object.httpMetadata?.contentType)
 
     // Set appropriate headers
     const headers = new Headers()
@@ -378,7 +349,6 @@ app.get('/health', (c) => {
 
 // 404 handler
 app.notFound((c) => {
-  console.log('[404] Not found:', c.req.method, c.req.url, c.req.path)
   return c.json({ error: 'Not Found', status: 404 }, 404)
 })
 
@@ -408,12 +378,5 @@ app.onError(async (err, c) => {
   
   return c.json({ error: 'Internal Server Error', status: 500 }, 500)
 })
-
-// Debug: Check app structure
-console.log('[DEBUG] Exporting app, typeof app:', typeof app)
-console.log('[DEBUG] app.fetch exists?:', typeof app.fetch)
-console.log('[DEBUG] app keys:', Object.keys(app))
-console.log('[DEBUG] app.routes:', app.routes)
-console.log('[DEBUG] Number of routes:', app.routes.length)
 
 export default app
