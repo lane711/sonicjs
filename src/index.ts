@@ -335,7 +335,7 @@ app.get('/health', (c) => {
   console.log('[MAIN APP] Health endpoint called from src/index.ts!')
   return c.json({
     name: 'SonicJS AI',
-    version: '0.1.0',
+    version: VERSION,
     description: 'A modern, TypeScript-first headless CMS built for Cloudflare\'s edge platform',
     status: 'running',
     timestamp: new Date().toISOString()

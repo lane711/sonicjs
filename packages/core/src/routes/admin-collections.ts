@@ -273,12 +273,14 @@ adminCollectionsRoutes.post('/', async (c) => {
       now
     ).run()
 
-    // Clear cache
-    try {
-      await c.env.CACHE_KV.delete('cache:collections:all')
-      await c.env.CACHE_KV.delete(`cache:collection:${name}`)
-    } catch (e) {
-      console.error('Error clearing cache:', e)
+    // Clear cache (only if CACHE_KV is available)
+    if (c.env.CACHE_KV) {
+      try {
+        await c.env.CACHE_KV.delete('cache:collections:all')
+        await c.env.CACHE_KV.delete(`cache:collection:${name}`)
+      } catch (e) {
+        console.error('Error clearing cache:', e)
+      }
     }
 
     if (isHtmx) {

@@ -4,9 +4,10 @@ import { checkAPIHealth } from './utils/test-helpers';
 test.describe('Health Checks', () => {
   test('API health endpoint should return running status', async ({ page }) => {
     const health = await checkAPIHealth(page);
-    
+
     expect(health).toHaveProperty('name', 'SonicJS AI');
-    expect(health).toHaveProperty('version', '0.1.0');
+    expect(health).toHaveProperty('version'); // Version comes from @sonicjs-cms/core package
+    expect(health.version).toMatch(/^\d+\.\d+\.\d+$/); // Verify semver format
     expect(health).toHaveProperty('status', 'running');
     expect(health).toHaveProperty('timestamp');
   });

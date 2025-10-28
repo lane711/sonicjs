@@ -1,0 +1,47 @@
+{
+  "name": "@sonicjs-cms/templates",
+  "version": "2.0.0",
+  "description": "Template system for SonicJS CMS",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./pages/*": {
+      "import": "./dist/pages/*.js",
+      "require": "./dist/pages/*.cjs",
+      "types": "./dist/pages/*.d.ts"
+    },
+    "./layouts/*": {
+      "import": "./dist/layouts/*.js",
+      "require": "./dist/layouts/*.cjs",
+      "types": "./dist/layouts/*.d.ts"
+    },
+    "./components/*": {
+      "import": "./dist/components/*.js",
+      "require": "./dist/components/*.cjs",
+      "types": "./dist/components/*.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250620.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "hono": "^4.10.1"
+  }
+}

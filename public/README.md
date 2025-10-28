@@ -1,1 +1,1 @@
-# Public assets
+# Public assets directory

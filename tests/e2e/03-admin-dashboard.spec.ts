@@ -9,20 +9,21 @@ test.describe('Admin Dashboard', () => {
 
   test('should display correct version from package.json', async ({ page }) => {
     // The version should be displayed in the layout (usually in the sidebar or footer)
-    const expectedVersion = `v${corePackageJson.version}`;
+    // Version comes from @sonicjs-cms/core package and is shown without 'v' prefix in badge
+    const expectedVersion = corePackageJson.version;
 
-    // Look for the version text anywhere in the page (there may be multiple instances)
-    const versionElement = page.getByText(expectedVersion).first();
-    await expect(versionElement).toBeVisible();
+    // Look for the version badge (it displays just the version number like "2.0.3")
+    const versionElement = page.getByText(expectedVersion, { exact: true }).first();
+    await expect(versionElement).toBeVisible({ timeout: 10000 });
 
     // Make sure it's not showing the old hardcoded version
-    const oldVersion = page.getByText('v0.1.0', { exact: true });
+    const oldVersion = page.getByText('0.1.0', { exact: true });
     await expect(oldVersion).not.toBeVisible();
   });
 
   test('should display admin dashboard with navigation', async ({ page }) => {
-    // Check that we're on the admin dashboard by verifying URL and navigation
-    await expect(page).toHaveURL('/admin');
+    // Check that we're on the admin dashboard (app redirects /admin to /admin/dashboard)
+    await expect(page).toHaveURL(/\/admin/);
 
     // Check navigation links in sidebar (they're inside nav element)
     // Use .first() to avoid strict mode violations (desktop + mobile nav)

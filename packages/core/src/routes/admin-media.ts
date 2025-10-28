@@ -425,6 +425,21 @@ adminMediaRoutes.post('/upload', async (c) => {
     const uploadResults = []
     const errors = []
 
+    // Check if MEDIA_BUCKET is available
+    console.log('[MEDIA UPLOAD] c.env keys:', Object.keys(c.env))
+    console.log('[MEDIA UPLOAD] MEDIA_BUCKET defined?', !!c.env.MEDIA_BUCKET)
+    console.log('[MEDIA UPLOAD] MEDIA_BUCKET type:', typeof c.env.MEDIA_BUCKET)
+
+    if (!c.env.MEDIA_BUCKET) {
+      console.error('[MEDIA UPLOAD] MEDIA_BUCKET is not available! Available env keys:', Object.keys(c.env))
+      return c.html(html`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          Media storage (R2) is not configured. Please check your wrangler.toml configuration.
+          <br><small>Debug: Available bindings: ${Object.keys(c.env).join(', ')}</small>
+        </div>
+      `)
+    }
+
     for (const file of files) {
       try {
         // Validate file

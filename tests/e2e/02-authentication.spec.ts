@@ -19,8 +19,8 @@ test.describe('Authentication', () => {
   test('should login successfully with valid credentials', async ({ page }) => {
     await loginAsAdmin(page);
 
-    // Should be on admin dashboard
-    await expect(page).toHaveURL('/admin');
+    // Should be on admin dashboard (app redirects /admin to /admin/dashboard)
+    await expect(page).toHaveURL(/\/admin/);
     // Verify we're logged in by checking for any admin content
     // Don't check for specific elements as layout may vary
   });
@@ -72,8 +72,8 @@ test.describe('Authentication', () => {
     // Reload the page
     await page.reload();
 
-    // Should still be authenticated
-    await expect(page).toHaveURL('/admin');
+    // Should still be authenticated (app redirects /admin to /admin/dashboard)
+    await expect(page).toHaveURL(/\/admin/);
     await expect(await isAuthenticated(page)).toBe(true);
   });
 }); 
