@@ -918,10 +918,17 @@ apiMediaRoutes.post("/create-folder", async (c) => {
     }
     const checkStmt = c.env.DB.prepare("SELECT COUNT(*) as count FROM media WHERE folder = ? AND deleted_at IS NULL");
     const existingFolder = await checkStmt.bind(folderName).first();
+    if (existingFolder && existingFolder.count > 0) {
+      return c.json({
+        success: false,
+        error: `Folder "${folderName}" already exists`
+      }, 400);
+    }
     return c.json({
       success: true,
-      message: `Folder "${folderName}" created successfully`,
-      folder: folderName
+      message: `Folder "${folderName}" is ready. Upload files to this folder to make it appear in the media library.`,
+      folder: folderName,
+      note: "Folders appear automatically when you upload files to them"
     });
   } catch (error) {
     console.error("Create folder error:", error);
@@ -10218,21 +10225,23 @@ adminMediaRoutes.get("/", async (c) => {
     const { results } = await stmt.bind(...params).all();
     const foldersStmt = db.prepare(`
       SELECT folder, COUNT(*) as count, SUM(size) as totalSize
-      FROM media 
-      GROUP BY folder 
+      FROM media
+      WHERE deleted_at IS NULL
+      GROUP BY folder
       ORDER BY folder
     `);
     const { results: folders } = await foldersStmt.all();
     const typesStmt = db.prepare(`
-      SELECT 
-        CASE 
+      SELECT
+        CASE
           WHEN mime_type LIKE 'image/%' THEN 'images'
           WHEN mime_type LIKE 'video/%' THEN 'videos'
           WHEN mime_type IN ('application/pdf', 'text/plain') THEN 'documents'
           ELSE 'other'
         END as type,
         COUNT(*) as count
-      FROM media 
+      FROM media
+      WHERE deleted_at IS NULL
       GROUP BY type
     `);
     const { results: types } = await typesStmt.all();
@@ -10508,10 +10517,15 @@ adminMediaRoutes.post("/upload", async (c) => {
     }
     const uploadResults = [];
     const errors = [];
+    console.log("[MEDIA UPLOAD] c.env keys:", Object.keys(c.env));
+    console.log("[MEDIA UPLOAD] MEDIA_BUCKET defined?", !!c.env.MEDIA_BUCKET);
+    console.log("[MEDIA UPLOAD] MEDIA_BUCKET type:", typeof c.env.MEDIA_BUCKET);
     if (!c.env.MEDIA_BUCKET) {
+      console.error("[MEDIA UPLOAD] MEDIA_BUCKET is not available! Available env keys:", Object.keys(c.env));
       return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Media storage (R2) is not configured. Please check your wrangler.toml configuration.
+          <br><small>Debug: Available bindings: ${Object.keys(c.env).join(", ")}</small>
         </div>
       `);
     }
@@ -17881,11 +17895,13 @@ adminCollectionsRoutes.post("/", async (c) => {
       now,
       now
     ).run();
-    try {
-      await c.env.CACHE_KV.delete("cache:collections:all");
-      await c.env.CACHE_KV.delete(`cache:collection:${name}`);
-    } catch (e) {
-      console.error("Error clearing cache:", e);
+    if (c.env.CACHE_KV) {
+      try {
+        await c.env.CACHE_KV.delete("cache:collections:all");
+        await c.env.CACHE_KV.delete(`cache:collection:${name}`);
+      } catch (e) {
+        console.error("Error clearing cache:", e);
+      }
     }
     if (isHtmx) {
       return c.html(html.html`
@@ -20006,5 +20022,5 @@ exports.api_system_default = api_system_default;
 exports.auth_default = auth_default;
 exports.router = router;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-4NHAAKEG.cjs.map
-//# sourceMappingURL=chunk-4NHAAKEG.cjs.map
+//# sourceMappingURL=chunk-JLZHGDEP.cjs.map
+//# sourceMappingURL=chunk-JLZHGDEP.cjs.map

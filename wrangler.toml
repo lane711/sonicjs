@@ -11,7 +11,7 @@ compatibility_flags = ["nodejs_compat"]
 # ============================================================================
 [dev]
 port = 8787
-persist_to = ".wrangler/state/v3"
+# persist_to = ".wrangler/state/v3"  # Deprecated field - removed
 # Reduce logging verbosity to avoid noise from high-frequency endpoints
 # Set WRANGLER_LOG environment variable to control log level
 # Options: "none", "error", "warn", "info", "log", "debug"
@@ -22,9 +22,10 @@ command = ""
 # ============================================================================
 # STATIC ASSETS
 # ============================================================================
-[assets]
-directory = "./public"
-binding = "ASSETS"
+# Temporarily disabled - causing issues with directory not found
+# [assets]
+# directory = "./public"
+# binding = "ASSETS"
 
 # ============================================================================
 # DEVELOPMENT ENVIRONMENT (default)

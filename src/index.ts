@@ -44,6 +44,12 @@ import { loggingMiddleware, securityLoggingMiddleware, performanceLoggingMiddlew
 import { compressionMiddleware, securityHeaders, cacheHeaders } from '@sonicjs-cms/core'
 import { VERSION } from '@sonicjs-cms/core'
 
+// Debug: Check if routes are imported correctly
+console.log('[DEBUG] authRoutes:', typeof authRoutes, authRoutes ? 'defined' : 'undefined')
+console.log('[DEBUG] apiRoutes:', typeof apiRoutes, apiRoutes ? 'defined' : 'undefined')
+console.log('[DEBUG] authRoutes.fetch?:', typeof authRoutes.fetch)
+console.log('[DEBUG] authRoutes.routes?:', authRoutes.routes ? authRoutes.routes.length : 'undefined')
+
 // Store app version globally at startup (use core package version)
 const APP_VERSION = `v${VERSION}`
 
@@ -52,7 +58,7 @@ type Bindings = {
   DB: D1Database
   CACHE_KV: KVNamespace
   MEDIA_BUCKET: R2Bucket
-  ASSETS: Fetcher
+  ASSETS?: Fetcher // Optional since assets may be disabled
   EMAIL_QUEUE?: Queue
   SENDGRID_API_KEY?: string
   DEFAULT_FROM_EMAIL?: string
@@ -75,6 +81,13 @@ type Variables = {
 }
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>()
+
+// Debug fetch handler
+app.use('*', async (c, next) => {
+  console.log('[FETCH] Request received:', c.req.method, c.req.url, c.req.path)
+  await next()
+  console.log('[FETCH] Response sent')
+})
 
 // Set app version globally from package.json
 app.use('*', async (c, next) => {
@@ -130,6 +143,11 @@ app.use('/api/*', prettyJSON())
 
 // Static file serving for images
 app.get('/images/*', async (c) => {
+  // Skip if ASSETS binding is not available
+  if (!c.env.ASSETS) {
+    return c.notFound()
+  }
+
   const path = c.req.path.replace('/images/', '')
   try {
     const response = await c.env.ASSETS.fetch(new Request(`http://localhost/images/${path}`))
@@ -141,6 +159,12 @@ app.get('/images/*', async (c) => {
     console.error('Error serving static file:', error)
     return c.notFound()
   }
+})
+
+// Test route to verify routing works
+app.get('/test-simple', (c) => {
+  console.log('[TEST] Simple test route hit!')
+  return c.json({ test: 'working' })
 })
 
 // Public routes
@@ -354,6 +378,7 @@ app.get('/health', (c) => {
 
 // 404 handler
 app.notFound((c) => {
+  console.log('[404] Not found:', c.req.method, c.req.url, c.req.path)
   return c.json({ error: 'Not Found', status: 404 }, 404)
 })
 
@@ -383,5 +408,12 @@ app.onError(async (err, c) => {
   
   return c.json({ error: 'Internal Server Error', status: 500 }, 500)
 })
+
+// Debug: Check app structure
+console.log('[DEBUG] Exporting app, typeof app:', typeof app)
+console.log('[DEBUG] app.fetch exists?:', typeof app.fetch)
+console.log('[DEBUG] app keys:', Object.keys(app))
+console.log('[DEBUG] app.routes:', app.routes)
+console.log('[DEBUG] Number of routes:', app.routes.length)
 
 export default app
