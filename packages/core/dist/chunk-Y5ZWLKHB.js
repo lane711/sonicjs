@@ -1,4 +1,4 @@
-import { getCacheService, CACHE_CONFIGS, getLogger } from './chunk-LH4Z7QID.js';
+import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-6FR25MPC.js';
 import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-G5KY3WJV.js';
 import { PluginService, MigrationService } from './chunk-HSRPDEQQ.js';
 import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderFAQList, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-3LZ6TLPC.js';
@@ -5891,6 +5891,11 @@ var admin_content_default = adminContentRoutes;
 
 // src/templates/pages/admin-profile.template.ts
 init_admin_layout_catalyst_template();
+function renderAvatarImage(avatarUrl, firstName, lastName) {
+  return `<div id="avatar-image-container" class="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden bg-gradient-to-br from-cyan-400 to-purple-400 flex items-center justify-center ring-4 ring-zinc-950/5 dark:ring-white/10">
+    ${avatarUrl ? `<img src="${avatarUrl}" alt="Profile picture" class="w-full h-full object-cover">` : `<span class="text-2xl font-bold text-white">${firstName.charAt(0)}${lastName.charAt(0)}</span>`}
+  </div>`;
+}
 function renderProfilePage(data) {
   const pageContent = `
     <div class="space-y-8">
@@ -6089,9 +6094,7 @@ function renderProfilePage(data) {
             <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Profile Picture</h3>
 
             <div class="text-center">
-              <div class="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden bg-gradient-to-br from-cyan-400 to-purple-400 flex items-center justify-center ring-4 ring-zinc-950/5 dark:ring-white/10">
-                ${data.profile.avatar_url ? `<img src="${data.profile.avatar_url}" alt="Profile picture" class="w-full h-full object-cover">` : `<span class="text-2xl font-bold text-white">${data.profile.first_name.charAt(0)}${data.profile.last_name.charAt(0)}</span>`}
-              </div>
+              ${renderAvatarImage(data.profile.avatar_url, data.profile.first_name, data.profile.last_name)}
 
               <form id="avatar-form" hx-post="/admin/profile/avatar" hx-target="#avatar-messages" hx-encoding="multipart/form-data">
                 <input
@@ -7927,6 +7930,10 @@ userRoutes.post("/profile/avatar", async (c) => {
       WHERE id = ?
     `);
     await updateStmt.bind(avatarUrl, Date.now(), user.userId).run();
+    const userStmt = db.prepare(`
+      SELECT first_name, last_name FROM users WHERE id = ?
+    `);
+    const userData = await userStmt.bind(user.userId).first();
     await logActivity(
       db,
       user.userId,
@@ -7937,11 +7944,18 @@ userRoutes.post("/profile/avatar", async (c) => {
       c.req.header("x-forwarded-for") || c.req.header("cf-connecting-ip"),
       c.req.header("user-agent")
     );
-    return c.html(renderAlert2({
+    const alertHtml = renderAlert2({
       type: "success",
       message: "Profile picture updated successfully!",
       dismissible: true
-    }));
+    });
+    const avatarUrlWithCache = `${avatarUrl}?t=${Date.now()}`;
+    const avatarImageHtml = renderAvatarImage(avatarUrlWithCache, userData.first_name, userData.last_name);
+    const avatarImageWithOob = avatarImageHtml.replace(
+      'id="avatar-image-container"',
+      'id="avatar-image-container" hx-swap-oob="true"'
+    );
+    return c.html(alertHtml + avatarImageWithOob);
   } catch (error) {
     console.error("Avatar upload error:", error);
     return c.html(renderAlert2({
@@ -16423,14 +16437,14 @@ router.get("/stats", async (c) => {
     } catch (error) {
       console.error("Error fetching users count:", error);
     }
-    const html9 = renderStatsCards({
+    const html8 = renderStatsCards({
       collections: collectionsCount,
       contentItems: contentCount,
       mediaFiles: mediaCount,
       users: usersCount,
       mediaSize
     });
-    return c.html(html9);
+    return c.html(html8);
   } catch (error) {
     console.error("Error fetching stats:", error);
     return c.html('<div class="text-red-500">Failed to load statistics</div>');
@@ -16454,8 +16468,8 @@ router.get("/storage", async (c) => {
     } catch (error) {
       console.error("Error fetching media size:", error);
     }
-    const html9 = renderStorageUsage(databaseSize, mediaSize);
-    return c.html(html9);
+    const html8 = renderStorageUsage(databaseSize, mediaSize);
+    return c.html(html8);
   } catch (error) {
     console.error("Error fetching storage usage:", error);
     return c.html('<div class="text-red-500">Failed to load storage information</div>');
@@ -16504,12 +16518,12 @@ router.get("/recent-activity", async (c) => {
         user: userName
       };
     });
-    const html9 = renderRecentActivity(activities);
-    return c.html(html9);
+    const html8 = renderRecentActivity(activities);
+    return c.html(html8);
   } catch (error) {
     console.error("Error fetching recent activity:", error);
-    const html9 = renderRecentActivity([]);
-    return c.html(html9);
+    const html8 = renderRecentActivity([]);
+    return c.html(html8);
   }
 });
 router.get("/api/metrics", async (c) => {
@@ -16522,7 +16536,7 @@ router.get("/api/metrics", async (c) => {
 });
 router.get("/system-status", async (c) => {
   try {
-    const html9 = `
+    const html8 = `
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="relative group">
           <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 dark:from-blue-500/10 dark:to-cyan-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -16577,7 +16591,7 @@ router.get("/system-status", async (c) => {
         </div>
       </div>
     `;
-    return c.html(html9);
+    return c.html(html8);
   } catch (error) {
     console.error("Error fetching system status:", error);
     return c.html('<div class="text-red-500">Failed to load system status</div>');
@@ -18333,31 +18347,52 @@ function renderSettingsPage(data) {
       // Initialize tab-specific features on page load
       const currentTab = '${activeTab}';
 
-      function saveAllSettings() {
+      async function saveAllSettings() {
         // Collect all form data
         const formData = new FormData();
-        
-        // Get all form inputs
-        document.querySelectorAll('input, select, textarea').forEach(input => {
+
+        // Get all form inputs in the settings content area
+        document.querySelectorAll('#settings-content input, #settings-content select, #settings-content textarea').forEach(input => {
           if (input.type === 'checkbox') {
-            formData.append(input.name, input.checked);
+            formData.append(input.name, input.checked ? 'true' : 'false');
           } else if (input.name) {
             formData.append(input.name, input.value);
           }
         });
-        
+
         // Show loading state
         const saveBtn = document.querySelector('button[onclick="saveAllSettings()"]');
         const originalText = saveBtn.innerHTML;
-        saveBtn.innerHTML = 'Saving...';
+        saveBtn.innerHTML = '<svg class="animate-spin -ml-0.5 mr-1.5 h-5 w-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>Saving...';
         saveBtn.disabled = true;
-        
-        // Simulate save (replace with actual API call)
-        setTimeout(() => {
+
+        try {
+          // Determine which endpoint to call based on current tab
+          let endpoint = '/admin/settings/general';
+          if (currentTab === 'general') {
+            endpoint = '/admin/settings/general';
+          }
+          // Add more endpoints for other tabs when implemented
+
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            body: formData
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            showNotification(result.message || 'Settings saved successfully!', 'success');
+          } else {
+            showNotification(result.error || 'Failed to save settings', 'error');
+          }
+        } catch (error) {
+          console.error('Error saving settings:', error);
+          showNotification('Failed to save settings. Please try again.', 'error');
+        } finally {
           saveBtn.innerHTML = originalText;
           saveBtn.disabled = false;
-          showNotification('Settings saved successfully!', 'success');
-        }, 1000);
+        }
       }
       
       function resetSettings() {
@@ -19762,15 +19797,20 @@ function getMockSettings(user) {
 adminSettingsRoutes.get("/", (c) => {
   return c.redirect("/admin/settings/general");
 });
-adminSettingsRoutes.get("/general", (c) => {
+adminSettingsRoutes.get("/general", async (c) => {
   const user = c.get("user");
+  const db = c.env.DB;
+  const settingsService = new SettingsService(db);
+  const generalSettings = await settingsService.getGeneralSettings(user?.email);
+  const mockSettings = getMockSettings(user);
+  mockSettings.general = generalSettings;
   const pageData = {
     user: user ? {
       name: user.email,
       email: user.email,
       role: user.role
     } : void 0,
-    settings: getMockSettings(user),
+    settings: mockSettings,
     activeTab: "general",
     version: c.get("appVersion")
   };
@@ -20051,27 +20091,54 @@ adminSettingsRoutes.post("/api/database-tools/truncate", async (c) => {
     }, 500);
   }
 });
-adminSettingsRoutes.post("/", async (c) => {
+adminSettingsRoutes.post("/general", async (c) => {
   try {
+    const user = c.get("user");
+    if (!user || user.role !== "admin") {
+      return c.json({
+        success: false,
+        error: "Unauthorized. Admin access required."
+      }, 403);
+    }
     const formData = await c.req.formData();
-    return c.html(html`
-      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-        Settings saved successfully!
-        <script>
-          setTimeout(() => {
-            showNotification('Settings saved successfully!', 'success');
-          }, 100);
-        </script>
-      </div>
-    `);
+    const db = c.env.DB;
+    const settingsService = new SettingsService(db);
+    const settings = {
+      siteName: formData.get("siteName"),
+      siteDescription: formData.get("siteDescription"),
+      adminEmail: formData.get("adminEmail"),
+      timezone: formData.get("timezone"),
+      language: formData.get("language"),
+      maintenanceMode: formData.get("maintenanceMode") === "true"
+    };
+    if (!settings.siteName || !settings.siteDescription) {
+      return c.json({
+        success: false,
+        error: "Site name and description are required"
+      }, 400);
+    }
+    const success = await settingsService.saveGeneralSettings(settings);
+    if (success) {
+      return c.json({
+        success: true,
+        message: "General settings saved successfully!"
+      });
+    } else {
+      return c.json({
+        success: false,
+        error: "Failed to save settings"
+      }, 500);
+    }
   } catch (error) {
-    console.error("Error saving settings:", error);
-    return c.html(html`
-      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-        Failed to save settings. Please try again.
-      </div>
-    `);
+    console.error("Error saving general settings:", error);
+    return c.json({
+      success: false,
+      error: "Failed to save settings. Please try again."
+    }, 500);
   }
+});
+adminSettingsRoutes.post("/", async (c) => {
+  return c.redirect("/admin/settings/general");
 });
 
 // src/routes/index.ts
@@ -20103,5 +20170,5 @@ var ROUTES_INFO = {
 };
 
 export { ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_faq_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, userRoutes };
-//# sourceMappingURL=chunk-2ILNN7L7.js.map
-//# sourceMappingURL=chunk-2ILNN7L7.js.map
+//# sourceMappingURL=chunk-Y5ZWLKHB.js.map
+//# sourceMappingURL=chunk-Y5ZWLKHB.js.map

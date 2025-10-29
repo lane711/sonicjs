@@ -1,0 +1,892 @@
+export const metadata = {
+  title: 'Database - SonicJS',
+  description:
+    'Comprehensive guide to SonicJS database architecture using Cloudflare D1, Drizzle ORM, migrations, schema, and query patterns.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'D1 Database Setup', id: 'd1-database-setup' },
+  { title: 'Complete Database Schema', id: 'complete-database-schema' },
+  { title: 'Drizzle ORM Integration', id: 'drizzle-orm-integration' },
+  { title: 'Migration System', id: 'migration-system' },
+  { title: 'Collection Sync System', id: 'collection-sync-system' },
+  { title: 'Query Patterns and Examples', id: 'query-patterns-and-examples' },
+  { title: 'Prepared Statements', id: 'prepared-statements' },
+  { title: 'Database Performance', id: 'database-performance' },
+  { title: 'Backup and Restore', id: 'backup-and-restore' },
+  { title: 'Wrangler D1 Commands', id: 'wrangler-d1-commands' },
+]
+
+# Database Documentation
+
+Comprehensive guide to SonicJS database architecture, schema, migrations, and operations using Cloudflare D1 and Drizzle ORM. {{ className: 'lead' }}
+
+## Overview
+
+SonicJS uses **Cloudflare D1**, a serverless SQLite database that runs at the edge, providing:
+
+- **Global Distribution** - Database replicated across Cloudflare's network
+- **Edge Compute** - Low-latency queries from any location
+- **SQLite Compatible** - Standard SQL syntax with SQLite extensions
+- **Zero Configuration** - No connection pools or server management
+- **ACID Compliance** - Full transactional support
+- **Cost Effective** - Pay-per-request pricing with generous free tier
+
+### Technology Stack
+
+<FeatureGrid
+  features={[
+    {
+      icon: '🗄️',
+      title: 'Cloudflare D1',
+      description: 'Serverless SQLite at the edge',
+    },
+    {
+      icon: '🔧',
+      title: 'Drizzle ORM',
+      description: 'Type-safe database operations',
+    },
+    {
+      icon: '📝',
+      title: 'SQL Migrations',
+      description: 'Version-controlled schema changes',
+    },
+    {
+      icon: '⚡',
+      title: 'Drizzle Kit',
+      description: 'SQL generation and introspection',
+    },
+    {
+      icon: '✅',
+      title: 'Zod + Drizzle Zod',
+      description: 'Runtime type validation',
+    },
+    {
+      icon: '🔄',
+      title: 'Collection Sync',
+      description: 'Config-managed collections',
+    },
+  ]}
+  columns={3}
+/>
+
+---
+
+## D1 Database Setup
+
+### Create D1 Database
+
+<CodeGroup title="Creating D1 Databases">
+
+```bash
+# Development database
+wrangler d1 create sonicjs-dev
+
+# Production database
+wrangler d1 create sonicjs-ai
+```
+
+</CodeGroup>
+
+### Configure wrangler.toml
+
+<CodeGroup title="Wrangler Configuration">
+
+```toml
+name = "sonicjs-ai"
+main = "src/index.ts"
+compatibility_date = "2024-06-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Development database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "sonicjs-dev"
+database_id = "your-dev-database-id"
+
+# R2 Bucket for media storage
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "sonicjs-media-dev"
+
+# KV Namespace for caching
+[[kv_namespaces]]
+binding = "CACHE_KV"
+id = "your-kv-namespace-id"
+preview_id = "your-preview-kv-id"
+
+# Production environment
+[env.production]
+name = "sonicjs-ai-prod"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "sonicjs-ai"
+database_id = "your-prod-database-id"
+
+[[env.production.r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "sonicjs-media-prod"
+
+[[env.production.kv_namespaces]]
+binding = "CACHE_KV"
+id = "your-prod-kv-id"
+```
+
+</CodeGroup>
+
+### Environment Access
+
+<CodeGroup title="Accessing Bindings in Worker">
+
+```typescript
+// In Cloudflare Worker
+export default {
+  async fetch(request: Request, env: Env) {
+    const db = env.DB // D1 Database
+    const bucket = env.MEDIA_BUCKET // R2 Bucket
+    const cache = env.CACHE_KV // KV Namespace
+
+    // Your application logic
+  }
+}
+```
+
+</CodeGroup>
+
+---
+
+## Complete Database Schema
+
+### Core Tables
+
+The database includes comprehensive tables for content management, user authentication, media storage, plugins, workflows, and system logging.
+
+#### users
+
+User authentication and profiles with role-based access control.
+
+<CodeGroup title="Users Table Schema">
+
+```sql
+CREATE TABLE users (
+  id TEXT PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  username TEXT NOT NULL UNIQUE,
+  first_name TEXT NOT NULL,
+  last_name TEXT NOT NULL,
+  password_hash TEXT,
+  role TEXT NOT NULL DEFAULT 'viewer',
+  avatar TEXT,
+  is_active INTEGER NOT NULL DEFAULT 1,
+  last_login_at INTEGER,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+
+  -- Extended profile fields
+  phone TEXT,
+  bio TEXT,
+  avatar_url TEXT,
+  timezone TEXT DEFAULT 'UTC',
+  language TEXT DEFAULT 'en',
+  email_notifications INTEGER DEFAULT 1,
+  theme TEXT DEFAULT 'dark',
+  two_factor_enabled INTEGER DEFAULT 0,
+  two_factor_secret TEXT,
+  password_reset_token TEXT,
+  password_reset_expires INTEGER,
+  email_verified INTEGER DEFAULT 0,
+  email_verification_token TEXT,
+  invitation_token TEXT,
+  invited_by TEXT REFERENCES users(id),
+  invited_at INTEGER,
+  accepted_invitation_at INTEGER
+);
+
+-- Indexes
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_username ON users(username);
+CREATE INDEX idx_users_role ON users(role);
+```
+
+</CodeGroup>
+
+#### collections
+
+Content collection definitions with JSON schemas.
+
+<CodeGroup title="Collections Table Schema">
+
+```sql
+CREATE TABLE collections (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE,
+  display_name TEXT NOT NULL,
+  description TEXT,
+  schema TEXT NOT NULL, -- JSON schema definition
+  is_active INTEGER NOT NULL DEFAULT 1,
+  managed INTEGER DEFAULT 0 NOT NULL, -- Config-managed collections
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
+-- Indexes
+CREATE INDEX idx_collections_name ON collections(name);
+CREATE INDEX idx_collections_active ON collections(is_active);
+CREATE INDEX idx_collections_managed ON collections(managed);
+```
+
+</CodeGroup>
+
+#### content
+
+Actual content items with versioning and workflow support.
+
+<CodeGroup title="Content Table Schema">
+
+```sql
+CREATE TABLE content (
+  id TEXT PRIMARY KEY,
+  collection_id TEXT NOT NULL REFERENCES collections(id),
+  slug TEXT NOT NULL,
+  title TEXT NOT NULL,
+  data TEXT NOT NULL, -- JSON content data
+  status TEXT NOT NULL DEFAULT 'draft',
+  published_at INTEGER,
+  author_id TEXT NOT NULL REFERENCES users(id),
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+
+  -- Scheduling fields
+  scheduled_publish_at INTEGER,
+  scheduled_unpublish_at INTEGER,
+
+  -- Review workflow
+  review_status TEXT DEFAULT 'none',
+  reviewer_id TEXT REFERENCES users(id),
+  reviewed_at INTEGER,
+  review_notes TEXT,
+
+  -- SEO and metadata
+  meta_title TEXT,
+  meta_description TEXT,
+  featured_image_id TEXT REFERENCES media(id),
+  content_type TEXT DEFAULT 'standard',
+
+  -- Workflow state
+  workflow_state_id TEXT DEFAULT 'draft',
+  embargo_until INTEGER,
+  expires_at INTEGER,
+  version_number INTEGER DEFAULT 1,
+  is_auto_saved INTEGER DEFAULT 0
+);
+
+-- Indexes
+CREATE INDEX idx_content_collection ON content(collection_id);
+CREATE INDEX idx_content_author ON content(author_id);
+CREATE INDEX idx_content_status ON content(status);
+CREATE INDEX idx_content_published ON content(published_at);
+CREATE INDEX idx_content_slug ON content(slug);
+```
+
+</CodeGroup>
+
+---
+
+## Drizzle ORM Integration
+
+### Schema Definition
+
+<CodeGroup title="Drizzle Schema">
+
+```typescript
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
+
+// Users table schema
+export const users = sqliteTable('users', {
+  id: text('id').primaryKey(),
+  email: text('email').notNull().unique(),
+  username: text('username').notNull().unique(),
+  firstName: text('first_name').notNull(),
+  lastName: text('last_name').notNull(),
+  passwordHash: text('password_hash'),
+  role: text('role').notNull().default('viewer'),
+  avatar: text('avatar'),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  lastLoginAt: integer('last_login_at'),
+  createdAt: integer('created_at').notNull(),
+  updatedAt: integer('updated_at').notNull(),
+});
+
+// Collections table schema
+export const collections = sqliteTable('collections', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull().unique(),
+  displayName: text('display_name').notNull(),
+  description: text('description'),
+  schema: text('schema', { mode: 'json' }).notNull(),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  managed: integer('managed', { mode: 'boolean' }).notNull().default(false),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+});
+
+// Type inference
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+export type Collection = typeof collections.$inferSelect;
+export type NewCollection = typeof collections.$inferInsert;
+
+// Zod validation schemas
+export const insertUserSchema = createInsertSchema(users, {
+  email: (schema) => schema.email(),
+  firstName: (schema) => schema.min(1),
+  lastName: (schema) => schema.min(1),
+  username: (schema) => schema.min(3),
+});
+
+export const selectUserSchema = createSelectSchema(users);
+```
+
+</CodeGroup>
+
+### Database Connection
+
+<CodeGroup title="Database Connection">
+
+```typescript
+import { drizzle } from 'drizzle-orm/d1';
+import * as schema from './schema';
+
+export function createDb(d1: D1Database) {
+  return drizzle(d1, { schema });
+}
+
+// Usage in worker
+export default {
+  async fetch(request: Request, env: Env) {
+    const db = createDb(env.DB);
+
+    // Now you can use db with full type safety
+    const users = await db.select().from(schema.users);
+
+    return new Response(JSON.stringify(users));
+  }
+}
+```
+
+</CodeGroup>
+
+---
+
+## Migration System
+
+### Migration Service
+
+The migration system handles database schema changes in a versioned, controlled manner.
+
+<CodeGroup title="Migration Service">
+
+```typescript
+export class MigrationService {
+  constructor(private db: D1Database) {}
+
+  /**
+   * Initialize migrations tracking table
+   */
+  async initializeMigrationsTable(): Promise<void> {
+    const createTableQuery = `
+      CREATE TABLE IF NOT EXISTS migrations (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        filename TEXT NOT NULL,
+        applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        checksum TEXT
+      )
+    `;
+
+    await this.db.prepare(createTableQuery).run();
+  }
+
+  /**
+   * Get migration status
+   */
+  async getMigrationStatus(): Promise<MigrationStatus> {
+    await this.initializeMigrationsTable();
+
+    const migrations = await this.getAvailableMigrations();
+    const appliedMigrations = migrations.filter(m => m.applied);
+    const pendingMigrations = migrations.filter(m => !m.applied);
+
+    return {
+      totalMigrations: migrations.length,
+      appliedMigrations: appliedMigrations.length,
+      pendingMigrations: pendingMigrations.length,
+      migrations
+    };
+  }
+
+  /**
+   * Run pending migrations
+   */
+  async runPendingMigrations(): Promise<{ success: boolean; message: string; applied: string[] }> {
+    const status = await this.getMigrationStatus();
+    const pendingMigrations = status.migrations.filter(m => !m.applied);
+
+    if (pendingMigrations.length === 0) {
+      return {
+        success: true,
+        message: 'All migrations are up to date',
+        applied: []
+      };
+    }
+
+    const applied: string[] = [];
+
+    for (const migration of pendingMigrations) {
+      try {
+        await this.applyMigration(migration);
+        await this.markMigrationApplied(migration.id, migration.name, migration.filename);
+        applied.push(migration.id);
+      } catch (error) {
+        console.error(`Failed to apply migration ${migration.id}:`, error);
+        break;
+      }
+    }
+
+    return {
+      success: true,
+      message: `Applied ${applied.length} migration(s)`,
+      applied
+    };
+  }
+}
+```
+
+</CodeGroup>
+
+### Running Migrations
+
+<CodeGroup title="Migration Commands">
+
+```bash
+# Local development (uses local D1 database)
+npm run db:migrate
+
+# Production
+npm run db:migrate:prod
+
+# Using wrangler directly
+wrangler d1 migrations apply DB --local
+wrangler d1 migrations apply DB --env production
+
+# Create new migration
+# Create file: migrations/012_your_migration.sql
+# Then run: npm run db:migrate
+```
+
+</CodeGroup>
+
+---
+
+## Collection Sync System
+
+Collections can be managed through configuration files, allowing version-controlled schema definitions.
+
+### Sync Service
+
+<CodeGroup title="Collection Sync">
+
+```typescript
+/**
+ * Sync all collection configurations to the database
+ */
+export async function syncCollections(db: D1Database): Promise<CollectionSyncResult[]> {
+  console.log('🔄 Starting collection sync...');
+
+  const results: CollectionSyncResult[] = [];
+  const configs = await loadCollectionConfigs();
+
+  for (const config of configs) {
+    const result = await syncCollection(db, config);
+    results.push(result);
+  }
+
+  const created = results.filter(r => r.status === 'created').length;
+  const updated = results.filter(r => r.status === 'updated').length;
+  const unchanged = results.filter(r => r.status === 'unchanged').length;
+  const errors = results.filter(r => r.status === 'error').length;
+
+  console.log(`✅ Collection sync complete: ${created} created, ${updated} updated, ${unchanged} unchanged, ${errors} errors`);
+
+  return results;
+}
+```
+
+</CodeGroup>
+
+### Running Collection Sync
+
+<CodeGroup title="Sync Command">
+
+```bash
+# Sync collections from config files
+npm run sync-collections
+```
+
+</CodeGroup>
+
+---
+
+## Query Patterns and Examples
+
+### Basic CRUD Operations
+
+<CodeGroup title="Create Operations">
+
+```typescript
+import { eq } from 'drizzle-orm';
+import { users, content, collections } from './db/schema';
+
+// Create user
+const newUser = await db.insert(users).values({
+  id: crypto.randomUUID(),
+  email: 'john@example.com',
+  username: 'john_doe',
+  firstName: 'John',
+  lastName: 'Doe',
+  passwordHash: await hashPassword('secret123'),
+  role: 'editor',
+  createdAt: Date.now(),
+  updatedAt: Date.now()
+}).returning();
+
+// Create content
+const newContent = await db.insert(content).values({
+  id: crypto.randomUUID(),
+  collectionId: 'blog-posts-collection',
+  slug: 'my-first-post',
+  title: 'My First Post',
+  data: JSON.stringify({
+    body: '<p>Hello world!</p>',
+    excerpt: 'My first blog post'
+  }),
+  status: 'draft',
+  authorId: newUser[0].id,
+  createdAt: Date.now(),
+  updatedAt: Date.now()
+}).returning();
+```
+
+</CodeGroup>
+
+<CodeGroup title="Read Operations">
+
+```typescript
+// Get user by email
+const user = await db.select()
+  .from(users)
+  .where(eq(users.email, 'john@example.com'))
+  .limit(1);
+
+// Get all published content
+const publishedContent = await db.select()
+  .from(content)
+  .where(eq(content.status, 'published'))
+  .orderBy(desc(content.publishedAt))
+  .limit(20);
+
+// Get content with joins
+const contentWithAuthor = await db.select({
+  id: content.id,
+  title: content.title,
+  slug: content.slug,
+  authorName: sql`${users.firstName} || ' ' || ${users.lastName}`,
+  authorEmail: users.email
+})
+.from(content)
+.leftJoin(users, eq(content.authorId, users.id))
+.where(eq(content.status, 'published'));
+```
+
+</CodeGroup>
+
+### Advanced Queries
+
+<CodeGroup title="Pagination">
+
+```typescript
+import { desc, asc, count } from 'drizzle-orm';
+
+async function getContentPaginated(page: number, limit: number = 20) {
+  const offset = (page - 1) * limit;
+
+  // Get paginated results
+  const results = await db.select()
+    .from(content)
+    .where(eq(content.status, 'published'))
+    .orderBy(desc(content.publishedAt))
+    .limit(limit)
+    .offset(offset);
+
+  // Get total count
+  const [{ total }] = await db.select({ total: count() })
+    .from(content)
+    .where(eq(content.status, 'published'));
+
+  return {
+    data: results,
+    pagination: {
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit),
+      hasNext: page * limit < total,
+      hasPrev: page > 1
+    }
+  };
+}
+```
+
+</CodeGroup>
+
+---
+
+## Prepared Statements
+
+D1 supports prepared statements for better performance and SQL injection prevention.
+
+<CodeGroup title="Prepared Statements">
+
+```typescript
+// Define prepared statement
+const getUserStmt = db.prepare('SELECT * FROM users WHERE email = ?');
+
+// Execute with parameter binding
+const user = await getUserStmt.bind('john@example.com').first();
+```
+
+</CodeGroup>
+
+### Batch Operations
+
+<CodeGroup title="Batch Insert">
+
+```typescript
+// Batch insert for better performance
+const batch = [];
+
+for (const item of dataArray) {
+  const stmt = db.prepare(
+    'INSERT INTO content (id, title, slug, collection_id, data, author_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+  );
+
+  batch.push(stmt.bind(
+    crypto.randomUUID(),
+    item.title,
+    item.slug,
+    item.collectionId,
+    JSON.stringify(item.data),
+    item.authorId,
+    Date.now(),
+    Date.now()
+  ));
+}
+
+// Execute all at once
+await db.batch(batch);
+```
+
+</CodeGroup>
+
+---
+
+## Database Performance
+
+### Indexing Strategy
+
+<CodeGroup title="Database Indexes">
+
+```sql
+-- Essential single-column indexes
+CREATE INDEX idx_content_status ON content(status);
+CREATE INDEX idx_content_published ON content(published_at);
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_media_type ON media(mime_type);
+
+-- Composite indexes for multi-column queries
+CREATE INDEX idx_content_collection_status ON content(collection_id, status);
+CREATE INDEX idx_content_author_status ON content(author_id, status, published_at DESC);
+CREATE INDEX idx_media_folder_type ON media(folder, mime_type);
+
+-- Covering indexes (include commonly selected columns)
+CREATE INDEX idx_content_published_covering ON content(status, published_at, title, slug);
+
+-- Partial indexes (filter specific conditions)
+CREATE INDEX idx_active_users ON users(email) WHERE is_active = 1;
+CREATE INDEX idx_published_content ON content(published_at DESC) WHERE status = 'published';
+```
+
+</CodeGroup>
+
+### Caching Strategies
+
+<CodeGroup title="Three-Tier Caching">
+
+```typescript
+// Three-tier caching: Memory → KV → Database
+class CachedQuery {
+  private memoryCache = new Map<string, any>();
+
+  async get(key: string, fetcher: () => Promise<any>, ttl: number = 3600) {
+    // Check memory cache
+    if (this.memoryCache.has(key)) {
+      return this.memoryCache.get(key);
+    }
+
+    // Check KV cache
+    const cached = await env.CACHE_KV.get(key, 'json');
+    if (cached) {
+      this.memoryCache.set(key, cached);
+      return cached;
+    }
+
+    // Fetch from database
+    const data = await fetcher();
+
+    // Store in caches
+    this.memoryCache.set(key, data);
+    await env.CACHE_KV.put(key, JSON.stringify(data), { expirationTtl: ttl });
+
+    return data;
+  }
+
+  async invalidate(key: string) {
+    this.memoryCache.delete(key);
+    await env.CACHE_KV.delete(key);
+  }
+}
+
+// Usage
+const cache = new CachedQuery();
+
+const publishedPosts = await cache.get(
+  'content:published:latest',
+  async () => {
+    return await db.select()
+      .from(content)
+      .where(eq(content.status, 'published'))
+      .orderBy(desc(content.publishedAt))
+      .limit(20);
+  },
+  3600 // 1 hour TTL
+);
+```
+
+</CodeGroup>
+
+---
+
+## Backup and Restore
+
+### Export Database
+
+<CodeGroup title="Database Export">
+
+```bash
+# Export entire database to SQL file
+wrangler d1 export sonicjs-dev --output=backup-dev.sql
+wrangler d1 export sonicjs-ai --output=backup-prod.sql --env production
+
+# Export with timestamp
+DATE=$(date +%Y%m%d_%H%M%S)
+wrangler d1 export sonicjs-ai --output=backups/backup-$DATE.sql --env production
+```
+
+</CodeGroup>
+
+### Import Database
+
+<CodeGroup title="Database Import">
+
+```bash
+# Import from SQL file
+wrangler d1 execute sonicjs-dev --file=backup-dev.sql --local
+wrangler d1 execute sonicjs-ai --file=backup-prod.sql --env production
+```
+
+</CodeGroup>
+
+---
+
+## Wrangler D1 Commands
+
+### Database Management
+
+<CodeGroup title="Wrangler Commands">
+
+```bash
+# Create new database
+wrangler d1 create <database-name>
+
+# List all databases
+wrangler d1 list
+
+# Delete database (careful!)
+wrangler d1 delete <database-name>
+
+# Get database info
+wrangler d1 info <database-name>
+```
+
+</CodeGroup>
+
+### Execute SQL
+
+<CodeGroup title="SQL Execution">
+
+```bash
+# Execute SQL file
+wrangler d1 execute DB --file=./script.sql --local
+wrangler d1 execute DB --file=./script.sql --env production
+
+# Execute SQL command directly
+wrangler d1 execute DB --command="SELECT * FROM users LIMIT 5" --local
+
+# Execute with JSON output
+wrangler d1 execute DB --command="SELECT * FROM content" --json --local
+```
+
+</CodeGroup>
+
+<Callout type="tip" title="Database Best Practices">
+- Always use transactions for multi-step operations
+- Validate input with Zod schemas before inserting
+- Use prepared statements for repeated queries
+- Implement soft deletes for recovery capability
+- Log important operations for audit trails
+</Callout>
+
+---
+
+## Next Steps
+
+<div className="not-prose">
+  <Button href="/collections" variant="text" arrow="right">
+    <>Learn about collections and content modeling</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/api" variant="text" arrow="right">
+    <>Explore the API endpoints</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/caching" variant="text" arrow="right">
+    <>Read about caching strategies</>
+  </Button>
+</div>

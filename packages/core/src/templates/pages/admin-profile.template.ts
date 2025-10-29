@@ -34,6 +34,15 @@ export interface ProfilePageData {
   version?: string
 }
 
+export function renderAvatarImage(avatarUrl: string | undefined, firstName: string, lastName: string): string {
+  return `<div id="avatar-image-container" class="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden bg-gradient-to-br from-cyan-400 to-purple-400 flex items-center justify-center ring-4 ring-zinc-950/5 dark:ring-white/10">
+    ${avatarUrl
+      ? `<img src="${avatarUrl}" alt="Profile picture" class="w-full h-full object-cover">`
+      : `<span class="text-2xl font-bold text-white">${firstName.charAt(0)}${lastName.charAt(0)}</span>`
+    }
+  </div>`
+}
+
 export function renderProfilePage(data: ProfilePageData): string {
   const pageContent = `
     <div class="space-y-8">
@@ -232,12 +241,7 @@ export function renderProfilePage(data: ProfilePageData): string {
             <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">Profile Picture</h3>
 
             <div class="text-center">
-              <div class="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden bg-gradient-to-br from-cyan-400 to-purple-400 flex items-center justify-center ring-4 ring-zinc-950/5 dark:ring-white/10">
-                ${data.profile.avatar_url
-                  ? `<img src="${data.profile.avatar_url}" alt="Profile picture" class="w-full h-full object-cover">`
-                  : `<span class="text-2xl font-bold text-white">${data.profile.first_name.charAt(0)}${data.profile.last_name.charAt(0)}</span>`
-                }
-              </div>
+              ${renderAvatarImage(data.profile.avatar_url, data.profile.first_name, data.profile.last_name)}
 
               <form id="avatar-form" hx-post="/admin/profile/avatar" hx-target="#avatar-messages" hx-encoding="multipart/form-data">
                 <input

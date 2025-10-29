@@ -1,14 +1,12 @@
-'use strict';
-
-var chunkIGJUBJBW_cjs = require('./chunk-IGJUBJBW.cjs');
-var sqliteCore = require('drizzle-orm/sqlite-core');
-var v4 = require('zod/v4');
-var drizzleOrm = require('drizzle-orm');
-var d1 = require('drizzle-orm/d1');
+import { __export } from './chunk-V4OQ3NZ2.js';
+import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
+import { z } from 'zod/v4';
+import { getTableColumns, getViewSelectedFields, isTable, is, Column, SQL, isView, inArray, eq, like, gte, lte, and, count, asc, desc } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/d1';
 
 // src/db/schema.ts
 var schema_exports = {};
-chunkIGJUBJBW_cjs.__export(schema_exports, {
+__export(schema_exports, {
   apiTokens: () => apiTokens,
   collections: () => collections,
   content: () => content,
@@ -75,15 +73,15 @@ function isWithEnum(column) {
   return "enumValues" in column && Array.isArray(column.enumValues) && column.enumValues.length > 0;
 }
 var isPgEnum = isWithEnum;
-var literalSchema = v4.z.union([v4.z.string(), v4.z.number(), v4.z.boolean(), v4.z.null()]);
-var jsonSchema = v4.z.union([
+var literalSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
+var jsonSchema = z.union([
   literalSchema,
-  v4.z.record(v4.z.string(), v4.z.any()),
-  v4.z.array(v4.z.any())
+  z.record(z.string(), z.any()),
+  z.array(z.any())
 ]);
-var bufferSchema = v4.z.custom((v) => v instanceof Buffer);
+var bufferSchema = z.custom((v) => v instanceof Buffer);
 function columnToSchema(column, factory) {
-  const z$1 = v4.z;
+  const z$1 = z;
   const coerce = {};
   let schema;
   if (isWithEnum(column)) {
@@ -251,13 +249,13 @@ function stringColumnToSchema(column, z2, coerce) {
   return max && fixed ? schema.length(max) : max ? schema.max(max) : schema;
 }
 function getColumns(tableLike) {
-  return drizzleOrm.isTable(tableLike) ? drizzleOrm.getTableColumns(tableLike) : drizzleOrm.getViewSelectedFields(tableLike);
+  return isTable(tableLike) ? getTableColumns(tableLike) : getViewSelectedFields(tableLike);
 }
 function handleColumns(columns, refinements, conditions, factory) {
   const columnSchemas = {};
   for (const [key, selected] of Object.entries(columns)) {
-    if (!drizzleOrm.is(selected, drizzleOrm.Column) && !drizzleOrm.is(selected, drizzleOrm.SQL) && !drizzleOrm.is(selected, drizzleOrm.SQL.Aliased) && typeof selected === "object") {
-      const columns2 = drizzleOrm.isTable(selected) || drizzleOrm.isView(selected) ? getColumns(selected) : selected;
+    if (!is(selected, Column) && !is(selected, SQL) && !is(selected, SQL.Aliased) && typeof selected === "object") {
+      const columns2 = isTable(selected) || isView(selected) ? getColumns(selected) : selected;
       columnSchemas[key] = handleColumns(columns2, refinements[key] ?? {}, conditions);
       continue;
     }
@@ -266,8 +264,8 @@ function handleColumns(columns, refinements, conditions, factory) {
       columnSchemas[key] = refinement;
       continue;
     }
-    const column = drizzleOrm.is(selected, drizzleOrm.Column) ? selected : void 0;
-    const schema = column ? columnToSchema(column) : v4.z.any();
+    const column = is(selected, Column) ? selected : void 0;
+    const schema = column ? columnToSchema(column) : z.any();
     const refined = typeof refinement === "function" ? refinement(schema) : schema;
     if (conditions.never(column)) {
       continue;
@@ -283,10 +281,10 @@ function handleColumns(columns, refinements, conditions, factory) {
       }
     }
   }
-  return v4.z.object(columnSchemas);
+  return z.object(columnSchemas);
 }
 function handleEnum(enum_, factory) {
-  const zod = v4.z;
+  const zod = z;
   return zod.enum(enum_.enumValues);
 }
 var selectConditions = {
@@ -312,166 +310,166 @@ var createInsertSchema = (entity, refine) => {
 };
 
 // src/db/schema.ts
-var users = sqliteCore.sqliteTable("users", {
-  id: sqliteCore.text("id").primaryKey(),
-  email: sqliteCore.text("email").notNull().unique(),
-  username: sqliteCore.text("username").notNull().unique(),
-  firstName: sqliteCore.text("first_name").notNull(),
-  lastName: sqliteCore.text("last_name").notNull(),
-  passwordHash: sqliteCore.text("password_hash"),
+var users = sqliteTable("users", {
+  id: text("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  username: text("username").notNull().unique(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  passwordHash: text("password_hash"),
   // Hashed password, nullable for OAuth users
-  role: sqliteCore.text("role").notNull().default("viewer"),
+  role: text("role").notNull().default("viewer"),
   // 'admin', 'editor', 'author', 'viewer'
-  avatar: sqliteCore.text("avatar"),
-  isActive: sqliteCore.integer("is_active", { mode: "boolean" }).notNull().default(true),
-  lastLoginAt: sqliteCore.integer("last_login_at"),
-  createdAt: sqliteCore.integer("created_at").notNull(),
-  updatedAt: sqliteCore.integer("updated_at").notNull()
+  avatar: text("avatar"),
+  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  lastLoginAt: integer("last_login_at"),
+  createdAt: integer("created_at").notNull(),
+  updatedAt: integer("updated_at").notNull()
 });
-var collections = sqliteCore.sqliteTable("collections", {
-  id: sqliteCore.text("id").primaryKey(),
-  name: sqliteCore.text("name").notNull().unique(),
-  displayName: sqliteCore.text("display_name").notNull(),
-  description: sqliteCore.text("description"),
-  schema: sqliteCore.text("schema", { mode: "json" }).notNull(),
+var collections = sqliteTable("collections", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  displayName: text("display_name").notNull(),
+  description: text("description"),
+  schema: text("schema", { mode: "json" }).notNull(),
   // JSON schema definition
-  isActive: sqliteCore.integer("is_active", { mode: "boolean" }).notNull().default(true),
-  managed: sqliteCore.integer("managed", { mode: "boolean" }).notNull().default(false),
+  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  managed: integer("managed", { mode: "boolean" }).notNull().default(false),
   // Config-managed collections cannot be edited in UI
-  createdAt: sqliteCore.integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
-  updatedAt: sqliteCore.integer("updated_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date())
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date())
 });
-var content = sqliteCore.sqliteTable("content", {
-  id: sqliteCore.text("id").primaryKey(),
-  collectionId: sqliteCore.text("collection_id").notNull().references(() => collections.id),
-  slug: sqliteCore.text("slug").notNull(),
-  title: sqliteCore.text("title").notNull(),
-  data: sqliteCore.text("data", { mode: "json" }).notNull(),
+var content = sqliteTable("content", {
+  id: text("id").primaryKey(),
+  collectionId: text("collection_id").notNull().references(() => collections.id),
+  slug: text("slug").notNull(),
+  title: text("title").notNull(),
+  data: text("data", { mode: "json" }).notNull(),
   // JSON content data
-  status: sqliteCore.text("status").notNull().default("draft"),
+  status: text("status").notNull().default("draft"),
   // 'draft', 'published', 'archived'
-  publishedAt: sqliteCore.integer("published_at", { mode: "timestamp" }),
-  authorId: sqliteCore.text("author_id").notNull().references(() => users.id),
-  createdAt: sqliteCore.integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
-  updatedAt: sqliteCore.integer("updated_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date())
+  publishedAt: integer("published_at", { mode: "timestamp" }),
+  authorId: text("author_id").notNull().references(() => users.id),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date())
 });
-var contentVersions = sqliteCore.sqliteTable("content_versions", {
-  id: sqliteCore.text("id").primaryKey(),
-  contentId: sqliteCore.text("content_id").notNull().references(() => content.id),
-  version: sqliteCore.integer("version").notNull(),
-  data: sqliteCore.text("data", { mode: "json" }).notNull(),
-  authorId: sqliteCore.text("author_id").notNull().references(() => users.id),
-  createdAt: sqliteCore.integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date())
+var contentVersions = sqliteTable("content_versions", {
+  id: text("id").primaryKey(),
+  contentId: text("content_id").notNull().references(() => content.id),
+  version: integer("version").notNull(),
+  data: text("data", { mode: "json" }).notNull(),
+  authorId: text("author_id").notNull().references(() => users.id),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date())
 });
-var media = sqliteCore.sqliteTable("media", {
-  id: sqliteCore.text("id").primaryKey(),
-  filename: sqliteCore.text("filename").notNull(),
-  originalName: sqliteCore.text("original_name").notNull(),
-  mimeType: sqliteCore.text("mime_type").notNull(),
-  size: sqliteCore.integer("size").notNull(),
-  width: sqliteCore.integer("width"),
-  height: sqliteCore.integer("height"),
-  folder: sqliteCore.text("folder").notNull().default("uploads"),
-  r2Key: sqliteCore.text("r2_key").notNull(),
+var media = sqliteTable("media", {
+  id: text("id").primaryKey(),
+  filename: text("filename").notNull(),
+  originalName: text("original_name").notNull(),
+  mimeType: text("mime_type").notNull(),
+  size: integer("size").notNull(),
+  width: integer("width"),
+  height: integer("height"),
+  folder: text("folder").notNull().default("uploads"),
+  r2Key: text("r2_key").notNull(),
   // R2 storage key
-  publicUrl: sqliteCore.text("public_url").notNull(),
+  publicUrl: text("public_url").notNull(),
   // CDN URL
-  thumbnailUrl: sqliteCore.text("thumbnail_url"),
-  alt: sqliteCore.text("alt"),
-  caption: sqliteCore.text("caption"),
-  tags: sqliteCore.text("tags", { mode: "json" }),
+  thumbnailUrl: text("thumbnail_url"),
+  alt: text("alt"),
+  caption: text("caption"),
+  tags: text("tags", { mode: "json" }),
   // JSON array of tags
-  uploadedBy: sqliteCore.text("uploaded_by").notNull().references(() => users.id),
-  uploadedAt: sqliteCore.integer("uploaded_at").notNull(),
-  updatedAt: sqliteCore.integer("updated_at"),
-  publishedAt: sqliteCore.integer("published_at"),
-  scheduledAt: sqliteCore.integer("scheduled_at"),
-  archivedAt: sqliteCore.integer("archived_at"),
-  deletedAt: sqliteCore.integer("deleted_at")
+  uploadedBy: text("uploaded_by").notNull().references(() => users.id),
+  uploadedAt: integer("uploaded_at").notNull(),
+  updatedAt: integer("updated_at"),
+  publishedAt: integer("published_at"),
+  scheduledAt: integer("scheduled_at"),
+  archivedAt: integer("archived_at"),
+  deletedAt: integer("deleted_at")
 });
-var apiTokens = sqliteCore.sqliteTable("api_tokens", {
-  id: sqliteCore.text("id").primaryKey(),
-  name: sqliteCore.text("name").notNull(),
-  token: sqliteCore.text("token").notNull().unique(),
-  userId: sqliteCore.text("user_id").notNull().references(() => users.id),
-  permissions: sqliteCore.text("permissions", { mode: "json" }).notNull(),
+var apiTokens = sqliteTable("api_tokens", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  token: text("token").notNull().unique(),
+  userId: text("user_id").notNull().references(() => users.id),
+  permissions: text("permissions", { mode: "json" }).notNull(),
   // Array of permissions
-  expiresAt: sqliteCore.integer("expires_at", { mode: "timestamp" }),
-  lastUsedAt: sqliteCore.integer("last_used_at", { mode: "timestamp" }),
-  createdAt: sqliteCore.integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date())
+  expiresAt: integer("expires_at", { mode: "timestamp" }),
+  lastUsedAt: integer("last_used_at", { mode: "timestamp" }),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date())
 });
-var workflowHistory = sqliteCore.sqliteTable("workflow_history", {
-  id: sqliteCore.text("id").primaryKey(),
-  contentId: sqliteCore.text("content_id").notNull().references(() => content.id),
-  action: sqliteCore.text("action").notNull(),
-  fromStatus: sqliteCore.text("from_status").notNull(),
-  toStatus: sqliteCore.text("to_status").notNull(),
-  userId: sqliteCore.text("user_id").notNull().references(() => users.id),
-  comment: sqliteCore.text("comment"),
-  createdAt: sqliteCore.integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date())
+var workflowHistory = sqliteTable("workflow_history", {
+  id: text("id").primaryKey(),
+  contentId: text("content_id").notNull().references(() => content.id),
+  action: text("action").notNull(),
+  fromStatus: text("from_status").notNull(),
+  toStatus: text("to_status").notNull(),
+  userId: text("user_id").notNull().references(() => users.id),
+  comment: text("comment"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date())
 });
-var plugins = sqliteCore.sqliteTable("plugins", {
-  id: sqliteCore.text("id").primaryKey(),
-  name: sqliteCore.text("name").notNull().unique(),
-  displayName: sqliteCore.text("display_name").notNull(),
-  description: sqliteCore.text("description"),
-  version: sqliteCore.text("version").notNull(),
-  author: sqliteCore.text("author").notNull(),
-  category: sqliteCore.text("category").notNull(),
-  icon: sqliteCore.text("icon"),
-  status: sqliteCore.text("status").notNull().default("inactive"),
+var plugins = sqliteTable("plugins", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  displayName: text("display_name").notNull(),
+  description: text("description"),
+  version: text("version").notNull(),
+  author: text("author").notNull(),
+  category: text("category").notNull(),
+  icon: text("icon"),
+  status: text("status").notNull().default("inactive"),
   // 'active', 'inactive', 'error'
-  isCore: sqliteCore.integer("is_core", { mode: "boolean" }).notNull().default(false),
-  settings: sqliteCore.text("settings", { mode: "json" }),
-  permissions: sqliteCore.text("permissions", { mode: "json" }),
-  dependencies: sqliteCore.text("dependencies", { mode: "json" }),
-  downloadCount: sqliteCore.integer("download_count").notNull().default(0),
-  rating: sqliteCore.integer("rating").notNull().default(0),
-  installedAt: sqliteCore.integer("installed_at").notNull(),
-  activatedAt: sqliteCore.integer("activated_at"),
-  lastUpdated: sqliteCore.integer("last_updated").notNull(),
-  errorMessage: sqliteCore.text("error_message"),
-  createdAt: sqliteCore.integer("created_at").notNull().$defaultFn(() => Math.floor(Date.now() / 1e3)),
-  updatedAt: sqliteCore.integer("updated_at").notNull().$defaultFn(() => Math.floor(Date.now() / 1e3))
+  isCore: integer("is_core", { mode: "boolean" }).notNull().default(false),
+  settings: text("settings", { mode: "json" }),
+  permissions: text("permissions", { mode: "json" }),
+  dependencies: text("dependencies", { mode: "json" }),
+  downloadCount: integer("download_count").notNull().default(0),
+  rating: integer("rating").notNull().default(0),
+  installedAt: integer("installed_at").notNull(),
+  activatedAt: integer("activated_at"),
+  lastUpdated: integer("last_updated").notNull(),
+  errorMessage: text("error_message"),
+  createdAt: integer("created_at").notNull().$defaultFn(() => Math.floor(Date.now() / 1e3)),
+  updatedAt: integer("updated_at").notNull().$defaultFn(() => Math.floor(Date.now() / 1e3))
 });
-var pluginHooks = sqliteCore.sqliteTable("plugin_hooks", {
-  id: sqliteCore.text("id").primaryKey(),
-  pluginId: sqliteCore.text("plugin_id").notNull().references(() => plugins.id),
-  hookName: sqliteCore.text("hook_name").notNull(),
-  handlerName: sqliteCore.text("handler_name").notNull(),
-  priority: sqliteCore.integer("priority").notNull().default(10),
-  isActive: sqliteCore.integer("is_active", { mode: "boolean" }).notNull().default(true),
-  createdAt: sqliteCore.integer("created_at").notNull().$defaultFn(() => Math.floor(Date.now() / 1e3))
+var pluginHooks = sqliteTable("plugin_hooks", {
+  id: text("id").primaryKey(),
+  pluginId: text("plugin_id").notNull().references(() => plugins.id),
+  hookName: text("hook_name").notNull(),
+  handlerName: text("handler_name").notNull(),
+  priority: integer("priority").notNull().default(10),
+  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  createdAt: integer("created_at").notNull().$defaultFn(() => Math.floor(Date.now() / 1e3))
 });
-var pluginRoutes = sqliteCore.sqliteTable("plugin_routes", {
-  id: sqliteCore.text("id").primaryKey(),
-  pluginId: sqliteCore.text("plugin_id").notNull().references(() => plugins.id),
-  path: sqliteCore.text("path").notNull(),
-  method: sqliteCore.text("method").notNull(),
-  handlerName: sqliteCore.text("handler_name").notNull(),
-  middleware: sqliteCore.text("middleware", { mode: "json" }),
-  isActive: sqliteCore.integer("is_active", { mode: "boolean" }).notNull().default(true),
-  createdAt: sqliteCore.integer("created_at").notNull().$defaultFn(() => Math.floor(Date.now() / 1e3))
+var pluginRoutes = sqliteTable("plugin_routes", {
+  id: text("id").primaryKey(),
+  pluginId: text("plugin_id").notNull().references(() => plugins.id),
+  path: text("path").notNull(),
+  method: text("method").notNull(),
+  handlerName: text("handler_name").notNull(),
+  middleware: text("middleware", { mode: "json" }),
+  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  createdAt: integer("created_at").notNull().$defaultFn(() => Math.floor(Date.now() / 1e3))
 });
-var pluginAssets = sqliteCore.sqliteTable("plugin_assets", {
-  id: sqliteCore.text("id").primaryKey(),
-  pluginId: sqliteCore.text("plugin_id").notNull().references(() => plugins.id),
-  assetType: sqliteCore.text("asset_type").notNull(),
+var pluginAssets = sqliteTable("plugin_assets", {
+  id: text("id").primaryKey(),
+  pluginId: text("plugin_id").notNull().references(() => plugins.id),
+  assetType: text("asset_type").notNull(),
   // 'css', 'js', 'image', 'font'
-  assetPath: sqliteCore.text("asset_path").notNull(),
-  loadOrder: sqliteCore.integer("load_order").notNull().default(100),
-  loadLocation: sqliteCore.text("load_location").notNull().default("footer"),
+  assetPath: text("asset_path").notNull(),
+  loadOrder: integer("load_order").notNull().default(100),
+  loadLocation: text("load_location").notNull().default("footer"),
   // 'header', 'footer'
-  isActive: sqliteCore.integer("is_active", { mode: "boolean" }).notNull().default(true),
-  createdAt: sqliteCore.integer("created_at").notNull().$defaultFn(() => Math.floor(Date.now() / 1e3))
+  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  createdAt: integer("created_at").notNull().$defaultFn(() => Math.floor(Date.now() / 1e3))
 });
-var pluginActivityLog = sqliteCore.sqliteTable("plugin_activity_log", {
-  id: sqliteCore.text("id").primaryKey(),
-  pluginId: sqliteCore.text("plugin_id").notNull().references(() => plugins.id),
-  action: sqliteCore.text("action").notNull(),
-  userId: sqliteCore.text("user_id"),
-  details: sqliteCore.text("details", { mode: "json" }),
-  timestamp: sqliteCore.integer("timestamp").notNull().$defaultFn(() => Math.floor(Date.now() / 1e3))
+var pluginActivityLog = sqliteTable("plugin_activity_log", {
+  id: text("id").primaryKey(),
+  pluginId: text("plugin_id").notNull().references(() => plugins.id),
+  action: text("action").notNull(),
+  userId: text("user_id"),
+  details: text("details", { mode: "json" }),
+  timestamp: integer("timestamp").notNull().$defaultFn(() => Math.floor(Date.now() / 1e3))
 });
 var insertUserSchema = createInsertSchema(users, {
   email: (schema) => schema.email(),
@@ -535,48 +533,48 @@ var insertPluginActivityLogSchema = createInsertSchema(pluginActivityLog, {
   action: (schema) => schema.min(1)
 });
 var selectPluginActivityLogSchema = createSelectSchema(pluginActivityLog);
-var systemLogs = sqliteCore.sqliteTable("system_logs", {
-  id: sqliteCore.text("id").primaryKey(),
-  level: sqliteCore.text("level").notNull(),
+var systemLogs = sqliteTable("system_logs", {
+  id: text("id").primaryKey(),
+  level: text("level").notNull(),
   // 'debug', 'info', 'warn', 'error', 'fatal'
-  category: sqliteCore.text("category").notNull(),
+  category: text("category").notNull(),
   // 'auth', 'api', 'workflow', 'plugin', 'media', 'system', etc.
-  message: sqliteCore.text("message").notNull(),
-  data: sqliteCore.text("data", { mode: "json" }),
+  message: text("message").notNull(),
+  data: text("data", { mode: "json" }),
   // Additional structured data
-  userId: sqliteCore.text("user_id").references(() => users.id),
-  sessionId: sqliteCore.text("session_id"),
-  requestId: sqliteCore.text("request_id"),
-  ipAddress: sqliteCore.text("ip_address"),
-  userAgent: sqliteCore.text("user_agent"),
-  method: sqliteCore.text("method"),
+  userId: text("user_id").references(() => users.id),
+  sessionId: text("session_id"),
+  requestId: text("request_id"),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  method: text("method"),
   // HTTP method for API logs
-  url: sqliteCore.text("url"),
+  url: text("url"),
   // Request URL for API logs
-  statusCode: sqliteCore.integer("status_code"),
+  statusCode: integer("status_code"),
   // HTTP status code for API logs
-  duration: sqliteCore.integer("duration"),
+  duration: integer("duration"),
   // Request duration in milliseconds
-  stackTrace: sqliteCore.text("stack_trace"),
+  stackTrace: text("stack_trace"),
   // Error stack trace for error logs
-  tags: sqliteCore.text("tags", { mode: "json" }),
+  tags: text("tags", { mode: "json" }),
   // Array of tags for categorization
-  source: sqliteCore.text("source"),
+  source: text("source"),
   // Source component/module that generated the log
-  createdAt: sqliteCore.integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date())
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date())
 });
-var logConfig = sqliteCore.sqliteTable("log_config", {
-  id: sqliteCore.text("id").primaryKey(),
-  category: sqliteCore.text("category").notNull().unique(),
-  enabled: sqliteCore.integer("enabled", { mode: "boolean" }).notNull().default(true),
-  level: sqliteCore.text("level").notNull().default("info"),
+var logConfig = sqliteTable("log_config", {
+  id: text("id").primaryKey(),
+  category: text("category").notNull().unique(),
+  enabled: integer("enabled", { mode: "boolean" }).notNull().default(true),
+  level: text("level").notNull().default("info"),
   // minimum log level to store
-  retention: sqliteCore.integer("retention").notNull().default(30),
+  retention: integer("retention").notNull().default(30),
   // days to keep logs
-  maxSize: sqliteCore.integer("max_size").default(1e4),
+  maxSize: integer("max_size").default(1e4),
   // max number of logs per category
-  createdAt: sqliteCore.integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
-  updatedAt: sqliteCore.integer("updated_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date())
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date())
 });
 var insertSystemLogSchema = createInsertSchema(systemLogs, {
   level: (schema) => schema.min(1),
@@ -597,7 +595,7 @@ var Logger = class {
   configRefreshInterval = 6e4;
   // 1 minute
   constructor(database) {
-    this.db = d1.drizzle(database);
+    this.db = drizzle(database);
   }
   /**
    * Log a debug message
@@ -736,33 +734,33 @@ var Logger = class {
     try {
       const conditions = [];
       if (filter.level && filter.level.length > 0) {
-        conditions.push(drizzleOrm.inArray(systemLogs.level, filter.level));
+        conditions.push(inArray(systemLogs.level, filter.level));
       }
       if (filter.category && filter.category.length > 0) {
-        conditions.push(drizzleOrm.inArray(systemLogs.category, filter.category));
+        conditions.push(inArray(systemLogs.category, filter.category));
       }
       if (filter.userId) {
-        conditions.push(drizzleOrm.eq(systemLogs.userId, filter.userId));
+        conditions.push(eq(systemLogs.userId, filter.userId));
       }
       if (filter.source) {
-        conditions.push(drizzleOrm.eq(systemLogs.source, filter.source));
+        conditions.push(eq(systemLogs.source, filter.source));
       }
       if (filter.search) {
         conditions.push(
-          drizzleOrm.like(systemLogs.message, `%${filter.search}%`)
+          like(systemLogs.message, `%${filter.search}%`)
         );
       }
       if (filter.startDate) {
-        conditions.push(drizzleOrm.gte(systemLogs.createdAt, filter.startDate));
+        conditions.push(gte(systemLogs.createdAt, filter.startDate));
       }
       if (filter.endDate) {
-        conditions.push(drizzleOrm.lte(systemLogs.createdAt, filter.endDate));
+        conditions.push(lte(systemLogs.createdAt, filter.endDate));
       }
-      const whereClause = conditions.length > 0 ? drizzleOrm.and(...conditions) : void 0;
-      const totalResult = await this.db.select({ count: drizzleOrm.count() }).from(systemLogs).where(whereClause);
+      const whereClause = conditions.length > 0 ? and(...conditions) : void 0;
+      const totalResult = await this.db.select({ count: count() }).from(systemLogs).where(whereClause);
       const total = totalResult[0]?.count || 0;
       const sortColumn = filter.sortBy === "level" ? systemLogs.level : filter.sortBy === "category" ? systemLogs.category : systemLogs.createdAt;
-      const sortFn = filter.sortOrder === "asc" ? drizzleOrm.asc : drizzleOrm.desc;
+      const sortFn = filter.sortOrder === "asc" ? asc : desc;
       const logs = await this.db.select().from(systemLogs).where(whereClause).orderBy(sortFn(sortColumn)).limit(filter.limit || 50).offset(filter.offset || 0);
       return { logs, total };
     } catch (error) {
@@ -779,7 +777,7 @@ var Logger = class {
       if (this.configCache.has(category) && now - this.lastConfigRefresh < this.configRefreshInterval) {
         return this.configCache.get(category) || null;
       }
-      const configs = await this.db.select().from(logConfig).where(drizzleOrm.eq(logConfig.category, category));
+      const configs = await this.db.select().from(logConfig).where(eq(logConfig.category, category));
       const config = configs[0] || null;
       if (config) {
         this.configCache.set(category, config);
@@ -799,7 +797,7 @@ var Logger = class {
       await this.db.update(logConfig).set({
         ...updates,
         updatedAt: /* @__PURE__ */ new Date()
-      }).where(drizzleOrm.eq(logConfig.category, category));
+      }).where(eq(logConfig.category, category));
       this.configCache.delete(category);
     } catch (error) {
       console.error("Error updating log config:", error);
@@ -821,15 +819,15 @@ var Logger = class {
    */
   async cleanupCategory(category, maxSize) {
     try {
-      const countResult = await this.db.select({ count: drizzleOrm.count() }).from(systemLogs).where(drizzleOrm.eq(systemLogs.category, category));
+      const countResult = await this.db.select({ count: count() }).from(systemLogs).where(eq(systemLogs.category, category));
       const currentCount = countResult[0]?.count || 0;
       if (currentCount > maxSize) {
-        const cutoffLogs = await this.db.select({ createdAt: systemLogs.createdAt }).from(systemLogs).where(drizzleOrm.eq(systemLogs.category, category)).orderBy(drizzleOrm.desc(systemLogs.createdAt)).limit(1).offset(maxSize - 1);
+        const cutoffLogs = await this.db.select({ createdAt: systemLogs.createdAt }).from(systemLogs).where(eq(systemLogs.category, category)).orderBy(desc(systemLogs.createdAt)).limit(1).offset(maxSize - 1);
         if (cutoffLogs[0]) {
           await this.db.delete(systemLogs).where(
-            drizzleOrm.and(
-              drizzleOrm.eq(systemLogs.category, category),
-              drizzleOrm.lte(systemLogs.createdAt, cutoffLogs[0].createdAt)
+            and(
+              eq(systemLogs.category, category),
+              lte(systemLogs.createdAt, cutoffLogs[0].createdAt)
             )
           );
         }
@@ -849,9 +847,9 @@ var Logger = class {
           const cutoffDate = /* @__PURE__ */ new Date();
           cutoffDate.setDate(cutoffDate.getDate() - config.retention);
           await this.db.delete(systemLogs).where(
-            drizzleOrm.and(
-              drizzleOrm.eq(systemLogs.category, config.category),
-              drizzleOrm.lte(systemLogs.createdAt, cutoffDate)
+            and(
+              eq(systemLogs.category, config.category),
+              lte(systemLogs.createdAt, cutoffDate)
             )
           );
         }
@@ -1027,50 +1025,114 @@ function getCacheService(config) {
   return new CacheService(config);
 }
 
-exports.CACHE_CONFIGS = CACHE_CONFIGS;
-exports.CacheService = CacheService;
-exports.Logger = Logger;
-exports.apiTokens = apiTokens;
-exports.collections = collections;
-exports.content = content;
-exports.contentVersions = contentVersions;
-exports.getCacheService = getCacheService;
-exports.getLogger = getLogger;
-exports.initLogger = initLogger;
-exports.insertCollectionSchema = insertCollectionSchema;
-exports.insertContentSchema = insertContentSchema;
-exports.insertLogConfigSchema = insertLogConfigSchema;
-exports.insertMediaSchema = insertMediaSchema;
-exports.insertPluginActivityLogSchema = insertPluginActivityLogSchema;
-exports.insertPluginAssetSchema = insertPluginAssetSchema;
-exports.insertPluginHookSchema = insertPluginHookSchema;
-exports.insertPluginRouteSchema = insertPluginRouteSchema;
-exports.insertPluginSchema = insertPluginSchema;
-exports.insertSystemLogSchema = insertSystemLogSchema;
-exports.insertUserSchema = insertUserSchema;
-exports.insertWorkflowHistorySchema = insertWorkflowHistorySchema;
-exports.logConfig = logConfig;
-exports.media = media;
-exports.pluginActivityLog = pluginActivityLog;
-exports.pluginAssets = pluginAssets;
-exports.pluginHooks = pluginHooks;
-exports.pluginRoutes = pluginRoutes;
-exports.plugins = plugins;
-exports.schema_exports = schema_exports;
-exports.selectCollectionSchema = selectCollectionSchema;
-exports.selectContentSchema = selectContentSchema;
-exports.selectLogConfigSchema = selectLogConfigSchema;
-exports.selectMediaSchema = selectMediaSchema;
-exports.selectPluginActivityLogSchema = selectPluginActivityLogSchema;
-exports.selectPluginAssetSchema = selectPluginAssetSchema;
-exports.selectPluginHookSchema = selectPluginHookSchema;
-exports.selectPluginRouteSchema = selectPluginRouteSchema;
-exports.selectPluginSchema = selectPluginSchema;
-exports.selectSystemLogSchema = selectSystemLogSchema;
-exports.selectUserSchema = selectUserSchema;
-exports.selectWorkflowHistorySchema = selectWorkflowHistorySchema;
-exports.systemLogs = systemLogs;
-exports.users = users;
-exports.workflowHistory = workflowHistory;
-//# sourceMappingURL=chunk-3NVJ6W27.cjs.map
-//# sourceMappingURL=chunk-3NVJ6W27.cjs.map
+// src/services/settings.ts
+var SettingsService = class {
+  constructor(db) {
+    this.db = db;
+  }
+  /**
+   * Get a setting value by category and key
+   */
+  async getSetting(category, key) {
+    try {
+      const result = await this.db.prepare("SELECT value FROM settings WHERE category = ? AND key = ?").bind(category, key).first();
+      if (!result) {
+        return null;
+      }
+      return JSON.parse(result.value);
+    } catch (error) {
+      console.error(`Error getting setting ${category}.${key}:`, error);
+      return null;
+    }
+  }
+  /**
+   * Get all settings for a category
+   */
+  async getCategorySettings(category) {
+    try {
+      const { results } = await this.db.prepare("SELECT key, value FROM settings WHERE category = ?").bind(category).all();
+      const settings = {};
+      for (const row of results || []) {
+        const r = row;
+        settings[r.key] = JSON.parse(r.value);
+      }
+      return settings;
+    } catch (error) {
+      console.error(`Error getting category settings for ${category}:`, error);
+      return {};
+    }
+  }
+  /**
+   * Set a setting value
+   */
+  async setSetting(category, key, value) {
+    try {
+      const now = Date.now();
+      const jsonValue = JSON.stringify(value);
+      await this.db.prepare(`
+          INSERT INTO settings (id, category, key, value, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?)
+          ON CONFLICT(category, key) DO UPDATE SET
+            value = excluded.value,
+            updated_at = excluded.updated_at
+        `).bind(crypto.randomUUID(), category, key, jsonValue, now, now).run();
+      return true;
+    } catch (error) {
+      console.error(`Error setting ${category}.${key}:`, error);
+      return false;
+    }
+  }
+  /**
+   * Set multiple settings at once
+   */
+  async setMultipleSettings(category, settings) {
+    try {
+      const now = Date.now();
+      for (const [key, value] of Object.entries(settings)) {
+        const jsonValue = JSON.stringify(value);
+        await this.db.prepare(`
+            INSERT INTO settings (id, category, key, value, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ON CONFLICT(category, key) DO UPDATE SET
+              value = excluded.value,
+              updated_at = excluded.updated_at
+          `).bind(crypto.randomUUID(), category, key, jsonValue, now, now).run();
+      }
+      return true;
+    } catch (error) {
+      console.error(`Error setting multiple settings for ${category}:`, error);
+      return false;
+    }
+  }
+  /**
+   * Get general settings with defaults
+   */
+  async getGeneralSettings(userEmail) {
+    const settings = await this.getCategorySettings("general");
+    return {
+      siteName: settings.siteName || "SonicJS AI",
+      siteDescription: settings.siteDescription || "A modern headless CMS powered by AI",
+      adminEmail: settings.adminEmail || userEmail || "admin@example.com",
+      timezone: settings.timezone || "UTC",
+      language: settings.language || "en",
+      maintenanceMode: settings.maintenanceMode || false
+    };
+  }
+  /**
+   * Save general settings
+   */
+  async saveGeneralSettings(settings) {
+    const settingsToSave = {};
+    if (settings.siteName !== void 0) settingsToSave.siteName = settings.siteName;
+    if (settings.siteDescription !== void 0) settingsToSave.siteDescription = settings.siteDescription;
+    if (settings.adminEmail !== void 0) settingsToSave.adminEmail = settings.adminEmail;
+    if (settings.timezone !== void 0) settingsToSave.timezone = settings.timezone;
+    if (settings.language !== void 0) settingsToSave.language = settings.language;
+    if (settings.maintenanceMode !== void 0) settingsToSave.maintenanceMode = settings.maintenanceMode;
+    return await this.setMultipleSettings("general", settingsToSave);
+  }
+};
+
+export { CACHE_CONFIGS, CacheService, Logger, SettingsService, apiTokens, collections, content, contentVersions, getCacheService, getLogger, initLogger, insertCollectionSchema, insertContentSchema, insertLogConfigSchema, insertMediaSchema, insertPluginActivityLogSchema, insertPluginAssetSchema, insertPluginHookSchema, insertPluginRouteSchema, insertPluginSchema, insertSystemLogSchema, insertUserSchema, insertWorkflowHistorySchema, logConfig, media, pluginActivityLog, pluginAssets, pluginHooks, pluginRoutes, plugins, schema_exports, selectCollectionSchema, selectContentSchema, selectLogConfigSchema, selectMediaSchema, selectPluginActivityLogSchema, selectPluginAssetSchema, selectPluginHookSchema, selectPluginRouteSchema, selectPluginSchema, selectSystemLogSchema, selectUserSchema, selectWorkflowHistorySchema, systemLogs, users, workflowHistory };
+//# sourceMappingURL=chunk-6FR25MPC.js.map
+//# sourceMappingURL=chunk-6FR25MPC.js.map

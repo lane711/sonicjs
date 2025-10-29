@@ -1,0 +1,707 @@
+export const metadata = {
+  title: 'Core Plugins - SonicJS',
+  description:
+    'Complete reference for SonicJS core plugins including authentication, media management, caching, database tools, and seed data.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Authentication Plugin', id: 'authentication-plugin' },
+  { title: 'Media Plugin', id: 'media-plugin' },
+  { title: 'Cache Plugin', id: 'cache-plugin' },
+  { title: 'Database Tools', id: 'database-tools' },
+  { title: 'Seed Data Plugin', id: 'seed-data-plugin' },
+]
+
+# Core Plugins Reference
+
+SonicJS includes several essential core plugins that provide fundamental functionality for your CMS. These plugins are automatically installed and configured when you set up SonicJS. {{ className: 'lead' }}
+
+## Overview
+
+Core plugins extend SonicJS with critical features like authentication, media management, caching, and database administration. They follow the same plugin architecture as custom plugins, making them excellent examples for plugin development.
+
+### Available Core Plugins
+
+<FeatureGrid
+  features={[
+    {
+      icon: '🔐',
+      title: 'Authentication',
+      description: 'JWT-based authentication with session management and token refresh',
+    },
+    {
+      icon: '📸',
+      title: 'Media',
+      description: 'Media file management with R2 storage and image processing',
+    },
+    {
+      icon: '⚡',
+      title: 'Cache',
+      description: 'Three-tier caching system with memory, KV, and database layers',
+    },
+    {
+      icon: '🛠️',
+      title: 'Database Tools',
+      description: 'Database administration, migrations, and query tools',
+    },
+    {
+      icon: '🌱',
+      title: 'Seed Data',
+      description: 'Sample data generation for development and testing',
+    },
+  ]}
+  columns={3}
+/>
+
+---
+
+## Authentication Plugin
+
+The authentication plugin provides comprehensive user authentication and session management functionality.
+
+### Features
+
+- **JWT Token Authentication** - Secure token-based authentication
+- **Session Management** - Track and manage active user sessions
+- **Token Refresh** - Automatic token renewal without re-authentication
+- **Rate Limiting** - Protect authentication endpoints from abuse
+- **User Context** - Inject authenticated user data into request context
+
+### Configuration
+
+<CodeGroup title="Plugin Configuration">
+
+```typescript
+{
+  name: 'core-auth',
+  version: '1.0.0-beta.1',
+  settings: {
+    tokenExpiration: 3600,      // Token TTL in seconds (1 hour)
+    refreshExpiration: 604800,   // Refresh token TTL (7 days)
+    sessionTracking: true,       // Enable session tracking
+    rateLimitWindow: 900,        // Rate limit window (15 minutes)
+    rateLimitMaxAttempts: 5      // Max login attempts per window
+  }
+}
+```
+
+</CodeGroup>
+
+### API Endpoints
+
+**POST /api/auth/login**
+Authenticate a user and receive JWT tokens
+
+<CodeGroup title="Login Request">
+
+```bash {{ title: 'cURL' }}
+curl -X POST http://localhost:8787/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "password123"
+  }'
+```
+
+```javascript
+const response = await fetch('http://localhost:8787/api/auth/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 'user@example.com',
+    password: 'password123'
+  })
+})
+
+const { token, refreshToken, user } = await response.json()
+```
+
+</CodeGroup>
+
+**POST /api/auth/logout**
+Invalidate current session
+
+**GET /api/auth/me**
+Get current authenticated user information
+
+**POST /api/auth/refresh**
+Refresh an expired access token
+
+### Services
+
+<CodeGroup title="Auth Service">
+
+```typescript
+// Available auth service methods
+const authService = {
+  // Validate JWT token
+  validateToken(token: string): { valid: boolean; userId: number }
+
+  // Generate new JWT token
+  generateToken(userId: number): string
+
+  // Hash password for storage
+  hashPassword(password: string): string
+
+  // Verify password against hash
+  verifyPassword(password: string, hash: string): boolean
+}
+```
+
+</CodeGroup>
+
+### Hooks
+
+- `auth:login` - Triggered when user attempts login
+- `auth:logout` - Triggered when user logs out
+- `request:start` - Injects authentication status into requests
+
+### Admin Pages
+
+- **/admin/auth/sessions** - View and manage active sessions
+- **/admin/auth/tokens** - Manage API tokens and access keys
+
+---
+
+## Media Plugin
+
+The media plugin provides comprehensive media file management with cloud storage integration.
+
+### Features
+
+- **File Upload** - Upload images, videos, and documents to R2 storage
+- **Media Library** - Browse and search uploaded media files
+- **Image Processing** - Resize, compress, and transform images
+- **Folder Organization** - Organize files into folders
+- **Metadata Extraction** - Automatic extraction of file metadata
+- **Thumbnail Generation** - Auto-generate thumbnails for images
+- **Bulk Operations** - Move, delete, and process multiple files
+
+### Configuration
+
+<CodeGroup title="Plugin Configuration">
+
+```typescript
+{
+  name: 'core-media',
+  version: '1.0.0-beta.1',
+  settings: {
+    maxFileSize: 10485760,        // Max file size (10MB)
+    allowedTypes: [                // Allowed MIME types
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'video/mp4',
+      'application/pdf'
+    ],
+    thumbnailSize: { width: 300, height: 300 },
+    storageProvider: 'r2',        // Storage backend
+    autoGenerateThumbnails: true
+  }
+}
+```
+
+</CodeGroup>
+
+### API Endpoints
+
+**GET /api/media**
+List media files with pagination and filtering
+
+<CodeGroup title="List Media">
+
+```bash {{ title: 'cURL' }}
+curl "http://localhost:8787/api/media?page=1&limit=20&type=image"
+```
+
+```javascript
+const response = await fetch('http://localhost:8787/api/media?page=1&limit=20&type=image')
+const { data, pagination } = await response.json()
+```
+
+</CodeGroup>
+
+**POST /api/media/upload**
+Upload a new media file
+
+<CodeGroup title="Upload File">
+
+```javascript
+const formData = new FormData()
+formData.append('file', fileInput.files[0])
+formData.append('folder', 'images')
+
+const response = await fetch('http://localhost:8787/api/media/upload', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`
+  },
+  body: formData
+})
+
+const { data } = await response.json()
+// data: { id, filename, url, size, type }
+```
+
+</CodeGroup>
+
+**GET /api/media/:id**
+Get media file information and metadata
+
+**DELETE /api/media/:id**
+Delete a media file
+
+**POST /api/media/process**
+Process media (resize, compress, transform)
+
+**POST /api/media/create-folder**
+Create a new folder for organization
+
+**POST /api/media/bulk-move**
+Move multiple files to a folder
+
+### Services
+
+<CodeGroup title="Media Service">
+
+```typescript
+const mediaService = {
+  // Upload file to storage
+  uploadFile(file: File, options?: UploadOptions): Promise<MediaFile>
+
+  // Delete file from storage
+  deleteFile(id: string): Promise<boolean>
+
+  // Process image with operations
+  processImage(id: string, operations: Operation[]): Promise<Job>
+
+  // Extract file metadata
+  getMetadata(id: string): Promise<Metadata>
+}
+```
+
+</CodeGroup>
+
+### Database Schema
+
+<CodeGroup title="Media Files Table">
+
+```sql
+CREATE TABLE media_files (
+  id INTEGER PRIMARY KEY,
+  filename TEXT NOT NULL,
+  original_name TEXT NOT NULL,
+  mime_type TEXT NOT NULL,
+  size INTEGER NOT NULL,
+  url TEXT NOT NULL,
+  thumbnail_url TEXT,
+  metadata TEXT,
+  uploaded_by INTEGER,
+  tags TEXT,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER
+)
+```
+
+</CodeGroup>
+
+### Hooks
+
+- `media:upload` - Triggered when file is uploaded (auto-generates thumbnails)
+- `media:delete` - Triggered when file is deleted (cleanup related files)
+- `content:save` - Tracks media references in content
+
+### Admin Pages
+
+- **/admin/media** - Media library browser
+- **/admin/media/upload** - File upload interface
+- **/admin/media/settings** - Media processing configuration
+
+---
+
+## Cache Plugin
+
+The cache plugin implements a sophisticated three-tier caching system for optimal performance.
+
+### Features
+
+- **Three-Tier Caching** - Memory, Cloudflare KV, and D1 database
+- **Automatic Invalidation** - Event-based cache invalidation
+- **Cache Namespaces** - Separate caches for different data types
+- **Performance Metrics** - Hit rates, latency, and usage statistics
+- **Cache Warming** - Pre-populate cache with frequently accessed data
+- **Pattern Invalidation** - Invalidate by wildcard patterns
+- **TTL Management** - Configurable time-to-live per namespace
+
+### Architecture
+
+```
+Request
+   ↓
+Memory Cache? ──Yes──→ Return (< 1ms)
+   ↓ No
+KV Cache? ──Yes──→ Populate Memory → Return (10-50ms)
+   ↓ No
+Database ──→ Populate KV → Populate Memory → Return (100-200ms)
+```
+
+### Configuration
+
+<CodeGroup title="Cache Configuration">
+
+```typescript
+{
+  name: 'cache',
+  version: '1.0.0-alpha.1',
+  settings: {
+    memoryEnabled: true,          // Enable in-memory cache
+    kvEnabled: false,             // Enable KV cache
+    defaultTTL: 3600,             // Default TTL (1 hour)
+    maxMemorySize: 50,            // Max memory cache size (MB)
+    namespaces: {
+      content: { ttl: 3600 },     // Content cache (1 hour)
+      user: { ttl: 900 },          // User cache (15 minutes)
+      api: { ttl: 300 }            // API response cache (5 minutes)
+    }
+  }
+}
+```
+
+</CodeGroup>
+
+### API Endpoints
+
+**GET /admin/cache/stats**
+Get detailed cache statistics for all namespaces
+
+<CodeGroup title="Cache Stats">
+
+```bash {{ title: 'cURL' }}
+curl http://localhost:8787/admin/cache/stats
+```
+
+```json {{ title: 'Response' }}
+{
+  "success": true,
+  "data": {
+    "global": {
+      "totalRequests": 15234,
+      "memoryHits": 12450,
+      "kvHits": 1892,
+      "dbHits": 892,
+      "hitRate": 94.1
+    },
+    "byNamespace": {
+      "content": {
+        "memoryHits": 8234,
+        "kvHits": 892,
+        "hitRate": 96.2
+      },
+      "user": {
+        "memoryHits": 2891,
+        "kvHits": 567,
+        "hitRate": 92.8
+      }
+    }
+  }
+}
+```
+
+</CodeGroup>
+
+**POST /admin/cache/clear**
+Clear all cache entries across all tiers
+
+**POST /admin/cache/invalidate**
+Invalidate cache entries matching a pattern
+
+<CodeGroup title="Invalidate Cache">
+
+```bash {{ title: 'cURL' }}
+curl -X POST http://localhost:8787/admin/cache/invalidate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "pattern": "content:*",
+    "namespace": "content"
+  }'
+```
+
+</CodeGroup>
+
+**GET /admin/cache/browser**
+Browse and inspect individual cache entries
+
+**POST /admin/cache/warm**
+Pre-populate cache with frequently accessed data
+
+### Usage in Code
+
+<CodeGroup title="Using Cache Service">
+
+```typescript
+import { getCacheService } from '@sonicjs-cms/core'
+
+// Get cache service for your namespace
+const cache = getCacheService({
+  namespace: 'my-plugin',
+  ttl: 600,
+  memoryEnabled: true,
+  kvEnabled: false,
+  invalidateOn: ['my-plugin:update'],
+  version: 'v1'
+})
+
+// Get value from cache
+const data = await cache.get('key')
+
+// Set value in cache
+await cache.set('key', data)
+
+// Get or set pattern
+const result = await cache.getOrSet('key', async () => {
+  return await fetchExpensiveData()
+})
+
+// Invalidate by pattern
+await cache.invalidate('user:*')
+
+// Get statistics
+const stats = cache.getStats()
+```
+
+</CodeGroup>
+
+### Cache Namespaces
+
+**content** - Content and pages (TTL: 1 hour)
+**user** - User data and profiles (TTL: 15 minutes)
+**api** - API response data (TTL: 5 minutes)
+**media** - Media file metadata (TTL: 1 hour)
+**auth** - Authentication tokens (TTL: 5 minutes)
+
+### Hooks
+
+- `content:update` - Invalidates content cache
+- `content:delete` - Invalidates content cache
+- `user:update` - Invalidates user cache
+- `auth:login` - Invalidates user cache
+
+---
+
+## Database Tools
+
+The database tools plugin provides administrative utilities for database management and development.
+
+### Features
+
+- **Migration Runner** - Execute database migrations
+- **Schema Browser** - View tables, columns, and indexes
+- **Query Console** - Execute SQL queries directly
+- **Table Inspector** - View table data and statistics
+- **Backup and Restore** - Database backup utilities
+- **Performance Metrics** - Query performance analysis
+
+### Configuration
+
+<CodeGroup title="Plugin Configuration">
+
+```typescript
+{
+  name: 'database-tools-plugin',
+  version: '1.0.0',
+  settings: {
+    enableQueryConsole: true,     // Enable SQL query console
+    maxQueryRows: 1000,           // Max rows returned
+    enableBackups: true,          // Enable backup functionality
+    autoMigration: true           // Auto-run migrations on startup
+  }
+}
+```
+
+</CodeGroup>
+
+### API Endpoints
+
+**GET /admin/database/tables**
+List all database tables
+
+**GET /admin/database/tables/:name**
+View table schema and data
+
+**POST /admin/database/query**
+Execute a SQL query
+
+<CodeGroup title="Execute Query">
+
+```bash {{ title: 'cURL' }}
+curl -X POST http://localhost:8787/admin/database/query \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${token}" \
+  -d '{
+    "query": "SELECT * FROM content LIMIT 10"
+  }'
+```
+
+</CodeGroup>
+
+**POST /admin/database/migrations/run**
+Run pending migrations
+
+**GET /admin/database/migrations/status**
+Check migration status
+
+### Services
+
+<CodeGroup title="Database Service">
+
+```typescript
+const databaseService = {
+  // List all tables
+  getTables(): Promise<Table[]>
+
+  // Get table schema
+  getTableSchema(tableName: string): Promise<Schema>
+
+  // Execute query
+  executeQuery(sql: string, params?: any[]): Promise<Result>
+
+  // Run migrations
+  runMigrations(): Promise<MigrationResult[]>
+
+  // Create backup
+  createBackup(): Promise<Backup>
+}
+```
+
+</CodeGroup>
+
+### Admin Pages
+
+- **/admin/database** - Database dashboard
+- **/admin/database/tables** - Table browser
+- **/admin/database/query** - Query console
+- **/admin/database/migrations** - Migration manager
+
+<Note>
+The database tools plugin is restricted to admin users only for security. Never expose database query capabilities to untrusted users.
+</Note>
+
+---
+
+## Seed Data Plugin
+
+The seed data plugin generates sample data for development and testing purposes.
+
+### Features
+
+- **Sample Content** - Generate blog posts, pages, and articles
+- **Test Users** - Create user accounts with various roles
+- **Media Files** - Generate placeholder images and files
+- **Collections** - Populate custom collections with data
+- **Relationships** - Create related data (users, posts, comments)
+- **Customizable** - Configure data generation parameters
+
+### Configuration
+
+<CodeGroup title="Plugin Configuration">
+
+```typescript
+{
+  name: 'seed-data-plugin',
+  version: '1.0.0',
+  settings: {
+    enabled: false,               // Disable in production
+    autoSeed: false,             // Auto-seed on first run
+    contentCount: 50,            // Number of content items
+    userCount: 10,               // Number of test users
+    mediaCount: 20               // Number of media files
+  }
+}
+```
+
+</CodeGroup>
+
+### API Endpoints
+
+**POST /admin/seed-data/generate**
+Generate seed data
+
+<CodeGroup title="Generate Seed Data">
+
+```bash {{ title: 'cURL' }}
+curl -X POST http://localhost:8787/admin/seed-data/generate \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${token}" \
+  -d '{
+    "contentCount": 50,
+    "userCount": 10,
+    "mediaCount": 20,
+    "clearExisting": false
+  }'
+```
+
+</CodeGroup>
+
+**POST /admin/seed-data/clear**
+Clear all seed data
+
+**GET /admin/seed-data/status**
+Check seed data status
+
+### Usage
+
+<CodeGroup title="Seed Data Generation">
+
+```typescript
+import { generateSeedData } from '@sonicjs-cms/core'
+
+// Generate seed data programmatically
+await generateSeedData({
+  content: {
+    count: 50,
+    collections: ['blog_posts', 'pages']
+  },
+  users: {
+    count: 10,
+    roles: ['admin', 'editor', 'author']
+  },
+  media: {
+    count: 20,
+    types: ['image', 'video', 'document']
+  }
+})
+```
+
+</CodeGroup>
+
+### Admin Pages
+
+- **/admin/seed-data** - Seed data generator interface
+
+<Note>
+The seed data plugin should be disabled in production environments. It's designed for development and testing only.
+</Note>
+
+---
+
+## Next Steps
+
+<div className="not-prose">
+  <Button href="/plugins/development" variant="text" arrow="right">
+    <>Learn plugin development</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/api" variant="text" arrow="right">
+    <>Explore the API reference</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/examples" variant="text" arrow="right">
+    <>View examples and use cases</>
+  </Button>
+</div>

@@ -25,6 +25,7 @@ import {
 import { getCoreVersion } from './utils/version'
 import { bootstrapMiddleware } from './middleware/bootstrap'
 import { metricsMiddleware } from './middleware/metrics'
+import { createDatabaseToolsAdminRoutes } from './plugins/core-plugins/database-tools-plugin/admin-routes'
 
 // ============================================================================
 // Type Definitions
@@ -172,6 +173,7 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   app.route('/admin/dashboard', adminDashboardRoutes)
   app.route('/admin/collections', adminCollectionsRoutes)
   app.route('/admin/settings', adminSettingsRoutes)
+  app.route('/admin/database-tools', createDatabaseToolsAdminRoutes())
   app.route('/admin/content', adminContentRoutes)
   app.route('/admin/media', adminMediaRoutes)
   app.route('/admin/plugins', adminPluginRoutes)

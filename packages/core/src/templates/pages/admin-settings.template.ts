@@ -152,31 +152,52 @@ export function renderSettingsPage(data: SettingsPageData): string {
       // Initialize tab-specific features on page load
       const currentTab = '${activeTab}';
 
-      function saveAllSettings() {
+      async function saveAllSettings() {
         // Collect all form data
         const formData = new FormData();
-        
-        // Get all form inputs
-        document.querySelectorAll('input, select, textarea').forEach(input => {
+
+        // Get all form inputs in the settings content area
+        document.querySelectorAll('#settings-content input, #settings-content select, #settings-content textarea').forEach(input => {
           if (input.type === 'checkbox') {
-            formData.append(input.name, input.checked);
+            formData.append(input.name, input.checked ? 'true' : 'false');
           } else if (input.name) {
             formData.append(input.name, input.value);
           }
         });
-        
+
         // Show loading state
         const saveBtn = document.querySelector('button[onclick="saveAllSettings()"]');
         const originalText = saveBtn.innerHTML;
-        saveBtn.innerHTML = 'Saving...';
+        saveBtn.innerHTML = '<svg class="animate-spin -ml-0.5 mr-1.5 h-5 w-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>Saving...';
         saveBtn.disabled = true;
-        
-        // Simulate save (replace with actual API call)
-        setTimeout(() => {
+
+        try {
+          // Determine which endpoint to call based on current tab
+          let endpoint = '/admin/settings/general';
+          if (currentTab === 'general') {
+            endpoint = '/admin/settings/general';
+          }
+          // Add more endpoints for other tabs when implemented
+
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            body: formData
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            showNotification(result.message || 'Settings saved successfully!', 'success');
+          } else {
+            showNotification(result.error || 'Failed to save settings', 'error');
+          }
+        } catch (error) {
+          console.error('Error saving settings:', error);
+          showNotification('Failed to save settings. Please try again.', 'error');
+        } finally {
           saveBtn.innerHTML = originalText;
           saveBtn.disabled = false;
-          showNotification('Settings saved successfully!', 'success');
-        }, 1000);
+        }
       }
       
       function resetSettings() {

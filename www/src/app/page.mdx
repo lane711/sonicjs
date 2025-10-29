@@ -21,6 +21,10 @@ export const sections = [
 
 The AI-powered headless CMS that turns your content ideas into production-ready applications in minutes, not months. Built by developers, for developers. {{ className: 'lead' }}
 
+```bash
+npx create-sonicjs my-app
+```
+
 <div className="not-prose mt-6 mb-16 flex gap-3">
   <Button href="/quickstart" arrow="right">
     <>Get Started</>
@@ -75,24 +79,24 @@ Tired of bloated content management systems, endless plugin configurations, and 
   ]}
 />
 
-## Quick Start in 60 Seconds {{ id: 'quick-start' }}
+## Get Started in Seconds {{ id: 'quick-start' }}
 
-Get SonicJS running locally in under a minute:
+Create a new SonicJS project with a single command:
 
-```bash {{ title: 'Installation' }}
-# Clone the repository
-git clone https://github.com/lane711/sonicjs.git
-cd sonicjs
+```bash {{ title: 'Create New Project' }}
+# Create a new SonicJS application
+npx create-sonicjs my-app
 
-# Install dependencies
-npm install
+# Navigate to your project
+cd my-app
 
-# Run migrations and start dev server
-npm run db:migrate
+# Start the development server
 npm run dev
 
 # Your CMS is now running at http://localhost:8787
 ```
+
+That's it! You now have a fully-functional headless CMS running on the edge with authentication, content management, and a REST API ready to go.
 
 Visit the [Quickstart guide](/quickstart) for detailed instructions and next steps.
 

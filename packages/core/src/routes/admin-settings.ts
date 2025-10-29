@@ -3,6 +3,7 @@ import { html } from 'hono/html'
 import { requireAuth } from '../middleware'
 import { renderSettingsPage, SettingsPageData } from '../templates/pages/admin-settings.template'
 import { MigrationService } from '../services/migrations'
+import { SettingsService } from '../services/settings'
 
 type Bindings = {
   DB: D1Database
@@ -101,15 +102,24 @@ adminSettingsRoutes.get('/', (c) => {
 })
 
 // General settings
-adminSettingsRoutes.get('/general', (c) => {
+adminSettingsRoutes.get('/general', async (c) => {
   const user = c.get('user')
+  const db = c.env.DB
+  const settingsService = new SettingsService(db)
+
+  // Get real general settings from database
+  const generalSettings = await settingsService.getGeneralSettings(user?.email)
+
+  const mockSettings = getMockSettings(user)
+  mockSettings.general = generalSettings
+
   const pageData: SettingsPageData = {
     user: user ? {
       name: user.email,
       email: user.email,
       role: user.role
     } : undefined,
-    settings: getMockSettings(user),
+    settings: mockSettings,
     activeTab: 'general',
     version: c.get('appVersion')
   }
@@ -447,30 +457,64 @@ adminSettingsRoutes.post('/api/database-tools/truncate', async (c) => {
   }
 })
 
-// Save settings
-adminSettingsRoutes.post('/', async (c) => {
+// Save general settings
+adminSettingsRoutes.post('/general', async (c) => {
   try {
+    const user = c.get('user')
+
+    if (!user || user.role !== 'admin') {
+      return c.json({
+        success: false,
+        error: 'Unauthorized. Admin access required.'
+      }, 403)
+    }
+
     const formData = await c.req.formData()
+    const db = c.env.DB
+    const settingsService = new SettingsService(db)
 
-    // Here you would save the settings to your database
-    // For now, we'll just return a success message
+    // Extract general settings from form data
+    const settings = {
+      siteName: formData.get('siteName') as string,
+      siteDescription: formData.get('siteDescription') as string,
+      adminEmail: formData.get('adminEmail') as string,
+      timezone: formData.get('timezone') as string,
+      language: formData.get('language') as string,
+      maintenanceMode: formData.get('maintenanceMode') === 'true'
+    }
 
-    return c.html(html`
-      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-        Settings saved successfully!
-        <script>
-          setTimeout(() => {
-            showNotification('Settings saved successfully!', 'success');
-          }, 100);
-        </script>
-      </div>
-    `)
+    // Validate required fields
+    if (!settings.siteName || !settings.siteDescription) {
+      return c.json({
+        success: false,
+        error: 'Site name and description are required'
+      }, 400)
+    }
+
+    // Save settings to database
+    const success = await settingsService.saveGeneralSettings(settings)
+
+    if (success) {
+      return c.json({
+        success: true,
+        message: 'General settings saved successfully!'
+      })
+    } else {
+      return c.json({
+        success: false,
+        error: 'Failed to save settings'
+      }, 500)
+    }
   } catch (error) {
-    console.error('Error saving settings:', error)
-    return c.html(html`
-      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-        Failed to save settings. Please try again.
-      </div>
-    `)
+    console.error('Error saving general settings:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to save settings. Please try again.'
+    }, 500)
   }
+})
+
+// Save settings (legacy endpoint - redirect to general)
+adminSettingsRoutes.post('/', async (c) => {
+  return c.redirect('/admin/settings/general')
 })

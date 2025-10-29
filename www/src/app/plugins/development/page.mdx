@@ -1,0 +1,1345 @@
+export const metadata = {
+  title: 'Plugin Development Guide - SonicJS',
+  description:
+    'Comprehensive guide to creating plugins for SonicJS using the plugin framework and SDK. Learn from real-world examples and best practices.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Plugin System Architecture', id: 'plugin-system-architecture' },
+  { title: 'Getting Started', id: 'getting-started' },
+  { title: 'Plugin Manifest', id: 'plugin-manifest' },
+  { title: 'Creating Custom Plugins', id: 'creating-custom-plugins' },
+  { title: 'Plugin Lifecycle', id: 'plugin-lifecycle' },
+  { title: 'Hook System', id: 'hook-system' },
+  { title: 'Routes and API', id: 'routes-and-api' },
+  { title: 'Middleware', id: 'middleware' },
+  { title: 'Services', id: 'services' },
+  { title: 'Database Models', id: 'database-models' },
+  { title: 'Admin Interface', id: 'admin-interface' },
+  { title: 'Testing', id: 'testing' },
+  { title: 'Best Practices', id: 'best-practices' },
+]
+
+# Plugin Development Guide
+
+Learn how to create powerful, extensible plugins for SonicJS using the plugin framework and SDK. This comprehensive guide covers everything from basic concepts to advanced patterns. {{ className: 'lead' }}
+
+## Overview
+
+The SonicJS plugin system provides a robust, event-driven architecture that allows you to extend the CMS with custom functionality. Plugins can add routes, middleware, services, database models, admin pages, and hook into system events.
+
+### Key Features
+
+- **Event-Driven Architecture** - React to system events with priority-based hooks
+- **Plugin Builder SDK** - Intuitive API for creating plugins
+- **Lifecycle Management** - Full control over installation, activation, and configuration
+- **Service Registration** - Share functionality across your application
+- **Admin Integration** - Add custom pages and menu items to the admin interface
+- **TypeScript-First** - Full type safety and IntelliSense support
+
+---
+
+## Plugin System Architecture
+
+### Core Components
+
+The plugin system is built on several interconnected components:
+
+**Plugin Manager** - Central orchestrator that manages plugin installation, activation, and lifecycle
+
+**Plugin Registry** - Tracks installed plugins, manages configuration, and resolves dependencies
+
+**Hook System** - Provides event-driven extensibility with priority ordering
+
+**Plugin Validator** - Ensures plugin integrity and compatibility
+
+### System Diagram
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Plugin Manager                        │
+│  - Orchestrates plugin lifecycle                        │
+│  - Manages dependencies                                 │
+│  - Coordinates initialization                           │
+└──────────────┬──────────────────────────────────────────┘
+               │
+        ┌──────┴──────┬──────────────┬──────────────┐
+        │             │              │              │
+┌───────▼────┐ ┌──────▼────┐ ┌──────▼────┐ ┌──────▼────┐
+│  Plugin    │ │   Hook    │ │  Plugin   │ │ Plugin    │
+│  Registry  │ │  System   │ │ Validator │ │  Context  │
+└────────────┘ └───────────┘ └───────────┘ └───────────┘
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+Before creating a plugin, ensure you have:
+
+- TypeScript knowledge
+- Understanding of Hono.js framework
+- Familiarity with SonicJS architecture
+- Node.js and npm installed
+
+### Plugin Directory Structure
+
+```
+src/plugins/
+├── your-plugin/
+│   ├── index.ts              # Main plugin file
+│   ├── manifest.json         # Plugin manifest
+│   ├── routes.ts             # API routes
+│   ├── services/             # Business logic
+│   │   ├── service-a.ts
+│   │   └── service-b.ts
+│   ├── middleware/           # Custom middleware
+│   ├── models/               # Database models
+│   ├── migrations/           # Database migrations
+│   ├── tests/                # Plugin tests
+│   │   └── plugin.test.ts
+│   └── README.md             # Plugin documentation
+```
+
+### Your First Plugin
+
+Create a simple plugin to get started:
+
+<CodeGroup title="Hello World Plugin">
+
+```typescript
+import { PluginBuilder } from '../sdk/plugin-builder'
+import { Hono } from 'hono'
+
+// Create plugin using builder pattern
+const plugin = PluginBuilder.create({
+  name: 'my-first-plugin',
+  version: '1.0.0',
+  description: 'My first SonicJS plugin'
+})
+
+// Add metadata
+plugin.metadata({
+  author: {
+    name: 'Your Name',
+    email: 'you@example.com'
+  },
+  license: 'MIT',
+  compatibility: '^0.1.0'
+})
+
+// Add a simple route
+const routes = new Hono()
+routes.get('/hello', (c) => c.json({
+  message: 'Hello from my plugin!'
+}))
+
+plugin.addRoute('/api/my-plugin', routes, {
+  description: 'My plugin API endpoints'
+})
+
+// Add lifecycle hooks
+plugin.lifecycle({
+  activate: async (context) => {
+    context.logger.info('Plugin activated!')
+  },
+
+  deactivate: async (context) => {
+    context.logger.info('Plugin deactivated!')
+  }
+})
+
+// Build and export
+export default plugin.build()
+```
+
+</CodeGroup>
+
+---
+
+## Plugin Manifest
+
+The `manifest.json` file defines plugin metadata and configuration settings.
+
+### Complete Example
+
+<CodeGroup title="Plugin Manifest">
+
+```json
+{
+  "id": "weather-plugin",
+  "name": "Weather Service",
+  "version": "1.0.0",
+  "description": "Provides weather information and forecasts with automatic caching",
+  "author": "Your Name",
+  "homepage": "https://example.com/plugins/weather",
+  "repository": "https://github.com/yourorg/weather-plugin",
+  "license": "MIT",
+  "category": "utility",
+  "tags": ["weather", "api", "forecast"],
+  "dependencies": ["cache"],
+  "settings": {
+    "apiKey": {
+      "type": "string",
+      "label": "Weather API Key",
+      "description": "API key for weather service",
+      "default": ""
+    },
+    "defaultCity": {
+      "type": "string",
+      "label": "Default City",
+      "description": "Default city for weather queries",
+      "default": "London"
+    },
+    "cacheEnabled": {
+      "type": "boolean",
+      "label": "Enable Caching",
+      "description": "Cache weather data to reduce API calls",
+      "default": true
+    },
+    "cacheTTL": {
+      "type": "number",
+      "label": "Cache TTL (seconds)",
+      "description": "How long to cache weather data",
+      "default": 300
+    }
+  },
+  "permissions": {
+    "weather.view": "View weather data",
+    "weather.configure": "Configure weather settings"
+  }
+}
+```
+
+</CodeGroup>
+
+### Schema Reference
+
+**Required Fields:**
+- `id` - Unique plugin identifier
+- `name` - Display name
+- `version` - Semantic version (e.g., "1.0.0")
+- `description` - Detailed description
+- `author` - Author name or organization
+- `license` - License identifier
+
+**Optional Fields:**
+- `homepage` - Plugin homepage URL
+- `repository` - Source repository URL
+- `category` - Plugin category
+- `tags` - Searchable tags
+- `dependencies` - Required plugin dependencies
+- `settings` - Configuration schema
+- `permissions` - Permission definitions
+
+---
+
+## Creating Custom Plugins
+
+### Step-by-Step Example: Weather Plugin
+
+Let's create a complete weather plugin from scratch.
+
+#### 1. Create Plugin Structure
+
+<CodeGroup title="Directory Setup">
+
+```bash
+mkdir -p src/plugins/weather/{services,routes,tests}
+touch src/plugins/weather/{index.ts,manifest.json,routes.ts}
+```
+
+</CodeGroup>
+
+#### 2. Define the Service
+
+<CodeGroup title="Weather Service">
+
+```typescript
+// src/plugins/weather/services/weather-service.ts
+
+export interface WeatherData {
+  city: string
+  temperature: number
+  condition: string
+  humidity: number
+  windSpeed: number
+  forecast: Array<{
+    date: string
+    high: number
+    low: number
+    condition: string
+  }>
+}
+
+export class WeatherService {
+  private apiKey: string
+  private cache?: any
+
+  constructor(apiKey: string, cache?: any) {
+    this.apiKey = apiKey
+    this.cache = cache
+  }
+
+  async getCurrentWeather(city: string): Promise<WeatherData> {
+    // Check cache first
+    if (this.cache) {
+      const cacheKey = `weather:current:${city}`
+      const cached = await this.cache.get(cacheKey)
+      if (cached) {
+        return cached
+      }
+    }
+
+    // Fetch from API
+    const response = await fetch(
+      `https://api.weather.com/v1/current?city=${city}&key=${this.apiKey}`
+    )
+    const weather: WeatherData = await response.json()
+
+    // Store in cache
+    if (this.cache) {
+      await this.cache.set(`weather:current:${city}`, weather)
+    }
+
+    return weather
+  }
+
+  async getForecast(city: string, days: number = 7): Promise<WeatherData['forecast']> {
+    const weather = await this.getCurrentWeather(city)
+    return weather.forecast.slice(0, days)
+  }
+
+  async searchCities(query: string): Promise<string[]> {
+    const response = await fetch(
+      `https://api.weather.com/v1/search?q=${query}&key=${this.apiKey}`
+    )
+    return response.json()
+  }
+}
+```
+
+</CodeGroup>
+
+#### 3. Create Routes
+
+<CodeGroup title="API Routes">
+
+```typescript
+// src/plugins/weather/routes.ts
+
+import { Hono } from 'hono'
+import type { Context } from 'hono'
+import { WeatherService } from './services/weather-service.js'
+
+const app = new Hono()
+
+// GET /api/weather/current?city=London
+app.get('/current', async (c: Context) => {
+  const city = c.req.query('city')
+
+  if (!city) {
+    return c.json({
+      success: false,
+      error: 'City parameter is required'
+    }, 400)
+  }
+
+  try {
+    const weatherService = c.get('weatherService') as WeatherService
+    const weather = await weatherService.getCurrentWeather(city)
+
+    return c.json({
+      success: true,
+      data: weather,
+      timestamp: new Date().toISOString()
+    })
+  } catch (error) {
+    console.error('Weather API error:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to fetch weather data'
+    }, 500)
+  }
+})
+
+// GET /api/weather/forecast?city=London&days=7
+app.get('/forecast', async (c: Context) => {
+  const city = c.req.query('city')
+  const days = parseInt(c.req.query('days') || '7')
+
+  if (!city) {
+    return c.json({
+      success: false,
+      error: 'City parameter is required'
+    }, 400)
+  }
+
+  try {
+    const weatherService = c.get('weatherService') as WeatherService
+    const forecast = await weatherService.getForecast(city, days)
+
+    return c.json({
+      success: true,
+      data: { city, forecast },
+      timestamp: new Date().toISOString()
+    })
+  } catch (error) {
+    console.error('Forecast API error:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to fetch forecast data'
+    }, 500)
+  }
+})
+
+// GET /api/weather/search?q=Lon
+app.get('/search', async (c: Context) => {
+  const query = c.req.query('q')
+
+  if (!query || query.length < 2) {
+    return c.json({
+      success: false,
+      error: 'Query must be at least 2 characters'
+    }, 400)
+  }
+
+  try {
+    const weatherService = c.get('weatherService') as WeatherService
+    const cities = await weatherService.searchCities(query)
+
+    return c.json({
+      success: true,
+      data: cities,
+      timestamp: new Date().toISOString()
+    })
+  } catch (error) {
+    console.error('City search error:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to search cities'
+    }, 500)
+  }
+})
+
+export default app
+```
+
+</CodeGroup>
+
+#### 4. Assemble the Plugin
+
+<CodeGroup title="Main Plugin File">
+
+```typescript
+// src/plugins/weather/index.ts
+
+import { PluginBuilder } from '../sdk/plugin-builder'
+import { PluginContext } from '../types'
+import weatherRoutes from './routes.js'
+import { WeatherService } from './services/weather-service.js'
+
+// Create plugin
+const plugin = PluginBuilder.create({
+  name: 'weather',
+  version: '1.0.0',
+  description: 'Weather information and forecast plugin'
+})
+
+// Add metadata
+plugin.metadata({
+  author: {
+    name: 'Your Name',
+    email: 'you@example.com'
+  },
+  license: 'MIT',
+  compatibility: '^0.1.0',
+  dependencies: ['cache']
+})
+
+// Store service instance
+let weatherService: WeatherService | null = null
+
+// Add routes
+plugin.addRoute('/api/weather', weatherRoutes, {
+  description: 'Weather API endpoints',
+  priority: 5
+})
+
+// Add admin page
+plugin.addAdminPage(
+  '/weather',
+  'Weather',
+  'WeatherDashboard',
+  {
+    description: 'View weather information',
+    permissions: ['admin'],
+    icon: 'cloud'
+  }
+)
+
+// Add menu item
+plugin.addMenuItem('Weather', '/admin/weather', {
+  icon: 'cloud',
+  order: 50
+})
+
+// Add lifecycle hooks
+plugin.lifecycle({
+  activate: async (context: PluginContext) => {
+    console.log('Activating weather plugin...')
+
+    const { apiKey, cacheEnabled, cacheTTL } = context.config
+
+    if (!apiKey) {
+      throw new Error('Weather API key is required')
+    }
+
+    // Get cache service if enabled
+    let cache = null
+    if (cacheEnabled) {
+      cache = getCacheService({
+        namespace: 'weather',
+        ttl: cacheTTL || 300,
+        memoryEnabled: true,
+        kvEnabled: false
+      })
+    }
+
+    // Initialize weather service
+    weatherService = new WeatherService(apiKey, cache)
+
+    console.log('Weather plugin activated successfully')
+  },
+
+  deactivate: async (context: PluginContext) => {
+    console.log('Deactivating weather plugin...')
+    weatherService = null
+  },
+
+  configure: async (config: any) => {
+    console.log('Configuring weather plugin...', config)
+
+    if (weatherService && config.apiKey) {
+      const cache = config.cacheEnabled ? getCacheService({
+        namespace: 'weather',
+        ttl: config.cacheTTL || 300
+      }) : null
+
+      weatherService = new WeatherService(config.apiKey, cache)
+    }
+  }
+})
+
+// Add hook to inject service into request context
+plugin.addHook('request:start', async (data, context) => {
+  if (weatherService) {
+    data.context.set('weatherService', weatherService)
+  }
+  return data
+}, {
+  priority: 5,
+  description: 'Inject weather service into request context'
+})
+
+export default plugin.build()
+```
+
+</CodeGroup>
+
+---
+
+## Plugin Lifecycle
+
+Plugins have five lifecycle stages with corresponding hooks:
+
+### 1. Install
+
+Called when the plugin is first installed. Use this to create database tables and initialize default configuration.
+
+<CodeGroup title="Install Hook">
+
+```typescript
+plugin.lifecycle({
+  install: async (context: PluginContext) => {
+    console.log('Installing plugin...')
+
+    // Create database tables
+    await context.db.exec(`
+      CREATE TABLE IF NOT EXISTS plugin_data (
+        id INTEGER PRIMARY KEY,
+        key TEXT NOT NULL,
+        value TEXT,
+        created_at INTEGER DEFAULT (strftime('%s', 'now'))
+      )
+    `)
+
+    // Initialize configuration
+    await context.db.exec(`
+      INSERT INTO plugin_data (key, value) VALUES
+      ('version', '1.0.0'),
+      ('installed_at', ${Date.now()})
+    `)
+
+    console.log('Plugin installed successfully')
+  }
+})
+```
+
+</CodeGroup>
+
+### 2. Activate
+
+Called when the plugin is activated. Use this to initialize services, register event listeners, and start background tasks.
+
+<CodeGroup title="Activate Hook">
+
+```typescript
+plugin.lifecycle({
+  activate: async (context: PluginContext) => {
+    console.log('Activating plugin...')
+
+    // Initialize services
+    const config = context.config
+    const service = new MyService(config)
+
+    // Store in context
+    context.services.myService = service
+
+    // Register event listeners
+    context.hooks.register('content:save', async (data) => {
+      await service.handleContentSave(data)
+      return data
+    })
+
+    console.log('Plugin activated')
+  }
+})
+```
+
+</CodeGroup>
+
+### 3. Configure
+
+Called when plugin configuration changes. Use this to update service settings and apply new configuration.
+
+<CodeGroup title="Configure Hook">
+
+```typescript
+plugin.lifecycle({
+  configure: async (config: PluginConfig) => {
+    console.log('Configuring plugin...', config)
+
+    // Validate configuration
+    if (config.apiKey && config.apiKey.length < 10) {
+      throw new Error('Invalid API key')
+    }
+
+    // Apply configuration changes
+    if (myService) {
+      myService.updateConfig(config)
+    }
+
+    console.log('Plugin configured')
+  }
+})
+```
+
+</CodeGroup>
+
+### 4. Deactivate
+
+Called when the plugin is deactivated. Use this to stop background tasks, unregister event listeners, and clean up resources.
+
+<CodeGroup title="Deactivate Hook">
+
+```typescript
+plugin.lifecycle({
+  deactivate: async (context: PluginContext) => {
+    console.log('Deactivating plugin...')
+
+    // Stop background tasks
+    if (backgroundTask) {
+      backgroundTask.stop()
+    }
+
+    // Clean up resources
+    if (context.services.myService) {
+      await context.services.myService.cleanup()
+      delete context.services.myService
+    }
+
+    console.log('Plugin deactivated')
+  }
+})
+```
+
+</CodeGroup>
+
+### 5. Uninstall
+
+Called when the plugin is removed. Use this to remove database tables, delete plugin data, and clean up all traces.
+
+<CodeGroup title="Uninstall Hook">
+
+```typescript
+plugin.lifecycle({
+  uninstall: async (context: PluginContext) => {
+    console.log('Uninstalling plugin...')
+
+    // Remove database tables
+    await context.db.exec('DROP TABLE IF EXISTS plugin_data')
+
+    // Delete plugin configuration
+    await context.kv.delete('plugin:config')
+
+    console.log('Plugin uninstalled')
+  }
+})
+```
+
+</CodeGroup>
+
+---
+
+## Hook System
+
+The hook system provides event-driven extensibility. Plugins can register hooks to listen for events and modify data flow.
+
+### Standard Hooks
+
+<CodeGroup title="Available Hooks">
+
+```typescript
+export const HOOKS = {
+  // Application lifecycle
+  APP_INIT: 'app:init',
+  APP_READY: 'app:ready',
+  APP_SHUTDOWN: 'app:shutdown',
+
+  // Request lifecycle
+  REQUEST_START: 'request:start',
+  REQUEST_END: 'request:end',
+  REQUEST_ERROR: 'request:error',
+
+  // Authentication
+  AUTH_LOGIN: 'auth:login',
+  AUTH_LOGOUT: 'auth:logout',
+  USER_LOGIN: 'user:login',
+  USER_LOGOUT: 'user:logout',
+
+  // Content lifecycle
+  CONTENT_CREATE: 'content:create',
+  CONTENT_UPDATE: 'content:update',
+  CONTENT_DELETE: 'content:delete',
+  CONTENT_PUBLISH: 'content:publish',
+  CONTENT_SAVE: 'content:save',
+
+  // Media lifecycle
+  MEDIA_UPLOAD: 'media:upload',
+  MEDIA_DELETE: 'media:delete',
+  MEDIA_TRANSFORM: 'media:transform',
+
+  // Admin interface
+  ADMIN_MENU_RENDER: 'admin:menu:render',
+  ADMIN_PAGE_RENDER: 'admin:page:render',
+}
+```
+
+</CodeGroup>
+
+### Hook Priority
+
+Hooks execute in priority order (lower number = earlier execution):
+
+- Priority 1-5: Critical hooks that must run first
+- Priority 6-10: Normal hooks (default is 10)
+- Priority 11+: Lower priority hooks
+
+### Registering Hooks
+
+<CodeGroup title="Hook Registration">
+
+```typescript
+// Default priority (10)
+plugin.addHook('content:save', async (data, context) => {
+  console.log('Content being saved:', data.title)
+  data.processedAt = Date.now()
+  return data
+})
+
+// Custom priority
+plugin.addHook('content:save', async (data, context) => {
+  data.validated = true
+  return data
+}, {
+  priority: 5,
+  description: 'Validate content before saving'
+})
+
+// Cancel hook execution
+plugin.addHook('content:delete', async (data, context) => {
+  if (data.protected) {
+    console.warn('Cannot delete protected content')
+    context.cancel?.()
+  }
+  return data
+})
+```
+
+</CodeGroup>
+
+---
+
+## Routes and API
+
+Routes define API endpoints that your plugin exposes.
+
+### Basic Route Registration
+
+<CodeGroup title="API Routes">
+
+```typescript
+import { Hono } from 'hono'
+
+const routes = new Hono()
+
+// GET endpoint
+routes.get('/items', async (c) => {
+  const items = [
+    { id: 1, name: 'Item 1' },
+    { id: 2, name: 'Item 2' }
+  ]
+  return c.json({
+    success: true,
+    data: items
+  })
+})
+
+// POST endpoint
+routes.post('/items', async (c) => {
+  const body = await c.req.json()
+
+  if (!body.name) {
+    return c.json({
+      success: false,
+      error: 'Name is required'
+    }, 400)
+  }
+
+  const item = {
+    id: Date.now(),
+    name: body.name,
+    createdAt: new Date().toISOString()
+  }
+
+  return c.json({
+    success: true,
+    data: item
+  }, 201)
+})
+
+// Register routes
+plugin.addRoute('/api/my-plugin', routes, {
+  description: 'My plugin API endpoints',
+  requiresAuth: false,
+  priority: 10
+})
+```
+
+</CodeGroup>
+
+### Query Parameters
+
+<CodeGroup title="Query Parameters">
+
+```typescript
+routes.get('/search', async (c) => {
+  const query = c.req.query('q')
+  const page = parseInt(c.req.query('page') || '1')
+  const limit = parseInt(c.req.query('limit') || '20')
+  const sortBy = c.req.query('sort') || 'name'
+
+  // Validate
+  if (!query || query.length < 2) {
+    return c.json({
+      error: 'Query must be at least 2 characters'
+    }, 400)
+  }
+
+  const results = await searchItems(query, { page, limit, sortBy })
+
+  return c.json({
+    success: true,
+    data: results,
+    pagination: {
+      page,
+      limit,
+      total: results.length
+    }
+  })
+})
+```
+
+</CodeGroup>
+
+### Request Body Validation
+
+<CodeGroup title="Validation with Zod">
+
+```typescript
+import { z } from 'zod'
+
+const createItemSchema = z.object({
+  name: z.string().min(3).max(100),
+  description: z.string().optional(),
+  price: z.number().positive(),
+  tags: z.array(z.string()).optional()
+})
+
+routes.post('/items', async (c) => {
+  try {
+    const body = await c.req.json()
+    const validated = createItemSchema.parse(body)
+
+    const item = {
+      id: Date.now(),
+      ...validated,
+      createdAt: new Date().toISOString()
+    }
+
+    return c.json({
+      success: true,
+      data: item
+    }, 201)
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return c.json({
+        success: false,
+        error: 'Validation failed',
+        details: error.errors
+      }, 400)
+    }
+    throw error
+  }
+})
+```
+
+</CodeGroup>
+
+---
+
+## Middleware
+
+Middleware allows you to intercept and modify requests and responses.
+
+### Global Middleware
+
+<CodeGroup title="Request Logger">
+
+```typescript
+plugin.addSingleMiddleware('request-logger', async (c, next) => {
+  const start = Date.now()
+  const path = c.req.path
+
+  await next()
+
+  const duration = Date.now() - start
+  console.log(`${c.req.method} ${path} - ${duration}ms`)
+}, {
+  description: 'Log all requests with duration',
+  global: true,
+  priority: 1
+})
+```
+
+</CodeGroup>
+
+### Route-Specific Middleware
+
+<CodeGroup title="Authentication Check">
+
+```typescript
+plugin.addSingleMiddleware('auth-check', async (c, next) => {
+  const token = c.req.header('authorization')
+
+  if (!token) {
+    return c.json({ error: 'Unauthorized' }, 401)
+  }
+
+  const user = await verifyToken(token)
+  if (!user) {
+    return c.json({ error: 'Invalid token' }, 401)
+  }
+
+  c.set('user', user)
+  await next()
+}, {
+  description: 'Verify authentication token',
+  routes: ['/api/protected/*'],
+  priority: 5
+})
+```
+
+</CodeGroup>
+
+---
+
+## Services
+
+Services encapsulate business logic and can be shared across your plugin.
+
+### Basic Service
+
+<CodeGroup title="Email Service">
+
+```typescript
+class EmailService {
+  private apiKey: string
+
+  constructor(apiKey: string) {
+    this.apiKey = apiKey
+  }
+
+  async sendEmail(to: string, subject: string, body: string): Promise<boolean> {
+    console.log(`Sending email to ${to}: ${subject}`)
+    // Email sending logic here
+    return true
+  }
+
+  async validateEmail(email: string): Promise<boolean> {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return regex.test(email)
+  }
+}
+
+// Register service
+plugin.addService('emailService', new EmailService('api-key-here'), {
+  description: 'Email sending and validation service',
+  singleton: true
+})
+```
+
+</CodeGroup>
+
+---
+
+## Database Models
+
+Define database structures for your plugin using Zod schemas and migrations.
+
+### Basic Model
+
+<CodeGroup title="User Model">
+
+```typescript
+import { z } from 'zod'
+import { PluginHelpers } from '../sdk/plugin-builder'
+
+// Define Zod schema
+const userSchema = z.object({
+  email: z.string().email(),
+  firstName: z.string(),
+  lastName: z.string(),
+  active: z.boolean().default(true),
+  metadata: z.record(z.any()).optional()
+})
+
+// Create migration
+const userMigration = PluginHelpers.createMigration('plugin_users', [
+  { name: 'id', type: 'INTEGER', primaryKey: true },
+  { name: 'email', type: 'TEXT', nullable: false, unique: true },
+  { name: 'first_name', type: 'TEXT', nullable: false },
+  { name: 'last_name', type: 'TEXT', nullable: false },
+  { name: 'active', type: 'INTEGER', nullable: false, defaultValue: '1' },
+  { name: 'metadata', type: 'TEXT', nullable: true },
+  { name: 'created_at', type: 'INTEGER', nullable: false },
+  { name: 'updated_at', type: 'INTEGER', nullable: true }
+])
+
+// Register model
+plugin.addModel('PluginUser', {
+  tableName: 'plugin_users',
+  schema: userSchema,
+  migrations: [userMigration]
+})
+```
+
+</CodeGroup>
+
+---
+
+## Admin Interface
+
+Add admin pages and menu items to the SonicJS admin interface.
+
+### Admin Pages
+
+<CodeGroup title="Admin Page Registration">
+
+```typescript
+// Add main admin page
+plugin.addAdminPage(
+  '/my-plugin',
+  'My Plugin',
+  'MyPluginView',
+  {
+    description: 'Manage my plugin settings and data',
+    permissions: ['admin', 'plugin:manage'],
+    icon: 'cog'
+  }
+)
+
+// Add sub-page
+plugin.addAdminPage(
+  '/my-plugin/settings',
+  'Plugin Settings',
+  'MyPluginSettingsView',
+  {
+    description: 'Configure plugin settings',
+    permissions: ['admin', 'plugin:configure'],
+    icon: 'settings'
+  }
+)
+```
+
+</CodeGroup>
+
+### Menu Items
+
+<CodeGroup title="Menu Item Registration">
+
+```typescript
+// Add top-level menu item
+plugin.addMenuItem('My Plugin', '/admin/my-plugin', {
+  icon: 'puzzle',
+  order: 50,
+  permissions: ['admin', 'plugin:manage']
+})
+
+// Add sub-menu items
+plugin.addMenuItem('Dashboard', '/admin/my-plugin', {
+  icon: 'home',
+  parent: 'My Plugin',
+  order: 1
+})
+
+plugin.addMenuItem('Settings', '/admin/my-plugin/settings', {
+  icon: 'cog',
+  parent: 'My Plugin',
+  order: 2,
+  permissions: ['admin', 'plugin:configure']
+})
+```
+
+</CodeGroup>
+
+---
+
+## Testing
+
+### Unit Testing
+
+<CodeGroup title="Plugin Tests">
+
+```typescript
+import { describe, it, expect } from 'vitest'
+import plugin from '../index.js'
+
+describe('My Plugin', () => {
+  it('should have correct metadata', () => {
+    expect(plugin.name).toBe('my-plugin')
+    expect(plugin.version).toBe('1.0.0')
+  })
+
+  it('should register routes', () => {
+    expect(plugin.routes).toBeDefined()
+    expect(plugin.routes?.length).toBeGreaterThan(0)
+  })
+
+  it('should have lifecycle hooks', () => {
+    expect(plugin.activate).toBeDefined()
+    expect(plugin.deactivate).toBeDefined()
+  })
+})
+```
+
+</CodeGroup>
+
+### Service Testing
+
+<CodeGroup title="Service Tests">
+
+```typescript
+import { describe, it, expect } from 'vitest'
+import { WeatherService } from '../services/weather-service.js'
+
+describe('WeatherService', () => {
+  const service = new WeatherService('test-api-key')
+
+  it('should fetch current weather', async () => {
+    const weather = await service.getCurrentWeather('London')
+
+    expect(weather).toBeDefined()
+    expect(weather.city).toBe('London')
+    expect(weather.temperature).toBeGreaterThan(-50)
+  })
+
+  it('should fetch forecast', async () => {
+    const forecast = await service.getForecast('London', 7)
+
+    expect(forecast).toHaveLength(7)
+    expect(forecast[0]).toHaveProperty('date')
+    expect(forecast[0]).toHaveProperty('high')
+  })
+})
+```
+
+</CodeGroup>
+
+---
+
+## Best Practices
+
+### 1. Naming Conventions
+
+Use lowercase with hyphens for plugin names:
+
+```typescript
+// Good
+name: 'weather-forecast'
+name: 'user-analytics'
+name: 'advanced-search'
+
+// Avoid
+name: 'Weather'
+name: 'MyPlugin'
+name: 'plugin_name'
+```
+
+### 2. Semantic Versioning
+
+Follow semantic versioning for plugin versions:
+
+```typescript
+version: '1.0.0'    // Initial release
+version: '1.1.0'    // New feature (backward compatible)
+version: '1.1.1'    // Bug fix
+version: '2.0.0'    // Breaking change
+```
+
+### 3. Error Handling
+
+Handle errors gracefully and provide useful messages:
+
+<CodeGroup title="Error Handling">
+
+```typescript
+plugin.addRoute('/api/data', new Hono().get('/', async (c) => {
+  try {
+    const data = await fetchData()
+    return c.json({ success: true, data })
+  } catch (error) {
+    console.error('Failed to fetch data:', error)
+
+    context.logger.error('Data fetch failed', error, {
+      path: c.req.path,
+      timestamp: Date.now()
+    })
+
+    return c.json({
+      success: false,
+      error: 'Failed to fetch data. Please try again later.'
+    }, 500)
+  }
+}))
+```
+
+</CodeGroup>
+
+### 4. Security
+
+Always validate and sanitize inputs:
+
+<CodeGroup title="Input Validation">
+
+```typescript
+import { z } from 'zod'
+
+const inputSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(1).max(100),
+  age: z.number().int().min(0).max(150)
+})
+
+routes.post('/users', async (c) => {
+  try {
+    const body = await c.req.json()
+    const validated = inputSchema.parse(body)
+
+    const user = await createUser(validated)
+    return c.json({ success: true, data: user })
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return c.json({
+        success: false,
+        error: 'Invalid input',
+        details: error.errors
+      }, 400)
+    }
+    throw error
+  }
+})
+```
+
+</CodeGroup>
+
+### 5. Performance
+
+Optimize for performance with caching:
+
+<CodeGroup title="Performance Optimization">
+
+```typescript
+// Use caching
+const cache = getCacheService({ namespace: 'my-plugin', ttl: 300 })
+const data = await cache.getOrSet('expensive-query', async () => {
+  return await expensiveOperation()
+})
+
+// Batch operations
+const users = await Promise.all(
+  userIds.map(id => fetchUser(id))
+)
+
+// Pagination
+const limit = Math.min(parseInt(c.req.query('limit') || '20'), 100)
+const offset = parseInt(c.req.query('offset') || '0')
+```
+
+</CodeGroup>
+
+---
+
+## Next Steps
+
+<div className="not-prose">
+  <Button href="/plugins/core" variant="text" arrow="right">
+    <>Explore core plugins</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/architecture" variant="text" arrow="right">
+    <>Learn about system architecture</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/api" variant="text" arrow="right">
+    <>Read API documentation</>
+  </Button>
+</div>

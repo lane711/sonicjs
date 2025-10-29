@@ -1,0 +1,816 @@
+export const metadata = {
+  title: 'Routing & Middleware - SonicJS',
+  description:
+    'Complete guide to routing and middleware in SonicJS using Hono framework, including authentication, authorization, logging, and plugin middleware.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Middleware Pipeline', id: 'middleware-pipeline' },
+  { title: 'Authentication Middleware', id: 'authentication-middleware' },
+  { title: 'Authorization and Permissions', id: 'authorization-and-permissions' },
+  { title: 'Bootstrap Middleware', id: 'bootstrap-middleware' },
+  { title: 'Logging Middleware', id: 'logging-middleware' },
+  { title: 'Performance Middleware', id: 'performance-middleware' },
+  { title: 'Plugin Middleware', id: 'plugin-middleware' },
+  { title: 'Route Structure', id: 'route-structure' },
+  { title: 'Creating Custom Middleware', id: 'creating-custom-middleware' },
+]
+
+# Routing and Middleware Documentation
+
+Complete guide to routing and middleware in SonicJS using the Hono framework, optimized for Cloudflare Workers. {{ className: 'lead' }}
+
+## Overview
+
+SonicJS uses **Hono**, a lightweight web framework optimized for Cloudflare Workers. The middleware pipeline processes every request through a series of layers before reaching route handlers.
+
+### Key Concepts
+
+- **Middleware** - Functions that execute before route handlers to process requests
+- **Middleware Ordering** - Order matters - middleware executes in the sequence it's registered
+- **Route Protection** - Middleware can protect routes based on authentication, roles, and permissions
+- **Context Object** - Middleware can set values on the context (`c.set()`) for downstream use
+
+<FeatureGrid
+  features={[
+    {
+      icon: '🔐',
+      title: 'Authentication',
+      description: 'JWT-based auth with KV caching',
+    },
+    {
+      icon: '🛡️',
+      title: 'Authorization',
+      description: 'Fine-grained permission system',
+    },
+    {
+      icon: '🚀',
+      title: 'Bootstrap',
+      description: 'System initialization on startup',
+    },
+    {
+      icon: '📝',
+      title: 'Logging',
+      description: 'Request/response/security logging',
+    },
+    {
+      icon: '⚡',
+      title: 'Performance',
+      description: 'Caching and security headers',
+    },
+    {
+      icon: '🔌',
+      title: 'Plugin Middleware',
+      description: 'Route protection by plugin status',
+    },
+  ]}
+  columns={3}
+/>
+
+---
+
+## Middleware Pipeline
+
+The middleware pipeline executes in the following order for every request:
+
+<CodeGroup title="Middleware Configuration">
+
+```typescript
+// File: /src/index.ts
+
+// 1. Bootstrap - System initialization (runs once per worker)
+app.use('*', bootstrapMiddleware())
+
+// 2. Logging - Request/response logging
+app.use('*', loggingMiddleware())
+app.use('*', securityLoggingMiddleware())
+app.use('*', performanceLoggingMiddleware(1000)) // Log slow requests
+
+// 3. Standard Middleware
+app.use('*', logger())              // Hono's built-in logger
+app.use('*', cors())                // CORS headers
+app.use('*', securityHeaders())     // Security headers
+app.use('/api/*', prettyJSON())     // JSON formatting for API routes
+
+// 4. Route-specific middleware (applied to specific paths)
+app.use('/admin/*', requireAuth())
+app.use('/admin/*', requireRole(['admin', 'editor']))
+app.use('/admin/*', cacheHeaders(60))
+```
+
+</CodeGroup>
+
+### Middleware Execution Order
+
+```
+Request
+  ↓
+Bootstrap Middleware → Check/run system initialization
+  ↓
+Logging Middleware → Log request start
+  ↓
+Security Logging → Check for suspicious patterns
+  ↓
+Performance Logging → Track request timing
+  ↓
+Standard Middleware → CORS, security headers, etc.
+  ↓
+Route-specific Middleware → Auth, roles, permissions
+  ↓
+Route Handler → Execute business logic
+  ↓
+Logging Middleware → Log request completion
+  ↓
+Response
+```
+
+---
+
+## Authentication Middleware
+
+The authentication system uses JWT tokens stored in HTTP-only cookies.
+
+### Authentication Manager
+
+<CodeGroup title="Auth Manager">
+
+```typescript
+import { AuthManager } from '../middleware/auth'
+
+// Generate JWT token
+const token = await AuthManager.generateToken(
+  userId,
+  email,
+  role
+)
+
+// Verify JWT token
+const payload = await AuthManager.verifyToken(token)
+// Returns: { userId, email, role, exp, iat } or null
+
+// Hash password
+const hash = await AuthManager.hashPassword(password)
+
+// Verify password
+const isValid = await AuthManager.verifyPassword(password, hash)
+```
+
+</CodeGroup>
+
+### requireAuth Middleware
+
+Requires valid authentication to access a route.
+
+<CodeGroup title="Require Auth">
+
+```typescript
+import { requireAuth } from '../middleware/auth'
+
+// Protect a route
+app.get('/protected', requireAuth(), async (c) => {
+  const user = c.get('user')
+  // user contains: { userId, email, role, exp, iat }
+
+  return c.json({ message: 'Welcome!', user })
+})
+```
+
+</CodeGroup>
+
+**How it works:**
+
+1. Checks for token in `Authorization` header (Bearer token)
+2. Falls back to `auth_token` cookie if no header present
+3. Verifies token with KV cache (5-minute TTL)
+4. Falls back to JWT verification if not cached
+5. Sets `user` object on context for downstream use
+6. Returns 401 error or redirects to login if invalid
+
+### requireRole Middleware
+
+Requires specific role(s) to access a route.
+
+<CodeGroup title="Role-Based Access">
+
+```typescript
+import { requireRole } from '../middleware/auth'
+
+// Single role
+app.get('/admin-only',
+  requireAuth(),
+  requireRole('admin'),
+  async (c) => {
+    return c.json({ message: 'Admin area' })
+  }
+)
+
+// Multiple roles (any of them)
+app.get('/content-edit',
+  requireAuth(),
+  requireRole(['admin', 'editor']),
+  async (c) => {
+    return c.json({ message: 'Content editing area' })
+  }
+)
+```
+
+</CodeGroup>
+
+**Role Hierarchy:**
+- `admin` - Full system access
+- `editor` - Content management and publishing
+- `viewer` - Read-only access
+
+### optionalAuth Middleware
+
+Allows authenticated and unauthenticated access, but populates user if authenticated.
+
+<CodeGroup title="Optional Auth">
+
+```typescript
+import { optionalAuth } from '../middleware/auth'
+
+// Public API with optional auth
+app.get('/content', optionalAuth(), async (c) => {
+  const user = c.get('user')
+  const db = c.env.DB
+
+  // Show different content based on authentication
+  const query = user
+    ? 'SELECT * FROM content WHERE status IN (?, ?, ?)'
+    : 'SELECT * FROM content WHERE status = ?'
+
+  const params = user
+    ? ['published', 'draft', 'scheduled']
+    : ['published']
+
+  const { results } = await db.prepare(query).bind(...params).all()
+
+  return c.json({ data: results, authenticated: !!user })
+})
+```
+
+</CodeGroup>
+
+---
+
+## Authorization and Permissions
+
+Fine-grained permission system for controlling access to specific resources.
+
+### Permission Manager
+
+<CodeGroup title="Permission Manager">
+
+```typescript
+import { PermissionManager } from '../middleware/permissions'
+
+// Get user permissions
+const permissions = await PermissionManager.getUserPermissions(db, userId)
+// Returns: { userId, role, permissions: string[], teamPermissions: {} }
+
+// Check single permission
+const hasPermission = await PermissionManager.hasPermission(
+  db,
+  userId,
+  'content.edit'
+)
+
+// Check multiple permissions
+const permissionMap = await PermissionManager.checkMultiplePermissions(
+  db,
+  userId,
+  ['content.edit', 'content.publish', 'users.create']
+)
+// Returns: { 'content.edit': true, 'content.publish': false, ... }
+
+// Clear user permission cache
+PermissionManager.clearUserCache(userId)
+
+// Clear all permission cache
+PermissionManager.clearAllCache()
+```
+
+</CodeGroup>
+
+### requirePermission Middleware
+
+Requires specific permission to access a route.
+
+<CodeGroup title="Permission-Based Access">
+
+```typescript
+import { requirePermission } from '../middleware/permissions'
+
+// Single permission
+app.post('/content',
+  requireAuth(),
+  requirePermission('content.create'),
+  async (c) => {
+    // User has content.create permission
+    return c.json({ message: 'Content created' })
+  }
+)
+
+// Permission with team context
+app.get('/teams/:teamId/settings',
+  requireAuth(),
+  requirePermission('team.settings', 'teamId'),
+  async (c) => {
+    const teamId = c.req.param('teamId')
+    // User has team.settings permission for this specific team
+    return c.json({ message: `Team ${teamId} settings` })
+  }
+)
+```
+
+</CodeGroup>
+
+### Permission Naming Convention
+
+Permissions follow the pattern: `resource.action`
+
+**Common Permissions:**
+- `content.create` - Create content
+- `content.edit` - Edit content
+- `content.publish` - Publish content
+- `content.delete` - Delete content
+- `users.create` - Create users
+- `users.edit` - Edit users
+- `users.delete` - Delete users
+- `media.upload` - Upload media files
+- `media.delete` - Delete media files
+
+---
+
+## Bootstrap Middleware
+
+Handles system initialization on worker startup.
+
+### Purpose
+
+The bootstrap middleware runs once per Cloudflare Worker instance to:
+1. Run pending database migrations
+2. Sync collection configurations
+3. Bootstrap core plugins
+4. Install demo plugins (development only)
+
+<CodeGroup title="Bootstrap Middleware">
+
+```typescript
+import { bootstrapMiddleware, resetBootstrap } from '../middleware/bootstrap'
+
+// Apply to all routes
+app.use('*', bootstrapMiddleware())
+
+// Reset bootstrap flag (useful for testing)
+resetBootstrap()
+```
+
+</CodeGroup>
+
+### Implementation
+
+<CodeGroup title="Bootstrap Process">
+
+```typescript
+let bootstrapComplete = false
+
+export function bootstrapMiddleware() {
+  return async (c: Context, next: Next) => {
+    // Skip if already bootstrapped
+    if (bootstrapComplete) {
+      return next()
+    }
+
+    // Skip bootstrap for static assets
+    const path = c.req.path
+    if (
+      path.startsWith('/images/') ||
+      path.startsWith('/assets/') ||
+      path === '/health' ||
+      path.endsWith('.js') ||
+      path.endsWith('.css')
+    ) {
+      return next()
+    }
+
+    try {
+      console.log('[Bootstrap] Starting system initialization...')
+
+      // 1. Run database migrations
+      const migrationService = new MigrationService(c.env.DB)
+      await migrationService.runPendingMigrations()
+
+      // 2. Sync collection configurations
+      await syncCollections(c.env.DB)
+
+      // 3. Bootstrap core plugins
+      const bootstrapService = new PluginBootstrapService(c.env.DB)
+      const needsBootstrap = await bootstrapService.isBootstrapNeeded()
+
+      if (needsBootstrap) {
+        await bootstrapService.bootstrapCorePlugins()
+        await bootstrapService.installDemoPlugins()
+      }
+
+      bootstrapComplete = true
+      console.log('[Bootstrap] System initialization completed')
+
+    } catch (error) {
+      console.error('[Bootstrap] Error during initialization:', error)
+      // Continue even if bootstrap fails
+    }
+
+    return next()
+  }
+}
+```
+
+</CodeGroup>
+
+---
+
+## Logging Middleware
+
+Comprehensive request/response logging with security monitoring.
+
+### Standard Logging Middleware
+
+Logs all HTTP requests and responses.
+
+<CodeGroup title="Logging">
+
+```typescript
+import { loggingMiddleware } from '../middleware/logging'
+
+app.use('*', loggingMiddleware())
+```
+
+</CodeGroup>
+
+**What it logs:**
+
+- Request method, URL, and headers
+- Response status code
+- Request duration
+- User ID (if authenticated)
+- IP address and user agent
+- Request ID (generated UUID)
+
+### Security Logging Middleware
+
+Monitors suspicious activity and security events.
+
+<CodeGroup title="Security Logging">
+
+```typescript
+import { securityLoggingMiddleware } from '../middleware/logging'
+
+app.use('*', securityLoggingMiddleware())
+```
+
+</CodeGroup>
+
+**What it monitors:**
+
+- Suspicious request patterns (SQL injection, XSS attempts)
+- Authentication failures
+- Admin area access
+- Unauthorized access attempts
+
+**Suspicious patterns detected:**
+
+```typescript
+const suspiciousPatterns = [
+  /script[^>]*>/i,        // XSS attempts
+  /javascript:/i,         // JavaScript protocol
+  /on\w+\s*=/i,          // Event handlers
+  /\.\.\/\.\.\//,        // Directory traversal
+  /\/etc\/passwd/i,      // System file access
+  /union\s+select/i,     // SQL injection
+  /drop\s+table/i        // SQL injection
+]
+```
+
+### Performance Logging Middleware
+
+Tracks slow requests for performance monitoring.
+
+<CodeGroup title="Performance Logging">
+
+```typescript
+import { performanceLoggingMiddleware } from '../middleware/logging'
+
+// Log requests slower than 1000ms (1 second)
+app.use('*', performanceLoggingMiddleware(1000))
+
+// Log requests slower than 500ms for critical API
+app.use('/api/critical/*', performanceLoggingMiddleware(500))
+```
+
+</CodeGroup>
+
+---
+
+## Performance Middleware
+
+Middleware for caching, compression, and security headers.
+
+### Cache Headers Middleware
+
+Adds cache-control headers to responses.
+
+<CodeGroup title="Cache Headers">
+
+```typescript
+import { cacheHeaders } from '../middleware/performance'
+
+// Cache for 60 seconds
+app.use('/admin/*', cacheHeaders(60))
+
+// Cache for 5 minutes
+app.use('/api/static/*', cacheHeaders(300))
+```
+
+</CodeGroup>
+
+**How it works:**
+
+- Only caches successful HTML responses (200 status)
+- Sets `Cache-Control: private, max-age={maxAge}`
+- Private caching prevents CDN caching of authenticated pages
+
+### Security Headers Middleware
+
+Adds security headers to all responses.
+
+<CodeGroup title="Security Headers">
+
+```typescript
+import { securityHeaders } from '../middleware/performance'
+
+app.use('*', securityHeaders())
+```
+
+</CodeGroup>
+
+**Headers added:**
+
+```typescript
+'X-Content-Type-Options': 'nosniff'
+'X-Frame-Options': 'SAMEORIGIN'
+'X-XSS-Protection': '1; mode=block'
+```
+
+---
+
+## Plugin Middleware
+
+Controls access to plugin routes based on plugin activation status.
+
+### requireActivePlugin Middleware
+
+Ensures a plugin is active before allowing access to its routes.
+
+<CodeGroup title="Plugin Middleware">
+
+```typescript
+import { requireActivePlugin } from '../middleware/plugin-middleware'
+
+// Protect FAQ plugin routes
+app.use('/admin/faq/*', requireActivePlugin('faq'))
+app.route('/admin/faq', adminFAQRoutes)
+
+// Protect workflow plugin routes
+app.use('/admin/workflow/*', requireActivePlugin('workflow'))
+app.route('/admin/workflow', createWorkflowAdminRoutes())
+
+// Protect cache plugin routes
+app.use('/admin/cache/*', requireActivePlugin('cache'))
+app.route('/admin/cache', cacheRoutes)
+```
+
+</CodeGroup>
+
+**How it works:**
+
+1. Queries database for plugin status
+2. Returns 404 with user-friendly message if plugin is not active
+3. Allows request to continue if plugin is active
+4. Fails open (allows access) if database query fails
+
+---
+
+## Route Structure
+
+SonicJS organizes routes into logical modules.
+
+### Public Routes
+
+No authentication required.
+
+<CodeGroup title="Public Routes">
+
+```typescript
+// Authentication pages
+GET  /auth/login                    # Login page
+POST /auth/login                    # Login form submission
+GET  /auth/register                 # Registration page
+POST /auth/register                 # Registration form submission
+GET  /auth/logout                   # Logout
+POST /auth/logout                   # Logout API
+
+// Public API
+GET  /api/                          # OpenAPI specification
+GET  /api/health                    # Health check
+GET  /api/collections               # List collections
+GET  /api/content                   # List content (published only)
+
+// Documentation
+GET  /docs                          # Documentation home
+
+// Static files
+GET  /images/*                      # Serve images
+GET  /media/serve/:key              # Serve media files
+
+// Health check
+GET  /health                        # System health
+```
+
+</CodeGroup>
+
+### Admin Routes
+
+Requires authentication + admin or editor role.
+
+<CodeGroup title="Admin Routes">
+
+```typescript
+// Dashboard
+GET  /admin/                        # Admin dashboard
+GET  /admin/api/stats               # Dashboard statistics (HTMX)
+GET  /admin/api/system-status       # System status (HTMX)
+
+// Collections
+GET  /admin/collections             # List collections
+GET  /admin/collections/new         # New collection form
+POST /admin/collections             # Create collection
+GET  /admin/collections/:id         # Edit collection
+PUT  /admin/collections/:id         # Update collection
+DELETE /admin/collections/:id       # Delete collection
+
+// Content
+GET  /admin/content/                # List content
+GET  /admin/content/new             # New content form
+POST /admin/content/                # Create content
+GET  /admin/content/:id/edit        # Edit content form
+PUT  /admin/content/:id             # Update content
+DELETE /admin/content/:id           # Delete content
+
+// Media
+GET  /admin/media/                  # Media library
+GET  /admin/media/search            # Search media (HTMX)
+GET  /admin/media/:id/details       # File details (HTMX)
+POST /admin/media/upload            # Upload files
+PUT  /admin/media/:id               # Update metadata
+DELETE /admin/media/:id             # Delete file
+
+// Users
+GET  /admin/users                   # List users
+POST /admin/users/:id/toggle        # Toggle user status
+GET  /admin/users/export            # Export users CSV
+
+// Plugins
+GET  /admin/plugins                 # List plugins
+POST /admin/plugins/:id/toggle      # Toggle plugin status
+GET  /admin/plugins/:id             # Plugin details
+
+// Settings
+GET  /admin/settings                # Settings page
+GET  /admin/settings/:tab           # Settings tab
+POST /admin/settings                # Save settings
+```
+
+</CodeGroup>
+
+---
+
+## Creating Custom Middleware
+
+### Basic Middleware Structure
+
+<CodeGroup title="Middleware Template">
+
+```typescript
+import { Context, Next } from 'hono'
+
+type Bindings = {
+  DB: D1Database
+  KV: KVNamespace
+}
+
+type Variables = {
+  user?: {
+    userId: string
+    email: string
+    role: string
+  }
+  customData?: any
+}
+
+export function customMiddleware() {
+  return async (c: Context<{ Bindings: Bindings; Variables: Variables }>, next: Next) => {
+    // 1. Pre-processing (before route handler)
+    console.log('Before route handler')
+
+    // 2. Set context variables
+    c.set('customData', { foo: 'bar' })
+
+    // 3. Call next middleware/handler
+    await next()
+
+    // 4. Post-processing (after route handler)
+    console.log('After route handler')
+  }
+}
+```
+
+</CodeGroup>
+
+### Example: Rate Limiting Middleware
+
+<CodeGroup title="Rate Limiter">
+
+```typescript
+export function rateLimitMiddleware(maxRequests: number, windowMs: number) {
+  const requests = new Map<string, { count: number; resetTime: number }>()
+
+  return async (c: Context, next: Next) => {
+    const clientId = c.req.header('cf-connecting-ip') || 'unknown'
+    const now = Date.now()
+
+    // Get or create rate limit record
+    let record = requests.get(clientId)
+
+    if (!record || now > record.resetTime) {
+      record = { count: 0, resetTime: now + windowMs }
+      requests.set(clientId, record)
+    }
+
+    // Check rate limit
+    if (record.count >= maxRequests) {
+      const retryAfter = Math.ceil((record.resetTime - now) / 1000)
+      c.header('Retry-After', retryAfter.toString())
+      return c.json({ error: 'Rate limit exceeded' }, 429)
+    }
+
+    // Increment counter
+    record.count++
+
+    // Add rate limit headers
+    c.header('X-RateLimit-Limit', maxRequests.toString())
+    c.header('X-RateLimit-Remaining', (maxRequests - record.count).toString())
+    c.header('X-RateLimit-Reset', record.resetTime.toString())
+
+    await next()
+  }
+}
+
+// Usage
+app.use('/api/*', rateLimitMiddleware(100, 60000)) // 100 requests per minute
+```
+
+</CodeGroup>
+
+<Callout type="tip" title="Middleware Best Practices">
+- Keep middleware focused on a single responsibility
+- Minimize database queries in middleware
+- Use context variables to pass data between middleware
+- Handle errors gracefully and provide meaningful error messages
+- Consider performance impact of middleware execution order
+- Test middleware independently before integrating
+</Callout>
+
+---
+
+## Next Steps
+
+<div className="not-prose">
+  <Button href="/authentication" variant="text" arrow="right">
+    <>Learn about authentication in detail</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/api" variant="text" arrow="right">
+    <>Explore the API reference</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/plugins" variant="text" arrow="right">
+    <>Read about the plugin system</>
+  </Button>
+</div>

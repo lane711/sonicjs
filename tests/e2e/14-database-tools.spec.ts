@@ -267,6 +267,48 @@ test.describe('Database Tools', () => {
     await expect(page.locator('#total-tables')).toBeVisible();
     await expect(page.locator('#total-rows')).toBeVisible();
   });
+
+  test('should navigate to table view when clicking on a table row', async ({ page }) => {
+    // Navigate directly to database tools tab
+    await page.goto('/admin/settings/database-tools');
+
+    // Wait for the page and JavaScript to load
+    await expect(page.locator('h3:has-text("Database Tools")')).toBeVisible();
+
+    // Wait for tables to load (stats API call)
+    await page.waitForTimeout(2000);
+
+    // Check if there are any tables in the list
+    const tableLinks = page.locator('#tables-list a[href^="/admin/database-tools/tables/"]');
+    const tableCount = await tableLinks.count();
+
+    // If there are tables, click on the first one
+    if (tableCount > 0) {
+      const firstTableLink = tableLinks.first();
+      const tableName = await firstTableLink.textContent();
+
+      // Click on the table link
+      await firstTableLink.click();
+
+      // Wait for navigation to complete
+      await page.waitForLoadState('networkidle');
+
+      // Verify we're on the table view page
+      await expect(page.locator('h1:has-text("Table:")')).toBeVisible({ timeout: 10000 });
+
+      // Verify the breadcrumb/back link is present
+      await expect(page.locator('a:has-text("Back to Database Tools")')).toBeVisible();
+
+      // Verify table structure is shown (columns headers should be visible)
+      await expect(page.locator('table thead')).toBeVisible();
+
+      // Verify we're on the correct URL
+      expect(page.url()).toContain('/admin/database-tools/tables/');
+
+      // Should NOT be redirected to login
+      expect(page.url()).not.toContain('/admin/login');
+    }
+  });
 });
 
 test.describe('Database Tools API Endpoints', () => {

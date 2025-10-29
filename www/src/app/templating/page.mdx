@@ -1,0 +1,858 @@
+export const metadata = {
+  title: 'Template System - SonicJS',
+  description:
+    'Modern server-side rendering template system built with TypeScript, HTMX, Alpine.js, and TailwindCSS for SonicJS.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Template Architecture', id: 'template-architecture' },
+  { title: 'Template Structure', id: 'template-structure' },
+  { title: 'Layout System', id: 'layout-system' },
+  { title: 'Component Library', id: 'component-library' },
+  { title: 'HTMX Integration', id: 'htmx-integration' },
+  { title: 'Alpine.js Integration', id: 'alpinejs-integration' },
+  { title: 'TailwindCSS & Design System', id: 'tailwindcss-design-system' },
+  { title: 'Dark Mode Implementation', id: 'dark-mode-implementation' },
+  { title: 'Creating Custom Templates', id: 'creating-custom-templates' },
+]
+
+# Template System Documentation
+
+SonicJS features a modern, server-side rendering template system built with TypeScript, HTMX, Alpine.js, and TailwindCSS. {{ className: 'lead' }}
+
+## Overview
+
+### Key Features
+
+- **Server-Side Rendering (SSR)** - Fast initial page loads with full HTML from the server
+- **Type-Safe Templates** - Full TypeScript support for template data interfaces
+- **HTMX-Driven Interactions** - Dynamic updates without complex JavaScript
+- **Alpine.js for Client-Side Logic** - Lightweight JavaScript framework for interactivity
+- **TailwindCSS Design System** - Utility-first CSS with dark mode support
+- **Component-Based Architecture** - Reusable, composable template components
+
+### Technology Stack
+
+<FeatureGrid
+  features={[
+    {
+      icon: '📝',
+      title: 'TypeScript',
+      description: 'Type-safe template functions',
+    },
+    {
+      icon: '⚡',
+      title: 'HTMX 2.0',
+      description: 'HTML-driven interactions',
+    },
+    {
+      icon: '🏔️',
+      title: 'Alpine.js 3.x',
+      description: 'Reactive client-side logic',
+    },
+    {
+      icon: '🎨',
+      title: 'TailwindCSS',
+      description: 'Utility-first styling',
+    },
+    {
+      icon: '🔥',
+      title: 'Hono.js',
+      description: 'Server framework integration',
+    },
+    {
+      icon: '🧩',
+      title: 'Template Renderer',
+      description: 'Handlebars-like engine',
+    },
+  ]}
+  columns={3}
+/>
+
+---
+
+## Template Architecture
+
+### Directory Structure
+
+```
+src/templates/
+├── layouts/                              # Page layouts
+│   ├── admin-layout-v2.template.ts      # Main admin layout
+│   ├── admin-layout-catalyst.template.ts # Catalyst-based admin UI
+│   └── docs-layout.template.ts          # Documentation layout
+├── pages/                                # Full page templates
+│   ├── admin-dashboard.template.ts      # Dashboard with stats & charts
+│   ├── admin-content-list.template.ts   # Content listing with filters
+│   ├── admin-content-edit.template.ts   # Content editor
+│   ├── admin-media-library.template.ts  # Media management
+│   ├── admin-users-list.template.ts     # User management
+│   └── auth-login.template.ts           # Login page
+├── components/                           # Reusable components
+│   ├── form.template.ts                 # Form builder
+│   ├── table.template.ts                # Data tables with sorting
+│   ├── media-grid.template.ts           # Media file grid/list
+│   ├── alert.template.ts                # Alert notifications
+│   ├── pagination.template.ts           # Pagination controls
+│   ├── filter-bar.template.ts           # Filter controls
+│   └── logo.template.ts                 # Logo component
+└── utils/
+    └── template-renderer.ts             # Template rendering utility
+```
+
+### Template Function Pattern
+
+All templates follow this TypeScript pattern:
+
+<CodeGroup title="Template Pattern">
+
+```typescript
+// 1. Define the data interface
+export interface MyTemplateData {
+  title: string
+  items: Array<{ id: string; name: string }>
+  optional?: string
+}
+
+// 2. Create the render function
+export function renderMyTemplate(data: MyTemplateData): string {
+  return `
+    <div class="my-template">
+      <h1>${data.title}</h1>
+      ${data.items.map(item => `
+        <div>${item.name}</div>
+      `).join('')}
+    </div>
+  `
+}
+```
+
+</CodeGroup>
+
+---
+
+## Template Structure
+
+### Three-Tier Template Hierarchy
+
+```
+Layout (admin-layout-v2.template.ts)
+  └── Page (admin-dashboard.template.ts)
+       └── Components (table.template.ts, alert.template.ts, etc.)
+```
+
+**1. Layouts** - Define the overall page structure (header, sidebar, footer)
+
+**2. Pages** - Compose components into full pages
+
+**3. Components** - Reusable UI elements
+
+### Template Rendering Flow
+
+The template renderer provides Handlebars-like functionality:
+
+<CodeGroup title="Template Renderer">
+
+```typescript
+import { renderTemplate, TemplateRenderer } from '../utils/template-renderer'
+
+// Simple variable interpolation
+const html = renderTemplate('Hello {{name}}!', { name: 'World' })
+// Output: "Hello World!"
+
+// Nested properties
+const html = renderTemplate('{{user.name}}', { user: { name: 'John' } })
+
+// Conditionals
+const html = renderTemplate(`
+  {{#if isActive}}
+    <div>Active</div>
+  {{/if}}
+`, { isActive: true })
+
+// Loops
+const html = renderTemplate(`
+  {{#each items}}
+    <li>{{name}}</li>
+  {{/each}}
+`, { items: [{ name: 'Item 1' }, { name: 'Item 2' }] })
+
+// Helper functions
+const html = renderTemplate('{{titleCase field}}', { field: 'hello_world' })
+// Output: "Hello World"
+```
+
+</CodeGroup>
+
+### Renderer Features
+
+- **Variable interpolation**: `{{variable}}`
+- **Nested properties**: `{{user.name}}`
+- **Raw HTML**: `{{{rawHtml}}}`
+- **Conditionals**: `{{#if condition}}...{{/if}}`
+- **Loops**: `{{#each array}}...{{/each}}`
+- **Special loop variables**: `{{@index}}`, `{{@first}}`, `{{@last}}`
+- **Helper functions**: `{{titleCase field}}`
+
+---
+
+## Layout System
+
+### Admin Layout v2 (with Catalyst)
+
+The main admin layout delegates to Catalyst UI:
+
+<CodeGroup title="Admin Layout Interface">
+
+```typescript
+export interface AdminLayoutData {
+  title: string
+  pageTitle?: string
+  currentPath?: string
+  user?: {
+    name: string
+    email: string
+    role: string
+  }
+  content: string | HtmlEscapedString
+  scripts?: string[]
+  styles?: string[]
+  version?: string
+  dynamicMenuItems?: Array<{
+    label: string
+    path: string
+    icon: string
+  }>
+}
+
+export function renderAdminLayout(data: AdminLayoutData): string {
+  const { renderAdminLayoutCatalyst } = require('./admin-layout-catalyst.template')
+  return renderAdminLayoutCatalyst(data)
+}
+```
+
+</CodeGroup>
+
+### Layout Features
+
+**1. Responsive Sidebar Navigation**
+- Dashboard, Content, Collections, Media, Users, Plugins, Cache, Design, Logs, Settings
+- Dynamic menu items from plugins
+- Active state highlighting
+
+**2. Top Bar**
+- Logo with customizable size/variant
+- Notifications button
+- Background theme customizer
+- User dropdown menu
+
+**3. Background Customization**
+- Multiple gradient themes (Deep Space, Cosmic Blue, Matrix Green, Cyber Pink)
+- Custom PNG backgrounds (Blue Waves, Stars, Crescent, 3D Waves)
+- Darkness adjustment slider
+- Persisted to localStorage
+
+**4. Dark Mode Support**
+- Class-based dark mode (`dark:` prefix)
+- System preference detection
+- Toggle functionality with localStorage persistence
+
+---
+
+## Component Library
+
+### 1. Form Component
+
+<CodeGroup title="Form Builder">
+
+```typescript
+import { renderForm, FormField, FormData } from '../components/form.template'
+
+const formData: FormData = {
+  id: 'my-form',
+  hxPost: '/api/submit',
+  hxTarget: '#form-response',
+  title: 'User Registration',
+  description: 'Please fill in your details',
+  fields: [
+    {
+      name: 'email',
+      label: 'Email Address',
+      type: 'email',
+      required: true,
+      placeholder: 'you@example.com'
+    },
+    {
+      name: 'bio',
+      label: 'Biography',
+      type: 'textarea',
+      rows: 4,
+      helpText: 'Tell us about yourself'
+    },
+    {
+      name: 'country',
+      label: 'Country',
+      type: 'select',
+      options: [
+        { value: 'us', label: 'United States' },
+        { value: 'uk', label: 'United Kingdom' }
+      ]
+    },
+    {
+      name: 'newsletter',
+      label: 'Subscribe to newsletter',
+      type: 'checkbox',
+      value: true
+    }
+  ],
+  submitButtons: [
+    { label: 'Save', type: 'submit', className: 'btn-primary' },
+    { label: 'Cancel', type: 'button', className: 'btn-secondary', onclick: 'history.back()' }
+  ]
+}
+
+const html = renderForm(formData)
+```
+
+</CodeGroup>
+
+**Supported Field Types**: `text`, `email`, `number`, `date`, `textarea`, `rich_text` (with EasyMDE), `select`, `multi_select`, `checkbox`, `file`
+
+### 2. Table Component
+
+<CodeGroup title="Data Table">
+
+```typescript
+import { renderTable, TableColumn, TableData } from '../components/table.template'
+
+const columns: TableColumn[] = [
+  {
+    key: 'name',
+    label: 'Name',
+    sortable: true,
+    sortType: 'string'
+  },
+  {
+    key: 'email',
+    label: 'Email',
+    sortable: true
+  },
+  {
+    key: 'created_at',
+    label: 'Created',
+    sortable: true,
+    sortType: 'date',
+    render: (value) => new Date(value).toLocaleDateString()
+  },
+  {
+    key: 'actions',
+    label: 'Actions',
+    render: (value, row) => `
+      <button hx-get="/users/${row.id}/edit" class="btn-sm btn-primary">Edit</button>
+      <button hx-delete="/users/${row.id}" class="btn-sm btn-danger">Delete</button>
+    `
+  }
+]
+
+const tableData: TableData = {
+  columns,
+  rows: users,
+  selectable: true,
+  rowClickable: true,
+  rowClickUrl: (row) => `/users/${row.id}`,
+  emptyMessage: 'No users found'
+}
+
+const html = renderTable(tableData)
+```
+
+</CodeGroup>
+
+**Table Features**: Column sorting (string, number, date, boolean), row selection with "select all", clickable rows, empty state, custom cell rendering
+
+### 3. Alert Component
+
+<CodeGroup title="Alert Notifications">
+
+```typescript
+import { renderAlert } from '../components/alert.template'
+
+// Success alert
+const success = renderAlert({
+  type: 'success',
+  title: 'Success!',
+  message: 'Your changes have been saved.',
+  dismissible: true
+})
+
+// Error alert
+const error = renderAlert({
+  type: 'error',
+  message: 'An error occurred. Please try again.'
+})
+
+// Warning and info
+const warning = renderAlert({ type: 'warning', message: 'This action cannot be undone.' })
+const info = renderAlert({ type: 'info', message: 'You have 3 pending notifications.' })
+```
+
+</CodeGroup>
+
+**Alert Types**: `success`, `error`, `warning`, `info`
+
+### 4. Pagination Component
+
+<CodeGroup title="Pagination">
+
+```typescript
+import { renderPagination } from '../components/pagination.template'
+
+const pagination = renderPagination({
+  currentPage: 2,
+  totalPages: 10,
+  totalItems: 195,
+  itemsPerPage: 20,
+  startItem: 21,
+  endItem: 40,
+  baseUrl: '/admin/content',
+  queryParams: { status: 'published', model: 'blog' },
+  showPageNumbers: true,
+  maxPageNumbers: 5,
+  showPageSizeSelector: true,
+  pageSizeOptions: [10, 20, 50, 100]
+})
+```
+
+</CodeGroup>
+
+**Pagination Features**: Page number navigation, previous/next buttons, page size selector, query parameter preservation, mobile-responsive
+
+---
+
+## HTMX Integration
+
+HTMX enables dynamic, server-driven interactions without writing JavaScript.
+
+### Core HTMX Patterns
+
+<CodeGroup title="Auto-Refresh with Polling">
+
+```html
+<!-- Refresh stats every 30 seconds -->
+<div
+  id="stats-container"
+  hx-get="/admin/api/stats"
+  hx-trigger="load, every 30s"
+  hx-swap="innerHTML"
+>
+  <div>Loading...</div>
+</div>
+```
+
+</CodeGroup>
+
+<CodeGroup title="Form Submission">
+
+```html
+<form
+  hx-post="/admin/content/create"
+  hx-target="#form-response"
+  hx-swap="innerHTML"
+  hx-indicator="#loading-spinner"
+>
+  <input type="text" name="title" required />
+  <button type="submit">
+    Submit
+    <div id="loading-spinner" class="htmx-indicator">Saving...</div>
+  </button>
+</form>
+
+<div id="form-response"></div>
+```
+
+</CodeGroup>
+
+<CodeGroup title="Delete with Confirmation">
+
+```html
+<button
+  hx-delete="/admin/content/${id}"
+  hx-confirm="Are you sure you want to delete this?"
+  hx-target="closest .content-item"
+  hx-swap="outerHTML"
+>
+  Delete
+</button>
+```
+
+</CodeGroup>
+
+### HTMX Attributes Reference
+
+| Attribute | Purpose | Example |
+|-----------|---------|---------|
+| `hx-get` | GET request | `hx-get="/api/data"` |
+| `hx-post` | POST request | `hx-post="/api/create"` |
+| `hx-put` | PUT request | `hx-put="/api/update/123"` |
+| `hx-delete` | DELETE request | `hx-delete="/api/delete/123"` |
+| `hx-target` | Where to insert response | `hx-target="#result"` |
+| `hx-swap` | How to insert | `innerHTML`, `outerHTML`, `beforeend` |
+| `hx-trigger` | When to trigger | `click`, `load`, `change`, `every 30s` |
+| `hx-indicator` | Loading indicator | `hx-indicator="#spinner"` |
+| `hx-confirm` | Confirmation dialog | `hx-confirm="Are you sure?"` |
+
+---
+
+## Alpine.js Integration
+
+Alpine.js provides reactive client-side interactions.
+
+### Alpine.js Examples
+
+<CodeGroup title="Dropdown Menu">
+
+```html
+<div x-data="{ open: false }">
+  <button @click="open = !open">
+    Toggle Menu
+  </button>
+  <div x-show="open" @click.away="open = false">
+    <a href="/profile">Profile</a>
+    <a href="/settings">Settings</a>
+  </div>
+</div>
+```
+
+</CodeGroup>
+
+<CodeGroup title="Tabs">
+
+```html
+<div x-data="{ activeTab: 'overview' }">
+  <div class="tabs">
+    <button @click="activeTab = 'overview'" :class="{ 'active': activeTab === 'overview' }">
+      Overview
+    </button>
+    <button @click="activeTab = 'details'" :class="{ 'active': activeTab === 'details' }">
+      Details
+    </button>
+  </div>
+
+  <div x-show="activeTab === 'overview'">
+    Overview content
+  </div>
+  <div x-show="activeTab === 'details'">
+    Details content
+  </div>
+</div>
+```
+
+</CodeGroup>
+
+---
+
+## TailwindCSS & Design System
+
+### TailwindCSS Configuration
+
+SonicJS uses Tailwind via CDN with custom configuration:
+
+<CodeGroup title="Tailwind Config">
+
+```javascript
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        primary: '#465FFF',
+        secondary: '#212A3E',
+        dark: '#1C1C24',
+        success: '#10B981',
+        warning: '#F59E0B',
+        error: '#EF4444',
+        info: '#3B82F6'
+      },
+      fontFamily: {
+        satoshi: ['Satoshi', 'sans-serif']
+      }
+    }
+  }
+}
+```
+
+</CodeGroup>
+
+### Common Utility Patterns
+
+<CodeGroup title="Form Inputs">
+
+```html
+<input
+  type="text"
+  class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
+/>
+```
+
+</CodeGroup>
+
+<CodeGroup title="Buttons">
+
+```html
+<!-- Primary Button -->
+<button class="inline-flex items-center justify-center rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm">
+  Save
+</button>
+
+<!-- Secondary Button -->
+<button class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm">
+  Cancel
+</button>
+```
+
+</CodeGroup>
+
+---
+
+## Dark Mode Implementation
+
+### Dark Mode Toggle
+
+Dark mode uses Tailwind's `class` strategy:
+
+<CodeGroup title="Dark Mode Toggle">
+
+```javascript
+// Dark mode toggle (in layout)
+function toggleDarkMode() {
+  document.documentElement.classList.toggle('dark')
+  localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'))
+}
+
+// Initialize from localStorage
+if (localStorage.getItem('darkMode') === 'true' ||
+    (!('darkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+  document.documentElement.classList.add('dark')
+}
+```
+
+</CodeGroup>
+
+### Dark Mode Utilities
+
+Every component uses dark mode variants:
+
+<CodeGroup title="Dark Mode Variants">
+
+```html
+<!-- Text colors -->
+<p class="text-zinc-950 dark:text-white">Primary text</p>
+<p class="text-zinc-500 dark:text-zinc-400">Secondary text</p>
+
+<!-- Backgrounds -->
+<div class="bg-white dark:bg-zinc-900">Content</div>
+<div class="bg-zinc-50 dark:bg-zinc-800">Subtle background</div>
+
+<!-- Borders -->
+<div class="border border-zinc-950/10 dark:border-white/10">Bordered</div>
+
+<!-- Rings (focus states) -->
+<input class="ring-1 ring-zinc-950/10 dark:ring-white/10 focus:ring-zinc-950 dark:focus:ring-white" />
+```
+
+</CodeGroup>
+
+---
+
+## Creating Custom Templates
+
+### Step-by-Step Guide
+
+<CodeGroup title="Step 1: Define Data Interface">
+
+```typescript
+// src/templates/pages/my-custom-page.template.ts
+
+export interface MyCustomPageData {
+  title: string
+  items: Array<{
+    id: string
+    name: string
+    description?: string
+  }>
+  user?: {
+    name: string
+    email: string
+    role: string
+  }
+  version?: string
+}
+```
+
+</CodeGroup>
+
+<CodeGroup title="Step 2: Create Component">
+
+```typescript
+// src/templates/components/my-component.template.ts
+
+export interface MyComponentData {
+  title: string
+  items: string[]
+}
+
+export function renderMyComponent(data: MyComponentData): string {
+  return `
+    <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
+      <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-4">
+        ${data.title}
+      </h3>
+      <ul class="space-y-2">
+        ${data.items.map(item => `
+          <li class="text-sm text-zinc-500 dark:text-zinc-400">${item}</li>
+        `).join('')}
+      </ul>
+    </div>
+  `
+}
+```
+
+</CodeGroup>
+
+<CodeGroup title="Step 3: Create Page Template">
+
+```typescript
+import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.template'
+import { renderMyComponent } from '../components/my-component.template'
+import { renderAlert } from '../components/alert.template'
+
+export function renderMyCustomPage(data: MyCustomPageData): string {
+  const pageContent = `
+    <div>
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">
+          ${data.title}
+        </h1>
+        <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">
+          Custom page description
+        </p>
+      </div>
+
+      <!-- Success Message -->
+      ${renderAlert({
+        type: 'success',
+        message: 'Page loaded successfully!',
+        dismissible: true
+      })}
+
+      <!-- Custom Content -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        ${data.items.map(item => `
+          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
+            <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-2">
+              ${item.name}
+            </h3>
+            ${item.description ? `
+              <p class="text-sm text-zinc-500 dark:text-zinc-400">
+                ${item.description}
+              </p>
+            ` : ''}
+
+            <!-- HTMX Action Button -->
+            <button
+              hx-get="/api/item/${item.id}"
+              hx-target="#item-details"
+              hx-swap="innerHTML"
+              class="mt-4 inline-flex items-center rounded-lg bg-zinc-950 dark:bg-white px-3 py-2 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
+            >
+              View Details
+            </button>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- HTMX Target for Dynamic Content -->
+      <div id="item-details" class="mt-6"></div>
+
+      <!-- Component Usage -->
+      ${renderMyComponent({
+        title: 'My Component',
+        items: ['Item 1', 'Item 2', 'Item 3']
+      })}
+    </div>
+  `
+
+  // Wrap in layout
+  const layoutData: AdminLayoutData = {
+    title: data.title,
+    pageTitle: data.title,
+    currentPath: '/admin/my-page',
+    user: data.user,
+    version: data.version,
+    content: pageContent
+  }
+
+  return renderAdminLayout(layoutData)
+}
+```
+
+</CodeGroup>
+
+<CodeGroup title="Step 4: Create Route Handler">
+
+```typescript
+// src/routes/admin.routes.ts
+import { renderMyCustomPage } from '../templates/pages/my-custom-page.template'
+
+app.get('/admin/my-page', async (c) => {
+  const user = c.get('user')
+
+  // Fetch your data
+  const items = await db.query('SELECT * FROM items')
+
+  const pageData = {
+    title: 'My Custom Page',
+    items,
+    user,
+    version: '1.0.0'
+  }
+
+  return c.html(renderMyCustomPage(pageData))
+})
+```
+
+</CodeGroup>
+
+<Callout type="tip" title="Template Best Practices">
+- Always define TypeScript interfaces for template data
+- Break down complex UIs into reusable components
+- Include ARIA attributes and semantic HTML for accessibility
+- Always escape user-provided content to prevent XSS
+- Use HTMX for partial updates instead of full page reloads
+- Provide fallback UI and error states
+- Always provide loading skeletons
+</Callout>
+
+---
+
+## Next Steps
+
+<div className="not-prose">
+  <Button href="/routing" variant="text" arrow="right">
+    <>Learn about routing and middleware</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/authentication" variant="text" arrow="right">
+    <>Explore authentication system</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/api" variant="text" arrow="right">
+    <>Read the API documentation</>
+  </Button>
+</div>

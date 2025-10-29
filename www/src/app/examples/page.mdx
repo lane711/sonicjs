@@ -1,0 +1,1238 @@
+export const metadata = {
+  title: 'Examples - SonicJS',
+  description:
+    'Real-world examples and use cases for SonicJS including blogs, e-commerce, documentation sites, and multi-tenant applications.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Blog Setup', id: 'blog-setup' },
+  { title: 'E-commerce Catalog', id: 'ecommerce-catalog' },
+  { title: 'Documentation Site', id: 'documentation-site' },
+  { title: 'Multi-tenant App', id: 'multi-tenant-app' },
+  { title: 'API-First CMS', id: 'api-first-cms' },
+  { title: 'Custom Workflow', id: 'custom-workflow' },
+]
+
+# Examples and Use Cases
+
+Explore practical examples and common use cases for building applications with SonicJS. Each example includes code snippets, configuration, and best practices. {{ className: 'lead' }}
+
+## Overview
+
+SonicJS is versatile enough to power various types of applications, from simple blogs to complex multi-tenant platforms. This guide showcases common patterns and implementations.
+
+### What You'll Learn
+
+- Setting up a blog with SEO optimization
+- Building an e-commerce product catalog
+- Creating a documentation site with search
+- Implementing multi-tenant architecture
+- API-first headless CMS patterns
+- Custom content workflows
+
+---
+
+## Blog Setup
+
+Create a fully-featured blog with categories, tags, authors, and SEO optimization.
+
+### Collection Schema
+
+<CodeGroup title="Blog Collections">
+
+```typescript
+// Blog post collection
+{
+  id: 'blog_posts',
+  name: 'Blog Posts',
+  fields: [
+    {
+      name: 'title',
+      type: 'text',
+      required: true,
+      validation: { minLength: 5, maxLength: 200 }
+    },
+    {
+      name: 'slug',
+      type: 'text',
+      required: true,
+      unique: true,
+      pattern: '^[a-z0-9-]+$'
+    },
+    {
+      name: 'content',
+      type: 'richtext',
+      required: true
+    },
+    {
+      name: 'excerpt',
+      type: 'textarea',
+      maxLength: 300
+    },
+    {
+      name: 'featuredImage',
+      type: 'media',
+      mediaTypes: ['image']
+    },
+    {
+      name: 'author',
+      type: 'relation',
+      collection: 'authors',
+      required: true
+    },
+    {
+      name: 'categories',
+      type: 'relation',
+      collection: 'categories',
+      multiple: true
+    },
+    {
+      name: 'tags',
+      type: 'tags'
+    },
+    {
+      name: 'publishedAt',
+      type: 'datetime'
+    },
+    {
+      name: 'status',
+      type: 'select',
+      options: ['draft', 'published', 'archived'],
+      default: 'draft'
+    },
+    {
+      name: 'seo',
+      type: 'group',
+      fields: [
+        { name: 'metaTitle', type: 'text', maxLength: 60 },
+        { name: 'metaDescription', type: 'textarea', maxLength: 160 },
+        { name: 'ogImage', type: 'media' }
+      ]
+    }
+  ]
+}
+```
+
+</CodeGroup>
+
+### API Implementation
+
+<CodeGroup title="Blog API Routes">
+
+```typescript
+import { Hono } from 'hono'
+
+const blog = new Hono()
+
+// Get all published posts with pagination
+blog.get('/posts', async (c) => {
+  const page = parseInt(c.req.query('page') || '1')
+  const limit = parseInt(c.req.query('limit') || '10')
+  const category = c.req.query('category')
+  const tag = c.req.query('tag')
+
+  const db = c.env.DB
+
+  let query = `
+    SELECT p.*, a.name as author_name, a.avatar as author_avatar
+    FROM blog_posts p
+    JOIN authors a ON p.author_id = a.id
+    WHERE p.status = 'published'
+    AND p.published_at <= datetime('now')
+  `
+
+  if (category) {
+    query += ` AND p.categories LIKE '%${category}%'`
+  }
+
+  if (tag) {
+    query += ` AND p.tags LIKE '%${tag}%'`
+  }
+
+  query += ` ORDER BY p.published_at DESC LIMIT ${limit} OFFSET ${(page - 1) * limit}`
+
+  const posts = await db.prepare(query).all()
+
+  return c.json({
+    success: true,
+    data: posts.results,
+    pagination: {
+      page,
+      limit,
+      total: posts.results.length
+    }
+  })
+})
+
+// Get single post by slug
+blog.get('/posts/:slug', async (c) => {
+  const slug = c.req.param('slug')
+  const db = c.env.DB
+
+  const post = await db
+    .prepare(`
+      SELECT p.*, a.name as author_name, a.bio as author_bio
+      FROM blog_posts p
+      JOIN authors a ON p.author_id = a.id
+      WHERE p.slug = ? AND p.status = 'published'
+    `)
+    .bind(slug)
+    .first()
+
+  if (!post) {
+    return c.json({ error: 'Post not found' }, 404)
+  }
+
+  // Increment view count
+  await db
+    .prepare('UPDATE blog_posts SET views = views + 1 WHERE id = ?')
+    .bind(post.id)
+    .run()
+
+  return c.json({
+    success: true,
+    data: post
+  })
+})
+
+// Get posts by category
+blog.get('/categories/:slug/posts', async (c) => {
+  const slug = c.req.param('slug')
+  const db = c.env.DB
+
+  const posts = await db
+    .prepare(`
+      SELECT p.* FROM blog_posts p
+      WHERE p.categories LIKE '%' || ? || '%'
+      AND p.status = 'published'
+      ORDER BY p.published_at DESC
+    `)
+    .bind(slug)
+    .all()
+
+  return c.json({
+    success: true,
+    data: posts.results
+  })
+})
+
+export default blog
+```
+
+</CodeGroup>
+
+### Frontend Integration
+
+<CodeGroup title="React Blog Component">
+
+```tsx
+// Blog listing component
+export function BlogList() {
+  const [posts, setPosts] = useState([])
+  const [page, setPage] = useState(1)
+
+  useEffect(() => {
+    fetch(`/api/blog/posts?page=${page}&limit=10`)
+      .then(res => res.json())
+      .then(data => setPosts(data.data))
+  }, [page])
+
+  return (
+    <div className="blog-list">
+      {posts.map(post => (
+        <article key={post.id} className="blog-post">
+          <img src={post.featured_image} alt={post.title} />
+          <h2>{post.title}</h2>
+          <p className="excerpt">{post.excerpt}</p>
+          <div className="meta">
+            <span className="author">{post.author_name}</span>
+            <span className="date">{new Date(post.published_at).toLocaleDateString()}</span>
+          </div>
+          <a href={`/blog/${post.slug}`}>Read more →</a>
+        </article>
+      ))}
+
+      <Pagination
+        currentPage={page}
+        onPageChange={setPage}
+      />
+    </div>
+  )
+}
+
+// Single post component
+export function BlogPost({ slug }) {
+  const [post, setPost] = useState(null)
+
+  useEffect(() => {
+    fetch(`/api/blog/posts/${slug}`)
+      .then(res => res.json())
+      .then(data => setPost(data.data))
+  }, [slug])
+
+  if (!post) return <div>Loading...</div>
+
+  return (
+    <article className="blog-post-single">
+      <header>
+        <h1>{post.title}</h1>
+        <div className="meta">
+          <img src={post.author_avatar} alt={post.author_name} />
+          <span>{post.author_name}</span>
+          <time>{new Date(post.published_at).toLocaleDateString()}</time>
+        </div>
+      </header>
+
+      {post.featured_image && (
+        <img src={post.featured_image} alt={post.title} className="featured" />
+      )}
+
+      <div
+        className="content"
+        dangerouslySetInnerHTML={{ __html: post.content }}
+      />
+
+      <footer>
+        <div className="categories">
+          {post.categories?.split(',').map(cat => (
+            <a key={cat} href={`/blog/category/${cat}`}>{cat}</a>
+          ))}
+        </div>
+        <div className="tags">
+          {post.tags?.split(',').map(tag => (
+            <a key={tag} href={`/blog/tag/${tag}`}>#{tag}</a>
+          ))}
+        </div>
+      </footer>
+    </article>
+  )
+}
+```
+
+</CodeGroup>
+
+---
+
+## E-commerce Catalog
+
+Build a product catalog with categories, variants, and inventory management.
+
+### Collection Schema
+
+<CodeGroup title="Product Collections">
+
+```typescript
+// Products collection
+{
+  id: 'products',
+  name: 'Products',
+  fields: [
+    {
+      name: 'name',
+      type: 'text',
+      required: true
+    },
+    {
+      name: 'slug',
+      type: 'text',
+      required: true,
+      unique: true
+    },
+    {
+      name: 'description',
+      type: 'richtext'
+    },
+    {
+      name: 'price',
+      type: 'number',
+      required: true,
+      validation: { min: 0 }
+    },
+    {
+      name: 'compareAtPrice',
+      type: 'number',
+      validation: { min: 0 }
+    },
+    {
+      name: 'images',
+      type: 'media',
+      multiple: true,
+      mediaTypes: ['image']
+    },
+    {
+      name: 'category',
+      type: 'relation',
+      collection: 'categories',
+      required: true
+    },
+    {
+      name: 'variants',
+      type: 'repeater',
+      fields: [
+        { name: 'name', type: 'text', required: true },
+        { name: 'sku', type: 'text', required: true, unique: true },
+        { name: 'price', type: 'number', required: true },
+        { name: 'stock', type: 'number', default: 0 },
+        { name: 'attributes', type: 'json' }
+      ]
+    },
+    {
+      name: 'inventory',
+      type: 'group',
+      fields: [
+        { name: 'trackInventory', type: 'boolean', default: true },
+        { name: 'stock', type: 'number', default: 0 },
+        { name: 'lowStockThreshold', type: 'number', default: 10 }
+      ]
+    },
+    {
+      name: 'seo',
+      type: 'group',
+      fields: [
+        { name: 'metaTitle', type: 'text' },
+        { name: 'metaDescription', type: 'textarea' }
+      ]
+    },
+    {
+      name: 'status',
+      type: 'select',
+      options: ['active', 'draft', 'archived'],
+      default: 'draft'
+    }
+  ]
+}
+```
+
+</CodeGroup>
+
+### API Implementation
+
+<CodeGroup title="Product API">
+
+```typescript
+import { Hono } from 'hono'
+
+const shop = new Hono()
+
+// Get all products with filtering
+shop.get('/products', async (c) => {
+  const category = c.req.query('category')
+  const minPrice = c.req.query('minPrice')
+  const maxPrice = c.req.query('maxPrice')
+  const inStock = c.req.query('inStock') === 'true'
+  const sort = c.req.query('sort') || 'name_asc'
+
+  const db = c.env.DB
+
+  let query = `
+    SELECT p.*, c.name as category_name
+    FROM products p
+    JOIN categories c ON p.category_id = c.id
+    WHERE p.status = 'active'
+  `
+
+  const params = []
+
+  if (category) {
+    query += ` AND c.slug = ?`
+    params.push(category)
+  }
+
+  if (minPrice) {
+    query += ` AND p.price >= ?`
+    params.push(parseFloat(minPrice))
+  }
+
+  if (maxPrice) {
+    query += ` AND p.price <= ?`
+    params.push(parseFloat(maxPrice))
+  }
+
+  if (inStock) {
+    query += ` AND p.stock > 0`
+  }
+
+  // Sorting
+  const [field, direction] = sort.split('_')
+  query += ` ORDER BY p.${field} ${direction.toUpperCase()}`
+
+  const products = await db.prepare(query).bind(...params).all()
+
+  return c.json({
+    success: true,
+    data: products.results
+  })
+})
+
+// Get single product
+shop.get('/products/:slug', async (c) => {
+  const slug = c.req.param('slug')
+  const db = c.env.DB
+
+  const product = await db
+    .prepare(`
+      SELECT p.*, c.name as category_name, c.slug as category_slug
+      FROM products p
+      JOIN categories c ON p.category_id = c.id
+      WHERE p.slug = ? AND p.status = 'active'
+    `)
+    .bind(slug)
+    .first()
+
+  if (!product) {
+    return c.json({ error: 'Product not found' }, 404)
+  }
+
+  // Parse JSON fields
+  product.variants = JSON.parse(product.variants || '[]')
+  product.images = JSON.parse(product.images || '[]')
+
+  return c.json({
+    success: true,
+    data: product
+  })
+})
+
+// Check product availability
+shop.get('/products/:slug/availability', async (c) => {
+  const slug = c.req.param('slug')
+  const variantId = c.req.query('variantId')
+  const db = c.env.DB
+
+  const product = await db
+    .prepare('SELECT * FROM products WHERE slug = ?')
+    .bind(slug)
+    .first()
+
+  if (!product) {
+    return c.json({ error: 'Product not found' }, 404)
+  }
+
+  const variants = JSON.parse(product.variants || '[]')
+  const variant = variants.find(v => v.id === variantId)
+
+  const available = variant
+    ? variant.stock > 0
+    : product.stock > 0
+
+  return c.json({
+    success: true,
+    data: {
+      available,
+      stock: variant?.stock || product.stock,
+      lowStock: (variant?.stock || product.stock) < product.low_stock_threshold
+    }
+  })
+})
+
+export default shop
+```
+
+</CodeGroup>
+
+---
+
+## Documentation Site
+
+Create a searchable documentation site with versioning and navigation.
+
+### Collection Schema
+
+<CodeGroup title="Documentation Collections">
+
+```typescript
+// Documentation pages collection
+{
+  id: 'docs',
+  name: 'Documentation',
+  fields: [
+    {
+      name: 'title',
+      type: 'text',
+      required: true
+    },
+    {
+      name: 'slug',
+      type: 'text',
+      required: true
+    },
+    {
+      name: 'content',
+      type: 'markdown',
+      required: true
+    },
+    {
+      name: 'excerpt',
+      type: 'textarea'
+    },
+    {
+      name: 'category',
+      type: 'relation',
+      collection: 'doc_categories',
+      required: true
+    },
+    {
+      name: 'order',
+      type: 'number',
+      default: 0
+    },
+    {
+      name: 'version',
+      type: 'text',
+      default: '1.0'
+    },
+    {
+      name: 'sections',
+      type: 'repeater',
+      fields: [
+        { name: 'title', type: 'text', required: true },
+        { name: 'id', type: 'text', required: true }
+      ]
+    },
+    {
+      name: 'relatedDocs',
+      type: 'relation',
+      collection: 'docs',
+      multiple: true
+    }
+  ]
+}
+```
+
+</CodeGroup>
+
+### API with Search
+
+<CodeGroup title="Documentation API">
+
+```typescript
+import { Hono } from 'hono'
+
+const docs = new Hono()
+
+// Get documentation navigation
+docs.get('/nav', async (c) => {
+  const version = c.req.query('version') || '1.0'
+  const db = c.env.DB
+
+  const categories = await db
+    .prepare(`
+      SELECT c.*,
+        (SELECT json_group_array(json_object('id', d.id, 'title', d.title, 'slug', d.slug, 'order', d.order))
+         FROM docs d
+         WHERE d.category_id = c.id AND d.version = ?
+         ORDER BY d.order ASC) as pages
+      FROM doc_categories c
+      ORDER BY c.order ASC
+    `)
+    .bind(version)
+    .all()
+
+  return c.json({
+    success: true,
+    data: categories.results.map(cat => ({
+      ...cat,
+      pages: JSON.parse(cat.pages)
+    }))
+  })
+})
+
+// Get single documentation page
+docs.get('/:slug', async (c) => {
+  const slug = c.req.param('slug')
+  const version = c.req.query('version') || '1.0'
+  const db = c.env.DB
+
+  const doc = await db
+    .prepare(`
+      SELECT d.*, c.name as category_name
+      FROM docs d
+      JOIN doc_categories c ON d.category_id = c.id
+      WHERE d.slug = ? AND d.version = ?
+    `)
+    .bind(slug, version)
+    .first()
+
+  if (!doc) {
+    return c.json({ error: 'Page not found' }, 404)
+  }
+
+  // Parse JSON fields
+  doc.sections = JSON.parse(doc.sections || '[]')
+  doc.related_docs = JSON.parse(doc.related_docs || '[]')
+
+  return c.json({
+    success: true,
+    data: doc
+  })
+})
+
+// Search documentation
+docs.get('/search', async (c) => {
+  const query = c.req.query('q')
+  const version = c.req.query('version') || '1.0'
+
+  if (!query || query.length < 2) {
+    return c.json({
+      success: false,
+      error: 'Query must be at least 2 characters'
+    }, 400)
+  }
+
+  const db = c.env.DB
+
+  const results = await db
+    .prepare(`
+      SELECT d.id, d.title, d.slug, d.excerpt, c.name as category
+      FROM docs d
+      JOIN doc_categories c ON d.category_id = c.id
+      WHERE d.version = ?
+      AND (d.title LIKE ? OR d.content LIKE ? OR d.excerpt LIKE ?)
+      ORDER BY
+        CASE
+          WHEN d.title LIKE ? THEN 1
+          WHEN d.excerpt LIKE ? THEN 2
+          ELSE 3
+        END,
+        d.order ASC
+      LIMIT 20
+    `)
+    .bind(version, `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`)
+    .all()
+
+  return c.json({
+    success: true,
+    data: results.results,
+    query
+  })
+})
+
+export default docs
+```
+
+</CodeGroup>
+
+---
+
+## Multi-tenant App
+
+Build a multi-tenant SaaS application with isolated data per tenant.
+
+### Tenant Isolation Strategy
+
+<CodeGroup title="Tenant Middleware">
+
+```typescript
+import { Hono } from 'hono'
+
+// Tenant identification middleware
+export function tenantMiddleware() {
+  return async (c, next) => {
+    // Extract tenant from subdomain or header
+    const host = c.req.header('host') || ''
+    const subdomain = host.split('.')[0]
+
+    // Or from custom header
+    const tenantId = c.req.header('x-tenant-id') || subdomain
+
+    if (!tenantId) {
+      return c.json({ error: 'Tenant not specified' }, 400)
+    }
+
+    const db = c.env.DB
+
+    // Get tenant info
+    const tenant = await db
+      .prepare('SELECT * FROM tenants WHERE subdomain = ? AND active = 1')
+      .bind(tenantId)
+      .first()
+
+    if (!tenant) {
+      return c.json({ error: 'Tenant not found' }, 404)
+    }
+
+    // Add tenant to context
+    c.set('tenant', tenant)
+
+    await next()
+  }
+}
+
+// Tenant-scoped queries
+export function withTenant(c) {
+  const tenant = c.get('tenant')
+
+  return {
+    // All queries automatically filter by tenant
+    async prepare(sql) {
+      const modifiedSql = sql.replace(
+        /FROM (\w+)/g,
+        `FROM $1 WHERE tenant_id = ${tenant.id}`
+      )
+      return c.env.DB.prepare(modifiedSql)
+    }
+  }
+}
+```
+
+</CodeGroup>
+
+### Multi-tenant API
+
+<CodeGroup title="Tenant API Routes">
+
+```typescript
+const app = new Hono()
+
+// Apply tenant middleware globally
+app.use('*', tenantMiddleware())
+
+// Get tenant content
+app.get('/content', async (c) => {
+  const tenant = c.get('tenant')
+  const db = c.env.DB
+
+  const content = await db
+    .prepare('SELECT * FROM content WHERE tenant_id = ? ORDER BY created_at DESC')
+    .bind(tenant.id)
+    .all()
+
+  return c.json({
+    success: true,
+    data: content.results,
+    tenant: {
+      id: tenant.id,
+      name: tenant.name
+    }
+  })
+})
+
+// Create tenant content
+app.post('/content', async (c) => {
+  const tenant = c.get('tenant')
+  const body = await c.req.json()
+  const db = c.env.DB
+
+  const result = await db
+    .prepare(`
+      INSERT INTO content (tenant_id, title, body, created_at)
+      VALUES (?, ?, ?, ?)
+    `)
+    .bind(tenant.id, body.title, body.body, Date.now())
+    .run()
+
+  return c.json({
+    success: true,
+    data: {
+      id: result.lastInsertRowid,
+      ...body,
+      tenant_id: tenant.id
+    }
+  })
+})
+
+// Tenant settings
+app.get('/settings', async (c) => {
+  const tenant = c.get('tenant')
+
+  return c.json({
+    success: true,
+    data: {
+      name: tenant.name,
+      subdomain: tenant.subdomain,
+      plan: tenant.plan,
+      features: JSON.parse(tenant.features || '[]'),
+      customization: JSON.parse(tenant.customization || '{}')
+    }
+  })
+})
+
+export default app
+```
+
+</CodeGroup>
+
+---
+
+## API-First CMS
+
+Use SonicJS as a headless CMS for any frontend framework.
+
+### RESTful API Pattern
+
+<CodeGroup title="Content API">
+
+```typescript
+import { Hono } from 'hono'
+import { cors } from 'hono/cors'
+
+const api = new Hono()
+
+// Enable CORS for all origins
+api.use('*', cors())
+
+// Generic content endpoint
+api.get('/:collection', async (c) => {
+  const collection = c.req.param('collection')
+  const db = c.env.DB
+
+  // Validate collection exists
+  const collectionExists = await db
+    .prepare('SELECT * FROM collections WHERE id = ?')
+    .bind(collection)
+    .first()
+
+  if (!collectionExists) {
+    return c.json({ error: 'Collection not found' }, 404)
+  }
+
+  // Get content with pagination
+  const page = parseInt(c.req.query('page') || '1')
+  const limit = Math.min(parseInt(c.req.query('limit') || '10'), 100)
+  const offset = (page - 1) * limit
+
+  const content = await db
+    .prepare(`
+      SELECT * FROM content
+      WHERE collection = ? AND status = 'published'
+      ORDER BY created_at DESC
+      LIMIT ? OFFSET ?
+    `)
+    .bind(collection, limit, offset)
+    .all()
+
+  const total = await db
+    .prepare('SELECT COUNT(*) as count FROM content WHERE collection = ? AND status = "published"')
+    .bind(collection)
+    .first()
+
+  return c.json({
+    success: true,
+    data: content.results.map(item => ({
+      ...item,
+      data: JSON.parse(item.data)
+    })),
+    pagination: {
+      page,
+      limit,
+      total: total.count,
+      pages: Math.ceil(total.count / limit)
+    }
+  })
+})
+
+// Get single content item
+api.get('/:collection/:id', async (c) => {
+  const collection = c.req.param('collection')
+  const id = c.req.param('id')
+  const db = c.env.DB
+
+  const content = await db
+    .prepare(`
+      SELECT * FROM content
+      WHERE collection = ? AND (id = ? OR slug = ?) AND status = 'published'
+    `)
+    .bind(collection, id, id)
+    .first()
+
+  if (!content) {
+    return c.json({ error: 'Content not found' }, 404)
+  }
+
+  return c.json({
+    success: true,
+    data: {
+      ...content,
+      data: JSON.parse(content.data)
+    }
+  })
+})
+
+export default api
+```
+
+</CodeGroup>
+
+### Frontend Integration Examples
+
+<CodeGroup title="Framework Examples">
+
+```javascript {{ title: 'React' }}
+// React with hooks
+function useSonicJS(collection, id = null) {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const url = id
+      ? `/api/${collection}/${id}`
+      : `/api/${collection}`
+
+    fetch(url)
+      .then(res => res.json())
+      .then(result => {
+        setData(result.data)
+        setLoading(false)
+      })
+  }, [collection, id])
+
+  return { data, loading }
+}
+
+// Usage
+function BlogPost({ slug }) {
+  const { data: post, loading } = useSonicJS('blog_posts', slug)
+
+  if (loading) return <div>Loading...</div>
+
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      <div dangerouslySetInnerHTML={{ __html: post.content }} />
+    </article>
+  )
+}
+```
+
+```javascript {{ title: 'Next.js' }}
+// Next.js with SSR
+export async function getStaticProps({ params }) {
+  const res = await fetch(`https://your-cms.com/api/blog_posts/${params.slug}`)
+  const { data } = await res.json()
+
+  return {
+    props: { post: data },
+    revalidate: 60 // Revalidate every minute
+  }
+}
+
+export async function getStaticPaths() {
+  const res = await fetch('https://your-cms.com/api/blog_posts')
+  const { data } = await res.json()
+
+  const paths = data.map(post => ({
+    params: { slug: post.slug }
+  }))
+
+  return { paths, fallback: 'blocking' }
+}
+
+export default function BlogPost({ post }) {
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      <div dangerouslySetInnerHTML={{ __html: post.content }} />
+    </article>
+  )
+}
+```
+
+```javascript {{ title: 'Vue' }}
+// Vue 3 Composition API
+<script setup>
+import { ref, onMounted } from 'vue'
+
+const props = defineProps(['slug'])
+const post = ref(null)
+const loading = ref(true)
+
+onMounted(async () => {
+  const response = await fetch(`/api/blog_posts/${props.slug}`)
+  const result = await response.json()
+  post.value = result.data
+  loading.value = false
+})
+</script>
+
+<template>
+  <article v-if="!loading">
+    <h1>{{ post.title }}</h1>
+    <div v-html="post.content"></div>
+  </article>
+  <div v-else>Loading...</div>
+</template>
+```
+
+</CodeGroup>
+
+---
+
+## Custom Workflow
+
+Implement a custom content approval workflow with multiple stages.
+
+### Workflow Plugin
+
+<CodeGroup title="Workflow Implementation">
+
+```typescript
+import { PluginBuilder } from '@sonicjs-cms/core'
+
+const workflow = PluginBuilder.create({
+  name: 'content-workflow',
+  version: '1.0.0',
+  description: 'Multi-stage content approval workflow'
+})
+
+// Workflow stages
+const STAGES = {
+  DRAFT: 'draft',
+  REVIEW: 'review',
+  APPROVED: 'approved',
+  PUBLISHED: 'published',
+  REJECTED: 'rejected'
+}
+
+// Add workflow routes
+const routes = new Hono()
+
+// Submit content for review
+routes.post('/submit/:contentId', async (c) => {
+  const contentId = c.req.param('contentId')
+  const user = c.get('user')
+  const db = c.env.DB
+
+  // Update content status
+  await db
+    .prepare(`
+      UPDATE content
+      SET status = ?, submitted_by = ?, submitted_at = ?
+      WHERE id = ?
+    `)
+    .bind(STAGES.REVIEW, user.userId, Date.now(), contentId)
+    .run()
+
+  // Create workflow entry
+  await db
+    .prepare(`
+      INSERT INTO workflow_history
+      (content_id, from_stage, to_stage, user_id, created_at)
+      VALUES (?, ?, ?, ?, ?)
+    `)
+    .bind(contentId, STAGES.DRAFT, STAGES.REVIEW, user.userId, Date.now())
+    .run()
+
+  return c.json({
+    success: true,
+    message: 'Content submitted for review'
+  })
+})
+
+// Approve content
+routes.post('/approve/:contentId', async (c) => {
+  const contentId = c.req.param('contentId')
+  const user = c.get('user')
+  const { comments } = await c.req.json()
+  const db = c.env.DB
+
+  // Check permissions
+  if (!user.role === 'editor' && !user.role === 'admin') {
+    return c.json({ error: 'Insufficient permissions' }, 403)
+  }
+
+  await db
+    .prepare(`
+      UPDATE content
+      SET status = ?, approved_by = ?, approved_at = ?
+      WHERE id = ?
+    `)
+    .bind(STAGES.APPROVED, user.userId, Date.now(), contentId)
+    .run()
+
+  await db
+    .prepare(`
+      INSERT INTO workflow_history
+      (content_id, from_stage, to_stage, user_id, comments, created_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `)
+    .bind(contentId, STAGES.REVIEW, STAGES.APPROVED, user.userId, comments, Date.now())
+    .run()
+
+  return c.json({
+    success: true,
+    message: 'Content approved'
+  })
+})
+
+// Reject content
+routes.post('/reject/:contentId', async (c) => {
+  const contentId = c.req.param('contentId')
+  const user = c.get('user')
+  const { reason } = await c.req.json()
+  const db = c.env.DB
+
+  await db
+    .prepare(`
+      UPDATE content
+      SET status = ?
+      WHERE id = ?
+    `)
+    .bind(STAGES.REJECTED, contentId)
+    .run()
+
+  await db
+    .prepare(`
+      INSERT INTO workflow_history
+      (content_id, from_stage, to_stage, user_id, comments, created_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `)
+    .bind(contentId, STAGES.REVIEW, STAGES.REJECTED, user.userId, reason, Date.now())
+    .run()
+
+  return c.json({
+    success: true,
+    message: 'Content rejected'
+  })
+})
+
+// Get workflow history
+routes.get('/history/:contentId', async (c) => {
+  const contentId = c.req.param('contentId')
+  const db = c.env.DB
+
+  const history = await db
+    .prepare(`
+      SELECT wh.*, u.name as user_name
+      FROM workflow_history wh
+      JOIN users u ON wh.user_id = u.id
+      WHERE wh.content_id = ?
+      ORDER BY wh.created_at DESC
+    `)
+    .bind(contentId)
+    .all()
+
+  return c.json({
+    success: true,
+    data: history.results
+  })
+})
+
+workflow.addRoute('/api/workflow', routes)
+
+export default workflow.build()
+```
+
+</CodeGroup>
+
+---
+
+## Next Steps
+
+<div className="not-prose">
+  <Button href="/plugins/development" variant="text" arrow="right">
+    <>Learn plugin development</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/api" variant="text" arrow="right">
+    <>Explore the API reference</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/quickstart" variant="text" arrow="right">
+    <>Get started with SonicJS</>
+  </Button>
+</div>

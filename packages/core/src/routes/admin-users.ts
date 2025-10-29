@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import type { D1Database, KVNamespace, R2Bucket, Queue } from '@cloudflare/workers-types'
 import { requireAuth, requirePermission, logActivity, AuthManager } from '../middleware'
 import { sanitizeInput } from '../utils/sanitize'
-import { renderProfilePage, type UserProfile, type ProfilePageData } from '../templates/pages/admin-profile.template'
+import { renderProfilePage, renderAvatarImage, type UserProfile, type ProfilePageData } from '../templates/pages/admin-profile.template'
 import { renderAlert } from '../templates/components/alert.template'
 import { renderActivityLogsPage, type ActivityLogsPageData, type ActivityLog } from '../templates/pages/admin-activity-logs.template'
 import { renderUserEditPage, type UserEditPageData, type UserEditData } from '../templates/pages/admin-user-edit.template'
@@ -276,6 +276,12 @@ userRoutes.post('/profile/avatar', async (c) => {
 
     await updateStmt.bind(avatarUrl, Date.now(), user!.userId).run()
 
+    // Get updated user data to render the avatar
+    const userStmt = db.prepare(`
+      SELECT first_name, last_name FROM users WHERE id = ?
+    `)
+    const userData = await userStmt.bind(user!.userId).first() as any
+
     // Log the activity
     await logActivity(
       db, user!.userId, 'profile.avatar_update', 'users', user!.userId,
@@ -284,11 +290,24 @@ userRoutes.post('/profile/avatar', async (c) => {
       c.req.header('user-agent')
     )
 
-    return c.html(renderAlert({ 
-      type: 'success', 
+    // Return both the alert message and the updated avatar image using HTMX out-of-band swap
+    const alertHtml = renderAlert({
+      type: 'success',
       message: 'Profile picture updated successfully!',
-      dismissible: true 
-    }))
+      dismissible: true
+    })
+
+    // Add timestamp to avatar URL to bust cache
+    const avatarUrlWithCache = `${avatarUrl}?t=${Date.now()}`
+    const avatarImageHtml = renderAvatarImage(avatarUrlWithCache, userData.first_name, userData.last_name)
+
+    // Use hx-swap-oob to update the avatar image container
+    const avatarImageWithOob = avatarImageHtml.replace(
+      'id="avatar-image-container"',
+      'id="avatar-image-container" hx-swap-oob="true"'
+    )
+
+    return c.html(alertHtml + avatarImageWithOob)
 
   } catch (error) {
     console.error('Avatar upload error:', error)

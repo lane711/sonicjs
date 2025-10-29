@@ -1,0 +1,769 @@
+export const metadata = {
+  title: 'FAQ - SonicJS',
+  description:
+    'Frequently asked questions about SonicJS including installation, features, deployment, performance, pricing, and support.',
+}
+
+export const sections = [
+  { title: 'General Questions', id: 'general-questions' },
+  { title: 'Installation & Setup', id: 'installation-setup' },
+  { title: 'Features & Capabilities', id: 'features-capabilities' },
+  { title: 'Development', id: 'development' },
+  { title: 'Deployment & Hosting', id: 'deployment-hosting' },
+  { title: 'Performance', id: 'performance' },
+  { title: 'Pricing & Licensing', id: 'pricing-licensing' },
+  { title: 'Support & Community', id: 'support-community' },
+]
+
+# Frequently Asked Questions
+
+Get answers to common questions about SonicJS, from installation to deployment and everything in between. {{ className: 'lead' }}
+
+---
+
+## General Questions
+
+### What is SonicJS?
+
+SonicJS is a modern, edge-first headless CMS built specifically for Cloudflare Workers. It combines the power of Cloudflare's global edge network with a flexible, plugin-driven architecture to deliver exceptional performance and developer experience.
+
+**Key Features:**
+- **Edge-First Architecture** - Runs entirely on Cloudflare's global network
+- **Zero Cold Starts** - V8 isolates provide instant startup times
+- **TypeScript-Native** - Fully typed for excellent developer experience
+- **Plugin System** - Extensible through robust plugins
+- **Three-Tier Caching** - Sub-millisecond response times
+
+### Why choose SonicJS over other CMS platforms?
+
+SonicJS offers several unique advantages:
+
+**Performance**
+- Runs at the edge for sub-50ms response times globally
+- Three-tier caching (memory, KV, database)
+- No cold starts thanks to V8 isolates
+
+**Developer Experience**
+- TypeScript-first with full type safety
+- Modern tech stack (Hono, Drizzle ORM, React)
+- Intuitive plugin architecture
+- Comprehensive API
+
+**Cost-Effective**
+- Serverless pricing model (pay per request)
+- Free tier available on Cloudflare
+- No infrastructure to manage
+
+**Scalability**
+- Automatic scaling to handle traffic spikes
+- Global distribution out of the box
+- Handles millions of requests effortlessly
+
+### What makes SonicJS different from traditional CMS platforms?
+
+Unlike traditional CMS platforms that run on centralized servers, SonicJS runs entirely at the edge:
+
+- **Traditional CMS**: Single origin server → CDN → Users
+- **SonicJS**: Edge locations → Users (direct)
+
+This architecture eliminates the origin server bottleneck and provides:
+- Lower latency (10-50ms vs 200-500ms)
+- Higher availability (no single point of failure)
+- Better scalability (automatic global distribution)
+- Lower costs (pay per request, not per server)
+
+### Is SonicJS suitable for production use?
+
+Yes! SonicJS is production-ready and powers several live websites. It's built on battle-tested technologies:
+
+- **Cloudflare Workers** - Handles billions of requests daily
+- **D1 Database** - SQLite with global replication
+- **R2 Storage** - S3-compatible object storage
+- **TypeScript** - Type-safe, enterprise-grade
+
+The plugin system is stable, the API is well-documented, and the codebase is actively maintained.
+
+---
+
+## Installation & Setup
+
+### What are the system requirements?
+
+**Development Environment:**
+- Node.js 18 or higher
+- npm or pnpm
+- Git
+- Modern web browser
+
+**Production Environment:**
+- Cloudflare account (free tier available)
+- Cloudflare Workers
+- D1 Database
+- R2 Storage (for media)
+- KV Storage (optional, for caching)
+
+### How long does installation take?
+
+Initial setup takes **under 5 minutes**:
+
+<CodeGroup title="Quick Setup">
+
+```bash
+# Clone and install (2 minutes)
+git clone https://github.com/lane711/sonicjs.git
+cd sonicjs
+npm install
+
+# Run migrations (1 minute)
+npm run db:migrate
+
+# Start development server (instant)
+npm run dev
+
+# Your CMS is now running at http://localhost:8787
+```
+
+</CodeGroup>
+
+### Can I use SonicJS with an existing project?
+
+Yes! SonicJS can be integrated into existing projects in several ways:
+
+**As a Headless CMS:**
+```bash
+# Install as a package
+npm install @sonicjs-cms/core
+
+# Or use the hosted API
+fetch('https://your-cms.com/api/content')
+```
+
+**As a Standalone Service:**
+Deploy SonicJS separately and consume its API from your existing application.
+
+**Monorepo Setup:**
+Include SonicJS as a package in your monorepo structure.
+
+### Do I need Cloudflare to use SonicJS?
+
+For **production deployment**, yes. SonicJS is specifically designed for Cloudflare's edge platform and leverages:
+- Cloudflare Workers (serverless compute)
+- D1 Database (distributed SQLite)
+- R2 Storage (object storage)
+- KV Storage (key-value cache)
+
+For **local development**, no Cloudflare account is needed. You can develop entirely locally using Wrangler's local mode.
+
+---
+
+## Features & Capabilities
+
+### What content types does SonicJS support?
+
+SonicJS supports flexible content types through its collection system:
+
+**Built-in Field Types:**
+- Text (single line, multi-line)
+- Rich text / Markdown
+- Numbers (integer, float)
+- Dates and datetimes
+- Boolean (toggle)
+- Media (images, videos, files)
+- Relations (one-to-one, one-to-many, many-to-many)
+- JSON (structured data)
+- Repeaters (nested content)
+- Groups (field grouping)
+- Select (dropdown)
+- Tags
+
+**Custom Collections:**
+Create any content structure you need - blogs, products, documentation, portfolios, etc.
+
+### Does SonicJS have a visual editor?
+
+Yes! SonicJS includes a modern admin interface with:
+
+- **Content Editor** - Rich text editing with markdown support
+- **Media Library** - Drag-and-drop file management
+- **Collection Builder** - Visual collection definition
+- **Dashboard** - Analytics and system overview
+- **User Management** - Role-based access control
+
+The admin interface is built with React and accessible at `/admin`.
+
+### Can I customize the admin interface?
+
+Absolutely! You can customize the admin interface through:
+
+**Plugins:**
+Add custom admin pages and menu items via plugins.
+
+**Theming:**
+Customize colors, fonts, and styles through CSS variables.
+
+**Component Overrides:**
+Replace built-in components with your own React components.
+
+**Custom Pages:**
+Create entirely custom admin pages for specific workflows.
+
+### Does SonicJS support multi-language content?
+
+Yes, through the internationalization (i18n) plugin:
+
+**Features:**
+- Multiple language versions per content item
+- Language-specific URLs
+- Automatic language detection
+- Fallback language support
+- Translation workflows
+
+**Implementation:**
+```typescript
+{
+  title_en: 'Hello World',
+  title_es: 'Hola Mundo',
+  title_fr: 'Bonjour le Monde',
+  content_en: '...',
+  content_es: '...',
+  content_fr: '...'
+}
+```
+
+### Can I use SonicJS with my frontend framework?
+
+Yes! SonicJS is a headless CMS that works with any frontend:
+
+**Officially Supported:**
+- React
+- Next.js
+- Vue.js
+- Nuxt.js
+- Svelte
+- SvelteKit
+
+**Also Works With:**
+- Angular
+- Solid.js
+- Astro
+- Remix
+- Any framework that can make HTTP requests
+
+Simply consume the REST API from your frontend framework.
+
+---
+
+## Development
+
+### How do I create a custom plugin?
+
+Creating a plugin is straightforward with the Plugin Builder SDK:
+
+<CodeGroup title="Basic Plugin">
+
+```typescript
+import { PluginBuilder } from '@sonicjs-cms/core'
+import { Hono } from 'hono'
+
+// Create plugin
+const plugin = PluginBuilder.create({
+  name: 'my-plugin',
+  version: '1.0.0',
+  description: 'My custom plugin'
+})
+
+// Add routes
+const routes = new Hono()
+routes.get('/hello', (c) => c.json({ message: 'Hello!' }))
+plugin.addRoute('/api/my-plugin', routes)
+
+// Add lifecycle hooks
+plugin.lifecycle({
+  activate: async (context) => {
+    console.log('Plugin activated!')
+  }
+})
+
+// Export
+export default plugin.build()
+```
+
+</CodeGroup>
+
+Check the [Plugin Development Guide](/plugins/development) for comprehensive documentation.
+
+### Can I use external APIs and services?
+
+Yes! SonicJS plugins can integrate with any external API or service:
+
+**Examples:**
+- Payment gateways (Stripe, PayPal)
+- Email services (SendGrid, Mailgun)
+- Analytics (Google Analytics, Plausible)
+- Search (Algolia, Meilisearch)
+- Authentication (Auth0, Clerk)
+- Storage (S3, Google Cloud)
+
+Simply make HTTP requests from your plugin code or use the service's SDK.
+
+### How do I handle authentication in my plugin?
+
+SonicJS provides built-in authentication through the core auth plugin:
+
+<CodeGroup title="Auth in Plugins">
+
+```typescript
+// Require authentication for routes
+plugin.addRoute('/api/protected', routes, {
+  requiresAuth: true
+})
+
+// Access authenticated user
+routes.get('/me', async (c) => {
+  const user = c.get('user')
+  return c.json({
+    userId: user.userId,
+    email: user.email,
+    role: user.role
+  })
+})
+
+// Check permissions
+routes.post('/admin-action', async (c) => {
+  const user = c.get('user')
+
+  if (user.role !== 'admin') {
+    return c.json({ error: 'Forbidden' }, 403)
+  }
+
+  // Admin action here
+})
+```
+
+</CodeGroup>
+
+### Can I schedule tasks or background jobs?
+
+Yes, through Cloudflare's Durable Objects or Queues:
+
+**Scheduled Tasks:**
+```typescript
+// Use Cloudflare Cron Triggers
+export default {
+  async scheduled(event, env, ctx) {
+    // Run every hour
+    await cleanupExpiredSessions(env.DB)
+  }
+}
+```
+
+**Background Jobs:**
+```typescript
+// Use Cloudflare Queues
+await env.QUEUE.send({
+  type: 'process-image',
+  imageId: '123',
+  operations: ['resize', 'compress']
+})
+```
+
+---
+
+## Deployment & Hosting
+
+### How do I deploy SonicJS to production?
+
+Deployment to Cloudflare Workers is simple:
+
+<CodeGroup title="Deploy to Production">
+
+```bash
+# 1. Install Wrangler CLI
+npm install -g wrangler
+
+# 2. Authenticate with Cloudflare
+wrangler login
+
+# 3. Create production D1 database
+wrangler d1 create sonicjs-production
+
+# 4. Run migrations on production
+wrangler d1 migrations apply sonicjs-production
+
+# 5. Deploy to Workers
+wrangler deploy
+
+# Your CMS is now live!
+```
+
+</CodeGroup>
+
+See the [Deployment Guide](/deployment) for detailed instructions.
+
+### What is the cost of running SonicJS in production?
+
+**Cloudflare Free Tier:**
+- 100,000 requests/day
+- 10 GB R2 storage
+- 1 GB D1 storage
+- Perfect for small to medium sites
+
+**Cloudflare Workers Paid Plan ($5/month):**
+- 10 million requests/month
+- 50 GB R2 storage
+- 5 GB D1 storage
+- Additional requests: $0.50 per million
+
+**Enterprise:**
+Custom pricing for high-volume sites
+
+Most projects start on the free tier and scale as needed.
+
+### Can I use a custom domain?
+
+Yes! Configure your custom domain in Cloudflare:
+
+1. Add your domain to Cloudflare
+2. Configure DNS records
+3. Update Worker route in `wrangler.toml`:
+
+```toml
+routes = [
+  { pattern = "cms.yourdomain.com/*", zone_name = "yourdomain.com" }
+]
+```
+
+### How do I handle environment variables?
+
+Use Wrangler secrets and environment variables:
+
+<CodeGroup title="Environment Configuration">
+
+```bash
+# Set secrets (for sensitive data)
+wrangler secret put JWT_SECRET
+wrangler secret put STRIPE_API_KEY
+
+# Environment variables (in wrangler.toml)
+[vars]
+ENVIRONMENT = "production"
+API_BASE_URL = "https://api.yourdomain.com"
+```
+
+```typescript
+// Access in your code
+export default {
+  async fetch(request, env) {
+    const jwtSecret = env.JWT_SECRET
+    const apiUrl = env.API_BASE_URL
+  }
+}
+```
+
+</CodeGroup>
+
+### Can I run SonicJS on other platforms?
+
+SonicJS is specifically designed for Cloudflare Workers and uses Cloudflare-specific APIs (D1, R2, KV). However:
+
+**Alternatives:**
+- Use the Cloudflare Workers compatibility layer on other platforms
+- Run locally for development (Wrangler provides local emulation)
+- Contribute an adapter for other platforms (community welcome!)
+
+For best performance and features, we recommend Cloudflare Workers.
+
+---
+
+## Performance
+
+### How fast is SonicJS?
+
+SonicJS delivers exceptional performance:
+
+**Response Times:**
+- Cache hit (memory): < 1ms
+- Cache hit (KV): 10-50ms
+- Database query: 50-150ms
+- First request (cold): 50-100ms
+
+**Real-World Performance:**
+- Time to First Byte (TTFB): 20-80ms globally
+- API response: 30-120ms
+- Page load: 100-300ms (depending on content)
+
+### What is the three-tier caching system?
+
+SonicJS implements intelligent caching across three tiers:
+
+**Tier 1: In-Memory Cache**
+- Fastest access (< 1ms)
+- 50MB size limit per worker
+- LRU eviction policy
+- Region-specific
+
+**Tier 2: Cloudflare KV**
+- Global distribution
+- Eventually consistent
+- 10-50ms access time
+- 1 GB free storage
+
+**Tier 3: D1 Database**
+- Source of truth
+- Strong consistency
+- 50-150ms query time
+- Full query capabilities
+
+**Flow:**
+```
+Request → Memory? → KV? → Database → Populate all tiers → Response
+```
+
+### How many requests can SonicJS handle?
+
+SonicJS scales automatically:
+
+**Typical Performance:**
+- 1,000-10,000 requests/second per worker
+- Automatic scaling to handle spikes
+- No manual scaling configuration needed
+
+**Cloudflare automatically:**
+- Distributes load across workers
+- Spins up additional instances
+- Routes requests to nearest edge location
+
+### How do I optimize performance?
+
+**Enable All Cache Tiers:**
+```typescript
+{
+  memoryEnabled: true,
+  kvEnabled: true,
+  defaultTTL: 3600
+}
+```
+
+**Use Appropriate TTLs:**
+- Content: 1 hour
+- User data: 15 minutes
+- API responses: 5 minutes
+
+**Implement Pagination:**
+```typescript
+const limit = Math.min(parseInt(query.limit) || 20, 100)
+const offset = (page - 1) * limit
+```
+
+**Minimize Database Queries:**
+- Batch operations
+- Use indexes
+- Cache query results
+
+---
+
+## Pricing & Licensing
+
+### Is SonicJS free to use?
+
+Yes! SonicJS is **open source** and **free to use** under the MIT license.
+
+**What's Included:**
+- Full source code
+- All core features
+- Plugin system
+- Admin interface
+- Commercial use allowed
+- No attribution required
+
+### What is the license?
+
+SonicJS is licensed under the **MIT License**:
+
+- ✅ Commercial use
+- ✅ Modification
+- ✅ Distribution
+- ✅ Private use
+- ❌ No liability
+- ❌ No warranty
+
+You can use SonicJS for any purpose, including commercial projects.
+
+### What about Cloudflare costs?
+
+Cloudflare has its own pricing (separate from SonicJS):
+
+**Free Tier:**
+- 100,000 requests/day
+- Great for development and small sites
+
+**Workers Paid ($5/month):**
+- 10 million requests/month
+- Suitable for most production sites
+
+**Storage Costs:**
+- D1: Free for 5 GB
+- R2: $0.015 per GB/month
+- KV: Free for 1 GB
+
+Most projects cost $5-20/month total.
+
+### Can I get commercial support?
+
+Yes! Commercial support options:
+
+**Community Support (Free):**
+- GitHub issues
+- Discord community
+- Documentation
+
+**Priority Support:**
+- Email support
+- Private Discord channel
+- 24-hour response time
+
+**Enterprise Support:**
+- Dedicated support engineer
+- Custom SLAs
+- Architecture consulting
+- Custom development
+
+Contact us at support@sonicjs.com for pricing.
+
+---
+
+## Support & Community
+
+### How do I get help?
+
+Multiple support channels available:
+
+**Documentation:**
+- [Documentation Site](https://docs.sonicjs.com)
+- [API Reference](/api)
+- [Plugin Development Guide](/plugins/development)
+
+**Community:**
+- [GitHub Discussions](https://github.com/lane711/sonicjs/discussions)
+- [Discord Server](https://discord.gg/sonicjs)
+- [Twitter/X](https://twitter.com/sonicjs)
+
+**Professional Support:**
+- Email: support@sonicjs.com
+- Priority support plans available
+
+### Can I contribute to SonicJS?
+
+Absolutely! Contributions are welcome:
+
+**Ways to Contribute:**
+- Report bugs on GitHub
+- Submit pull requests
+- Write plugins
+- Improve documentation
+- Share examples and tutorials
+- Help others in Discord
+
+**Getting Started:**
+```bash
+# Fork and clone
+git clone https://github.com/YOUR_USERNAME/sonicjs.git
+
+# Create a branch
+git checkout -b feature/my-feature
+
+# Make changes and commit
+git commit -m "Add my feature"
+
+# Push and create PR
+git push origin feature/my-feature
+```
+
+See [CONTRIBUTING.md](https://github.com/lane711/sonicjs/blob/main/CONTRIBUTING.md) for guidelines.
+
+### Where can I find examples and tutorials?
+
+**Official Resources:**
+- [Examples Page](/examples)
+- [GitHub Examples](https://github.com/lane711/sonicjs/tree/main/examples)
+- [Blog](https://sonicjs.com/blog)
+
+**Community Resources:**
+- Community plugins
+- Third-party tutorials
+- YouTube videos
+- Dev.to articles
+
+### How do I report a bug?
+
+Report bugs on GitHub:
+
+1. Check if the bug already exists
+2. Create a new issue with:
+   - Clear description
+   - Steps to reproduce
+   - Expected vs actual behavior
+   - Environment details
+   - Code samples (if applicable)
+
+**Bug Report Template:**
+```markdown
+**Describe the bug**
+A clear description...
+
+**To Reproduce**
+1. Step one
+2. Step two
+3. Step three
+
+**Expected behavior**
+What should happen...
+
+**Environment**
+- SonicJS version:
+- Node.js version:
+- Browser:
+- OS:
+```
+
+### Is there a roadmap?
+
+Yes! Check the [GitHub Projects](https://github.com/lane711/sonicjs/projects) for:
+
+- **Upcoming Features** - Planned for next releases
+- **In Progress** - Currently being developed
+- **Under Discussion** - Community feedback needed
+
+**Recent Additions:**
+- Plugin system v2
+- Enhanced caching
+- Admin interface improvements
+- TypeScript improvements
+
+**Coming Soon:**
+- GraphQL API
+- Advanced search
+- Workflow engine
+- Visual page builder
+
+---
+
+## Still Have Questions?
+
+<div className="not-prose">
+  <Button href="/community" variant="text" arrow="right">
+    <>Join the community</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="https://github.com/lane711/sonicjs/discussions" variant="text" arrow="right">
+    <>Ask on GitHub Discussions</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="https://discord.gg/sonicjs" variant="text" arrow="right">
+    <>Chat on Discord</>
+  </Button>
+</div>

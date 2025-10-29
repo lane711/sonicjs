@@ -1,0 +1,443 @@
+export const metadata = {
+  title: 'Installation - SonicJS',
+  description:
+    'Complete installation guide for SonicJS. Get up and running with the TypeScript-first headless CMS built on Cloudflare Workers in under 60 seconds.',
+}
+
+export const sections = [
+  { title: 'Prerequisites', id: 'prerequisites' },
+  { title: 'Quick Start', id: 'quick-start' },
+  { title: 'Development Setup', id: 'development-setup' },
+  { title: 'Environment Configuration', id: 'environment-configuration' },
+  { title: 'First Steps', id: 'first-steps' },
+  { title: 'Available Scripts', id: 'available-scripts' },
+  { title: 'Troubleshooting', id: 'troubleshooting' },
+]
+
+# Installation
+
+Get SonicJS running locally or deploy to production. This guide covers everything from prerequisites to your first content creation. {{ className: 'lead' }}
+
+---
+
+## Prerequisites {{ id: 'prerequisites' }}
+
+Before you begin, ensure you have the following installed:
+
+- **Node.js** (version 20 or higher)
+- **npm** or **pnpm**
+- **Git**
+- **Cloudflare account** (for deployment and production use)
+
+### Recommended Tools
+
+- **TypeScript** knowledge (project is fully typed)
+- **Visual Studio Code** (for best TypeScript experience)
+- **Wrangler CLI** (installed automatically with dependencies)
+
+---
+
+## Quick Start {{ id: 'quick-start' }}
+
+### Option 1: Create New Project (Recommended)
+
+Get started in under 60 seconds with the official CLI:
+
+```bash {{ title: 'Create New Project' }}
+# Create a new SonicJS project
+npx create-sonicjs my-cms
+
+# Navigate to project
+cd my-cms
+
+# Start development server
+npm run dev
+```
+
+Your SonicJS instance will be available at **http://localhost:8787**
+
+### Option 2: Clone Repository (Development)
+
+For contributing or developing SonicJS itself:
+
+```bash {{ title: 'Clone Repository' }}
+# Clone the repository
+git clone https://github.com/lane711/sonicjs-ai.git
+cd sonicjs-ai
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+---
+
+## Development Setup {{ id: 'development-setup' }}
+
+### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+This will install all required dependencies including:
+
+- **Hono** - Ultra-fast web framework
+- **Drizzle ORM** - Type-safe database queries
+- **Wrangler** - Cloudflare Workers CLI
+- **Vitest** - Unit testing framework
+- **Playwright** - E2E testing framework
+
+### 2. Database Setup
+
+SonicJS uses Cloudflare D1 (SQLite) for local development and production.
+
+**Run migrations locally:**
+
+```bash
+npm run db:migrate
+```
+
+This command applies all database migrations and creates the initial schema including:
+
+- User authentication tables
+- Content and collections
+- Media library
+- Plugin system
+- Workflow and automation
+- Email templates
+
+**Available database commands:**
+
+```bash
+# Generate new migration files (if you modify schema)
+npm run db:generate
+
+# Apply migrations to local database
+npm run db:migrate
+
+# Apply migrations to production
+npm run db:migrate:prod
+
+# Open interactive database studio (Drizzle Studio)
+npm run db:studio
+```
+
+---
+
+## Environment Configuration {{ id: 'environment-configuration' }}
+
+SonicJS is configured via **wrangler.toml** instead of .env files.
+
+**wrangler.toml** (automatically configured):
+
+```toml
+name = "sonicjs-ai"
+main = "src/index.ts"
+compatibility_date = "2024-06-01"
+
+[vars]
+ENVIRONMENT = "development"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "sonicjs-dev"
+database_id = "your-database-id"
+
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "sonicjs-media-dev"
+
+[[kv_namespaces]]
+binding = "CACHE_KV"
+id = "your-kv-id"
+```
+
+**Key Bindings:**
+
+- **DB** - D1 Database for all data storage
+- **MEDIA_BUCKET** - R2 bucket for media files
+- **CACHE_KV** - KV namespace for caching layer
+- **ASSETS** - Static asset serving
+
+### Start Development Server
+
+```bash
+npm run dev
+```
+
+**What happens on startup:**
+
+1. **Bootstrap Phase:**
+   - Runs database migrations
+   - Syncs collection configurations
+   - Bootstraps core plugins (auth, media, cache, database-tools, seed-data)
+   - Installs demo plugins (workflow, FAQ, demo-login)
+
+2. **Server Ready:**
+   - Admin interface: http://localhost:8787/admin
+   - API documentation: http://localhost:8787/api
+   - Health check: http://localhost:8787/health
+
+---
+
+## First Steps {{ id: 'first-steps' }}
+
+### 1. Access the Admin Dashboard
+
+Navigate to **http://localhost:8787/admin**
+
+**Default Credentials** (if seed data is loaded):
+
+- Email: admin@sonicjs.com
+- Password: admin123
+
+**Note:** The `demo-login-plugin` auto-fills these credentials in development.
+
+### 2. Create Your First Content
+
+**Via Admin UI:**
+
+1. Navigate to **Content** → **New Content**
+2. Select a collection (e.g., "Blog Posts")
+3. Fill in the fields:
+   - Title: "My First Post"
+   - Slug: "my-first-post" (auto-generated)
+   - Content: Write your content
+   - Status: "published"
+4. Click **Save**
+
+**Via API:**
+
+```bash
+# Get auth token
+curl -X POST http://localhost:8787/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@sonicjs.com","password":"admin123"}'
+
+# Create content
+curl -X POST http://localhost:8787/admin/content \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "collection": "blog_posts",
+    "title": "My First Post",
+    "data": {
+      "slug": "my-first-post",
+      "content": "<p>Hello World!</p>",
+      "status": "published"
+    }
+  }'
+```
+
+### 3. Explore the API
+
+**API Documentation:**
+Visit **http://localhost:8787/api** for interactive OpenAPI docs.
+
+**Key Endpoints:**
+
+```bash
+# Health check
+GET /health
+
+# List collections
+GET /api/collections
+
+# Get all content (paginated)
+GET /api/content?limit=50
+
+# Get collection content
+GET /api/collections/blog_posts/content
+
+# Get single content item
+GET /api/content/:id
+
+# Search content
+GET /api/content?search=keyword
+```
+
+---
+
+## Available Scripts {{ id: 'available-scripts' }}
+
+### Development
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server with Wrangler |
+| `npm run build` | TypeScript compilation + dry-run deploy |
+| `npm run deploy` | Deploy to Cloudflare Workers |
+| `npm run predeploy` | Run tests + build before deploy |
+
+### Database
+
+| Command | Description |
+|---------|-------------|
+| `npm run db:generate` | Generate migration files from schema changes |
+| `npm run db:migrate` | Apply migrations to local D1 database |
+| `npm run db:migrate:prod` | Apply migrations to production database |
+| `npm run db:studio` | Open Drizzle Studio (database GUI) |
+
+### Testing
+
+| Command | Description |
+|---------|-------------|
+| `npm test` | Run Vitest unit tests |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:cov` | Run tests with coverage report |
+| `npm run test:cov:ui` | Run tests with coverage UI |
+| `npm run test:e2e` | Run Playwright E2E tests |
+| `npm run test:e2e:ui` | Run E2E tests with UI mode |
+
+### Utilities
+
+| Command | Description |
+|---------|-------------|
+| `npm run plugins:generate` | Regenerate plugin registry from manifests |
+| `npm run plugins:watch` | Watch plugin manifests and auto-regenerate |
+| `npm run sonicjs` | Run SonicJS CLI commands |
+
+---
+
+## Troubleshooting {{ id: 'troubleshooting' }}
+
+### Common Issues
+
+#### Database Connection Errors
+
+**Error:** `Error: no such table: users`
+
+**Solution:**
+
+```bash
+# Run migrations
+npm run db:migrate
+
+# Verify migration status
+wrangler d1 migrations list DB --local
+```
+
+---
+
+#### Port Already in Use
+
+**Error:** `Error: listen EADDRINUSE: address already in use :::8787`
+
+**Solution:**
+
+```bash
+# Find and kill the process using port 8787
+lsof -ti:8787 | xargs kill -9
+
+# Or specify a different port in wrangler.toml
+# [dev]
+# port = 3000
+```
+
+---
+
+#### Module Not Found / Import Errors
+
+**Error:** `Cannot find module 'hono'`
+
+**Solution:**
+
+```bash
+# Clear and reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
+
+# Clear TypeScript build cache
+rm -rf .wrangler
+```
+
+---
+
+#### Media Upload Fails
+
+**Error:** `Failed to upload to R2`
+
+**Solution:**
+
+1. Verify R2 bucket exists and binding is correct in `wrangler.toml`
+2. Check bucket permissions
+3. Ensure file size is under limits (10MB default for images)
+4. Verify MIME type is allowed
+
+```bash
+# Test R2 bucket
+wrangler r2 bucket list
+
+# Check specific bucket
+wrangler r2 bucket info sonicjs-media-dev
+```
+
+### Getting Help
+
+**Resources:**
+
+- 📚 [Full Documentation](https://docs.sonicjs.com)
+- 🐛 [GitHub Issues](https://github.com/lane711/sonicjs-ai/issues)
+- 💬 [Discussions](https://github.com/lane711/sonicjs-ai/discussions)
+- 📖 [API Reference](/api)
+- 🏗️ [Architecture Guide](/architecture)
+
+---
+
+## Next Steps
+
+Now that you have SonicJS running, explore these guides:
+
+<div className="not-prose my-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
+  <div className="group relative rounded-xl border border-zinc-950/10 dark:border-white/10">
+    <div className="absolute -inset-px rounded-xl border-2 border-transparent opacity-0 [background:linear-gradient(var(--quick-links-hover-bg,theme(colors.sky.50)),var(--quick-links-hover-bg,theme(colors.sky.50)))_padding-box,linear-gradient(to_top,theme(colors.indigo.400),theme(colors.cyan.400),theme(colors.sky.500))_border-box] group-hover:opacity-100 dark:[--quick-links-hover-bg:theme(colors.zinc.800)]" />
+    <div className="relative overflow-hidden rounded-xl p-6">
+      <h3 className="font-semibold text-zinc-900 dark:text-white">
+        <a href="/architecture">
+          <span className="absolute -inset-px rounded-xl" />
+          Architecture Overview
+        </a>
+      </h3>
+      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Understand how SonicJS works under the hood</p>
+    </div>
+  </div>
+  <div className="group relative rounded-xl border border-zinc-950/10 dark:border-white/10">
+    <div className="absolute -inset-px rounded-xl border-2 border-transparent opacity-0 [background:linear-gradient(var(--quick-links-hover-bg,theme(colors.sky.50)),var(--quick-links-hover-bg,theme(colors.sky.50)))_padding-box,linear-gradient(to_top,theme(colors.indigo.400),theme(colors.cyan.400),theme(colors.sky.500))_border-box] group-hover:opacity-100 dark:[--quick-links-hover-bg:theme(colors.zinc.800)]" />
+    <div className="relative overflow-hidden rounded-xl p-6">
+      <h3 className="font-semibold text-zinc-900 dark:text-white">
+        <a href="/collections">
+          <span className="absolute -inset-px rounded-xl" />
+          Collections
+        </a>
+      </h3>
+      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Define and manage your content types</p>
+    </div>
+  </div>
+  <div className="group relative rounded-xl border border-zinc-950/10 dark:border-white/10">
+    <div className="absolute -inset-px rounded-xl border-2 border-transparent opacity-0 [background:linear-gradient(var(--quick-links-hover-bg,theme(colors.sky.50)),var(--quick-links-hover-bg,theme(colors.sky.50)))_padding-box,linear-gradient(to_top,theme(colors.indigo.400),theme(colors.cyan.400),theme(colors.sky.500))_border-box] group-hover:opacity-100 dark:[--quick-links-hover-bg:theme(colors.zinc.800)]" />
+    <div className="relative overflow-hidden rounded-xl p-6">
+      <h3 className="font-semibold text-zinc-900 dark:text-white">
+        <a href="/api">
+          <span className="absolute -inset-px rounded-xl" />
+          API Reference
+        </a>
+      </h3>
+      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Integrate SonicJS with your frontend</p>
+    </div>
+  </div>
+  <div className="group relative rounded-xl border border-zinc-950/10 dark:border-white/10">
+    <div className="absolute -inset-px rounded-xl border-2 border-transparent opacity-0 [background:linear-gradient(var(--quick-links-hover-bg,theme(colors.sky.50)),var(--quick-links-hover-bg,theme(colors.sky.50)))_padding-box,linear-gradient(to_top,theme(colors.indigo.400),theme(colors.cyan.400),theme(colors.sky.500))_border-box] group-hover:opacity-100 dark:[--quick-links-hover-bg:theme(colors.zinc.800)]" />
+    <div className="relative overflow-hidden rounded-xl p-6">
+      <h3 className="font-semibold text-zinc-900 dark:text-white">
+        <a href="/plugins/development">
+          <span className="absolute -inset-px rounded-xl" />
+          Plugin Development
+        </a>
+      </h3>
+      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Extend SonicJS with custom plugins</p>
+    </div>
+  </div>
+</div>

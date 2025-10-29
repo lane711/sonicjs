@@ -1,6 +1,6 @@
 'use strict';
 
-var chunk3NVJ6W27_cjs = require('./chunk-3NVJ6W27.cjs');
+var chunkDOR2IU73_cjs = require('./chunk-DOR2IU73.cjs');
 var chunk3JMOWGUU_cjs = require('./chunk-3JMOWGUU.cjs');
 require('./chunk-IGJUBJBW.cjs');
 
@@ -8,27 +8,31 @@ require('./chunk-IGJUBJBW.cjs');
 
 Object.defineProperty(exports, "CACHE_CONFIGS", {
   enumerable: true,
-  get: function () { return chunk3NVJ6W27_cjs.CACHE_CONFIGS; }
+  get: function () { return chunkDOR2IU73_cjs.CACHE_CONFIGS; }
 });
 Object.defineProperty(exports, "CacheService", {
   enumerable: true,
-  get: function () { return chunk3NVJ6W27_cjs.CacheService; }
+  get: function () { return chunkDOR2IU73_cjs.CacheService; }
 });
 Object.defineProperty(exports, "Logger", {
   enumerable: true,
-  get: function () { return chunk3NVJ6W27_cjs.Logger; }
+  get: function () { return chunkDOR2IU73_cjs.Logger; }
+});
+Object.defineProperty(exports, "SettingsService", {
+  enumerable: true,
+  get: function () { return chunkDOR2IU73_cjs.SettingsService; }
 });
 Object.defineProperty(exports, "getCacheService", {
   enumerable: true,
-  get: function () { return chunk3NVJ6W27_cjs.getCacheService; }
+  get: function () { return chunkDOR2IU73_cjs.getCacheService; }
 });
 Object.defineProperty(exports, "getLogger", {
   enumerable: true,
-  get: function () { return chunk3NVJ6W27_cjs.getLogger; }
+  get: function () { return chunkDOR2IU73_cjs.getLogger; }
 });
 Object.defineProperty(exports, "initLogger", {
   enumerable: true,
-  get: function () { return chunk3NVJ6W27_cjs.initLogger; }
+  get: function () { return chunkDOR2IU73_cjs.initLogger; }
 });
 Object.defineProperty(exports, "MigrationService", {
   enumerable: true,
