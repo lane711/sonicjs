@@ -5208,11 +5208,11 @@ adminContentRoutes.post("/", async (c) => {
     const now = Date.now();
     const insertStmt = db.prepare(`
       INSERT INTO content (
-        id, collection_id, slug, title, data, status, 
+        id, collection_id, slug, title, data, status,
         scheduled_publish_at, scheduled_unpublish_at,
-        meta_title, meta_description, author_id, created_at, updated_at
+        meta_title, meta_description, author_id, created_by, created_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     await insertStmt.bind(
       contentId,
@@ -5225,6 +5225,7 @@ adminContentRoutes.post("/", async (c) => {
       scheduledUnpublishAt ? new Date(scheduledUnpublishAt).getTime() : null,
       data.meta_title || null,
       data.meta_description || null,
+      user?.userId || "unknown",
       user?.userId || "unknown",
       now,
       now
@@ -5527,10 +5528,10 @@ adminContentRoutes.post("/duplicate", async (c) => {
     originalData.title = `${originalData.title || "Untitled"} (Copy)`;
     const insertStmt = db.prepare(`
       INSERT INTO content (
-        id, collection_id, slug, title, data, status, 
-        author_id, created_at, updated_at
+        id, collection_id, slug, title, data, status,
+        author_id, created_by, created_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     await insertStmt.bind(
       newId,
@@ -5540,6 +5541,7 @@ adminContentRoutes.post("/duplicate", async (c) => {
       JSON.stringify(originalData),
       "draft",
       // Always start as draft
+      user?.userId || "unknown",
       user?.userId || "unknown",
       now,
       now
@@ -20122,5 +20124,5 @@ exports.api_system_default = api_system_default;
 exports.auth_default = auth_default;
 exports.router = router;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-WLQAHDR4.cjs.map
-//# sourceMappingURL=chunk-WLQAHDR4.cjs.map
+//# sourceMappingURL=chunk-23YZ7J3D.cjs.map
+//# sourceMappingURL=chunk-23YZ7J3D.cjs.map

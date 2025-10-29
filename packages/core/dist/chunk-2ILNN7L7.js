@@ -5206,11 +5206,11 @@ adminContentRoutes.post("/", async (c) => {
     const now = Date.now();
     const insertStmt = db.prepare(`
       INSERT INTO content (
-        id, collection_id, slug, title, data, status, 
+        id, collection_id, slug, title, data, status,
         scheduled_publish_at, scheduled_unpublish_at,
-        meta_title, meta_description, author_id, created_at, updated_at
+        meta_title, meta_description, author_id, created_by, created_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     await insertStmt.bind(
       contentId,
@@ -5223,6 +5223,7 @@ adminContentRoutes.post("/", async (c) => {
       scheduledUnpublishAt ? new Date(scheduledUnpublishAt).getTime() : null,
       data.meta_title || null,
       data.meta_description || null,
+      user?.userId || "unknown",
       user?.userId || "unknown",
       now,
       now
@@ -5525,10 +5526,10 @@ adminContentRoutes.post("/duplicate", async (c) => {
     originalData.title = `${originalData.title || "Untitled"} (Copy)`;
     const insertStmt = db.prepare(`
       INSERT INTO content (
-        id, collection_id, slug, title, data, status, 
-        author_id, created_at, updated_at
+        id, collection_id, slug, title, data, status,
+        author_id, created_by, created_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     await insertStmt.bind(
       newId,
@@ -5538,6 +5539,7 @@ adminContentRoutes.post("/duplicate", async (c) => {
       JSON.stringify(originalData),
       "draft",
       // Always start as draft
+      user?.userId || "unknown",
       user?.userId || "unknown",
       now,
       now
@@ -20101,5 +20103,5 @@ var ROUTES_INFO = {
 };
 
 export { ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_faq_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, userRoutes };
-//# sourceMappingURL=chunk-47FCWMG6.js.map
-//# sourceMappingURL=chunk-47FCWMG6.js.map
+//# sourceMappingURL=chunk-2ILNN7L7.js.map
+//# sourceMappingURL=chunk-2ILNN7L7.js.map

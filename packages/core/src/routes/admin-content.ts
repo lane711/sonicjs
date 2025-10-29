@@ -561,13 +561,13 @@ adminContentRoutes.post('/', async (c) => {
     
     const insertStmt = db.prepare(`
       INSERT INTO content (
-        id, collection_id, slug, title, data, status, 
+        id, collection_id, slug, title, data, status,
         scheduled_publish_at, scheduled_unpublish_at,
-        meta_title, meta_description, author_id, created_at, updated_at
+        meta_title, meta_description, author_id, created_by, created_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
-    
+
     await insertStmt.bind(
       contentId,
       collectionId,
@@ -579,6 +579,7 @@ adminContentRoutes.post('/', async (c) => {
       scheduledUnpublishAt ? new Date(scheduledUnpublishAt).getTime() : null,
       data.meta_title || null,
       data.meta_description || null,
+      user?.userId || 'unknown',
       user?.userId || 'unknown',
       now,
       now
@@ -974,12 +975,12 @@ adminContentRoutes.post('/duplicate', async (c) => {
     
     const insertStmt = db.prepare(`
       INSERT INTO content (
-        id, collection_id, slug, title, data, status, 
-        author_id, created_at, updated_at
+        id, collection_id, slug, title, data, status,
+        author_id, created_by, created_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
-    
+
     await insertStmt.bind(
       newId,
       original.collection_id,
@@ -987,6 +988,7 @@ adminContentRoutes.post('/duplicate', async (c) => {
       originalData.title,
       JSON.stringify(originalData),
       'draft', // Always start as draft
+      user?.userId || 'unknown',
       user?.userId || 'unknown',
       now,
       now
