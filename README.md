@@ -94,6 +94,36 @@ npx create-sonicjs@latest my-sonicjs-app
 npm test
 ```
 
+#### Working with Database Migrations
+
+When developing the core package, migrations are located in `packages/core/migrations/`. Your test app will reference these migrations through the npm workspace symlink.
+
+**From your test app directory** (e.g., `my-sonicjs-app/`):
+
+```bash
+# Check migration status (local D1 database)
+wrangler d1 migrations list DB --local
+
+# Apply pending migrations to local database
+wrangler d1 migrations apply DB --local
+
+# Apply migrations to production database
+wrangler d1 migrations apply DB --remote
+```
+
+**Important Notes:**
+- The test app's `wrangler.toml` points to: `migrations_dir = "./node_modules/@sonicjs-cms/core/migrations"`
+- Since the core package is symlinked via npm workspaces, changes to migrations are immediately available
+- After creating new migrations in `packages/core/migrations/`, rebuild the core package: `npm run build:core`
+- Always apply migrations to your test database before running the dev server or tests
+
+**Creating New Migrations:**
+
+1. Create a new migration file in `packages/core/migrations/` following the naming pattern: `NNN_description.sql`
+2. Write your migration SQL (use `CREATE TABLE IF NOT EXISTS` and `INSERT OR IGNORE` for idempotency)
+3. Rebuild the core package: `npm run build:core`
+4. Apply to your test database: `cd my-sonicjs-app && wrangler d1 migrations apply DB --local`
+
 ### Common Commands (For Apps)
 
 ```bash
