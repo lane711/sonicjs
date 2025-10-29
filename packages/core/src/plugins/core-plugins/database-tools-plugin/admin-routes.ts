@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { DatabaseToolsService } from './services/database-service'
-import { renderDatabaseTablePage, DatabaseTablePageData } from '@sonicjs-cms/templates/pages/admin-database-table.template'
+import { renderDatabaseTablePage, DatabaseTablePageData } from '../../../templates/pages/admin-database-table.template'
+import { requireAuth } from '../../../middleware'
 
 type Bindings = {
   DB: D1Database
@@ -16,6 +17,9 @@ type Variables = {
 
 export function createDatabaseToolsAdminRoutes() {
   const router = new Hono<{ Bindings: Bindings; Variables: Variables }>()
+
+  // Apply authentication middleware
+  router.use('*', requireAuth())
 
   // Get database statistics
   router.get('/api/stats', async (c) => {
@@ -198,7 +202,7 @@ export function createDatabaseToolsAdminRoutes() {
 
       const tableName = c.req.param('tableName')
       const page = parseInt(c.req.query('page') || '1')
-      const pageSize = parseInt(c.req.query('pageSize') || '50')
+      const pageSize = parseInt(c.req.query('pageSize') || '20')
       const sortColumn = c.req.query('sort')
       const sortDirection = (c.req.query('dir') || 'asc') as 'asc' | 'desc'
 

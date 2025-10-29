@@ -43,6 +43,22 @@ export function renderDatabaseTablePage(data: DatabaseTablePageData): string {
           </p>
         </div>
         <div class="mt-4 sm:mt-0 flex items-center space-x-3">
+          <div class="flex items-center space-x-2">
+            <label for="pageSize" class="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              Rows per page:
+            </label>
+            <select
+              id="pageSize"
+              onchange="changePageSize(this.value)"
+              class="rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm cursor-pointer"
+            >
+              <option value="10" ${data.pageSize === 10 ? 'selected' : ''}>10</option>
+              <option value="20" ${data.pageSize === 20 ? 'selected' : ''}>20</option>
+              <option value="50" ${data.pageSize === 50 ? 'selected' : ''}>50</option>
+              <option value="100" ${data.pageSize === 100 ? 'selected' : ''}>100</option>
+              <option value="200" ${data.pageSize === 200 ? 'selected' : ''}>200</option>
+            </select>
+          </div>
           <button
             onclick="refreshTableData()"
             class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
@@ -171,6 +187,7 @@ export function renderDatabaseTablePage(data: DatabaseTablePageData): string {
     <script>
       const currentTableName = '${data.tableName}';
       let currentPage = ${data.currentPage};
+      let currentPageSize = ${data.pageSize};
       let currentSort = '${data.sortColumn || ''}';
       let currentSortDir = '${data.sortDirection || 'asc'}';
 
@@ -178,6 +195,7 @@ export function renderDatabaseTablePage(data: DatabaseTablePageData): string {
         if (page < 1 || page > ${totalPages}) return;
         const params = new URLSearchParams();
         params.set('page', page);
+        params.set('pageSize', currentPageSize);
         if (currentSort) {
           params.set('sort', currentSort);
           params.set('dir', currentSortDir);
@@ -193,8 +211,20 @@ export function renderDatabaseTablePage(data: DatabaseTablePageData): string {
 
         const params = new URLSearchParams();
         params.set('page', '1');
+        params.set('pageSize', currentPageSize);
         params.set('sort', column);
         params.set('dir', newDir);
+        window.location.href = \`/admin/database-tools/tables/\${currentTableName}?\${params}\`;
+      }
+
+      function changePageSize(newSize) {
+        const params = new URLSearchParams();
+        params.set('page', '1');
+        params.set('pageSize', newSize);
+        if (currentSort) {
+          params.set('sort', currentSort);
+          params.set('dir', currentSortDir);
+        }
         window.location.href = \`/admin/database-tools/tables/\${currentTableName}?\${params}\`;
       }
 
