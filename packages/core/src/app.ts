@@ -179,6 +179,45 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   app.route('/admin', adminUsersRoutes)
   app.route('/auth', authRoutes)
 
+  // Serve files from R2 storage (public file access)
+  app.get('/files/*', async (c) => {
+    try {
+      // Extract the path from the URL pathname (everything after /files/)
+      const url = new URL(c.req.url)
+      const pathname = url.pathname
+
+      // Remove the /files/ prefix to get the R2 object key
+      const objectKey = pathname.replace(/^\/files\//, '')
+
+      if (!objectKey) {
+        return c.notFound()
+      }
+
+      // Get file from R2
+      const object = await c.env.MEDIA_BUCKET.get(objectKey)
+
+      if (!object) {
+        return c.notFound()
+      }
+
+      // Set appropriate headers
+      const headers = new Headers()
+      object.httpMetadata?.contentType && headers.set('Content-Type', object.httpMetadata.contentType)
+      object.httpMetadata?.contentDisposition && headers.set('Content-Disposition', object.httpMetadata.contentDisposition)
+      headers.set('Cache-Control', 'public, max-age=31536000') // 1 year cache
+      headers.set('Access-Control-Allow-Origin', '*') // Allow CORS for media files
+      headers.set('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS')
+      headers.set('Access-Control-Allow-Headers', 'Content-Type')
+
+      return new Response(object.body as any, {
+        headers
+      })
+    } catch (error) {
+      console.error('Error serving file:', error)
+      return c.notFound()
+    }
+  })
+
   // Custom routes - User-defined routes
   if (config.routes) {
     for (const route of config.routes) {

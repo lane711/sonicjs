@@ -189,8 +189,12 @@ adminApiRoutes.get('/activity', async (c) => {
  */
 const createCollectionSchema = z.object({
   name: z.string().min(1).max(255).regex(/^[a-z0-9_]+$/, 'Must contain only lowercase letters, numbers, and underscores'),
-  display_name: z.string().min(1).max(255),
+  displayName: z.string().min(1).max(255).optional(),
+  display_name: z.string().min(1).max(255).optional(),
   description: z.string().optional()
+}).refine(data => data.displayName || data.display_name, {
+  message: 'Either displayName or display_name is required',
+  path: ['displayName']
 })
 
 const updateCollectionSchema = z.object({
@@ -300,15 +304,16 @@ adminApiRoutes.get('/collections/:id', async (c) => {
     }))
 
     return c.json({
-      data: {
-        ...collection,
-        is_active: collection.is_active === 1,
-        managed: collection.managed === 1,
-        schema: collection.schema ? JSON.parse(collection.schema) : null,
-        created_at: Number(collection.created_at),
-        updated_at: Number(collection.updated_at),
-        fields
-      }
+      id: collection.id,
+      name: collection.name,
+      display_name: collection.display_name,
+      description: collection.description,
+      is_active: collection.is_active === 1,
+      managed: collection.managed === 1,
+      schema: collection.schema ? JSON.parse(collection.schema) : null,
+      created_at: Number(collection.created_at),
+      updated_at: Number(collection.updated_at),
+      fields
     })
   } catch (error) {
     console.error('Error fetching collection:', error)
@@ -322,7 +327,19 @@ adminApiRoutes.get('/collections/:id', async (c) => {
  */
 adminApiRoutes.post('/collections', async (c) => {
     try {
-      const body = await c.req.json()
+      // Validate content type
+      const contentType = c.req.header('Content-Type')
+      if (!contentType || !contentType.includes('application/json')) {
+        return c.json({ error: 'Content-Type must be application/json' }, 400)
+      }
+
+      let body
+      try {
+        body = await c.req.json()
+      } catch (e) {
+        return c.json({ error: 'Invalid JSON in request body' }, 400)
+      }
+
       const validation = createCollectionSchema.safeParse(body)
       if (!validation.success) {
         return c.json({ error: 'Validation failed', details: validation.error.errors }, 400)
@@ -330,6 +347,9 @@ adminApiRoutes.post('/collections', async (c) => {
       const validatedData = validation.data
       const db = c.env.DB
       const user = c.get('user')
+
+      // Handle both camelCase and snake_case for display_name
+      const displayName = validatedData.displayName || validatedData.display_name || ''
 
       // Check if collection already exists
       const existingStmt = db.prepare('SELECT id FROM collections WHERE name = ?')
@@ -374,7 +394,7 @@ adminApiRoutes.post('/collections', async (c) => {
       await insertStmt.bind(
         collectionId,
         validatedData.name,
-        validatedData.display_name,
+        displayName,
         validatedData.description || null,
         JSON.stringify(basicSchema),
         1, // is_active
@@ -391,13 +411,11 @@ adminApiRoutes.post('/collections', async (c) => {
       }
 
       return c.json({
-        data: {
-          id: collectionId,
-          name: validatedData.name,
-          display_name: validatedData.display_name,
-          description: validatedData.description,
-          created_at: now
-        }
+        id: collectionId,
+        name: validatedData.name,
+        displayName: displayName,
+        description: validatedData.description,
+        created_at: now
       }, 201)
     } catch (error) {
       console.error('Error creating collection:', error)
@@ -487,6 +505,14 @@ adminApiRoutes.delete('/collections/:id', async (c) => {
     const id = c.req.param('id')
     const db = c.env.DB
 
+    // Check if collection exists
+    const collectionStmt = db.prepare('SELECT name FROM collections WHERE id = ?')
+    const collection = await collectionStmt.bind(id).first() as any
+
+    if (!collection) {
+      return c.json({ error: 'Collection not found' }, 404)
+    }
+
     // Check if collection has content
     const contentStmt = db.prepare('SELECT COUNT(*) as count FROM content WHERE collection_id = ?')
     const contentResult = await contentStmt.bind(id).first() as any
@@ -496,10 +522,6 @@ adminApiRoutes.delete('/collections/:id', async (c) => {
         error: `Cannot delete collection: it contains ${contentResult.count} content item(s). Delete all content first.`
       }, 400)
     }
-
-    // Get collection name for cache clearing
-    const collectionStmt = db.prepare('SELECT name FROM collections WHERE id = ?')
-    const collection = await collectionStmt.bind(id).first() as any
 
     // Delete collection fields first
     const deleteFieldsStmt = db.prepare('DELETE FROM content_fields WHERE collection_id = ?')
@@ -512,9 +534,7 @@ adminApiRoutes.delete('/collections/:id', async (c) => {
     // Clear cache
     try {
       await c.env.CACHE_KV.delete('cache:collections:all')
-      if (collection) {
-        await c.env.CACHE_KV.delete(`cache:collection:${collection.name}`)
-      }
+      await c.env.CACHE_KV.delete(`cache:collection:${collection.name}`)
     } catch (e) {
       console.error('Error clearing cache:', e)
     }

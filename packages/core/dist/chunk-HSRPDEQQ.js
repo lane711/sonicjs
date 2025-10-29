@@ -1347,6 +1347,24 @@ var PluginBootstrapService = class {
         enableDatabaseCache: true,
         defaultTTL: 3600
       }
+    },
+    {
+      id: "workflow-plugin",
+      name: "workflow-plugin",
+      display_name: "Workflow Management",
+      description: "Content workflow management with approval chains, scheduling, and automation",
+      version: "1.0.0-beta.1",
+      author: "SonicJS Team",
+      category: "content",
+      icon: "\u{1F504}",
+      permissions: ["manage:workflows", "view:workflows", "transition:content"],
+      dependencies: ["content-plugin"],
+      settings: {
+        enableApprovalChains: true,
+        enableScheduling: true,
+        enableAutomation: true,
+        enableNotifications: true
+      }
     }
   ];
   /**
@@ -1459,5 +1477,5 @@ var PluginBootstrapService = class {
 };
 
 export { MigrationService, PluginBootstrapService, PluginService, cleanupRemovedCollections, fullCollectionSync, getAvailableCollectionNames, getManagedCollections, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, syncCollection, syncCollections, validateCollectionConfig };
-//# sourceMappingURL=chunk-CDBVZEWR.js.map
-//# sourceMappingURL=chunk-CDBVZEWR.js.map
+//# sourceMappingURL=chunk-HSRPDEQQ.js.map
+//# sourceMappingURL=chunk-HSRPDEQQ.js.map

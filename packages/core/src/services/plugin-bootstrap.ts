@@ -131,6 +131,25 @@ export class PluginBootstrapService {
         defaultTTL: 3600,
       },
     },
+    {
+      id: "workflow-plugin",
+      name: "workflow-plugin",
+      display_name: "Workflow Management",
+      description:
+        "Content workflow management with approval chains, scheduling, and automation",
+      version: "1.0.0-beta.1",
+      author: "SonicJS Team",
+      category: "content",
+      icon: "🔄",
+      permissions: ["manage:workflows", "view:workflows", "transition:content"],
+      dependencies: ["content-plugin"],
+      settings: {
+        enableApprovalChains: true,
+        enableScheduling: true,
+        enableAutomation: true,
+        enableNotifications: true,
+      },
+    },
   ];
 
   /**

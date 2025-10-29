@@ -94,7 +94,7 @@ apiContentCrudRoutes.post('/', requireAuth(), async (c) => {
       title,
       JSON.stringify(data || {}),
       status || 'draft',
-      user?.userId || 'unknown',
+      user?.userId || 'system',
       now,
       now
     ).run()
