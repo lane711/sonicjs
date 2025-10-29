@@ -4,25 +4,30 @@ import { loginAsAdmin } from './utils/test-helpers';
 test.describe('API Endpoints', () => {
   test('should return health check', async ({ request }) => {
     const response = await request.get('/health');
-    
+
     expect(response.ok()).toBeTruthy();
-    
+
     const health = await response.json();
     expect(health).toHaveProperty('name', 'SonicJS AI');
-    expect(health).toHaveProperty('version', '0.1.0');
+    expect(health).toHaveProperty('version'); // Version comes from core package
+    expect(health.version).toMatch(/^\d+\.\d+\.\d+/); // Semantic versioning
     expect(health).toHaveProperty('status', 'running');
     expect(health).toHaveProperty('timestamp');
   });
 
-  test('should return OpenAPI spec', async ({ request }) => {
+  test('should return API info', async ({ request }) => {
     const response = await request.get('/api');
-    
+
     expect(response.ok()).toBeTruthy();
-    
-    const spec = await response.json();
-    expect(spec).toHaveProperty('openapi');
-    expect(spec).toHaveProperty('info');
-    expect(spec).toHaveProperty('paths');
+
+    const apiInfo = await response.json();
+    expect(apiInfo).toHaveProperty('name', 'SonicJS API');
+    expect(apiInfo).toHaveProperty('version');
+    expect(apiInfo).toHaveProperty('description');
+    expect(apiInfo).toHaveProperty('endpoints');
+    expect(apiInfo.endpoints).toHaveProperty('health');
+    expect(apiInfo.endpoints).toHaveProperty('collections');
+    expect(apiInfo.endpoints).toHaveProperty('content');
   });
 
   test('should require authentication for admin API', async ({ request }) => {
