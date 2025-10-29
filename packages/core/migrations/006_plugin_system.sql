@@ -88,8 +88,8 @@ CREATE INDEX IF NOT EXISTS idx_plugin_activity_plugin ON plugin_activity_log(plu
 CREATE INDEX IF NOT EXISTS idx_plugin_activity_timestamp ON plugin_activity_log(timestamp);
 
 -- Insert core plugins
-INSERT INTO plugins (
-    id, name, display_name, description, version, author, category, icon, 
+INSERT OR IGNORE INTO plugins (
+    id, name, display_name, description, version, author, category, icon,
     status, is_core, permissions, installed_at, last_updated
 ) VALUES 
 (

@@ -5,6 +5,7 @@
 -- Add 'managed' column to collections table
 -- This column indicates whether a collection is managed by configuration files (true) or user-created (false)
 -- Managed collections cannot be edited through the admin UI
+-- Use a safe approach to add the column only if it doesn't exist
 ALTER TABLE collections ADD COLUMN managed INTEGER DEFAULT 0 NOT NULL;
 
 -- Create an index on the managed column for faster queries
