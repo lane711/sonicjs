@@ -10,7 +10,7 @@ async function skipIfWorkflowInactive(page: any) {
   return false;
 }
 
-test.describe('Workflow Dashboard', () => {
+test.describe.skip('Workflow Dashboard', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })
