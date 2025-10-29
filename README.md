@@ -1,6 +1,10 @@
-# SonicJS AI
+# SonicJS
 
 A modern, TypeScript-first headless CMS built for Cloudflare's edge platform with Hono.js.
+
+> **📦 Get Started:** `npx create-sonicjs@latest my-app`
+>
+> **⚠️ Note:** This repository is for **developing the SonicJS core package**. To build an application with SonicJS, use the command above to create a new project.
 
 ## 🚀 Features
 
@@ -44,50 +48,67 @@ A modern, TypeScript-first headless CMS built for Cloudflare's edge platform wit
 
 ## 🏁 Quick Start
 
-### Prerequisites
-- Node.js 20+
-- Cloudflare account
-- Wrangler CLI
+### For Application Developers (Using SonicJS)
 
-### Installation
+If you want to **build an application** with SonicJS:
 
 ```bash
-# Clone the repository
+# Create a new SonicJS application
+npx create-sonicjs@latest my-app
+
+# Navigate to your app
+cd my-app
+
+# Start development server
+npm run dev
+
+# Visit http://localhost:8787
+```
+
+Your app will be created with:
+- ✅ SonicJS CMS pre-configured
+- ✅ Database migrations ready
+- ✅ Example content collections
+- ✅ Admin interface at `/admin`
+- ✅ Ready to deploy to Cloudflare
+
+### For Package Developers (Contributing to SonicJS)
+
+If you want to **contribute to the SonicJS core package**:
+
+```bash
+# Clone this repository
 git clone https://github.com/lane711/sonicjs-ai.git
 cd sonicjs-ai
 
 # Install dependencies
 npm install
 
-# Set up local development database
-npm run db:migrate
+# Build the core package
+npm run build:core
 
-# Start development server
-npm run dev
+# Create a test app to validate changes
+npx create-sonicjs@latest my-sonicjs-app
+
+# Run tests
+npm test
 ```
 
-### Development Commands
+### Common Commands (For Apps)
 
 ```bash
 # Start development server
 npm run dev
 
-# Run tests
-npm test
-
-# Run E2E tests
-npm run test:e2e
-
-# Build for production
-npm run build
-
 # Deploy to Cloudflare
 npm run deploy
 
 # Database operations
-npm run db:generate    # Generate migrations
 npm run db:migrate     # Apply migrations
 npm run db:studio      # Open database studio
+
+# Run tests
+npm test
 ```
 
 ## 📁 Project Structure
@@ -179,25 +200,42 @@ INSERT INTO content_fields (collection_id, field_name, field_type, field_label, 
 
 ## 🚀 Deployment
 
-### Development Setup
-```bash
-# Run database migrations (includes Stage 5 enhancements)
-npm run db:migrate
+### Deploying Your SonicJS Application
 
-# Apply Stage 5 schema updates
-wrangler d1 migrations apply sonicjs-ai --local
+After creating your app with `npx create-sonicjs@latest`:
+
+```bash
+# 1. Configure your Cloudflare project
+# Update wrangler.toml with your project settings
+
+# 2. Create production database
+wrangler d1 create my-app-db
+
+# 3. Apply database migrations
+npm run db:migrate:prod
+
+# 4. Deploy to Cloudflare Workers
+npm run deploy
 ```
 
-### Production Deployment
-```bash
-# Deploy to production
-npm run deploy
+Your app will be live at: `https://your-app.workers.dev`
 
-# Deploy with custom environment
-wrangler deploy --env production
+### Environment Configuration
 
-# Apply migrations to production database
-wrangler d1 migrations apply sonicjs-ai --remote
+```toml
+# wrangler.toml
+name = "my-sonicjs-app"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "my-app-db"
+database_id = "your-database-id"
+
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "my-app-media"
 ```
 
 ## 🧪 Testing
@@ -241,22 +279,25 @@ export default {
 } as Plugin
 ```
 
-## 🌟 Why SonicJS AI?
+## 🌟 Why SonicJS?
 
 ### Edge Performance
 - Global distribution via Cloudflare's network
 - Sub-100ms response times worldwide
 - Automatic scaling and DDoS protection
+- No cold starts - instant responses
 
-### Developer Experience  
+### Developer Experience
 - TypeScript-first with full type safety
 - Hot reload development environment
-- Comprehensive CLI tools and generators
+- `create-sonicjs` CLI for instant setup
+- Comprehensive documentation
 
 ### AI-Friendly Architecture
 - Clean, structured codebase
-- Comprehensive documentation
+- TypeScript types for autocomplete
 - Clear conventions and patterns
+- Built for AI-assisted development
 
 ## 📄 License
 
