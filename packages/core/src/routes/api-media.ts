@@ -172,6 +172,7 @@ apiMediaRoutes.post('/upload', async (c) => {
         size: mediaRecord.size,
         width: mediaRecord.width,
         height: mediaRecord.height,
+        r2_key: mediaRecord.r2_key,
         publicUrl: mediaRecord.public_url,
         thumbnailUrl: mediaRecord.thumbnail_url,
         uploadedAt: new Date(mediaRecord.uploaded_at * 1000).toISOString()
@@ -324,6 +325,7 @@ apiMediaRoutes.post('/upload-multiple', async (c) => {
           size: mediaRecord.size,
           width: mediaRecord.width,
           height: mediaRecord.height,
+          r2_key: mediaRecord.r2_key,
           publicUrl: mediaRecord.public_url,
           thumbnailUrl: mediaRecord.thumbnail_url,
           uploadedAt: new Date(mediaRecord.uploaded_at * 1000).toISOString()

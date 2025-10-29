@@ -31,20 +31,11 @@
       "@sonicjs-cms/templates/*": ["./packages/templates/src/*"]
     }
   },
-  "include": [
-    "src/**/*"
-  ],
+  "include": [],
   "exclude": [
     "node_modules",
     "packages",
     "dist",
-    "src/utils/api-generator.ts",
-    "src/utils/openapi-generator.ts",
-    "src/content/models.ts",
-    "src/content/rich-text.ts",
-    "src/content/versioning.ts",
-    "src/routes/admin-content.ts",
-    "src/components/catalyst/**/*.tsx",
-    "src/plugins/available/email-templates-plugin/**/*"
+    "tests"
   ]
 }

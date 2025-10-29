@@ -92,24 +92,38 @@ npm run db:studio      # Open database studio
 
 ## 📁 Project Structure
 
+This is a **package development monorepo** for building and maintaining the SonicJS CMS npm package.
+
 ```
-src/
-├── routes/           # Hono.js route handlers
-│   ├── admin*.ts     # Admin interface routes
-│   ├── api*.ts       # REST API endpoints
-│   └── auth.ts       # Authentication routes
-├── templates/        # HTML templates & components
-│   ├── layouts/      # Page layouts (admin, public)
-│   ├── pages/        # Full page templates
-│   └── components/   # Reusable UI components
-├── middleware/       # Hono.js middleware
-│   └── auth.ts       # Authentication & authorization
-├── utils/           # Utility functions
-├── scripts/         # Database & deployment scripts
-├── migrations/      # Database migration files
-└── tests/           # Unit & integration tests
-    └── e2e/         # End-to-end test suites
+sonicjs-ai/
+├── packages/
+│   ├── core/              # 📦 Main CMS package (published as @sonicjs-cms/core)
+│   │   ├── src/
+│   │   │   ├── routes/    # All route handlers (admin, API, auth)
+│   │   │   ├── templates/ # HTML templates & components
+│   │   │   ├── middleware/# Authentication & middleware
+│   │   │   ├── utils/     # Utility functions
+│   │   │   └── db/        # Database schemas & migrations
+│   │   └── package.json   # @sonicjs-cms/core
+│   ├── templates/         # Template system package
+│   └── scripts/           # Build scripts & generators
+│
+├── my-sonicjs-app/        # 🧪 Test application (gitignored)
+│   └── ...                # Created with: npx create-sonicjs@latest
+│                          # Used for testing the published package
+│
+├── www/                   # 🌐 Marketing website
+├── tests/e2e/             # End-to-end test suites
+└── drizzle/               # Database migrations
 ```
+
+### Important Notes
+
+⚠️ **This is NOT an application repository** - it's for developing the `@sonicjs-cms/core` npm package.
+
+- **`packages/core/`** - The main package published to npm
+- **`my-sonicjs-app/`** - Test installation for validating the published package (can be deleted/recreated)
+- **No root `src/`** - Application code lives in `packages/core/` or test apps like `my-sonicjs-app/`
 
 ## 🔧 Content Management
 

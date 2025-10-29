@@ -1,0 +1,43 @@
+# SonicJS Monorepo Project Context
+
+## Project Structure
+
+This is a **monorepo** with the following structure:
+
+### Core Package
+- **Location**: `packages/core/`
+- **Contains**: All core CMS functionality including routes, middleware, utilities, templates
+- **Exported routes**: All routes are exported from `@sonicjs-cms/core` package
+- **Published to npm**: Yes, as `@sonicjs-cms/core`
+
+### Package Development Repository
+- **Purpose**: This is a package development monorepo, NOT an application
+- **Main product**: `@sonicjs-cms/core` npm package
+- **No root application**: The old `src/` folder has been removed after migration to packages
+- **Testing**: All application testing happens in `my-sonicjs-app/`
+
+### Test Application
+- **Location**: `my-sonicjs-app/`
+- **Purpose**: Test installation created with `npx create-sonicjs`
+- **Used for**: Testing the published npm package in a real-world scenario
+- **Created via**: `npx create-sonicjs@latest my-sonicjs-app`
+- **Note**: This is a gitignored test folder, can be safely deleted and recreated
+
+### Other Packages
+- `packages/templates/` - Template system
+- `packages/scripts/` - Build scripts
+- `www/` - Marketing website
+
+## Important Notes
+
+1. **This is a PACKAGE DEVELOPMENT repo** - Not an application!
+2. **Primary focus**: Developing and maintaining `@sonicjs-cms/core` npm package
+3. **No root src/**: The old application code has been moved to the package
+4. **Testing applications**: Use `my-sonicjs-app/` for testing the published package
+5. **When developing**:
+   - Modify `packages/core/` for core functionality
+   - Test changes by republishing and installing in `my-sonicjs-app/`
+   - Or use `npm link` for local testing
+
+## Current Focus
+Moving core functionality to npm package for reusability across projects.
