@@ -721,16 +721,119 @@ adminMediaRoutes.put('/:id', async (c) => {
   }
 })
 
+// Cleanup unused media files (HTMX compatible)
+adminMediaRoutes.delete('/cleanup', requireRole('admin'), async (c) => {
+  try {
+    const db = c.env.DB
+
+    // Find all media files
+    const allMediaStmt = db.prepare('SELECT id, r2_key, filename FROM media WHERE deleted_at IS NULL')
+    const { results: allMedia } = await allMediaStmt.all()
+
+    // Find media files referenced in content
+    // Content can reference media in various JSON fields like data, hero_image, etc.
+    const contentStmt = db.prepare('SELECT data FROM content')
+    const { results: contentRecords } = await contentStmt.all()
+
+    // Extract all media URLs from content
+    const referencedUrls = new Set<string>()
+    for (const record of contentRecords) {
+      if (record.data) {
+        const dataStr = typeof record.data === 'string' ? record.data : JSON.stringify(record.data)
+        // Find all /files/ URLs in the content
+        const urlMatches = dataStr.matchAll(/\/files\/([^\s"',]+)/g)
+        for (const match of urlMatches) {
+          referencedUrls.add(match[1]!)
+        }
+      }
+    }
+
+    // Find unreferenced media files
+    const unusedFiles = allMedia.filter((file: any) => !referencedUrls.has(file.r2_key))
+
+    if (unusedFiles.length === 0) {
+      return c.html(html`
+        <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded">
+          No unused media files found. All files are referenced in content.
+        </div>
+        <script>
+          setTimeout(() => {
+            window.location.href = '/admin/media?t=' + Date.now();
+          }, 2000);
+        </script>
+      `)
+    }
+
+    // Delete unused files from R2 and database
+    let deletedCount = 0
+    const errors = []
+
+    for (const file of unusedFiles) {
+      try {
+        // Delete from R2
+        await c.env.MEDIA_BUCKET.delete(file.r2_key)
+
+        // Soft delete in database
+        const deleteStmt = db.prepare('UPDATE media SET deleted_at = ? WHERE id = ?')
+        await deleteStmt.bind(Math.floor(Date.now() / 1000), file.id).run()
+
+        deletedCount++
+      } catch (error) {
+        console.error(`Failed to delete ${file.filename}:`, error)
+        errors.push({
+          filename: file.filename,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        })
+      }
+    }
+
+    // Return success response
+    return c.html(html`
+      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        Successfully cleaned up ${deletedCount} unused media file${deletedCount !== 1 ? 's' : ''}.
+        ${errors.length > 0 ? html`
+          <br><span class="text-sm">Failed to delete ${errors.length} file${errors.length !== 1 ? 's' : ''}.</span>
+        ` : ''}
+      </div>
+
+      ${errors.length > 0 ? html`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p class="font-medium">Cleanup errors:</p>
+          <ul class="list-disc list-inside mt-2 text-sm">
+            ${errors.map(error => html`
+              <li>${error.filename}: ${error.error}</li>
+            `)}
+          </ul>
+        </div>
+      ` : ''}
+
+      <script>
+        // Refresh media library after cleanup
+        setTimeout(() => {
+          window.location.href = '/admin/media?t=' + Date.now();
+        }, 2500);
+      </script>
+    `)
+  } catch (error) {
+    console.error('Cleanup error:', error)
+    return c.html(html`
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        Cleanup failed: ${error instanceof Error ? error.message : 'Unknown error'}
+      </div>
+    `)
+  }
+})
+
 // Delete media file (HTMX compatible)
 adminMediaRoutes.delete('/:id', async (c) => {
   try {
     const user = c.get('user')
     const fileId = c.req.param('id')
-    
+
     // Get file record
     const stmt = c.env.DB.prepare('SELECT * FROM media WHERE id = ? AND deleted_at IS NULL')
     const fileRecord = await stmt.bind(fileId).first() as any
-    
+
     if (!fileRecord) {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">

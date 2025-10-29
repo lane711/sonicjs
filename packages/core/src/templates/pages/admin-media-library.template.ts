@@ -152,8 +152,10 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                 </button>
                 <button
                   class="w-full text-left px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-lg transition-colors"
-                  hx-delete="/media/cleanup"
+                  hx-delete="/admin/media/cleanup"
                   hx-confirm="Delete unused files?"
+                  hx-target="body"
+                  hx-swap="beforeend"
                 >
                   Cleanup Unused
                 </button>

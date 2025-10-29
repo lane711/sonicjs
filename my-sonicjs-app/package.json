@@ -5,7 +5,7 @@
   "description": "A SonicJS headless CMS application",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "wrangler dev 2>&1 | grep -v '\\[wrangler:inf\\]'",
     "deploy": "wrangler deploy",
     "db:migrate": "wrangler d1 migrations apply DB",
     "db:migrate:local": "wrangler d1 migrations apply DB --local",

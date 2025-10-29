@@ -9171,8 +9171,10 @@ function renderMediaLibraryPage(data) {
                 </button>
                 <button
                   class="w-full text-left px-3 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-lg transition-colors"
-                  hx-delete="/media/cleanup"
+                  hx-delete="/admin/media/cleanup"
                   hx-confirm="Delete unused files?"
+                  hx-target="body"
+                  hx-swap="beforeend"
                 >
                   Cleanup Unused
                 </button>
@@ -10771,6 +10773,87 @@ adminMediaRoutes.put("/:id", async (c) => {
     return c.html(html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
         Update failed: ${error instanceof Error ? error.message : "Unknown error"}
+      </div>
+    `);
+  }
+});
+adminMediaRoutes.delete("/cleanup", requireRole("admin"), async (c) => {
+  try {
+    const db = c.env.DB;
+    const allMediaStmt = db.prepare("SELECT id, r2_key, filename FROM media WHERE deleted_at IS NULL");
+    const { results: allMedia } = await allMediaStmt.all();
+    const contentStmt = db.prepare("SELECT data FROM content");
+    const { results: contentRecords } = await contentStmt.all();
+    const referencedUrls = /* @__PURE__ */ new Set();
+    for (const record of contentRecords) {
+      if (record.data) {
+        const dataStr = typeof record.data === "string" ? record.data : JSON.stringify(record.data);
+        const urlMatches = dataStr.matchAll(/\/files\/([^\s"',]+)/g);
+        for (const match of urlMatches) {
+          referencedUrls.add(match[1]);
+        }
+      }
+    }
+    const unusedFiles = allMedia.filter((file) => !referencedUrls.has(file.r2_key));
+    if (unusedFiles.length === 0) {
+      return c.html(html`
+        <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded">
+          No unused media files found. All files are referenced in content.
+        </div>
+        <script>
+          setTimeout(() => {
+            window.location.href = '/admin/media?t=' + Date.now();
+          }, 2000);
+        </script>
+      `);
+    }
+    let deletedCount = 0;
+    const errors = [];
+    for (const file of unusedFiles) {
+      try {
+        await c.env.MEDIA_BUCKET.delete(file.r2_key);
+        const deleteStmt = db.prepare("UPDATE media SET deleted_at = ? WHERE id = ?");
+        await deleteStmt.bind(Math.floor(Date.now() / 1e3), file.id).run();
+        deletedCount++;
+      } catch (error) {
+        console.error(`Failed to delete ${file.filename}:`, error);
+        errors.push({
+          filename: file.filename,
+          error: error instanceof Error ? error.message : "Unknown error"
+        });
+      }
+    }
+    return c.html(html`
+      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        Successfully cleaned up ${deletedCount} unused media file${deletedCount !== 1 ? "s" : ""}.
+        ${errors.length > 0 ? html`
+          <br><span class="text-sm">Failed to delete ${errors.length} file${errors.length !== 1 ? "s" : ""}.</span>
+        ` : ""}
+      </div>
+
+      ${errors.length > 0 ? html`
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p class="font-medium">Cleanup errors:</p>
+          <ul class="list-disc list-inside mt-2 text-sm">
+            ${errors.map((error) => html`
+              <li>${error.filename}: ${error.error}</li>
+            `)}
+          </ul>
+        </div>
+      ` : ""}
+
+      <script>
+        // Refresh media library after cleanup
+        setTimeout(() => {
+          window.location.href = '/admin/media?t=' + Date.now();
+        }, 2500);
+      </script>
+    `);
+  } catch (error) {
+    console.error("Cleanup error:", error);
+    return c.html(html`
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        Cleanup failed: ${error instanceof Error ? error.message : "Unknown error"}
       </div>
     `);
   }
@@ -20018,5 +20101,5 @@ var ROUTES_INFO = {
 };
 
 export { ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_faq_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, userRoutes };
-//# sourceMappingURL=chunk-IA3MG3ET.js.map
-//# sourceMappingURL=chunk-IA3MG3ET.js.map
+//# sourceMappingURL=chunk-47FCWMG6.js.map
+//# sourceMappingURL=chunk-47FCWMG6.js.map

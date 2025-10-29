@@ -87,13 +87,12 @@ test.describe('Media Thumbnail Loading', () => {
     });
 
     console.log('Image naturalWidth:', naturalWidth);
-    expect(naturalWidth).toBeGreaterThan(0);
 
-    // Also verify we can fetch the image URL directly
-    console.log('Fetching image URL:', imageSrc);
+    // Also verify we can fetch the image URL directly - do this FIRST for better debugging
+    console.log('Fetching image URL directly:', imageSrc);
     const response = await page.request.get(imageSrc!);
     console.log('Response status:', response.status());
-    console.log('Response headers:', response.headers());
+    console.log('Response headers:', JSON.stringify(response.headers(), null, 2));
 
     if (response.status() !== 200) {
       const body = await response.text();
@@ -102,6 +101,9 @@ test.describe('Media Thumbnail Loading', () => {
 
     expect(response.status()).toBe(200);
     expect(response.headers()['content-type']).toContain('image');
+
+    // If the fetch works, then check naturalWidth
+    expect(naturalWidth).toBeGreaterThan(0);
   });
 
   test('should display all uploaded images without broken thumbnails', async ({ page }) => {

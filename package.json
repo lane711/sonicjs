@@ -4,9 +4,11 @@
   "private": true,
   "workspaces": [
     "packages/*",
-    "www"
+    "www",
+    "my-sonicjs-app"
   ],
   "scripts": {
+    "dev": "npm run dev --workspace=my-sonicjs-app",
     "dev:www": "npm run dev --workspace=www",
     "build:www": "npm run build --workspace=www",
     "build:core": "npm run build --workspace=@sonicjs-cms/core",
