@@ -126,7 +126,6 @@ export const Header = forwardRef<
       <div className="flex items-center gap-5">
         <nav className="hidden md:block">
           <ul role="list" className="flex items-center gap-8">
-            <TopLevelNavItem href="/blog">Blog</TopLevelNavItem>
             <SocialLink
               href="https://github.com/lane711/sonicjs"
               icon={GitHubIcon}
