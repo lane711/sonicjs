@@ -138,7 +138,8 @@ test.describe('Media Management', () => {
     const mediaItems = page.locator('.media-item');
 
     if (await mediaItems.count() === 0) {
-      await expect(page.getByText(/No media files|Upload your first file|No files found/i)).toBeVisible();
+      // Use .first() to handle strict mode violation when multiple elements match
+      await expect(page.getByText(/No media files|Upload your first file|No files found/i).first()).toBeVisible();
     }
   });
 
@@ -190,7 +191,7 @@ test.describe('Media Management', () => {
       }
     } else {
       // If no items, that's also valid - should show empty state
-      await expect(page.getByText(/No media files|Upload your first file/i)).toBeVisible();
+      await expect(page.getByText(/No media files|Upload your first file/i).first()).toBeVisible();
     }
   });
 

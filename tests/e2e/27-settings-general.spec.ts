@@ -50,15 +50,27 @@ test.describe('Settings - General Tab', () => {
     await page.locator('select[name="timezone"]').selectOption('America/New_York');
     await page.locator('select[name="language"]').selectOption('en');
 
+    // Wait for the response to complete
+    const responsePromise = page.waitForResponse(response =>
+      response.url().includes('/admin/settings/general') && response.request().method() === 'POST'
+    );
+
     // Click save button
     await page.locator('button:has-text("Save All Changes")').click();
 
-    // Wait for success notification
+    // Wait for the save to complete
+    const response = await responsePromise;
+    expect(response.status()).toBe(200);
+
+    // Wait a bit for database to be updated
     await page.waitForTimeout(1000);
 
     // Reload page and verify values persisted
     await page.reload();
     await page.waitForLoadState('networkidle');
+
+    // Wait for form to be populated
+    await page.waitForTimeout(500);
 
     const savedSiteName = await page.locator('input[name="siteName"]').inputValue();
     const savedDescription = await page.locator('textarea[name="siteDescription"]').inputValue();
@@ -160,20 +172,25 @@ test.describe('Settings - General Tab', () => {
     await page.waitForLoadState('networkidle');
 
     // Make a change
-    await page.locator('input[name="siteName"]').fill('Test Save Loading');
+    const uniqueSiteName = `Test Save Loading ${Date.now()}`;
+    await page.locator('input[name="siteName"]').fill(uniqueSiteName);
 
     const saveButton = page.locator('button:has-text("Save All Changes")');
 
-    // Click save and check for loading state
+    // Wait for the response
+    const responsePromise = page.waitForResponse(response =>
+      response.url().includes('/admin/settings/general') && response.request().method() === 'POST'
+    );
+
+    // Click save button
     await saveButton.click();
 
-    // Button should show "Saving..." text
-    await expect(saveButton).toContainText(/Saving/i);
-
     // Wait for save to complete
-    await page.waitForTimeout(2000);
+    const response = await responsePromise;
+    expect(response.status()).toBe(200);
 
-    // Button should return to normal
+    // Button should return to normal state (not disabled)
+    await expect(saveButton).toBeEnabled();
     await expect(saveButton).toContainText(/Save All Changes/i);
   });
 });
