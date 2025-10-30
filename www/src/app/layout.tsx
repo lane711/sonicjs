@@ -9,8 +9,15 @@ import '@/styles/tailwind.css'
 
 export const metadata: Metadata = {
   title: {
-    template: '%s - Protocol API Reference',
-    default: 'Protocol API Reference',
+    template: '%s - SonicJS Documentation',
+    default: 'SonicJS - Modern Headless CMS',
+  },
+  description: 'SonicJS is a modern, blazingly fast headless CMS built with TypeScript, Hono, and Cloudflare Workers.',
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
   },
 }
 
