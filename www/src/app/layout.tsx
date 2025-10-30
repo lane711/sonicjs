@@ -25,19 +25,34 @@ export const metadata: Metadata = {
   },
 }
 
+async function getAllSections() {
+  // In production/Workers, fast-glob won't work, so we return empty
+  // The sections are only needed for navigation which is client-side
+  if (typeof process === 'undefined' || !process.cwd) {
+    return {}
+  }
+
+  try {
+    let pages = await glob('**/*.mdx', { cwd: 'src/app' })
+    let allSectionsEntries = (await Promise.all(
+      pages.map(async (filename) => [
+        '/' + filename.replace(/(^|\/)page\.mdx$/, ''),
+        (await import(`./${filename}`)).sections,
+      ]),
+    )) as Array<[string, Array<Section>]>
+    return Object.fromEntries(allSectionsEntries)
+  } catch (error) {
+    console.warn('Failed to load sections:', error)
+    return {}
+  }
+}
+
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  let pages = await glob('**/*.mdx', { cwd: 'src/app' })
-  let allSectionsEntries = (await Promise.all(
-    pages.map(async (filename) => [
-      '/' + filename.replace(/(^|\/)page\.mdx$/, ''),
-      (await import(`./${filename}`)).sections,
-    ]),
-  )) as Array<[string, Array<Section>]>
-  let allSections = Object.fromEntries(allSectionsEntries)
+  let allSections = await getAllSections()
 
   return (
     <html lang="en" className="h-full" suppressHydrationWarning>
