@@ -291,6 +291,21 @@ export function Navigation(props: React.ComponentPropsWithoutRef<'nav'>) {
         <TopLevelNavItem href="/">Documentation</TopLevelNavItem>
         <TopLevelNavItem href="https://github.com/lane711/sonicjs">GitHub</TopLevelNavItem>
         <TopLevelNavItem href="https://github.com/lane711/sonicjs/discussions">Community</TopLevelNavItem>
+        <li className="relative mt-6">
+          <a
+            href="https://github.com/lane711/sonicjs"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-zinc-900 to-zinc-800 dark:from-zinc-800 dark:to-zinc-700 px-4 py-3 text-sm font-semibold text-white shadow-lg hover:shadow-xl transition-all hover:scale-105"
+          >
+            <span>🙏 Star</span>
+            <span>⭐</span>
+            <span>us on Github</span>
+            <svg className="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+        </li>
         {navigation.map((group, groupIndex) => (
           <NavigationGroup
             key={group.title}
