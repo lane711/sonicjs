@@ -1,10 +1,8 @@
-'use strict';
-
 // src/services/collection-loader.ts
 async function loadCollectionConfigs() {
   const collections = [];
   try {
-    const modules = undefined?.("../collections/*.collection.ts", { eager: true }) || {};
+    const modules = import.meta.glob?.("../collections/*.collection.ts", { eager: true }) || {};
     for (const [path, module] of Object.entries(modules)) {
       try {
         const configModule = module;
@@ -46,7 +44,7 @@ async function loadCollectionConfig(name) {
 }
 async function getAvailableCollectionNames() {
   try {
-    const modules = undefined?.("../collections/*.collection.ts") || {};
+    const modules = import.meta.glob?.("../collections/*.collection.ts") || {};
     const names = [];
     for (const path of Object.keys(modules)) {
       const match = path.match(/\/([^/]+)\.collection\.ts$/);
@@ -956,6 +954,10 @@ INSERT OR IGNORE INTO content (
       case "011":
       case "012":
       case "013":
+      case "014":
+      case "015":
+      case "016":
+      case "017":
         return "";
       default:
         return null;
@@ -1488,18 +1490,6 @@ var PluginBootstrapService = class {
   }
 };
 
-exports.MigrationService = MigrationService;
-exports.PluginBootstrapService = PluginBootstrapService;
-exports.PluginService = PluginService;
-exports.cleanupRemovedCollections = cleanupRemovedCollections;
-exports.fullCollectionSync = fullCollectionSync;
-exports.getAvailableCollectionNames = getAvailableCollectionNames;
-exports.getManagedCollections = getManagedCollections;
-exports.isCollectionManaged = isCollectionManaged;
-exports.loadCollectionConfig = loadCollectionConfig;
-exports.loadCollectionConfigs = loadCollectionConfigs;
-exports.syncCollection = syncCollection;
-exports.syncCollections = syncCollections;
-exports.validateCollectionConfig = validateCollectionConfig;
-//# sourceMappingURL=chunk-32MTGVH3.cjs.map
-//# sourceMappingURL=chunk-32MTGVH3.cjs.map
+export { MigrationService, PluginBootstrapService, PluginService, cleanupRemovedCollections, fullCollectionSync, getAvailableCollectionNames, getManagedCollections, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, syncCollection, syncCollections, validateCollectionConfig };
+//# sourceMappingURL=chunk-4MBTSUI6.js.map
+//# sourceMappingURL=chunk-4MBTSUI6.js.map

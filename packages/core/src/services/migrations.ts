@@ -806,7 +806,12 @@ INSERT OR IGNORE INTO content (
       case '011':
       case '012':
       case '013':
+      case '014':
+      case '015':
+      case '016':
+      case '017':
         // These migrations are skipped - either obsolete or have errors
+        // Migrations should be run via: wrangler d1 migrations apply DB --local
         return ''
       default:
         return null
