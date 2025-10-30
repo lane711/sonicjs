@@ -1,6 +1,6 @@
 {
   "name": "create-sonicjs",
-  "version": "2.0.0-beta.10",
+  "version": "2.0.1-beta.10",
   "description": "Create a new SonicJS application with zero configuration",
   "type": "module",
   "bin": {
