@@ -291,7 +291,7 @@ export function Navigation(props: React.ComponentPropsWithoutRef<'nav'>) {
         <TopLevelNavItem href="/">Documentation</TopLevelNavItem>
         <TopLevelNavItem href="https://github.com/lane711/sonicjs">GitHub</TopLevelNavItem>
         <TopLevelNavItem href="https://github.com/lane711/sonicjs/discussions">Community</TopLevelNavItem>
-        <li className="relative mt-6">
+        <li className="relative mb-3">
           <a
             href="https://github.com/lane711/sonicjs"
             target="_blank"

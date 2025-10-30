@@ -31,20 +31,16 @@ For production deployment, you'll also need a **Cloudflare account** with access
 
 ## Quick Start
 
-Get SonicJS running locally with these simple commands:
+Create a new SonicJS application with a single command. The setup is fully automated and takes less than 60 seconds:
 
-<CodeGroup title="60-Second Setup">
+<CodeGroup title="One-Command Setup">
 
 ```bash
-# Clone the repository
-git clone https://github.com/lane711/sonicjs.git
-cd sonicjs
+# Create a new SonicJS application
+npx create-sonicjs my-app
 
-# Install dependencies
-npm install
-
-# Run database migrations
-npm run db:migrate
+# Navigate to your project
+cd my-app
 
 # Start development server
 npm run dev
@@ -54,12 +50,18 @@ npm run dev
 
 </CodeGroup>
 
+The `create-sonicjs` command automatically:
+- ✅ Creates a new project directory
+- ✅ Installs all dependencies
+- ✅ Sets up the database schema
+- ✅ Configures Cloudflare Workers
+- ✅ Creates the admin user
+- ✅ Runs initial migrations
+
 Your SonicJS instance will be available at **http://localhost:8787**
 
 <Note>
 Access the admin dashboard at [http://localhost:8787/admin](http://localhost:8787/admin)
-
-Default credentials: `admin@sonicjs.com` / `admin123`
 </Note>
 
 ---
