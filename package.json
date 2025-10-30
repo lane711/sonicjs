@@ -21,7 +21,16 @@
     "e2e:ui": "playwright test --config=tests/playwright.config.ts --ui",
     "prepare": "husky",
     "type-check": "npm run type-check --workspace=@sonicjs-cms/core",
-    "lint": "npm run type-check"
+    "lint": "npm run type-check",
+    "version:patch": "npm version patch --workspace=@sonicjs-cms/core --no-git-tag-version && node scripts/sync-versions.js",
+    "version:minor": "npm version minor --workspace=@sonicjs-cms/core --no-git-tag-version && node scripts/sync-versions.js",
+    "version:major": "npm version major --workspace=@sonicjs-cms/core --no-git-tag-version && node scripts/sync-versions.js",
+    "publish:core": "npm run build:core && npm publish --workspace=@sonicjs-cms/core",
+    "publish:create-app": "npm publish --workspace=create-sonicjs",
+    "publish:all": "npm run publish:core && npm run publish:create-app",
+    "release:patch": "npm run version:patch && npm run publish:all",
+    "release:minor": "npm run version:minor && npm run publish:all",
+    "release:major": "npm run version:major && npm run publish:all"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
