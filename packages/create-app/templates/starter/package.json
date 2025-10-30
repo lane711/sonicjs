@@ -18,15 +18,15 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250620.0",
-    "@types/node": "^20.19.1",
-    "drizzle-kit": "^0.30.0",
-    "drizzle-orm": "^0.44.2",
-    "hono": "^4.7.3",
-    "typescript": "^5.8.3",
-    "vitest": "^2.1.8",
-    "wrangler": "^3.110.0",
-    "zod": "^3.25.67"
+    "@cloudflare/workers-types": "^4.20251014.0",
+    "@types/node": "^24.9.2",
+    "drizzle-kit": "^0.30.3",
+    "drizzle-orm": "^0.44.7",
+    "hono": "^4.10.4",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.5",
+    "wrangler": "^3.110.4",
+    "zod": "^4.1.12"
   },
   "engines": {
     "node": ">=18.0.0"

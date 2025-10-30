@@ -40,10 +40,10 @@
   "dependencies": {
     "prompts": "^2.4.2",
     "kleur": "^4.1.5",
-    "ora": "^8.0.1",
-    "execa": "^9.5.2",
+    "ora": "^8.1.3",
+    "execa": "^10.0.0",
     "fs-extra": "^11.2.0",
-    "validate-npm-package-name": "^6.0.0"
+    "validate-npm-package-name": "^7.0.0"
   },
   "engines": {
     "node": ">=18.0.0"

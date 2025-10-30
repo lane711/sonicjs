@@ -92,20 +92,20 @@
     "zod": "^3.0.0"
   },
   "dependencies": {
-    "drizzle-zod": "^0.8.2",
-    "marked": "^15.0.12",
+    "drizzle-zod": "^0.8.3",
+    "marked": "^16.4.1",
     "highlight.js": "^11.11.1",
-    "semver": "^7.7.2"
+    "semver": "^7.7.3"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250620.0",
-    "@types/node": "^20.19.1",
-    "drizzle-orm": "^0.44.2",
-    "hono": "^4.10.1",
-    "tsup": "^8.0.0",
-    "typescript": "^5.8.3",
-    "vitest": "^2.1.8",
-    "zod": "^3.25.67"
+    "@cloudflare/workers-types": "^4.20251014.0",
+    "@types/node": "^24.9.2",
+    "drizzle-orm": "^0.44.7",
+    "hono": "^4.10.4",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.5",
+    "zod": "^4.1.12"
   },
   "engines": {
     "node": ">=18.0.0"
