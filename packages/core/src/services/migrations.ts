@@ -54,7 +54,17 @@ export class MigrationService {
       { id: '003', name: 'Stage 5 Enhancements', filename: '003_stage5_enhancements.sql', description: 'Enhanced content management and media handling' },
       { id: '004', name: 'User Management', filename: '004_stage6_user_management.sql', description: 'Advanced user management with roles and permissions' },
       { id: '005', name: 'Workflow & Automation', filename: '005_stage7_workflow_automation.sql', description: 'Workflow states, automation rules, and scheduled content' },
-      { id: '006', name: 'Plugin System', filename: '006_plugin_system.sql', description: 'Plugin registration and configuration system' }
+      { id: '006', name: 'Plugin System', filename: '006_plugin_system.sql', description: 'Plugin registration and configuration system' },
+      { id: '007', name: 'Demo Login Plugin', filename: '007_demo_login_plugin.sql', description: 'Demo login functionality' },
+      { id: '008', name: 'Fix Slug Validation', filename: '008_fix_slug_validation.sql', description: 'Fix slug validation in content' },
+      { id: '009', name: 'System Logging', filename: '009_system_logging.sql', description: 'System logging and audit trails' },
+      { id: '011', name: 'Config Managed Collections', filename: '011_config_managed_collections.sql', description: 'Configuration for managed collections' },
+      { id: '012', name: 'Testimonials Plugin', filename: '012_testimonials_plugin.sql', description: 'Testimonials plugin and collection' },
+      { id: '013', name: 'Code Examples Plugin', filename: '013_code_examples_plugin.sql', description: 'Code examples plugin and collection' },
+      { id: '014', name: 'Fix Plugin Registry', filename: '014_fix_plugin_registry.sql', description: 'Fix plugin registry issues' },
+      { id: '015', name: 'Add Remaining Plugins', filename: '015_add_remaining_plugins.sql', description: 'Add remaining core plugins' },
+      { id: '016', name: 'Remove Duplicate Cache Plugin', filename: '016_remove_duplicate_cache_plugin.sql', description: 'Remove duplicate cache plugin entries' },
+      { id: '017', name: 'Auth Configurable Fields', filename: '017_auth_configurable_fields.sql', description: 'Configurable authentication fields' }
     ]
 
     // Get applied migrations from database

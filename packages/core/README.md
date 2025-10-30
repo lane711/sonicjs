@@ -5,6 +5,22 @@
 [![Version](https://img.shields.io/npm/v/@sonicjs-cms/core)](https://www.npmjs.com/package/@sonicjs-cms/core)
 [![License](https://img.shields.io/npm/l/@sonicjs-cms/core)](./LICENSE)
 
+---
+
+## 🏠 New to SonicJS?
+
+**Visit [sonicjs.com](https://sonicjs.com) for full documentation and guides.**
+
+To create a new SonicJS project, use:
+
+```bash
+npx create-sonicjs my-app
+```
+
+This is the recommended way to get started with SonicJS. It sets up everything you need with a single command.
+
+---
+
 ## ✨ Features
 
 - 🚀 **Edge-First**: Runs on Cloudflare Workers for sub-50ms global response times

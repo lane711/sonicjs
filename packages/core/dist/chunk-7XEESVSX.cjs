@@ -281,6 +281,39 @@ function renderAdminLayoutCatalyst(data) {
   <!-- Notification Container -->
   <div id="notification-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
+  <!-- Migration Warning Banner (hidden by default) -->
+  <div id="migration-banner" class="hidden fixed top-0 left-0 right-0 z-50 bg-amber-500 dark:bg-amber-600 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between flex-wrap">
+        <div class="flex items-center flex-1">
+          <span class="flex p-2 rounded-lg bg-amber-600 dark:bg-amber-700">
+            <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </span>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-white">
+              <span id="migration-count"></span> pending database migration(s) detected
+            </p>
+            <p class="text-xs text-amber-100 dark:text-amber-200 mt-1">
+              Run: <code class="bg-amber-700 dark:bg-amber-800 px-2 py-0.5 rounded font-mono text-white">wrangler d1 migrations apply DB --local</code>
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <a href="/admin/settings/migrations" class="text-xs font-semibold text-white hover:text-amber-100 underline">
+            View Details
+          </a>
+          <button onclick="closeMigrationBanner()" class="p-1 rounded-md text-white hover:bg-amber-600 dark:hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-white">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Mobile sidebar toggle
     function openMobileSidebar() {
@@ -349,6 +382,44 @@ function renderAdminLayoutCatalyst(data) {
     if (localStorage.getItem('darkMode') === 'false') {
       document.documentElement.classList.remove('dark');
     }
+
+    // Migration banner functions
+    function closeMigrationBanner() {
+      const banner = document.getElementById('migration-banner');
+      if (banner) {
+        banner.classList.add('hidden');
+        // Store in session storage so it doesn't show again during this session
+        sessionStorage.setItem('migrationBannerDismissed', 'true');
+      }
+    }
+
+    // Check for pending migrations on page load
+    async function checkPendingMigrations() {
+      // Don't check if user dismissed the banner in this session
+      if (sessionStorage.getItem('migrationBannerDismissed') === 'true') {
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/migrations/status');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.pendingMigrations > 0) {
+            const banner = document.getElementById('migration-banner');
+            const countElement = document.getElementById('migration-count');
+            if (banner && countElement) {
+              countElement.textContent = data.pendingMigrations;
+              banner.classList.remove('hidden');
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to check migration status:', error);
+      }
+    }
+
+    // Check for pending migrations when the page loads
+    document.addEventListener('DOMContentLoaded', checkPendingMigrations);
   </script>
 </body>
 </html>`;
@@ -3691,5 +3762,5 @@ exports.renderLogo = renderLogo;
 exports.renderPagination = renderPagination;
 exports.renderTable = renderTable;
 exports.renderTestimonialsList = renderTestimonialsList;
-//# sourceMappingURL=chunk-3SPQ3J4N.cjs.map
-//# sourceMappingURL=chunk-3SPQ3J4N.cjs.map
+//# sourceMappingURL=chunk-7XEESVSX.cjs.map
+//# sourceMappingURL=chunk-7XEESVSX.cjs.map

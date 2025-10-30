@@ -1,6 +1,6 @@
 'use strict';
 
-var chunk3JMOWGUU_cjs = require('./chunk-3JMOWGUU.cjs');
+var chunk32MTGVH3_cjs = require('./chunk-32MTGVH3.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 var jwt = require('hono/jwt');
 var cookie = require('hono/cookie');
@@ -19,16 +19,16 @@ function bootstrapMiddleware() {
     try {
       console.log("[Bootstrap] Starting system initialization...");
       console.log("[Bootstrap] Running database migrations...");
-      const migrationService = new chunk3JMOWGUU_cjs.MigrationService(c.env.DB);
+      const migrationService = new chunk32MTGVH3_cjs.MigrationService(c.env.DB);
       await migrationService.runPendingMigrations();
       console.log("[Bootstrap] Syncing collection configurations...");
       try {
-        await chunk3JMOWGUU_cjs.syncCollections(c.env.DB);
+        await chunk32MTGVH3_cjs.syncCollections(c.env.DB);
       } catch (error) {
         console.error("[Bootstrap] Error syncing collections:", error);
       }
       console.log("[Bootstrap] Bootstrapping core plugins...");
-      const bootstrapService = new chunk3JMOWGUU_cjs.PluginBootstrapService(c.env.DB);
+      const bootstrapService = new chunk32MTGVH3_cjs.PluginBootstrapService(c.env.DB);
       const needsBootstrap = await bootstrapService.isBootstrapNeeded();
       if (needsBootstrap) {
         await bootstrapService.bootstrapCorePlugins();
@@ -219,5 +219,5 @@ exports.requirePermission = requirePermission;
 exports.requireRole = requireRole;
 exports.securityHeaders = securityHeaders;
 exports.securityLoggingMiddleware = securityLoggingMiddleware;
-//# sourceMappingURL=chunk-IM5SDXOE.cjs.map
-//# sourceMappingURL=chunk-IM5SDXOE.cjs.map
+//# sourceMappingURL=chunk-MGQXIMSS.cjs.map
+//# sourceMappingURL=chunk-MGQXIMSS.cjs.map
