@@ -1,4 +1,3 @@
-import glob from 'fast-glob'
 import { type Metadata } from 'next'
 
 import { Providers } from '@/app/providers'
@@ -26,13 +25,21 @@ export const metadata: Metadata = {
 }
 
 async function getAllSections() {
-  // In production/Workers, fast-glob won't work, so we return empty
-  // The sections are only needed for navigation which is client-side
-  if (typeof process === 'undefined' || !process.cwd) {
+  // Check if we're in a Node.js environment with filesystem access
+  // In Cloudflare Workers, process.versions will be undefined or won't have 'node'
+  const isNodeEnvironment = typeof process !== 'undefined' &&
+                           process.versions &&
+                           process.versions.node
+
+  if (!isNodeEnvironment) {
+    // Running in Cloudflare Workers - return empty sections
+    // The sections are baked into the static HTML at build time
     return {}
   }
 
   try {
+    // Dynamically import glob only when in Node.js environment
+    const { default: glob } = await import('fast-glob')
     let pages = await glob('**/*.mdx', { cwd: 'src/app' })
     let allSectionsEntries = (await Promise.all(
       pages.map(async (filename) => [
