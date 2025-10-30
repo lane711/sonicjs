@@ -7,6 +7,10 @@ import { type Section } from '@/components/SectionProvider'
 
 import '@/styles/tailwind.css'
 
+// Force static rendering at build time
+export const dynamic = 'force-static'
+export const dynamicParams = false
+
 export const metadata: Metadata = {
   title: {
     template: '%s - SonicJS Documentation',
