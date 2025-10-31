@@ -34,3 +34,4 @@ yarn-error.log*
 
 # Testing
 coverage/
+src/app/allSections.json
