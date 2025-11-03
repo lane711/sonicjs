@@ -130,3 +130,24 @@ export function Property({
     </li>
   )
 }
+
+export function ResponseGroup({
+  title,
+  children,
+}: {
+  title?: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className="my-6">
+      {title && (
+        <h4 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-white">
+          {title}
+        </h4>
+      )}
+      <div className="not-prose">
+        {children}
+      </div>
+    </div>
+  )
+}

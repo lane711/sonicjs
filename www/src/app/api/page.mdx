@@ -1,28 +1,1012 @@
 export const metadata = {
   title: 'API Reference',
-  description: 'Complete API reference for SonicJS headless CMS',
+  description: 'Complete REST API reference for SonicJS headless CMS',
 }
+
+export const sections = [
+  { title: 'Introduction', id: 'introduction' },
+  { title: 'Authentication', id: 'authentication' },
+  { title: 'Collections', id: 'collections' },
+  { title: 'Content Management', id: 'content-management' },
+  { title: 'Media Management', id: 'media-management' },
+  { title: 'System Endpoints', id: 'system-endpoints' },
+  { title: 'Filtering & Querying', id: 'filtering' },
+  { title: 'Caching', id: 'caching' },
+  { title: 'Error Handling', id: 'error-handling' },
+]
 
 # API Reference
 
-## Coming Soon
+SonicJS provides a comprehensive REST API for managing content, collections, media, and authentication programmatically. Built on Cloudflare Workers with a three-tiered caching system for optimal performance. {{ className: 'lead' }}
 
-This page is currently under construction. We're working on comprehensive API documentation for all SonicJS endpoints.
+---
 
-### What to Expect
+## Introduction {{ id: 'introduction' }}
 
-- **Complete endpoint documentation** - All available API endpoints
-- **Request/response examples** - Real-world usage examples
-- **Authentication patterns** - How to authenticate API requests
-- **Rate limiting** - Understanding API rate limits
-- **Error handling** - Common errors and how to handle them
+### Base URL
 
-### In the Meantime
+```
+https://your-domain.com/api
+```
 
-Check out our other documentation sections:
+For local development:
+```
+http://localhost:8787/api
+```
 
-- [Quickstart](/quickstart) - Get started with your first API call
-- [Authentication](/authentication) - Learn about JWT authentication
-- [Collections](/collections) - Understand data structures
+### Interactive API Documentation
 
-For immediate help, visit our [Community](/community) page or check the [FAQ](/faq).
+SonicJS includes an interactive API explorer powered by Scalar UI. Access it at:
+```
+http://localhost:8787/docs
+```
+
+### OpenAPI Specification
+
+Get the complete OpenAPI 3.0 specification:
+
+```bash
+curl -X GET "http://localhost:8787/api/"
+```
+
+---
+
+## Authentication {{ id: 'authentication' }}
+
+Most API endpoints require authentication. SonicJS uses JWT (JSON Web Tokens) with HTTP-only cookies for web clients and Bearer tokens for API clients.
+
+### Login
+
+Get an access token by authenticating with your credentials.
+
+<CodeGroup title="Login Request">
+
+```bash {{ title: 'cURL' }}
+curl -X POST "http://localhost:8787/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@sonicjs.com",
+    "password": "admin123"
+  }'
+```
+
+```js {{ title: 'JavaScript' }}
+const response = await fetch('http://localhost:8787/auth/login', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    email: 'admin@sonicjs.com',
+    password: 'admin123',
+  }),
+});
+
+const { user, token } = await response.json();
+```
+
+```python {{ title: 'Python' }}
+import requests
+
+response = requests.post('http://localhost:8787/auth/login', json={
+    'email': 'admin@sonicjs.com',
+    'password': 'admin123'
+})
+
+data = response.json()
+token = data['token']
+```
+
+</CodeGroup>
+
+<ResponseGroup title="Login Response">
+
+```json {{ title: '200 Success' }}
+{
+  "user": {
+    "id": "admin-user-id",
+    "email": "admin@sonicjs.com",
+    "username": "admin",
+    "firstName": "Admin",
+    "lastName": "User",
+    "role": "admin"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+```json {{ title: '401 Error' }}
+{
+  "error": "Invalid email or password"
+}
+```
+
+</ResponseGroup>
+
+### Using the Token
+
+Include the token in the Authorization header for all authenticated requests:
+
+```http
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+For browser-based applications, the token is automatically stored as an HTTP-only cookie named `auth_token`.
+
+### Register
+
+Create a new user account.
+
+<CodeGroup title="Register Request">
+
+```bash {{ title: 'cURL' }}
+curl -X POST "http://localhost:8787/auth/register" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "newuser@example.com",
+    "password": "securepassword123",
+    "username": "newuser",
+    "firstName": "John",
+    "lastName": "Doe"
+  }'
+```
+
+```js {{ title: 'JavaScript' }}
+const response = await fetch('http://localhost:8787/auth/register', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    email: 'newuser@example.com',
+    password: 'securepassword123',
+    username: 'newuser',
+    firstName: 'John',
+    lastName: 'Doe',
+  }),
+});
+
+const { user, token } = await response.json();
+```
+
+</CodeGroup>
+
+### Get Current User
+
+Get information about the currently authenticated user.
+
+<CodeGroup title="Get User Request">
+
+```bash {{ title: 'cURL' }}
+curl -X GET "http://localhost:8787/auth/me" \
+  -H "Authorization: Bearer {token}"
+```
+
+```js {{ title: 'JavaScript' }}
+const response = await fetch('http://localhost:8787/auth/me', {
+  headers: {
+    'Authorization': `Bearer ${token}`,
+  },
+});
+
+const { user } = await response.json();
+```
+
+</CodeGroup>
+
+### Refresh Token
+
+Refresh your access token before it expires.
+
+```bash
+curl -X POST "http://localhost:8787/auth/refresh" \
+  -H "Authorization: Bearer {token}"
+```
+
+### Logout
+
+End your session.
+
+```bash
+curl -X POST "http://localhost:8787/auth/logout"
+```
+
+---
+
+## Collections {{ id: 'collections' }}
+
+### List All Collections
+
+Retrieve all active collections with their schemas.
+
+**Authentication:** None required
+**Cache:** 5 minutes
+
+<CodeGroup title="List Collections">
+
+```bash {{ title: 'cURL' }}
+curl -X GET "http://localhost:8787/api/collections"
+```
+
+```js {{ title: 'JavaScript' }}
+const response = await fetch('http://localhost:8787/api/collections');
+const { data, meta } = await response.json();
+```
+
+```python {{ title: 'Python' }}
+import requests
+
+response = requests.get('http://localhost:8787/api/collections')
+data = response.json()
+```
+
+</CodeGroup>
+
+<ResponseGroup title="Collections Response">
+
+```json {{ title: '200 Success' }}
+{
+  "data": [
+    {
+      "id": "blog-posts-collection-id",
+      "name": "blog-posts",
+      "display_name": "Blog Posts",
+      "description": "Blog posts collection",
+      "schema": {
+        "name": "blog-posts",
+        "displayName": "Blog Posts",
+        "fields": [
+          {
+            "name": "title",
+            "type": "text",
+            "label": "Title",
+            "required": true
+          },
+          {
+            "name": "content",
+            "type": "richtext",
+            "label": "Content"
+          },
+          {
+            "name": "featuredImage",
+            "type": "media",
+            "label": "Featured Image"
+          }
+        ]
+      },
+      "is_active": 1,
+      "created_at": 1730000000,
+      "updated_at": 1730000000
+    }
+  ],
+  "meta": {
+    "count": 1,
+    "timestamp": "2025-10-06T12:34:56.789Z",
+    "cache": {
+      "hit": false,
+      "source": "database"
+    },
+    "timing": {
+      "total": 45,
+      "execution": 12,
+      "unit": "ms"
+    }
+  }
+}
+```
+
+</ResponseGroup>
+
+---
+
+## Content Management {{ id: 'content-management' }}
+
+### List All Content
+
+Retrieve all content items with pagination and filtering.
+
+**Authentication:** None required
+**Cache:** 5 minutes
+
+**Query Parameters:**
+- `limit` - Maximum items to return (default: 50, max: 100)
+- `offset` - Number of items to skip for pagination
+- `sort` - Sort field (prefix with `-` for descending)
+- `filter` - Advanced filtering (see [Filtering & Querying](#filtering))
+
+<CodeGroup title="List Content">
+
+```bash {{ title: 'cURL' }}
+curl -X GET "http://localhost:8787/api/content?limit=10"
+```
+
+```js {{ title: 'JavaScript' }}
+const response = await fetch('http://localhost:8787/api/content?limit=10');
+const { data, meta } = await response.json();
+```
+
+```python {{ title: 'Python' }}
+import requests
+
+response = requests.get('http://localhost:8787/api/content', params={
+    'limit': 10
+})
+data = response.json()
+```
+
+</CodeGroup>
+
+### Get Content by Collection
+
+Retrieve content for a specific collection.
+
+**Authentication:** None required
+**Cache:** 5 minutes
+
+<CodeGroup title="Get Collection Content">
+
+```bash {{ title: 'cURL' }}
+curl -X GET "http://localhost:8787/api/collections/blog-posts/content?limit=25"
+```
+
+```js {{ title: 'JavaScript' }}
+const response = await fetch(
+  'http://localhost:8787/api/collections/blog-posts/content?limit=25'
+);
+const { data, meta } = await response.json();
+```
+
+</CodeGroup>
+
+### Get Single Content Item
+
+Retrieve a specific content item by ID.
+
+**Authentication:** None required
+**Cache:** 5 minutes
+
+<CodeGroup title="Get Content">
+
+```bash {{ title: 'cURL' }}
+curl -X GET "http://localhost:8787/api/content/{id}"
+```
+
+```js {{ title: 'JavaScript' }}
+const response = await fetch(`http://localhost:8787/api/content/${id}`);
+const { data } = await response.json();
+```
+
+</CodeGroup>
+
+### Create Content
+
+Create a new content item.
+
+**Authentication:** Required
+**Permissions:** Editor or Admin role
+
+<CodeGroup title="Create Content">
+
+```bash {{ title: 'cURL' }}
+curl -X POST "http://localhost:8787/api/content" \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "collectionId": "blog-posts-collection-id",
+    "title": "My New Blog Post",
+    "slug": "my-new-blog-post",
+    "status": "draft",
+    "data": {
+      "title": "My New Blog Post",
+      "content": "<p>This is my blog post content...</p>",
+      "excerpt": "A brief description"
+    }
+  }'
+```
+
+```js {{ title: 'JavaScript' }}
+const response = await fetch('http://localhost:8787/api/content', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    collectionId: 'blog-posts-collection-id',
+    title: 'My New Blog Post',
+    slug: 'my-new-blog-post',
+    status: 'draft',
+    data: {
+      title: 'My New Blog Post',
+      content: '<p>This is my blog post content...</p>',
+      excerpt: 'A brief description',
+    },
+  }),
+});
+
+const { data } = await response.json();
+```
+
+</CodeGroup>
+
+### Update Content
+
+Update an existing content item.
+
+**Authentication:** Required
+**Permissions:** Content owner, Editor, or Admin role
+
+<CodeGroup title="Update Content">
+
+```bash {{ title: 'cURL' }}
+curl -X PUT "http://localhost:8787/api/content/{id}" \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Updated Blog Post Title",
+    "status": "published",
+    "data": {
+      "title": "Updated Blog Post Title",
+      "content": "<p>Updated content...</p>"
+    }
+  }'
+```
+
+```js {{ title: 'JavaScript' }}
+const response = await fetch(`http://localhost:8787/api/content/${id}`, {
+  method: 'PUT',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    title: 'Updated Blog Post Title',
+    status: 'published',
+    data: {
+      title: 'Updated Blog Post Title',
+      content: '<p>Updated content...</p>',
+    },
+  }),
+});
+
+const { data } = await response.json();
+```
+
+</CodeGroup>
+
+### Delete Content
+
+Delete a content item.
+
+**Authentication:** Required
+**Permissions:** Content owner, Editor, or Admin role
+
+<CodeGroup title="Delete Content">
+
+```bash {{ title: 'cURL' }}
+curl -X DELETE "http://localhost:8787/api/content/{id}" \
+  -H "Authorization: Bearer {token}"
+```
+
+```js {{ title: 'JavaScript' }}
+const response = await fetch(`http://localhost:8787/api/content/${id}`, {
+  method: 'DELETE',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+  },
+});
+
+const { success } = await response.json();
+```
+
+</CodeGroup>
+
+---
+
+## Media Management {{ id: 'media-management' }}
+
+All media endpoints require authentication.
+
+### Upload Single File
+
+Upload a file to Cloudflare R2 storage.
+
+**Authentication:** Required
+**Content-Type:** `multipart/form-data`
+**Max File Size:** 50MB
+
+**Supported File Types:**
+- Images: JPEG, PNG, GIF, WebP, SVG
+- Documents: PDF, TXT, DOC, DOCX
+- Videos: MP4, WebM, OGG, AVI, MOV
+- Audio: MP3, WAV, OGG, M4A
+
+<CodeGroup title="Upload File">
+
+```bash {{ title: 'cURL' }}
+curl -X POST "http://localhost:8787/api/media/upload" \
+  -H "Authorization: Bearer {token}" \
+  -F "file=@/path/to/image.jpg" \
+  -F "folder=blog-images"
+```
+
+```js {{ title: 'JavaScript' }}
+const formData = new FormData();
+formData.append('file', fileInput.files[0]);
+formData.append('folder', 'blog-images');
+
+const response = await fetch('http://localhost:8787/api/media/upload', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+  },
+  body: formData,
+});
+
+const { success, file } = await response.json();
+```
+
+</CodeGroup>
+
+<ResponseGroup title="Upload Response">
+
+```json {{ title: '200 Success' }}
+{
+  "success": true,
+  "file": {
+    "id": "V1StGXR8_Z5jdHi6B",
+    "filename": "V1StGXR8_Z5jdHi6B.jpg",
+    "originalName": "my-image.jpg",
+    "mimeType": "image/jpeg",
+    "size": 245678,
+    "width": 1920,
+    "height": 1080,
+    "publicUrl": "https://pub-sonicjs-media-dev.r2.dev/blog-images/V1StGXR8_Z5jdHi6B.jpg",
+    "thumbnailUrl": "https://imagedelivery.net/account-id/blog-images/V1StGXR8_Z5jdHi6B.jpg/thumbnail",
+    "uploadedAt": "2025-10-06T12:34:56.789Z"
+  }
+}
+```
+
+```json {{ title: '400 Error' }}
+{
+  "error": "File validation failed",
+  "details": [
+    {
+      "code": "too_big",
+      "message": "File size exceeds 50MB limit",
+      "path": ["size"]
+    }
+  ]
+}
+```
+
+</ResponseGroup>
+
+### Upload Multiple Files
+
+Upload multiple files in a single request.
+
+**Authentication:** Required
+
+<CodeGroup title="Upload Multiple Files">
+
+```bash {{ title: 'cURL' }}
+curl -X POST "http://localhost:8787/api/media/upload-multiple" \
+  -H "Authorization: Bearer {token}" \
+  -F "files=@/path/to/image1.jpg" \
+  -F "files=@/path/to/image2.png" \
+  -F "folder=gallery"
+```
+
+```js {{ title: 'JavaScript' }}
+const formData = new FormData();
+for (const file of fileInput.files) {
+  formData.append('files', file);
+}
+formData.append('folder', 'gallery');
+
+const response = await fetch('http://localhost:8787/api/media/upload-multiple', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+  },
+  body: formData,
+});
+
+const { success, uploaded, errors, summary } = await response.json();
+```
+
+</CodeGroup>
+
+### Update File Metadata
+
+Update file metadata (alt text, caption, tags, folder).
+
+**Authentication:** Required
+**Permissions:** Uploader or Admin role
+
+<CodeGroup title="Update File">
+
+```bash {{ title: 'cURL' }}
+curl -X PATCH "http://localhost:8787/api/media/{id}" \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "alt": "Beautiful sunset over the ocean",
+    "caption": "Sunset at Malibu Beach",
+    "tags": ["nature", "sunset", "ocean"],
+    "folder": "featured-images"
+  }'
+```
+
+```js {{ title: 'JavaScript' }}
+const response = await fetch(`http://localhost:8787/api/media/${id}`, {
+  method: 'PATCH',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    alt: 'Beautiful sunset over the ocean',
+    caption: 'Sunset at Malibu Beach',
+    tags: ['nature', 'sunset', 'ocean'],
+    folder: 'featured-images',
+  }),
+});
+
+const { success } = await response.json();
+```
+
+</CodeGroup>
+
+### Delete File
+
+Delete a single file.
+
+**Authentication:** Required
+**Permissions:** Uploader or Admin role
+
+<CodeGroup title="Delete File">
+
+```bash {{ title: 'cURL' }}
+curl -X DELETE "http://localhost:8787/api/media/{id}" \
+  -H "Authorization: Bearer {token}"
+```
+
+```js {{ title: 'JavaScript' }}
+const response = await fetch(`http://localhost:8787/api/media/${id}`, {
+  method: 'DELETE',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+  },
+});
+
+const { success } = await response.json();
+```
+
+</CodeGroup>
+
+### Bulk Delete Files
+
+Delete multiple files in a single request.
+
+**Authentication:** Required
+**Max Files:** 50 per request
+
+<CodeGroup title="Bulk Delete">
+
+```bash {{ title: 'cURL' }}
+curl -X POST "http://localhost:8787/api/media/bulk-delete" \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fileIds": ["file-id-1", "file-id-2", "file-id-3"]
+  }'
+```
+
+```js {{ title: 'JavaScript' }}
+const response = await fetch('http://localhost:8787/api/media/bulk-delete', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    fileIds: ['file-id-1', 'file-id-2', 'file-id-3'],
+  }),
+});
+
+const { success, deleted, errors, summary } = await response.json();
+```
+
+</CodeGroup>
+
+### Bulk Move Files
+
+Move multiple files to a different folder.
+
+**Authentication:** Required
+**Max Files:** 50 per request
+
+<CodeGroup title="Bulk Move">
+
+```bash {{ title: 'cURL' }}
+curl -X POST "http://localhost:8787/api/media/bulk-move" \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fileIds": ["file-id-1", "file-id-2"],
+    "targetFolder": "archived"
+  }'
+```
+
+</CodeGroup>
+
+---
+
+## System Endpoints {{ id: 'system-endpoints' }}
+
+### Health Check
+
+Check API and system health.
+
+**Authentication:** None required
+
+<CodeGroup title="Health Check">
+
+```bash {{ title: 'cURL' }}
+curl -X GET "http://localhost:8787/api/health"
+```
+
+```js {{ title: 'JavaScript' }}
+const response = await fetch('http://localhost:8787/api/health');
+const { status, schemas } = await response.json();
+```
+
+</CodeGroup>
+
+### System Information
+
+Get system information and available features.
+
+**Authentication:** None required
+
+```bash
+curl -X GET "http://localhost:8787/api/system/info"
+```
+
+### System Statistics
+
+Get database statistics (content count, media count, user count).
+
+**Authentication:** Admin role required
+
+```bash
+curl -X GET "http://localhost:8787/api/system/stats" \
+  -H "Authorization: Bearer {token}"
+```
+
+### Database Ping
+
+Check database connectivity and latency.
+
+**Authentication:** None required
+
+```bash
+curl -X GET "http://localhost:8787/api/system/ping"
+```
+
+---
+
+## Filtering & Querying {{ id: 'filtering' }}
+
+SonicJS provides powerful filtering capabilities for content queries.
+
+### Filter Operators
+
+| Operator | Description | Example |
+|----------|-------------|---------|
+| `equals` | Exact match | `filter[status][equals]=published` |
+| `not_equals` | Not equal | `filter[status][not_equals]=draft` |
+| `greater_than` | Greater than | `filter[price][greater_than]=100` |
+| `less_than` | Less than | `filter[price][less_than]=1000` |
+| `like` | Case-insensitive search | `filter[title][like]=javascript` |
+| `contains` | String contains | `filter[tags][contains]=tutorial` |
+| `in` | Value in list | `filter[category][in]=blog,news` |
+| `not_in` | Value not in list | `filter[status][not_in]=draft,archived` |
+| `exists` | Field exists | `filter[featuredImage][exists]=true` |
+
+### Filter Examples
+
+**Simple equality filter:**
+```bash
+curl "http://localhost:8787/api/content?filter[status][equals]=published"
+```
+
+**Multiple filters (AND logic):**
+```bash
+curl "http://localhost:8787/api/content?\
+filter[status][equals]=published&\
+filter[category][equals]=blog&\
+filter[price][less_than]=100"
+```
+
+**Search with LIKE:**
+```bash
+curl "http://localhost:8787/api/content?filter[title][like]=getting started"
+```
+
+**Filter with IN operator:**
+```bash
+curl "http://localhost:8787/api/content?filter[category][in]=blog,tutorial,guide"
+```
+
+**Date range filter:**
+```bash
+curl "http://localhost:8787/api/content?\
+filter[created_at][greater_than]=2025-01-01&\
+filter[created_at][less_than]=2025-12-31"
+```
+
+### Sorting
+
+Sort results by any field. Prefix with `-` for descending order.
+
+```bash
+# Sort by created_at descending
+curl "http://localhost:8787/api/content?sort=-created_at"
+
+# Sort by title ascending
+curl "http://localhost:8787/api/content?sort=title"
+```
+
+### Pagination
+
+Use `limit` and `offset` for pagination.
+
+```bash
+# Get first 10 items
+curl "http://localhost:8787/api/content?limit=10&offset=0"
+
+# Get next 10 items
+curl "http://localhost:8787/api/content?limit=10&offset=10"
+```
+
+---
+
+## Caching {{ id: 'caching' }}
+
+SonicJS implements a three-tiered caching system for optimal performance.
+
+### Cache Tiers
+
+1. **Memory Cache** - In-memory cache (fastest, ~1-3ms)
+2. **KV Cache** - Cloudflare KV storage (fast, ~5-15ms)
+3. **Database** - D1 database (slower, ~20-50ms)
+
+### Cache Headers
+
+Every API response includes cache information:
+
+```http
+X-Cache-Status: HIT
+X-Cache-Source: memory
+X-Cache-TTL: 278
+X-Response-Time: 3ms
+```
+
+**Headers:**
+- `X-Cache-Status` - `HIT` or `MISS`
+- `X-Cache-Source` - `memory`, `kv`, or `database`
+- `X-Cache-TTL` - Remaining TTL in seconds (cache hits only)
+- `X-Response-Time` - Total response time
+
+### Cache TTLs
+
+| Resource | TTL | Memory | KV |
+|----------|-----|--------|-----|
+| API responses | 5 min | ✓ | ✓ |
+| Collections | 2 hours | ✓ | ✓ |
+| Content | 1 hour | ✓ | ✓ |
+| User data | 15 min | ✓ | ✓ |
+| Media metadata | 1 hour | ✓ | ✓ |
+
+### Cache Invalidation
+
+Caches are automatically invalidated when:
+- Content is created, updated, or deleted
+- Collections are modified
+- Media files are uploaded or deleted
+- User permissions change
+
+---
+
+## Error Handling {{ id: 'error-handling' }}
+
+SonicJS uses standard HTTP status codes and returns consistent error responses.
+
+### HTTP Status Codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 201 | Created |
+| 400 | Bad Request |
+| 401 | Unauthorized |
+| 403 | Forbidden |
+| 404 | Not Found |
+| 500 | Internal Server Error |
+
+### Error Response Format
+
+```json
+{
+  "error": "Error message",
+  "details": [
+    {
+      "code": "validation_error",
+      "message": "Field is required",
+      "path": ["fieldName"]
+    }
+  ]
+}
+```
+
+### Common Errors
+
+**401 Unauthorized:**
+```json
+{
+  "error": "Authentication required"
+}
+```
+
+**403 Forbidden:**
+```json
+{
+  "error": "Insufficient permissions"
+}
+```
+
+**404 Not Found:**
+```json
+{
+  "error": "Resource not found"
+}
+```
+
+**400 Validation Error:**
+```json
+{
+  "error": "Validation failed",
+  "details": [
+    {
+      "code": "invalid_type",
+      "message": "Expected string, received number",
+      "path": ["title"]
+    }
+  ]
+}
+```
+
+---
+
+## Rate Limiting
+
+Currently, SonicJS does not enforce rate limits. This may change in future versions.
+
+For production deployments, consider implementing rate limiting at the Cloudflare Workers level using:
+- [Cloudflare Rate Limiting](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)
+- Custom middleware using Cloudflare KV
+
+---
+
+## Next Steps
+
+- [Authentication Guide](/authentication) - Deep dive into authentication and RBAC
+- [Collections](/collections) - Learn about collection schemas and field types
+- [Caching](/caching) - Understand the caching system in detail
+- [Testing](/testing) - Write tests for your API integrations
+
+For questions or support, visit our [Community](/community) page.

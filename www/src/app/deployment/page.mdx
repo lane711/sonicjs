@@ -3,27 +3,980 @@ export const metadata = {
   description: 'Deploy SonicJS to Cloudflare Workers and production environments',
 }
 
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Prerequisites', id: 'prerequisites' },
+  { title: 'Database Setup', id: 'database-setup' },
+  { title: 'R2 Storage Setup', id: 'r2-storage-setup' },
+  { title: 'KV Cache Setup', id: 'kv-cache-setup' },
+  { title: 'Environment Variables', id: 'environment-variables' },
+  { title: 'Deployment Workflow', id: 'deployment-workflow' },
+  { title: 'Custom Domains', id: 'custom-domains' },
+  { title: 'Production Checklist', id: 'production-checklist' },
+  { title: 'Monitoring', id: 'monitoring' },
+  { title: 'Rollback Procedures', id: 'rollback-procedures' },
+  { title: 'Troubleshooting', id: 'troubleshooting' },
+]
+
 # Production Deployment
 
-## Coming Soon
+Complete guide for deploying SonicJS to production on Cloudflare's global edge platform. {{ className: 'lead' }}
 
-This page is currently under construction. We're working on comprehensive deployment documentation for SonicJS.
+---
 
-### What to Expect
+## Overview {{ id: 'overview' }}
 
-- **Cloudflare Workers deployment** - Step-by-step deployment guide
-- **Environment setup** - Configuring production environments
-- **Production configuration** - Optimization and security settings
-- **CI/CD pipelines** - Automated deployment workflows
-- **Monitoring and logging** - Production observability
-- **Scaling strategies** - Handling high traffic
+SonicJS runs on Cloudflare's global edge network, providing:
 
-### In the Meantime
+- **Cloudflare Workers** - Serverless runtime at 300+ edge locations
+- **D1 Database** - SQLite-based distributed database at the edge
+- **R2 Object Storage** - S3-compatible storage for media files
+- **KV Storage** - Low-latency key-value storage for caching
+- **Zero cold starts** - Instant response times globally
 
-Check out our other documentation sections:
+### Architecture
 
-- [Installation](/installation) - Get started with local development
-- [Testing](/testing) - Ensure your app is production-ready
-- [Database](/database) - Configure production databases
+```
+┌─────────────────────────────────────────────────────────┐
+│                   Cloudflare Edge                        │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
+│  │   Workers    │  │  D1 Database │  │  R2 Storage  │  │
+│  │  (Runtime)   │──│  (SQLite)    │  │   (Media)    │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  │
+│         │                                   │            │
+│         └───────────── KV Cache ────────────┘            │
+└─────────────────────────────────────────────────────────┘
+```
 
-For immediate help, visit our [Community](/community) page or check the [FAQ](/faq).
+### Deployment Environments
+
+SonicJS supports three environments:
+
+| Environment | Database | R2 Bucket | Domain |
+|-------------|----------|-----------|--------|
+| Development | local D1 | dev bucket | localhost:8787 |
+| Preview | shared D1 | preview bucket | preview.workers.dev |
+| Production | prod D1 | prod bucket | yourdomain.com |
+
+---
+
+## Prerequisites {{ id: 'prerequisites' }}
+
+### Required Accounts
+
+1. **Cloudflare Account**
+   - Sign up at [dash.cloudflare.com/sign-up](https://dash.cloudflare.com/sign-up)
+   - Workers Paid plan ($5/month minimum)
+   - Payment method on file
+
+2. **Domain Name** (optional but recommended)
+   - Can use `workers.dev` subdomain for testing
+   - Custom domain recommended for production
+
+### Required Tools
+
+Install the necessary tools:
+
+<CodeGroup title="Install Tools">
+
+```bash {{ title: 'Node.js & npm' }}
+# Verify Node.js 18+ is installed
+node --version  # Should be v18.0.0 or higher
+npm --version
+```
+
+```bash {{ title: 'Wrangler CLI' }}
+# Install Wrangler globally
+npm install -g wrangler@latest
+wrangler --version  # Should be v3.0.0 or higher
+```
+
+```bash {{ title: 'Git' }}
+# Verify Git is installed
+git --version
+```
+
+</CodeGroup>
+
+### Login to Cloudflare
+
+Authenticate with your Cloudflare account:
+
+```bash
+# Login to Cloudflare
+wrangler login
+
+# This will:
+# 1. Open browser for authentication
+# 2. Save credentials locally
+# 3. Verify account access
+
+# Verify login
+wrangler whoami
+```
+
+---
+
+## Database Setup {{ id: 'database-setup' }}
+
+### Create Production Database
+
+Create a new D1 database for production:
+
+<CodeGroup title="Create Database">
+
+```bash {{ title: 'Create D1' }}
+# Create a new D1 database
+wrangler d1 create sonicjs-ai
+
+# Output example:
+# ✅ Successfully created DB 'sonicjs-ai'
+#
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "sonicjs-ai"
+# database_id = "583c089c-1a4a-477d-9d58-06c07bf7c1d7"
+```
+
+```bash {{ title: 'Update Config' }}
+# Copy the database ID and update wrangler.toml:
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "sonicjs-ai"
+database_id = "YOUR-DATABASE-ID-HERE"
+```
+
+</CodeGroup>
+
+### Apply Database Migrations
+
+Apply all database migrations to production:
+
+<CodeGroup title="Run Migrations">
+
+```bash {{ title: 'Using npm script' }}
+# Apply migrations to production
+npm run db:migrate:prod
+```
+
+```bash {{ title: 'Using Wrangler' }}
+# Manually with wrangler
+wrangler d1 migrations apply DB --env production
+
+# This will:
+# 1. Read migration files from drizzle/migrations/
+# 2. Apply them in order to production D1
+# 3. Track applied migrations
+```
+
+</CodeGroup>
+
+### Verify Database Schema
+
+Check that all tables were created:
+
+```bash
+# List tables in production database
+wrangler d1 execute sonicjs-ai --env production \
+  --command="SELECT name FROM sqlite_master WHERE type='table';"
+
+# Expected tables:
+# - users
+# - collections
+# - content
+# - content_versions
+# - media
+# - api_tokens
+# - plugins
+# - plugin_routes
+# - plugin_hooks
+```
+
+### Seed Initial Data
+
+Create an admin user and initial collections:
+
+<CodeGroup title="Seed Data">
+
+```bash {{ title: 'Create Admin User' }}
+wrangler d1 execute sonicjs-ai --env production --command="
+INSERT INTO users (id, email, username, first_name, last_name, role, is_active, created_at, updated_at)
+VALUES (
+  'admin-' || lower(hex(randomblob(16))),
+  'admin@yourdomain.com',
+  'admin',
+  'Admin',
+  'User',
+  'admin',
+  1,
+  strftime('%s', 'now') * 1000,
+  strftime('%s', 'now') * 1000
+);
+"
+```
+
+```bash {{ title: 'From SQL File' }}
+# Use a production seed script
+wrangler d1 execute sonicjs-ai --env production \
+  --file=./scripts/seed-production-content.sql
+```
+
+</CodeGroup>
+
+---
+
+## R2 Storage Setup {{ id: 'r2-storage-setup' }}
+
+### Create R2 Bucket
+
+Create an R2 bucket for media storage:
+
+<CodeGroup title="Create R2 Bucket">
+
+```bash {{ title: 'Create Bucket' }}
+# Create R2 bucket for production
+wrangler r2 bucket create sonicjs-media-prod
+
+# Verify creation
+wrangler r2 bucket list
+
+# Output:
+# sonicjs-media-dev
+# sonicjs-media-preview
+# sonicjs-media-prod
+```
+
+```toml {{ title: 'Update Config' }}
+# Add to wrangler.toml
+[[env.production.r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "sonicjs-media-prod"
+```
+
+</CodeGroup>
+
+### Configure Custom Domain (Optional)
+
+Set up a custom domain for public media access:
+
+```bash
+# In Cloudflare Dashboard:
+# 1. Go to R2 > sonicjs-media-prod > Settings
+# 2. Click "Connect Domain"
+# 3. Enter: media.yourdomain.com
+# 4. DNS records will be created automatically
+
+# This allows public access to media files via:
+# https://media.yourdomain.com/uploads/image.jpg
+```
+
+### Bucket Organization
+
+Recommended folder structure:
+
+```
+sonicjs-media-prod/
+├── uploads/          # User uploaded media
+├── avatars/          # User avatar images
+├── thumbnails/       # Generated thumbnails
+├── documents/        # PDF and documents
+└── temp/            # Temporary files (auto-cleanup)
+```
+
+### Supported File Types
+
+- **Images**: JPEG, PNG, GIF, WebP, SVG
+- **Documents**: PDF, TXT, DOC, DOCX
+- **Videos**: MP4, WebM, OGG, AVI, MOV
+- **Audio**: MP3, WAV, OGG, M4A
+- **Max File Size**: 50MB
+
+---
+
+## KV Cache Setup {{ id: 'kv-cache-setup' }}
+
+### Create KV Namespace
+
+Create a KV namespace for caching:
+
+<CodeGroup title="Create KV Namespace">
+
+```bash {{ title: 'Production Namespace' }}
+# Create KV namespace for cache
+wrangler kv:namespace create "CACHE_KV" --env production
+
+# Output:
+# ✅ Created namespace with id "7171ca98640e43b6b33dbff516a5a6cf"
+```
+
+```bash {{ title: 'Preview Namespace' }}
+# Create preview namespace
+wrangler kv:namespace create "CACHE_KV" --env production --preview
+
+# Output:
+# ✅ Created preview namespace with id "aed99543752d438b8051a0b6809ced10"
+```
+
+```toml {{ title: 'Update Config' }}
+# Add to wrangler.toml
+[[env.production.kv_namespaces]]
+binding = "CACHE_KV"
+id = "7171ca98640e43b6b33dbff516a5a6cf"
+preview_id = "aed99543752d438b8051a0b6809ced10"
+```
+
+</CodeGroup>
+
+### Verify KV Access
+
+Test KV namespace access:
+
+```bash
+# List all KV namespaces
+wrangler kv:namespace list
+
+# Test write
+wrangler kv:key put --binding CACHE_KV --env production "test" "Hello"
+
+# Test read
+wrangler kv:key get --binding CACHE_KV --env production "test"
+
+# Delete test key
+wrangler kv:key delete --binding CACHE_KV --env production "test"
+```
+
+### Cache Usage
+
+The cache plugin uses KV for:
+- API response caching (5 min TTL)
+- Collection metadata caching (2 hour TTL)
+- Content caching (1 hour TTL)
+- Admin dashboard stats (15 min TTL)
+
+Cache keys follow the pattern:
+```
+cache:api:collections:all
+cache:api:content-list:limit:50
+cache:collection-content:blog-posts:limit:50
+```
+
+---
+
+## Environment Variables {{ id: 'environment-variables' }}
+
+### Required Secrets
+
+Set up required secrets for production:
+
+<CodeGroup title="Configure Secrets">
+
+```bash {{ title: 'JWT Secret' }}
+# Generate and set JWT secret (required)
+openssl rand -base64 32 | wrangler secret put JWT_SECRET --env production
+```
+
+```bash {{ title: 'Admin Password' }}
+# Set admin password (optional)
+echo "your-secure-admin-password" | \
+  wrangler secret put ADMIN_PASSWORD --env production
+```
+
+```bash {{ title: 'Email Service' }}
+# Email service credentials (optional)
+echo "your-sendgrid-api-key" | \
+  wrangler secret put SENDGRID_API_KEY --env production
+```
+
+```bash {{ title: 'Monitoring' }}
+# Analytics/monitoring tokens (optional)
+echo "your-sentry-dsn" | \
+  wrangler secret put SENTRY_DSN --env production
+```
+
+</CodeGroup>
+
+### Managing Secrets
+
+<CodeGroup title="Secret Management">
+
+```bash {{ title: 'List Secrets' }}
+# List all secrets (names only, not values)
+wrangler secret list --env production
+```
+
+```bash {{ title: 'Update Secret' }}
+# Update a secret
+echo "new-value" | wrangler secret put SECRET_NAME --env production
+```
+
+```bash {{ title: 'Delete Secret' }}
+# Delete a secret
+wrangler secret delete SECRET_NAME --env production
+```
+
+</CodeGroup>
+
+### Public Variables
+
+Configure public variables in `wrangler.toml`:
+
+```toml
+[env.production.vars]
+ENVIRONMENT = "production"
+# CDN_DOMAIN = "media.yourdomain.com"
+# IMAGES_ACCOUNT_ID = "your-cloudflare-account-id"
+# FEATURE_NEW_EDITOR = "true"
+```
+
+---
+
+## Deployment Workflow {{ id: 'deployment-workflow' }}
+
+### Pre-deployment Checks
+
+Run these checks before deploying:
+
+<CodeGroup title="Pre-deployment">
+
+```bash {{ title: 'Run Tests' }}
+# Run all tests
+npm test
+```
+
+```bash {{ title: 'Build Check' }}
+# Check TypeScript compilation
+npm run build
+```
+
+```bash {{ title: 'Migration Check' }}
+# Verify migrations are up to date
+wrangler d1 migrations list DB --env production
+```
+
+</CodeGroup>
+
+### Deploy to Production
+
+Deploy your application:
+
+<CodeGroup title="Production Deployment">
+
+```bash {{ title: 'Using npm script' }}
+# Option 1: Using predeploy script (runs tests + build)
+npm run predeploy && npm run deploy
+```
+
+```bash {{ title: 'Direct deployment' }}
+# Option 2: Direct deployment with Wrangler
+wrangler deploy --env production
+
+# Output:
+# ✅ Successfully deployed to production
+# URL: https://sonicjs-ai-prod.workers.dev
+#
+# Deployment details:
+# - Version: 2024-01-15-abc123
+# - Size: 2.4 MB
+# - Upload time: 3.2s
+```
+
+</CodeGroup>
+
+### Post-deployment Verification
+
+Verify the deployment:
+
+<CodeGroup title="Verify Deployment">
+
+```bash {{ title: 'Health Check' }}
+# Check API health
+curl https://sonicjs-ai-prod.workers.dev/api/health
+
+# Expected response:
+# {
+#   "status": "healthy",
+#   "timestamp": "2024-01-15T12:00:00.000Z",
+#   "schemas": ["users", "collections", "content", ...]
+# }
+```
+
+```bash {{ title: 'Test Endpoints' }}
+# Test API endpoints
+curl https://sonicjs-ai-prod.workers.dev/api/collections
+
+# Check admin panel
+curl -I https://sonicjs-ai-prod.workers.dev/admin
+```
+
+</CodeGroup>
+
+### Preview Deployment
+
+Test changes in a preview environment first:
+
+```bash
+# Deploy to preview environment
+wrangler deploy --env preview
+
+# Output:
+# ✅ Successfully deployed to preview
+# URL: https://sonicjs-ai-preview.workers.dev
+
+# Test the preview deployment
+curl https://sonicjs-ai-preview.workers.dev/api/health
+```
+
+### View Deployment History
+
+```bash
+# List recent deployments
+wrangler deployments list --env production
+
+# Output:
+# Created       ID                          Version
+# 2024-01-15    abc123def456                v1.2.3
+# 2024-01-14    def456abc789                v1.2.2
+# 2024-01-13    ghi789jkl012                v1.2.1
+```
+
+---
+
+## Custom Domains {{ id: 'custom-domains' }}
+
+### Add Custom Domain
+
+Connect your custom domain to the Worker:
+
+#### Via Cloudflare Dashboard
+
+1. Go to **Workers & Pages** > **sonicjs-ai-prod**
+2. Click **Triggers** tab
+3. Click **Add Custom Domain**
+4. Enter: `yourdomain.com`
+5. Click **Add Custom Domain**
+
+#### Via wrangler.toml
+
+```toml
+[env.production]
+name = "sonicjs-ai-prod"
+routes = [
+  { pattern = "yourdomain.com/*", zone_name = "yourdomain.com" },
+  { pattern = "www.yourdomain.com/*", zone_name = "yourdomain.com" }
+]
+```
+
+Then deploy:
+
+```bash
+wrangler deploy --env production
+```
+
+### Configure DNS
+
+Cloudflare automatically creates DNS records. Verify with:
+
+```bash
+# Check DNS propagation
+dig yourdomain.com
+
+# Or using nslookup
+nslookup yourdomain.com
+```
+
+Manual DNS configuration (if needed):
+
+```
+Type: AAAA
+Name: @
+Content: 100::
+Proxy: Enabled (orange cloud)
+```
+
+### SSL Certificate
+
+SSL is automatic with Cloudflare:
+
+1. **Universal SSL** - Issued automatically
+2. **Edge Certificates** - Free, auto-renewed
+3. **Full (Strict)** - Recommended encryption mode
+
+Verify SSL:
+
+```bash
+# Check certificate
+curl -vI https://yourdomain.com 2>&1 | grep -i "ssl\|tls"
+
+# Or use SSL checker
+# https://www.ssllabs.com/ssltest/analyze.html?d=yourdomain.com
+```
+
+### Force HTTPS
+
+Ensure all traffic uses HTTPS:
+
+```typescript
+// In src/index.ts
+app.use('*', async (c, next) => {
+  const url = new URL(c.req.url)
+  if (url.protocol === 'http:') {
+    url.protocol = 'https:'
+    return c.redirect(url.toString(), 301)
+  }
+  await next()
+})
+```
+
+---
+
+## Production Checklist {{ id: 'production-checklist' }}
+
+Use this checklist before going live:
+
+### Infrastructure
+
+- [ ] Production D1 database created and migrated
+- [ ] Production R2 bucket created
+- [ ] Production KV namespace created
+- [ ] All bindings configured in wrangler.toml
+- [ ] Secrets uploaded (JWT_SECRET, etc.)
+- [ ] Custom domain added and DNS configured
+- [ ] SSL certificate active and valid
+
+### Database
+
+- [ ] All migrations applied successfully
+- [ ] Initial data seeded (users, collections)
+- [ ] Admin user created with secure password
+- [ ] Database indexes verified
+- [ ] Backup strategy in place
+
+### Application
+
+- [ ] Health check endpoint responding
+- [ ] API endpoints working correctly
+- [ ] Admin panel accessible
+- [ ] Authentication system working
+- [ ] Media upload functionality tested
+- [ ] Cache system operational
+
+### Security
+
+- [ ] HTTPS enforced (no HTTP access)
+- [ ] Strong JWT secret configured
+- [ ] CORS properly configured
+- [ ] Security headers configured
+- [ ] Admin password is strong and unique
+
+### Performance
+
+- [ ] Cache headers configured
+- [ ] Static assets compressed
+- [ ] Database queries optimized
+- [ ] KV cache working correctly
+- [ ] R2 CDN domain configured
+
+### Monitoring
+
+- [ ] Error logging configured
+- [ ] Performance monitoring enabled
+- [ ] Uptime monitoring setup
+- [ ] Alert notifications configured
+- [ ] Log retention policy set
+
+---
+
+## Monitoring {{ id: 'monitoring' }}
+
+### Real-time Logs
+
+View production logs in real-time:
+
+<CodeGroup title="Log Monitoring">
+
+```bash {{ title: 'Tail Logs' }}
+# Tail production logs
+wrangler tail --env production
+```
+
+```bash {{ title: 'Filter Errors' }}
+# Filter by status
+wrangler tail --env production --status error
+```
+
+```bash {{ title: 'Filter Method' }}
+# Filter by request method
+wrangler tail --env production --method POST
+```
+
+```bash {{ title: 'Sample Rate' }}
+# Sample rate (10%)
+wrangler tail --env production --sampling-rate 0.1
+```
+
+</CodeGroup>
+
+### Cloudflare Analytics
+
+Access analytics in the dashboard:
+
+**Workers & Pages** > **sonicjs-ai-prod** > **Analytics**
+
+Key metrics:
+- **Requests** - Total requests and errors
+- **Success Rate** - % of successful requests
+- **Duration** - P50, P95, P99 response times
+- **CPU Time** - Average CPU usage
+- **Errors** - Error count and types
+
+### Health Check Monitoring
+
+Set up external monitoring:
+
+```bash
+# Health check endpoint
+GET https://yourdomain.com/api/health
+
+# Expected response:
+{
+  "status": "healthy",
+  "timestamp": "2024-01-15T12:00:00.000Z",
+  "schemas": ["users", "collections", "content", "media", "plugins"]
+}
+```
+
+Recommended monitoring services:
+- **UptimeRobot** - [uptimerobot.com](https://uptimerobot.com)
+- **Pingdom** - [pingdom.com](https://www.pingdom.com)
+- **Better Uptime** - [betteruptime.com](https://betteruptime.com)
+
+### Performance Monitoring
+
+Every API response includes performance headers:
+
+```http
+X-Cache-Status: HIT
+X-Cache-Source: memory
+X-Cache-TTL: 278
+X-Response-Time: 3ms
+```
+
+---
+
+## Rollback Procedures {{ id: 'rollback-procedures' }}
+
+### View Deployment History
+
+```bash
+# List recent deployments
+wrangler deployments list --env production
+
+# Output:
+# Created       ID                Version
+# 2024-01-15    abc123            v1.2.3  (current)
+# 2024-01-14    def456            v1.2.2
+# 2024-01-13    ghi789            v1.2.1
+```
+
+### Rollback to Previous Version
+
+<CodeGroup title="Rollback">
+
+```bash {{ title: 'Rollback to Previous' }}
+# Rollback to previous deployment
+wrangler rollback --env production
+
+# This will rollback to: v1.2.2
+```
+
+```bash {{ title: 'Rollback to Specific Version' }}
+# Rollback to specific version
+wrangler rollback \
+  --message "Rolling back to v1.2.1" \
+  --env production \
+  --deployment-id ghi789
+```
+
+```bash {{ title: 'Verify Rollback' }}
+# Verify rollback
+curl https://yourdomain.com/api/health
+```
+
+</CodeGroup>
+
+### Rollback with Database
+
+If the version included database migrations:
+
+```bash
+# 1. Export current database
+wrangler d1 export sonicjs-ai --env production \
+  --output backup-before-rollback.sql
+
+# 2. Rollback Worker deployment
+wrangler rollback --env production
+
+# 3. Check which migrations to revert
+wrangler d1 migrations list DB --env production
+
+# Note: D1 doesn't have automatic down migrations
+# Manual SQL required for schema changes
+```
+
+### Emergency Rollback Script
+
+```bash
+#!/bin/bash
+# emergency-rollback.sh
+
+echo "Starting emergency rollback..."
+
+# 1. Backup current state
+echo "Creating backup..."
+wrangler d1 export sonicjs-ai --env production \
+  --output "emergency-backup-$(date +%Y%m%d-%H%M%S).sql"
+
+# 2. Rollback deployment
+echo "Rolling back deployment..."
+wrangler rollback --env production
+
+# 3. Verify health
+echo "Verifying health..."
+curl -f https://yourdomain.com/api/health || echo "❌ Health check failed"
+
+echo "Rollback complete"
+```
+
+---
+
+## Troubleshooting {{ id: 'troubleshooting' }}
+
+### Database Connection Errors
+
+<CodeGroup title="Database Issues">
+
+```bash {{ title: 'Symptom' }}
+# Error: D1_ERROR: no such table: users
+```
+
+```bash {{ title: 'Solution' }}
+# Apply migrations
+wrangler d1 migrations apply DB --env production
+
+# Verify tables exist
+wrangler d1 execute sonicjs-ai --env production \
+  --command="SELECT name FROM sqlite_master WHERE type='table';"
+```
+
+</CodeGroup>
+
+### Secrets Not Found
+
+<CodeGroup title="Secret Issues">
+
+```bash {{ title: 'Symptom' }}
+# Error: Uncaught ReferenceError: JWT_SECRET is not defined
+```
+
+```bash {{ title: 'Solution' }}
+# List secrets
+wrangler secret list --env production
+
+# Add missing secret
+echo "your-secret-value" | wrangler secret put JWT_SECRET --env production
+```
+
+</CodeGroup>
+
+### R2 Bucket Access Denied
+
+<CodeGroup title="R2 Issues">
+
+```bash {{ title: 'Symptom' }}
+# Error: R2 bucket 'sonicjs-media-prod' not found
+```
+
+```bash {{ title: 'Solution' }}
+# Verify bucket exists
+wrangler r2 bucket list
+
+# Create if missing
+wrangler r2 bucket create sonicjs-media-prod
+
+# Verify binding in wrangler.toml
+[[env.production.r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "sonicjs-media-prod"
+```
+
+</CodeGroup>
+
+### Performance Issues
+
+#### Slow Database Queries
+
+```sql
+-- Add missing indexes
+CREATE INDEX idx_content_status ON content(status);
+CREATE INDEX idx_content_collection ON content(collection_id);
+
+-- Analyze query performance
+EXPLAIN QUERY PLAN SELECT * FROM content WHERE status = 'published';
+```
+
+#### Cache Not Working
+
+```bash
+# Verify cache headers
+curl -I https://yourdomain.com/api/collections | grep -i cache
+
+# Expected headers:
+# X-Cache-Status: HIT
+# X-Cache-Source: memory
+# X-Cache-TTL: 278
+```
+
+### Domain and SSL Issues
+
+#### SSL Certificate Errors
+
+```bash
+# Check SSL status
+curl -vI https://yourdomain.com 2>&1 | grep -i ssl
+
+# Solutions:
+# 1. Wait for certificate issuance (up to 24 hours)
+# 2. Verify domain is proxied (orange cloud)
+# 3. Check SSL/TLS mode is "Full (strict)"
+```
+
+#### Domain Not Routing
+
+```bash
+# Verify DNS
+dig yourdomain.com
+
+# Check Worker routes
+wrangler routes list
+
+# Verify route in wrangler.toml
+```
+
+### Getting Help
+
+- **Cloudflare Community** - [community.cloudflare.com](https://community.cloudflare.com)
+- **Discord** - [discord.gg/cloudflaredev](https://discord.gg/cloudflaredev)
+- **Cloudflare Docs** - [developers.cloudflare.com/workers](https://developers.cloudflare.com/workers)
+- **SonicJS Issues** - [github.com/lane711/sonicjs/issues](https://github.com/lane711/sonicjs/issues)
+
+---
+
+## Next Steps
+
+- [Testing Guide](/testing) - Test your deployment
+- [Database Documentation](/database) - Advanced database features
+- [API Reference](/api) - API endpoints reference
+- [Caching](/caching) - Optimize cache configuration
+
+For ongoing support, visit our [Community](/community) page.

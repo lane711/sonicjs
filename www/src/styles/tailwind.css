@@ -41,6 +41,7 @@
   --container-5xl: 66rem;
 
   --animate-spin-slow: spin-slow 3s linear infinite;
+  --animate-gradient: gradient-shift 8s ease infinite;
 }
 
 @keyframes spin-slow {
@@ -49,6 +50,15 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
   }
 }
 
