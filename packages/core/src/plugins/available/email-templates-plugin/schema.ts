@@ -1,6 +1,6 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
+// import { z } from 'zod';
 
 // Import users table from main schema for foreign key references
 import { users } from '../../../db/schema';
@@ -77,11 +77,11 @@ export const insertEmailVariableSchema = createInsertSchema(emailVariables);
 export const selectEmailVariableSchema = createSelectSchema(emailVariables);
 
 // TypeScript types
-export type EmailTheme = z.infer<typeof selectEmailThemeSchema>;
-export type NewEmailTheme = z.infer<typeof insertEmailThemeSchema>;
-export type EmailTemplate = z.infer<typeof selectEmailTemplateSchema>;
-export type NewEmailTemplate = z.infer<typeof insertEmailTemplateSchema>;
-export type EmailLog = z.infer<typeof selectEmailLogSchema>;
-export type NewEmailLog = z.infer<typeof insertEmailLogSchema>;
-export type EmailVariable = z.infer<typeof selectEmailVariableSchema>;
-export type NewEmailVariable = z.infer<typeof insertEmailVariableSchema>;
+export type EmailTheme = typeof emailThemes.$inferSelect;
+export type NewEmailTheme = typeof emailThemes.$inferInsert;
+export type EmailTemplate = typeof emailTemplates.$inferSelect;
+export type NewEmailTemplate = typeof emailTemplates.$inferInsert;
+export type EmailLog = typeof emailLogs.$inferSelect;
+export type NewEmailLog = typeof emailLogs.$inferInsert;
+export type EmailVariable = typeof emailVariables.$inferSelect;
+export type NewEmailVariable = typeof emailVariables.$inferInsert;

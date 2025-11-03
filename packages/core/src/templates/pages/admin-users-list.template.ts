@@ -63,7 +63,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
       label: 'Name',
       sortable: true,
       sortType: 'string',
-      render: (value: any, row: User) => {
+      render: (_value: any, row: User) => {
         const escapeHtml = (text: string) => text.replace(/[&<>"']/g, (char) => ({
           '&': '&amp;',
           '<': '&lt;',
@@ -110,7 +110,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
       label: 'Role',
       sortable: true,
       sortType: 'string',
-      render: (value: string) => {
+      render: (_value: string) => {
         const roleColors = {
           admin: 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-700/10 dark:ring-red-500/20',
           editor: 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-500/20',
@@ -126,7 +126,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
       label: 'Last Login',
       sortable: true,
       sortType: 'date',
-      render: (value: number | null) => {
+      render: (_value: number | null) => {
         if (!value) return '<span class="text-zinc-500 dark:text-zinc-400">Never</span>'
         return `<span class="text-sm text-zinc-500 dark:text-zinc-400">${new Date(value).toLocaleDateString()}</span>`
       }
@@ -136,14 +136,14 @@ export function renderUsersListPage(data: UsersListPageData): string {
       label: 'Created',
       sortable: true,
       sortType: 'date',
-      render: (value: number) => `<span class="text-sm text-zinc-500 dark:text-zinc-400">${new Date(value).toLocaleDateString()}</span>`
+      render: (_value: number) => `<span class="text-sm text-zinc-500 dark:text-zinc-400">${new Date(value).toLocaleDateString()}</span>`
     },
     {
       key: 'actions',
       label: 'Actions',
       className: 'text-right',
       sortable: false,
-      render: (value: any, row: User) => `
+      render: (_value: any, row: User) => `
         <div class="flex justify-end space-x-2">
           ${row.isActive ?
             `<button onclick="toggleUserStatus('${row.id}', false)" title="Deactivate user" class="inline-flex items-center justify-center p-2 text-sm font-medium rounded-lg bg-gradient-to-r from-red-500 to-pink-500 dark:from-red-400 dark:to-pink-400 text-white hover:from-red-600 hover:to-pink-600 dark:hover:from-red-500 dark:hover:to-pink-500 shadow-sm transition-all duration-200">

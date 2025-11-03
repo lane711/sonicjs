@@ -7,10 +7,10 @@
 
 export type EventHandler = (data?: any) => Promise<void> | void
 
-interface EventSubscription {
-  event: string
-  handler: EventHandler
-}
+// interface EventSubscription {
+//   event: string
+//   handler: EventHandler
+// }
 
 class EventBus {
   private subscriptions: Map<string, EventHandler[]> = new Map()

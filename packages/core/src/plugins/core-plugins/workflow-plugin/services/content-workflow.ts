@@ -123,7 +123,7 @@ export class ContentWorkflow {
     action: WorkflowAction,
     currentStatus: ContentStatus,
     userRole: string,
-    isAuthor: boolean = false,
+    _isAuthor: boolean = false,
     permissions: WorkflowPermissions = defaultWorkflowPermissions
   ): boolean {
     // Check if action is valid for current status
@@ -149,7 +149,7 @@ export class ContentWorkflow {
   static getAvailableActions(
     currentStatus: ContentStatus,
     userRole: string,
-    isAuthor: boolean = false,
+    _isAuthor: boolean = false,
     permissions: WorkflowPermissions = defaultWorkflowPermissions
   ): WorkflowAction[] {
     const allActions = workflowTransitions[currentStatus] || []
@@ -238,7 +238,7 @@ export class ContentWorkflow {
   }
 
   // Get content visibility based on user role and status
-  static getContentVisibility(userRole: string, isAuthor: boolean = false): ContentStatus[] {
+  static getContentVisibility(userRole: string, _isAuthor: boolean = false): ContentStatus[] {
     switch (userRole) {
       case 'admin':
       case 'editor':

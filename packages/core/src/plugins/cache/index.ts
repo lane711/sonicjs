@@ -15,7 +15,7 @@ import { setupCacheInvalidation } from './services/cache-invalidation.js'
 import cacheRoutes from './routes.js'
 
 export class CachePlugin {
-  private context: PluginContext | null = null
+  private ___context: PluginContext | null = null
 
   /**
    * Get plugin routes
@@ -28,7 +28,7 @@ export class CachePlugin {
    * Activate the cache plugin
    */
   async activate(context: PluginContext): Promise<void> {
-    this.context = context
+    this.___context = context
 
     const settings = context.config || {}
 
@@ -39,7 +39,7 @@ export class CachePlugin {
     })
 
     // Initialize default cache services
-    for (const [namespace, config] of Object.entries(CACHE_CONFIGS)) {
+    for (const [_namespace, config] of Object.entries(CACHE_CONFIGS)) {
       getCacheService({
         ...config,
         memoryEnabled: settings.memoryEnabled ?? config.memoryEnabled,
@@ -58,7 +58,7 @@ export class CachePlugin {
   async deactivate(): Promise<void> {
     console.log('❌ Cache plugin deactivated - clearing all caches')
     await clearAllCaches()
-    this.context = null
+    this.___context = null
   }
 
   /**
@@ -68,7 +68,7 @@ export class CachePlugin {
     console.log('⚙️ Cache plugin configured', settings)
 
     // Reconfigure all cache instances with new settings
-    for (const [namespace, config] of Object.entries(CACHE_CONFIGS)) {
+    for (const [_namespace, config] of Object.entries(CACHE_CONFIGS)) {
       getCacheService({
         ...config,
         memoryEnabled: settings.memoryEnabled ?? config.memoryEnabled,
@@ -109,7 +109,7 @@ export class CachePlugin {
    */
   async invalidatePattern(c: Context): Promise<Response> {
     const body = await c.req.json()
-    const { pattern, namespace } = body
+    const { pattern, namespace: _namespace } = body
 
     if (!pattern) {
       return c.json({
@@ -120,13 +120,13 @@ export class CachePlugin {
 
     let totalInvalidated = 0
 
-    if (namespace) {
+    if (_namespace) {
       // Invalidate from specific namespace
-      const cache = getCacheService(CACHE_CONFIGS[namespace] || {
+      const cache = getCacheService(CACHE_CONFIGS[_namespace] || {
         ttl: 3600,
         kvEnabled: false,
         memoryEnabled: true,
-        namespace,
+        namespace: _namespace,
         invalidateOn: [],
         version: 'v1'
       })
@@ -143,7 +143,7 @@ export class CachePlugin {
       success: true,
       invalidated: totalInvalidated,
       pattern,
-      namespace: namespace || 'all',
+      namespace: _namespace || 'all',
       timestamp: new Date().toISOString()
     })
   }

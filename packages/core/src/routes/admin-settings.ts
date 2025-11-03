@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { html } from 'hono/html'
+// import { html } from 'hono/html'
 import { requireAuth } from '../middleware'
 import { renderSettingsPage, SettingsPageData } from '../templates/pages/admin-settings.template'
 import { MigrationService } from '../services/migrations'

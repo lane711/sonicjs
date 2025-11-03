@@ -283,7 +283,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
 
     case 'guid':
       // GUID fields are read-only and auto-generated
-      const displayValue = value || '(auto-generated on save)'
+      const ____displayValue = value || '(auto-generated on save)'
       fieldHTML = `
         <div class="guid-field-container">
           <input

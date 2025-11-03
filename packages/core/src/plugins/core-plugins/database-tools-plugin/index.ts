@@ -1,6 +1,6 @@
 import { PluginBuilder } from '../../sdk/plugin-builder'
 import { Plugin } from '@sonicjs-cms/core'
-import { createDatabaseToolsAdminRoutes } from './admin-routes'
+// import { createDatabaseToolsAdminRoutes } from './admin-routes'
 import { DatabaseToolsService } from './services/database-service'
 
 export function createDatabaseToolsPlugin(): Plugin {

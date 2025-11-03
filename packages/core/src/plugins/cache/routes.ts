@@ -461,8 +461,8 @@ app.get('/analytics/trends', async (c: Context) => {
  * Most accessed cache keys (would need hit tracking)
  */
 app.get('/analytics/top-keys', async (c: Context) => {
-  const namespace = c.req.query('namespace') || 'all'
-  const limit = parseInt(c.req.query('limit') || '10')
+  const _____namespace = c.req.query('namespace') || 'all'
+  const _____limit = parseInt(c.req.query('limit') || '10')
 
   // This is a placeholder - would need per-key hit tracking
   return c.json({

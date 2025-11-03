@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { zValidator } from '@hono/zod-validator'
+// import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { setCookie } from 'hono/cookie'
 import { html } from 'hono/html'
@@ -335,7 +335,7 @@ authRoutes.post('/register/form', async (c) => {
     const validatedData = validation.data
 
     // Extract fields with defaults for optional ones
-    const email = validatedData.email
+    // const email = validatedData.email
     const password = validatedData.password
     const username = validatedData.username || authValidationService.generateDefaultValue('username', validatedData)
     const firstName = validatedData.firstName || authValidationService.generateDefaultValue('firstName', validatedData)

@@ -6,7 +6,7 @@
  * This script syncs the @sonicjs-cms/core version across the monorepo:
  * 1. Reads the version from packages/core/package.json
  * 2. Updates the version in packages/create-app/src/cli.js
- * 3. Bumps the version of create-sonicjs package
+ * 3. Syncs the create-sonicjs package version to match core version
  */
 
 import fs from 'fs'
@@ -42,24 +42,14 @@ async function syncVersions() {
       console.warn('⚠ Could not find version string in CLI file to update')
     }
 
-    // Bump create-sonicjs version (patch bump)
+    // Sync create-sonicjs version to match core version
     const createAppPackageJson = JSON.parse(fs.readFileSync(createAppPackageJsonPath, 'utf8'))
     const oldCreateAppVersion = createAppPackageJson.version
 
-    // Parse version and increment patch
-    const versionParts = oldCreateAppVersion.split(/[-.]/)
-    const [major, minor, patch] = versionParts.slice(0, 3)
-    const suffix = versionParts.slice(3).join('.')
-
-    const newPatch = parseInt(patch) + 1
-    const newCreateAppVersion = suffix
-      ? `${major}.${minor}.${newPatch}-${suffix}`
-      : `${major}.${minor}.${newPatch}`
-
-    createAppPackageJson.version = newCreateAppVersion
+    createAppPackageJson.version = coreVersion
     fs.writeFileSync(createAppPackageJsonPath, JSON.stringify(createAppPackageJson, null, 2) + '\n', 'utf8')
 
-    console.log(`✓ Bumped create-sonicjs from ${oldCreateAppVersion} to ${newCreateAppVersion}`)
+    console.log(`✓ Synced create-sonicjs from ${oldCreateAppVersion} to ${coreVersion}`)
 
     console.log('\n✅ Version sync complete!')
     console.log('\nNext steps:')

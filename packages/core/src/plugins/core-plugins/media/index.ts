@@ -5,7 +5,7 @@
  */
 
 import { Hono } from 'hono'
-import { z } from 'zod'
+// import { z } from 'zod'
 import { PluginBuilder, PluginHelpers } from '../../sdk/plugin-builder'
 import { Plugin, HOOKS } from '@sonicjs-cms/core'
 
@@ -34,7 +34,7 @@ export function createMediaPlugin(): Plugin {
   mediaAPI.get('/', async (c) => {
     const page = parseInt(c.req.query('page') || '1')
     const limit = parseInt(c.req.query('limit') || '20')
-    const type = c.req.query('type') // image, video, document, etc.
+    const ____type = c.req.query('type') // image, video, document, etc.
 
     return c.json({
       message: 'Media list',
@@ -192,7 +192,7 @@ export function createMediaPlugin(): Plugin {
 
   // Add media service
   builder.addService('mediaService', {
-    uploadFile: async (file: File, options?: any) => {
+    uploadFile: async (file: File, _options?: any) => {
       // File upload implementation
       return {
         id: `media-${Date.now()}`,
@@ -202,19 +202,19 @@ export function createMediaPlugin(): Plugin {
       }
     },
     
-    deleteFile: async (id: string) => {
+    deleteFile: async (_id: string) => {
       // File deletion implementation
       console.info(`Deleting media file: ${id}`)
       return true
     },
     
-    processImage: async (id: string, operations: any[]) => {
+    processImage: async (_id: string, operations: any[]) => {
       // Image processing implementation
       console.info(`Processing image ${id} with operations:`, operations)
       return { jobId: `job-${id}-${Date.now()}` }
     },
     
-    getMetadata: async (id: string) => {
+    getMetadata: async (_id: string) => {
       // Extract file metadata
       return {
         width: 1920,
@@ -268,7 +268,7 @@ export function createMediaPlugin(): Plugin {
   })
 
   // Add media hooks
-  builder.addHook('media:upload', async (data: any, context: any) => {
+  builder.addHook('media:upload', async (data: any, _context: any) => {
     console.info(`Media upload event: ${data.filename}`)
     
     // Auto-generate thumbnails for images
@@ -283,7 +283,7 @@ export function createMediaPlugin(): Plugin {
     description: 'Handle media upload events'
   })
 
-  builder.addHook('media:delete', async (data: any, context: any) => {
+  builder.addHook('media:delete', async (data: any, _context: any) => {
     console.info(`Media delete event: ${data.id}`)
     
     // Clean up related files (thumbnails, processed versions)
@@ -295,7 +295,7 @@ export function createMediaPlugin(): Plugin {
     description: 'Handle media deletion events'
   })
 
-  builder.addHook(HOOKS.CONTENT_SAVE, async (data: any, context: any) => {
+  builder.addHook(HOOKS.CONTENT_SAVE, async (data: any, _context: any) => {
     // Extract media references from content
     const content = data.content || ''
     const mediaReferences = content.match(/\/media\/[a-zA-Z0-9-]+/g) || []

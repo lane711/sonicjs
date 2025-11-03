@@ -135,7 +135,7 @@ export class CloudflareEmailQueueService implements EmailQueueService {
     }
   }
 
-  private shouldRetryJob(job: EmailQueueJob, error?: string): boolean {
+  private shouldRetryJob(_job: EmailQueueJob, error?: string): boolean {
     if (!error) return true;
 
     // Don't retry for certain types of errors

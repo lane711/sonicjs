@@ -11,8 +11,10 @@ import validatePackageName from 'validate-npm-package-name'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-// Version
-const VERSION = '2.0.0-beta.9'
+// Read version from package.json
+const packageJsonPath = path.join(__dirname, '../package.json')
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
+const VERSION = packageJson.version
 
 // Templates available
 const TEMPLATES = {
@@ -98,20 +100,8 @@ async function getProjectDetails(initialName) {
     })
   }
 
-  // Template selection
-  if (!flags.template) {
-    questions.push({
-      type: 'select',
-      name: 'template',
-      message: 'Choose a template:',
-      choices: Object.entries(TEMPLATES).map(([key, { name, description }]) => ({
-        title: name,
-        description: description,
-        value: key
-      })),
-      initial: 0
-    })
-  }
+  // Template selection - always use 'starter' since it's the only template
+  // No need to ask user, just default to starter
 
   // Database name
   if (!flags.databaseName) {
@@ -207,7 +197,7 @@ async function getProjectDetails(initialName) {
 
   return {
     projectName: initialName || answers.projectName,
-    template: flags.template || answers.template,
+    template: flags.template || 'starter', // Always default to starter template
     databaseName: flags.databaseName || answers.databaseName || `${initialName || answers.projectName}-db`,
     bucketName: flags.bucketName || answers.bucketName || `${initialName || answers.projectName}-media`,
     seedAdmin: answers.seedAdmin !== undefined ? answers.seedAdmin : true,
@@ -382,7 +372,7 @@ async function copyTemplate(templateName, targetDir, options) {
 
   // Add @sonicjs-cms/core dependency
   packageJson.dependencies = {
-    '@sonicjs-cms/core': '^2.0.5',
+    '@sonicjs-cms/core': '^2.0.8',
     ...packageJson.dependencies
   }
 

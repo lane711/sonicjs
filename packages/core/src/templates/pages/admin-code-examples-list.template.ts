@@ -1,7 +1,7 @@
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
-import { renderPagination, PaginationData } from '../pagination.template'
+import { renderPagination } from '../pagination.template'
 import { renderAlert } from '../alert.template'
-import { renderTable, TableColumn, TableData } from '../table.template'
+import { renderTable } from '../table.template'
 
 interface CodeExample {
   id: number

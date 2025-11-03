@@ -45,7 +45,7 @@ adminMediaRoutes.get('/', async (c) => {
     const type = searchParams.get('type') || 'all'
     const view = searchParams.get('view') || 'grid'
     const page = parseInt(searchParams.get('page') || '1')
-    const cacheBust = searchParams.get('t') // Cache-busting parameter
+    const ____cacheBust = searchParams.get('t') // Cache-busting parameter
     const limit = 24
     const offset = (page - 1) * limit
 
@@ -549,7 +549,7 @@ adminMediaRoutes.post('/upload', async (c) => {
     // TODO: Cache invalidation removed during migration
 
     // Fetch updated media list to include in response
-    let mediaGridHTML = ''
+    let __mediaGridHTML = ''
     if (uploadResults.length > 0) {
       try {
         const folder = formData.get('folder') as string || 'uploads'

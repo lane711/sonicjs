@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import type { D1Database, KVNamespace, R2Bucket, Queue } from '@cloudflare/workers-types'
-import { requireAuth, requirePermission, logActivity, AuthManager } from '../middleware'
+import { requireAuth, logActivity, AuthManager } from '../middleware'
 import { sanitizeInput } from '../utils/sanitize'
 import { renderProfilePage, renderAvatarImage, type UserProfile, type ProfilePageData } from '../templates/pages/admin-profile.template'
 import { renderAlert } from '../templates/components/alert.template'
@@ -234,9 +234,9 @@ userRoutes.post('/profile/avatar', async (c) => {
 
   try {
     const formData = await c.req.formData()
-    const avatarFile = formData.get('avatar') as File
+    const avatarFile = formData.get('avatar')
 
-    if (!avatarFile || !avatarFile.name) {
+    if (!avatarFile || !(avatarFile instanceof File) || !avatarFile.name) {
       return c.html(renderAlert({ 
         type: 'error', 
         message: 'Please select an image file.',
@@ -391,7 +391,7 @@ userRoutes.post('/profile/password', async (c) => {
       VALUES (?, ?, ?, ?)
     `)
     await historyStmt.bind(
-      globalThis.crypto.randomUUID(),
+      crypto.randomUUID(),
       user!.userId,
       userData.password_hash,
       Date.now()
@@ -683,7 +683,7 @@ userRoutes.post('/users/new', async (c) => {
     const passwordHash = await AuthManager.hashPassword(password)
 
     // Create user
-    const userId = globalThis.crypto.randomUUID()
+    const userId = crypto.randomUUID()
     const createStmt = db.prepare(`
       INSERT INTO users (
         id, email, username, first_name, last_name, phone, bio,
@@ -1054,11 +1054,11 @@ userRoutes.post('/invite-user', async (c) => {
     }
 
     // Generate invitation token
-    const invitationToken = globalThis.crypto.randomUUID()
-    const invitationExpires = Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 days
+    const invitationToken = crypto.randomUUID()
+    // const invitationExpires = Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 days
 
     // Create user record with invitation
-    const userId = globalThis.crypto.randomUUID()
+    const userId = crypto.randomUUID()
     const createUserStmt = db.prepare(`
       INSERT INTO users (
         id, email, first_name, last_name, role, 
@@ -1126,7 +1126,7 @@ userRoutes.post('/resend-invitation/:id', async (c) => {
     }
 
     // Generate new invitation token
-    const newInvitationToken = globalThis.crypto.randomUUID()
+    const newInvitationToken = crypto.randomUUID()
 
     // Update invitation token and date
     const updateStmt = db.prepare(`

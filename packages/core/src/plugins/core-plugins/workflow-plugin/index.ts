@@ -1,10 +1,10 @@
-import { Hono } from 'hono'
+// import { Hono } from 'hono'
 import { Plugin } from '@sonicjs-cms/core'
 import { PluginBuilder } from '../../sdk/plugin-builder'
 import { workflowMigration } from './migrations'
-import { createWorkflowRoutes } from './routes'
-import { createWorkflowAdminRoutes } from './admin-routes'
-import { WorkflowService, WorkflowEngine, workflowSchemas } from './services/workflow-service'
+// import { createWorkflowRoutes } from './routes'
+// import { createWorkflowAdminRoutes } from './admin-routes'
+import { WorkflowService, WorkflowEngine, _workflowSchemas } from './services/workflow-service'
 import { SchedulerService } from './services/scheduler'
 import { AutomationEngine } from './services/automation'
 import { NotificationService } from './services/notifications'
@@ -154,19 +154,19 @@ export function createWorkflowPlugin(): Plugin {
   })
 
   // Register hooks
-  builder.addHook('content:create', async (data: any, context: any) => {
+  builder.addHook('content:create', async (data: any, _context: any) => {
     const workflowEngine = new WorkflowEngine(context.db)
     await workflowEngine.initializeContentWorkflow(data.id, data.collectionId || data.collection_id)
     return data
   })
 
-  builder.addHook('content:save', async (data: any, context: any) => {
+  builder.addHook('content:save', async (data: any, _context: any) => {
     // For now, we'll just return the data as-is
     // This can be extended to handle workflow state changes on save
     return data
   })
 
-  builder.addHook('content:delete', async (data: any, context: any) => {
+  builder.addHook('content:delete', async (data: any, _context: any) => {
     // Workflow status will be deleted automatically due to foreign key constraints
     return data
   })
@@ -191,7 +191,7 @@ export function createWorkflowPlugin(): Plugin {
     },
     activate: async (context) => {
       // Initialize default workflow if needed
-      const workflowService = new WorkflowService(context.db)
+      const ___workflowService = new WorkflowService(context.db)
       // For now, we'll just log that the plugin is activated
       // Default workflow initialization can be added later
       console.log('Workflow plugin activated')

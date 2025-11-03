@@ -1,4 +1,4 @@
-import { vi } from 'vitest'
+import { vi, expect } from 'vitest'
 
 // Collection test fixtures and utilities
 export const mockCollections = {

@@ -5,7 +5,7 @@
  */
 
 import { Hono } from 'hono'
-import { z } from 'zod'
+// import { z } from 'zod'
 import { PluginBuilder, PluginHelpers } from '../../sdk/plugin-builder'
 import { Plugin, HOOKS } from '@sonicjs-cms/core'
 
@@ -33,7 +33,7 @@ export function createAnalyticsPlugin(): Plugin {
   // GET /analytics/stats - Get analytics overview
   analyticsAPI.get('/stats', async (c) => {
     const timeRange = c.req.query('range') || '7d' // 1d, 7d, 30d, 90d
-    const metric = c.req.query('metric') || 'all' // pageviews, sessions, users, etc.
+    const _____metric = c.req.query('metric') || 'all' // pageviews, sessions, users, etc.
 
     return c.json({
       message: 'Analytics stats',
@@ -155,7 +155,7 @@ export function createAnalyticsPlugin(): Plugin {
       return { viewId: `view-${Date.now()}` }
     },
     
-    getStats: async (timeRange: string) => {
+    getStats: async (_timeRange: string) => {
       // Get analytics statistics
       return {
         pageviews: 12500,
@@ -230,7 +230,7 @@ export function createAnalyticsPlugin(): Plugin {
   })
 
   // Add analytics hooks
-  builder.addHook(HOOKS.REQUEST_START, async (data: any, context: any) => {
+  builder.addHook(HOOKS.REQUEST_START, async (data: any, _context: any) => {
     // Start tracking request
     data.analytics = {
       startTime: Date.now(),
@@ -242,7 +242,7 @@ export function createAnalyticsPlugin(): Plugin {
     description: 'Initialize analytics tracking for requests'
   })
 
-  builder.addHook(HOOKS.REQUEST_END, async (data: any, context: any) => {
+  builder.addHook(HOOKS.REQUEST_END, async (data: any, _context: any) => {
     // Complete request tracking
     if (data.analytics) {
       const duration = Date.now() - data.analytics.startTime

@@ -1,7 +1,7 @@
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
 import { renderPagination, PaginationData } from '../pagination.template'
 import { renderTable, TableData, TableColumn } from '../table.template'
-import { renderFilterBar, FilterBarData } from '../filter-bar.template'
+// import { renderFilterBar, FilterBarData } from '../filter-bar.template'
 import { renderConfirmationDialog, getConfirmationDialogScript } from '../confirmation-dialog.template'
 
 export interface ContentItem {
@@ -54,9 +54,9 @@ export function renderContentListPage(data: ContentListPageData): string {
         name: 'model',
         label: 'Model',
         options: [
-          { value: 'all', label: 'All Models', selected: data.modelName === 'all' },
+          { __value: 'all', label: 'All Models', selected: data.modelName === 'all' },
           ...data.models.map(model => ({
-            value: model.name,
+            __value: model.name,
             label: model.displayName,
             selected: data.modelName === model.name
           }))
@@ -66,13 +66,13 @@ export function renderContentListPage(data: ContentListPageData): string {
         name: 'status',
         label: 'Status',
         options: [
-          { value: 'all', label: 'All Status', selected: data.status === 'all' },
-          { value: 'draft', label: 'Draft', selected: data.status === 'draft' },
-          { value: 'review', label: 'Under Review', selected: data.status === 'review' },
-          { value: 'scheduled', label: 'Scheduled', selected: data.status === 'scheduled' },
-          { value: 'published', label: 'Published', selected: data.status === 'published' },
-          { value: 'archived', label: 'Archived', selected: data.status === 'archived' },
-          { value: 'deleted', label: 'Deleted', selected: data.status === 'deleted' }
+          { __value: 'all', label: 'All Status', selected: data.status === 'all' },
+          { __value: 'draft', label: 'Draft', selected: data.status === 'draft' },
+          { __value: 'review', label: 'Under Review', selected: data.status === 'review' },
+          { __value: 'scheduled', label: 'Scheduled', selected: data.status === 'scheduled' },
+          { __value: 'published', label: 'Published', selected: data.status === 'published' },
+          { __value: 'archived', label: 'Archived', selected: data.status === 'archived' },
+          { __value: 'deleted', label: 'Deleted', selected: data.status === 'deleted' }
         ]
       }
     ],
@@ -84,9 +84,9 @@ export function renderContentListPage(data: ContentListPageData): string {
       }
     ],
     bulkActions: [
-      { label: 'Publish', value: 'publish', icon: 'check-circle' },
-      { label: 'Unpublish', value: 'unpublish', icon: 'x-circle' },
-      { label: 'Delete', value: 'delete', icon: 'trash', className: 'text-pink-600' }
+      { label: 'Publish', ___value: 'publish', icon: 'check-circle' },
+      { label: 'Unpublish', ___value: 'unpublish', icon: 'x-circle' },
+      { label: 'Delete', ___value: 'delete', icon: 'trash', className: 'text-pink-600' }
     ]
   }
 

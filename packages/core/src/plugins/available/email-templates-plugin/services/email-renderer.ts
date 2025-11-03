@@ -162,7 +162,7 @@ export class EmailTemplateRenderer {
     };
 
     // Style code for email
-    renderer.code = (code: string, language?: string) => {
+    renderer.code = (code: string, _language?: string) => {
       return `<pre style="background-color: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 8px; overflow-x: auto; margin: 20px 0; font-family: Monaco, Menlo, Ubuntu Mono, monospace;"><code>${code}</code></pre>`;
     };
 

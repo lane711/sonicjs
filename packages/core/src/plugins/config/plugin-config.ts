@@ -293,7 +293,7 @@ export class PluginConfigManager {
   /**
    * Validate plugin configuration against schema
    */
-  validateConfig(pluginName: string, config: PluginConfig): { valid: boolean; errors: string[] } {
+  validateConfig(_pluginName: string, config: PluginConfig): { valid: boolean; errors: string[] } {
     const validation = PluginConfigSchema.safeParse(config)
     
     if (validation.success) {
@@ -310,7 +310,7 @@ export class PluginConfigManager {
   /**
    * Get configuration schema for a plugin
    */
-  getConfigSchema(pluginName: string): z.ZodSchema | undefined {
+  getConfigSchema(_pluginName: string): z.ZodSchema | undefined {
     // This would return plugin-specific configuration schemas
     // For now, return the general schema
     return PluginConfigSchema

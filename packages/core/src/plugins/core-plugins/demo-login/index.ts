@@ -51,7 +51,7 @@ const demoLoginAssets = {
   `
 }
 
-const loginPrefillHook: HookHandler = async (data: any, context: any) => {
+const loginPrefillHook: HookHandler = async (data: any, _context: any) => {
   // Add demo login script to pages that contain login forms
   if (data.pageType === 'auth-login' || data.template?.includes('login')) {
     if (!data.scripts) {

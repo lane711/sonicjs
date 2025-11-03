@@ -2,7 +2,7 @@ import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './ch
 import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-O7LMFJMZ.js';
 import { PluginService, MigrationService } from './chunk-4MBTSUI6.js';
 import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderFAQList, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-YHLLVUJC.js';
-import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-XZUPYVTP.js';
+import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-Z2CZC6TC.js';
 import { metricsTracker } from './chunk-FICTAGD4.js';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
@@ -20170,5 +20170,5 @@ var ROUTES_INFO = {
 };
 
 export { ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_faq_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, userRoutes };
-//# sourceMappingURL=chunk-SYYG3CIE.js.map
-//# sourceMappingURL=chunk-SYYG3CIE.js.map
+//# sourceMappingURL=chunk-CUEIM4FE.js.map
+//# sourceMappingURL=chunk-CUEIM4FE.js.map

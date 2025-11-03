@@ -7,7 +7,7 @@
 
 import { Hono } from 'hono'
 import { z } from 'zod'
-import { zValidator } from '@hono/zod-validator'
+// import { zValidator } from '@hono/zod-validator'
 import { requireAuth, requireRole } from '../middleware'
 import type { Bindings, Variables } from '../app'
 
@@ -346,7 +346,7 @@ adminApiRoutes.post('/collections', async (c) => {
       }
       const validatedData = validation.data
       const db = c.env.DB
-      const user = c.get('user')
+      const ____user = c.get('user')
 
       // Handle both camelCase and snake_case for display_name
       const displayName = validatedData.displayName || validatedData.display_name || ''

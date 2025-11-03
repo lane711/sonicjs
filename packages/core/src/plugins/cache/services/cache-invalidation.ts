@@ -12,7 +12,7 @@ import { getEventBus, onEvent } from './event-bus.js'
  * Setup automatic cache invalidation based on events
  */
 export function setupCacheInvalidation(): void {
-  const eventBus = getEventBus()
+  const _____eventBus = getEventBus()
 
   // Content cache invalidation
   setupContentInvalidation()
@@ -44,7 +44,7 @@ function setupContentInvalidation(): void {
   const contentCache = getCacheService(config)
 
   // Invalidate on content updates
-  onEvent('content.create', async (data) => {
+  onEvent('content.create', async (_data) => {
     await contentCache.invalidate('content:*')
     console.log('Cache invalidated: content.create')
   })
@@ -67,7 +67,7 @@ function setupContentInvalidation(): void {
     console.log('Cache invalidated: content.delete', data?.id)
   })
 
-  onEvent('content.publish', async (data) => {
+  onEvent('content.publish', async (_data) => {
     await contentCache.invalidate('content:*')
     console.log('Cache invalidated: content.publish')
   })
@@ -129,7 +129,7 @@ function setupConfigInvalidation(): void {
   if (!configConfig) return
   const configCache = getCacheService(configConfig)
 
-  onEvent('config.update', async (data) => {
+  onEvent('config.update', async (_data) => {
     await configCache.invalidate('config:*')
     console.log('Cache invalidated: config.update')
   })
@@ -171,7 +171,7 @@ function setupMediaInvalidation(): void {
   if (!config) return
   const mediaCache = getCacheService(config)
 
-  onEvent('media.upload', async (data) => {
+  onEvent('media.upload', async (_data) => {
     await mediaCache.invalidate('media:*')
     console.log('Cache invalidated: media.upload')
   })
@@ -201,27 +201,27 @@ function setupAPIInvalidation(): void {
   if (!config) return
   const apiCache = getCacheService(config)
 
-  onEvent('content.update', async (data) => {
+  onEvent('content.update', async (_data) => {
     await apiCache.invalidate('api:*')
     console.log('Cache invalidated: api (content.update)')
   })
 
-  onEvent('content.publish', async (data) => {
+  onEvent('content.publish', async (_data) => {
     await apiCache.invalidate('api:*')
     console.log('Cache invalidated: api (content.publish)')
   })
 
-  onEvent('content.create', async (data) => {
+  onEvent('content.create', async (_data) => {
     await apiCache.invalidate('api:*')
     console.log('Cache invalidated: api (content.create)')
   })
 
-  onEvent('content.delete', async (data) => {
+  onEvent('content.delete', async (_data) => {
     await apiCache.invalidate('api:*')
     console.log('Cache invalidated: api (content.delete)')
   })
 
-  onEvent('collection.update', async (data) => {
+  onEvent('collection.update', async (_data) => {
     await apiCache.invalidate('api:*')
     console.log('Cache invalidated: api (collection.update)')
   })
@@ -235,7 +235,7 @@ function setupCollectionInvalidation(): void {
   if (!config) return
   const collectionCache = getCacheService(config)
 
-  onEvent('collection.create', async (data) => {
+  onEvent('collection.create', async (_data) => {
     await collectionCache.invalidate('collection:*')
     console.log('Cache invalidated: collection.create')
   })

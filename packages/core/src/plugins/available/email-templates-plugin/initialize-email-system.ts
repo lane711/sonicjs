@@ -7,7 +7,7 @@
  * Run this after the database migration to set up the email system.
  */
 
-import { createEmailManagementService } from './services/email-management';
+// import { createEmailManagementService } from './services/email-management';
 
 interface InitOptions {
   dbUrl?: string;
@@ -15,7 +15,7 @@ interface InitOptions {
   force?: boolean;
 }
 
-export async function initializeEmailSystem(options: InitOptions = {}) {
+export async function initializeEmailSystem(_options: InitOptions = {}) {
   console.log('🚀 Initializing SonicJS AI Email System...\n');
 
   try {
