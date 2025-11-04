@@ -377,7 +377,7 @@ MIT © SonicJS Team - See [LICENSE](./LICENSE) for details.
 
 ## 🔖 Resources
 
-- [Starter Template](../../templates/starter) - Greenfield project template
+- [Create SonicJS App](../../packages/create-app) - Scaffold a new project
 - [Cloudflare Workers Docs](https://developers.cloudflare.com/workers/)
 - [D1 Database](https://developers.cloudflare.com/d1/)
 - [R2 Storage](https://developers.cloudflare.com/r2/)

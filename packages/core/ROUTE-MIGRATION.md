@@ -31,7 +31,7 @@ npm run build
 # Changes are immediately available in linked projects!
 ```
 
-See `/templates/starter/SETUP-TESTING.md` for complete testing workflow.
+See the create-app templates for testing setup.
 
 ## Migration Progress Summary
 
@@ -665,5 +665,4 @@ After analyzing all remaining route files, here's what we found:
 ## Resources
 
 - [npm link documentation](https://docs.npmjs.com/cli/v8/commands/npm-link)
-- [Local Testing Guide](/templates/starter/SETUP-TESTING.md)
 - [SonicJS Documentation](https://docs.sonicjs.com)
