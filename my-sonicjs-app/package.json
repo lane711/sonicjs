@@ -18,7 +18,7 @@
     "seed": "tsx scripts/seed-admin.ts"
   },
   "dependencies": {
-    "@sonicjs-cms/core": "link:../packages/core"
+    "@sonicjs-cms/core": "file:../packages/core"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250620.0",
