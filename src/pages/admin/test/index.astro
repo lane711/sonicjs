@@ -1,0 +1,11 @@
+---
+import { apiConfig } from "../../../db/routes";
+import AdminLayout from "../layouts/admin-layout.astro";
+---
+
+<AdminLayout title=`SonicJs Admin` | Cache `>
+  <h1 class="text-base font-semibold leading-6 text-white">Performance Testing Sandbox</h1>
+    <p class="mt-4">This page makes a few calls back to the local API to compare various data source response times.</p>
+    <h2 class="text-base font-semibold leading-2 text-white mt-4">Fastest - Let SonicJs automatically return the fastest payload</h2>
+<code>/api/categories?limit=10</code>
+</AdminLayout>

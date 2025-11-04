@@ -1,0 +1,68 @@
+---
+import { getAdminKvData } from "@services/kv-data";
+import { apiConfig } from "../../../db/routes";
+import AdminLayout from "../layouts/admin-layout.astro";
+import TableCacheRequests from "components/table-cache-requests";
+import { getFieldDefinitions } from "@services/fields";
+
+// const data = await getAdminKvData(Astro);
+
+const tableConfigRecord = apiConfig.find((t) => t.route === "cache-requests");
+const tableConfig = getFieldDefinitions(tableConfigRecord);
+
+//remove fields
+
+tableConfig.formFields = tableConfig.formFields.filter(
+  (f) => f.key !== "createdOn"
+);
+
+tableConfig.formFields = tableConfig.formFields.filter(
+  (f) => f.key !== "updatedOn"
+);
+
+tableConfig.formFields = tableConfig.formFields.filter(
+  (f) => f.key !== "deletedOn"
+);
+//add fields
+
+tableConfig.formFields.push({
+  key: "createdOnAgo",
+  label: "Created On",
+  type: "textField",
+});
+
+tableConfig.formFields.push({
+  key: "matchingKvRecord",
+  label: "Matching KV Record",
+  type: "textField",
+});
+
+tableConfig.formFields.push({
+  key: "kvUpdatedOnAgo",
+  label: "KV Updated",
+  type: "textField",
+});
+
+tableConfig.formFields.push({
+  key: "kvTTL",
+  label: "KV TTL",
+  type: "textField",
+});
+
+let x;
+---
+
+<AdminLayout title=`SonicJs Admin` | Cache `>
+
+
+
+  <div>
+    <TableCacheRequests client:load tableConfig={tableConfig} />
+  </div>
+
+
+  <!-- <div>
+    KV Count: {data.kvRecordsCount} | Records Count: {data.cacheRequestsCount}
+  </div> -->
+
+</AdminLayout>

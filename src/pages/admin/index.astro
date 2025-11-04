@@ -1,0 +1,113 @@
+---
+// import { desc } from "drizzle-orm";
+// import { drizzle } from "drizzle-orm/d1";
+// import { linkShare } from "../db/schema";
+
+if (Astro.locals.user === null) {
+  return Astro.redirect("/admin/login");
+}
+
+const data = Astro.locals;
+
+const { user } = Astro.locals;
+const fullName = `${user.firstName} ${user.lastName}`;
+
+import { apiConfig, type ApiConfig } from "db/routes";
+import AdminLayout from "./layouts/admin-layout.astro";
+import { getTableCounts } from "@services/d1-data";
+
+const tables = apiConfig;
+const tablesWithStats = [];
+for (const item of tables) {
+  const tableCounts = await getTableCounts(Astro.locals.runtime.env.D1, item.table);
+  tablesWithStats.push({
+    ...item,
+    count: tableCounts.count
+  });
+}
+
+const x = false;
+// const { env } = Astro.locals.runtime;
+// const db = drizzle(env.D1);
+
+// const links = await db
+//   .select()
+//   .from(linkShare)
+//   .orderBy(desc(linkShare.created));
+---
+
+<AdminLayout title="SonicJs Admin">
+  <div class="bg-gray-900">
+    <div class="mx-auto max-w-7xl">
+      <div class="bg-gray-900 py-10">
+        <div class="px-4 sm:px-6 lg:px-8">
+          <div>
+            <h3 class="text-base font-semibold text-white">Data Stats</h3>
+
+            <dl
+              class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+            >
+              {
+                tablesWithStats.map((item: any) => {
+                  return (
+                    <div class="relative overflow-hidden rounded-lg bg-gray-800 px-4 pb-12 pt-5 shadow sm:px-6 sm:pt-6">
+                      <dt>
+                        <div class="absolute rounded-md bg-indigo-500 p-3">
+                          <div set:html={item.icon} />
+
+                        </div>
+                        <p class="ml-16 truncate text-sm font-medium text-gray-500">
+                          Total {item.name}
+                        </p>
+                      </dt>
+                      <dd class="ml-16 flex items-baseline pb-6 sm:pb-7">
+                        <p class="text-2xl font-semibold text-gray-100">
+                            {item.count.toLocaleString()}
+                        </p>
+                        {/* <p class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+                          <svg
+                            class="size-5 shrink-0 self-center text-green-500"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            aria-hidden="true"
+                            data-slot="icon"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              d="M10 17a.75.75 0 0 1-.75-.75V5.612L5.29 9.77a.75.75 0 0 1-1.08-1.04l5.25-5.5a.75.75 0 0 1 1.08 0l5.25 5.5a.75.75 0 1 1-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0 1 10 17Z"
+                              clip-rule="evenodd"
+                            />
+                          </svg>
+                          <span class="sr-only"> Increased by </span>
+                          122
+                        </p> */}
+                        <div class="absolute inset-x-0 bottom-0 bg-gray-700 px-4 py-4 sm:px-6">
+                          <div class="text-sm">
+                            <a
+                                                  href=`/admin/tables/${item.route}`
+
+                              class="font-medium text-gray-300 hover:text-indigo-500"
+                            >
+                              View all
+                              <span class="sr-only">
+                                {" "}
+                                Total Subscribers stats
+                              </span>
+                            </a>
+                          </div>
+                        </div>
+                      </dd>
+                    </div>
+                  );
+                })
+              }
+
+            </dl>
+          </div>
+
+    
+        </div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
