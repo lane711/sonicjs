@@ -18,5 +18,5 @@ export const GET: APIRoute = async (context) => {
     console.log('context.locals.runtime.env', context.locals.runtime.env);
     let value = await context.locals.runtime.env.KV.put('test', JSON.stringify(blogPosts));
 
-    return return200("success");
+    return return200();
 };

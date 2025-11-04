@@ -34,5 +34,8 @@ TEMP.md
 /blob-report/
 /playwright/.cache/
 
-# Deployment config
-wrangler.deploy.jsonc
+build.txt
+
+
+# local sonicjs-core
+_sonicjs-core

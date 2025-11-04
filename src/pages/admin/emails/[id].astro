@@ -1,0 +1,20 @@
+---
+
+interface Params {
+    emailName: string;
+}
+import { getEmailComponent } from "@emails/index";
+
+const { id } = Astro.params;
+
+const EmailComponent = getEmailComponent(id);
+if (!EmailComponent) {
+    throw new Error(`Email template '${id}' not found`);
+}
+
+
+const baseUrl = Astro.locals.runtime.env.EMAIL_BASE_URL;
+console.log(baseUrl);
+---
+
+<EmailComponent baseUrl={baseUrl} />
