@@ -1,13 +1,19 @@
-import { sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  text,
+  uniqueIndex,
+  integer,
+} from "drizzle-orm/sqlite-core";
 import { relations, type InferSelectModel } from "drizzle-orm";
 import { auditSchema } from "./audit";
 import * as posts from "@custom/db/schema/posts";
 import * as comments from "@custom/db/schema/comments";
 // import * as userKeys from "./userKeys";
 // import * as userSessions from "./userSessions";
-import { isAdmin, isAdminOrEditor, isAdminOrUser } from "../config-helpers";
+import { isAdmin, isAdminOrEditor, isAdminOrUser, usersCanRegister } from "../config-helpers";
 import type { ApiConfig } from "../routes";
 import { hashString } from "@services/cyrpt";
+// import { sendEmailConfirmation } from "@services/auth";
 export const tableName = "users";
 export const name = "Users";
 
@@ -20,7 +26,13 @@ export const definition = {
   lastName: text("lastName"),
   profile: text("profile"),
   email: text("email").unique(),
+  emailConfirmedOn: integer("emailConfirmedOn"),
+  emailConfirmationToken: text("emailConfirmationToken"),
   password: text("password").notNull(),
+  passwordOTP: text("passwordOTP"),
+  passwordOTPExpiresOn: integer("passwordOTPExpiresOn"),
+  passwordResetCode: text("passwordResetCode"),
+  passwordResetCodeExpiresOn: integer("passwordResetCodeExpiresOn"),
   role: text("role").$type<"admin" | "user">().default("user"),
 };
 
@@ -49,7 +61,7 @@ export const relation = relations(table, ({ many }) => ({
 export const access: ApiConfig["access"] = {
   operation: {
     read: isAdmin,
-    create: isAdmin,
+    create: usersCanRegister,
     delete: isAdmin,
     update: isAdminOrUser,
   },
@@ -70,7 +82,7 @@ export const access: ApiConfig["access"] = {
       },
     },
     password: {
-      read:false,
+      read: false,
       update: isAdminOrUser,
     },
     role: {
@@ -80,6 +92,31 @@ export const access: ApiConfig["access"] = {
       update: isAdmin,
     },
   },
+};
+
+export const userRegistrationAfterOperation = (
+  context,
+  operation,
+  id,
+  data,
+  result
+) => {
+  removePassword(context, operation, id, data, result);
+  addEmailToken(context, operation, id, data, result);
+};
+
+export const addEmailToken = (context, operation, id, data, result) => {
+  if (operation === "create" && result.status === 201) {
+    if (result.data.email && context.locals.runtime.env.REQUIRE_EMAIL_CONFIRMATION?.toString().toLowerCase() === "true") {
+      // sendEmailConfirmation(context, result.data.email);
+    }
+  }
+};
+
+export const removePassword = (context, operation, id, data, result) => {
+  if (operation === "create" && result.status === 201) {
+    delete result.data.password;
+  }
 };
 
 export const hooks: ApiConfig["hooks"] = {
@@ -100,4 +137,5 @@ export const hooks: ApiConfig["hooks"] = {
       return data;
     },
   },
+  afterOperation: userRegistrationAfterOperation,
 };

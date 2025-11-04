@@ -31,7 +31,7 @@ const fallbackData = [
   },
 ];
 
-function Table({ tableConfig }) {
+function Table({ tableConfig, token }) {
   // debugger;
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -42,7 +42,7 @@ function Table({ tableConfig }) {
   const [recordToDelete, setRecordToDelete] = useState(false);
   const [columnFilters, setColumnFilters] = useState([{id:'title', value: ''}]);
 
-  const pageSize = 18;
+  const pageSize = 100;
 
   // const columns = Object.entries(tableConfig.formFields).map(([key, value]) =>
   //   columnHelper.accessor(key, {
@@ -120,11 +120,15 @@ function Table({ tableConfig }) {
 
   useEffect(() => {
     if (confirmDelete) {
-      deleteData(recordToDelete);
-      console.log("record deleted");
-      setConfirmDelete(false);
-      //redirect to table
-      window.location.href = `/admin/tables/${tableConfig.route}`;
+      (async () => {
+        const result = await deleteData(recordToDelete);
+        console.log("record deleted");
+        // setConfirmDelete(false);
+        //redirect to table
+        if (result.success) {
+          window.location.href = `/admin/tables/${tableConfig.route}`;
+        }
+      })();
     }
   }, [confirmDelete]);
 
@@ -138,18 +142,31 @@ function Table({ tableConfig }) {
       }
     };
 
-  const deleteData = (id) => {
+  const deleteData = async (id) => {
+    console.log("deleteData with id", id);
+
     if (id) {
       const path = `/api/v1/${tableConfig.route}/${id}`;
 
-      // const path = `/api/v1/${tableConfig.route}`;
 
-      fetch(path, {
-        method: "DELETE",
-      })
-        .then((res) => res.text()) // or res.json()
-        .then((res) => console.log(res));
-      console.log("delete record with id", id);
+      try {
+        const response = await fetch(path, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+    
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error("There was an error deleting the data:", error);
+        throw error;
+      }
     }
   };
 
@@ -208,6 +225,7 @@ function Table({ tableConfig }) {
                                 return (
                                   <th
                                     scope="col"
+                                    key={header.id}
                                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-100"
                                     onClick={header.column.getToggleSortingHandler()}
                                   >
@@ -273,6 +291,7 @@ function Table({ tableConfig }) {
                       </thead>
                       <tbody>
                         {table.getRowModel().rows.map((row) => {
+                          console.log("row", row);
                           return (
                             <tr key={row.id}>
                               {row.getVisibleCells().map((cell) => {
@@ -334,7 +353,10 @@ function Table({ tableConfig }) {
                 </div>
                 <div className="hidden md:-mt-px md:flex">
                   {pageArray.map((pageNumber) => 
-                    <Button onClick={() => table.setPageIndex(pageNumber-1)} className={"inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium hover:border-gray-300 hover:text-gray-300" + pagerColor(pageNumber)}>
+                    <Button
+                      key={pageNumber}
+                      onClick={() => table.setPageIndex(pageNumber-1)}
+                      className={"inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium hover:border-gray-300 hover:text-gray-300" + pagerColor(pageNumber)}>
                       {pageNumber}
                     </Button>
                   )}

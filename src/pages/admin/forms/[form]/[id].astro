@@ -9,9 +9,9 @@ const tableConfigRecord = apiConfig.find((t) => t.route === form);
 // const tableConfig = getFieldDefinitions(tableConfigRecord);
 
 //get existing record
-const getRecord = async (table, id) => {
+const getRecord = async (id) => {
   const baseURl = Astro.request.url.split("/admin/")[0];
-  const getUrl = `${baseURl}/api/v1/${tableConfigRecord.route}/${id}`;
+  const getUrl = `${baseURl}/api/v1/${tableConfigRecord.route}/?id=${id}`;
 
   const session = Astro.cookies.get("session")?.value;
   const response = await fetch(getUrl, {
@@ -19,13 +19,11 @@ const getRecord = async (table, id) => {
   });
   if (response.ok) {
     const responseData: { data: any } = await response.json();
-    const { data } = responseData;
-    return data
+    return responseData;
   }
 };
 
-const record = await getRecord(tableConfigRecord.route, id);
-// console.log("record====>", record);
+const record = await getRecord(id);
 
 if (Astro.request.method === "POST") {
   try {
@@ -77,5 +75,5 @@ if (Astro.request.method === "POST") {
 ---
 
 <AdminLayout title=`SonicJs Admin` | {form} `>
-  <FormComponent record={record.data} />
+  <FormComponent record={record} />
 </AdminLayout>

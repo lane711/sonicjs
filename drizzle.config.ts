@@ -8,14 +8,14 @@ console.log("LOCAL_DB_PATH", LOCAL_DB_PATH);
 // Use better-sqlite driver for local development
 export default LOCAL_DB_PATH
 	? ({
-			schema: "./src/db/schema",
+			schema: "./src/custom/custom.config.ts",
 			dialect: "sqlite",
 			dbCredentials: {
 				url: LOCAL_DB_PATH,
 			},
 		} satisfies Config)
 	: ({
-			schema: "./src/db/schema",
+			schema: "./src/custom/custom.config.ts",
 			out: "./migrations",
 			dialect: "sqlite",
 			driver: "d1-http",

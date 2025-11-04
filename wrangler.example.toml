@@ -12,7 +12,37 @@ database_name = "sonicjs"
 database_id = "CHANGEME"
 
 [vars]
+#auth settings
+INVALIDATE_USER_SESSIONS = false
+REQUIRE_EMAIL_CONFIRMATION = true
+USERS_CAN_REGISTER = true
+
+# password reset settings
+RESET_PASSWORD_EXPIRATION_TIME = 1200000          # 20 minutes in milliseconds
+PASSWORD_RESET_EMAIL_SUBJECT="SonicJS Password Reset"
+
+# cache
 DISABLED_CACHE = true
-DEPOLY_URL  = "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/<ADD-ID-HERE>"
 
+# reset email service
+RESEND_API_KEY = "CHANGEME"
 
+#email settings
+EMAIL_ENABLED = true
+EMAIL_FROM="me@example.com"
+EMAIL_BASE_URL="https://example.com"
+EMAIL_FROM_NAME="Example"
+EMAIL_SEND_WELCOME_EMAIL = true
+
+# one time password settings
+ONE_TIME_PASSWORD_CHARACTER_LENGTH = 5
+ONE_TIME_PASSWORD_EXPIRATION_TIME = 1200000 # 20 minutes in milliseconds
+ONE_TIME_PASSWORD_EMAIL_SUBJECT="Your SonicJS OTP"
+
+#email confirmation settings
+EMAIL_CONFIRMATION_SUBJECT = "Your SonicJS Email Confirmation"
+EMAIL_CONFIRMATION_REDIRECT_URL = "https://sonicjs.com/login" # after user clicks confirmation link, they will be redirected to this url
+AUTO_LOGIN_AFTER_EMAIL_CONFIRMATION = true
+
+# testing
+TESTING_MODE = true # do not set to true in production, it enables e2e endpoints
