@@ -14,5 +14,6 @@
       "@emails/*": ["./emails/*"],
 
     }
-  }
+  },
+  "exclude": ["playwright-report", "dist", "node_modules"]
 }

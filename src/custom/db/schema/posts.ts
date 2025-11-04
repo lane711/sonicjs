@@ -120,7 +120,7 @@ export const fields: ApiConfig["fields"] = {
     type: "textField",
   },
   body: {
-    type: "textArea",
+    type: "mdxEditor",
   },
   image: {
     type: "file",
