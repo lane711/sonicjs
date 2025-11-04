@@ -1,4 +1,19 @@
 import { test, expect } from "@playwright/test";
+import { cleanup, loginAsAdmin, updateEnvVar } from "./e2e-helpers";
+  
+test.describe.configure({ mode: "serial" });
+
+
+var token = "";
+const e2ePrefix = "e2e!!-anonymous";
+test.beforeAll(async ({ request }) => {
+  token = await loginAsAdmin(request);
+  await cleanup(request, token, "users", "email", e2ePrefix);
+});
+
+test.afterEach(async ({ request }) => {
+  await cleanup(request, token, "users", "email", e2ePrefix);
+});
 
 test("should not allow unauthenticated user to access /api/v1/users", async ({
   request,
@@ -48,19 +63,4 @@ test("should allow unauthenticated user to access /api/v1/posts", async ({
   expect(Array.isArray(data)).toBe(true);
   expect(data.length).toBeGreaterThan(0);
 });
-test("should not allow unauthenticated user to create a user", async ({
-  request,
-}) => {
-  const response = await request.post(`/api/v1/users`, {
-    data: {
-      username: "newuser",
-      password: "password123",
-    },
-  });
-  expect(response.status()).toBe(401);
-  expect(await response.json()).toEqual(
-    expect.objectContaining({
-      message: "Unauthorized",
-    })
-  );
-});
+

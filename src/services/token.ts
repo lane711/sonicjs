@@ -2,9 +2,7 @@ import { validateSessionToken } from "./sessions";
 
 export const checkToken = async (context: any) => {
   // get header for token and lookup user and attached to context
-  const token = context.request.headers
-    .get("Authorization").toLowerCase()
-    ?.replace("bearer ", "");
+  const token = getToken(context);
   if (!token) {
     return false;
   }
@@ -25,4 +23,14 @@ export const checkToken = async (context: any) => {
   }
 
   return true;
+};
+
+export const getToken = (context: any) => {
+  return (
+    context.cookies.get("session")?.value ??
+    context.request.headers
+      .get("Authorization")
+      ?.toLowerCase()
+      ?.replace("bearer ", "")
+  );
 };

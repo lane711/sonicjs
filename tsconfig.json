@@ -5,11 +5,14 @@
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "module": "es2020",
+    "target": "es2017",  // had to change this to "es2017"
     "paths": {
       "@services/*": ["./services/*"],
       "@schema/*": ["./db/schema/*"],
       "@routes": ["./db/routes.ts"],
       "@custom/*": ["./custom/*"],
+      "@emails/*": ["./emails/*"],
+
     }
   },
   "exclude": ["playwright-report", "dist", "node_modules"]

@@ -31,7 +31,7 @@ const fallbackData = [
   },
 ];
 
-function Table({ tableConfig }) {
+function Table({ tableConfig, token }) {
   // debugger;
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -42,7 +42,7 @@ function Table({ tableConfig }) {
   const [recordToDelete, setRecordToDelete] = useState(false);
   const [columnFilters, setColumnFilters] = useState([{id:'title', value: ''}]);
 
-  const pageSize = 18;
+  const pageSize = 100;
 
   // const columns = Object.entries(tableConfig.formFields).map(([key, value]) =>
   //   columnHelper.accessor(key, {
@@ -120,11 +120,15 @@ function Table({ tableConfig }) {
 
   useEffect(() => {
     if (confirmDelete) {
-      deleteData(recordToDelete);
-      console.log("record deleted");
-      setConfirmDelete(false);
-      //redirect to table
-      window.location.href = `/admin/tables/${tableConfig.route}`;
+      (async () => {
+        const result = await deleteData(recordToDelete);
+        console.log("record deleted");
+        // setConfirmDelete(false);
+        //redirect to table
+        if (result.success) {
+          window.location.href = `/admin/tables/${tableConfig.route}`;
+        }
+      })();
     }
   }, [confirmDelete]);
 
@@ -138,18 +142,31 @@ function Table({ tableConfig }) {
       }
     };
 
-  const deleteData = (id) => {
+  const deleteData = async (id) => {
+    console.log("deleteData with id", id);
+
     if (id) {
       const path = `/api/v1/${tableConfig.route}/${id}`;
 
-      // const path = `/api/v1/${tableConfig.route}`;
 
-      fetch(path, {
-        method: "DELETE",
-      })
-        .then((res) => res.text()) // or res.json()
-        .then((res) => console.log(res));
-      console.log("delete record with id", id);
+      try {
+        const response = await fetch(path, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+    
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error("There was an error deleting the data:", error);
+        throw error;
+      }
     }
   };
 
@@ -274,6 +291,7 @@ function Table({ tableConfig }) {
                       </thead>
                       <tbody>
                         {table.getRowModel().rows.map((row) => {
+                          console.log("row", row);
                           return (
                             <tr key={row.id}>
                               {row.getVisibleCells().map((cell) => {
