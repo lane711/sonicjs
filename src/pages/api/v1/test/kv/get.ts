@@ -1,4 +1,3 @@
-import { return200WithObject } from '@services/return-types';
 import type { APIRoute } from "astro";
 
 export const GET: APIRoute = async (context) => {

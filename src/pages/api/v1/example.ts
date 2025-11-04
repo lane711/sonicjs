@@ -1,13 +1,12 @@
 import {
-  return200WithObject,
+  return200,
   return201,
-  return204,
   return500,
 } from "@services/return-types";
 import type { APIRoute } from "astro";
 
 export async function GET(context) {
-  return return200WithObject({ hello: "cruel world" });
+  return return200({ hello: "cruel world" });
 }
 
 export const POST: APIRoute = async ({ request }) => {
@@ -21,9 +20,9 @@ export const POST: APIRoute = async ({ request }) => {
 };
 
 export const DELETE: APIRoute = ({ request }) => {
-  return return204();
+  return return200({ message: "wildcard" });
 };
 
 export const ALL: APIRoute = ({ request }) => {
-  return return200WithObject({ message: "wildcard" });
+  return return200({ message: "wildcard" });
 };

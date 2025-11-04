@@ -1,4 +1,7 @@
-import { return200, return200WithObject, return401 } from "@services/return-types";
+import {
+  return200,
+  return401,
+} from "@services/return-types";
 import { validateSessionToken } from "@services/sessions";
 import type { APIRoute } from "astro";
 
@@ -9,7 +12,7 @@ export const GET: APIRoute = async (context) => {
     return return401("No token provided");
   }
 
-  token = token.replace("Bearer ", "");
+  token = token.toLowerCase().replace("bearer ", "");
 
   if (!token) {
     return return401();
@@ -20,9 +23,9 @@ export const GET: APIRoute = async (context) => {
     token
   );
 
-  if(validSession.session === null || validSession.user === null) {
+  if (validSession.session === null || validSession.user === null) {
     return return401();
   }
 
-  return return200WithObject(validSession);
+  return return200({ data: validSession });
 };

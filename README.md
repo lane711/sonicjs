@@ -11,7 +11,7 @@ This results in extremely fast page/app loads for end users.
 Built on Astro and optimized for Cloudflare, SonicJs is a headless CMS that offers a flexible and scalable content management solution, utilizing the latest web technologies.
 
 ## Dedicated Documentation Website
-Read the docs here [https://sonicjs.com](https://sonicjs.com])
+Read the docs here [https://sonicjs.com](https://sonicjs.com)
 
 ## How Fast is "Blazingly" Fast?
 
@@ -88,6 +88,11 @@ Details of our performance benchmark can be found at SonicJs.com. Here is a part
 
 ## Contributions
 We gladly accept Pull Requests (PRs) from the community.
+
+## Road Map
+Curious what's on the horizon for SonicJs? Check out our [Project Backlog](https://github.com/users/lane711/projects/2).
+
+While you're there, please consider picking up a story in the backlog. 
 
 ## Licensing (MIT)
 This project is licensed under the MIT License. This means you are free to use, modify, and distribute this software under the  conditions specified.

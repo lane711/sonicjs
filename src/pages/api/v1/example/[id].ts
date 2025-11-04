@@ -1,5 +1,5 @@
-import { return200WithObject } from "@services/return-types";
+import { return200 } from "@services/return-types";
 
 export async function GET({params}) {
-  return return200WithObject({ id: params.id});
+  return return200({ id: params.id});
 }

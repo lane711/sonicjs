@@ -1,10 +1,9 @@
 ---
-import { convertFormDataToObject } from "../../../services/utils";
 import LoginLayout from "../layouts/admin-login.astro";
 import SonicJsLogo from "../../../../public/images/sonicjs-logo.svg";
 import { Image } from "astro:assets";
-import { sendEmail } from "../../../services/email";
 import { doesAdminAccountExist } from "@services/auth";
+import { convertFormDataToObject } from "@services/utils";
 
 let isAdminAccountCreated = await doesAdminAccountExist(Astro.locals.runtime.env.D1) ;
 console.log('isAdminAccountCreated register', isAdminAccountCreated)
