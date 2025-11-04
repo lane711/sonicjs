@@ -4,76 +4,76 @@
  * Example collection configuration for blog posts
  */
 
-import type { CollectionConfig } from '@sonicjs-cms/core'
+import type { CollectionConfig } from "@sonicjs-cms/core";
 
 export default {
-  name: 'blog-posts',
-  displayName: 'Blog Posts',
-  description: 'Manage your blog posts',
-  icon: '📝',
+  name: "blog_posts",
+  displayName: "Blog Posts",
+  description: "Manage your blog posts",
+  icon: "📝",
 
   schema: {
-    type: 'object',
+    type: "object",
     properties: {
       title: {
-        type: 'string',
-        title: 'Title',
+        type: "string",
+        title: "Title",
         required: true,
-        maxLength: 200
+        maxLength: 200,
       },
       slug: {
-        type: 'slug',
-        title: 'URL Slug',
+        type: "slug",
+        title: "URL Slug",
         required: true,
-        maxLength: 200
+        maxLength: 200,
       },
       excerpt: {
-        type: 'textarea',
-        title: 'Excerpt',
+        type: "textarea",
+        title: "Excerpt",
         maxLength: 500,
-        helpText: 'A short summary of the post'
+        helpText: "A short summary of the post",
       },
       content: {
-        type: 'markdown',
-        title: 'Content',
-        required: true
+        type: "markdown",
+        title: "Content",
+        required: true,
       },
       featuredImage: {
-        type: 'media',
-        title: 'Featured Image'
+        type: "media",
+        title: "Featured Image",
       },
       author: {
-        type: 'string',
-        title: 'Author',
-        required: true
+        type: "string",
+        title: "Author",
+        required: true,
       },
       publishedAt: {
-        type: 'datetime',
-        title: 'Published Date'
+        type: "datetime",
+        title: "Published Date",
       },
       status: {
-        type: 'select',
-        title: 'Status',
-        enum: ['draft', 'published', 'archived'],
-        enumLabels: ['Draft', 'Published', 'Archived'],
-        default: 'draft'
+        type: "select",
+        title: "Status",
+        enum: ["draft", "published", "archived"],
+        enumLabels: ["Draft", "Published", "Archived"],
+        default: "draft",
       },
       tags: {
-        type: 'string',
-        title: 'Tags',
-        helpText: 'Comma-separated tags'
-      }
+        type: "string",
+        title: "Tags",
+        helpText: "Comma-separated tags",
+      },
     },
-    required: ['title', 'slug', 'content', 'author']
+    required: ["title", "slug", "content", "author"],
   },
 
   // List view configuration
-  listFields: ['title', 'author', 'status', 'publishedAt'],
-  searchFields: ['title', 'excerpt', 'author'],
-  defaultSort: 'createdAt',
-  defaultSortOrder: 'desc',
+  listFields: ["title", "author", "status", "publishedAt"],
+  searchFields: ["title", "excerpt", "author"],
+  defaultSort: "createdAt",
+  defaultSortOrder: "desc",
 
   // Mark as config-managed (code-based) collection
   managed: true,
-  isActive: true
-} satisfies CollectionConfig
+  isActive: true,
+} satisfies CollectionConfig;

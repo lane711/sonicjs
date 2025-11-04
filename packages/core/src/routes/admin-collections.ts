@@ -100,7 +100,7 @@ adminCollectionsRoutes.get('/', async (c) => {
     let results
     if (search) {
       stmt = db.prepare(`
-        SELECT id, name, display_name, description, created_at, managed
+        SELECT id, name, display_name, description, created_at, managed, schema
         FROM collections
         WHERE is_active = 1
         AND (name LIKE ? OR display_name LIKE ? OR description LIKE ?)
@@ -110,12 +110,12 @@ adminCollectionsRoutes.get('/', async (c) => {
       const queryResults = await stmt.bind(searchParam, searchParam, searchParam).all()
       results = queryResults.results
     } else {
-      stmt = db.prepare('SELECT id, name, display_name, description, created_at, managed FROM collections WHERE is_active = 1 ORDER BY created_at DESC')
+      stmt = db.prepare('SELECT id, name, display_name, description, created_at, managed, schema FROM collections WHERE is_active = 1 ORDER BY created_at DESC')
       const queryResults = await stmt.all()
       results = queryResults.results
     }
 
-    // Fetch field counts for all collections
+    // Fetch field counts for all collections from content_fields table (legacy)
     const fieldCountStmt = db.prepare('SELECT collection_id, COUNT(*) as count FROM content_fields GROUP BY collection_id')
     const { results: fieldCountResults } = await fieldCountStmt.all()
     const fieldCounts = new Map((fieldCountResults || []).map((row: any) => [String(row.collection_id), Number(row.count)]))
@@ -123,6 +123,22 @@ adminCollectionsRoutes.get('/', async (c) => {
     const collections: Collection[] = (results || [])
       .filter((row: any) => row && row.id)
       .map((row: any) => {
+        // Calculate field count: use schema if available, otherwise use content_fields table
+        let fieldCount = 0
+        if (row.schema) {
+          try {
+            const schema = typeof row.schema === 'string' ? JSON.parse(row.schema) : row.schema
+            if (schema && schema.properties) {
+              fieldCount = Object.keys(schema.properties).length
+            }
+          } catch (e) {
+            // If schema parsing fails, fall back to content_fields count
+            fieldCount = fieldCounts.get(String(row.id)) || 0
+          }
+        } else {
+          fieldCount = fieldCounts.get(String(row.id)) || 0
+        }
+
         return {
           id: String(row.id || ''),
           name: String(row.name || ''),
@@ -130,7 +146,7 @@ adminCollectionsRoutes.get('/', async (c) => {
           description: row.description ? String(row.description) : undefined,
           created_at: Number(row.created_at || 0),
           formattedDate: row.created_at ? new Date(Number(row.created_at)).toLocaleDateString() : 'Unknown',
-          field_count: fieldCounts.get(String(row.id)) || 0,
+          field_count: fieldCount,
           managed: row.managed === 1
         }
       })
@@ -338,23 +354,51 @@ adminCollectionsRoutes.get('/:id', async (c) => {
       return c.html(renderCollectionFormPage(formData))
     }
 
-    // Get collection fields
-    const fieldsStmt = db.prepare(`
-      SELECT * FROM content_fields
-      WHERE collection_id = ?
-      ORDER BY field_order ASC
-    `)
-    const { results: fieldsResults } = await fieldsStmt.bind(id).all()
-    const fields = (fieldsResults || []).map((row: any) => ({
-      id: row.id,
-      field_name: row.field_name,
-      field_type: row.field_type,
-      field_label: row.field_label,
-      field_options: row.field_options ? JSON.parse(row.field_options) : {},
-      field_order: row.field_order,
-      is_required: row.is_required === 1,
-      is_searchable: row.is_searchable === 1
-    }))
+    // Get collection fields - try schema first, then content_fields table
+    let fields: CollectionField[] = []
+
+    // If collection has a schema, parse it
+    if (collection.schema) {
+      try {
+        const schema = typeof collection.schema === 'string' ? JSON.parse(collection.schema) : collection.schema
+        if (schema && schema.properties) {
+          // Convert schema properties to field format
+          let fieldOrder = 0
+          fields = Object.entries(schema.properties).map(([fieldName, fieldConfig]: [string, any]) => ({
+            id: `schema-${fieldName}`,
+            field_name: fieldName,
+            field_type: fieldConfig.type || 'string',
+            field_label: fieldConfig.title || fieldName,
+            field_options: fieldConfig,
+            field_order: fieldOrder++,
+            is_required: fieldConfig.required === true || (schema.required && schema.required.includes(fieldName)),
+            is_searchable: false
+          }))
+        }
+      } catch (e) {
+        console.error('Error parsing collection schema:', e)
+      }
+    }
+
+    // Fall back to content_fields table if no schema or parsing failed
+    if (fields.length === 0) {
+      const fieldsStmt = db.prepare(`
+        SELECT * FROM content_fields
+        WHERE collection_id = ?
+        ORDER BY field_order ASC
+      `)
+      const { results: fieldsResults } = await fieldsStmt.bind(id).all()
+      fields = (fieldsResults || []).map((row: any) => ({
+        id: row.id,
+        field_name: row.field_name,
+        field_type: row.field_type,
+        field_label: row.field_label,
+        field_options: row.field_options ? JSON.parse(row.field_options) : {},
+        field_order: row.field_order,
+        is_required: row.is_required === 1,
+        is_searchable: row.is_searchable === 1
+      }))
+    }
 
     const formData: CollectionFormData = {
       id: collection.id,

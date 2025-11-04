@@ -270,7 +270,55 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
           </style>
           
           ${renderForm(formData)}
-          
+
+          ${isEdit && data.managed ? `
+            <!-- Read-Only Fields Display for Managed Collections -->
+            <div class="mt-8 pt-8 border-t border-zinc-950/5 dark:border-white/10">
+              <div class="mb-6">
+                <h3 class="text-base/7 font-semibold text-zinc-950 dark:text-white">Collection Fields</h3>
+                <p class="text-sm/6 text-zinc-500 dark:text-zinc-400 mt-1">Fields defined in the configuration file (read-only)</p>
+              </div>
+
+              <!-- Fields List (Read-Only) -->
+              <div class="space-y-3">
+                ${(data.fields || []).map(field => `
+                  <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-950/5 dark:border-white/10 p-4">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-x-4">
+                        <div>
+                          <div class="flex items-center gap-x-2">
+                            <span class="text-sm/6 font-medium text-zinc-950 dark:text-white">${field.field_label}</span>
+                            <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-cyan-500/10 dark:bg-cyan-400/10 text-cyan-700 dark:text-cyan-300 ring-1 ring-inset ring-cyan-500/20 dark:ring-cyan-400/20">
+                              ${field.field_type}
+                            </span>
+                            ${field.is_required ? `
+                              <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-rose-500/10 dark:bg-rose-400/10 text-rose-700 dark:text-rose-300 ring-1 ring-inset ring-rose-500/20 dark:ring-rose-400/20">
+                                Required
+                              </span>
+                            ` : ''}
+                          </div>
+                          <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                            <code class="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 font-mono">${field.field_name}</code>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `).join('')}
+
+                ${(data.fields || []).length === 0 ? `
+                  <div class="text-center py-12 text-zinc-500 dark:text-zinc-400">
+                    <svg class="mx-auto h-12 w-12 text-zinc-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                    </svg>
+                    <p class="mt-4 text-base/7 font-semibold text-zinc-950 dark:text-white">No fields defined</p>
+                    <p class="mt-2 text-sm/6">Add fields to your collection configuration file to see them here.</p>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          ` : ''}
+
           ${isEdit && !data.managed ? `
             <!-- Fields Management Section -->
             <div class="mt-8 pt-8 border-t border-zinc-950/5 dark:border-white/10">
