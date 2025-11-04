@@ -10,6 +10,7 @@ export {
   loadCollectionConfig,
   getAvailableCollectionNames,
   validateCollectionConfig,
+  registerCollections,
 } from './collection-loader'
 
 export {

@@ -1,8 +1,24 @@
 'use strict';
 
 // src/services/collection-loader.ts
+var registeredCollections = [];
+function registerCollections(collections) {
+  for (const config of collections) {
+    if (!config.name || !config.displayName || !config.schema) {
+      console.error(`Invalid collection config: missing required fields`, config);
+      continue;
+    }
+    const normalizedConfig = {
+      ...config,
+      managed: config.managed !== void 0 ? config.managed : true,
+      isActive: config.isActive !== void 0 ? config.isActive : true
+    };
+    registeredCollections.push(normalizedConfig);
+    console.log(`\u2713 Registered collection: ${config.name}`);
+  }
+}
 async function loadCollectionConfigs() {
-  const collections = [];
+  const collections = [...registeredCollections];
   try {
     const modules = undefined?.("../collections/*.collection.ts", { eager: true }) || {};
     for (const [path, module] of Object.entries(modules)) {
@@ -28,11 +44,11 @@ async function loadCollectionConfigs() {
         console.error(`Error loading collection from ${path}:`, error);
       }
     }
-    console.log(`Loaded ${collections.length} collection configuration(s)`);
+    console.log(`Loaded ${collections.length} total collection configuration(s) (${registeredCollections.length} registered, ${collections.length - registeredCollections.length} from core)`);
     return collections;
   } catch (error) {
     console.error("Error loading collection configurations:", error);
-    return [];
+    return collections;
   }
 }
 async function loadCollectionConfig(name) {
@@ -1502,8 +1518,9 @@ exports.getManagedCollections = getManagedCollections;
 exports.isCollectionManaged = isCollectionManaged;
 exports.loadCollectionConfig = loadCollectionConfig;
 exports.loadCollectionConfigs = loadCollectionConfigs;
+exports.registerCollections = registerCollections;
 exports.syncCollection = syncCollection;
 exports.syncCollections = syncCollections;
 exports.validateCollectionConfig = validateCollectionConfig;
-//# sourceMappingURL=chunk-YGVWY6KO.cjs.map
-//# sourceMappingURL=chunk-YGVWY6KO.cjs.map
+//# sourceMappingURL=chunk-NBDPIRQS.cjs.map
+//# sourceMappingURL=chunk-NBDPIRQS.cjs.map

@@ -1,9 +1,7 @@
-'use strict';
-
-var chunkYGVWY6KO_cjs = require('./chunk-YGVWY6KO.cjs');
-var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
-var jwt = require('hono/jwt');
-var cookie = require('hono/cookie');
+import { MigrationService, syncCollections, PluginBootstrapService } from './chunk-COBUPOMD.js';
+import { metricsTracker } from './chunk-FICTAGD4.js';
+import { sign, verify } from 'hono/jwt';
+import { getCookie } from 'hono/cookie';
 
 // src/middleware/bootstrap.ts
 var bootstrapComplete = false;
@@ -19,16 +17,16 @@ function bootstrapMiddleware() {
     try {
       console.log("[Bootstrap] Starting system initialization...");
       console.log("[Bootstrap] Running database migrations...");
-      const migrationService = new chunkYGVWY6KO_cjs.MigrationService(c.env.DB);
+      const migrationService = new MigrationService(c.env.DB);
       await migrationService.runPendingMigrations();
       console.log("[Bootstrap] Syncing collection configurations...");
       try {
-        await chunkYGVWY6KO_cjs.syncCollections(c.env.DB);
+        await syncCollections(c.env.DB);
       } catch (error) {
         console.error("[Bootstrap] Error syncing collections:", error);
       }
       console.log("[Bootstrap] Bootstrapping core plugins...");
-      const bootstrapService = new chunkYGVWY6KO_cjs.PluginBootstrapService(c.env.DB);
+      const bootstrapService = new PluginBootstrapService(c.env.DB);
       const needsBootstrap = await bootstrapService.isBootstrapNeeded();
       if (needsBootstrap) {
         await bootstrapService.bootstrapCorePlugins();
@@ -52,11 +50,11 @@ var AuthManager = class {
       // 24 hours
       iat: Math.floor(Date.now() / 1e3)
     };
-    return await jwt.sign(payload, JWT_SECRET);
+    return await sign(payload, JWT_SECRET);
   }
   static async verifyToken(token) {
     try {
-      const payload = await jwt.verify(token, JWT_SECRET);
+      const payload = await verify(token, JWT_SECRET);
       if (payload.exp < Math.floor(Date.now() / 1e3)) {
         return null;
       }
@@ -83,7 +81,7 @@ var requireAuth = () => {
     try {
       let token = c.req.header("Authorization")?.replace("Bearer ", "");
       if (!token) {
-        token = cookie.getCookie(c, "auth_token");
+        token = getCookie(c, "auth_token");
       }
       if (!token) {
         const acceptHeader = c.req.header("Accept") || "";
@@ -153,7 +151,7 @@ var optionalAuth = () => {
     try {
       let token = c.req.header("Authorization")?.replace("Bearer ", "");
       if (!token) {
-        token = cookie.getCookie(c, "auth_token");
+        token = getCookie(c, "auth_token");
       }
       if (token) {
         const payload = await AuthManager.verifyToken(token);
@@ -174,7 +172,7 @@ var metricsMiddleware = () => {
   return async (c, next) => {
     const path = new URL(c.req.url).pathname;
     if (path !== "/admin/dashboard/api/metrics") {
-      chunkRCQ2HIQD_cjs.metricsTracker.recordRequest();
+      metricsTracker.recordRequest();
     }
     await next();
   };
@@ -198,26 +196,6 @@ var requireActivePlugins = () => async (_c, next) => await next();
 var getActivePlugins = () => [];
 var isPluginActive = () => false;
 
-exports.AuthManager = AuthManager;
-exports.PermissionManager = PermissionManager;
-exports.bootstrapMiddleware = bootstrapMiddleware;
-exports.cacheHeaders = cacheHeaders;
-exports.compressionMiddleware = compressionMiddleware;
-exports.detailedLoggingMiddleware = detailedLoggingMiddleware;
-exports.getActivePlugins = getActivePlugins;
-exports.isPluginActive = isPluginActive;
-exports.logActivity = logActivity;
-exports.loggingMiddleware = loggingMiddleware;
-exports.metricsMiddleware = metricsMiddleware;
-exports.optionalAuth = optionalAuth;
-exports.performanceLoggingMiddleware = performanceLoggingMiddleware;
-exports.requireActivePlugin = requireActivePlugin;
-exports.requireActivePlugins = requireActivePlugins;
-exports.requireAnyPermission = requireAnyPermission;
-exports.requireAuth = requireAuth;
-exports.requirePermission = requirePermission;
-exports.requireRole = requireRole;
-exports.securityHeaders = securityHeaders;
-exports.securityLoggingMiddleware = securityLoggingMiddleware;
-//# sourceMappingURL=chunk-3R7EQNGO.cjs.map
-//# sourceMappingURL=chunk-3R7EQNGO.cjs.map
+export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, metricsMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware };
+//# sourceMappingURL=chunk-OKPDQO2Y.js.map
+//# sourceMappingURL=chunk-OKPDQO2Y.js.map

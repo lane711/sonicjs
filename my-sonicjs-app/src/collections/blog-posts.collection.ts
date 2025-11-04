@@ -71,5 +71,9 @@ export default {
   listFields: ['title', 'author', 'status', 'publishedAt'],
   searchFields: ['title', 'excerpt', 'author'],
   defaultSort: 'createdAt',
-  defaultSortOrder: 'desc'
+  defaultSortOrder: 'desc',
+
+  // Mark as config-managed (code-based) collection
+  managed: true,
+  isActive: true
 } satisfies CollectionConfig

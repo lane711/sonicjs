@@ -7,14 +7,41 @@
 
 import { CollectionConfig, CollectionConfigModule } from '../types/collection-config'
 
+// Global registry for externally registered collections
+const registeredCollections: CollectionConfig[] = []
+
+/**
+ * Register collections from the application code
+ * This should be called before creating the app
+ */
+export function registerCollections(collections: CollectionConfig[]): void {
+  for (const config of collections) {
+    // Validate required fields
+    if (!config.name || !config.displayName || !config.schema) {
+      console.error(`Invalid collection config: missing required fields`, config)
+      continue
+    }
+
+    // Set defaults
+    const normalizedConfig: CollectionConfig = {
+      ...config,
+      managed: config.managed !== undefined ? config.managed : true,
+      isActive: config.isActive !== undefined ? config.isActive : true
+    }
+
+    registeredCollections.push(normalizedConfig)
+    console.log(`✓ Registered collection: ${config.name}`)
+  }
+}
+
 /**
  * Load all collection configurations from the collections directory
  */
 export async function loadCollectionConfigs(): Promise<CollectionConfig[]> {
-  const collections: CollectionConfig[] = []
+  const collections: CollectionConfig[] = [...registeredCollections]
 
   try {
-    // Import all collection files dynamically
+    // Import all collection files dynamically from core package
     // In production, these will be bundled with the application
     const modules = (import.meta as any).glob?.('../collections/*.collection.ts', { eager: true }) || {}
 
@@ -49,11 +76,11 @@ export async function loadCollectionConfigs(): Promise<CollectionConfig[]> {
       }
     }
 
-    console.log(`Loaded ${collections.length} collection configuration(s)`)
+    console.log(`Loaded ${collections.length} total collection configuration(s) (${registeredCollections.length} registered, ${collections.length - registeredCollections.length} from core)`)
     return collections
   } catch (error) {
     console.error('Error loading collection configurations:', error)
-    return []
+    return collections // Return registered collections even if core loading fails
   }
 }
 

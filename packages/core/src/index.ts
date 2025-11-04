@@ -34,6 +34,7 @@ export {
   loadCollectionConfig,
   getAvailableCollectionNames,
   validateCollectionConfig,
+  registerCollections,
   syncCollections,
   syncCollection,
   isCollectionManaged,

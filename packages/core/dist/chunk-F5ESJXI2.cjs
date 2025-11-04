@@ -155,6 +155,9 @@ var require_identifiers = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/internal/identifiers.js"(exports, module) {
     var numeric = /^[0-9]+$/;
     var compareIdentifiers = (a, b) => {
+      if (typeof a === "number" && typeof b === "number") {
+        return a === b ? 0 : a < b ? -1 : 1;
+      }
       const anum = numeric.test(a);
       const bnum = numeric.test(b);
       if (anum && bnum) {
@@ -260,7 +263,25 @@ var require_semver = chunkIGJUBJBW_cjs.__commonJS({
         if (!(other instanceof _SemVer)) {
           other = new _SemVer(other, this.options);
         }
-        return compareIdentifiers(this.major, other.major) || compareIdentifiers(this.minor, other.minor) || compareIdentifiers(this.patch, other.patch);
+        if (this.major < other.major) {
+          return -1;
+        }
+        if (this.major > other.major) {
+          return 1;
+        }
+        if (this.minor < other.minor) {
+          return -1;
+        }
+        if (this.minor > other.minor) {
+          return 1;
+        }
+        if (this.patch < other.patch) {
+          return -1;
+        }
+        if (this.patch > other.patch) {
+          return 1;
+        }
+        return 0;
       }
       comparePre(other) {
         if (!(other instanceof _SemVer)) {
@@ -996,6 +1017,7 @@ var require_range = chunkIGJUBJBW_cjs.__commonJS({
       return result;
     };
     var parseComparator = (comp, options) => {
+      comp = comp.replace(re[t.BUILD], "");
       debug("comp", comp, options);
       comp = replaceCarets(comp, options);
       debug("caret", comp);
@@ -3067,5 +3089,5 @@ exports.PluginManager = PluginManager;
 exports.PluginRegistryImpl = PluginRegistryImpl;
 exports.PluginValidator = PluginValidator;
 exports.ScopedHookSystem = ScopedHookSystem;
-//# sourceMappingURL=chunk-HJZOA2O5.cjs.map
-//# sourceMappingURL=chunk-HJZOA2O5.cjs.map
+//# sourceMappingURL=chunk-F5ESJXI2.cjs.map
+//# sourceMappingURL=chunk-F5ESJXI2.cjs.map

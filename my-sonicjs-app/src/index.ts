@@ -4,13 +4,20 @@
  * Entry point for your SonicJS headless CMS application
  */
 
-import { createSonicJSApp } from '@sonicjs-cms/core'
+import { createSonicJSApp, registerCollections } from '@sonicjs-cms/core'
 import type { SonicJSConfig } from '@sonicjs-cms/core'
+
+// Import custom collections
+import blogPostsCollection from './collections/blog-posts.collection'
+
+// Register all custom collections
+registerCollections([
+  blogPostsCollection
+])
 
 // Application configuration
 const config: SonicJSConfig = {
   collections: {
-    directory: './src/collections',
     autoSync: true
   },
   plugins: {
