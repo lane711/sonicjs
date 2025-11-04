@@ -28,7 +28,7 @@
     "hono": "^4.7.3",
     "typescript": "^5.8.3",
     "vitest": "^2.1.8",
-    "wrangler": "^3.110.0",
+    "wrangler": "^4.45.4",
     "zod": "^3.25.67"
   },
   "engines": {
