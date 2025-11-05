@@ -1084,10 +1084,10 @@ apiMediaRoutes.patch("/:id", async (c) => {
     const allowedFields = ["alt", "caption", "tags", "folder"];
     const updates = [];
     const values = [];
-    for (const [key, value2] of Object.entries(body)) {
+    for (const [key, value] of Object.entries(body)) {
       if (allowedFields.includes(key)) {
         updates.push(`${key} = ?`);
-        values.push(key === "tags" ? JSON.stringify(value2) : value2);
+        values.push(key === "tags" ? JSON.stringify(value) : value);
       }
     }
     if (updates.length === 0) {
@@ -2990,7 +2990,7 @@ init_admin_layout_catalyst_template();
 
 // src/templates/components/dynamic-field.template.ts
 function renderDynamicField(field, options = {}) {
-  const { value: value2 = "", errors = [], disabled = false, className = "" } = options;
+  const { value = "", errors = [], disabled = false, className = "" } = options;
   const opts = field.field_options || {};
   const required = field.is_required ? "required" : "";
   const baseClasses = `w-full rounded-lg px-3 py-2 text-sm text-zinc-950 dark:text-white bg-white dark:bg-zinc-800 shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow ${className}`;
@@ -3047,7 +3047,7 @@ function renderDynamicField(field, options = {}) {
           type="text" 
           id="${fieldId}"
           name="${fieldName}"
-          value="${escapeHtml2(value2)}"
+          value="${escapeHtml2(value)}"
           placeholder="${opts.placeholder || ""}"
           maxlength="${opts.maxLength || ""}"
           ${opts.pattern ? `data-pattern="${opts.pattern}"` : ""}
@@ -3092,7 +3092,7 @@ function renderDynamicField(field, options = {}) {
             class="${baseClasses} ${errorClasses} min-h-[${opts.height || 300}px]"
             ${required}
             ${disabled ? "disabled" : ""}
-          >${escapeHtml2(value2)}</textarea>
+          >${escapeHtml2(value)}</textarea>
           <script>
             // Initialize TinyMCE for this field
             if (typeof tinymce !== 'undefined') {
@@ -3126,7 +3126,7 @@ function renderDynamicField(field, options = {}) {
           type="number" 
           id="${fieldId}"
           name="${fieldName}"
-          value="${value2}"
+          value="${value}"
           min="${opts.min || ""}"
           max="${opts.max || ""}"
           step="${opts.step || ""}"
@@ -3138,7 +3138,7 @@ function renderDynamicField(field, options = {}) {
       `;
       break;
     case "boolean":
-      const checked = value2 === true || value2 === "true" || value2 === "1" ? "checked" : "";
+      const checked = value === true || value === "true" || value === "1" ? "checked" : "";
       fieldHTML = `
         <div class="flex items-center space-x-3">
           <input 
@@ -3163,7 +3163,7 @@ function renderDynamicField(field, options = {}) {
           type="date" 
           id="${fieldId}"
           name="${fieldName}"
-          value="${value2}"
+          value="${value}"
           min="${opts.min || ""}"
           max="${opts.max || ""}"
           class="${baseClasses} ${errorClasses}"
@@ -3175,7 +3175,7 @@ function renderDynamicField(field, options = {}) {
     case "select":
       const options2 = opts.options || [];
       const multiple = opts.multiple ? "multiple" : "";
-      const selectedValues = Array.isArray(value2) ? value2 : [value2];
+      const selectedValues = Array.isArray(value) ? value : [value];
       fieldHTML = `
         <select 
           id="${fieldId}"
@@ -3208,9 +3208,9 @@ function renderDynamicField(field, options = {}) {
     case "media":
       fieldHTML = `
         <div class="media-field-container">
-          <input type="hidden" id="${fieldId}" name="${fieldName}" value="${value2}">
-          <div class="media-preview ${value2 ? "" : "hidden"}" id="${fieldId}-preview">
-            ${value2 ? `<img src="${value2}" alt="Selected media" class="w-32 h-32 object-cover rounded-lg border border-white/20">` : ""}
+          <input type="hidden" id="${fieldId}" name="${fieldName}" value="${value}">
+          <div class="media-preview ${value ? "" : "hidden"}" id="${fieldId}-preview">
+            ${value ? `<img src="${value}" alt="Selected media" class="w-32 h-32 object-cover rounded-lg border border-white/20">` : ""}
           </div>
           <div class="media-actions mt-2 space-x-2">
             <button
@@ -3224,7 +3224,7 @@ function renderDynamicField(field, options = {}) {
               </svg>
               Select Media
             </button>
-            ${value2 ? `
+            ${value ? `
               <button
                 type="button"
                 onclick="clearMediaField('${fieldId}')"
@@ -3245,7 +3245,7 @@ function renderDynamicField(field, options = {}) {
             type="text"
             id="${fieldId}"
             name="${fieldName}"
-            value="${escapeHtml2(value2)}"
+            value="${escapeHtml2(value)}"
             class="${baseClasses} bg-zinc-100 dark:bg-zinc-800/50 cursor-not-allowed"
             readonly
             disabled
@@ -3255,7 +3255,7 @@ function renderDynamicField(field, options = {}) {
               <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/>
             </svg>
             <div class="text-xs text-zinc-600 dark:text-zinc-400">
-              ${value2 ? "This unique identifier was automatically generated and cannot be changed." : "A unique identifier (UUID) will be automatically generated when you save this content."}
+              ${value ? "This unique identifier was automatically generated and cannot be changed." : "A unique identifier (UUID) will be automatically generated when you save this content."}
             </div>
           </div>
         </div>
@@ -3267,7 +3267,7 @@ function renderDynamicField(field, options = {}) {
           type="text" 
           id="${fieldId}"
           name="${fieldName}"
-          value="${escapeHtml2(value2)}"
+          value="${escapeHtml2(value)}"
           class="${baseClasses} ${errorClasses}"
           ${required}
           ${disabled ? "disabled" : ""}
@@ -3996,7 +3996,7 @@ function renderContentListPage(data) {
       label: "Title",
       sortable: true,
       sortType: "string",
-      render: (value2, row) => `
+      render: (value, row) => `
         <div class="flex items-center">
           <div>
             <div class="text-sm font-medium text-zinc-950 dark:text-white">
@@ -4019,7 +4019,7 @@ function renderContentListPage(data) {
       label: "Status",
       sortable: true,
       sortType: "string",
-      render: (value2) => value2
+      render: (value) => value
     },
     {
       key: "authorName",
@@ -4040,7 +4040,7 @@ function renderContentListPage(data) {
       label: "Actions",
       sortable: false,
       className: "text-sm font-medium",
-      render: (value2, row) => `
+      render: (value, row) => `
         <div class="flex space-x-2">
           <button
             class="inline-flex items-center justify-center p-1.5 rounded-lg bg-cyan-50 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 ring-1 ring-inset ring-cyan-600/20 dark:ring-cyan-500/20 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 transition-colors"
@@ -4770,9 +4770,9 @@ async function getCollectionFields(db, collectionId) {
             return Object.entries(schema.properties).map(([fieldName, fieldConfig]) => {
               let fieldOptions = { ...fieldConfig };
               if (fieldConfig.type === "select" && fieldConfig.enum) {
-                fieldOptions.options = fieldConfig.enum.map((value2, index) => ({
-                  value: value2,
-                  label: fieldConfig.enumLabels?.[index] || value2
+                fieldOptions.options = fieldConfig.enum.map((value, index) => ({
+                  value,
+                  label: fieldConfig.enumLabels?.[index] || value
                 }));
               }
               return {
@@ -5170,7 +5170,7 @@ adminContentRoutes.post("/", async (c) => {
     const data = {};
     const errors = {};
     for (const field of fields) {
-      const value2 = formData.get(field.field_name);
+      const value = formData.get(field.field_name);
       if (field.field_type === "guid") {
         const options = field.field_options || {};
         if (options.autoGenerate) {
@@ -5178,33 +5178,33 @@ adminContentRoutes.post("/", async (c) => {
           continue;
         }
       }
-      if (field.is_required && (!value2 || value2.toString().trim() === "")) {
+      if (field.is_required && (!value || value.toString().trim() === "")) {
         errors[field.field_name] = [`${field.field_label} is required`];
         continue;
       }
       switch (field.field_type) {
         case "number":
-          if (value2 && isNaN(Number(value2))) {
+          if (value && isNaN(Number(value))) {
             errors[field.field_name] = [`${field.field_label} must be a valid number`];
           } else {
-            data[field.field_name] = value2 ? Number(value2) : null;
+            data[field.field_name] = value ? Number(value) : null;
           }
           break;
         case "boolean":
-          data[field.field_name] = formData.get(`${field.field_name}_submitted`) ? value2 === "true" : false;
+          data[field.field_name] = formData.get(`${field.field_name}_submitted`) ? value === "true" : false;
           break;
         case "select":
           if (field.field_options?.multiple) {
             data[field.field_name] = formData.getAll(`${field.field_name}[]`);
           } else {
-            data[field.field_name] = value2;
+            data[field.field_name] = value;
           }
           break;
         case "guid":
-          data[field.field_name] = value2 || null;
+          data[field.field_name] = value || null;
           break;
         default:
-          data[field.field_name] = value2;
+          data[field.field_name] = value;
       }
     }
     if (Object.keys(errors).length > 0) {
@@ -5331,31 +5331,31 @@ adminContentRoutes.put("/:id", async (c) => {
     const data = {};
     const errors = {};
     for (const field of fields) {
-      const value2 = formData.get(field.field_name);
-      if (field.is_required && (!value2 || value2.toString().trim() === "")) {
+      const value = formData.get(field.field_name);
+      if (field.is_required && (!value || value.toString().trim() === "")) {
         errors[field.field_name] = [`${field.field_label} is required`];
         continue;
       }
       switch (field.field_type) {
         case "number":
-          if (value2 && isNaN(Number(value2))) {
+          if (value && isNaN(Number(value))) {
             errors[field.field_name] = [`${field.field_label} must be a valid number`];
           } else {
-            data[field.field_name] = value2 ? Number(value2) : null;
+            data[field.field_name] = value ? Number(value) : null;
           }
           break;
         case "boolean":
-          data[field.field_name] = formData.get(`${field.field_name}_submitted`) ? value2 === "true" : false;
+          data[field.field_name] = formData.get(`${field.field_name}_submitted`) ? value === "true" : false;
           break;
         case "select":
           if (field.field_options?.multiple) {
             data[field.field_name] = formData.getAll(`${field.field_name}[]`);
           } else {
-            data[field.field_name] = value2;
+            data[field.field_name] = value;
           }
           break;
         default:
-          data[field.field_name] = value2;
+          data[field.field_name] = value;
       }
     }
     if (Object.keys(errors).length > 0) {
@@ -5472,23 +5472,23 @@ adminContentRoutes.post("/preview", async (c) => {
     const fields = await getCollectionFields(db, collectionId);
     const data = {};
     for (const field of fields) {
-      const value2 = formData.get(field.field_name);
+      const value = formData.get(field.field_name);
       switch (field.field_type) {
         case "number":
-          data[field.field_name] = value2 ? Number(value2) : null;
+          data[field.field_name] = value ? Number(value) : null;
           break;
         case "boolean":
-          data[field.field_name] = value2 === "true";
+          data[field.field_name] = value === "true";
           break;
         case "select":
           if (field.field_options?.multiple) {
             data[field.field_name] = formData.getAll(`${field.field_name}[]`);
           } else {
-            data[field.field_name] = value2;
+            data[field.field_name] = value;
           }
           break;
         default:
-          data[field.field_name] = value2;
+          data[field.field_name] = value;
       }
     }
     const previewHTML = `
@@ -7344,10 +7344,10 @@ function renderUsersListPage(data) {
       label: "",
       className: "w-12",
       sortable: false,
-      render: (value2, row) => {
+      render: (value, row) => {
         const initials = `${row.firstName.charAt(0)}${row.lastName.charAt(0)}`.toUpperCase();
-        if (value2) {
-          return `<img src="${value2}" alt="${row.firstName} ${row.lastName}" class="w-8 h-8 rounded-full">`;
+        if (value) {
+          return `<img src="${value}" alt="${row.firstName} ${row.lastName}" class="w-8 h-8 rounded-full">`;
         }
         return `
           <div class="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-500 dark:from-cyan-300 dark:to-blue-400 rounded-full flex items-center justify-center">
@@ -7388,7 +7388,7 @@ function renderUsersListPage(data) {
       label: "Email",
       sortable: true,
       sortType: "string",
-      render: (value2) => {
+      render: (value) => {
         const escapeHtml7 = (text) => text.replace(/[&<>"']/g, (char) => ({
           "&": "&amp;",
           "<": "&lt;",
@@ -7396,7 +7396,7 @@ function renderUsersListPage(data) {
           '"': "&quot;",
           "'": "&#39;"
         })[char] || char);
-        const escapedEmail = escapeHtml7(value2);
+        const escapedEmail = escapeHtml7(value);
         return `<a href="mailto:${escapedEmail}" class="text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors">${escapedEmail}</a>`;
       }
     },
@@ -7405,7 +7405,7 @@ function renderUsersListPage(data) {
       label: "Role",
       sortable: true,
       sortType: "string",
-      render: (_value) => {
+      render: (value) => {
         const roleColors = {
           admin: "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-700/10 dark:ring-red-500/20",
           editor: "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-500/20",
@@ -7421,7 +7421,7 @@ function renderUsersListPage(data) {
       label: "Last Login",
       sortable: true,
       sortType: "date",
-      render: (_value) => {
+      render: (value) => {
         if (!value) return '<span class="text-zinc-500 dark:text-zinc-400">Never</span>';
         return `<span class="text-sm text-zinc-500 dark:text-zinc-400">${new Date(value).toLocaleDateString()}</span>`;
       }
@@ -7431,7 +7431,7 @@ function renderUsersListPage(data) {
       label: "Created",
       sortable: true,
       sortType: "date",
-      render: (_value) => `<span class="text-sm text-zinc-500 dark:text-zinc-400">${new Date(value).toLocaleDateString()}</span>`
+      render: (value) => `<span class="text-sm text-zinc-500 dark:text-zinc-400">${new Date(value).toLocaleDateString()}</span>`
     },
     {
       key: "actions",
@@ -8510,6 +8510,46 @@ userRoutes.put("/users/:id", async (c) => {
       message: "Failed to update user!. Please try again.",
       dismissible: true
     }));
+  }
+});
+userRoutes.post("/users/:id/toggle", async (c) => {
+  const db = c.env.DB;
+  const user = c.get("user");
+  const userId = c.req.param("id");
+  try {
+    const body = await c.req.json().catch(() => ({ active: true }));
+    const active = body.active === true;
+    if (userId === user.userId && !active) {
+      return c.json({ error: "You cannot deactivate your own account" }, 400);
+    }
+    const userStmt = db.prepare(`
+      SELECT id, email FROM users WHERE id = ?
+    `);
+    const userToToggle = await userStmt.bind(userId).first();
+    if (!userToToggle) {
+      return c.json({ error: "User not found" }, 404);
+    }
+    const toggleStmt = db.prepare(`
+      UPDATE users SET is_active = ?, updated_at = ? WHERE id = ?
+    `);
+    await toggleStmt.bind(active ? 1 : 0, Date.now(), userId).run();
+    await logActivity(
+      db,
+      user.userId,
+      active ? "user.activate" : "user.deactivate",
+      "users",
+      userId,
+      { email: userToToggle.email },
+      c.req.header("x-forwarded-for") || c.req.header("cf-connecting-ip"),
+      c.req.header("user-agent")
+    );
+    return c.json({
+      success: true,
+      message: active ? "User activated successfully" : "User deactivated successfully"
+    });
+  } catch (error) {
+    console.error("User toggle error:", error);
+    return c.json({ error: "Failed to toggle user status" }, 500);
   }
 });
 userRoutes.delete("/users/:id", async (c) => {
@@ -12265,10 +12305,10 @@ function renderSettingsTab(plugin) {
   `;
 }
 function renderSettingsFields(settings) {
-  return Object.entries(settings).map(([key, value2]) => {
+  return Object.entries(settings).map(([key, value]) => {
     const fieldId = `setting_${key}`;
     const displayName = key.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase());
-    if (typeof value2 === "boolean") {
+    if (typeof value === "boolean") {
       return `
         <div class="flex items-center justify-between">
           <div>
@@ -12276,12 +12316,12 @@ function renderSettingsFields(settings) {
             <p class="text-xs text-gray-400">Enable or disable this feature</p>
           </div>
           <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" name="${fieldId}" id="${fieldId}" ${value2 ? "checked" : ""} class="sr-only peer">
+            <input type="checkbox" name="${fieldId}" id="${fieldId}" ${value ? "checked" : ""} class="sr-only peer">
             <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
           </label>
         </div>
       `;
-    } else if (typeof value2 === "number") {
+    } else if (typeof value === "number") {
       return `
         <div>
           <label for="${fieldId}" class="block text-sm font-medium text-gray-300 mb-2">${displayName}</label>
@@ -12289,7 +12329,7 @@ function renderSettingsFields(settings) {
             type="number" 
             name="${fieldId}" 
             id="${fieldId}" 
-            value="${value2}"
+            value="${value}"
             class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full"
           >
         </div>
@@ -12302,7 +12342,7 @@ function renderSettingsFields(settings) {
             type="text" 
             name="${fieldId}" 
             id="${fieldId}" 
-            value="${value2}"
+            value="${value}"
             class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full"
           >
         </div>
@@ -16810,8 +16850,8 @@ function renderTable2(data) {
                     </td>
                   ` : ""}
                   ${data.columns.map((column, colIndex) => {
-      const value2 = row[column.key];
-      const displayValue = column.render ? column.render(value2, row) : value2;
+      const value = row[column.key];
+      const displayValue = column.render ? column.render(value, row) : value;
       const stopPropagation = column.key === "actions" ? 'onclick="event.stopPropagation()"' : "";
       const isFirst = colIndex === 0 && !data.selectable;
       const isLast = colIndex === data.columns.length - 1;
@@ -20374,5 +20414,5 @@ var ROUTES_INFO = {
 };
 
 export { ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_faq_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, userRoutes };
-//# sourceMappingURL=chunk-5GOBPTGE.js.map
-//# sourceMappingURL=chunk-5GOBPTGE.js.map
+//# sourceMappingURL=chunk-7BR5NZBO.js.map
+//# sourceMappingURL=chunk-7BR5NZBO.js.map

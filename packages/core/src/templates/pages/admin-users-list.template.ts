@@ -110,7 +110,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
       label: 'Role',
       sortable: true,
       sortType: 'string',
-      render: (_value: string) => {
+      render: (value: string) => {
         const roleColors = {
           admin: 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-700/10 dark:ring-red-500/20',
           editor: 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-500/20',
@@ -126,7 +126,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
       label: 'Last Login',
       sortable: true,
       sortType: 'date',
-      render: (_value: number | null) => {
+      render: (value: number | null) => {
         if (!value) return '<span class="text-zinc-500 dark:text-zinc-400">Never</span>'
         return `<span class="text-sm text-zinc-500 dark:text-zinc-400">${new Date(value).toLocaleDateString()}</span>`
       }
@@ -136,7 +136,7 @@ export function renderUsersListPage(data: UsersListPageData): string {
       label: 'Created',
       sortable: true,
       sortType: 'date',
-      render: (_value: number) => `<span class="text-sm text-zinc-500 dark:text-zinc-400">${new Date(value).toLocaleDateString()}</span>`
+      render: (value: number) => `<span class="text-sm text-zinc-500 dark:text-zinc-400">${new Date(value).toLocaleDateString()}</span>`
     },
     {
       key: 'actions',

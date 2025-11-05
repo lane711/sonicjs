@@ -7,11 +7,9 @@ const mockRenderTemplate = vi.hoisted(() => vi.fn())
 
 vi.mock('../services/email-renderer', () => {
   return {
-    EmailTemplateRenderer: vi.fn().mockImplementation(() => {
-      return {
-        renderTemplate: mockRenderTemplate
-      }
-    })
+    EmailTemplateRenderer: class {
+      renderTemplate = mockRenderTemplate
+    }
   }
 })
 

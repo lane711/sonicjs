@@ -1,5 +1,4 @@
 import { Hono } from 'hono'
-import type { D1Database, KVNamespace } from '@cloudflare/workers-types'
 import { requireAuth } from '../middleware'
 import { renderPluginsListPage, PluginsListPageData, Plugin } from '../templates/pages/admin-plugins-list.template'
 import { renderPluginSettingsPage, PluginSettingsPageData } from '../templates/pages/admin-plugin-settings.template'

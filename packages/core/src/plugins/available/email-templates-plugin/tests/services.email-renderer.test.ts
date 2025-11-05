@@ -24,17 +24,17 @@ vi.mock('../utils/template-renderer', () => ({
 // Mock marked
 vi.mock('marked', () => ({
   marked: vi.fn((content) => Promise.resolve(`<p>${content}</p>`)),
-  Renderer: vi.fn(() => ({
-    link: vi.fn(),
-    strong: vi.fn(),
-    heading: vi.fn(),
-    paragraph: vi.fn(),
-    list: vi.fn(),
-    listitem: vi.fn(),
-    blockquote: vi.fn(),
-    code: vi.fn(),
-    codespan: vi.fn()
-  }))
+  Renderer: class {
+    link = vi.fn()
+    strong = vi.fn()
+    heading = vi.fn()
+    paragraph = vi.fn()
+    list = vi.fn()
+    listitem = vi.fn()
+    blockquote = vi.fn()
+    code = vi.fn()
+    codespan = vi.fn()
+  }
 }))
 
 describe('EmailTemplateRenderer', () => {

@@ -1,5 +1,4 @@
 import { Hono } from 'hono'
-import type { D1Database, KVNamespace, R2Bucket, Queue } from '@cloudflare/workers-types'
 import { requireAuth, logActivity, AuthManager } from '../middleware'
 import { sanitizeInput } from '../utils/sanitize'
 import { renderProfilePage, renderAvatarImage, type UserProfile, type ProfilePageData } from '../templates/pages/admin-profile.template'
@@ -234,13 +233,13 @@ userRoutes.post('/profile/avatar', async (c) => {
 
   try {
     const formData = await c.req.formData()
-    const avatarFile = formData.get('avatar')
+    const avatarFile = formData.get('avatar') as File | null
 
-    if (!avatarFile || !(avatarFile instanceof File) || !avatarFile.name) {
-      return c.html(renderAlert({ 
-        type: 'error', 
+    if (!avatarFile || typeof avatarFile === 'string' || !avatarFile.name) {
+      return c.html(renderAlert({
+        type: 'error',
         message: 'Please select an image file.',
-        dismissible: true 
+        dismissible: true
       }))
     }
 
@@ -939,6 +938,58 @@ userRoutes.put('/users/:id', async (c) => {
       message: 'Failed to update user!. Please try again.',
       dismissible: true
     }))
+  }
+})
+
+/**
+ * POST /admin/users/:id/toggle - Toggle user active status
+ */
+userRoutes.post('/users/:id/toggle', async (c) => {
+  const db = c.env.DB
+  const user = c.get('user')
+  const userId = c.req.param('id')
+
+  try {
+    const body = await c.req.json().catch(() => ({ active: true }))
+    const active = body.active === true
+
+    // Prevent self-deactivation
+    if (userId === user!.userId && !active) {
+      return c.json({ error: 'You cannot deactivate your own account' }, 400)
+    }
+
+    // Check if user exists
+    const userStmt = db.prepare(`
+      SELECT id, email FROM users WHERE id = ?
+    `)
+    const userToToggle = await userStmt.bind(userId).first() as any
+
+    if (!userToToggle) {
+      return c.json({ error: 'User not found' }, 404)
+    }
+
+    // Toggle user status
+    const toggleStmt = db.prepare(`
+      UPDATE users SET is_active = ?, updated_at = ? WHERE id = ?
+    `)
+    await toggleStmt.bind(active ? 1 : 0, Date.now(), userId).run()
+
+    // Log the activity
+    await logActivity(
+      db, user!.userId, active ? 'user.activate' : 'user.deactivate', 'users', userId,
+      { email: userToToggle.email },
+      c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
+      c.req.header('user-agent')
+    )
+
+    return c.json({
+      success: true,
+      message: active ? 'User activated successfully' : 'User deactivated successfully'
+    })
+
+  } catch (error) {
+    console.error('User toggle error:', error)
+    return c.json({ error: 'Failed to toggle user status' }, 500)
   }
 })
 
