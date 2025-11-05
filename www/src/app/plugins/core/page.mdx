@@ -1,12 +1,14 @@
 export const metadata = {
   title: 'Core Plugins - SonicJS',
   description:
-    'Complete reference for SonicJS core plugins including authentication, media management, caching, database tools, and seed data.',
+    'Complete reference for SonicJS core plugins including authentication, email, magic link auth, media management, caching, database tools, and seed data.',
 }
 
 export const sections = [
   { title: 'Overview', id: 'overview' },
   { title: 'Authentication Plugin', id: 'authentication-plugin' },
+  { title: 'Email Plugin', id: 'email-plugin' },
+  { title: 'Magic Link Auth', id: 'magic-link-auth' },
   { title: 'Media Plugin', id: 'media-plugin' },
   { title: 'Cache Plugin', id: 'cache-plugin' },
   { title: 'Database Tools', id: 'database-tools' },
@@ -29,6 +31,16 @@ Core plugins extend SonicJS with critical features like authentication, media ma
       icon: '🔐',
       title: 'Authentication',
       description: 'JWT-based authentication with session management and token refresh',
+    },
+    {
+      icon: '📧',
+      title: 'Email',
+      description: 'Transactional email sending via Resend with pre-built templates',
+    },
+    {
+      icon: '🔗',
+      title: 'Magic Link Auth',
+      description: 'Passwordless authentication using secure email magic links',
     },
     {
       icon: '📸',
@@ -161,6 +173,268 @@ const authService = {
 
 - **/admin/auth/sessions** - View and manage active sessions
 - **/admin/auth/tokens** - Manage API tokens and access keys
+
+---
+
+## Email Plugin
+
+The email plugin provides transactional email functionality using Resend, with pre-built templates for common authentication and notification scenarios.
+
+### Features
+
+- **Resend Integration** - Send emails via the Resend API
+- **Email Templates** - Pre-built templates for registration, verification, password reset, and one-time codes
+- **Template Customization** - Code-based templates that can be customized
+- **Logo Support** - Add your company logo to email templates
+- **Settings Management** - Admin UI for configuring email settings
+- **Test Email** - Send test emails to verify configuration
+
+### Configuration
+
+<CodeGroup title="Plugin Configuration">
+
+```typescript
+{
+  name: 'email',
+  version: '1.0.0-beta.1',
+  settings: {
+    apiKey: 're_...',              // Resend API key
+    fromEmail: 'noreply@yourdomain.com',  // From email address
+    fromName: 'Your App Name',     // From name
+    replyTo: 'support@yourdomain.com',    // Reply-to address (optional)
+    logoUrl: 'https://yourdomain.com/logo.png'  // Logo URL (optional)
+  }
+}
+```
+
+</CodeGroup>
+
+### Setup
+
+1. Sign up for [Resend](https://resend.com) and get your API key
+2. Navigate to `/admin/plugins/email/settings` in your SonicJS admin
+3. Configure your Resend API key and email settings
+4. Send a test email to verify configuration
+
+### Included Email Templates
+
+**Registration Confirmation**
+Sent when a new user registers an account
+
+**Email Verification**
+Sent to verify user email addresses
+
+**Password Reset**
+Sent when users request to reset their password
+
+**One-Time Code (2FA)**
+Sent for two-factor authentication codes
+
+### API Usage
+
+<CodeGroup title="Sending Emails">
+
+```typescript
+// Get email plugin instance
+const emailPlugin = context.plugins.get('email')
+
+// Send a custom email
+await emailPlugin.sendEmail({
+  to: 'user@example.com',
+  subject: 'Welcome to SonicJS',
+  html: '<h1>Welcome!</h1><p>Thanks for signing up.</p>'
+})
+
+// Send using built-in templates
+await emailPlugin.sendVerificationEmail({
+  to: 'user@example.com',
+  verificationUrl: 'https://yoursite.com/verify?token=...'
+})
+
+await emailPlugin.sendPasswordResetEmail({
+  to: 'user@example.com',
+  resetUrl: 'https://yoursite.com/reset?token=...'
+})
+
+await emailPlugin.sendOneTimeCodeEmail({
+  to: 'user@example.com',
+  code: '123456',
+  expiryMinutes: 10
+})
+```
+
+</CodeGroup>
+
+### Admin Pages
+
+- **/admin/plugins/email/settings** - Configure Resend API and email settings
+
+<Note>
+The email plugin requires a Resend API key. You must verify your domain in Resend before sending emails from it.
+</Note>
+
+---
+
+## Magic Link Auth
+
+The magic link auth plugin provides passwordless authentication via secure, one-time email links. Users can sign in without remembering passwords.
+
+### Features
+
+- **Passwordless Authentication** - No passwords required
+- **Secure One-Time Links** - Links expire after 15 minutes and can only be used once
+- **Rate Limiting** - Prevent abuse with configurable rate limits
+- **Email Integration** - Works with the Email plugin for sending magic links
+- **Auto User Creation** - Optionally create new users when they request a magic link
+- **Security Tracking** - Logs IP addresses and user agents for security auditing
+
+### How It Works
+
+1. User enters their email address
+2. System generates a secure, random token
+3. Email is sent with a magic link containing the token
+4. User clicks the link to authenticate
+5. Token is validated and marked as used
+6. User is signed in with a JWT session
+
+### Configuration
+
+<CodeGroup title="Plugin Configuration">
+
+```typescript
+{
+  name: 'magic-link-auth',
+  version: '1.0.0',
+  dependencies: ['email'],
+  settings: {
+    linkExpiryMinutes: 15,         // Magic link expiry time
+    rateLimitPerHour: 5,           // Max requests per hour per email
+    allowNewUsers: false,          // Auto-create users who don't exist
+    requireEmailVerification: true // Require verified emails
+  }
+}
+```
+
+</CodeGroup>
+
+### API Endpoints
+
+**POST /auth/magic-link/request**
+Request a magic link to be sent via email
+
+<CodeGroup title="Request Magic Link">
+
+```bash {{ title: 'cURL' }}
+curl -X POST http://localhost:8787/auth/magic-link/request \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com"
+  }'
+```
+
+```javascript
+const response = await fetch('http://localhost:8787/auth/magic-link/request', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 'user@example.com'
+  })
+})
+
+const result = await response.json()
+// result: { message: 'If an account exists...' }
+```
+
+```json {{ title: 'Response' }}
+{
+  "message": "If an account exists for this email, you will receive a magic link shortly."
+}
+```
+
+</CodeGroup>
+
+**GET /auth/magic-link/verify?token=...**
+Verify magic link token and sign in the user
+
+### Database Schema
+
+<CodeGroup title="Magic Links Table">
+
+```sql
+CREATE TABLE magic_links (
+  id TEXT PRIMARY KEY,
+  user_email TEXT NOT NULL,
+  token TEXT NOT NULL UNIQUE,
+  expires_at INTEGER NOT NULL,
+  used INTEGER DEFAULT 0,
+  used_at INTEGER,
+  created_at INTEGER NOT NULL,
+  ip_address TEXT,
+  user_agent TEXT
+)
+```
+
+</CodeGroup>
+
+### Security Features
+
+**Token Generation**
+Tokens are generated using crypto.randomUUID() twice and concatenated for maximum entropy
+
+**Rate Limiting**
+Limits users to 5 magic link requests per hour to prevent abuse
+
+**Expiration**
+Links automatically expire after 15 minutes
+
+**One-Time Use**
+Each link can only be used once - it's marked as used immediately after verification
+
+**IP Tracking**
+IP addresses and user agents are logged for security auditing
+
+### Usage Example
+
+<CodeGroup title="Adding Magic Link to Login Page">
+
+```html
+<form id="magicLinkForm">
+  <label>Email Address</label>
+  <input type="email" name="email" required />
+  <button type="submit">Send Magic Link</button>
+</form>
+
+<script>
+document.getElementById('magicLinkForm').addEventListener('submit', async (e) => {
+  e.preventDefault()
+  const email = new FormData(e.target).get('email')
+
+  const response = await fetch('/auth/magic-link/request', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  })
+
+  if (response.ok) {
+    alert('Check your email for a magic link!')
+  }
+})
+</script>
+```
+
+</CodeGroup>
+
+### Email Template
+
+The magic link email includes:
+- A prominent "Sign In" button with the magic link
+- Expiration time warning
+- Security notice if the user didn't request it
+- Modern, responsive design
+
+<Note>
+The Magic Link Auth plugin requires the Email plugin to be installed and configured. Make sure to set up Resend before enabling magic link authentication.
+</Note>
 
 ---
 
