@@ -21,6 +21,33 @@ async function getCollectionFields(db: D1Database, collectionId: string) {
   return cache.getOrSet(
     cache.generateKey('fields', collectionId),
     async () => {
+      // First, check if collection has a schema (code-based collection)
+      const collectionStmt = db.prepare('SELECT schema FROM collections WHERE id = ?')
+      const collectionRow = await collectionStmt.bind(collectionId).first() as any
+
+      if (collectionRow && collectionRow.schema) {
+        try {
+          const schema = typeof collectionRow.schema === 'string' ? JSON.parse(collectionRow.schema) : collectionRow.schema
+          if (schema && schema.properties) {
+            // Convert schema properties to field format
+            let fieldOrder = 0
+            return Object.entries(schema.properties).map(([fieldName, fieldConfig]: [string, any]) => ({
+              id: `schema-${fieldName}`,
+              field_name: fieldName,
+              field_type: fieldConfig.type || 'string',
+              field_label: fieldConfig.title || fieldName,
+              field_options: fieldConfig,
+              field_order: fieldOrder++,
+              is_required: fieldConfig.required === true || (schema.required && schema.required.includes(fieldName)),
+              is_searchable: false
+            }))
+          }
+        } catch (e) {
+          console.error('Error parsing collection schema:', e)
+        }
+      }
+
+      // Fall back to content_fields table for legacy collections
       const stmt = db.prepare(`
         SELECT * FROM content_fields
         WHERE collection_id = ?
