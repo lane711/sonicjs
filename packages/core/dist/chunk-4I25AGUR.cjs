@@ -4,7 +4,7 @@ var chunkDOR2IU73_cjs = require('./chunk-DOR2IU73.cjs');
 var chunkDYYAXDXI_cjs = require('./chunk-DYYAXDXI.cjs');
 var chunkNBDPIRQS_cjs = require('./chunk-NBDPIRQS.cjs');
 var chunkEYMHWJTW_cjs = require('./chunk-EYMHWJTW.cjs');
-var chunkCHMO2DOC_cjs = require('./chunk-CHMO2DOC.cjs');
+var chunkTMIRVVQ7_cjs = require('./chunk-TMIRVVQ7.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 var hono = require('hono');
 var cors = require('hono/cors');
@@ -334,12 +334,12 @@ apiRoutes.get("/content", async (c) => {
         });
       }
     }
-    const filter = chunkCHMO2DOC_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunkTMIRVVQ7_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.limit) {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder = new chunkCHMO2DOC_cjs.QueryFilterBuilder();
+    const builder = new chunkTMIRVVQ7_cjs.QueryFilterBuilder();
     const queryResult = builder.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -426,7 +426,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
     if (!collectionResult) {
       return c.json({ error: "Collection not found" }, 404);
     }
-    const filter = chunkCHMO2DOC_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunkTMIRVVQ7_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.where) {
       filter.where = { and: [] };
     }
@@ -442,7 +442,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder = new chunkCHMO2DOC_cjs.QueryFilterBuilder();
+    const builder = new chunkTMIRVVQ7_cjs.QueryFilterBuilder();
     const queryResult = builder.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -6743,7 +6743,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="first_name"
-                      value="${chunkCHMO2DOC_cjs.escapeHtml(data.userToEdit.firstName || "")}"
+                      value="${chunkTMIRVVQ7_cjs.escapeHtml(data.userToEdit.firstName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -6754,7 +6754,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="last_name"
-                      value="${chunkCHMO2DOC_cjs.escapeHtml(data.userToEdit.lastName || "")}"
+                      value="${chunkTMIRVVQ7_cjs.escapeHtml(data.userToEdit.lastName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -6765,7 +6765,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="username"
-                      value="${chunkCHMO2DOC_cjs.escapeHtml(data.userToEdit.username || "")}"
+                      value="${chunkTMIRVVQ7_cjs.escapeHtml(data.userToEdit.username || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -6776,7 +6776,7 @@ function renderUserEditPage(data) {
                     <input
                       type="email"
                       name="email"
-                      value="${chunkCHMO2DOC_cjs.escapeHtml(data.userToEdit.email || "")}"
+                      value="${chunkTMIRVVQ7_cjs.escapeHtml(data.userToEdit.email || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -6787,7 +6787,7 @@ function renderUserEditPage(data) {
                     <input
                       type="tel"
                       name="phone"
-                      value="${chunkCHMO2DOC_cjs.escapeHtml(data.userToEdit.phone || "")}"
+                      value="${chunkTMIRVVQ7_cjs.escapeHtml(data.userToEdit.phone || "")}"
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
                   </div>
@@ -6801,7 +6801,7 @@ function renderUserEditPage(data) {
                         class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-zinc-500/30 dark:outline-zinc-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-500 dark:focus-visible:outline-zinc-400 sm:text-sm/6"
                       >
                         ${data.roles.map((role) => `
-                          <option value="${chunkCHMO2DOC_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunkCHMO2DOC_cjs.escapeHtml(role.label)}</option>
+                          <option value="${chunkTMIRVVQ7_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunkTMIRVVQ7_cjs.escapeHtml(role.label)}</option>
                         `).join("")}
                       </select>
                       <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-zinc-600 dark:text-zinc-400 sm:size-4">
@@ -6817,7 +6817,7 @@ function renderUserEditPage(data) {
                     name="bio"
                     rows="3"
                     class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-                  >${chunkCHMO2DOC_cjs.escapeHtml(data.userToEdit.bio || "")}</textarea>
+                  >${chunkTMIRVVQ7_cjs.escapeHtml(data.userToEdit.bio || "")}</textarea>
                 </div>
               </div>
 
@@ -7816,12 +7816,12 @@ userRoutes.put("/profile", async (c) => {
   const db = c.env.DB;
   try {
     const formData = await c.req.formData();
-    const firstName = chunkCHMO2DOC_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkCHMO2DOC_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkCHMO2DOC_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkTMIRVVQ7_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkTMIRVVQ7_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkTMIRVVQ7_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkCHMO2DOC_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkCHMO2DOC_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkTMIRVVQ7_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkTMIRVVQ7_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const timezone = formData.get("timezone")?.toString() || "UTC";
     const language = formData.get("language")?.toString() || "en";
     const emailNotifications = formData.get("email_notifications") === "1";
@@ -8199,12 +8199,12 @@ userRoutes.post("/users/new", async (c) => {
   const user = c.get("user");
   try {
     const formData = await c.req.formData();
-    const firstName = chunkCHMO2DOC_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkCHMO2DOC_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkCHMO2DOC_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkTMIRVVQ7_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkTMIRVVQ7_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkTMIRVVQ7_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkCHMO2DOC_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkCHMO2DOC_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkTMIRVVQ7_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkTMIRVVQ7_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const password = formData.get("password")?.toString() || "";
     const confirmPassword = formData.get("confirm_password")?.toString() || "";
@@ -8405,12 +8405,12 @@ userRoutes.put("/users/:id", async (c) => {
   const userId = c.req.param("id");
   try {
     const formData = await c.req.formData();
-    const firstName = chunkCHMO2DOC_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkCHMO2DOC_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkCHMO2DOC_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkTMIRVVQ7_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkTMIRVVQ7_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkTMIRVVQ7_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkCHMO2DOC_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkCHMO2DOC_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkTMIRVVQ7_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkTMIRVVQ7_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const isActive = formData.get("is_active") === "1";
     const emailVerified = formData.get("email_verified") === "1";
@@ -8553,8 +8553,8 @@ userRoutes.post("/invite-user", async (c) => {
     const formData = await c.req.formData();
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
     const role = formData.get("role")?.toString()?.trim() || "viewer";
-    const firstName = chunkCHMO2DOC_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkCHMO2DOC_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const firstName = chunkTMIRVVQ7_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkTMIRVVQ7_cjs.sanitizeInput(formData.get("last_name")?.toString());
     if (!email || !firstName || !lastName) {
       return c.json({ error: "Email, first name, and last name are required" }, 400);
     }
@@ -16372,7 +16372,7 @@ function renderStorageUsage(databaseSizeBytes, mediaSizeBytes) {
 }
 
 // src/routes/admin-dashboard.ts
-var VERSION = chunkCHMO2DOC_cjs.getCoreVersion();
+var VERSION = chunkTMIRVVQ7_cjs.getCoreVersion();
 var router = new hono.Hono();
 router.use("*", chunkDYYAXDXI_cjs.requireAuth());
 router.get("/", async (c) => {
@@ -20273,5 +20273,5 @@ exports.api_system_default = api_system_default;
 exports.auth_default = auth_default;
 exports.router = router;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-ZQWCAA3B.cjs.map
-//# sourceMappingURL=chunk-ZQWCAA3B.cjs.map
+//# sourceMappingURL=chunk-4I25AGUR.cjs.map
+//# sourceMappingURL=chunk-4I25AGUR.cjs.map
