@@ -58,17 +58,25 @@ export default {
         enumLabels: ["Draft", "Published", "Archived"],
         default: "draft",
       },
+      difficulty: {
+        type: "select",
+        title: "Difficulty",
+        enum: ["beginner", "intermediate", "advanced"],
+        enumLabels: ["Beginner", "Intermediate", "Advanced"],
+        required: true,
+        default: "beginner",
+      },
       tags: {
         type: "string",
         title: "Tags",
         helpText: "Comma-separated tags",
       },
     },
-    required: ["title", "slug", "content", "author"],
+    required: ["title", "slug", "content", "author", "difficulty"],
   },
 
   // List view configuration
-  listFields: ["title", "author", "status", "publishedAt"],
+  listFields: ["title", "author", "difficulty", "status", "publishedAt"],
   searchFields: ["title", "excerpt", "author"],
   defaultSort: "createdAt",
   defaultSortOrder: "desc",

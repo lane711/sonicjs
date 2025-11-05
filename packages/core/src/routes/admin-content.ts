@@ -31,16 +31,27 @@ async function getCollectionFields(db: D1Database, collectionId: string) {
           if (schema && schema.properties) {
             // Convert schema properties to field format
             let fieldOrder = 0
-            return Object.entries(schema.properties).map(([fieldName, fieldConfig]: [string, any]) => ({
-              id: `schema-${fieldName}`,
-              field_name: fieldName,
-              field_type: fieldConfig.type || 'string',
-              field_label: fieldConfig.title || fieldName,
-              field_options: fieldConfig,
-              field_order: fieldOrder++,
-              is_required: fieldConfig.required === true || (schema.required && schema.required.includes(fieldName)),
-              is_searchable: false
-            }))
+            return Object.entries(schema.properties).map(([fieldName, fieldConfig]: [string, any]) => {
+              // For select fields, convert enum/enumLabels to options array
+              let fieldOptions = { ...fieldConfig }
+              if (fieldConfig.type === 'select' && fieldConfig.enum) {
+                fieldOptions.options = fieldConfig.enum.map((value: string, index: number) => ({
+                  value: value,
+                  label: fieldConfig.enumLabels?.[index] || value
+                }))
+              }
+
+              return {
+                id: `schema-${fieldName}`,
+                field_name: fieldName,
+                field_type: fieldConfig.type || 'string',
+                field_label: fieldConfig.title || fieldName,
+                field_options: fieldOptions,
+                field_order: fieldOrder++,
+                is_required: fieldConfig.required === true || (schema.required && schema.required.includes(fieldName)),
+                is_searchable: false
+              }
+            })
           }
         } catch (e) {
           console.error('Error parsing collection schema:', e)
