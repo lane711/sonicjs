@@ -1,4 +1,6 @@
-import { init_admin_layout_catalyst_template, init_logo_template } from './chunk-VEC5MLT3.js';
+'use strict';
+
+var chunkMU3MR2QR_cjs = require('./chunk-MU3MR2QR.cjs');
 
 // src/templates/filter-bar.template.ts
 function renderFilterBar(data) {
@@ -66,9 +68,9 @@ function renderFilterBar(data) {
 }
 
 // src/templates/index.ts
-init_admin_layout_catalyst_template();
-init_logo_template();
+chunkMU3MR2QR_cjs.init_admin_layout_catalyst_template();
+chunkMU3MR2QR_cjs.init_logo_template();
 
-export { renderFilterBar };
-//# sourceMappingURL=chunk-OPGDMS7L.js.map
-//# sourceMappingURL=chunk-OPGDMS7L.js.map
+exports.renderFilterBar = renderFilterBar;
+//# sourceMappingURL=chunk-CAP6QQR2.cjs.map
+//# sourceMappingURL=chunk-CAP6QQR2.cjs.map
