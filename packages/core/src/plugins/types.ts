@@ -69,6 +69,25 @@ export interface PluginContext {
   logger: PluginLogger
 }
 
+// Authentication service interface for plugins
+export interface AuthService {
+  /** Generate JWT token for a user */
+  generateToken(userId: string, email: string, role: string): Promise<string>
+  /** Verify and decode JWT token */
+  verifyToken(token: string): Promise<any>
+  /** Set authentication cookie (useful for alternative auth methods) */
+  setAuthCookie(context: Context, token: string, options?: {
+    maxAge?: number
+    secure?: boolean
+    httpOnly?: boolean
+    sameSite?: 'Strict' | 'Lax' | 'None'
+  }): void
+  /** Hash password */
+  hashPassword(password: string): Promise<string>
+  /** Verify password against hash */
+  verifyPassword(password: string, hash: string): Promise<boolean>
+}
+
 // Plugin configuration
 export interface PluginConfig {
   /** Plugin-specific configuration */

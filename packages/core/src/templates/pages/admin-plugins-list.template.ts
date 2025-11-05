@@ -185,13 +185,16 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
                 <div>
                   <label class="block text-sm/6 font-medium text-zinc-950 dark:text-white">Category</label>
                   <div class="mt-2 grid grid-cols-1">
-                    <select class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-cyan-500/30 dark:outline-cyan-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-500 dark:focus-visible:outline-cyan-400 sm:text-sm/6 min-w-48">
+                    <select id="category-filter" onchange="filterPlugins()" class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-cyan-500/30 dark:outline-cyan-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-500 dark:focus-visible:outline-cyan-400 sm:text-sm/6 min-w-48">
                       <option value="">All Categories</option>
                       <option value="content">Content Management</option>
                       <option value="media">Media</option>
                       <option value="seo">SEO & Analytics</option>
                       <option value="security">Security</option>
                       <option value="utilities">Utilities</option>
+                      <option value="system">System</option>
+                      <option value="development">Development</option>
+                      <option value="demo">Demo</option>
                     </select>
                     <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-cyan-600 dark:text-cyan-400 sm:size-4">
                       <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
@@ -201,7 +204,7 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
                 <div>
                   <label class="block text-sm/6 font-medium text-zinc-950 dark:text-white">Status</label>
                   <div class="mt-2 grid grid-cols-1">
-                    <select class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-cyan-500/30 dark:outline-cyan-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-500 dark:focus-visible:outline-cyan-400 sm:text-sm/6 min-w-48">
+                    <select id="status-filter" onchange="filterPlugins()" class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-cyan-500/30 dark:outline-cyan-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-500 dark:focus-visible:outline-cyan-400 sm:text-sm/6 min-w-48">
                       <option value="">All Status</option>
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
@@ -221,8 +224,10 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
                       </svg>
                     </div>
                     <input
+                      id="search-input"
                       type="text"
                       placeholder="Search plugins..."
+                      oninput="filterPlugins()"
                       class="w-full rounded-full bg-transparent px-11 py-2 text-sm text-zinc-950 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 border-2 border-cyan-200/50 dark:border-cyan-700/50 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
                     />
                   </div>
@@ -245,7 +250,7 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
       </div>
 
     <!-- Plugins Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+    <div id="plugins-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       ${data.plugins.map(plugin => renderPluginCard(plugin)).join('')}
     </div>
 
@@ -396,12 +401,78 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
         const dropdown = document.getElementById('plugin-dropdown');
         dropdown.classList.toggle('hidden');
       }
-      
+
+      function filterPlugins() {
+        const categoryFilter = document.getElementById('category-filter').value.toLowerCase();
+        const statusFilter = document.getElementById('status-filter').value.toLowerCase();
+        const searchInput = document.getElementById('search-input').value.toLowerCase();
+
+        const pluginCards = document.querySelectorAll('.plugin-card');
+        let visibleCount = 0;
+
+        pluginCards.forEach(card => {
+          // Get plugin data from card attributes
+          const category = card.getAttribute('data-category')?.toLowerCase() || '';
+          const status = card.getAttribute('data-status')?.toLowerCase() || '';
+          const name = card.getAttribute('data-name')?.toLowerCase() || '';
+          const description = card.getAttribute('data-description')?.toLowerCase() || '';
+
+          // Check if plugin matches all filters
+          let matches = true;
+
+          // Category filter
+          if (categoryFilter && category !== categoryFilter) {
+            matches = false;
+          }
+
+          // Status filter
+          if (statusFilter && status !== statusFilter) {
+            matches = false;
+          }
+
+          // Search filter - check if search term is in name or description
+          if (searchInput && !name.includes(searchInput) && !description.includes(searchInput)) {
+            matches = false;
+          }
+
+          // Show/hide card
+          if (matches) {
+            card.style.display = '';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        // Show/hide "no results" message
+        let noResultsMsg = document.getElementById('no-results-message');
+        if (visibleCount === 0) {
+          if (!noResultsMsg) {
+            noResultsMsg = document.createElement('div');
+            noResultsMsg.id = 'no-results-message';
+            noResultsMsg.className = 'col-span-full text-center py-12';
+            noResultsMsg.innerHTML = \`
+              <div class="flex flex-col items-center">
+                <svg class="w-16 h-16 text-zinc-400 dark:text-zinc-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 class="text-lg font-semibold text-zinc-950 dark:text-white mb-2">No plugins found</h3>
+                <p class="text-sm text-zinc-500 dark:text-zinc-400">Try adjusting your filters or search terms</p>
+              </div>
+            \`;
+            document.getElementById('plugins-grid').appendChild(noResultsMsg);
+          }
+          noResultsMsg.style.display = '';
+        } else if (noResultsMsg) {
+          noResultsMsg.style.display = 'none';
+        }
+      }
+
       // Close dropdown when clicking outside
       document.addEventListener('click', (event) => {
         const dropdown = document.getElementById('plugin-dropdown');
         const button = event.target.closest('button[onclick="toggleDropdown()"]');
-        
+
         if (!button && !dropdown.contains(event.target)) {
           dropdown.classList.add('hidden');
         }
@@ -464,7 +535,7 @@ function renderPluginCard(plugin: Plugin): string {
     : `<button onclick="togglePlugin('${plugin.id}', 'activate')" class="bg-lime-600 dark:bg-lime-700 hover:bg-lime-700 dark:hover:bg-lime-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">Activate</button>`
 
   return `
-    <div class="plugin-card rounded-xl bg-white dark:bg-zinc-900 shadow-sm ${borderColors[plugin.status]} p-6 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all">
+    <div class="plugin-card rounded-xl bg-white dark:bg-zinc-900 shadow-sm ${borderColors[plugin.status]} p-6 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all" data-category="${plugin.category}" data-status="${plugin.status}" data-name="${plugin.displayName}" data-description="${plugin.description}">
       <div class="flex items-start justify-between mb-4">
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 rounded-lg flex items-center justify-center ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 bg-zinc-50 dark:bg-zinc-800">

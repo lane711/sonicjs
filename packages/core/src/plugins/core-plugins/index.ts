@@ -18,6 +18,7 @@ export { workflowPlugin, createWorkflowPlugin } from './workflow-plugin'
 export { seedDataPlugin, createSeedDataPlugin } from './seed-data-plugin'
 export { databaseToolsPlugin } from './database-tools-plugin'
 export { helloWorldPlugin, createHelloWorldPlugin } from './hello-world-plugin'
+export { emailPlugin, createEmailPlugin } from './email-plugin'
 
 // Core plugins list - now imported from auto-generated registry
 import { CORE_PLUGIN_IDS } from '../plugin-registry'

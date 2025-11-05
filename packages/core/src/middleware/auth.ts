@@ -1,6 +1,6 @@
 import { sign, verify } from 'hono/jwt'
 import { Context, Next } from 'hono'
-import { getCookie } from 'hono/cookie'
+import { getCookie, setCookie } from 'hono/cookie'
 
 type JWTPayload = {
   userId: string
@@ -54,6 +54,26 @@ export class AuthManager {
   static async verifyPassword(password: string, hash: string): Promise<boolean> {
     const passwordHash = await this.hashPassword(password)
     return passwordHash === hash
+  }
+
+  /**
+   * Set authentication cookie - useful for plugins implementing alternative auth methods
+   * @param c - Hono context
+   * @param token - JWT token to set in cookie
+   * @param options - Optional cookie configuration
+   */
+  static setAuthCookie(c: Context, token: string, options?: {
+    maxAge?: number
+    secure?: boolean
+    httpOnly?: boolean
+    sameSite?: 'Strict' | 'Lax' | 'None'
+  }): void {
+    setCookie(c, 'auth_token', token, {
+      httpOnly: options?.httpOnly ?? true,
+      secure: options?.secure ?? true,
+      sameSite: options?.sameSite ?? 'Strict',
+      maxAge: options?.maxAge ?? (60 * 60 * 24) // 24 hours default
+    })
   }
 }
 
