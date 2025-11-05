@@ -99,7 +99,7 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
             <div class="mt-2 text-sm text-amber-700 dark:text-amber-300">
               <p>
                 Plugin management is currently under active development. While functional, some features may change or have limitations.
-                Please report any issues you encounter on our <a href="https://discord.gg/sonicjs" target="_blank" class="font-medium underline hover:text-amber-900 dark:hover:text-amber-100">Discord community</a>.
+                Please report any issues you encounter on our <a href="https://discord.gg/8bMy6bv3sZ" target="_blank" class="font-medium underline hover:text-amber-900 dark:hover:text-amber-100">Discord community</a>.
               </p>
             </div>
           </div>
