@@ -2,6 +2,7 @@ import { Context, Next } from "hono";
 import { syncCollections } from "../services/collection-sync";
 import { MigrationService } from "../services/migrations";
 import { PluginBootstrapService } from "../services/plugin-bootstrap";
+import type { SonicJSConfig } from "../app";
 
 type Bindings = {
   DB: D1Database;
@@ -15,7 +16,7 @@ let bootstrapComplete = false;
  * Bootstrap middleware that ensures system initialization
  * Runs once per worker instance
  */
-export function bootstrapMiddleware() {
+export function bootstrapMiddleware(config: SonicJSConfig = {}) {
   return async (c: Context<{ Bindings: Bindings }>, next: Next) => {
     // Skip if already bootstrapped in this worker instance
     if (bootstrapComplete) {
@@ -54,14 +55,18 @@ export function bootstrapMiddleware() {
         // Continue bootstrap even if collection sync fails
       }
 
-      // 3. Bootstrap core plugins
-      console.log("[Bootstrap] Bootstrapping core plugins...");
-      const bootstrapService = new PluginBootstrapService(c.env.DB);
+      // 3. Bootstrap core plugins (unless disableAll is set)
+      if (!config.plugins?.disableAll) {
+        console.log("[Bootstrap] Bootstrapping core plugins...");
+        const bootstrapService = new PluginBootstrapService(c.env.DB);
 
-      // Check if bootstrap is needed
-      const needsBootstrap = await bootstrapService.isBootstrapNeeded();
-      if (needsBootstrap) {
-        await bootstrapService.bootstrapCorePlugins();
+        // Check if bootstrap is needed
+        const needsBootstrap = await bootstrapService.isBootstrapNeeded();
+        if (needsBootstrap) {
+          await bootstrapService.bootstrapCorePlugins();
+        }
+      } else {
+        console.log("[Bootstrap] Plugin bootstrap skipped (disableAll is true)");
       }
 
       // Mark bootstrap as complete for this worker instance

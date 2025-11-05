@@ -69,6 +69,7 @@ export interface SonicJSConfig {
   plugins?: {
     directory?: string
     autoLoad?: boolean
+    disableAll?: boolean  // Disable all plugins including core plugins
   }
 
   // Custom routes
@@ -135,7 +136,7 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   app.use('*', metricsMiddleware())
 
   // Bootstrap middleware - runs migrations, syncs collections, and initializes plugins
-  app.use('*', bootstrapMiddleware())
+  app.use('*', bootstrapMiddleware(config))
 
   // Custom middleware - before auth
   if (config.middleware?.beforeAuth) {

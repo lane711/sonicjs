@@ -1,5 +1,5 @@
 import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-6FR25MPC.js';
-import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-OKPDQO2Y.js';
+import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-YHG45LMU.js';
 import { PluginService, MigrationService } from './chunk-COBUPOMD.js';
 import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderFAQList, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-LW33AOBF.js';
 import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-WRRLB6KG.js';
@@ -11127,7 +11127,7 @@ function renderPluginsListPage(data) {
             <div class="mt-2 text-sm text-amber-700 dark:text-amber-300">
               <p>
                 Plugin management is currently under active development. While functional, some features may change or have limitations.
-                Please report any issues you encounter on our <a href="https://github.com/sonicjs/sonicjs/issues" target="_blank" class="font-medium underline hover:text-amber-900 dark:hover:text-amber-100">GitHub repository</a>.
+                Please report any issues you encounter on our <a href="https://discord.gg/sonicjs" target="_blank" class="font-medium underline hover:text-amber-900 dark:hover:text-amber-100">Discord community</a>.
               </p>
             </div>
           </div>
@@ -20296,5 +20296,5 @@ var ROUTES_INFO = {
 };
 
 export { ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_faq_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, userRoutes };
-//# sourceMappingURL=chunk-MBHCUUEU.js.map
-//# sourceMappingURL=chunk-MBHCUUEU.js.map
+//# sourceMappingURL=chunk-TT7NOLLW.js.map
+//# sourceMappingURL=chunk-TT7NOLLW.js.map

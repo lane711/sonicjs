@@ -7,7 +7,7 @@ var cookie = require('hono/cookie');
 
 // src/middleware/bootstrap.ts
 var bootstrapComplete = false;
-function bootstrapMiddleware() {
+function bootstrapMiddleware(config = {}) {
   return async (c, next) => {
     if (bootstrapComplete) {
       return next();
@@ -27,11 +27,15 @@ function bootstrapMiddleware() {
       } catch (error) {
         console.error("[Bootstrap] Error syncing collections:", error);
       }
-      console.log("[Bootstrap] Bootstrapping core plugins...");
-      const bootstrapService = new chunkNBDPIRQS_cjs.PluginBootstrapService(c.env.DB);
-      const needsBootstrap = await bootstrapService.isBootstrapNeeded();
-      if (needsBootstrap) {
-        await bootstrapService.bootstrapCorePlugins();
+      if (!config.plugins?.disableAll) {
+        console.log("[Bootstrap] Bootstrapping core plugins...");
+        const bootstrapService = new chunkNBDPIRQS_cjs.PluginBootstrapService(c.env.DB);
+        const needsBootstrap = await bootstrapService.isBootstrapNeeded();
+        if (needsBootstrap) {
+          await bootstrapService.bootstrapCorePlugins();
+        }
+      } else {
+        console.log("[Bootstrap] Plugin bootstrap skipped (disableAll is true)");
       }
       bootstrapComplete = true;
       console.log("[Bootstrap] System initialization completed");
@@ -219,5 +223,5 @@ exports.requirePermission = requirePermission;
 exports.requireRole = requireRole;
 exports.securityHeaders = securityHeaders;
 exports.securityLoggingMiddleware = securityLoggingMiddleware;
-//# sourceMappingURL=chunk-DYYAXDXI.cjs.map
-//# sourceMappingURL=chunk-DYYAXDXI.cjs.map
+//# sourceMappingURL=chunk-HXA5QSI3.cjs.map
+//# sourceMappingURL=chunk-HXA5QSI3.cjs.map
