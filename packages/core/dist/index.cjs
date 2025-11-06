@@ -13,7 +13,6 @@ var chunkKYGRJCZM_cjs = require('./chunk-KYGRJCZM.cjs');
 require('./chunk-IGJUBJBW.cjs');
 var hono = require('hono');
 var html = require('hono/html');
-require('zod');
 var d1 = require('drizzle-orm/d1');
 
 // src/plugins/core-plugins/database-tools-plugin/services/database-service.ts
@@ -955,6 +954,11 @@ function createEmailPlugin() {
   const emailRoutes = new hono.Hono();
   emailRoutes.get("/settings", async (c) => {
     const user = c.get("user");
+    const db = c.env.DB;
+    const plugin = await db.prepare(`
+      SELECT settings FROM plugins WHERE id = 'email'
+    `).first();
+    const settings = plugin?.settings ? JSON.parse(plugin.settings) : {};
     const contentHTML = html.html`
       <div class="p-8">
         <!-- Header -->
@@ -979,6 +983,7 @@ function createEmailPlugin() {
                   type="password"
                   id="apiKey"
                   name="apiKey"
+                  value="${settings.apiKey || ""}"
                   class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
                   placeholder="re_..."
                   required
@@ -997,6 +1002,7 @@ function createEmailPlugin() {
                   type="email"
                   id="fromEmail"
                   name="fromEmail"
+                  value="${settings.fromEmail || ""}"
                   class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
                   placeholder="noreply@yourdomain.com"
                   required
@@ -1015,6 +1021,7 @@ function createEmailPlugin() {
                   type="text"
                   id="fromName"
                   name="fromName"
+                  value="${settings.fromName || ""}"
                   class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
                   placeholder="Your App Name"
                   required
@@ -1030,6 +1037,7 @@ function createEmailPlugin() {
                   type="email"
                   id="replyTo"
                   name="replyTo"
+                  value="${settings.replyTo || ""}"
                   class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
                   placeholder="support@yourdomain.com"
                 />
@@ -1044,6 +1052,7 @@ function createEmailPlugin() {
                   type="url"
                   id="logoUrl"
                   name="logoUrl"
+                  value="${settings.logoUrl || ""}"
                   class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
                   placeholder="https://yourdomain.com/logo.png"
                 />
@@ -1132,26 +1141,41 @@ function createEmailPlugin() {
 
         // Test email handler
         document.getElementById('testEmailBtn').addEventListener('click', async () => {
+          // Prompt for destination email
+          const toEmail = prompt('Enter destination email address for test:')
+          if (!toEmail) return
+
+          // Basic email validation
+          if (!toEmail.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/)) {
+            alert('Please enter a valid email address')
+            return
+          }
+
           const statusEl = document.getElementById('statusMessage')
 
           statusEl.className = 'backdrop-blur-md bg-blue-500/20 border border-blue-500/30 rounded-xl p-4 mb-6'
-          statusEl.innerHTML = '📧 Sending test email...'
+          statusEl.innerHTML = \`📧 Sending test email to \${toEmail}...\`
           statusEl.classList.remove('hidden')
 
           try {
             const response = await fetch('/admin/plugins/email/test', {
-              method: 'POST'
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ toEmail })
             })
+
+            const data = await response.json()
 
             if (response.ok) {
               statusEl.className = 'backdrop-blur-md bg-green-500/20 border border-green-500/30 rounded-xl p-4 mb-6'
-              statusEl.innerHTML = '✅ Test email sent! Check your inbox.'
+              statusEl.innerHTML = \`✅ \${data.message || 'Test email sent! Check your inbox.'}\`
             } else {
-              throw new Error('Failed to send test email')
+              statusEl.className = 'backdrop-blur-md bg-red-500/20 border border-red-500/30 rounded-xl p-4 mb-6'
+              statusEl.innerHTML = \`❌ \${data.error || 'Failed to send test email. Check your settings.'}\`
             }
           } catch (error) {
             statusEl.className = 'backdrop-blur-md bg-red-500/20 border border-red-500/30 rounded-xl p-4 mb-6'
-            statusEl.innerHTML = '❌ Failed to send test email. Check your settings.'
+            statusEl.innerHTML = '❌ Network error. Please try again.'
           }
         })
 
@@ -1171,10 +1195,94 @@ function createEmailPlugin() {
     );
   });
   emailRoutes.post("/settings", async (c) => {
-    return c.json({ success: true });
+    try {
+      const body = await c.req.json();
+      const db = c.env.DB;
+      await db.prepare(`
+        UPDATE plugins
+        SET settings = ?,
+            updated_at = unixepoch()
+        WHERE id = 'email'
+      `).bind(JSON.stringify(body)).run();
+      return c.json({ success: true });
+    } catch (error) {
+      console.error("Error saving email settings:", error);
+      return c.json({ success: false, error: "Failed to save settings" }, 500);
+    }
   });
   emailRoutes.post("/test", async (c) => {
-    return c.json({ success: true });
+    try {
+      const db = c.env.DB;
+      const body = await c.req.json();
+      const plugin = await db.prepare(`
+        SELECT settings FROM plugins WHERE id = 'email'
+      `).first();
+      if (!plugin?.settings) {
+        return c.json({
+          success: false,
+          error: "Email settings not configured. Please save your settings first."
+        }, 400);
+      }
+      const settings = JSON.parse(plugin.settings);
+      if (!settings.apiKey || !settings.fromEmail || !settings.fromName) {
+        return c.json({
+          success: false,
+          error: "Missing required settings. Please configure API Key, From Email, and From Name."
+        }, 400);
+      }
+      const toEmail = body.toEmail || settings.fromEmail;
+      if (!toEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        return c.json({
+          success: false,
+          error: "Invalid email address format"
+        }, 400);
+      }
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${settings.apiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          from: `${settings.fromName} <${settings.fromEmail}>`,
+          to: [toEmail],
+          subject: "Test Email from SonicJS",
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h1 style="color: #667eea;">Test Email Successful! \u{1F389}</h1>
+              <p>This is a test email from your SonicJS Email plugin.</p>
+              <p><strong>Configuration:</strong></p>
+              <ul>
+                <li>From: ${settings.fromName} &lt;${settings.fromEmail}&gt;</li>
+                <li>Reply-To: ${settings.replyTo || "Not set"}</li>
+                <li>Sent at: ${(/* @__PURE__ */ new Date()).toISOString()}</li>
+              </ul>
+              <p>Your email settings are working correctly!</p>
+            </div>
+          `,
+          reply_to: settings.replyTo || settings.fromEmail
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        console.error("Resend API error:", data);
+        return c.json({
+          success: false,
+          error: data.message || "Failed to send test email. Check your API key and domain verification."
+        }, response.status);
+      }
+      return c.json({
+        success: true,
+        message: `Test email sent successfully to ${toEmail}`,
+        emailId: data.id
+      });
+    } catch (error) {
+      console.error("Test email error:", error);
+      return c.json({
+        success: false,
+        error: error.message || "An error occurred while sending test email"
+      }, 500);
+    }
   });
   builder.addRoute("/admin/plugins/email", emailRoutes, {
     description: "Email plugin settings",

@@ -43,6 +43,12 @@ export default defineConfig({
     'zod',
   ],
 
+  // Configure esbuild to drop unused imports
+  esbuildOptions(options) {
+    options.treeShaking = true
+    options.ignoreAnnotations = false
+  },
+
   // Bundle these dependencies (included in package)
   noExternal: [
     'drizzle-zod',
@@ -72,6 +78,22 @@ export default defineConfig({
     const path = await import('path')
 
     const distDir = path.resolve(process.cwd(), 'dist')
+
+    // Remove bare zod imports from built files
+    const indexJs = path.join(distDir, 'index.js')
+    const indexCjs = path.join(distDir, 'index.cjs')
+
+    if (fs.existsSync(indexJs)) {
+      let content = fs.readFileSync(indexJs, 'utf-8')
+      content = content.replace(/^import 'zod';?\n/gm, '')
+      fs.writeFileSync(indexJs, content, 'utf-8')
+    }
+
+    if (fs.existsSync(indexCjs)) {
+      let content = fs.readFileSync(indexCjs, 'utf-8')
+      content = content.replace(/^require\(['"]zod['"]\);?\n/gm, '')
+      fs.writeFileSync(indexCjs, content, 'utf-8')
+    }
 
     const typeFiles = {
       'index.d.ts': `// Main exports from @sonicjs-cms/core package
