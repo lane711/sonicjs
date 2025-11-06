@@ -12,366 +12,497 @@ export const sections = [
   { title: 'Version 0.5.x', id: 'version-0-5-x' },
   { title: 'Version 0.4.x', id: 'version-0-4-x' },
   { title: 'Earlier Versions', id: 'earlier-versions' },
-  { title: 'Version History Summary', id: 'version-history-summary' },
+  { title: 'Version History', id: 'version-history' },
 ]
 
 # Changelog
 
-Complete history of SonicJS development, documenting features, improvements, and bug fixes across 7 years of development. {{ className: 'lead' }}
+<div className="not-prose mb-8">
+  <div className="text-xl text-gray-600 dark:text-gray-400 mb-6">
+    Complete history of SonicJS development, documenting features, improvements, and bug fixes across <strong className="text-gray-900 dark:text-white">7 years of active development</strong>.
+  </div>
+  <div className="flex flex-wrap gap-3">
+    <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+      <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+      <span className="text-sm font-semibold text-green-700 dark:text-green-300">Actively Maintained</span>
+    </div>
+    <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+      <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">📊 3,683+ Commits</span>
+    </div>
+    <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+      <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">🚀 20+ Releases</span>
+    </div>
+  </div>
+</div>
 
 ---
 
 ## Unreleased
 
-### Added
-- **Magic Link Authentication Plugin** - Passwordless login via email (inactive by default as most developers prefer email/password)
-- **Core Auth Enhancements** - Plugin extensibility with AuthManager.setAuthCookie() and AuthService interface
-- **Difficulty Field** - Improved select field handling in forms
-- **Experimental Notice Banner** - Added to plugins page with Discord community link
+<div className="not-prose my-8 p-6 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-green-900/10 dark:via-emerald-900/10 dark:to-teal-900/10 rounded-xl border border-green-200 dark:border-green-800 shadow-lg">
+  <div className="flex items-center gap-2 mb-4">
+    <span className="px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full uppercase tracking-wide">Coming Soon</span>
+    <span className="text-sm text-gray-600 dark:text-gray-400">In Development</span>
+  </div>
 
-### Fixed
-- All unit test failures in core package
-- Non-existent created_by column in content INSERT statements
-- Discord invite link updated to correct URL (https://discord.gg/8bMy6bv3sZ)
+  <div className="space-y-4">
+    <div>
+      <h4 className="text-sm font-bold text-green-800 dark:text-green-300 mb-2 flex items-center gap-2">
+        <span className="text-lg">✨</span> Added
+      </h4>
+      <ul className="space-y-2 ml-6">
+        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+          <span className="text-green-500 mt-0.5">▸</span>
+          <span><strong className="font-semibold">Magic Link Authentication Plugin</strong> - Passwordless login via email (inactive by default as most developers prefer email/password)</span>
+        </li>
+        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+          <span className="text-green-500 mt-0.5">▸</span>
+          <span><strong className="font-semibold">Core Auth Enhancements</strong> - Plugin extensibility with AuthManager.setAuthCookie() and AuthService interface</span>
+        </li>
+        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+          <span className="text-green-500 mt-0.5">▸</span>
+          <span><strong className="font-semibold">Difficulty Field</strong> - Improved select field handling in forms</span>
+        </li>
+        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+          <span className="text-green-500 mt-0.5">▸</span>
+          <span><strong className="font-semibold">Experimental Notice Banner</strong> - Added to plugins page with Discord community link</span>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 className="text-sm font-bold text-green-800 dark:text-green-300 mb-2 flex items-center gap-2">
+        <span className="text-lg">🔧</span> Fixed
+      </h4>
+      <ul className="space-y-2 ml-6">
+        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+          <span className="text-green-500 mt-0.5">▸</span>
+          <span>All unit test failures in core package</span>
+        </li>
+        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+          <span className="text-green-500 mt-0.5">▸</span>
+          <span>Non-existent created_by column in content INSERT statements</span>
+        </li>
+        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+          <span className="text-green-500 mt-0.5">▸</span>
+          <span>Discord invite link updated to correct URL</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
 
 ---
 
 ## Version 2.0.x
 
-### [2.0.9] - 2025-11-04
+<div className="not-prose space-y-6 my-8">
 
-**Added:**
-- Improved managed collections display with normalized naming
-- Explicit collection registration system
+{/* Version 2.0.9 */}
+<div className="relative pl-8 pb-8 border-l-2 border-blue-200 dark:border-blue-800">
+  <div className="absolute -left-3 top-0 w-6 h-6 rounded-full bg-blue-500 border-4 border-white dark:border-gray-900 shadow-lg"></div>
 
-**Changed:**
-- Refactored collection management to use explicit registration
-- Updated Wrangler to v4.45.4
-- Removed duplicate starter template directory
-- Removed experimental flag for Plugins menu
+  <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 shadow-md hover:shadow-xl transition-shadow">
+    <div className="flex items-center gap-3 mb-4">
+      <span className="px-3 py-1 bg-blue-500 text-white text-sm font-bold rounded-lg">v2.0.9</span>
+      <span className="text-sm text-gray-600 dark:text-gray-400">November 4, 2025</span>
+    </div>
 
-**Fixed:**
-- Rebuild dist files with updated chunk names
+    <div className="space-y-3">
+      <div>
+        <h4 className="text-sm font-bold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
+          <span>✨</span> Added
+        </h4>
+        <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
+          <li className="flex items-start gap-2"><span className="text-blue-500">▸</span>Improved managed collections display with normalized naming</li>
+          <li className="flex items-start gap-2"><span className="text-blue-500">▸</span>Explicit collection registration system</li>
+        </ul>
+      </div>
 
-### [2.0.6] - 2025-11-03
+      <div>
+        <h4 className="text-sm font-bold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
+          <span>🔄</span> Changed
+        </h4>
+        <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
+          <li className="flex items-start gap-2"><span className="text-blue-500">▸</span>Refactored collection management to use explicit registration</li>
+          <li className="flex items-start gap-2"><span className="text-blue-500">▸</span>Updated Wrangler to v4.45.4</li>
+          <li className="flex items-start gap-2"><span className="text-blue-500">▸</span>Removed duplicate starter template directory</li>
+          <li className="flex items-start gap-2"><span className="text-blue-500">▸</span>Removed experimental flag for Plugins menu</li>
+        </ul>
+      </div>
 
-**Added:**
-- ResponseGroup component for MDX pages
-- Pre-generated sections to prevent fs.readdir error in Cloudflare Workers
+      <div>
+        <h4 className="text-sm font-bold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
+          <span>🔧</span> Fixed
+        </h4>
+        <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
+          <li className="flex items-start gap-2"><span className="text-blue-500">▸</span>Rebuild dist files with updated chunk names</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
 
-**Changed:**
-- Merged legacy sonicjs repository history (3,683+ commits)
-- Improved documentation and contributor workflows
+{/* Version 2.0.6 */}
+<div className="relative pl-8 pb-8 border-l-2 border-purple-200 dark:border-purple-800">
+  <div className="absolute -left-3 top-0 w-6 h-6 rounded-full bg-purple-500 border-4 border-white dark:border-gray-900 shadow-lg"></div>
 
-**Fixed:**
-- fs.readdir error in Cloudflare Workers by pre-generating sections
-- Dynamic import for fast-glob to prevent Workers error
-- Duplicate ID attributes in MDX headings
-- Silenced Next.js workspace root inference warning
+  <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800 shadow-md hover:shadow-xl transition-shadow">
+    <div className="flex items-center gap-3 mb-4">
+      <span className="px-3 py-1 bg-purple-500 text-white text-sm font-bold rounded-lg">v2.0.6</span>
+      <span className="text-sm text-gray-600 dark:text-gray-400">November 3, 2025</span>
+    </div>
 
-### [2.0.5] - 2025-10-30
+    <div className="space-y-3">
+      <div>
+        <h4 className="text-sm font-bold text-purple-800 dark:text-purple-300 mb-2 flex items-center gap-2">
+          <span>✨</span> Added
+        </h4>
+        <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
+          <li className="flex items-start gap-2"><span className="text-purple-500">▸</span>ResponseGroup component for MDX pages</li>
+          <li className="flex items-start gap-2"><span className="text-purple-500">▸</span>Pre-generated sections to prevent fs.readdir error in Cloudflare Workers</li>
+        </ul>
+      </div>
 
-**Added:**
-- Migration warning banner for admin users
-- Publishing and versioning scripts
-- Database migration instructions for core package developers
-- Settings general tab with database persistence and E2E tests
-- Page size selector to database tools table view (default: 20 rows)
-- Media cleanup and content duplicate features with E2E tests
+      <div>
+        <h4 className="text-sm font-bold text-purple-800 dark:text-purple-300 mb-2 flex items-center gap-2">
+          <span>🔄</span> Changed
+        </h4>
+        <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
+          <li className="flex items-start gap-2"><span className="text-purple-500">▸</span>Merged legacy sonicjs repository history (3,683+ commits)</li>
+          <li className="flex items-start gap-2"><span className="text-purple-500">▸</span>Improved documentation and contributor workflows</li>
+        </ul>
+      </div>
 
-**Changed:**
-- Made migrations idempotent to support existing databases
-- Updated package dependencies
-- Improved homepage with creative design
+      <div>
+        <h4 className="text-sm font-bold text-purple-800 dark:text-purple-300 mb-2 flex items-center gap-2">
+          <span>🔧</span> Fixed
+        </h4>
+        <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
+          <li className="flex items-start gap-2"><span className="text-purple-500">▸</span>fs.readdir error in Cloudflare Workers by pre-generating sections</li>
+          <li className="flex items-start gap-2"><span className="text-purple-500">▸</span>Dynamic import for fast-glob to prevent Workers error</li>
+          <li className="flex items-start gap-2"><span className="text-purple-500">▸</span>Duplicate ID attributes in MDX headings</li>
+          <li className="flex items-start gap-2"><span className="text-purple-500">▸</span>Silenced Next.js workspace root inference warning</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
 
-**Fixed:**
-- E2E test failures for media and settings
-- Missing migration SQL for migrations 014-017
-- Content author to use correct database column
-- Skipped Workflow Dashboard e2e tests
-- API endpoints e2e tests
+{/* Version 2.0.5 */}
+<div className="relative pl-8 pb-8 border-l-2 border-indigo-200 dark:border-indigo-800">
+  <div className="absolute -left-3 top-0 w-6 h-6 rounded-full bg-indigo-500 border-4 border-white dark:border-gray-900 shadow-lg"></div>
 
-### [2.0.3] - 2025-10-27
+  <div className="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-xl p-6 border border-indigo-200 dark:border-indigo-800 shadow-md hover:shadow-xl transition-shadow">
+    <div className="flex items-center gap-3 mb-4">
+      <span className="px-3 py-1 bg-indigo-500 text-white text-sm font-bold rounded-lg">v2.0.5</span>
+      <span className="text-sm text-gray-600 dark:text-gray-400">October 30, 2025</span>
+    </div>
 
-**Added:**
-- Auth validation service to fix registration 500 errors
-- Dynamic version management utilities from package.json
+    <details className="group">
+      <summary className="cursor-pointer text-sm font-semibold text-indigo-700 dark:text-indigo-300 hover:text-indigo-900 dark:hover:text-indigo-200 flex items-center gap-2">
+        <span className="transform transition-transform group-open:rotate-90">▶</span>
+        View changes (11 improvements)
+      </summary>
 
-**Fixed:**
-- Health check and login redirect test failures
-- Registration 500 errors with proper auth validation
-- Template improvements in core package rebuild
+      <div className="mt-3 space-y-3">
+        <div>
+          <h4 className="text-sm font-bold text-indigo-800 dark:text-indigo-300 mb-2 flex items-center gap-2">
+            <span>✨</span> Added
+          </h4>
+          <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
+            <li className="flex items-start gap-2"><span className="text-indigo-500">▸</span>Migration warning banner for admin users</li>
+            <li className="flex items-start gap-2"><span className="text-indigo-500">▸</span>Publishing and versioning scripts</li>
+            <li className="flex items-start gap-2"><span className="text-indigo-500">▸</span>Database migration instructions for core package developers</li>
+            <li className="flex items-start gap-2"><span className="text-indigo-500">▸</span>Settings general tab with database persistence and E2E tests</li>
+            <li className="flex items-start gap-2"><span className="text-indigo-500">▸</span>Page size selector to database tools table view (default: 20 rows)</li>
+            <li className="flex items-start gap-2"><span className="text-indigo-500">▸</span>Media cleanup and content duplicate features with E2E tests</li>
+          </ul>
+        </div>
 
-### [2.0.2] - 2025-10-24
+        <div>
+          <h4 className="text-sm font-bold text-indigo-800 dark:text-indigo-300 mb-2 flex items-center gap-2">
+            <span>🔄</span> Changed
+          </h4>
+          <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
+            <li className="flex items-start gap-2"><span className="text-indigo-500">▸</span>Made migrations idempotent to support existing databases</li>
+            <li className="flex items-start gap-2"><span className="text-indigo-500">▸</span>Updated package dependencies</li>
+            <li className="flex items-start gap-2"><span className="text-indigo-500">▸</span>Improved homepage with creative design</li>
+          </ul>
+        </div>
 
-**Added:**
-- Real-time metrics tracking system
-- Database tools API endpoints
-- Modernized admin profile and dashboard with Catalyst design system
+        <div>
+          <h4 className="text-sm font-bold text-indigo-800 dark:text-indigo-300 mb-2 flex items-center gap-2">
+            <span>🔧</span> Fixed
+          </h4>
+          <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
+            <li className="flex items-start gap-2"><span className="text-indigo-500">▸</span>E2E test failures for media and settings</li>
+            <li className="flex items-start gap-2"><span className="text-indigo-500">▸</span>Missing migration SQL for migrations 014-017</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </div>
+</div>
 
-**Changed:**
-- Updated plugin registry timestamp
-- Cleaned up migrations and fixed TypeScript errors
+{/* Version 2.0.0 - Major Release */}
+<div className="relative pl-8 pb-8 border-l-2 border-amber-200 dark:border-amber-800">
+  <div className="absolute -left-3 top-0 w-6 h-6 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-4 border-white dark:border-gray-900 shadow-lg animate-pulse"></div>
 
-**Fixed:**
-- Removed non-functional permission middleware from user routes
-- Filtered out noisy metrics endpoint logging
+  <div className="bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-amber-900/20 dark:via-orange-900/20 dark:to-yellow-900/20 rounded-xl p-6 border-2 border-amber-300 dark:border-amber-700 shadow-lg hover:shadow-2xl transition-shadow">
+    <div className="flex items-center gap-3 mb-4">
+      <span className="px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold rounded-lg shadow-md flex items-center gap-1">
+        <span>🎉</span> v2.0.0
+      </span>
+      <span className="px-2 py-1 bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-xs font-bold rounded uppercase">Major Release</span>
+      <span className="text-sm text-gray-600 dark:text-gray-400">October 22, 2025</span>
+    </div>
 
-### [2.0.1] - 2025-10-23
+    <p className="text-sm text-gray-700 dark:text-gray-300 mb-4 font-medium">
+      🚀 <strong>NPM Package Distribution</strong> - Complete core package extraction and npm publishing infrastructure
+    </p>
 
-**Added:**
-- Published core package v2.0.1 to npm ✨
-- WIP notices to non-functional settings tabs
-- Real-time metrics endpoint for analytics chart
-- Admin dashboard route
-- Dedicated endpoints for dashboard HTMX fragments
+    <details className="group">
+      <summary className="cursor-pointer text-sm font-semibold text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-200 flex items-center gap-2">
+        <span className="transform transition-transform group-open:rotate-90">▶</span>
+        View all changes
+      </summary>
 
-### [2.0.0] - 2025-10-22 🎉
+      <div className="mt-3 space-y-3">
+        <div>
+          <h4 className="text-sm font-bold text-amber-800 dark:text-amber-300 mb-2 flex items-center gap-2">
+            <span>✨</span> Added
+          </h4>
+          <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
+            <li className="flex items-start gap-2"><span className="text-amber-500">▸</span>Core package extraction to @sonicjs-cms/core</li>
+            <li className="flex items-start gap-2"><span className="text-amber-500">▸</span>Complete route migration to core package</li>
+            <li className="flex items-start gap-2"><span className="text-amber-500">▸</span>Template migration with full integration</li>
+            <li className="flex items-start gap-2"><span className="text-amber-500">▸</span>Middleware, plugins, and services in core package</li>
+            <li className="flex items-start gap-2"><span className="text-amber-500">▸</span>Automatic migration and seeding during setup</li>
+            <li className="flex items-start gap-2"><span className="text-amber-500">▸</span>Custom admin credentials setup</li>
+          </ul>
+        </div>
 
-**Major Release: NPM Package Distribution**
+        <div>
+          <h4 className="text-sm font-bold text-amber-800 dark:text-amber-300 mb-2 flex items-center gap-2">
+            <span>🔄</span> Changed
+          </h4>
+          <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
+            <li className="flex items-start gap-2"><span className="text-amber-500">▸</span>Package name from @sonicjs/core to @sonicjs-cms/core</li>
+            <li className="flex items-start gap-2"><span className="text-amber-500">▸</span>Streamlined create-app setup flow</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </div>
+</div>
 
-**Added:**
-- Core package extraction to @sonicjs-cms/core
-- Complete route migration to core package
-- Template migration with full integration
-- Middleware, plugins, and services in core package
-- Automatic migration and seeding during setup
-- Custom admin credentials setup
-- Update scripts to starter templates
-
-**Changed:**
-- Package name from @sonicjs/core to @sonicjs-cms/core
-- Streamlined create-app setup flow
-- Bootstrap middleware moved to monolith with collection sync
-- Core package version for app version display
-
-**Fixed:**
-- Wrangler warnings and seedAdmin scope
-- Cloudflare resource creation error handling
-- Template path resolution for npm installed package
-- Missing API routes (apiContentCrudRoutes, adminApiRoutes, apiSystemRoutes)
+</div>
 
 ---
 
 ## Version 1.0.x
 
-### [1.0.3] - 2025-10-15
+<div className="not-prose my-8">
+  <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-6 border border-emerald-200 dark:border-emerald-800 shadow-md">
+    <div className="flex items-center gap-3 mb-4">
+      <span className="px-3 py-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-bold rounded-lg flex items-center gap-1">
+        <span>🎉</span> v1.0.0
+      </span>
+      <span className="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded uppercase">Production Ready</span>
+      <span className="text-sm text-gray-600 dark:text-gray-400">October 14, 2025</span>
+    </div>
 
-**Added:**
-- E2E tests for plugin version display
-- Collection filtering to content API
+    <p className="text-sm text-gray-700 dark:text-gray-300 mb-4 font-medium">
+      First production-ready release with comprehensive E2E testing, media management, and security hardening.
+    </p>
 
-**Changed:**
-- Standardized all plugin versions to 1.0.0-beta.1
+    <details className="group">
+      <summary className="cursor-pointer text-sm font-semibold text-emerald-700 dark:text-emerald-300 hover:text-emerald-900 dark:hover:text-emerald-200 flex items-center gap-2">
+        <span className="transform transition-transform group-open:rotate-90">▶</span>
+        View highlights
+      </summary>
 
-**Fixed:**
-- Plugin install versions display
-- Media selector UX improvements
-
-### [1.0.0] - 2025-10-14 🎉
-
-**Major Release: Production Ready**
-
-**Added:**
-- Media bulk actions with E2E tests
-- Pre-push hook to run E2E tests before pushing
-- Husky pre-commit hooks
-- Dynamic plugin menu system
-- Media folder creation
-- Comprehensive API filtering system with 14 operators
-
-**Changed:**
-- Database-tools plugin activated in migration
-- Made E2E tests optional on git push
-
-**Fixed:**
-- Media bulk action e2e test failures
-- Foreign key constraints
-- User management e2e tests (40/42 passing)
-- Database-tools and migrations E2E tests JavaScript initialization
-- Collection name in E2E test for empty collections
-- Plugin E2E tests with auto-install and selector fixes
-- Collections E2E test failures
-- Media e2e tests (5 failing tests fixed)
-- Integration test and TypeScript errors
-- XSS prevention test syntax errors
-- Deprecated wrangler config
-- API route tests to handle isPluginActive middleware calls
-- Update KV binding name from KV to CACHE_KV
-- XSS vulnerability in user creation and management
-
----
-
-## Version 0.6.0
-
-### [0.6.0] - 2025-10-08
-
-**Added:**
-- Bulk move to folder functionality in media library
-- Comprehensive documentation
-- Clickable logo navigation to dashboard
-- Test coverage thresholds to 90%
-
-**Changed:**
-- Development server port standardized to 8787
-- Improved dashboard recent activity to show collections
-- Replaced lightning bolt with pencil icon for edit button
-
-**Fixed:**
-- Dashboard storage usage showing 0 B for media files
-- Media library images not loading and size calculation
-- Content list row links
-- Race condition showing deleted user in list
-- Null check for hard delete checkbox in user deletion
-
----
-
-## Version 0.5.x
-
-### [0.5.4] - 2025-10-07
-
-**Added:**
-- Activity logging for content creation, updates, and deletions
-- Real-time requests per second analytics to dashboard
-- Recent Activity section with real database data
-- Developer Docs button to dashboard
-- Dynamic confirmation dialogs for content bulk actions
-
-**Changed:**
-- Redesigned System Health section with modern gradients and animations
-- Improved logging and test coverage
-- Filter out deleted content by default with opt-in viewing
-
-**Fixed:**
-- Dashboard template TypeScript errors
-- Excluded metrics API endpoint from analytics tracking
-- Disabled logging for high-frequency /admin/api/metrics endpoint
-- Excluded polling endpoints from metrics tracking
-- Prevented HTML escaping in dashboard system health display
-
----
-
-## Version 0.4.x
-
-### [0.4.4] - 2025-10-06
-
-**Added:**
-- Design System converted to plugin
-- Visual status indicators to plugin cards
-- Seed data generator link to plugin settings page
-
-**Changed:**
-- Media library view selector updated to match design guide
-- Media library search input improved to match content list
-- Set app version globally via middleware
-
-**Fixed:**
-- Plugin status borders made more visible
-- Seed data service converted from Drizzle ORM to D1 Database API
-- Plugin activation state preserved across server restarts
-- Duplicate cache plugin resolved
-- Design plugin added to registry
-- Media library view selector
-
-### [0.4.2] - 2025-10-06
-
-**Added:**
-- Husky pre-commit hooks
-- All tests passing
-
-**Fixed:**
-- TypeScript build errors
-- Content list row links
-
-### [0.4.0] - 2025-10-06
-
-**Changed:**
-- Major refactoring and cleanup
-- Version bump
+      <div className="mt-3 space-y-2 ml-6 text-sm text-gray-700 dark:text-gray-300">
+        <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span>Media bulk actions with E2E tests</div>
+        <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span>Pre-push hooks for E2E testing</div>
+        <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span>Dynamic plugin menu system</div>
+        <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span>Comprehensive API filtering (14 operators)</div>
+        <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span>XSS vulnerability fixes</div>
+      </div>
+    </details>
+  </div>
+</div>
 
 ---
 
 ## Earlier Versions
 
-### 2024 - Refinement Year
-- Continued improvements to core functionality
-- Performance optimizations
-- Bug fixes and stability improvements
+<div className="not-prose my-8 space-y-4">
 
-### 2023 - Enhancement Year
-- Enhanced plugin system
-- Improved admin interface
-- Better content management features
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-### 2022 - Optimization Year
-- Database optimization
-- API improvements
-- Security enhancements
+    <div className="bg-gradient-to-br from-sky-50 to-blue-50 dark:from-sky-900/20 dark:to-blue-900/20 rounded-lg p-5 border border-sky-200 dark:border-sky-800">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-2xl">📦</span>
+        <span className="font-bold text-sky-900 dark:text-sky-200">v0.6.0</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">Oct 2025</span>
+      </div>
+      <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">Media Management Era</p>
+      <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+        <li>• Bulk media operations</li>
+        <li>• 90% test coverage</li>
+        <li>• Dashboard improvements</li>
+      </ul>
+    </div>
 
-### 2021 - Feature Expansion
-- Major feature additions
-- UI/UX improvements
-- Performance tuning
+    <div className="bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 rounded-lg p-5 border border-violet-200 dark:border-violet-800">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-2xl">📊</span>
+        <span className="font-bold text-violet-900 dark:text-violet-200">v0.5.x</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">Oct 2025</span>
+      </div>
+      <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">Analytics & Activity</p>
+      <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+        <li>• Real-time analytics</li>
+        <li>• Activity logging</li>
+        <li>• Modern UI redesign</li>
+      </ul>
+    </div>
 
-### 2020 - Architecture Evolution
-- Core architecture refinements
-- Plugin system enhancements
-- Admin panel improvements
+    <div className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 rounded-lg p-5 border border-pink-200 dark:border-pink-800">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-2xl">🎨</span>
+        <span className="font-bold text-pink-900 dark:text-pink-200">v0.4.x</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">Oct 2025</span>
+      </div>
+      <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">Design System</p>
+      <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+        <li>• Plugin architecture</li>
+        <li>• Visual indicators</li>
+        <li>• Pre-commit hooks</li>
+      </ul>
+    </div>
 
-### 2019 - Foundation Building
-- Dynamic form rendering
-- Content type system
-- Field type management
-- Content instance creation
-- Admin UI development
+    <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-lg p-5 border border-orange-200 dark:border-orange-800">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-2xl">🔧</span>
+        <span className="font-bold text-orange-900 dark:text-orange-200">2019-2024</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">Foundation</span>
+      </div>
+      <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">Platform Evolution</p>
+      <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+        <li>• Core architecture</li>
+        <li>• Content management</li>
+        <li>• API development</li>
+      </ul>
+    </div>
 
-### 2018 - Project Genesis
+  </div>
 
-**August 2018** - The Beginning
-
-- Initial commit
-- Project launched as "siteden"
-- Basic CMS functionality
-- Content listing features
-- Surge deployment support
-- Logo and branding
-- Admin interface foundation
+  <div className="bg-gradient-to-br from-gray-50 to-slate-50 dark:from-gray-900/20 dark:to-slate-900/20 rounded-xl p-6 border border-gray-200 dark:border-gray-800">
+    <div className="flex items-center gap-3 mb-4">
+      <span className="text-3xl">🌱</span>
+      <div>
+        <h3 className="font-bold text-gray-900 dark:text-white">2018 - Project Genesis</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">Where it all began</p>
+      </div>
+    </div>
+    <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+      <div className="flex items-start gap-2"><span className="text-gray-400">▸</span>August 2018: Initial commit</div>
+      <div className="flex items-start gap-2"><span className="text-gray-400">▸</span>Project launched as "siteden"</div>
+      <div className="flex items-start gap-2"><span className="text-gray-400">▸</span>Basic CMS functionality and admin interface</div>
+      <div className="flex items-start gap-2"><span className="text-gray-400">▸</span>Foundation for 7 years of development</div>
+    </div>
+  </div>
+</div>
 
 ---
 
-## Version History Summary
+## Version History
 
-| Version | Year | Highlights |
-|---------|------|------------|
-| **2.0.x** | 2025 | Modern cloud-native CMS with npm package distribution, Cloudflare Workers optimized |
-| **1.0.x** | 2025 | Production-ready with E2E testing, comprehensive features, and security hardening |
-| **0.6.0** | 2025 | Media management and bulk operations |
-| **0.5.x** | 2025 | Dashboard analytics and activity logging |
-| **0.4.x** | 2025 | Plugin system and design system |
-| **0.3.x** | 2024 | Core feature refinements |
-| **0.2.x** | 2023 | API and performance improvements |
-| **0.1.x** | 2019-2022 | Foundation and early development |
+<div className="not-prose my-8 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 shadow-lg">
+  <div className="overflow-x-auto">
+    <table className="w-full text-sm">
+      <thead>
+        <tr className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+          <th className="px-6 py-4 text-left font-bold">Version</th>
+          <th className="px-6 py-4 text-left font-bold">Year</th>
+          <th className="px-6 py-4 text-left font-bold">Highlights</th>
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+        <tr className="bg-blue-50/50 dark:bg-blue-900/10 hover:bg-blue-100/50 dark:hover:bg-blue-900/20 transition-colors">
+          <td className="px-6 py-4 font-bold text-blue-700 dark:text-blue-300">2.0.x</td>
+          <td className="px-6 py-4 text-gray-700 dark:text-gray-300">2025</td>
+          <td className="px-6 py-4 text-gray-700 dark:text-gray-300">Modern cloud-native CMS with npm package distribution, Cloudflare Workers optimized</td>
+        </tr>
+        <tr className="bg-emerald-50/50 dark:bg-emerald-900/10 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/20 transition-colors">
+          <td className="px-6 py-4 font-bold text-emerald-700 dark:text-emerald-300">1.0.x</td>
+          <td className="px-6 py-4 text-gray-700 dark:text-gray-300">2025</td>
+          <td className="px-6 py-4 text-gray-700 dark:text-gray-300">Production-ready with E2E testing, comprehensive features, and security hardening</td>
+        </tr>
+        <tr className="bg-purple-50/50 dark:bg-purple-900/10 hover:bg-purple-100/50 dark:hover:bg-purple-900/20 transition-colors">
+          <td className="px-6 py-4 font-bold text-purple-700 dark:text-purple-300">0.6.0</td>
+          <td className="px-6 py-4 text-gray-700 dark:text-gray-300">2025</td>
+          <td className="px-6 py-4 text-gray-700 dark:text-gray-300">Media management and bulk operations</td>
+        </tr>
+        <tr className="bg-pink-50/50 dark:bg-pink-900/10 hover:bg-pink-100/50 dark:hover:bg-pink-900/20 transition-colors">
+          <td className="px-6 py-4 font-bold text-pink-700 dark:text-pink-300">0.5.x</td>
+          <td className="px-6 py-4 text-gray-700 dark:text-gray-300">2025</td>
+          <td className="px-6 py-4 text-gray-700 dark:text-gray-300">Dashboard analytics and activity logging</td>
+        </tr>
+        <tr className="bg-orange-50/50 dark:bg-orange-900/10 hover:bg-orange-100/50 dark:hover:bg-orange-900/20 transition-colors">
+          <td className="px-6 py-4 font-bold text-orange-700 dark:text-orange-300">0.4.x</td>
+          <td className="px-6 py-4 text-gray-700 dark:text-gray-300">2025</td>
+          <td className="px-6 py-4 text-gray-700 dark:text-gray-300">Plugin system and design system</td>
+        </tr>
+        <tr className="bg-gray-50/50 dark:bg-gray-900/10 hover:bg-gray-100/50 dark:hover:bg-gray-900/20 transition-colors">
+          <td className="px-6 py-4 font-bold text-gray-700 dark:text-gray-300">0.1.x - 0.3.x</td>
+          <td className="px-6 py-4 text-gray-700 dark:text-gray-300">2019-2024</td>
+          <td className="px-6 py-4 text-gray-700 dark:text-gray-300">Foundation and early development</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div className="not-prose my-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+  <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+    <div className="text-4xl font-black bg-gradient-to-br from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-2">3,683+</div>
+    <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">Total Commits</div>
+  </div>
+  <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
+    <div className="text-4xl font-black bg-gradient-to-br from-purple-600 to-pink-500 bg-clip-text text-transparent mb-2">7</div>
+    <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">Years Active</div>
+  </div>
+  <div className="text-center p-6 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl border border-green-200 dark:border-green-800">
+    <div className="text-4xl font-black bg-gradient-to-br from-green-600 to-emerald-500 bg-clip-text text-transparent mb-2">20+</div>
+    <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">Major Releases</div>
+  </div>
+  <div className="text-center p-6 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-xl border border-orange-200 dark:border-orange-800">
+    <div className="text-4xl font-black bg-gradient-to-br from-orange-600 to-amber-500 bg-clip-text text-transparent mb-2">∞</div>
+    <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">More to Come</div>
+  </div>
+</div>
 
 ---
 
-## Statistics
+<div className="not-prose my-12 p-8 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-900/20 dark:via-purple-900/20 dark:to-pink-900/20 rounded-2xl border border-blue-200 dark:border-blue-800 shadow-xl text-center">
+  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Want to Contribute?</h3>
+  <p className="text-gray-700 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
+    SonicJS is open source and community-driven. Join us in building the future of edge-first content management.
+  </p>
+  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+    <a href="https://github.com/lane711/sonicjs" className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg font-semibold hover:scale-105 transition-transform shadow-lg">
+      <span>⭐</span> Star on GitHub
+    </a>
+    <a href="https://discord.gg/8bMy6bv3sZ" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-semibold hover:scale-105 transition-transform shadow-lg">
+      <span>💬</span> Join Discord
+    </a>
+  </div>
+</div>
 
-- **📊 Total Commits**: 3,683+
-- **📅 Development Time**: 7 years (2018-2025)
-- **👥 Contributors**: Community-driven
-- **🚀 Releases**: 20+ major versions
-- **📦 NPM Package**: Available since 2.0.0
-
----
-
-## Contributing
-
-Want to help make SonicJS better? See our [Contributing Guide](https://github.com/lane711/sonicjs/blob/main/CONTRIBUTING.md) for information on how to get involved.
-
-## License
-
-MIT - See [LICENSE](https://github.com/lane711/sonicjs/blob/main/LICENSE) for details.
-
----
-
-**Note**: This changelog represents a comprehensive history derived from the complete git history. For the most up-to-date changes, see the [GitHub repository](https://github.com/lane711/sonicjs).
+<div className="text-center text-sm text-gray-500 dark:text-gray-400 my-8">
+  MIT License - Free Forever • Built with ❤️ by the SonicJS Community
+</div>

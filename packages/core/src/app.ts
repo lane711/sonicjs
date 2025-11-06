@@ -26,6 +26,7 @@ import { getCoreVersion } from './utils/version'
 import { bootstrapMiddleware } from './middleware/bootstrap'
 import { metricsMiddleware } from './middleware/metrics'
 import { createDatabaseToolsAdminRoutes } from './plugins/core-plugins/database-tools-plugin/admin-routes'
+import { emailPlugin } from './plugins/core-plugins/email-plugin'
 
 // ============================================================================
 // Type Definitions
@@ -181,6 +182,13 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   app.route('/admin/logs', adminLogsRoutes)
   app.route('/admin', adminUsersRoutes)
   app.route('/auth', authRoutes)
+
+  // Plugin routes
+  if (emailPlugin.routes && emailPlugin.routes.length > 0) {
+    for (const route of emailPlugin.routes) {
+      app.route(route.path, route.handler)
+    }
+  }
 
   // Serve files from R2 storage (public file access)
   app.get('/files/*', async (c) => {

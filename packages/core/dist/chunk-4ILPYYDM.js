@@ -459,7 +459,8 @@ var package_default = {
       types: "./dist/types.d.ts",
       import: "./dist/types.js",
       require: "./dist/types.cjs"
-    }
+    },
+    "./package.json": "./package.json"
   },
   files: [
     "dist",
@@ -536,5 +537,5 @@ function getCoreVersion() {
 }
 
 export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, package_default, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer };
-//# sourceMappingURL=chunk-MXJJN4IA.js.map
-//# sourceMappingURL=chunk-MXJJN4IA.js.map
+//# sourceMappingURL=chunk-4ILPYYDM.js.map
+//# sourceMappingURL=chunk-4ILPYYDM.js.map

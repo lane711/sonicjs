@@ -377,7 +377,12 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
       }
       
       function openPluginSettings(pluginId) {
-        window.location.href = \`/admin/plugins/\${pluginId}\`;
+        // Email plugin has a custom settings page
+        if (pluginId === 'email') {
+          window.location.href = '/admin/plugins/email/settings';
+        } else {
+          window.location.href = \`/admin/plugins/\${pluginId}\`;
+        }
       }
       
       function showPluginDetails(pluginId) {

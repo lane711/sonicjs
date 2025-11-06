@@ -4,7 +4,7 @@ var chunkDOR2IU73_cjs = require('./chunk-DOR2IU73.cjs');
 var chunkYN4VD3ML_cjs = require('./chunk-YN4VD3ML.cjs');
 var chunkNBDPIRQS_cjs = require('./chunk-NBDPIRQS.cjs');
 var chunkMU3MR2QR_cjs = require('./chunk-MU3MR2QR.cjs');
-var chunk3PHG75W4_cjs = require('./chunk-3PHG75W4.cjs');
+var chunkPGZZPKZL_cjs = require('./chunk-PGZZPKZL.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 var hono = require('hono');
 var cors = require('hono/cors');
@@ -334,12 +334,12 @@ apiRoutes.get("/content", async (c) => {
         });
       }
     }
-    const filter = chunk3PHG75W4_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunkPGZZPKZL_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.limit) {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder = new chunk3PHG75W4_cjs.QueryFilterBuilder();
+    const builder = new chunkPGZZPKZL_cjs.QueryFilterBuilder();
     const queryResult = builder.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -426,7 +426,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
     if (!collectionResult) {
       return c.json({ error: "Collection not found" }, 404);
     }
-    const filter = chunk3PHG75W4_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunkPGZZPKZL_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.where) {
       filter.where = { and: [] };
     }
@@ -442,7 +442,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder = new chunk3PHG75W4_cjs.QueryFilterBuilder();
+    const builder = new chunkPGZZPKZL_cjs.QueryFilterBuilder();
     const queryResult = builder.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -6772,7 +6772,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="first_name"
-                      value="${chunk3PHG75W4_cjs.escapeHtml(data.userToEdit.firstName || "")}"
+                      value="${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.firstName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -6783,7 +6783,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="last_name"
-                      value="${chunk3PHG75W4_cjs.escapeHtml(data.userToEdit.lastName || "")}"
+                      value="${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.lastName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -6794,7 +6794,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="username"
-                      value="${chunk3PHG75W4_cjs.escapeHtml(data.userToEdit.username || "")}"
+                      value="${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.username || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -6805,7 +6805,7 @@ function renderUserEditPage(data) {
                     <input
                       type="email"
                       name="email"
-                      value="${chunk3PHG75W4_cjs.escapeHtml(data.userToEdit.email || "")}"
+                      value="${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.email || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -6816,7 +6816,7 @@ function renderUserEditPage(data) {
                     <input
                       type="tel"
                       name="phone"
-                      value="${chunk3PHG75W4_cjs.escapeHtml(data.userToEdit.phone || "")}"
+                      value="${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.phone || "")}"
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
                   </div>
@@ -6830,7 +6830,7 @@ function renderUserEditPage(data) {
                         class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-zinc-500/30 dark:outline-zinc-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-500 dark:focus-visible:outline-zinc-400 sm:text-sm/6"
                       >
                         ${data.roles.map((role) => `
-                          <option value="${chunk3PHG75W4_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunk3PHG75W4_cjs.escapeHtml(role.label)}</option>
+                          <option value="${chunkPGZZPKZL_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunkPGZZPKZL_cjs.escapeHtml(role.label)}</option>
                         `).join("")}
                       </select>
                       <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-zinc-600 dark:text-zinc-400 sm:size-4">
@@ -6846,7 +6846,7 @@ function renderUserEditPage(data) {
                     name="bio"
                     rows="3"
                     class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-                  >${chunk3PHG75W4_cjs.escapeHtml(data.userToEdit.bio || "")}</textarea>
+                  >${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.bio || "")}</textarea>
                 </div>
               </div>
 
@@ -7845,12 +7845,12 @@ userRoutes.put("/profile", async (c) => {
   const db = c.env.DB;
   try {
     const formData = await c.req.formData();
-    const firstName = chunk3PHG75W4_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunk3PHG75W4_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunk3PHG75W4_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunk3PHG75W4_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunk3PHG75W4_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const timezone = formData.get("timezone")?.toString() || "UTC";
     const language = formData.get("language")?.toString() || "en";
     const emailNotifications = formData.get("email_notifications") === "1";
@@ -7931,7 +7931,7 @@ userRoutes.post("/profile/avatar", async (c) => {
   try {
     const formData = await c.req.formData();
     const avatarFile = formData.get("avatar");
-    if (!avatarFile || !(avatarFile instanceof File) || !avatarFile.name) {
+    if (!avatarFile || typeof avatarFile === "string" || !avatarFile.name) {
       return c.html(renderAlert2({
         type: "error",
         message: "Please select an image file.",
@@ -8228,12 +8228,12 @@ userRoutes.post("/users/new", async (c) => {
   const user = c.get("user");
   try {
     const formData = await c.req.formData();
-    const firstName = chunk3PHG75W4_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunk3PHG75W4_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunk3PHG75W4_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunk3PHG75W4_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunk3PHG75W4_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const password = formData.get("password")?.toString() || "";
     const confirmPassword = formData.get("confirm_password")?.toString() || "";
@@ -8434,12 +8434,12 @@ userRoutes.put("/users/:id", async (c) => {
   const userId = c.req.param("id");
   try {
     const formData = await c.req.formData();
-    const firstName = chunk3PHG75W4_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunk3PHG75W4_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunk3PHG75W4_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunk3PHG75W4_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunk3PHG75W4_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const isActive = formData.get("is_active") === "1";
     const emailVerified = formData.get("email_verified") === "1";
@@ -8622,8 +8622,8 @@ userRoutes.post("/invite-user", async (c) => {
     const formData = await c.req.formData();
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
     const role = formData.get("role")?.toString()?.trim() || "viewer";
-    const firstName = chunk3PHG75W4_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunk3PHG75W4_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const firstName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("last_name")?.toString());
     if (!email || !firstName || !lastName) {
       return c.json({ error: "Email, first name, and last name are required" }, 400);
     }
@@ -11454,7 +11454,12 @@ function renderPluginsListPage(data) {
       }
       
       function openPluginSettings(pluginId) {
-        window.location.href = \`/admin/plugins/\${pluginId}\`;
+        // Email plugin has a custom settings page
+        if (pluginId === 'email') {
+          window.location.href = '/admin/plugins/email/settings';
+        } else {
+          window.location.href = \`/admin/plugins/\${pluginId}\`;
+        }
       }
       
       function showPluginDetails(pluginId) {
@@ -11977,28 +11982,22 @@ function renderPluginSettingsPage(data) {
   const { plugin, activity = [], user } = data;
   const pageContent = `
     <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
-      <!-- Header with breadcrumb -->
-      <div class="flex items-center mb-6">
-        <nav class="flex" aria-label="Breadcrumb">
-          <ol class="flex items-center space-x-2">
-            <li>
-              <a href="/admin/plugins" class="text-gray-400 hover:text-white transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                </svg>
-                Plugins
-              </a>
-            </li>
-            <li>
-              <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-              </svg>
-            </li>
-            <li>
-              <span class="text-gray-300">${plugin.displayName}</span>
-            </li>
-          </ol>
-        </nav>
+      <!-- Header with Back Button -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div>
+          <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">Plugin Settings</h1>
+          <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">
+            ${plugin.description}
+          </p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <a href="/admin/plugins" class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm">
+            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to Plugins
+          </a>
+        </div>
       </div>
 
       <!-- Plugin Header -->
@@ -12009,9 +12008,8 @@ function renderPluginSettingsPage(data) {
               ${plugin.icon || plugin.displayName.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h1 class="text-2xl font-semibold text-white mb-1">${plugin.displayName}</h1>
-              <p class="text-gray-300 mb-2">${plugin.description}</p>
-              <div class="flex items-center gap-4 text-sm text-gray-400">
+              <h2 class="text-2xl font-semibold text-white mb-1">${plugin.displayName}</h2>
+              <div class="flex items-center gap-4 text-sm text-gray-400 mt-2">
                 <span>v${plugin.version}</span>
                 <span>by ${plugin.author}</span>
                 <span>${plugin.category}</span>
@@ -12020,7 +12018,7 @@ function renderPluginSettingsPage(data) {
               </div>
             </div>
           </div>
-          
+
           <div class="flex items-center gap-3">
             ${renderStatusBadge(plugin.status)}
             ${renderToggleButton(plugin)}
@@ -16534,7 +16532,7 @@ function renderStorageUsage(databaseSizeBytes, mediaSizeBytes) {
 }
 
 // src/routes/admin-dashboard.ts
-var VERSION = chunk3PHG75W4_cjs.getCoreVersion();
+var VERSION = chunkPGZZPKZL_cjs.getCoreVersion();
 var router = new hono.Hono();
 router.use("*", chunkYN4VD3ML_cjs.requireAuth());
 router.get("/", async (c) => {
@@ -20435,5 +20433,5 @@ exports.api_system_default = api_system_default;
 exports.auth_default = auth_default;
 exports.router = router;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-4L5WRR4M.cjs.map
-//# sourceMappingURL=chunk-4L5WRR4M.cjs.map
+//# sourceMappingURL=chunk-PQ4S4G3U.cjs.map
+//# sourceMappingURL=chunk-PQ4S4G3U.cjs.map

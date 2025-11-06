@@ -2,7 +2,7 @@ import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './ch
 import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-XQGVZVST.js';
 import { PluginService, MigrationService } from './chunk-COBUPOMD.js';
 import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderFAQList, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-LW33AOBF.js';
-import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-MXJJN4IA.js';
+import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-4ILPYYDM.js';
 import { metricsTracker } from './chunk-FICTAGD4.js';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
@@ -7929,7 +7929,7 @@ userRoutes.post("/profile/avatar", async (c) => {
   try {
     const formData = await c.req.formData();
     const avatarFile = formData.get("avatar");
-    if (!avatarFile || !(avatarFile instanceof File) || !avatarFile.name) {
+    if (!avatarFile || typeof avatarFile === "string" || !avatarFile.name) {
       return c.html(renderAlert2({
         type: "error",
         message: "Please select an image file.",
@@ -11452,7 +11452,12 @@ function renderPluginsListPage(data) {
       }
       
       function openPluginSettings(pluginId) {
-        window.location.href = \`/admin/plugins/\${pluginId}\`;
+        // Email plugin has a custom settings page
+        if (pluginId === 'email') {
+          window.location.href = '/admin/plugins/email/settings';
+        } else {
+          window.location.href = \`/admin/plugins/\${pluginId}\`;
+        }
       }
       
       function showPluginDetails(pluginId) {
@@ -11975,28 +11980,22 @@ function renderPluginSettingsPage(data) {
   const { plugin, activity = [], user } = data;
   const pageContent = `
     <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
-      <!-- Header with breadcrumb -->
-      <div class="flex items-center mb-6">
-        <nav class="flex" aria-label="Breadcrumb">
-          <ol class="flex items-center space-x-2">
-            <li>
-              <a href="/admin/plugins" class="text-gray-400 hover:text-white transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                </svg>
-                Plugins
-              </a>
-            </li>
-            <li>
-              <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-              </svg>
-            </li>
-            <li>
-              <span class="text-gray-300">${plugin.displayName}</span>
-            </li>
-          </ol>
-        </nav>
+      <!-- Header with Back Button -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div>
+          <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">Plugin Settings</h1>
+          <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">
+            ${plugin.description}
+          </p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <a href="/admin/plugins" class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm">
+            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to Plugins
+          </a>
+        </div>
       </div>
 
       <!-- Plugin Header -->
@@ -12007,9 +12006,8 @@ function renderPluginSettingsPage(data) {
               ${plugin.icon || plugin.displayName.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h1 class="text-2xl font-semibold text-white mb-1">${plugin.displayName}</h1>
-              <p class="text-gray-300 mb-2">${plugin.description}</p>
-              <div class="flex items-center gap-4 text-sm text-gray-400">
+              <h2 class="text-2xl font-semibold text-white mb-1">${plugin.displayName}</h2>
+              <div class="flex items-center gap-4 text-sm text-gray-400 mt-2">
                 <span>v${plugin.version}</span>
                 <span>by ${plugin.author}</span>
                 <span>${plugin.category}</span>
@@ -12018,7 +12016,7 @@ function renderPluginSettingsPage(data) {
               </div>
             </div>
           </div>
-          
+
           <div class="flex items-center gap-3">
             ${renderStatusBadge(plugin.status)}
             ${renderToggleButton(plugin)}
@@ -20414,5 +20412,5 @@ var ROUTES_INFO = {
 };
 
 export { ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_faq_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, userRoutes };
-//# sourceMappingURL=chunk-7BR5NZBO.js.map
-//# sourceMappingURL=chunk-7BR5NZBO.js.map
+//# sourceMappingURL=chunk-NJDVKQDV.js.map
+//# sourceMappingURL=chunk-NJDVKQDV.js.map

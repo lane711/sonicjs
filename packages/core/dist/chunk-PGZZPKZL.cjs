@@ -461,7 +461,8 @@ var package_default = {
       types: "./dist/types.d.ts",
       import: "./dist/types.js",
       require: "./dist/types.cjs"
-    }
+    },
+    "./package.json": "./package.json"
   },
   files: [
     "dist",
@@ -548,5 +549,5 @@ exports.renderTemplate = renderTemplate;
 exports.sanitizeInput = sanitizeInput;
 exports.sanitizeObject = sanitizeObject;
 exports.templateRenderer = templateRenderer;
-//# sourceMappingURL=chunk-3PHG75W4.cjs.map
-//# sourceMappingURL=chunk-3PHG75W4.cjs.map
+//# sourceMappingURL=chunk-PGZZPKZL.cjs.map
+//# sourceMappingURL=chunk-PGZZPKZL.cjs.map
