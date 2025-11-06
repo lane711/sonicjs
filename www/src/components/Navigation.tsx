@@ -279,6 +279,7 @@ export const navigation: Array<NavGroup> = [
     links: [
       { title: 'Examples', href: '/examples' },
       { title: 'FAQ', href: '/faq' },
+      { title: 'Changelog', href: '/changelog' },
       { title: 'Community', href: '/community' },
     ],
   },
