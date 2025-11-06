@@ -14,10 +14,7 @@ export const metadata: Metadata = {
   },
   description: 'SonicJS is a modern, blazingly fast headless CMS built with TypeScript, Hono, and Cloudflare Workers.',
   icons: {
-    icon: [
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico', sizes: 'any' },
-    ],
+    icon: '/favicon.svg',
   },
 }
 
