@@ -1,6 +1,6 @@
 'use strict';
 
-var chunkPQ4S4G3U_cjs = require('./chunk-PQ4S4G3U.cjs');
+var chunk2ZQIQNET_cjs = require('./chunk-2ZQIQNET.cjs');
 var chunkDOR2IU73_cjs = require('./chunk-DOR2IU73.cjs');
 var chunkYN4VD3ML_cjs = require('./chunk-YN4VD3ML.cjs');
 var chunkNBDPIRQS_cjs = require('./chunk-NBDPIRQS.cjs');
@@ -963,20 +963,20 @@ function createEmailPlugin() {
       <div class="p-8">
         <!-- Header -->
         <div class="mb-8">
-          <h1 class="text-3xl font-bold mb-2">Email Settings</h1>
+          <h1 class="text-3xl font-bold text-zinc-950 dark:text-white mb-2">Email Settings</h1>
           <p class="text-zinc-600 dark:text-zinc-400">Configure Resend API for sending transactional emails</p>
         </div>
 
         <!-- Settings Form -->
         <div class="max-w-3xl">
           <!-- Main Settings Card -->
-          <div class="backdrop-blur-md bg-black/20 border border-white/10 shadow-xl rounded-xl p-6 mb-6">
-            <h2 class="text-xl font-semibold mb-4">Resend Configuration</h2>
+          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 mb-6">
+            <h2 class="text-xl font-semibold text-zinc-950 dark:text-white mb-4">Resend Configuration</h2>
 
             <form id="emailSettingsForm" class="space-y-6">
               <!-- API Key -->
               <div>
-                <label for="apiKey" class="block text-sm font-medium mb-2">
+                <label for="apiKey" class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
                   Resend API Key <span class="text-red-500">*</span>
                 </label>
                 <input
@@ -984,18 +984,18 @@ function createEmailPlugin() {
                   id="apiKey"
                   name="apiKey"
                   value="${settings.apiKey || ""}"
-                  class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
+                  class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:focus:ring-indigo-400"
                   placeholder="re_..."
                   required
                 />
-                <p class="text-xs text-zinc-500 mt-1">
-                  Get your API key from <a href="https://resend.com/api-keys" target="_blank" class="text-blue-400 hover:underline">resend.com/api-keys</a>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                  Get your API key from <a href="https://resend.com/api-keys" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">resend.com/api-keys</a>
                 </p>
               </div>
 
               <!-- From Email -->
               <div>
-                <label for="fromEmail" class="block text-sm font-medium mb-2">
+                <label for="fromEmail" class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
                   From Email <span class="text-red-500">*</span>
                 </label>
                 <input
@@ -1003,18 +1003,18 @@ function createEmailPlugin() {
                   id="fromEmail"
                   name="fromEmail"
                   value="${settings.fromEmail || ""}"
-                  class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
+                  class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:focus:ring-indigo-400"
                   placeholder="noreply@yourdomain.com"
                   required
                 />
-                <p class="text-xs text-zinc-500 mt-1">
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                   Must be a verified domain in Resend
                 </p>
               </div>
 
               <!-- From Name -->
               <div>
-                <label for="fromName" class="block text-sm font-medium mb-2">
+                <label for="fromName" class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
                   From Name <span class="text-red-500">*</span>
                 </label>
                 <input
@@ -1022,7 +1022,7 @@ function createEmailPlugin() {
                   id="fromName"
                   name="fromName"
                   value="${settings.fromName || ""}"
-                  class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
+                  class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:focus:ring-indigo-400"
                   placeholder="Your App Name"
                   required
                 />
@@ -1030,7 +1030,7 @@ function createEmailPlugin() {
 
               <!-- Reply To -->
               <div>
-                <label for="replyTo" class="block text-sm font-medium mb-2">
+                <label for="replyTo" class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
                   Reply-To Email
                 </label>
                 <input
@@ -1038,14 +1038,14 @@ function createEmailPlugin() {
                   id="replyTo"
                   name="replyTo"
                   value="${settings.replyTo || ""}"
-                  class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
+                  class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:focus:ring-indigo-400"
                   placeholder="support@yourdomain.com"
                 />
               </div>
 
               <!-- Logo URL -->
               <div>
-                <label for="logoUrl" class="block text-sm font-medium mb-2">
+                <label for="logoUrl" class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
                   Logo URL
                 </label>
                 <input
@@ -1053,10 +1053,10 @@ function createEmailPlugin() {
                   id="logoUrl"
                   name="logoUrl"
                   value="${settings.logoUrl || ""}"
-                  class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
+                  class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:focus:ring-indigo-400"
                   placeholder="https://yourdomain.com/logo.png"
                 />
-                <p class="text-xs text-zinc-500 mt-1">
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                   Logo to display in email templates
                 </p>
               </div>
@@ -1065,21 +1065,21 @@ function createEmailPlugin() {
               <div class="flex gap-3 pt-4">
                 <button
                   type="submit"
-                  class="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all"
+                  class="inline-flex items-center justify-center rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
                 >
                   Save Settings
                 </button>
                 <button
                   type="button"
                   id="testEmailBtn"
-                  class="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-all"
+                  class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
                 >
                   Send Test Email
                 </button>
                 <button
                   type="button"
                   id="resetBtn"
-                  class="px-6 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg font-medium transition-all"
+                  class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
                 >
                   Reset
                 </button>
@@ -1088,20 +1088,20 @@ function createEmailPlugin() {
           </div>
 
           <!-- Status Message -->
-          <div id="statusMessage" class="hidden backdrop-blur-md bg-black/20 border border-white/10 rounded-xl p-4"></div>
+          <div id="statusMessage" class="hidden rounded-xl p-4 mb-6"></div>
 
           <!-- Info Card -->
-          <div class="backdrop-blur-md bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
-            <h3 class="font-semibold text-blue-400 mb-3">
+          <div class="rounded-xl bg-indigo-50 dark:bg-indigo-950/30 ring-1 ring-indigo-100 dark:ring-indigo-900/50 p-6">
+            <h3 class="font-semibold text-indigo-900 dark:text-indigo-300 mb-3">
               📧 Email Templates Included
             </h3>
-            <ul class="text-sm text-blue-200 space-y-2">
+            <ul class="text-sm text-indigo-800 dark:text-indigo-200 space-y-2">
               <li>✓ Registration confirmation</li>
               <li>✓ Email verification</li>
               <li>✓ Password reset</li>
               <li>✓ One-time code (2FA)</li>
             </ul>
-            <p class="text-xs text-blue-300 mt-4">
+            <p class="text-xs text-indigo-700 dark:text-indigo-300 mt-4">
               Templates are code-based and can be customized by editing the plugin files.
             </p>
           </div>
@@ -1125,7 +1125,7 @@ function createEmailPlugin() {
             })
 
             if (response.ok) {
-              statusEl.className = 'backdrop-blur-md bg-green-500/20 border border-green-500/30 rounded-xl p-4 mb-6'
+              statusEl.className = 'rounded-xl bg-green-50 dark:bg-green-950/30 ring-1 ring-green-100 dark:ring-green-900/50 p-4 mb-6 text-green-900 dark:text-green-200'
               statusEl.innerHTML = '✅ Settings saved successfully!'
               statusEl.classList.remove('hidden')
               setTimeout(() => statusEl.classList.add('hidden'), 3000)
@@ -1133,7 +1133,7 @@ function createEmailPlugin() {
               throw new Error('Failed to save settings')
             }
           } catch (error) {
-            statusEl.className = 'backdrop-blur-md bg-red-500/20 border border-red-500/30 rounded-xl p-4 mb-6'
+            statusEl.className = 'rounded-xl bg-red-50 dark:bg-red-950/30 ring-1 ring-red-100 dark:ring-red-900/50 p-4 mb-6 text-red-900 dark:text-red-200'
             statusEl.innerHTML = '❌ Failed to save settings. Please try again.'
             statusEl.classList.remove('hidden')
           }
@@ -1153,7 +1153,7 @@ function createEmailPlugin() {
 
           const statusEl = document.getElementById('statusMessage')
 
-          statusEl.className = 'backdrop-blur-md bg-blue-500/20 border border-blue-500/30 rounded-xl p-4 mb-6'
+          statusEl.className = 'rounded-xl bg-indigo-50 dark:bg-indigo-950/30 ring-1 ring-indigo-100 dark:ring-indigo-900/50 p-4 mb-6 text-indigo-900 dark:text-indigo-200'
           statusEl.innerHTML = \`📧 Sending test email to \${toEmail}...\`
           statusEl.classList.remove('hidden')
 
@@ -1167,14 +1167,14 @@ function createEmailPlugin() {
             const data = await response.json()
 
             if (response.ok) {
-              statusEl.className = 'backdrop-blur-md bg-green-500/20 border border-green-500/30 rounded-xl p-4 mb-6'
+              statusEl.className = 'rounded-xl bg-green-50 dark:bg-green-950/30 ring-1 ring-green-100 dark:ring-green-900/50 p-4 mb-6 text-green-900 dark:text-green-200'
               statusEl.innerHTML = \`✅ \${data.message || 'Test email sent! Check your inbox.'}\`
             } else {
-              statusEl.className = 'backdrop-blur-md bg-red-500/20 border border-red-500/30 rounded-xl p-4 mb-6'
+              statusEl.className = 'rounded-xl bg-red-50 dark:bg-red-950/30 ring-1 ring-red-100 dark:ring-red-900/50 p-4 mb-6 text-red-900 dark:text-red-200'
               statusEl.innerHTML = \`❌ \${data.error || 'Failed to send test email. Check your settings.'}\`
             }
           } catch (error) {
-            statusEl.className = 'backdrop-blur-md bg-red-500/20 border border-red-500/30 rounded-xl p-4 mb-6'
+            statusEl.className = 'rounded-xl bg-red-50 dark:bg-red-950/30 ring-1 ring-red-100 dark:ring-red-900/50 p-4 mb-6 text-red-900 dark:text-red-200'
             statusEl.innerHTML = '❌ Network error. Please try again.'
           }
         })
@@ -1186,7 +1186,7 @@ function createEmailPlugin() {
       </script>
     `;
     return c.html(
-      chunkMU3MR2QR_cjs.adminLayoutV2({
+      chunkMU3MR2QR_cjs.renderAdminLayout({
         title: "Email Settings",
         content: contentHTML,
         user,
@@ -1333,20 +1333,20 @@ function createSonicJSApp(config = {}) {
       app.use("*", middleware);
     }
   }
-  app.route("/api", chunkPQ4S4G3U_cjs.api_default);
-  app.route("/api/media", chunkPQ4S4G3U_cjs.api_media_default);
-  app.route("/api/system", chunkPQ4S4G3U_cjs.api_system_default);
-  app.route("/admin/api", chunkPQ4S4G3U_cjs.admin_api_default);
-  app.route("/admin/dashboard", chunkPQ4S4G3U_cjs.router);
-  app.route("/admin/collections", chunkPQ4S4G3U_cjs.adminCollectionsRoutes);
-  app.route("/admin/settings", chunkPQ4S4G3U_cjs.adminSettingsRoutes);
+  app.route("/api", chunk2ZQIQNET_cjs.api_default);
+  app.route("/api/media", chunk2ZQIQNET_cjs.api_media_default);
+  app.route("/api/system", chunk2ZQIQNET_cjs.api_system_default);
+  app.route("/admin/api", chunk2ZQIQNET_cjs.admin_api_default);
+  app.route("/admin/dashboard", chunk2ZQIQNET_cjs.router);
+  app.route("/admin/collections", chunk2ZQIQNET_cjs.adminCollectionsRoutes);
+  app.route("/admin/settings", chunk2ZQIQNET_cjs.adminSettingsRoutes);
   app.route("/admin/database-tools", createDatabaseToolsAdminRoutes());
-  app.route("/admin/content", chunkPQ4S4G3U_cjs.admin_content_default);
-  app.route("/admin/media", chunkPQ4S4G3U_cjs.adminMediaRoutes);
-  app.route("/admin/plugins", chunkPQ4S4G3U_cjs.adminPluginRoutes);
-  app.route("/admin/logs", chunkPQ4S4G3U_cjs.adminLogsRoutes);
-  app.route("/admin", chunkPQ4S4G3U_cjs.userRoutes);
-  app.route("/auth", chunkPQ4S4G3U_cjs.auth_default);
+  app.route("/admin/content", chunk2ZQIQNET_cjs.admin_content_default);
+  app.route("/admin/media", chunk2ZQIQNET_cjs.adminMediaRoutes);
+  app.route("/admin/plugins", chunk2ZQIQNET_cjs.adminPluginRoutes);
+  app.route("/admin/logs", chunk2ZQIQNET_cjs.adminLogsRoutes);
+  app.route("/admin", chunk2ZQIQNET_cjs.userRoutes);
+  app.route("/auth", chunk2ZQIQNET_cjs.auth_default);
   if (emailPlugin.routes && emailPlugin.routes.length > 0) {
     for (const route of emailPlugin.routes) {
       app.route(route.path, route.handler);
@@ -1419,83 +1419,83 @@ var VERSION = chunkPGZZPKZL_cjs.package_default.version;
 
 Object.defineProperty(exports, "ROUTES_INFO", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.ROUTES_INFO; }
+  get: function () { return chunk2ZQIQNET_cjs.ROUTES_INFO; }
 });
 Object.defineProperty(exports, "adminApiRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.admin_api_default; }
+  get: function () { return chunk2ZQIQNET_cjs.admin_api_default; }
 });
 Object.defineProperty(exports, "adminCheckboxRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.adminCheckboxRoutes; }
+  get: function () { return chunk2ZQIQNET_cjs.adminCheckboxRoutes; }
 });
 Object.defineProperty(exports, "adminCodeExamplesRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.admin_code_examples_default; }
+  get: function () { return chunk2ZQIQNET_cjs.admin_code_examples_default; }
 });
 Object.defineProperty(exports, "adminCollectionsRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.adminCollectionsRoutes; }
+  get: function () { return chunk2ZQIQNET_cjs.adminCollectionsRoutes; }
 });
 Object.defineProperty(exports, "adminContentRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.admin_content_default; }
+  get: function () { return chunk2ZQIQNET_cjs.admin_content_default; }
 });
 Object.defineProperty(exports, "adminDashboardRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.router; }
+  get: function () { return chunk2ZQIQNET_cjs.router; }
 });
 Object.defineProperty(exports, "adminDesignRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.adminDesignRoutes; }
+  get: function () { return chunk2ZQIQNET_cjs.adminDesignRoutes; }
 });
 Object.defineProperty(exports, "adminFAQRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.admin_faq_default; }
+  get: function () { return chunk2ZQIQNET_cjs.admin_faq_default; }
 });
 Object.defineProperty(exports, "adminLogsRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.adminLogsRoutes; }
+  get: function () { return chunk2ZQIQNET_cjs.adminLogsRoutes; }
 });
 Object.defineProperty(exports, "adminMediaRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.adminMediaRoutes; }
+  get: function () { return chunk2ZQIQNET_cjs.adminMediaRoutes; }
 });
 Object.defineProperty(exports, "adminPluginRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.adminPluginRoutes; }
+  get: function () { return chunk2ZQIQNET_cjs.adminPluginRoutes; }
 });
 Object.defineProperty(exports, "adminSettingsRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.adminSettingsRoutes; }
+  get: function () { return chunk2ZQIQNET_cjs.adminSettingsRoutes; }
 });
 Object.defineProperty(exports, "adminTestimonialsRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.admin_testimonials_default; }
+  get: function () { return chunk2ZQIQNET_cjs.admin_testimonials_default; }
 });
 Object.defineProperty(exports, "adminUsersRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.userRoutes; }
+  get: function () { return chunk2ZQIQNET_cjs.userRoutes; }
 });
 Object.defineProperty(exports, "apiContentCrudRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.api_content_crud_default; }
+  get: function () { return chunk2ZQIQNET_cjs.api_content_crud_default; }
 });
 Object.defineProperty(exports, "apiMediaRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.api_media_default; }
+  get: function () { return chunk2ZQIQNET_cjs.api_media_default; }
 });
 Object.defineProperty(exports, "apiRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.api_default; }
+  get: function () { return chunk2ZQIQNET_cjs.api_default; }
 });
 Object.defineProperty(exports, "apiSystemRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.api_system_default; }
+  get: function () { return chunk2ZQIQNET_cjs.api_system_default; }
 });
 Object.defineProperty(exports, "authRoutes", {
   enumerable: true,
-  get: function () { return chunkPQ4S4G3U_cjs.auth_default; }
+  get: function () { return chunk2ZQIQNET_cjs.auth_default; }
 });
 Object.defineProperty(exports, "Logger", {
   enumerable: true,

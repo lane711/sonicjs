@@ -60,20 +60,27 @@ authRoutes.post('/register',
   async (c) => {
     try {
       const db = c.env.DB
-      const requestData = await c.req.json()
+
+      // Parse JSON with error handling
+      let requestData
+      try {
+        requestData = await c.req.json()
+      } catch (parseError) {
+        return c.json({ error: 'Invalid JSON in request body' }, 400)
+      }
 
       // Build and validate using dynamic schema
       const validationSchema = await authValidationService.buildRegistrationSchema(db)
-      const validationResult = await validationSchema.safeParseAsync(requestData)
 
-      if (!validationResult.success) {
+      let validatedData
+      try {
+        validatedData = await validationSchema.parseAsync(requestData)
+      } catch (validationError: any) {
         return c.json({
           error: 'Validation failed',
-          details: validationResult.error.errors.map((e: { message: string }) => e.message)
+          details: validationError.errors?.map((e: any) => e.message) || [validationError.message || 'Invalid request data']
         }, 400)
       }
-
-      const validatedData = validationResult.data
 
       // Extract fields with defaults for optional ones
       const email = validatedData.email
@@ -81,7 +88,7 @@ authRoutes.post('/register',
       const username = validatedData.username || authValidationService.generateDefaultValue('username', validatedData)
       const firstName = validatedData.firstName || authValidationService.generateDefaultValue('firstName', validatedData)
       const lastName = validatedData.lastName || authValidationService.generateDefaultValue('lastName', validatedData)
-      
+
       // Normalize email to lowercase
       const normalizedEmail = email.toLowerCase()
       
@@ -141,7 +148,14 @@ authRoutes.post('/register',
       }, 201)
     } catch (error) {
       console.error('Registration error:', error)
-      return c.json({ error: 'Registration failed' }, 500)
+      // Return validation errors as 400, other errors as 500
+      if (error instanceof Error && error.message.includes('validation')) {
+        return c.json({ error: error.message }, 400)
+      }
+      return c.json({
+        error: 'Registration failed',
+        details: error instanceof Error ? error.message : String(error)
+      }, 500)
     }
   }
 )
@@ -211,8 +225,8 @@ authRoutes.post('/login', async (c) => {
           id: user.id,
           email: user.email,
           username: user.username,
-          firstName: user.firstName,
-          lastName: user.lastName,
+          firstName: user.first_name,
+          lastName: user.last_name,
           role: user.role
         },
         token
@@ -526,10 +540,16 @@ authRoutes.post('/seed-admin', async (c) => {
     const existingAdmin = await db.prepare('SELECT id FROM users WHERE email = ? OR username = ?')
       .bind('admin@sonicjs.com', 'admin')
       .first()
-    
+
     if (existingAdmin) {
-      return c.json({ 
-        message: 'Admin user already exists',
+      // Update the password to ensure it's correct for testing
+      const passwordHash = await AuthManager.hashPassword('admin123')
+      await db.prepare('UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?')
+        .bind(passwordHash, Date.now(), existingAdmin.id)
+        .run()
+
+      return c.json({
+        message: 'Admin user already exists (password updated)',
         user: {
           id: existingAdmin.id,
           email: 'admin@sonicjs.com',

@@ -2122,16 +2122,22 @@ authRoutes.post(
   async (c) => {
     try {
       const db = c.env.DB;
-      const requestData = await c.req.json();
+      let requestData;
+      try {
+        requestData = await c.req.json();
+      } catch (parseError) {
+        return c.json({ error: "Invalid JSON in request body" }, 400);
+      }
       const validationSchema = await authValidationService.buildRegistrationSchema(db);
-      const validationResult = await validationSchema.safeParseAsync(requestData);
-      if (!validationResult.success) {
+      let validatedData;
+      try {
+        validatedData = await validationSchema.parseAsync(requestData);
+      } catch (validationError) {
         return c.json({
           error: "Validation failed",
-          details: validationResult.error.errors.map((e) => e.message)
+          details: validationError.errors?.map((e) => e.message) || [validationError.message || "Invalid request data"]
         }, 400);
       }
-      const validatedData = validationResult.data;
       const email = validatedData.email;
       const password = validatedData.password;
       const username = validatedData.username || authValidationService.generateDefaultValue("username", validatedData);
@@ -2183,7 +2189,13 @@ authRoutes.post(
       }, 201);
     } catch (error) {
       console.error("Registration error:", error);
-      return c.json({ error: "Registration failed" }, 500);
+      if (error instanceof Error && error.message.includes("validation")) {
+        return c.json({ error: error.message }, 400);
+      }
+      return c.json({
+        error: "Registration failed",
+        details: error instanceof Error ? error.message : String(error)
+      }, 500);
     }
   }
 );
@@ -2229,8 +2241,8 @@ authRoutes.post("/login", async (c) => {
         id: user.id,
         email: user.email,
         username: user.username,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        firstName: user.first_name,
+        lastName: user.last_name,
         role: user.role
       },
       token
@@ -2472,8 +2484,10 @@ authRoutes.post("/seed-admin", async (c) => {
     `).run();
     const existingAdmin = await db.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind("admin@sonicjs.com", "admin").first();
     if (existingAdmin) {
+      const passwordHash2 = await chunkYN4VD3ML_cjs.AuthManager.hashPassword("admin123");
+      await db.prepare("UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?").bind(passwordHash2, Date.now(), existingAdmin.id).run();
       return c.json({
-        message: "Admin user already exists",
+        message: "Admin user already exists (password updated)",
         user: {
           id: existingAdmin.id,
           email: "admin@sonicjs.com",
@@ -20433,5 +20447,5 @@ exports.api_system_default = api_system_default;
 exports.auth_default = auth_default;
 exports.router = router;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-PQ4S4G3U.cjs.map
-//# sourceMappingURL=chunk-PQ4S4G3U.cjs.map
+//# sourceMappingURL=chunk-2ZQIQNET.cjs.map
+//# sourceMappingURL=chunk-2ZQIQNET.cjs.map
