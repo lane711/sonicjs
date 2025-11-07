@@ -153,6 +153,15 @@ export function renderContentListPage(data: ContentListPageData): string {
             </svg>
           </button>
           <button
+            class="inline-flex items-center justify-center p-1.5 rounded-lg bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 ring-1 ring-inset ring-purple-600/20 dark:ring-purple-500/20 hover:bg-purple-100 dark:hover:bg-purple-500/20 transition-colors"
+            onclick="window.open('/api/content/${row.id}', '_blank')"
+            title="View API"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+            </svg>
+          </button>
+          <button
             class="inline-flex items-center justify-center p-1.5 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/20 dark:ring-red-500/20 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors"
             hx-delete="/admin/content/${row.id}"
             hx-confirm="Are you sure you want to delete this content item?"

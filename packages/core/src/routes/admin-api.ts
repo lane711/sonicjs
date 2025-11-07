@@ -546,4 +546,79 @@ adminApiRoutes.delete('/collections/:id', async (c) => {
   }
 })
 
+// Migrations API endpoints
+// Get migration status
+adminApiRoutes.get('/migrations/status', async (c) => {
+  try {
+    const { MigrationService } = await import('../services/migrations')
+    const db = c.env.DB
+    const migrationService = new MigrationService(db)
+    const status = await migrationService.getMigrationStatus()
+
+    return c.json({
+      success: true,
+      data: status
+    })
+  } catch (error) {
+    console.error('Error fetching migration status:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to fetch migration status'
+    }, 500)
+  }
+})
+
+// Run pending migrations
+adminApiRoutes.post('/migrations/run', async (c) => {
+  try {
+    const user = c.get('user')
+
+    // Only allow admin users to run migrations
+    if (!user || user.role !== 'admin') {
+      return c.json({
+        success: false,
+        error: 'Unauthorized. Admin access required.'
+      }, 403)
+    }
+
+    const { MigrationService } = await import('../services/migrations')
+    const db = c.env.DB
+    const migrationService = new MigrationService(db)
+    const result = await migrationService.runPendingMigrations()
+
+    return c.json({
+      success: result.success,
+      message: result.message,
+      applied: result.applied
+    })
+  } catch (error) {
+    console.error('Error running migrations:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to run migrations'
+    }, 500)
+  }
+})
+
+// Validate database schema
+adminApiRoutes.get('/migrations/validate', async (c) => {
+  try {
+    const { MigrationService } = await import('../services/migrations')
+    const db = c.env.DB
+    const migrationService = new MigrationService(db)
+    const validation = await migrationService.validateSchema()
+
+    return c.json({
+      success: true,
+      data: validation
+    })
+  } catch (error) {
+    console.error('Error validating schema:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to validate schema'
+    }, 500)
+  }
+})
+
 export default adminApiRoutes

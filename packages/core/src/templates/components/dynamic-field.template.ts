@@ -117,7 +117,22 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         ` : ''}
       `
       break
-      
+
+    case 'textarea':
+      fieldHTML = `
+        <textarea
+          id="${fieldId}"
+          name="${fieldName}"
+          rows="${opts.rows || 6}"
+          placeholder="${opts.placeholder || ''}"
+          maxlength="${opts.maxLength || ''}"
+          class="${baseClasses} ${errorClasses} resize-y"
+          ${required}
+          ${disabled ? 'disabled' : ''}
+        >${escapeHtml(value)}</textarea>
+      `
+      break
+
     case 'richtext':
       fieldHTML = `
         <div class="richtext-container">
