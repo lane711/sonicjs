@@ -399,14 +399,14 @@ function renderAdminLayoutCatalyst(data) {
       }
 
       try {
-        const response = await fetch('/api/migrations/status');
+        const response = await fetch('/admin/api/migrations/status');
         if (response.ok) {
           const data = await response.json();
-          if (data.pendingMigrations > 0) {
+          if (data.success && data.data && data.data.pendingMigrations > 0) {
             const banner = document.getElementById('migration-banner');
             const countElement = document.getElementById('migration-count');
             if (banner && countElement) {
-              countElement.textContent = data.pendingMigrations;
+              countElement.textContent = data.data.pendingMigrations;
               banner.classList.remove('hidden');
             }
           }
@@ -3741,5 +3741,5 @@ function renderFormField(field) {
 }
 
 export { adminLayoutV2, getConfirmationDialogScript, init_admin_layout_catalyst_template, init_logo_template, renderAdminLayout, renderAdminLayoutCatalyst, renderAlert, renderCheckboxPage, renderCodeExamplesList, renderConfirmationDialog, renderDesignPage, renderFAQList, renderForm, renderFormField, renderLogo, renderPagination, renderTable, renderTestimonialsList };
-//# sourceMappingURL=chunk-LW33AOBF.js.map
-//# sourceMappingURL=chunk-LW33AOBF.js.map
+//# sourceMappingURL=chunk-35N5HXXG.js.map
+//# sourceMappingURL=chunk-35N5HXXG.js.map

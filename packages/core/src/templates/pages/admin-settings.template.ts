@@ -1327,7 +1327,7 @@ function renderMigrationSettings(settings?: MigrationSettings): string {
           btn.innerHTML = 'Running...';
 
           try {
-            const response = await fetch('/admin/api/migrations/run', {
+            const response = await fetch('/admin/settings/api/migrations/run', {
               method: 'POST'
             });
             const result = await response.json();
@@ -1348,7 +1348,7 @@ function renderMigrationSettings(settings?: MigrationSettings): string {
 
         window.validateSchema = async function() {
           try {
-            const response = await fetch('/admin/api/migrations/validate');
+            const response = await fetch('/admin/settings/api/migrations/validate');
             const result = await response.json();
             
             if (result.success) {

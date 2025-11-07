@@ -401,14 +401,14 @@ function renderAdminLayoutCatalyst(data) {
       }
 
       try {
-        const response = await fetch('/api/migrations/status');
+        const response = await fetch('/admin/api/migrations/status');
         if (response.ok) {
           const data = await response.json();
-          if (data.pendingMigrations > 0) {
+          if (data.success && data.data && data.data.pendingMigrations > 0) {
             const banner = document.getElementById('migration-banner');
             const countElement = document.getElementById('migration-count');
             if (banner && countElement) {
-              countElement.textContent = data.pendingMigrations;
+              countElement.textContent = data.data.pendingMigrations;
               banner.classList.remove('hidden');
             }
           }
@@ -3760,5 +3760,5 @@ exports.renderLogo = renderLogo;
 exports.renderPagination = renderPagination;
 exports.renderTable = renderTable;
 exports.renderTestimonialsList = renderTestimonialsList;
-//# sourceMappingURL=chunk-MU3MR2QR.cjs.map
-//# sourceMappingURL=chunk-MU3MR2QR.cjs.map
+//# sourceMappingURL=chunk-LAVIR5SF.cjs.map
+//# sourceMappingURL=chunk-LAVIR5SF.cjs.map
