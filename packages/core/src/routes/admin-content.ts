@@ -8,6 +8,7 @@ import { renderVersionHistory, VersionHistoryData, ContentVersion } from '../tem
 import { isPluginActive } from '../middleware/plugin-middleware'
 import { getCacheService, CACHE_CONFIGS } from '../services/cache'
 import type { Bindings, Variables } from '../app'
+import { PluginService } from '../services/plugin-service'
 
 const adminContentRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
@@ -347,15 +348,26 @@ adminContentRoutes.get('/new', async (c) => {
     }
     
     const fields = await getCollectionFields(db, collectionId)
-    
+
     // Check if workflow plugin is active
     const workflowEnabled = await isPluginActive(db, 'workflow')
-    
+
+    // Check if TinyMCE plugin is active and get settings
+    const tinymceEnabled = await isPluginActive(db, 'tinymce-plugin')
+    let tinymceSettings
+    if (tinymceEnabled) {
+      const pluginService = new PluginService(db)
+      const tinymcePlugin = await pluginService.getPlugin('tinymce-plugin')
+      tinymceSettings = tinymcePlugin?.settings
+    }
+
     const formData: ContentFormData = {
       collection,
       fields,
       isEdit: false,
       workflowEnabled,
+      tinymceEnabled,
+      tinymceSettings,
       user: user ? {
         name: user.email,
         email: user.email,
@@ -436,6 +448,15 @@ adminContentRoutes.get('/:id/edit', async (c) => {
     // Check if workflow plugin is active
     const workflowEnabled = await isPluginActive(db, 'workflow')
 
+    // Check if TinyMCE plugin is active and get settings
+    const tinymceEnabled = await isPluginActive(db, 'tinymce-plugin')
+    let tinymceSettings
+    if (tinymceEnabled) {
+      const pluginService = new PluginService(db)
+      const tinymcePlugin = await pluginService.getPlugin('tinymce-plugin')
+      tinymceSettings = tinymcePlugin?.settings
+    }
+
     const formData: ContentFormData = {
       id: content.id,
       title: content.title,
@@ -451,6 +472,8 @@ adminContentRoutes.get('/:id/edit', async (c) => {
       fields,
       isEdit: true,
       workflowEnabled,
+      tinymceEnabled,
+      tinymceSettings,
       referrerParams,
       user: user ? {
         name: user.email,

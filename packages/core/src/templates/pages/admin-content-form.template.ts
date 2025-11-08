@@ -2,6 +2,7 @@ import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/a
 import { renderAlert } from '../alert.template'
 import { renderDynamicField, renderFieldGroup, FieldDefinition } from '../components/dynamic-field.template'
 import { renderConfirmationDialog, getConfirmationDialogScript } from '../confirmation-dialog.template'
+import { getTinyMCEScript, getTinyMCEInitScript } from '../../plugins/available/tinymce-plugin'
 
 export interface Collection {
   id: string
@@ -29,6 +30,13 @@ export interface ContentFormData {
   success?: string
   validationErrors?: Record<string, string[]>
   workflowEnabled?: boolean // New flag to indicate if workflow plugin is active
+  tinymceEnabled?: boolean // Flag to indicate if TinyMCE plugin is active
+  tinymceSettings?: {
+    apiKey?: string
+    defaultHeight?: number
+    defaultToolbar?: string
+    skin?: string
+  }
   referrerParams?: string // URL parameters to preserve filters when returning to list
   user?: {
     name: string
@@ -381,8 +389,7 @@ export function renderContentFormPage(data: ContentFormData): string {
 
     ${getConfirmationDialogScript()}
 
-    <!-- TinyMCE CDN -->
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    ${data.tinymceEnabled ? getTinyMCEScript(data.tinymceSettings?.apiKey) : '<!-- TinyMCE plugin not active -->'}
 
     <!-- Dynamic Field Scripts -->
     <script>
@@ -657,6 +664,12 @@ export function renderContentFormPage(data: ContentFormData): string {
         form.addEventListener('input', scheduleAutoSave);
         form.addEventListener('change', scheduleAutoSave);
       });
+
+      ${data.tinymceEnabled ? `<script>${getTinyMCEInitScript({
+        skin: data.tinymceSettings?.skin,
+        defaultHeight: data.tinymceSettings?.defaultHeight,
+        defaultToolbar: data.tinymceSettings?.defaultToolbar
+      })}</script>` : '// TinyMCE plugin not active - richtext fields will use plain textareas'}
     </script>
   `
 

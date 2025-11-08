@@ -3708,8 +3708,7 @@ builder.metadata({
     email: "team@sonicjs.com"
   },
   license: "MIT",
-  compatibility: "^2.0.0",
-  tags: ["editor", "wysiwyg", "richtext", "tinymce"]
+  compatibility: "^2.0.0"
 });
 builder.lifecycle({
   activate: async () => {
@@ -11672,7 +11671,7 @@ function renderPluginsListPage(data) {
       <!-- Stats -->
       <div class="mb-6">
         <h3 class="text-base font-semibold text-zinc-950 dark:text-white">Plugin Statistics</h3>
-        <dl class="mt-5 grid grid-cols-1 divide-zinc-950/5 dark:divide-white/10 overflow-hidden rounded-lg bg-zinc-800/75 dark:bg-zinc-800/75 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 md:grid-cols-4 md:divide-x md:divide-y-0">
+        <dl class="mt-5 grid grid-cols-1 divide-zinc-950/5 dark:divide-white/10 overflow-hidden rounded-lg bg-zinc-800/75 dark:bg-zinc-800/75 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 md:grid-cols-5 md:divide-x md:divide-y-0">
           <div class="px-4 py-5 sm:p-6">
             <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Total Plugins</dt>
             <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
@@ -11733,6 +11732,21 @@ function renderPluginsListPage(data) {
               </div>
             </dd>
           </div>
+          <div class="px-4 py-5 sm:p-6">
+            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Available to Install</dt>
+            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+              <div class="flex items-baseline text-2xl font-semibold text-zinc-400">
+                ${data.stats?.uninstalled || 0}
+              </div>
+              <div class="inline-flex items-baseline rounded-full bg-zinc-400/10 text-zinc-600 dark:text-zinc-400 px-2.5 py-0.5 text-sm font-medium md:mt-2 lg:mt-0">
+                <svg viewBox="0 0 20 20" fill="currentColor" class="-ml-1 mr-0.5 size-5 shrink-0 self-center">
+                  <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                </svg>
+                <span class="sr-only">Available</span>
+                Ready
+              </div>
+            </dd>
+          </div>
         </dl>
       </div>
 
@@ -11771,6 +11785,7 @@ function renderPluginsListPage(data) {
                       <option value="">All Status</option>
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
+                      <option value="uninstalled">Available to Install</option>
                       <option value="error">Error</option>
                     </select>
                     <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-cyan-600 dark:text-cyan-400 sm:size-4">
@@ -12075,21 +12090,31 @@ function renderPluginCard(plugin) {
   const statusColors = {
     active: "bg-lime-50 dark:bg-lime-500/10 text-lime-700 dark:text-lime-300 ring-lime-700/10 dark:ring-lime-400/20",
     inactive: "bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700 dark:text-zinc-400 ring-zinc-700/10 dark:ring-zinc-400/20",
-    error: "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-red-700/10 dark:ring-red-400/20"
+    error: "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-red-700/10 dark:ring-red-400/20",
+    uninstalled: "bg-zinc-100 dark:bg-zinc-600/10 text-zinc-600 dark:text-zinc-500 ring-zinc-600/10 dark:ring-zinc-500/20"
   };
   const statusIcons = {
     active: '<div class="w-2 h-2 bg-lime-500 dark:bg-lime-400 rounded-full mr-2"></div>',
     inactive: '<div class="w-2 h-2 bg-zinc-500 dark:bg-zinc-400 rounded-full mr-2"></div>',
-    error: '<div class="w-2 h-2 bg-red-500 dark:bg-red-400 rounded-full mr-2"></div>'
+    error: '<div class="w-2 h-2 bg-red-500 dark:bg-red-400 rounded-full mr-2"></div>',
+    uninstalled: '<div class="w-2 h-2 bg-zinc-400 dark:bg-zinc-600 rounded-full mr-2"></div>'
   };
   const borderColors = {
     active: "ring-[3px] ring-lime-500 dark:ring-lime-400",
     inactive: "ring-[3px] ring-pink-500 dark:ring-pink-400",
-    error: "ring-[3px] ring-red-500 dark:ring-red-400"
+    error: "ring-[3px] ring-red-500 dark:ring-red-400",
+    uninstalled: "ring-[3px] ring-zinc-400 dark:ring-zinc-600"
   };
   const criticalCorePlugins = ["core-auth", "core-media"];
   const canToggle = !criticalCorePlugins.includes(plugin.id);
-  const actionButton = plugin.status === "active" ? `<button onclick="togglePlugin('${plugin.id}', 'deactivate')" class="bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">Deactivate</button>` : `<button onclick="togglePlugin('${plugin.id}', 'activate')" class="bg-lime-600 dark:bg-lime-700 hover:bg-lime-700 dark:hover:bg-lime-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">Activate</button>`;
+  let actionButton = "";
+  if (plugin.status === "uninstalled") {
+    actionButton = `<button onclick="installPlugin('${plugin.name}')" class="bg-cyan-600 dark:bg-cyan-700 hover:bg-cyan-700 dark:hover:bg-cyan-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">Install</button>`;
+  } else if (plugin.status === "active") {
+    actionButton = `<button onclick="togglePlugin('${plugin.id}', 'deactivate')" class="bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">Deactivate</button>`;
+  } else {
+    actionButton = `<button onclick="togglePlugin('${plugin.id}', 'activate')" class="bg-lime-600 dark:bg-lime-700 hover:bg-lime-700 dark:hover:bg-lime-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">Activate</button>`;
+  }
   return `
     <div class="plugin-card rounded-xl bg-white dark:bg-zinc-900 shadow-sm ${borderColors[plugin.status]} p-6 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all" data-category="${plugin.category}" data-status="${plugin.status}" data-name="${plugin.displayName}" data-description="${plugin.description}">
       <div class="flex items-start justify-between mb-4">
@@ -12152,20 +12177,24 @@ function renderPluginCard(plugin) {
 
       <div class="flex items-center justify-between">
         <div class="flex gap-2">
-          ${canToggle ? actionButton : ""}
+          ${plugin.status === "uninstalled" ? actionButton : canToggle ? actionButton : ""}
+          ${plugin.status !== "uninstalled" ? `
           <button onclick="openPluginSettings('${plugin.id}')" class="bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">
             Settings
           </button>
+          ` : ""}
         </div>
 
         <div class="flex items-center gap-2">
+          ${plugin.status !== "uninstalled" ? `
           <button onclick="showPluginDetails('${plugin.id}')" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Plugin Details">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
           </button>
+          ` : ""}
 
-          ${!plugin.isCore ? `
+          ${!plugin.isCore && plugin.status !== "uninstalled" ? `
           <button onclick="uninstallPlugin('${plugin.id}')" class="text-zinc-500 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Uninstall Plugin">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -12976,6 +13005,86 @@ function formatTimestamp(timestamp) {
 // src/routes/admin-plugins.ts
 var adminPluginRoutes = new Hono();
 adminPluginRoutes.use("*", requireAuth());
+var AVAILABLE_PLUGINS = [
+  {
+    id: "third-party-faq",
+    name: "faq-plugin",
+    display_name: "FAQ System",
+    description: "Frequently Asked Questions management system with categories, search, and custom styling",
+    version: "2.0.0",
+    author: "Community Developer",
+    category: "content",
+    icon: "\u2753",
+    permissions: ["manage:faqs"],
+    dependencies: [],
+    is_core: false
+  },
+  {
+    id: "demo-login-prefill",
+    name: "demo-login-plugin",
+    display_name: "Demo Login Prefill",
+    description: "Prefills login form with demo credentials (admin@sonicjs.com/admin123) for easy site demonstration",
+    version: "1.0.0-beta.1",
+    author: "SonicJS",
+    category: "demo",
+    icon: "\u{1F3AF}",
+    permissions: [],
+    dependencies: [],
+    is_core: false
+  },
+  {
+    id: "database-tools",
+    name: "database-tools",
+    display_name: "Database Tools",
+    description: "Database management tools including truncate, backup, and validation",
+    version: "1.0.0-beta.1",
+    author: "SonicJS Team",
+    category: "system",
+    icon: "\u{1F5C4}\uFE0F",
+    permissions: ["manage:database", "admin"],
+    dependencies: [],
+    is_core: false
+  },
+  {
+    id: "seed-data",
+    name: "seed-data",
+    display_name: "Seed Data",
+    description: "Generate realistic example users and content for testing and development",
+    version: "1.0.0-beta.1",
+    author: "SonicJS Team",
+    category: "development",
+    icon: "\u{1F331}",
+    permissions: ["admin"],
+    dependencies: [],
+    is_core: false
+  },
+  {
+    id: "quill-editor",
+    name: "quill-editor",
+    display_name: "Quill Rich Text Editor",
+    description: "Quill WYSIWYG editor integration for rich text editing. Lightweight, modern editor with customizable toolbars and dark mode support.",
+    version: "1.0.0",
+    author: "SonicJS Team",
+    category: "editor",
+    icon: "\u270D\uFE0F",
+    permissions: [],
+    dependencies: [],
+    is_core: true
+  },
+  {
+    id: "tinymce-plugin",
+    name: "tinymce-plugin",
+    display_name: "TinyMCE Rich Text Editor",
+    description: "Powerful WYSIWYG rich text editor for content creation. Provides a full-featured editor with formatting, media embedding, and customizable toolbars for richtext fields.",
+    version: "1.0.0",
+    author: "SonicJS Team",
+    category: "editor",
+    icon: "\u{1F4DD}",
+    permissions: [],
+    dependencies: [],
+    is_core: false
+  }
+];
 adminPluginRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -12984,15 +13093,17 @@ adminPluginRoutes.get("/", async (c) => {
       return c.text("Access denied", 403);
     }
     const pluginService = new PluginService(db);
-    let plugins = [];
-    let stats = { total: 0, active: 0, inactive: 0, errors: 0 };
+    let installedPlugins = [];
+    let stats = { total: 0, active: 0, inactive: 0, errors: 0, uninstalled: 0 };
     try {
-      plugins = await pluginService.getAllPlugins();
+      installedPlugins = await pluginService.getAllPlugins();
       stats = await pluginService.getPluginStats();
     } catch (error) {
       console.error("Error loading plugins:", error);
     }
-    const templatePlugins = plugins.map((p) => ({
+    const installedPluginIds = new Set(installedPlugins.map((p) => p.id));
+    const uninstalledPlugins = AVAILABLE_PLUGINS.filter((p) => !installedPluginIds.has(p.id));
+    const templatePlugins = installedPlugins.map((p) => ({
       id: p.id,
       name: p.name,
       displayName: p.display_name,
@@ -13009,8 +13120,28 @@ adminPluginRoutes.get("/", async (c) => {
       permissions: p.permissions,
       isCore: p.is_core
     }));
+    const uninstalledTemplatePlugins = uninstalledPlugins.map((p) => ({
+      id: p.id,
+      name: p.name,
+      displayName: p.display_name,
+      description: p.description,
+      version: p.version,
+      author: p.author,
+      status: "uninstalled",
+      category: p.category,
+      icon: p.icon,
+      downloadCount: 0,
+      rating: 0,
+      lastUpdated: "Not installed",
+      dependencies: p.dependencies,
+      permissions: p.permissions,
+      isCore: p.is_core
+    }));
+    const allPlugins = [...templatePlugins, ...uninstalledTemplatePlugins];
+    stats.uninstalled = uninstalledPlugins.length;
+    stats.total = installedPlugins.length + uninstalledPlugins.length;
     const pageData = {
-      plugins: templatePlugins,
+      plugins: allPlugins,
       stats,
       user: {
         name: user?.email || "User",
@@ -18071,7 +18202,7 @@ function renderCollectionFormPage(data) {
                 ${(data.fields || []).map((field) => `
                   <div class="field-item bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-950/5 dark:border-white/10 p-4"
                        data-field-id="${field.id}"
-                       data-field-data='${JSON.stringify(field).replace(/'/g, "&#39;")}'>
+                       data-field-data="${JSON.stringify(JSON.stringify(field))}">
                     <div class="flex items-center justify-between">
                       <div class="flex items-center gap-x-4">
                         <div class="drag-handle cursor-move text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-400">
@@ -18200,7 +18331,7 @@ function renderCollectionFormPage(data) {
             <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Field Name</label>
             <input
               type="text"
-              id="field-name"
+              id="modal-field-name"
               name="field_name"
               required
               pattern="[a-z0-9_]+"
@@ -18335,8 +18466,9 @@ function renderCollectionFormPage(data) {
         document.getElementById('submit-text').textContent = 'Add Field';
         document.getElementById('field-form').reset();
         document.getElementById('field-id').value = '';
-        document.getElementById('field-name').disabled = false;
+        document.getElementById('modal-field-name').disabled = false;
         currentEditingField = null;
+        isEditingField = false; // Allow change handlers for add mode
         document.getElementById('field-modal').classList.remove('hidden');
       }
 
@@ -18354,10 +18486,18 @@ function renderCollectionFormPage(data) {
         const fieldDataAttr = fieldItem.getAttribute('data-field-data');
         if (fieldDataAttr) {
           try {
-            field = JSON.parse(fieldDataAttr);
+            // Data is double-JSON encoded to properly escape all special characters
+            field = JSON.parse(JSON.parse(fieldDataAttr));
             console.log('Loaded field data from data attribute:', field);
           } catch (e) {
             console.error('Error parsing field data from attribute:', e);
+            // Try single parse as fallback for backwards compatibility
+            try {
+              field = JSON.parse(fieldDataAttr);
+              console.log('Loaded field data from data attribute (single parse):', field);
+            } catch (e2) {
+              console.error('Error parsing field data (fallback):', e2);
+            }
           }
         }
 
@@ -18379,18 +18519,97 @@ function renderCollectionFormPage(data) {
         document.getElementById('field-id').value = fieldId;
         currentEditingField = fieldId;
 
-        // Populate form with existing field data
+        // Show modal FIRST before populating fields
+        document.getElementById('field-modal').classList.remove('hidden');
+
+        // Set flag to prevent change event handlers from interfering
+        isEditingField = true;
+
+        // Use setTimeout to ensure modal is rendered before setting values
+        setTimeout(() => {
+          // Populate form with existing field data
         console.log('Field object for editing:', field);
         console.log('field.field_name:', field.field_name);
         console.log('field.field_type:', field.field_type);
         console.log('field.field_label:', field.field_label);
 
-        document.getElementById('field-name').value = field.field_name || '';
-        document.getElementById('field-name').disabled = true;
-        document.getElementById('field-label').value = field.field_label || '';
-        document.getElementById('field-type').value = field.field_type || '';
-        document.getElementById('field-required').checked = Boolean(field.is_required);
-        document.getElementById('field-searchable').checked = Boolean(field.is_searchable);
+        const fieldNameInput = document.getElementById('modal-field-name');
+        const fieldTypeSelect = document.getElementById('field-type');
+        const fieldLabelInput = document.getElementById('field-label');
+
+        console.log('Field name input element:', fieldNameInput);
+        console.log('Field type select element:', fieldTypeSelect);
+        console.log('Field label input element:', fieldLabelInput);
+
+        if (fieldNameInput) {
+          console.log('Before setting - field-name value:', fieldNameInput.value);
+          console.log('Before setting - field-name disabled:', fieldNameInput.disabled);
+
+          fieldNameInput.disabled = false; // Enable first to ensure value can be set
+          fieldNameInput.value = field.field_name || '';
+          fieldNameInput.disabled = true; // Then disable
+
+          console.log('After setting - field-name value:', fieldNameInput.value);
+          console.log('After setting - field-name disabled:', fieldNameInput.disabled);
+
+          // Verify the value stuck
+          setTimeout(() => {
+            console.log('After 100ms - field-name value:', fieldNameInput.value);
+          }, 100);
+        } else {
+          console.error('field-name input not found!');
+        }
+
+        if (fieldLabelInput) {
+          fieldLabelInput.value = field.field_label || '';
+          console.log('Set field-label to:', fieldLabelInput.value);
+        } else {
+          console.error('field-label input not found!');
+        }
+
+        if (fieldTypeSelect) {
+          // Map schema types to UI field types
+          let uiFieldType = field.field_type || '';
+
+          // Check if it's a schema field with field_options that might indicate the actual type
+          if (field.field_options && typeof field.field_options === 'object') {
+            // Check for richtext format
+            if (field.field_options.format === 'richtext') {
+              uiFieldType = 'richtext';
+            }
+            // Check for other format indicators
+            else if (field.field_options.type) {
+              uiFieldType = field.field_options.type;
+            }
+          }
+
+          // Map common schema types to UI types
+          const typeMapping = {
+            'string': 'text',
+            'integer': 'number',
+            'bool': 'boolean'
+          };
+
+          if (typeMapping[uiFieldType]) {
+            uiFieldType = typeMapping[uiFieldType];
+          }
+
+          fieldTypeSelect.value = uiFieldType;
+          console.log('Set field-type to:', fieldTypeSelect.value, '(original:', field.field_type, ')');
+        } else {
+          console.error('field-type select not found!');
+        }
+
+        const requiredCheckbox = document.getElementById('field-required');
+        const searchableCheckbox = document.getElementById('field-searchable');
+
+        if (requiredCheckbox) {
+          requiredCheckbox.checked = Boolean(field.is_required);
+        }
+
+        if (searchableCheckbox) {
+          searchableCheckbox.checked = Boolean(field.is_searchable);
+        }
 
         // Handle field options - serialize object back to JSON string
         if (field.field_options) {
@@ -18446,12 +18665,19 @@ function renderCollectionFormPage(data) {
           }
         }
 
-        document.getElementById('field-modal').classList.remove('hidden');
+        // Clear the flag after a short delay to allow all events to settle
+        setTimeout(() => {
+          isEditingField = false;
+          console.log('Cleared isEditingField flag');
+        }, 100);
+
+        }, 10); // Small delay to ensure modal is fully rendered
       }
 
       function closeFieldModal() {
         document.getElementById('field-modal').classList.add('hidden');
         currentEditingField = null;
+        isEditingField = false; // Clear the flag when closing
       }
 
       let fieldToDelete = null;
@@ -18525,12 +18751,21 @@ function renderCollectionFormPage(data) {
         });
       });
 
+      // Flag to prevent change handler during programmatic edits
+      let isEditingField = false;
+
       // Field type change handler
       document.getElementById('field-type').addEventListener('change', function() {
+        // Skip if we're programmatically setting values during edit
+        if (isEditingField) {
+          console.log('Skipping change handler - field is being edited');
+          return;
+        }
+
         const optionsContainer = document.getElementById('field-options-container');
         const fieldOptions = document.getElementById('field-options');
         const helpText = document.getElementById('field-type-help');
-        const fieldNameInput = document.getElementById('field-name');
+        const fieldNameInput = document.getElementById('modal-field-name');
 
         // Show/hide options based on field type
         if (['select', 'media', 'richtext', 'guid'].includes(this.value)) {
@@ -20976,5 +21211,5 @@ var ROUTES_INFO = {
 };
 
 export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_faq_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, userRoutes };
-//# sourceMappingURL=chunk-4ZBZ5QTJ.js.map
-//# sourceMappingURL=chunk-4ZBZ5QTJ.js.map
+//# sourceMappingURL=chunk-LX7U6YWR.js.map
+//# sourceMappingURL=chunk-LX7U6YWR.js.map

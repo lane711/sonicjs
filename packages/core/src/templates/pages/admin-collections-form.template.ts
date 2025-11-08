@@ -342,7 +342,9 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
               <!-- Fields List -->
               <div id="fields-list" class="space-y-3">
                 ${(data.fields || []).map(field => `
-                  <div class="field-item bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-950/5 dark:border-white/10 p-4" data-field-id="${field.id}">
+                  <div class="field-item bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-950/5 dark:border-white/10 p-4"
+                       data-field-id="${field.id}"
+                       data-field-data="${JSON.stringify(JSON.stringify(field))}">
                     <div class="flex items-center justify-between">
                       <div class="flex items-center gap-x-4">
                         <div class="drag-handle cursor-move text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-400">
@@ -471,7 +473,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
             <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Field Name</label>
             <input
               type="text"
-              id="field-name"
+              id="modal-field-name"
               name="field_name"
               required
               pattern="[a-z0-9_]+"
@@ -606,18 +608,52 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         document.getElementById('submit-text').textContent = 'Add Field';
         document.getElementById('field-form').reset();
         document.getElementById('field-id').value = '';
-        document.getElementById('field-name').disabled = false;
+        document.getElementById('modal-field-name').disabled = false;
         currentEditingField = null;
+        isEditingField = false; // Allow change handlers for add mode
         document.getElementById('field-modal').classList.remove('hidden');
       }
 
       function editField(fieldId) {
         const fieldItem = document.querySelector(\`[data-field-id="\${fieldId}"]\`);
-        if (!fieldItem) return;
+        if (!fieldItem) {
+          console.error('Field item not found:', fieldId);
+          return;
+        }
 
-        // Find the field data from the collection's fields array
-        const field = ${JSON.stringify(data.fields || [])}.find(f => f.id === fieldId);
-        if (!field) return;
+        // Get field data from data attribute (primary source) or embedded array (fallback)
+        let field = null;
+
+        // Try to get from data attribute first
+        const fieldDataAttr = fieldItem.getAttribute('data-field-data');
+        if (fieldDataAttr) {
+          try {
+            // Data is double-JSON encoded to properly escape all special characters
+            field = JSON.parse(JSON.parse(fieldDataAttr));
+            console.log('Loaded field data from data attribute:', field);
+          } catch (e) {
+            console.error('Error parsing field data from attribute:', e);
+            // Try single parse as fallback for backwards compatibility
+            try {
+              field = JSON.parse(fieldDataAttr);
+              console.log('Loaded field data from data attribute (single parse):', field);
+            } catch (e2) {
+              console.error('Error parsing field data (fallback):', e2);
+            }
+          }
+        }
+
+        // Fallback to embedded array
+        if (!field) {
+          const fields = ${JSON.stringify(data.fields || [])};
+          field = fields.find(f => f.id === fieldId);
+          console.log('Loaded field data from embedded array:', field);
+        }
+
+        if (!field) {
+          console.error('Field data not found for id:', fieldId);
+          return;
+        }
 
         // Set up the modal for editing
         document.getElementById('modal-title').textContent = 'Edit Field';
@@ -625,18 +661,102 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         document.getElementById('field-id').value = fieldId;
         currentEditingField = fieldId;
 
-        // Populate form with existing field data
-        document.getElementById('field-name').value = field.field_name || '';
-        document.getElementById('field-name').disabled = true;
-        document.getElementById('field-label').value = field.field_label || '';
-        document.getElementById('field-type').value = field.field_type || '';
-        document.getElementById('field-required').checked = Boolean(field.is_required);
-        document.getElementById('field-searchable').checked = Boolean(field.is_searchable);
-        
+        // Show modal FIRST before populating fields
+        document.getElementById('field-modal').classList.remove('hidden');
+
+        // Set flag to prevent change event handlers from interfering
+        isEditingField = true;
+
+        // Use setTimeout to ensure modal is rendered before setting values
+        setTimeout(() => {
+          // Populate form with existing field data
+        console.log('Field object for editing:', field);
+        console.log('field.field_name:', field.field_name);
+        console.log('field.field_type:', field.field_type);
+        console.log('field.field_label:', field.field_label);
+
+        const fieldNameInput = document.getElementById('modal-field-name');
+        const fieldTypeSelect = document.getElementById('field-type');
+        const fieldLabelInput = document.getElementById('field-label');
+
+        console.log('Field name input element:', fieldNameInput);
+        console.log('Field type select element:', fieldTypeSelect);
+        console.log('Field label input element:', fieldLabelInput);
+
+        if (fieldNameInput) {
+          console.log('Before setting - field-name value:', fieldNameInput.value);
+          console.log('Before setting - field-name disabled:', fieldNameInput.disabled);
+
+          fieldNameInput.disabled = false; // Enable first to ensure value can be set
+          fieldNameInput.value = field.field_name || '';
+          fieldNameInput.disabled = true; // Then disable
+
+          console.log('After setting - field-name value:', fieldNameInput.value);
+          console.log('After setting - field-name disabled:', fieldNameInput.disabled);
+
+          // Verify the value stuck
+          setTimeout(() => {
+            console.log('After 100ms - field-name value:', fieldNameInput.value);
+          }, 100);
+        } else {
+          console.error('field-name input not found!');
+        }
+
+        if (fieldLabelInput) {
+          fieldLabelInput.value = field.field_label || '';
+          console.log('Set field-label to:', fieldLabelInput.value);
+        } else {
+          console.error('field-label input not found!');
+        }
+
+        if (fieldTypeSelect) {
+          // Map schema types to UI field types
+          let uiFieldType = field.field_type || '';
+
+          // Check if it's a schema field with field_options that might indicate the actual type
+          if (field.field_options && typeof field.field_options === 'object') {
+            // Check for richtext format
+            if (field.field_options.format === 'richtext') {
+              uiFieldType = 'richtext';
+            }
+            // Check for other format indicators
+            else if (field.field_options.type) {
+              uiFieldType = field.field_options.type;
+            }
+          }
+
+          // Map common schema types to UI types
+          const typeMapping = {
+            'string': 'text',
+            'integer': 'number',
+            'bool': 'boolean'
+          };
+
+          if (typeMapping[uiFieldType]) {
+            uiFieldType = typeMapping[uiFieldType];
+          }
+
+          fieldTypeSelect.value = uiFieldType;
+          console.log('Set field-type to:', fieldTypeSelect.value, '(original:', field.field_type, ')');
+        } else {
+          console.error('field-type select not found!');
+        }
+
+        const requiredCheckbox = document.getElementById('field-required');
+        const searchableCheckbox = document.getElementById('field-searchable');
+
+        if (requiredCheckbox) {
+          requiredCheckbox.checked = Boolean(field.is_required);
+        }
+
+        if (searchableCheckbox) {
+          searchableCheckbox.checked = Boolean(field.is_searchable);
+        }
+
         // Handle field options - serialize object back to JSON string
         if (field.field_options) {
-          document.getElementById('field-options').value = typeof field.field_options === 'string' 
-            ? field.field_options 
+          document.getElementById('field-options').value = typeof field.field_options === 'string'
+            ? field.field_options
             : JSON.stringify(field.field_options, null, 2);
         } else {
           document.getElementById('field-options').value = '';
@@ -687,12 +807,19 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
           }
         }
 
-        document.getElementById('field-modal').classList.remove('hidden');
+        // Clear the flag after a short delay to allow all events to settle
+        setTimeout(() => {
+          isEditingField = false;
+          console.log('Cleared isEditingField flag');
+        }, 100);
+
+        }, 10); // Small delay to ensure modal is fully rendered
       }
 
       function closeFieldModal() {
         document.getElementById('field-modal').classList.add('hidden');
         currentEditingField = null;
+        isEditingField = false; // Clear the flag when closing
       }
 
       let fieldToDelete = null;
@@ -766,12 +893,21 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         });
       });
 
+      // Flag to prevent change handler during programmatic edits
+      let isEditingField = false;
+
       // Field type change handler
       document.getElementById('field-type').addEventListener('change', function() {
+        // Skip if we're programmatically setting values during edit
+        if (isEditingField) {
+          console.log('Skipping change handler - field is being edited');
+          return;
+        }
+
         const optionsContainer = document.getElementById('field-options-container');
         const fieldOptions = document.getElementById('field-options');
         const helpText = document.getElementById('field-type-help');
-        const fieldNameInput = document.getElementById('field-name');
+        const fieldNameInput = document.getElementById('modal-field-name');
 
         // Show/hide options based on field type
         if (['select', 'media', 'richtext', 'guid'].includes(this.value)) {
