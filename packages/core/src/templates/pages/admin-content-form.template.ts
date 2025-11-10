@@ -4,6 +4,7 @@ import { renderDynamicField, renderFieldGroup, FieldDefinition } from '../compon
 import { renderConfirmationDialog, getConfirmationDialogScript } from '../confirmation-dialog.template'
 import { getTinyMCEScript, getTinyMCEInitScript } from '../../plugins/available/tinymce-plugin'
 import { getQuillCDN, getQuillInitScript } from '../../plugins/core-plugins/quill-editor'
+import { getMDXEditorScripts, getMDXEditorInitScript } from '../../plugins/available/mdxeditor-plugin'
 
 export interface Collection {
   id: string
@@ -44,6 +45,13 @@ export interface ContentFormData {
     defaultHeight?: number
     defaultToolbar?: string
     theme?: string
+  }
+  mdxeditorEnabled?: boolean // Flag to indicate if MDXEditor plugin is active
+  mdxeditorSettings?: {
+    defaultHeight?: number
+    theme?: string
+    toolbar?: string
+    placeholder?: string
   }
   referrerParams?: string // URL parameters to preserve filters when returning to list
   user?: {
@@ -403,6 +411,8 @@ export function renderContentFormPage(data: ContentFormData): string {
 
     ${data.quillEnabled ? getQuillInitScript() : '<!-- Quill init script not needed -->'}
 
+    ${data.mdxeditorEnabled ? getMDXEditorScripts() : '<!-- MDXEditor plugin not active -->'}
+
     <!-- Dynamic Field Scripts -->
     <script>
       // Field group toggle
@@ -682,6 +692,13 @@ export function renderContentFormPage(data: ContentFormData): string {
         defaultHeight: data.tinymceSettings?.defaultHeight,
         defaultToolbar: data.tinymceSettings?.defaultToolbar
       })}</script>` : '// TinyMCE plugin not active - richtext fields will use plain textareas'}
+
+      ${data.mdxeditorEnabled ? `<script>${getMDXEditorInitScript({
+        theme: data.mdxeditorSettings?.theme,
+        defaultHeight: data.mdxeditorSettings?.defaultHeight,
+        toolbar: data.mdxeditorSettings?.toolbar,
+        placeholder: data.mdxeditorSettings?.placeholder
+      })}</script>` : '// MDXEditor plugin not active - richtext fields will use plain textareas'}
 
       // Quill initialization is handled by a separate script tag above
     </script>

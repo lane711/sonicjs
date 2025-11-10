@@ -370,6 +370,15 @@ adminContentRoutes.get('/new', async (c) => {
       quillSettings = quillPlugin?.settings
     }
 
+    // Check if MDXEditor plugin is active and get settings
+    const mdxeditorEnabled = await isPluginActive(db, 'mdxeditor-plugin')
+    let mdxeditorSettings
+    if (mdxeditorEnabled) {
+      const pluginService = new PluginService(db)
+      const mdxeditorPlugin = await pluginService.getPlugin('mdxeditor-plugin')
+      mdxeditorSettings = mdxeditorPlugin?.settings
+    }
+
     const formData: ContentFormData = {
       collection,
       fields,
@@ -379,6 +388,8 @@ adminContentRoutes.get('/new', async (c) => {
       tinymceSettings,
       quillEnabled,
       quillSettings,
+      mdxeditorEnabled,
+      mdxeditorSettings,
       user: user ? {
         name: user.email,
         email: user.email,
@@ -477,6 +488,15 @@ adminContentRoutes.get('/:id/edit', async (c) => {
       quillSettings = quillPlugin?.settings
     }
 
+    // Check if MDXEditor plugin is active and get settings
+    const mdxeditorEnabled = await isPluginActive(db, 'mdxeditor-plugin')
+    let mdxeditorSettings
+    if (mdxeditorEnabled) {
+      const pluginService = new PluginService(db)
+      const mdxeditorPlugin = await pluginService.getPlugin('mdxeditor-plugin')
+      mdxeditorSettings = mdxeditorPlugin?.settings
+    }
+
     const formData: ContentFormData = {
       id: content.id,
       title: content.title,
@@ -496,6 +516,8 @@ adminContentRoutes.get('/:id/edit', async (c) => {
       tinymceSettings,
       quillEnabled,
       quillSettings,
+      mdxeditorEnabled,
+      mdxeditorSettings,
       referrerParams,
       user: user ? {
         name: user.email,

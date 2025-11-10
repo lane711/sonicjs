@@ -1,0 +1,47 @@
+{
+  "id": "mdxeditor-plugin",
+  "name": "MDXEditor Rich Text Editor",
+  "version": "1.0.0",
+  "description": "Modern React-based MDX editor for content creation. Provides a powerful editor with markdown support, live preview, and extensible features for richtext fields.",
+  "author": "SonicJS Team",
+  "homepage": "https://mdxeditor.dev/",
+  "repository": "https://github.com/lane711/sonicjs",
+  "license": "MIT",
+  "category": "editor",
+  "tags": ["editor", "richtext", "markdown", "mdx", "content"],
+  "dependencies": [],
+  "settings": {
+    "defaultHeight": {
+      "type": "number",
+      "label": "Default Editor Height",
+      "description": "Default height in pixels for the editor",
+      "default": 400
+    },
+    "theme": {
+      "type": "select",
+      "label": "Editor Theme",
+      "description": "Visual theme for the editor",
+      "default": "dark",
+      "options": ["light", "dark"]
+    },
+    "toolbar": {
+      "type": "select",
+      "label": "Default Toolbar",
+      "description": "Default toolbar configuration",
+      "default": "full",
+      "options": ["full", "simple", "minimal"]
+    },
+    "placeholder": {
+      "type": "string",
+      "label": "Placeholder Text",
+      "description": "Placeholder text when editor is empty",
+      "default": "Start writing your content..."
+    }
+  },
+  "hooks": {
+    "onActivate": "activate",
+    "onDeactivate": "deactivate"
+  },
+  "routes": [],
+  "permissions": {}
+}
