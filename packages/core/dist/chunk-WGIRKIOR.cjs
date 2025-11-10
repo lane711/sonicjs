@@ -3212,6 +3212,19 @@ function renderDynamicField(field, options = {}) {
         </div>
       `;
       break;
+    case "mdxeditor":
+      fieldHTML = `
+        <div class="richtext-container" data-height="${opts.height || 300}" data-toolbar="${opts.toolbar || "full"}">
+          <textarea
+            id="${fieldId}"
+            name="${fieldName}"
+            class="${baseClasses} ${errorClasses} min-h-[${opts.height || 300}px]"
+            ${required}
+            ${disabled ? "disabled" : ""}
+          >${escapeHtml2(value)}</textarea>
+        </div>
+      `;
+      break;
     case "number":
       fieldHTML = `
         <input 
@@ -18819,7 +18832,9 @@ function renderCollectionFormPage(data) {
               >
                 <option value="">Select field type...</option>
                 <option value="text">Text</option>
-                <option value="richtext">Rich Text</option>
+                <option value="richtext">Rich Text (TinyMCE)</option>
+                <option value="quill">Rich Text (Quill)</option>
+                <option value="mdxeditor">Rich Text (MDXEditor)</option>
                 <option value="number">Number</option>
                 <option value="boolean">Boolean</option>
                 <option value="date">Date</option>
@@ -19505,16 +19520,16 @@ adminCollectionsRoutes.post("/", async (c) => {
     if (isHtmx) {
       return c.html(html.html`
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          Collection created successfully! Redirecting...
+          Collection created successfully! Redirecting to edit mode...
           <script>
             setTimeout(() => {
-              window.location.href = '/admin/collections';
+              window.location.href = '/admin/collections/${collectionId}';
             }, 1500);
           </script>
         </div>
       `);
     } else {
-      return c.redirect("/admin/collections");
+      return c.redirect(`/admin/collections/${collectionId}`);
     }
   } catch (error) {
     console.error("Error creating collection:", error);
@@ -21698,5 +21713,5 @@ exports.api_system_default = api_system_default;
 exports.auth_default = auth_default;
 exports.router = router;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-5KETXHQY.cjs.map
-//# sourceMappingURL=chunk-5KETXHQY.cjs.map
+//# sourceMappingURL=chunk-WGIRKIOR.cjs.map
+//# sourceMappingURL=chunk-WGIRKIOR.cjs.map

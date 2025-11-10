@@ -302,17 +302,17 @@ adminCollectionsRoutes.post('/', async (c) => {
     if (isHtmx) {
       return c.html(html`
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          Collection created successfully! Redirecting...
+          Collection created successfully! Redirecting to edit mode...
           <script>
             setTimeout(() => {
-              window.location.href = '/admin/collections';
+              window.location.href = '/admin/collections/${collectionId}';
             }, 1500);
           </script>
         </div>
       `)
     } else {
-      // For regular form submission, redirect to collections list
-      return c.redirect('/admin/collections')
+      // For regular form submission, redirect to edit page
+      return c.redirect(`/admin/collections/${collectionId}`)
     }
   } catch (error) {
     console.error('Error creating collection:', error)

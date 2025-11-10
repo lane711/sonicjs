@@ -3210,6 +3210,19 @@ function renderDynamicField(field, options = {}) {
         </div>
       `;
       break;
+    case "mdxeditor":
+      fieldHTML = `
+        <div class="richtext-container" data-height="${opts.height || 300}" data-toolbar="${opts.toolbar || "full"}">
+          <textarea
+            id="${fieldId}"
+            name="${fieldName}"
+            class="${baseClasses} ${errorClasses} min-h-[${opts.height || 300}px]"
+            ${required}
+            ${disabled ? "disabled" : ""}
+          >${escapeHtml2(value)}</textarea>
+        </div>
+      `;
+      break;
     case "number":
       fieldHTML = `
         <input 
@@ -18817,7 +18830,9 @@ function renderCollectionFormPage(data) {
               >
                 <option value="">Select field type...</option>
                 <option value="text">Text</option>
-                <option value="richtext">Rich Text</option>
+                <option value="richtext">Rich Text (TinyMCE)</option>
+                <option value="quill">Rich Text (Quill)</option>
+                <option value="mdxeditor">Rich Text (MDXEditor)</option>
                 <option value="number">Number</option>
                 <option value="boolean">Boolean</option>
                 <option value="date">Date</option>
@@ -19503,16 +19518,16 @@ adminCollectionsRoutes.post("/", async (c) => {
     if (isHtmx) {
       return c.html(html`
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          Collection created successfully! Redirecting...
+          Collection created successfully! Redirecting to edit mode...
           <script>
             setTimeout(() => {
-              window.location.href = '/admin/collections';
+              window.location.href = '/admin/collections/${collectionId}';
             }, 1500);
           </script>
         </div>
       `);
     } else {
-      return c.redirect("/admin/collections");
+      return c.redirect(`/admin/collections/${collectionId}`);
     }
   } catch (error) {
     console.error("Error creating collection:", error);
@@ -21676,5 +21691,5 @@ var ROUTES_INFO = {
 };
 
 export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_faq_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, userRoutes };
-//# sourceMappingURL=chunk-GEYI5HBE.js.map
-//# sourceMappingURL=chunk-GEYI5HBE.js.map
+//# sourceMappingURL=chunk-6EGGCLWJ.js.map
+//# sourceMappingURL=chunk-6EGGCLWJ.js.map
