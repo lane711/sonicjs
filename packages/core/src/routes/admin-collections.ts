@@ -183,7 +183,7 @@ adminCollectionsRoutes.get('/new', async (c) => {
   // Check which editor plugins are active
   const [tinymceActive, quillActive, mdxeditorActive] = await Promise.all([
     isPluginActive(db, 'tinymce-plugin'),
-    isPluginActive(db, 'quill-plugin'),
+    isPluginActive(db, 'quill-editor'),
     isPluginActive(db, 'mdxeditor-plugin')
   ])
 

@@ -19371,7 +19371,7 @@ adminCollectionsRoutes.get("/new", async (c) => {
   const db = c.env.DB;
   const [tinymceActive, quillActive, mdxeditorActive] = await Promise.all([
     isPluginActive2(db, "tinymce-plugin"),
-    isPluginActive2(db, "quill-plugin"),
+    isPluginActive2(db, "quill-editor"),
     isPluginActive2(db, "mdxeditor-plugin")
   ]);
   const formData = {
@@ -21689,5 +21689,5 @@ exports.api_system_default = api_system_default;
 exports.auth_default = auth_default;
 exports.router = router;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-PIOLB3N6.cjs.map
-//# sourceMappingURL=chunk-PIOLB3N6.cjs.map
+//# sourceMappingURL=chunk-IB7VY3SU.cjs.map
+//# sourceMappingURL=chunk-IB7VY3SU.cjs.map

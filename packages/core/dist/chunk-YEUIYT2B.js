@@ -19369,7 +19369,7 @@ adminCollectionsRoutes.get("/new", async (c) => {
   const db = c.env.DB;
   const [tinymceActive, quillActive, mdxeditorActive] = await Promise.all([
     isPluginActive2(db, "tinymce-plugin"),
-    isPluginActive2(db, "quill-plugin"),
+    isPluginActive2(db, "quill-editor"),
     isPluginActive2(db, "mdxeditor-plugin")
   ]);
   const formData = {
@@ -21667,5 +21667,5 @@ var ROUTES_INFO = {
 };
 
 export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_faq_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, userRoutes };
-//# sourceMappingURL=chunk-NCTNHRAF.js.map
-//# sourceMappingURL=chunk-NCTNHRAF.js.map
+//# sourceMappingURL=chunk-YEUIYT2B.js.map
+//# sourceMappingURL=chunk-YEUIYT2B.js.map
