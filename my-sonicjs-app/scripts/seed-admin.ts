@@ -53,7 +53,7 @@ async function seed() {
     }
 
     // Hash password using bcrypt
-    const passwordHash = await bcrypt.hash('admin123', 10)
+    const passwordHash = await bcrypt.hash('sonicjs!', 10)
 
     // Create admin user
     await db

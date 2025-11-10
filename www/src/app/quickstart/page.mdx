@@ -96,7 +96,7 @@ The admin interface provides:
 # Get auth token
 curl -X POST http://localhost:8787/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@sonicjs.com","password":"admin123"}'
+  -d '{"email":"admin@sonicjs.com","password":"sonicjs!"}'
 
 # Create content
 curl -X POST http://localhost:8787/admin/content \
@@ -120,7 +120,7 @@ const authResponse = await fetch('http://localhost:8787/auth/login', {
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     email: 'admin@sonicjs.com',
-    password: 'admin123'
+    password: 'sonicjs!'
   })
 });
 const { token } = await authResponse.json();

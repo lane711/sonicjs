@@ -12,6 +12,88 @@ const adminPluginRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>
 // Apply authentication middleware
 adminPluginRoutes.use('*', requireAuth())
 
+// Available plugins registry - plugins that can be installed
+const AVAILABLE_PLUGINS = [
+  {
+    id: 'third-party-faq',
+    name: 'faq-plugin',
+    display_name: 'FAQ System',
+    description: 'Frequently Asked Questions management system with categories, search, and custom styling',
+    version: '2.0.0',
+    author: 'Community Developer',
+    category: 'content',
+    icon: '❓',
+    permissions: ['manage:faqs'],
+    dependencies: [],
+    is_core: false
+  },
+  {
+    id: 'demo-login-prefill',
+    name: 'demo-login-plugin',
+    display_name: 'Demo Login Prefill',
+    description: 'Prefills login form with demo credentials (admin@sonicjs.com/admin123) for easy site demonstration',
+    version: '1.0.0-beta.1',
+    author: 'SonicJS',
+    category: 'demo',
+    icon: '🎯',
+    permissions: [],
+    dependencies: [],
+    is_core: false
+  },
+  {
+    id: 'database-tools',
+    name: 'database-tools',
+    display_name: 'Database Tools',
+    description: 'Database management tools including truncate, backup, and validation',
+    version: '1.0.0-beta.1',
+    author: 'SonicJS Team',
+    category: 'system',
+    icon: '🗄️',
+    permissions: ['manage:database', 'admin'],
+    dependencies: [],
+    is_core: false
+  },
+  {
+    id: 'seed-data',
+    name: 'seed-data',
+    display_name: 'Seed Data',
+    description: 'Generate realistic example users and content for testing and development',
+    version: '1.0.0-beta.1',
+    author: 'SonicJS Team',
+    category: 'development',
+    icon: '🌱',
+    permissions: ['admin'],
+    dependencies: [],
+    is_core: false
+  },
+  {
+    id: 'quill-editor',
+    name: 'quill-editor',
+    display_name: 'Quill Rich Text Editor',
+    description: 'Quill WYSIWYG editor integration for rich text editing. Lightweight, modern editor with customizable toolbars and dark mode support.',
+    version: '1.0.0',
+    author: 'SonicJS Team',
+    category: 'editor',
+    icon: '✍️',
+    permissions: [],
+    dependencies: [],
+    is_core: true
+  },
+  {
+    id: 'tinymce-plugin',
+    name: 'tinymce-plugin',
+    display_name: 'TinyMCE Rich Text Editor',
+    description: 'Powerful WYSIWYG rich text editor for content creation. Provides a full-featured editor with formatting, media embedding, and customizable toolbars for richtext fields.',
+    version: '1.0.0',
+    author: 'SonicJS Team',
+    category: 'editor',
+    icon: '📝',
+    permissions: [],
+    dependencies: [],
+    is_core: false
+  }
+]
+
 // Plugin list page
 adminPluginRoutes.get('/', async (c) => {
   try {
@@ -25,21 +107,27 @@ adminPluginRoutes.get('/', async (c) => {
     }
     
     const pluginService = new PluginService(db)
-    
-    // Get all plugins with error handling
-    let plugins: any[] = []
-    let stats = { total: 0, active: 0, inactive: 0, errors: 0 }
-    
+
+    // Get all installed plugins with error handling
+    let installedPlugins: any[] = []
+    let stats = { total: 0, active: 0, inactive: 0, errors: 0, uninstalled: 0 }
+
     try {
-      plugins = await pluginService.getAllPlugins()
+      installedPlugins = await pluginService.getAllPlugins()
       stats = await pluginService.getPluginStats()
     } catch (error) {
       console.error('Error loading plugins:', error)
       // Continue with empty data
     }
-    
-    // Map to template format
-    const templatePlugins: Plugin[] = plugins.map(p => ({
+
+    // Get list of installed plugin IDs
+    const installedPluginIds = new Set(installedPlugins.map(p => p.id))
+
+    // Find uninstalled plugins
+    const uninstalledPlugins = AVAILABLE_PLUGINS.filter(p => !installedPluginIds.has(p.id))
+
+    // Map installed plugins to template format
+    const templatePlugins: Plugin[] = installedPlugins.map(p => ({
       id: p.id,
       name: p.name,
       displayName: p.display_name,
@@ -56,9 +144,35 @@ adminPluginRoutes.get('/', async (c) => {
       permissions: p.permissions,
       isCore: p.is_core
     }))
-    
+
+    // Add uninstalled plugins to the list
+    const uninstalledTemplatePlugins: Plugin[] = uninstalledPlugins.map(p => ({
+      id: p.id,
+      name: p.name,
+      displayName: p.display_name,
+      description: p.description,
+      version: p.version,
+      author: p.author,
+      status: 'uninstalled' as const,
+      category: p.category,
+      icon: p.icon,
+      downloadCount: 0,
+      rating: 0,
+      lastUpdated: 'Not installed',
+      dependencies: p.dependencies,
+      permissions: p.permissions,
+      isCore: p.is_core
+    }))
+
+    // Combine installed and uninstalled plugins
+    const allPlugins = [...templatePlugins, ...uninstalledTemplatePlugins]
+
+    // Update stats with uninstalled count
+    stats.uninstalled = uninstalledPlugins.length
+    stats.total = installedPlugins.length + uninstalledPlugins.length
+
     const pageData: PluginsListPageData = {
-      plugins: templatePlugins,
+      plugins: allPlugins,
       stats,
       user: {
         name: user?.email || 'User',
@@ -357,6 +471,56 @@ adminPluginRoutes.post('/install', async (c) => {
       })
 
       return c.json({ success: true, plugin: seedDataPlugin })
+    }
+
+    // Handle Quill Editor plugin installation
+    if (body.name === 'quill-editor') {
+      const quillPlugin = await pluginService.installPlugin({
+        id: 'quill-editor',
+        name: 'quill-editor',
+        display_name: 'Quill Rich Text Editor',
+        description: 'Quill WYSIWYG editor integration for rich text editing. Lightweight, modern editor with customizable toolbars and dark mode support.',
+        version: '1.0.0',
+        author: 'SonicJS Team',
+        category: 'editor',
+        icon: '✍️',
+        permissions: [],
+        dependencies: [],
+        is_core: true,
+        settings: {
+          version: '2.0.2',
+          defaultHeight: 300,
+          defaultToolbar: 'full',
+          theme: 'snow'
+        }
+      })
+
+      return c.json({ success: true, plugin: quillPlugin })
+    }
+
+    // Handle TinyMCE plugin installation
+    if (body.name === 'tinymce-plugin') {
+      const tinymcePlugin = await pluginService.installPlugin({
+        id: 'tinymce-plugin',
+        name: 'tinymce-plugin',
+        display_name: 'TinyMCE Rich Text Editor',
+        description: 'Powerful WYSIWYG rich text editor for content creation. Provides a full-featured editor with formatting, media embedding, and customizable toolbars for richtext fields.',
+        version: '1.0.0',
+        author: 'SonicJS Team',
+        category: 'editor',
+        icon: '📝',
+        permissions: [],
+        dependencies: [],
+        is_core: false,
+        settings: {
+          apiKey: 'no-api-key',
+          defaultHeight: 300,
+          defaultToolbar: 'full',
+          skin: 'oxide-dark'
+        }
+      })
+
+      return c.json({ success: true, plugin: tinymcePlugin })
     }
 
     return c.json({ error: 'Plugin not found in registry' }, 404)

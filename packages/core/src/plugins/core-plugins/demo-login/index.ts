@@ -3,8 +3,8 @@ import type { Plugin, PluginContext, HookHandler } from '@sonicjs-cms/core'
 
 /**
  * Demo Login Plugin
- * 
- * Prefills the login form with demo credentials (admin@sonicjs.com/admin123)
+ *
+ * Prefills the login form with demo credentials (admin@sonicjs.com/sonicjs!)
  * when activated, making it easy for demo site visitors to log in.
  */
 
@@ -20,7 +20,7 @@ const demoLoginAssets = {
         
         if (emailInput && passwordInput) {
           emailInput.value = 'admin@sonicjs.com';
-          passwordInput.value = 'admin123';
+          passwordInput.value = 'sonicjs!';
           
           // Add visual indication that form is prefilled
           const form = emailInput.closest('form');
@@ -77,7 +77,7 @@ const demoLoginPlugin = PluginBuilder.create({
   .addHook('template:render', loginPrefillHook)
   .addHook('page:before-render', loginPrefillHook)
   .metadata({
-    description: 'Prefills login form with demo credentials (admin@sonicjs.com/admin123) for easy site demonstration',
+    description: 'Prefills login form with demo credentials (admin@sonicjs.com/sonicjs!) for easy site demonstration',
     author: {
       name: 'SonicJS'
     },

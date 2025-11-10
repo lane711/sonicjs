@@ -10,7 +10,7 @@ INSERT INTO plugins (
     'demo-login-prefill',
     'demo-login-plugin',
     'Demo Login Prefill',
-    'Prefills login form with demo credentials (admin@sonicjs.com/admin123) for easy site demonstration',
+    'Prefills login form with demo credentials (admin@sonicjs.com/sonicjs!) for easy site demonstration',
     '1.0.0',
     'SonicJS',
     'demo',

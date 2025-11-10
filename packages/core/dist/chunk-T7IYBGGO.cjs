@@ -1,3 +1,5 @@
+'use strict';
+
 // src/services/migrations.ts
 var MigrationService = class {
   constructor(db) {
@@ -438,7 +440,7 @@ CREATE INDEX IF NOT EXISTS idx_api_tokens_token ON api_tokens(token);
 CREATE INDEX IF NOT EXISTS idx_workflow_history_content ON workflow_history(content_id);
 CREATE INDEX IF NOT EXISTS idx_workflow_history_user ON workflow_history(user_id);
 
--- Insert default admin user (password: admin123)
+-- Insert default admin user (password: sonicjs!)
 INSERT OR IGNORE INTO users (
   id, email, username, first_name, last_name, password_hash,
   role, is_active, created_at, updated_at
@@ -739,6 +741,6 @@ INSERT OR IGNORE INTO content (
   }
 };
 
-export { MigrationService };
-//# sourceMappingURL=chunk-W2NNZD32.js.map
-//# sourceMappingURL=chunk-W2NNZD32.js.map
+exports.MigrationService = MigrationService;
+//# sourceMappingURL=chunk-T7IYBGGO.cjs.map
+//# sourceMappingURL=chunk-T7IYBGGO.cjs.map

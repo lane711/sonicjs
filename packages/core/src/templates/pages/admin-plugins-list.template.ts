@@ -8,7 +8,7 @@ export interface Plugin {
   description: string
   version: string
   author: string
-  status: 'active' | 'inactive' | 'error'
+  status: 'active' | 'inactive' | 'error' | 'uninstalled'
   category: string
   icon: string
   downloadCount?: number
@@ -26,6 +26,7 @@ export interface PluginsListPageData {
     active: number
     inactive: number
     errors: number
+    uninstalled: number
   }
   user?: {
     name: string
@@ -109,7 +110,7 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
       <!-- Stats -->
       <div class="mb-6">
         <h3 class="text-base font-semibold text-zinc-950 dark:text-white">Plugin Statistics</h3>
-        <dl class="mt-5 grid grid-cols-1 divide-zinc-950/5 dark:divide-white/10 overflow-hidden rounded-lg bg-zinc-800/75 dark:bg-zinc-800/75 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 md:grid-cols-4 md:divide-x md:divide-y-0">
+        <dl class="mt-5 grid grid-cols-1 divide-zinc-950/5 dark:divide-white/10 overflow-hidden rounded-lg bg-zinc-800/75 dark:bg-zinc-800/75 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 md:grid-cols-5 md:divide-x md:divide-y-0">
           <div class="px-4 py-5 sm:p-6">
             <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Total Plugins</dt>
             <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
@@ -170,6 +171,21 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
               </div>
             </dd>
           </div>
+          <div class="px-4 py-5 sm:p-6">
+            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Available to Install</dt>
+            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
+              <div class="flex items-baseline text-2xl font-semibold text-zinc-400">
+                ${data.stats?.uninstalled || 0}
+              </div>
+              <div class="inline-flex items-baseline rounded-full bg-zinc-400/10 text-zinc-600 dark:text-zinc-400 px-2.5 py-0.5 text-sm font-medium md:mt-2 lg:mt-0">
+                <svg viewBox="0 0 20 20" fill="currentColor" class="-ml-1 mr-0.5 size-5 shrink-0 self-center">
+                  <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                </svg>
+                <span class="sr-only">Available</span>
+                Ready
+              </div>
+            </dd>
+          </div>
         </dl>
       </div>
 
@@ -208,6 +224,7 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
                       <option value="">All Status</option>
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
+                      <option value="uninstalled">Available to Install</option>
                       <option value="error">Error</option>
                     </select>
                     <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-cyan-600 dark:text-cyan-400 sm:size-4">
@@ -515,29 +532,37 @@ function renderPluginCard(plugin: Plugin): string {
   const statusColors = {
     active: 'bg-lime-50 dark:bg-lime-500/10 text-lime-700 dark:text-lime-300 ring-lime-700/10 dark:ring-lime-400/20',
     inactive: 'bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700 dark:text-zinc-400 ring-zinc-700/10 dark:ring-zinc-400/20',
-    error: 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-red-700/10 dark:ring-red-400/20'
+    error: 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-red-700/10 dark:ring-red-400/20',
+    uninstalled: 'bg-zinc-100 dark:bg-zinc-600/10 text-zinc-600 dark:text-zinc-500 ring-zinc-600/10 dark:ring-zinc-500/20'
   }
 
   const statusIcons = {
     active: '<div class="w-2 h-2 bg-lime-500 dark:bg-lime-400 rounded-full mr-2"></div>',
     inactive: '<div class="w-2 h-2 bg-zinc-500 dark:bg-zinc-400 rounded-full mr-2"></div>',
-    error: '<div class="w-2 h-2 bg-red-500 dark:bg-red-400 rounded-full mr-2"></div>'
+    error: '<div class="w-2 h-2 bg-red-500 dark:bg-red-400 rounded-full mr-2"></div>',
+    uninstalled: '<div class="w-2 h-2 bg-zinc-400 dark:bg-zinc-600 rounded-full mr-2"></div>'
   }
 
   // Border colors based on status
   const borderColors = {
     active: 'ring-[3px] ring-lime-500 dark:ring-lime-400',
     inactive: 'ring-[3px] ring-pink-500 dark:ring-pink-400',
-    error: 'ring-[3px] ring-red-500 dark:ring-red-400'
+    error: 'ring-[3px] ring-red-500 dark:ring-red-400',
+    uninstalled: 'ring-[3px] ring-zinc-400 dark:ring-zinc-600'
   }
 
   // Core system plugins that cannot be deactivated
   const criticalCorePlugins = ['core-auth', 'core-media']
   const canToggle = !criticalCorePlugins.includes(plugin.id)
 
-  const actionButton = plugin.status === 'active'
-    ? `<button onclick="togglePlugin('${plugin.id}', 'deactivate')" class="bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">Deactivate</button>`
-    : `<button onclick="togglePlugin('${plugin.id}', 'activate')" class="bg-lime-600 dark:bg-lime-700 hover:bg-lime-700 dark:hover:bg-lime-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">Activate</button>`
+  let actionButton = ''
+  if (plugin.status === 'uninstalled') {
+    actionButton = `<button onclick="installPlugin('${plugin.name}')" class="bg-cyan-600 dark:bg-cyan-700 hover:bg-cyan-700 dark:hover:bg-cyan-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">Install</button>`
+  } else if (plugin.status === 'active') {
+    actionButton = `<button onclick="togglePlugin('${plugin.id}', 'deactivate')" class="bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">Deactivate</button>`
+  } else {
+    actionButton = `<button onclick="togglePlugin('${plugin.id}', 'activate')" class="bg-lime-600 dark:bg-lime-700 hover:bg-lime-700 dark:hover:bg-lime-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">Activate</button>`
+  }
 
   return `
     <div class="plugin-card rounded-xl bg-white dark:bg-zinc-900 shadow-sm ${borderColors[plugin.status]} p-6 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all" data-category="${plugin.category}" data-status="${plugin.status}" data-name="${plugin.displayName}" data-description="${plugin.description}">
@@ -601,20 +626,24 @@ function renderPluginCard(plugin: Plugin): string {
 
       <div class="flex items-center justify-between">
         <div class="flex gap-2">
-          ${canToggle ? actionButton : ''}
+          ${plugin.status === 'uninstalled' ? actionButton : (canToggle ? actionButton : '')}
+          ${plugin.status !== 'uninstalled' ? `
           <button onclick="openPluginSettings('${plugin.id}')" class="bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">
             Settings
           </button>
+          ` : ''}
         </div>
 
         <div class="flex items-center gap-2">
+          ${plugin.status !== 'uninstalled' ? `
           <button onclick="showPluginDetails('${plugin.id}')" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Plugin Details">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
           </button>
+          ` : ''}
 
-          ${!plugin.isCore ? `
+          ${!plugin.isCore && plugin.status !== 'uninstalled' ? `
           <button onclick="uninstallPlugin('${plugin.id}')" class="text-zinc-500 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Uninstall Plugin">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>

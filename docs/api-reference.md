@@ -26,7 +26,7 @@ curl -X POST "http://localhost:8787/auth/login" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@sonicjs.com",
-    "password": "admin123"
+    "password": "sonicjs!"
   }'
 ```
 
@@ -963,7 +963,7 @@ const loginResponse = await fetch('http://localhost:8787/auth/login', {
   },
   body: JSON.stringify({
     email: 'admin@sonicjs.com',
-    password: 'admin123'
+    password: 'sonicjs!'
   })
 })
 
@@ -1011,7 +1011,7 @@ login_response = requests.post(
     'http://localhost:8787/auth/login',
     json={
         'email': 'admin@sonicjs.com',
-        'password': 'admin123'
+        'password': 'sonicjs!'
     }
 )
 token = login_response.json()['token']
@@ -1081,7 +1081,7 @@ curl -X POST "http://localhost:8787/auth/login" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@sonicjs.com",
-    "password": "admin123"
+    "password": "sonicjs!"
   }'
 ```
 

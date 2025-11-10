@@ -68,7 +68,7 @@ curl -X POST http://localhost:8787/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@sonicjs.com",
-    "password": "admin123"
+    "password": "sonicjs!"
   }'
 ```
 
@@ -78,7 +78,7 @@ const response = await fetch('http://localhost:8787/auth/login', {
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     email: 'admin@sonicjs.com',
-    password: 'admin123'
+    password: 'sonicjs!'
   })
 });
 

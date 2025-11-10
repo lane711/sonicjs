@@ -71,7 +71,7 @@ The system currently supports these plugin types with settings:
    {
      "enableNotice": true,
      "demoEmail": "admin@sonicjs.com",
-     "demoPassword": "admin123"
+     "demoPassword": "sonicjs!"
    }
    ```
 

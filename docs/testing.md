@@ -1059,7 +1059,7 @@ test('should ensure collection IDs are consistent', async ({ request }) => {
 // Authentication
 export const ADMIN_CREDENTIALS = {
   email: 'admin@sonicjs.com',
-  password: 'admin123'
+  password: 'sonicjs!'
 }
 
 export async function loginAsAdmin(page: Page) {

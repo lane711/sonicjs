@@ -135,43 +135,43 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
 
     case 'richtext':
       fieldHTML = `
-        <div class="richtext-container">
-          <textarea 
+        <div class="richtext-container" data-height="${opts.height || 300}" data-toolbar="${opts.toolbar || 'full'}">
+          <textarea
             id="${fieldId}"
             name="${fieldName}"
             class="${baseClasses} ${errorClasses} min-h-[${opts.height || 300}px]"
             ${required}
             ${disabled ? 'disabled' : ''}
           >${escapeHtml(value)}</textarea>
-          <script>
-            // Initialize TinyMCE for this field
-            if (typeof tinymce !== 'undefined') {
-              tinymce.init({
-                selector: '#${fieldId}',
-                skin: 'oxide-dark',
-                content_css: 'dark',
-                height: ${opts.height || 300},
-                menubar: false,
-                plugins: [
-                  'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                  'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                  'insertdatetime', 'media', 'table', 'help', 'wordcount'
-                ],
-                toolbar: '${opts.toolbar === 'simple' ? 'bold italic underline | bullist numlist | link' : 
-                  'undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help'}',
-                content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; color: #fff; background-color: #1f2937; }',
-                setup: function(editor) {
-                  editor.on('change', function() {
-                    editor.save();
-                  });
-                }
-              });
-            }
-          </script>
         </div>
       `
       break
-      
+
+    case 'quill':
+      // Quill WYSIWYG Editor
+      fieldHTML = `
+        <div class="quill-editor-container" data-field-id="${fieldId}">
+          <!-- Quill Editor Container -->
+          <div
+            id="${fieldId}-editor"
+            class="quill-editor bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100"
+            data-theme="${opts.theme || 'snow'}"
+            data-toolbar="${opts.toolbar || 'full'}"
+            data-placeholder="${opts.placeholder || 'Enter content...'}"
+            data-height="${opts.height || 300}"
+          >${value}</div>
+
+          <!-- Hidden input to store the actual content for form submission -->
+          <input
+            type="hidden"
+            id="${fieldId}"
+            name="${fieldName}"
+            value="${escapeHtml(value)}"
+          >
+        </div>
+      `
+      break
+
     case 'number':
       fieldHTML = `
         <input 
@@ -213,8 +213,8 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
       
     case 'date':
       fieldHTML = `
-        <input 
-          type="date" 
+        <input
+          type="date"
           id="${fieldId}"
           name="${fieldName}"
           value="${value}"
@@ -226,7 +226,91 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         >
       `
       break
-      
+
+    case 'datetime':
+      fieldHTML = `
+        <input
+          type="datetime-local"
+          id="${fieldId}"
+          name="${fieldName}"
+          value="${value}"
+          min="${opts.min || ''}"
+          max="${opts.max || ''}"
+          class="${baseClasses} ${errorClasses}"
+          ${required}
+          ${disabled ? 'disabled' : ''}
+        >
+      `
+      break
+
+    case 'slug':
+      // Slug fields behave like text fields but with special validation
+      let slugPattern = opts.pattern || '^[a-z0-9-]+$'
+      let slugHelp = '<p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Use lowercase letters, numbers, and hyphens only</p>'
+      slugHelp += '<button type="button" class="mt-1 text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300" onclick="generateSlugFromTitle(\'${fieldId}\')">Generate from title</button>'
+
+      fieldHTML = `
+        <input
+          type="text"
+          id="${fieldId}"
+          name="${fieldName}"
+          value="${escapeHtml(value)}"
+          placeholder="${opts.placeholder || 'url-friendly-slug'}"
+          maxlength="${opts.maxLength || ''}"
+          data-pattern="${slugPattern}"
+          class="${baseClasses} ${errorClasses}"
+          ${required}
+          ${disabled ? 'disabled' : ''}
+        >
+        ${slugHelp}
+        <script>
+          (function() {
+            const field = document.getElementById('${fieldId}');
+            const pattern = new RegExp('${slugPattern}');
+
+            field.addEventListener('input', function() {
+              if (this.value && !pattern.test(this.value)) {
+                this.setCustomValidity('Please use only lowercase letters, numbers, and hyphens.');
+              } else {
+                this.setCustomValidity('');
+              }
+            });
+
+            field.addEventListener('blur', function() {
+              this.reportValidity();
+            });
+          })();
+
+          function generateSlugFromTitle(slugFieldId) {
+            const titleField = document.querySelector('input[name="title"]');
+            const slugField = document.getElementById(slugFieldId);
+            if (titleField && slugField) {
+              const slug = titleField.value
+                .toLowerCase()
+                .replace(/[^a-z0-9\\s_-]/g, '')
+                .replace(/\\s+/g, '-')
+                .replace(/[-_]+/g, '-')
+                .replace(/^[-_]|[-_]$/g, '');
+              slugField.value = slug;
+            }
+          }
+
+          // Auto-generate slug when title changes
+          document.addEventListener('DOMContentLoaded', function() {
+            const titleField = document.querySelector('input[name="title"]');
+            const slugField = document.getElementById('${fieldId}');
+            if (titleField && slugField && !slugField.value) {
+              titleField.addEventListener('input', function() {
+                if (!slugField.value) {
+                  generateSlugFromTitle('${fieldId}');
+                }
+              });
+            }
+          });
+        </script>
+      `
+      break
+
     case 'select':
       const options = opts.options || []
       const multiple = opts.multiple ? 'multiple' : ''

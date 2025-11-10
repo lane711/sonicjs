@@ -3,6 +3,7 @@ import { renderAlert } from '../alert.template'
 import { renderDynamicField, renderFieldGroup, FieldDefinition } from '../components/dynamic-field.template'
 import { renderConfirmationDialog, getConfirmationDialogScript } from '../confirmation-dialog.template'
 import { getTinyMCEScript, getTinyMCEInitScript } from '../../plugins/available/tinymce-plugin'
+import { getQuillCDN, getQuillInitScript } from '../../plugins/core-plugins/quill-editor'
 
 export interface Collection {
   id: string
@@ -36,6 +37,13 @@ export interface ContentFormData {
     defaultHeight?: number
     defaultToolbar?: string
     skin?: string
+  }
+  quillEnabled?: boolean // Flag to indicate if Quill plugin is active
+  quillSettings?: {
+    version?: string
+    defaultHeight?: number
+    defaultToolbar?: string
+    theme?: string
   }
   referrerParams?: string // URL parameters to preserve filters when returning to list
   user?: {
@@ -391,6 +399,8 @@ export function renderContentFormPage(data: ContentFormData): string {
 
     ${data.tinymceEnabled ? getTinyMCEScript(data.tinymceSettings?.apiKey) : '<!-- TinyMCE plugin not active -->'}
 
+    ${data.quillEnabled ? getQuillCDN(data.quillSettings?.version) : '<!-- Quill plugin not active -->'}
+
     <!-- Dynamic Field Scripts -->
     <script>
       // Field group toggle
@@ -670,6 +680,8 @@ export function renderContentFormPage(data: ContentFormData): string {
         defaultHeight: data.tinymceSettings?.defaultHeight,
         defaultToolbar: data.tinymceSettings?.defaultToolbar
       })}</script>` : '// TinyMCE plugin not active - richtext fields will use plain textareas'}
+
+      ${data.quillEnabled ? `<script>${getQuillInitScript()}</script>` : '// Quill plugin not active - quill fields will use plain textareas'}
     </script>
   `
 

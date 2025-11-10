@@ -543,7 +543,7 @@ authRoutes.post('/seed-admin', async (c) => {
 
     if (existingAdmin) {
       // Update the password to ensure it's correct for testing
-      const passwordHash = await AuthManager.hashPassword('admin123')
+      const passwordHash = await AuthManager.hashPassword('sonicjs!')
       await db.prepare('UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?')
         .bind(passwordHash, Date.now(), existingAdmin.id)
         .run()
@@ -558,9 +558,9 @@ authRoutes.post('/seed-admin', async (c) => {
         }
       })
     }
-    
+
     // Hash password
-    const passwordHash = await AuthManager.hashPassword('admin123')
+    const passwordHash = await AuthManager.hashPassword('sonicjs!')
     
     // Create admin user
     const userId = 'admin-user-id'

@@ -129,7 +129,7 @@ CREATE INDEX IF NOT EXISTS idx_api_tokens_token ON api_tokens(token);
 CREATE INDEX IF NOT EXISTS idx_workflow_history_content ON workflow_history(content_id);
 CREATE INDEX IF NOT EXISTS idx_workflow_history_user ON workflow_history(user_id);
 
--- Insert default admin user (password: admin123)
+-- Insert default admin user (password: sonicjs!)
 INSERT OR IGNORE INTO users (
   id, email, username, first_name, last_name, password_hash, 
   role, is_active, created_at, updated_at
@@ -139,7 +139,7 @@ INSERT OR IGNORE INTO users (
   'admin',
   'Admin',
   'User',
-  'd1c379e871838f44e21d5a55841349e50636f06df139bfef11870eec74c381db', -- SHA-256 hash of 'admin123'
+  'd1c379e871838f44e21d5a55841349e50636f06df139bfef11870eec74c381db', -- SHA-256 hash of 'sonicjs!'
   'admin',
   1,
   strftime('%s', 'now') * 1000,

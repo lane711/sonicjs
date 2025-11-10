@@ -1122,7 +1122,7 @@ test.describe('Blog Posts', () => {
     // Login
     await page.goto('/auth/login')
     await page.fill('input[name="email"]', 'admin@sonicjs.com')
-    await page.fill('input[name="password"]', 'admin123')
+    await page.fill('input[name="password"]', 'sonicjs!')
     await page.click('button[type="submit"]')
 
     // Navigate to new post page

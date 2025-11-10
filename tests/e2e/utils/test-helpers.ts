@@ -3,7 +3,7 @@ import { Page, expect } from '@playwright/test';
 // Default admin credentials for testing
 export const ADMIN_CREDENTIALS = {
   email: 'admin@sonicjs.com',
-  password: 'admin123'
+  password: 'sonicjs!'
 };
 
 // Test data

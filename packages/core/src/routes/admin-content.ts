@@ -361,6 +361,15 @@ adminContentRoutes.get('/new', async (c) => {
       tinymceSettings = tinymcePlugin?.settings
     }
 
+    // Check if Quill plugin is active and get settings
+    const quillEnabled = await isPluginActive(db, 'quill-editor')
+    let quillSettings
+    if (quillEnabled) {
+      const pluginService = new PluginService(db)
+      const quillPlugin = await pluginService.getPlugin('quill-editor')
+      quillSettings = quillPlugin?.settings
+    }
+
     const formData: ContentFormData = {
       collection,
       fields,
@@ -368,6 +377,8 @@ adminContentRoutes.get('/new', async (c) => {
       workflowEnabled,
       tinymceEnabled,
       tinymceSettings,
+      quillEnabled,
+      quillSettings,
       user: user ? {
         name: user.email,
         email: user.email,
@@ -457,6 +468,15 @@ adminContentRoutes.get('/:id/edit', async (c) => {
       tinymceSettings = tinymcePlugin?.settings
     }
 
+    // Check if Quill plugin is active and get settings
+    const quillEnabled = await isPluginActive(db, 'quill-editor')
+    let quillSettings
+    if (quillEnabled) {
+      const pluginService = new PluginService(db)
+      const quillPlugin = await pluginService.getPlugin('quill-editor')
+      quillSettings = quillPlugin?.settings
+    }
+
     const formData: ContentFormData = {
       id: content.id,
       title: content.title,
@@ -474,6 +494,8 @@ adminContentRoutes.get('/:id/edit', async (c) => {
       workflowEnabled,
       tinymceEnabled,
       tinymceSettings,
+      quillEnabled,
+      quillSettings,
       referrerParams,
       user: user ? {
         name: user.email,

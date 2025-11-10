@@ -770,7 +770,7 @@ Creates default admin user for testing. **Not for production use.**
 
 // Default credentials
 // Email: admin@sonicjs.com
-// Password: admin123
+// Password: sonicjs!
 ```
 
 ## Session Management

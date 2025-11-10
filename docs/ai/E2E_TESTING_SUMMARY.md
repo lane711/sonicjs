@@ -216,7 +216,7 @@ const TEST_DATA = {
 
 ### Admin Credentials
 - Email: `admin@sonicjs.com`
-- Password: `admin123`
+- Password: `sonicjs!`
 
 ## 🔒 Best Practices Implemented
 

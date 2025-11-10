@@ -412,7 +412,7 @@ Navigate to **<http://localhost:8787/admin>**
 **Default Credentials** (if seed data is loaded):
 
 - Email: <admin@sonicjs.com>
-- Password: admin123
+- Password: sonicjs!
 
 **Note:** The `demo-login-plugin` auto-fills these credentials in development.
 
@@ -482,7 +482,7 @@ The admin interface provides:
 # Get auth token
 curl -X POST http://localhost:8787/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@sonicjs.com","password":"admin123"}'
+  -d '{"email":"admin@sonicjs.com","password":"sonicjs!"}'
 
 # Create content
 curl -X POST http://localhost:8787/admin/content \
