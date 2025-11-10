@@ -172,6 +172,22 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
       `
       break
 
+    case 'mdxeditor':
+      // MDXEditor Rich Text Editor - renders same container as richtext
+      // The MDXEditor plugin initialization script will handle the editor initialization
+      fieldHTML = `
+        <div class="richtext-container" data-height="${opts.height || 300}" data-toolbar="${opts.toolbar || 'full'}">
+          <textarea
+            id="${fieldId}"
+            name="${fieldName}"
+            class="${baseClasses} ${errorClasses} min-h-[${opts.height || 300}px]"
+            ${required}
+            ${disabled ? 'disabled' : ''}
+          >${escapeHtml(value)}</textarea>
+        </div>
+      `
+      break
+
     case 'number':
       fieldHTML = `
         <input 

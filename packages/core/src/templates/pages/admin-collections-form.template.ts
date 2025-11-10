@@ -494,7 +494,9 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
               >
                 <option value="">Select field type...</option>
                 <option value="text">Text</option>
-                <option value="richtext">Rich Text</option>
+                <option value="richtext">Rich Text (TinyMCE)</option>
+                <option value="quill">Rich Text (Quill)</option>
+                <option value="mdxeditor">Rich Text (MDXEditor)</option>
                 <option value="number">Number</option>
                 <option value="boolean">Boolean</option>
                 <option value="date">Date</option>
