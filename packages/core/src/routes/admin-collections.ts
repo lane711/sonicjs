@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { html } from 'hono/html'
 import { requireAuth } from '../middleware'
+import { isPluginActive } from '../middleware/plugin-middleware'
 import { renderCollectionsListPage } from '../templates/pages/admin-collections-list.template'
 import { renderCollectionFormPage } from '../templates/pages/admin-collections-form.template'
 
@@ -32,6 +33,11 @@ interface CollectionFormData {
     role: string
   }
   version?: string
+  editorPlugins?: {
+    tinymce: boolean
+    quill: boolean
+    mdxeditor: boolean
+  }
 }
 
 interface CollectionField {
@@ -170,8 +176,16 @@ adminCollectionsRoutes.get('/', async (c) => {
 })
 
 // New collection form
-adminCollectionsRoutes.get('/new', (c) => {
+adminCollectionsRoutes.get('/new', async (c) => {
   const user = c.get('user')
+  const db = c.env.DB
+
+  // Check which editor plugins are active
+  const [tinymceActive, quillActive, mdxeditorActive] = await Promise.all([
+    isPluginActive(db, 'tinymce-plugin'),
+    isPluginActive(db, 'quill-plugin'),
+    isPluginActive(db, 'mdxeditor-plugin')
+  ])
 
   const formData: CollectionFormData = {
     isEdit: false,
@@ -180,7 +194,12 @@ adminCollectionsRoutes.get('/new', (c) => {
       email: user.email,
       role: user.role
     } : undefined,
-    version: c.get('appVersion')
+    version: c.get('appVersion'),
+    editorPlugins: {
+      tinymce: tinymceActive,
+      quill: quillActive,
+      mdxeditor: mdxeditorActive
+    }
   }
 
   return c.html(renderCollectionFormPage(formData))
@@ -400,6 +419,13 @@ adminCollectionsRoutes.get('/:id', async (c) => {
       }))
     }
 
+    // Check which editor plugins are active
+    const [tinymceActive, quillActive, mdxeditorActive] = await Promise.all([
+      isPluginActive(db, 'tinymce-plugin'),
+      isPluginActive(db, 'quill-plugin'),
+      isPluginActive(db, 'mdxeditor-plugin')
+    ])
+
     const formData: CollectionFormData = {
       id: collection.id,
       name: collection.name,
@@ -413,7 +439,12 @@ adminCollectionsRoutes.get('/:id', async (c) => {
         email: user.email,
         role: user.role
       } : undefined,
-      version: c.get('appVersion')
+      version: c.get('appVersion'),
+      editorPlugins: {
+        tinymce: tinymceActive,
+        quill: quillActive,
+        mdxeditor: mdxeditorActive
+      }
     }
 
     return c.html(renderCollectionFormPage(formData))

@@ -30,6 +30,11 @@ export interface CollectionFormData {
     role: string
   }
   version?: string
+  editorPlugins?: {
+    tinymce: boolean
+    quill: boolean
+    mdxeditor: boolean
+  }
 }
 
 export function renderCollectionFormPage(data: CollectionFormData): string {
@@ -494,15 +499,14 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
               >
                 <option value="">Select field type...</option>
                 <option value="text">Text</option>
-                <option value="richtext">Rich Text (TinyMCE)</option>
-                <option value="quill">Rich Text (Quill)</option>
-                <option value="mdxeditor">Rich Text (MDXEditor)</option>
+                ${data.editorPlugins?.tinymce ? '<option value="richtext">Rich Text (TinyMCE)</option>' : ''}
+                ${data.editorPlugins?.quill ? '<option value="quill">Rich Text (Quill)</option>' : ''}
+                ${data.editorPlugins?.mdxeditor ? '<option value="mdxeditor">Rich Text (MDXEditor)</option>' : ''}
                 <option value="number">Number</option>
                 <option value="boolean">Boolean</option>
                 <option value="date">Date</option>
                 <option value="select">Select</option>
                 <option value="media">Media</option>
-                <option value="guid">GUID (Auto-generated)</option>
               </select>
               <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-blue-600 dark:text-blue-400 sm:size-4">
                 <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
@@ -769,7 +773,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         const optionsContainer = document.getElementById('field-options-container');
         const helpText = document.getElementById('field-type-help');
 
-        if (['select', 'media', 'richtext', 'guid'].includes(fieldType)) {
+        if (['select', 'media', 'richtext'].includes(fieldType)) {
           optionsContainer.classList.remove('hidden');
 
           // Set help text based on type
@@ -782,9 +786,6 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
               break;
             case 'richtext':
               helpText.textContent = 'Full-featured WYSIWYG text editor with formatting options';
-              break;
-            case 'guid':
-              helpText.textContent = 'Automatically generates a unique identifier (UUID v4) for each content item';
               break;
           }
         } else {
@@ -928,14 +929,6 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
             case 'richtext':
               fieldOptions.value = '{"toolbar": "full", "height": 400}';
               helpText.textContent = 'Full-featured WYSIWYG text editor with formatting options';
-              break;
-            case 'guid':
-              fieldOptions.value = '{"autoGenerate": true, "format": "uuid-v4"}';
-              helpText.textContent = 'Automatically generates a unique identifier (UUID v4) for each content item';
-              // Suggest 'id' as field name for GUID fields
-              if (!fieldNameInput.value || fieldNameInput.value === '') {
-                fieldNameInput.value = 'id';
-              }
               break;
           }
         } else {
