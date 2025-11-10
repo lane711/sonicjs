@@ -401,6 +401,8 @@ export function renderContentFormPage(data: ContentFormData): string {
 
     ${data.quillEnabled ? getQuillCDN(data.quillSettings?.version) : '<!-- Quill plugin not active -->'}
 
+    ${data.quillEnabled ? getQuillInitScript() : '<!-- Quill init script not needed -->'}
+
     <!-- Dynamic Field Scripts -->
     <script>
       // Field group toggle
@@ -681,7 +683,7 @@ export function renderContentFormPage(data: ContentFormData): string {
         defaultToolbar: data.tinymceSettings?.defaultToolbar
       })}</script>` : '// TinyMCE plugin not active - richtext fields will use plain textareas'}
 
-      ${data.quillEnabled ? `<script>${getQuillInitScript()}</script>` : '// Quill plugin not active - quill fields will use plain textareas'}
+      // Quill initialization is handled by a separate script tag above
     </script>
   `
 

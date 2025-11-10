@@ -34,7 +34,7 @@ export default {
         helpText: "A short summary of the post",
       },
       content: {
-        type: "markdown",
+        type: "quill",
         title: "Content",
         required: true,
       },

@@ -3808,16 +3808,21 @@ function getQuillInitScript() {
     <script>
       // Global Quill initialization function
       window.initializeQuillEditors = function() {
+        console.log('[Quill] initializeQuillEditors called');
         if (typeof Quill === 'undefined') {
-          console.warn('Quill is not loaded yet. Retrying...');
+          console.warn('[Quill] Quill is not loaded yet. Retrying...');
           setTimeout(window.initializeQuillEditors, 100);
           return;
         }
 
+        console.log('[Quill] Quill is loaded, searching for editors...');
         // Find all Quill editor containers that haven't been initialized
         const containers = document.querySelectorAll('.quill-editor-container');
+        console.log('[Quill] Found', containers.length, 'editor containers');
 
-        containers.forEach(container => {
+        containers.forEach((container, index) => {
+          console.log('[Quill] Processing container', index);
+          try {
           const editorDiv = container.querySelector('.quill-editor');
           if (!editorDiv || editorDiv.classList.contains('ql-container')) {
             return; // Already initialized or invalid
@@ -3866,7 +3871,12 @@ function getQuillInitScript() {
 
           // Store quill instance for potential later access
           editorDiv.quillInstance = quill;
+          console.log('[Quill] Successfully initialized editor', index);
+          } catch (error) {
+            console.error('[Quill] Error initializing editor', index, ':', error);
+          }
         });
+        console.log('[Quill] Initialization complete');
       };
 
       // Initialize on DOM ready
@@ -4325,6 +4335,8 @@ function renderContentFormPage(data) {
 
     ${data.quillEnabled ? getQuillCDN(data.quillSettings?.version) : "<!-- Quill plugin not active -->"}
 
+    ${data.quillEnabled ? getQuillInitScript() : "<!-- Quill init script not needed -->"}
+
     <!-- Dynamic Field Scripts -->
     <script>
       // Field group toggle
@@ -4605,7 +4617,7 @@ function renderContentFormPage(data) {
     defaultToolbar: data.tinymceSettings?.defaultToolbar
   })}</script>` : "// TinyMCE plugin not active - richtext fields will use plain textareas"}
 
-      ${data.quillEnabled ? `<script>${getQuillInitScript()}</script>` : "// Quill plugin not active - quill fields will use plain textareas"}
+      // Quill initialization is handled by a separate script tag above
     </script>
   `;
   const layoutData = {
@@ -21457,5 +21469,5 @@ var ROUTES_INFO = {
 };
 
 export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_faq_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, userRoutes };
-//# sourceMappingURL=chunk-IH4ZNKM5.js.map
-//# sourceMappingURL=chunk-IH4ZNKM5.js.map
+//# sourceMappingURL=chunk-D4W53JMD.js.map
+//# sourceMappingURL=chunk-D4W53JMD.js.map

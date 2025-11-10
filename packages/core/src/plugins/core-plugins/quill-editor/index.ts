@@ -109,16 +109,21 @@ export function getQuillInitScript(): string {
     <script>
       // Global Quill initialization function
       window.initializeQuillEditors = function() {
+        console.log('[Quill] initializeQuillEditors called');
         if (typeof Quill === 'undefined') {
-          console.warn('Quill is not loaded yet. Retrying...');
+          console.warn('[Quill] Quill is not loaded yet. Retrying...');
           setTimeout(window.initializeQuillEditors, 100);
           return;
         }
 
+        console.log('[Quill] Quill is loaded, searching for editors...');
         // Find all Quill editor containers that haven't been initialized
         const containers = document.querySelectorAll('.quill-editor-container');
+        console.log('[Quill] Found', containers.length, 'editor containers');
 
-        containers.forEach(container => {
+        containers.forEach((container, index) => {
+          console.log('[Quill] Processing container', index);
+          try {
           const editorDiv = container.querySelector('.quill-editor');
           if (!editorDiv || editorDiv.classList.contains('ql-container')) {
             return; // Already initialized or invalid
@@ -167,7 +172,12 @@ export function getQuillInitScript(): string {
 
           // Store quill instance for potential later access
           editorDiv.quillInstance = quill;
+          console.log('[Quill] Successfully initialized editor', index);
+          } catch (error) {
+            console.error('[Quill] Error initializing editor', index, ':', error);
+          }
         });
+        console.log('[Quill] Initialization complete');
       };
 
       // Initialize on DOM ready
