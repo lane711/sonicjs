@@ -23,7 +23,6 @@ export { adminPluginRoutes } from './admin-plugins'
 export { adminLogsRoutes } from './admin-logs'
 export { adminDesignRoutes } from './admin-design'
 export { adminCheckboxRoutes } from './admin-checkboxes'
-export { default as adminFAQRoutes } from './admin-faq'
 export { default as adminTestimonialsRoutes } from './admin-testimonials'
 export { default as adminCodeExamplesRoutes } from './admin-code-examples'
 export { adminDashboardRoutes } from './admin-dashboard'
@@ -46,7 +45,6 @@ export const ROUTES_INFO = {
     'adminLogsRoutes',
     'adminDesignRoutes',
     'adminCheckboxRoutes',
-    'adminFAQRoutes',
     'adminTestimonialsRoutes',
     'adminCodeExamplesRoutes',
     'adminDashboardRoutes',

@@ -10,7 +10,6 @@
 export { authPlugin, createAuthPlugin } from './auth'
 export { mediaPlugin, createMediaPlugin } from './media'
 export { analyticsPlugin, createAnalyticsPlugin } from './analytics'
-export { faqPlugin, createFAQPlugin } from './faq'
 export { testimonialsPlugin, createTestimonialPlugin } from './testimonials'
 export { codeExamplesPlugin, createCodeExamplesPlugin } from './code-examples'
 export { demoLoginPlugin } from './demo-login'

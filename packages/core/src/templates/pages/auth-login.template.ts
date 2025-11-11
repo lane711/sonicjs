@@ -147,7 +147,7 @@ export function renderLoginPage(data: LoginPageData, demoLoginActive: boolean = 
 
             if (emailInput && passwordInput) {
               emailInput.value = 'admin@sonicjs.com';
-              passwordInput.value = 'admin123';
+              passwordInput.value = 'sonicjs!';
 
               // Add visual indication that form is prefilled (only if not already present)
               const form = emailInput.closest('form');

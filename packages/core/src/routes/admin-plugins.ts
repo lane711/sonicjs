@@ -31,7 +31,7 @@ const AVAILABLE_PLUGINS = [
     id: 'demo-login-prefill',
     name: 'demo-login-plugin',
     display_name: 'Demo Login Prefill',
-    description: 'Prefills login form with demo credentials (admin@sonicjs.com/admin123) for easy site demonstration',
+    description: 'Prefills login form with demo credentials (admin@sonicjs.com/sonicjs!) for easy site demonstration',
     version: '1.0.0-beta.1',
     author: 'SonicJS',
     category: 'demo',
@@ -347,7 +347,7 @@ adminPluginRoutes.post('/install', async (c) => {
         id: 'demo-login-prefill',
         name: 'demo-login-plugin',
         display_name: 'Demo Login Prefill',
-        description: 'Prefills login form with demo credentials (admin@sonicjs.com/admin123) for easy site demonstration',
+        description: 'Prefills login form with demo credentials (admin@sonicjs.com/sonicjs!) for easy site demonstration',
         version: '1.0.0-beta.1',
         author: 'SonicJS',
         category: 'demo',
@@ -357,7 +357,7 @@ adminPluginRoutes.post('/install', async (c) => {
         settings: {
           enableNotice: true,
           demoEmail: 'admin@sonicjs.com',
-          demoPassword: 'admin123'
+          demoPassword: 'sonicjs!'
         }
       })
 

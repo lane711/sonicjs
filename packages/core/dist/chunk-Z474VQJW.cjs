@@ -4,7 +4,7 @@ var chunkDOR2IU73_cjs = require('./chunk-DOR2IU73.cjs');
 var chunk64K5JZ6Q_cjs = require('./chunk-64K5JZ6Q.cjs');
 var chunkCRYZYNNJ_cjs = require('./chunk-CRYZYNNJ.cjs');
 var chunkT7IYBGGO_cjs = require('./chunk-T7IYBGGO.cjs');
-var chunkLAVIR5SF_cjs = require('./chunk-LAVIR5SF.cjs');
+var chunkYU6QFFI4_cjs = require('./chunk-YU6QFFI4.cjs');
 var chunkPGZZPKZL_cjs = require('./chunk-PGZZPKZL.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 var hono = require('hono');
@@ -1841,8 +1841,8 @@ function renderLoginPage(data, demoLoginActive = false) {
         <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div class="bg-zinc-900 shadow-sm ring-1 ring-white/10 rounded-xl px-6 py-8 sm:px-10">
             <!-- Alerts -->
-            ${data.error ? `<div class="mb-6">${chunkLAVIR5SF_cjs.renderAlert({ type: "error", message: data.error })}</div>` : ""}
-            ${data.message ? `<div class="mb-6">${chunkLAVIR5SF_cjs.renderAlert({ type: "success", message: data.message })}</div>` : ""}
+            ${data.error ? `<div class="mb-6">${chunkYU6QFFI4_cjs.renderAlert({ type: "error", message: data.error })}</div>` : ""}
+            ${data.message ? `<div class="mb-6">${chunkYU6QFFI4_cjs.renderAlert({ type: "success", message: data.message })}</div>` : ""}
 
             <!-- Form Response (HTMX target) -->
             <div id="form-response" class="mb-6"></div>
@@ -1926,7 +1926,7 @@ function renderLoginPage(data, demoLoginActive = false) {
 
             if (emailInput && passwordInput) {
               emailInput.value = 'admin@sonicjs.com';
-              passwordInput.value = 'admin123';
+              passwordInput.value = 'sonicjs!';
 
               // Add visual indication that form is prefilled (only if not already present)
               const form = emailInput.closest('form');
@@ -2006,7 +2006,7 @@ function renderRegisterPage(data) {
         <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div class="bg-zinc-900 shadow-sm ring-1 ring-white/10 rounded-xl px-6 py-8 sm:px-10">
             <!-- Alerts -->
-            ${data.error ? `<div class="mb-6">${chunkLAVIR5SF_cjs.renderAlert({ type: "error", message: data.error })}</div>` : ""}
+            ${data.error ? `<div class="mb-6">${chunkYU6QFFI4_cjs.renderAlert({ type: "error", message: data.error })}</div>` : ""}
 
             <!-- Form -->
             <form
@@ -3065,7 +3065,7 @@ authRoutes.post("/reset-password", async (c) => {
 var auth_default = authRoutes;
 
 // src/templates/pages/admin-content-form.template.ts
-chunkLAVIR5SF_cjs.init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 
 // src/templates/components/dynamic-field.template.ts
 function renderDynamicField(field, options = {}) {
@@ -4243,8 +4243,8 @@ function renderContentFormPage(data) {
         <!-- Form Content -->
         <div class="px-6 py-6">
           <div id="form-messages">
-            ${data.error ? chunkLAVIR5SF_cjs.renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
-            ${data.success ? chunkLAVIR5SF_cjs.renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
+            ${data.error ? chunkYU6QFFI4_cjs.renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
+            ${data.success ? chunkYU6QFFI4_cjs.renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -4479,7 +4479,7 @@ function renderContentFormPage(data) {
     </div>
 
     <!-- Confirmation Dialogs -->
-    ${chunkLAVIR5SF_cjs.renderConfirmationDialog({
+    ${chunkYU6QFFI4_cjs.renderConfirmationDialog({
     id: "duplicate-content-confirm",
     title: "Duplicate Content",
     message: "Create a copy of this content?",
@@ -4490,7 +4490,7 @@ function renderContentFormPage(data) {
     onConfirm: "performDuplicateContent()"
   })}
 
-    ${chunkLAVIR5SF_cjs.renderConfirmationDialog({
+    ${chunkYU6QFFI4_cjs.renderConfirmationDialog({
     id: "delete-content-confirm",
     title: "Delete Content",
     message: "Are you sure you want to delete this content? This action cannot be undone.",
@@ -4501,7 +4501,7 @@ function renderContentFormPage(data) {
     onConfirm: `performDeleteContent('${data.id}')`
   })}
 
-    ${chunkLAVIR5SF_cjs.getConfirmationDialogScript()}
+    ${chunkYU6QFFI4_cjs.getConfirmationDialogScript()}
 
     ${data.tinymceEnabled ? getTinyMCEScript(data.tinymceSettings?.apiKey) : "<!-- TinyMCE plugin not active -->"}
 
@@ -4809,11 +4809,11 @@ function renderContentFormPage(data) {
     content: pageContent,
     version: data.version
   };
-  return chunkLAVIR5SF_cjs.renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/pages/admin-content-list.template.ts
-chunkLAVIR5SF_cjs.init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function renderContentListPage(data) {
   const urlParams = new URLSearchParams();
   if (data.modelName && data.modelName !== "all") urlParams.set("model", data.modelName);
@@ -5218,8 +5218,8 @@ function renderContentListPage(data) {
       
       <!-- Content List -->
       <div id="content-list">
-        ${chunkLAVIR5SF_cjs.renderTable(tableData)}
-        ${chunkLAVIR5SF_cjs.renderPagination(paginationData)}
+        ${chunkYU6QFFI4_cjs.renderTable(tableData)}
+        ${chunkYU6QFFI4_cjs.renderPagination(paginationData)}
       </div>
       
     </div>
@@ -5428,7 +5428,7 @@ function renderContentListPage(data) {
     </script>
 
     <!-- Confirmation Dialog for Bulk Actions -->
-    ${chunkLAVIR5SF_cjs.renderConfirmationDialog({
+    ${chunkYU6QFFI4_cjs.renderConfirmationDialog({
     id: "bulk-action-confirm",
     title: "Confirm Bulk Action",
     message: "Are you sure you want to perform this action? This operation will affect multiple items.",
@@ -5440,7 +5440,7 @@ function renderContentListPage(data) {
   })}
 
     <!-- Confirmation Dialog Script -->
-    ${chunkLAVIR5SF_cjs.getConfirmationDialogScript()}
+    ${chunkYU6QFFI4_cjs.getConfirmationDialogScript()}
   `;
   const layoutData = {
     title: "Content Management",
@@ -5450,7 +5450,7 @@ function renderContentListPage(data) {
     version: data.version,
     content: pageContent
   };
-  return chunkLAVIR5SF_cjs.renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/components/version-history.template.ts
@@ -6852,7 +6852,7 @@ ${JSON.stringify(data, null, 2)}
 var admin_content_default = adminContentRoutes;
 
 // src/templates/pages/admin-profile.template.ts
-chunkLAVIR5SF_cjs.init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function renderAvatarImage(avatarUrl, firstName, lastName) {
   return `<div id="avatar-image-container" class="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden bg-gradient-to-br from-cyan-400 to-purple-400 flex items-center justify-center ring-4 ring-zinc-950/5 dark:ring-white/10">
     ${avatarUrl ? `<img src="${avatarUrl}" alt="Profile picture" class="w-full h-full object-cover">` : `<span class="text-2xl font-bold text-white">${firstName.charAt(0)}${lastName.charAt(0)}</span>`}
@@ -6872,8 +6872,8 @@ function renderProfilePage(data) {
       </div>
 
       <!-- Alert Messages -->
-      ${data.error ? chunkLAVIR5SF_cjs.renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
-      ${data.success ? chunkLAVIR5SF_cjs.renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
+      ${data.error ? chunkYU6QFFI4_cjs.renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
+      ${data.success ? chunkYU6QFFI4_cjs.renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
 
       <!-- Profile Form -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -7260,7 +7260,7 @@ function renderProfilePage(data) {
     version: data.version,
     content: pageContent
   };
-  return chunkLAVIR5SF_cjs.renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/components/alert.template.ts
@@ -7543,7 +7543,7 @@ function renderActivityLogsPage(data) {
     user: data.user,
     content: pageContent
   };
-  return chunkLAVIR5SF_cjs.renderAdminLayout(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayout(layoutData);
 }
 function getActionBadgeClass(action) {
   if (action.includes("login") || action.includes("logout")) {
@@ -7563,7 +7563,7 @@ function formatAction(action) {
 }
 
 // src/templates/pages/admin-user-edit.template.ts
-chunkLAVIR5SF_cjs.init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 
 // src/templates/components/confirmation-dialog.template.ts
 function renderConfirmationDialog2(options) {
@@ -7684,8 +7684,8 @@ function renderUserEditPage(data) {
 
       <!-- Alert Messages -->
       <div id="form-messages">
-        ${data.error ? chunkLAVIR5SF_cjs.renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
-        ${data.success ? chunkLAVIR5SF_cjs.renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
+        ${data.error ? chunkYU6QFFI4_cjs.renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
+        ${data.success ? chunkYU6QFFI4_cjs.renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
       </div>
 
       <!-- User Edit Form -->
@@ -7978,11 +7978,11 @@ function renderUserEditPage(data) {
     user: data.user,
     content: pageContent
   };
-  return chunkLAVIR5SF_cjs.renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/pages/admin-user-new.template.ts
-chunkLAVIR5SF_cjs.init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function renderUserNewPage(data) {
   const pageContent = `
     <div>
@@ -8021,8 +8021,8 @@ function renderUserNewPage(data) {
 
       <!-- Alert Messages -->
       <div id="form-messages">
-        ${data.error ? chunkLAVIR5SF_cjs.renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
-        ${data.success ? chunkLAVIR5SF_cjs.renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
+        ${data.error ? chunkYU6QFFI4_cjs.renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
+        ${data.success ? chunkYU6QFFI4_cjs.renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
       </div>
 
       <!-- User New Form -->
@@ -8266,11 +8266,11 @@ function renderUserNewPage(data) {
     user: data.user,
     content: pageContent
   };
-  return chunkLAVIR5SF_cjs.renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/pages/admin-users-list.template.ts
-chunkLAVIR5SF_cjs.init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function renderUsersListPage(data) {
   const columns = [
     {
@@ -8296,7 +8296,7 @@ function renderUsersListPage(data) {
       sortable: true,
       sortType: "string",
       render: (_value, row) => {
-        const escapeHtml7 = (text) => text.replace(/[&<>"']/g, (char) => ({
+        const escapeHtml6 = (text) => text.replace(/[&<>"']/g, (char) => ({
           "&": "&amp;",
           "<": "&lt;",
           ">": "&gt;",
@@ -8305,9 +8305,9 @@ function renderUsersListPage(data) {
         })[char] || char);
         const truncatedFirstName = row.firstName.length > 25 ? row.firstName.substring(0, 25) + "..." : row.firstName;
         const truncatedLastName = row.lastName.length > 25 ? row.lastName.substring(0, 25) + "..." : row.lastName;
-        const fullName = escapeHtml7(`${truncatedFirstName} ${truncatedLastName}`);
+        const fullName = escapeHtml6(`${truncatedFirstName} ${truncatedLastName}`);
         const truncatedUsername = row.username.length > 100 ? row.username.substring(0, 100) + "..." : row.username;
-        const username = escapeHtml7(truncatedUsername);
+        const username = escapeHtml6(truncatedUsername);
         const statusBadge = row.isActive ? '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-lime-50 dark:bg-lime-500/10 text-lime-700 dark:text-lime-300 ring-1 ring-inset ring-lime-700/10 dark:ring-lime-400/20 ml-2">Active</span>' : '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-700/10 dark:ring-red-500/20 ml-2">Inactive</span>';
         return `
           <div>
@@ -8323,14 +8323,14 @@ function renderUsersListPage(data) {
       sortable: true,
       sortType: "string",
       render: (value) => {
-        const escapeHtml7 = (text) => text.replace(/[&<>"']/g, (char) => ({
+        const escapeHtml6 = (text) => text.replace(/[&<>"']/g, (char) => ({
           "&": "&amp;",
           "<": "&lt;",
           ">": "&gt;",
           '"': "&quot;",
           "'": "&#39;"
         })[char] || char);
-        const escapedEmail = escapeHtml7(value);
+        const escapedEmail = escapeHtml6(value);
         return `<a href="mailto:${escapedEmail}" class="text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors">${escapedEmail}</a>`;
       }
     },
@@ -8421,8 +8421,8 @@ function renderUsersListPage(data) {
       </div>
 
       <!-- Alert Messages -->
-      ${data.error ? chunkLAVIR5SF_cjs.renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
-      ${data.success ? chunkLAVIR5SF_cjs.renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
+      ${data.error ? chunkYU6QFFI4_cjs.renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
+      ${data.success ? chunkYU6QFFI4_cjs.renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
 
       <!-- Stats -->
       <div class="mb-6">
@@ -8599,10 +8599,10 @@ function renderUsersListPage(data) {
       </div>
 
       <!-- Users Table -->
-      ${chunkLAVIR5SF_cjs.renderTable(tableData)}
+      ${chunkYU6QFFI4_cjs.renderTable(tableData)}
 
       <!-- Pagination -->
-      ${data.pagination ? chunkLAVIR5SF_cjs.renderPagination(data.pagination) : ""}
+      ${data.pagination ? chunkYU6QFFI4_cjs.renderPagination(data.pagination) : ""}
     </div>
 
     <script>
@@ -8673,7 +8673,7 @@ function renderUsersListPage(data) {
     version: data.version,
     content: pageContent
   };
-  return chunkLAVIR5SF_cjs.renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/routes/admin-users.ts
@@ -10094,7 +10094,7 @@ function getFileIcon(mimeType) {
 }
 
 // src/templates/pages/admin-media-library.template.ts
-chunkLAVIR5SF_cjs.init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function renderMediaLibraryPage(data) {
   const pageContent = `
     <div>
@@ -11029,7 +11029,7 @@ function renderMediaLibraryPage(data) {
     version: data.version,
     content: pageContent
   };
-  return chunkLAVIR5SF_cjs.renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/components/media-file-details.template.ts
@@ -12043,7 +12043,7 @@ function formatFileSize(bytes) {
 }
 
 // src/templates/pages/admin-plugins-list.template.ts
-chunkLAVIR5SF_cjs.init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function renderPluginsListPage(data) {
   const pageContent = `
     <div>
@@ -12531,7 +12531,7 @@ function renderPluginsListPage(data) {
     version: data.version,
     content: pageContent
   };
-  return chunkLAVIR5SF_cjs.renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 function renderPluginCard(plugin) {
   const statusColors = {
@@ -13188,7 +13188,7 @@ function renderPluginSettingsPage(data) {
     user,
     content: pageContent
   };
-  return chunkLAVIR5SF_cjs.renderAdminLayout(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayout(layoutData);
 }
 function renderStatusBadge(status) {
   const statusColors = {
@@ -13470,7 +13470,7 @@ var AVAILABLE_PLUGINS = [
     id: "demo-login-prefill",
     name: "demo-login-plugin",
     display_name: "Demo Login Prefill",
-    description: "Prefills login form with demo credentials (admin@sonicjs.com/admin123) for easy site demonstration",
+    description: "Prefills login form with demo credentials (admin@sonicjs.com/sonicjs!) for easy site demonstration",
     version: "1.0.0-beta.1",
     author: "SonicJS",
     category: "demo",
@@ -13725,7 +13725,7 @@ adminPluginRoutes.post("/install", async (c) => {
         id: "demo-login-prefill",
         name: "demo-login-plugin",
         display_name: "Demo Login Prefill",
-        description: "Prefills login form with demo credentials (admin@sonicjs.com/admin123) for easy site demonstration",
+        description: "Prefills login form with demo credentials (admin@sonicjs.com/sonicjs!) for easy site demonstration",
         version: "1.0.0-beta.1",
         author: "SonicJS",
         category: "demo",
@@ -13735,7 +13735,7 @@ adminPluginRoutes.post("/install", async (c) => {
         settings: {
           enableNotice: true,
           demoEmail: "admin@sonicjs.com",
-          demoPassword: "admin123"
+          demoPassword: "sonicjs!"
         }
       });
       return c.json({ success: true, plugin: demoPlugin });
@@ -13932,7 +13932,7 @@ function formatLastUpdated(timestamp) {
 }
 
 // src/templates/pages/admin-logs-list.template.ts
-chunkLAVIR5SF_cjs.init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function renderLogsListPage(data) {
   const { logs, pagination, filters, user } = data;
   const content = `
@@ -14243,7 +14243,7 @@ function renderLogsListPage(data) {
     user,
     content
   };
-  return chunkLAVIR5SF_cjs.renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 function renderLogDetailsPage(data) {
   const { log, user } = data;
@@ -14455,7 +14455,7 @@ function renderLogDetailsPage(data) {
       </div>
     </div>
   `;
-  return chunkLAVIR5SF_cjs.adminLayoutV2({
+  return chunkYU6QFFI4_cjs.adminLayoutV2({
     title: `Log Details - ${log.id}`,
     user,
     content
@@ -14698,7 +14698,7 @@ function renderLogConfigPage(data) {
 
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
   `;
-  return chunkLAVIR5SF_cjs.adminLayoutV2({
+  return chunkYU6QFFI4_cjs.adminLayoutV2({
     title: "Log Configuration",
     user,
     content
@@ -15079,7 +15079,7 @@ adminDesignRoutes.get("/", (c) => {
       role: user.role
     } : void 0
   };
-  return c.html(chunkLAVIR5SF_cjs.renderDesignPage(pageData));
+  return c.html(chunkYU6QFFI4_cjs.renderDesignPage(pageData));
 });
 var adminCheckboxRoutes = new hono.Hono();
 adminCheckboxRoutes.get("/", (c) => {
@@ -15091,613 +15091,8 @@ adminCheckboxRoutes.get("/", (c) => {
       role: user.role
     } : void 0
   };
-  return c.html(chunkLAVIR5SF_cjs.renderCheckboxPage(pageData));
+  return c.html(chunkYU6QFFI4_cjs.renderCheckboxPage(pageData));
 });
-
-// src/templates/pages/admin-faq-form.template.ts
-function renderFAQForm(data) {
-  const { faq, isEdit, errors, message, messageType } = data;
-  const pageTitle = isEdit ? "Edit FAQ" : "New FAQ";
-  const pageContent = `
-    <div class="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      <!-- Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-        <div>
-          <h1 class="text-2xl font-semibold text-white">${pageTitle}</h1>
-          <p class="mt-2 text-sm text-gray-300">
-            ${isEdit ? "Update the FAQ details below" : "Create a new frequently asked question"}
-          </p>
-        </div>
-        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <a href="/admin/faq" 
-             class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/10 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all">
-            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back to List
-          </a>
-        </div>
-      </div>
-
-      ${message ? chunkLAVIR5SF_cjs.renderAlert({ type: messageType || "info", message, dismissible: true }) : ""}
-
-      <!-- Form -->
-      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl">
-        <form ${isEdit ? `hx-put="/admin/faq/${faq?.id}"` : 'hx-post="/admin/faq"'} 
-              hx-target="body" 
-              hx-swap="outerHTML"
-              class="space-y-6 p-6">
-          
-          <!-- Question -->
-          <div>
-            <label for="question" class="block text-sm font-medium text-white">
-              Question <span class="text-red-400">*</span>
-            </label>
-            <div class="mt-1">
-              <textarea name="question" 
-                        id="question" 
-                        rows="3" 
-                        required
-                        maxlength="500"
-                        class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full"
-                        placeholder="Enter the frequently asked question...">${faq?.question || ""}</textarea>
-              <p class="mt-1 text-sm text-gray-300">
-                <span id="question-count">0</span>/500 characters
-              </p>
-            </div>
-            ${errors?.question ? `
-              <div class="mt-1">
-                ${errors.question.map((error) => `
-                  <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
-                `).join("")}
-              </div>
-            ` : ""}
-          </div>
-
-          <!-- Answer -->
-          <div>
-            <label for="answer" class="block text-sm font-medium text-white">
-              Answer <span class="text-red-400">*</span>
-            </label>
-            <div class="mt-1">
-              <textarea name="answer" 
-                        id="answer" 
-                        rows="6" 
-                        required
-                        maxlength="2000"
-                        class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full"
-                        placeholder="Enter the detailed answer...">${faq?.answer || ""}</textarea>
-              <p class="mt-1 text-sm text-gray-300">
-                <span id="answer-count">0</span>/2000 characters. You can use basic HTML for formatting.
-              </p>
-            </div>
-            ${errors?.answer ? `
-              <div class="mt-1">
-                ${errors.answer.map((error) => `
-                  <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
-                `).join("")}
-              </div>
-            ` : ""}
-          </div>
-
-          <!-- Category and Tags Row -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Category -->
-            <div>
-              <label for="category" class="block text-sm font-medium text-white">Category</label>
-              <div class="mt-1">
-                <select name="category" 
-                        id="category" 
-                        class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
-                  <option value="">Select a category</option>
-                  <option value="general" ${faq?.category === "general" ? "selected" : ""}>General</option>
-                  <option value="technical" ${faq?.category === "technical" ? "selected" : ""}>Technical</option>
-                  <option value="billing" ${faq?.category === "billing" ? "selected" : ""}>Billing</option>
-                  <option value="support" ${faq?.category === "support" ? "selected" : ""}>Support</option>
-                  <option value="account" ${faq?.category === "account" ? "selected" : ""}>Account</option>
-                  <option value="features" ${faq?.category === "features" ? "selected" : ""}>Features</option>
-                </select>
-              </div>
-              ${errors?.category ? `
-                <div class="mt-1">
-                  ${errors.category.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
-                  `).join("")}
-                </div>
-              ` : ""}
-            </div>
-
-            <!-- Tags -->
-            <div>
-              <label for="tags" class="block text-sm font-medium text-white">Tags</label>
-              <div class="mt-1">
-                <input type="text" 
-                       name="tags" 
-                       id="tags" 
-                       value="${faq?.tags || ""}"
-                       class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                       placeholder="e.g., payment, setup, troubleshooting">
-                <p class="mt-1 text-sm text-gray-300">Separate multiple tags with commas</p>
-              </div>
-              ${errors?.tags ? `
-                <div class="mt-1">
-                  ${errors.tags.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
-                  `).join("")}
-                </div>
-              ` : ""}
-            </div>
-          </div>
-
-          <!-- Status and Sort Order Row -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Published Status -->
-            <div>
-              <label class="block text-sm font-medium text-white">Status</label>
-              <div class="mt-2 space-y-2">
-                <div class="flex items-center">
-                  <input id="published" 
-                         name="isPublished" 
-                         type="radio" 
-                         value="true"
-                         ${!faq || faq.isPublished ? "checked" : ""}
-                         class="h-4 w-4 text-blue-600 focus:ring-blue-600 border-gray-600 bg-gray-700">
-                  <label for="published" class="ml-2 block text-sm text-white">
-                    Published <span class="text-gray-300">(visible to users)</span>
-                  </label>
-                </div>
-                <div class="flex items-center">
-                  <input id="draft" 
-                         name="isPublished" 
-                         type="radio" 
-                         value="false"
-                         ${faq && !faq.isPublished ? "checked" : ""}
-                         class="h-4 w-4 text-blue-600 focus:ring-blue-600 border-gray-600 bg-gray-700">
-                  <label for="draft" class="ml-2 block text-sm text-white">
-                    Draft <span class="text-gray-300">(not visible to users)</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <!-- Sort Order -->
-            <div>
-              <label for="sortOrder" class="block text-sm font-medium text-white">Sort Order</label>
-              <div class="mt-1">
-                <input type="number" 
-                       name="sortOrder" 
-                       id="sortOrder" 
-                       value="${faq?.sortOrder || 0}"
-                       min="0"
-                       step="1"
-                       class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
-                <p class="mt-1 text-sm text-gray-300">Lower numbers appear first (0 = highest priority)</p>
-              </div>
-              ${errors?.sortOrder ? `
-                <div class="mt-1">
-                  ${errors.sortOrder.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
-                  `).join("")}
-                </div>
-              ` : ""}
-            </div>
-          </div>
-
-          <!-- Form Actions -->
-          <div class="flex items-center justify-end space-x-3 pt-6 border-t border-white/20">
-            <a href="/admin/faq" 
-               class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/10 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all">
-              Cancel
-            </a>
-            <button type="submit" 
-                    class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-blue-500/80 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-blue-500 transition-all">
-              <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              ${isEdit ? "Update FAQ" : "Create FAQ"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <script>
-      // Character count for question
-      const questionTextarea = document.getElementById('question');
-      const questionCount = document.getElementById('question-count');
-      
-      function updateQuestionCount() {
-        questionCount.textContent = questionTextarea.value.length;
-      }
-      
-      questionTextarea.addEventListener('input', updateQuestionCount);
-      updateQuestionCount(); // Initial count
-
-      // Character count for answer
-      const answerTextarea = document.getElementById('answer');
-      const answerCount = document.getElementById('answer-count');
-      
-      function updateAnswerCount() {
-        answerCount.textContent = answerTextarea.value.length;
-      }
-      
-      answerTextarea.addEventListener('input', updateAnswerCount);
-      updateAnswerCount(); // Initial count
-    </script>
-  `;
-  const layoutData = {
-    title: `${pageTitle} - Admin`,
-    pageTitle,
-    currentPath: isEdit ? `/admin/faq/${faq?.id}` : "/admin/faq/new",
-    user: data.user,
-    content: pageContent
-  };
-  return chunkLAVIR5SF_cjs.renderAdminLayout(layoutData);
-}
-function escapeHtml4(unsafe) {
-  return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
-
-// src/routes/admin-faq.ts
-var faqSchema = zod.z.object({
-  question: zod.z.string().min(1, "Question is required").max(500, "Question must be under 500 characters"),
-  answer: zod.z.string().min(1, "Answer is required").max(2e3, "Answer must be under 2000 characters"),
-  category: zod.z.string().optional(),
-  tags: zod.z.string().optional(),
-  isPublished: zod.z.string().transform((val) => val === "true"),
-  sortOrder: zod.z.string().transform((val) => parseInt(val, 10)).pipe(zod.z.number().min(0))
-});
-var adminFAQRoutes = new hono.Hono();
-adminFAQRoutes.get("/", async (c) => {
-  try {
-    const user = c.get("user");
-    const { category, published, search, page = "1" } = c.req.query();
-    const currentPage = parseInt(page, 10) || 1;
-    const limit = 20;
-    const offset = (currentPage - 1) * limit;
-    const db = c.env?.DB;
-    if (!db) {
-      return c.html(chunkLAVIR5SF_cjs.renderFAQList({
-        faqs: [],
-        totalCount: 0,
-        currentPage: 1,
-        totalPages: 1,
-        user: user ? {
-          name: user.email,
-          email: user.email,
-          role: user.role
-        } : void 0,
-        message: "Database not available",
-        messageType: "error"
-      }));
-    }
-    let whereClause = "WHERE 1=1";
-    const params = [];
-    if (category) {
-      whereClause += " AND category = ?";
-      params.push(category);
-    }
-    if (published !== void 0) {
-      whereClause += " AND isPublished = ?";
-      params.push(published === "true" ? 1 : 0);
-    }
-    if (search) {
-      whereClause += " AND (question LIKE ? OR answer LIKE ? OR tags LIKE ?)";
-      const searchTerm = `%${search}%`;
-      params.push(searchTerm, searchTerm, searchTerm);
-    }
-    const countQuery = `SELECT COUNT(*) as count FROM faqs ${whereClause}`;
-    const { results: countResults } = await db.prepare(countQuery).bind(...params).all();
-    const totalCount = countResults?.[0]?.count || 0;
-    const dataQuery = `
-      SELECT * FROM faqs 
-      ${whereClause} 
-      ORDER BY sortOrder ASC, created_at DESC 
-      LIMIT ? OFFSET ?
-    `;
-    const { results: faqs } = await db.prepare(dataQuery).bind(...params, limit, offset).all();
-    const totalPages = Math.ceil(totalCount / limit);
-    return c.html(chunkLAVIR5SF_cjs.renderFAQList({
-      faqs: faqs || [],
-      totalCount,
-      currentPage,
-      totalPages,
-      user: user ? {
-        name: user.email,
-        email: user.email,
-        role: user.role
-      } : void 0
-    }));
-  } catch (error) {
-    console.error("Error fetching FAQs:", error);
-    const user = c.get("user");
-    return c.html(chunkLAVIR5SF_cjs.renderFAQList({
-      faqs: [],
-      totalCount: 0,
-      currentPage: 1,
-      totalPages: 1,
-      user: user ? {
-        name: user.email,
-        email: user.email,
-        role: user.role
-      } : void 0,
-      message: "Failed to load FAQs",
-      messageType: "error"
-    }));
-  }
-});
-adminFAQRoutes.get("/new", async (c) => {
-  const user = c.get("user");
-  return c.html(renderFAQForm({
-    isEdit: false,
-    user: user ? {
-      name: user.email,
-      email: user.email,
-      role: user.role
-    } : void 0
-  }));
-});
-adminFAQRoutes.post("/", async (c) => {
-  try {
-    const formData = await c.req.formData();
-    const data = Object.fromEntries(formData.entries());
-    const validatedData = faqSchema.parse(data);
-    const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
-      return c.html(renderFAQForm({
-        isEdit: false,
-        user: user ? {
-          name: user.email,
-          email: user.email,
-          role: user.role
-        } : void 0,
-        message: "Database not available",
-        messageType: "error"
-      }));
-    }
-    const { results } = await db.prepare(`
-      INSERT INTO faqs (question, answer, category, tags, isPublished, sortOrder)
-      VALUES (?, ?, ?, ?, ?, ?)
-      RETURNING *
-    `).bind(
-      validatedData.question,
-      validatedData.answer,
-      validatedData.category || null,
-      validatedData.tags || null,
-      validatedData.isPublished ? 1 : 0,
-      validatedData.sortOrder
-    ).all();
-    if (results && results.length > 0) {
-      return c.redirect("/admin/faq?message=FAQ created successfully");
-    } else {
-      return c.html(renderFAQForm({
-        isEdit: false,
-        user: user ? {
-          name: user.email,
-          email: user.email,
-          role: user.role
-        } : void 0,
-        message: "Failed to create FAQ",
-        messageType: "error"
-      }));
-    }
-  } catch (error) {
-    console.error("Error creating FAQ:", error);
-    const user = c.get("user");
-    if (error instanceof zod.z.ZodError) {
-      const errors = {};
-      error.errors.forEach((err) => {
-        const field = err.path[0];
-        if (!errors[field]) errors[field] = [];
-        errors[field].push(err.message);
-      });
-      return c.html(renderFAQForm({
-        isEdit: false,
-        user: user ? {
-          name: user.email,
-          email: user.email,
-          role: user.role
-        } : void 0,
-        errors,
-        message: "Please correct the errors below",
-        messageType: "error"
-      }));
-    }
-    return c.html(renderFAQForm({
-      isEdit: false,
-      user: user ? {
-        name: user.email,
-        email: user.email,
-        role: user.role
-      } : void 0,
-      message: "Failed to create FAQ",
-      messageType: "error"
-    }));
-  }
-});
-adminFAQRoutes.get("/:id", async (c) => {
-  try {
-    const id = parseInt(c.req.param("id"));
-    const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
-      return c.html(renderFAQForm({
-        isEdit: true,
-        user: user ? {
-          name: user.email,
-          email: user.email,
-          role: user.role
-        } : void 0,
-        message: "Database not available",
-        messageType: "error"
-      }));
-    }
-    const { results } = await db.prepare("SELECT * FROM faqs WHERE id = ?").bind(id).all();
-    if (!results || results.length === 0) {
-      return c.redirect("/admin/faq?message=FAQ not found&type=error");
-    }
-    const faq = results[0];
-    return c.html(renderFAQForm({
-      faq: {
-        id: faq.id,
-        question: faq.question,
-        answer: faq.answer,
-        category: faq.category,
-        tags: faq.tags,
-        isPublished: Boolean(faq.isPublished),
-        sortOrder: faq.sortOrder
-      },
-      isEdit: true,
-      user: user ? {
-        name: user.email,
-        email: user.email,
-        role: user.role
-      } : void 0
-    }));
-  } catch (error) {
-    console.error("Error fetching FAQ:", error);
-    const user = c.get("user");
-    return c.html(renderFAQForm({
-      isEdit: true,
-      user: user ? {
-        name: user.email,
-        email: user.email,
-        role: user.role
-      } : void 0,
-      message: "Failed to load FAQ",
-      messageType: "error"
-    }));
-  }
-});
-adminFAQRoutes.put("/:id", async (c) => {
-  try {
-    const id = parseInt(c.req.param("id"));
-    const formData = await c.req.formData();
-    const data = Object.fromEntries(formData.entries());
-    const validatedData = faqSchema.parse(data);
-    const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
-      return c.html(renderFAQForm({
-        isEdit: true,
-        user: user ? {
-          name: user.email,
-          email: user.email,
-          role: user.role
-        } : void 0,
-        message: "Database not available",
-        messageType: "error"
-      }));
-    }
-    const { results } = await db.prepare(`
-      UPDATE faqs 
-      SET question = ?, answer = ?, category = ?, tags = ?, isPublished = ?, sortOrder = ?
-      WHERE id = ?
-      RETURNING *
-    `).bind(
-      validatedData.question,
-      validatedData.answer,
-      validatedData.category || null,
-      validatedData.tags || null,
-      validatedData.isPublished ? 1 : 0,
-      validatedData.sortOrder,
-      id
-    ).all();
-    if (results && results.length > 0) {
-      return c.redirect("/admin/faq?message=FAQ updated successfully");
-    } else {
-      return c.html(renderFAQForm({
-        faq: {
-          id,
-          question: validatedData.question,
-          answer: validatedData.answer,
-          category: validatedData.category,
-          tags: validatedData.tags,
-          isPublished: validatedData.isPublished,
-          sortOrder: validatedData.sortOrder
-        },
-        isEdit: true,
-        user: user ? {
-          name: user.email,
-          email: user.email,
-          role: user.role
-        } : void 0,
-        message: "FAQ not found",
-        messageType: "error"
-      }));
-    }
-  } catch (error) {
-    console.error("Error updating FAQ:", error);
-    const user = c.get("user");
-    const id = parseInt(c.req.param("id"));
-    if (error instanceof zod.z.ZodError) {
-      const errors = {};
-      error.errors.forEach((err) => {
-        const field = err.path[0];
-        if (!errors[field]) errors[field] = [];
-        errors[field].push(err.message);
-      });
-      return c.html(renderFAQForm({
-        faq: {
-          id,
-          question: "",
-          answer: "",
-          category: "",
-          tags: "",
-          isPublished: true,
-          sortOrder: 0
-        },
-        isEdit: true,
-        user: user ? {
-          name: user.email,
-          email: user.email,
-          role: user.role
-        } : void 0,
-        errors,
-        message: "Please correct the errors below",
-        messageType: "error"
-      }));
-    }
-    return c.html(renderFAQForm({
-      faq: {
-        id,
-        question: "",
-        answer: "",
-        category: "",
-        tags: "",
-        isPublished: true,
-        sortOrder: 0
-      },
-      isEdit: true,
-      user: user ? {
-        name: user.email,
-        email: user.email,
-        role: user.role
-      } : void 0,
-      message: "Failed to update FAQ",
-      messageType: "error"
-    }));
-  }
-});
-adminFAQRoutes.delete("/:id", async (c) => {
-  try {
-    const id = parseInt(c.req.param("id"));
-    const db = c.env?.DB;
-    if (!db) {
-      return c.json({ error: "Database not available" }, 500);
-    }
-    const { changes } = await db.prepare("DELETE FROM faqs WHERE id = ?").bind(id).run();
-    if (changes === 0) {
-      return c.json({ error: "FAQ not found" }, 404);
-    }
-    return c.redirect("/admin/faq?message=FAQ deleted successfully");
-  } catch (error) {
-    console.error("Error deleting FAQ:", error);
-    return c.json({ error: "Failed to delete FAQ" }, 500);
-  }
-});
-var admin_faq_default = adminFAQRoutes;
 
 // src/templates/pages/admin-testimonials-form.template.ts
 function renderTestimonialsForm(data) {
@@ -15724,7 +15119,7 @@ function renderTestimonialsForm(data) {
         </div>
       </div>
 
-      ${message ? chunkLAVIR5SF_cjs.renderAlert({ type: messageType || "info", message, dismissible: true }) : ""}
+      ${message ? chunkYU6QFFI4_cjs.renderAlert({ type: messageType || "info", message, dismissible: true }) : ""}
 
       <!-- Form -->
       <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl">
@@ -15755,7 +15150,7 @@ function renderTestimonialsForm(data) {
               ${errors?.authorName ? `
                 <div class="mt-1">
                   ${errors.authorName.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                    <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
                   `).join("")}
                 </div>
               ` : ""}
@@ -15777,7 +15172,7 @@ function renderTestimonialsForm(data) {
                 ${errors?.authorTitle ? `
                   <div class="mt-1">
                     ${errors.authorTitle.map((error) => `
-                      <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                      <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
                     `).join("")}
                   </div>
                 ` : ""}
@@ -15798,7 +15193,7 @@ function renderTestimonialsForm(data) {
                 ${errors?.authorCompany ? `
                   <div class="mt-1">
                     ${errors.authorCompany.map((error) => `
-                      <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                      <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
                     `).join("")}
                   </div>
                 ` : ""}
@@ -15830,7 +15225,7 @@ function renderTestimonialsForm(data) {
               ${errors?.testimonialText ? `
                 <div class="mt-1">
                   ${errors.testimonialText.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                    <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
                   `).join("")}
                 </div>
               ` : ""}
@@ -15854,7 +15249,7 @@ function renderTestimonialsForm(data) {
               ${errors?.rating ? `
                 <div class="mt-1">
                   ${errors.rating.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                    <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
                   `).join("")}
                 </div>
               ` : ""}
@@ -15908,7 +15303,7 @@ function renderTestimonialsForm(data) {
               ${errors?.sortOrder ? `
                 <div class="mt-1">
                   ${errors.sortOrder.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                    <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
                   `).join("")}
                 </div>
               ` : ""}
@@ -15953,9 +15348,9 @@ function renderTestimonialsForm(data) {
     user: data.user,
     content: pageContent
   };
-  return chunkLAVIR5SF_cjs.renderAdminLayout(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayout(layoutData);
 }
-function escapeHtml5(unsafe) {
+function escapeHtml4(unsafe) {
   return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
@@ -15979,7 +15374,7 @@ adminTestimonialsRoutes.get("/", async (c) => {
     const offset = (currentPage - 1) * limit;
     const db = c.env?.DB;
     if (!db) {
-      return c.html(chunkLAVIR5SF_cjs.renderTestimonialsList({
+      return c.html(chunkYU6QFFI4_cjs.renderTestimonialsList({
         testimonials: [],
         totalCount: 0,
         currentPage: 1,
@@ -16019,7 +15414,7 @@ adminTestimonialsRoutes.get("/", async (c) => {
     `;
     const { results: testimonials } = await db.prepare(dataQuery).bind(...params, limit, offset).all();
     const totalPages = Math.ceil(totalCount / limit);
-    return c.html(chunkLAVIR5SF_cjs.renderTestimonialsList({
+    return c.html(chunkYU6QFFI4_cjs.renderTestimonialsList({
       testimonials: testimonials || [],
       totalCount,
       currentPage,
@@ -16033,7 +15428,7 @@ adminTestimonialsRoutes.get("/", async (c) => {
   } catch (error) {
     console.error("Error fetching testimonials:", error);
     const user = c.get("user");
-    return c.html(chunkLAVIR5SF_cjs.renderTestimonialsList({
+    return c.html(chunkYU6QFFI4_cjs.renderTestimonialsList({
       testimonials: [],
       totalCount: 0,
       currentPage: 1,
@@ -16352,7 +15747,7 @@ function renderCodeExamplesForm(data) {
         </div>
       </div>
 
-      ${message ? chunkLAVIR5SF_cjs.renderAlert({ type: messageType || "info", message, dismissible: true }) : ""}
+      ${message ? chunkYU6QFFI4_cjs.renderAlert({ type: messageType || "info", message, dismissible: true }) : ""}
 
       <!-- Form -->
       <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl">
@@ -16383,7 +15778,7 @@ function renderCodeExamplesForm(data) {
               ${errors?.title ? `
                 <div class="mt-1">
                   ${errors.title.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
                   `).join("")}
                 </div>
               ` : ""}
@@ -16406,7 +15801,7 @@ function renderCodeExamplesForm(data) {
               ${errors?.description ? `
                 <div class="mt-1">
                   ${errors.description.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
                   `).join("")}
                 </div>
               ` : ""}
@@ -16438,7 +15833,7 @@ function renderCodeExamplesForm(data) {
                 ${errors?.language ? `
                   <div class="mt-1">
                     ${errors.language.map((error) => `
-                      <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                      <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
                     `).join("")}
                   </div>
                 ` : ""}
@@ -16459,7 +15854,7 @@ function renderCodeExamplesForm(data) {
                 ${errors?.category ? `
                   <div class="mt-1">
                     ${errors.category.map((error) => `
-                      <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                      <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
                     `).join("")}
                   </div>
                 ` : ""}
@@ -16481,7 +15876,7 @@ function renderCodeExamplesForm(data) {
                 ${errors?.tags ? `
                   <div class="mt-1">
                     ${errors.tags.map((error) => `
-                      <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                      <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
                     `).join("")}
                   </div>
                 ` : ""}
@@ -16512,7 +15907,7 @@ function renderCodeExamplesForm(data) {
               ${errors?.code ? `
                 <div class="mt-1">
                   ${errors.code.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
                   `).join("")}
                 </div>
               ` : ""}
@@ -16566,7 +15961,7 @@ function renderCodeExamplesForm(data) {
               ${errors?.sortOrder ? `
                 <div class="mt-1">
                   ${errors.sortOrder.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
                   `).join("")}
                 </div>
               ` : ""}
@@ -16622,9 +16017,9 @@ function renderCodeExamplesForm(data) {
     user: data.user,
     content: pageContent
   };
-  return chunkLAVIR5SF_cjs.renderAdminLayout(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayout(layoutData);
 }
-function escapeHtml6(unsafe) {
+function escapeHtml5(unsafe) {
   return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
@@ -16649,7 +16044,7 @@ adminCodeExamplesRoutes.get("/", async (c) => {
     const offset = (currentPage - 1) * limit;
     const db = c.env?.DB;
     if (!db) {
-      return c.html(chunkLAVIR5SF_cjs.renderCodeExamplesList({
+      return c.html(chunkYU6QFFI4_cjs.renderCodeExamplesList({
         codeExamples: [],
         totalCount: 0,
         currentPage: 1,
@@ -16689,7 +16084,7 @@ adminCodeExamplesRoutes.get("/", async (c) => {
     `;
     const { results: codeExamples } = await db.prepare(dataQuery).bind(...params, limit, offset).all();
     const totalPages = Math.ceil(totalCount / limit);
-    return c.html(chunkLAVIR5SF_cjs.renderCodeExamplesList({
+    return c.html(chunkYU6QFFI4_cjs.renderCodeExamplesList({
       codeExamples: codeExamples || [],
       totalCount,
       currentPage,
@@ -16703,7 +16098,7 @@ adminCodeExamplesRoutes.get("/", async (c) => {
   } catch (error) {
     console.error("Error fetching code examples:", error);
     const user = c.get("user");
-    return c.html(chunkLAVIR5SF_cjs.renderCodeExamplesList({
+    return c.html(chunkYU6QFFI4_cjs.renderCodeExamplesList({
       codeExamples: [],
       totalCount: 0,
       currentPage: 1,
@@ -17092,7 +16487,7 @@ function renderDashboardPage(data) {
     version: data.version,
     content: pageContent
   };
-  return chunkLAVIR5SF_cjs.renderAdminLayout(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayout(layoutData);
 }
 function renderStatsCards(stats) {
   const cards = [
@@ -17867,7 +17262,7 @@ router.get("/system-status", async (c) => {
 });
 
 // src/templates/pages/admin-collections-list.template.ts
-chunkLAVIR5SF_cjs.init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 
 // src/templates/components/table.template.ts
 function renderTable2(data) {
@@ -18341,11 +17736,11 @@ function renderCollectionsListPage(data) {
     version: data.version,
     content: pageContent
   };
-  return chunkLAVIR5SF_cjs.renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/pages/admin-collections-form.template.ts
-chunkLAVIR5SF_cjs.init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function renderCollectionFormPage(data) {
   const isEdit = data.isEdit || !!data.id;
   const title = isEdit ? "Edit Collection" : "Create New Collection";
@@ -18589,7 +17984,7 @@ function renderCollectionFormPage(data) {
             }
           </style>
           
-          ${chunkLAVIR5SF_cjs.renderForm(formData)}
+          ${chunkYU6QFFI4_cjs.renderForm(formData)}
 
           ${isEdit && data.managed ? `
             <!-- Read-Only Fields Display for Managed Collections -->
@@ -19305,7 +18700,7 @@ function renderCollectionFormPage(data) {
     version: data.version,
     content: pageContent
   };
-  return chunkLAVIR5SF_cjs.renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/routes/admin-collections.ts
@@ -19799,7 +19194,7 @@ adminCollectionsRoutes.post("/:collectionId/fields/reorder", async (c) => {
 });
 
 // src/templates/pages/admin-settings.template.ts
-chunkLAVIR5SF_cjs.init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function renderSettingsPage(data) {
   const activeTab = data.activeTab || "general";
   const pageContent = `
@@ -20230,7 +19625,7 @@ function renderSettingsPage(data) {
     version: data.version,
     content: pageContent
   };
-  return chunkLAVIR5SF_cjs.renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 function renderTabButton(tabId, label, iconPath, activeTab) {
   const isActive = activeTab === tabId;
@@ -21670,7 +21065,6 @@ var ROUTES_INFO = {
     "adminLogsRoutes",
     "adminDesignRoutes",
     "adminCheckboxRoutes",
-    "adminFAQRoutes",
     "adminTestimonialsRoutes",
     "adminCodeExamplesRoutes",
     "adminDashboardRoutes",
@@ -21693,7 +21087,6 @@ exports.adminSettingsRoutes = adminSettingsRoutes;
 exports.admin_api_default = admin_api_default;
 exports.admin_code_examples_default = admin_code_examples_default;
 exports.admin_content_default = admin_content_default;
-exports.admin_faq_default = admin_faq_default;
 exports.admin_testimonials_default = admin_testimonials_default;
 exports.api_content_crud_default = api_content_crud_default;
 exports.api_default = api_default;
@@ -21702,5 +21095,5 @@ exports.api_system_default = api_system_default;
 exports.auth_default = auth_default;
 exports.router = router;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-CELE3GH2.cjs.map
-//# sourceMappingURL=chunk-CELE3GH2.cjs.map
+//# sourceMappingURL=chunk-Z474VQJW.cjs.map
+//# sourceMappingURL=chunk-Z474VQJW.cjs.map

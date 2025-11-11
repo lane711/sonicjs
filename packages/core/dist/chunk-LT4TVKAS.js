@@ -2,7 +2,7 @@ import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './ch
 import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-UWF4OCAZ.js';
 import { PluginService } from './chunk-IYD4SXSJ.js';
 import { MigrationService } from './chunk-ZPMFT2JW.js';
-import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderFAQList, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-35N5HXXG.js';
+import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-5RKQB2JG.js';
 import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-4ILPYYDM.js';
 import { metricsTracker } from './chunk-FICTAGD4.js';
 import { Hono } from 'hono';
@@ -1924,7 +1924,7 @@ function renderLoginPage(data, demoLoginActive = false) {
 
             if (emailInput && passwordInput) {
               emailInput.value = 'admin@sonicjs.com';
-              passwordInput.value = 'admin123';
+              passwordInput.value = 'sonicjs!';
 
               // Add visual indication that form is prefilled (only if not already present)
               const form = emailInput.closest('form');
@@ -8294,7 +8294,7 @@ function renderUsersListPage(data) {
       sortable: true,
       sortType: "string",
       render: (_value, row) => {
-        const escapeHtml7 = (text) => text.replace(/[&<>"']/g, (char) => ({
+        const escapeHtml6 = (text) => text.replace(/[&<>"']/g, (char) => ({
           "&": "&amp;",
           "<": "&lt;",
           ">": "&gt;",
@@ -8303,9 +8303,9 @@ function renderUsersListPage(data) {
         })[char] || char);
         const truncatedFirstName = row.firstName.length > 25 ? row.firstName.substring(0, 25) + "..." : row.firstName;
         const truncatedLastName = row.lastName.length > 25 ? row.lastName.substring(0, 25) + "..." : row.lastName;
-        const fullName = escapeHtml7(`${truncatedFirstName} ${truncatedLastName}`);
+        const fullName = escapeHtml6(`${truncatedFirstName} ${truncatedLastName}`);
         const truncatedUsername = row.username.length > 100 ? row.username.substring(0, 100) + "..." : row.username;
-        const username = escapeHtml7(truncatedUsername);
+        const username = escapeHtml6(truncatedUsername);
         const statusBadge = row.isActive ? '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-lime-50 dark:bg-lime-500/10 text-lime-700 dark:text-lime-300 ring-1 ring-inset ring-lime-700/10 dark:ring-lime-400/20 ml-2">Active</span>' : '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-700/10 dark:ring-red-500/20 ml-2">Inactive</span>';
         return `
           <div>
@@ -8321,14 +8321,14 @@ function renderUsersListPage(data) {
       sortable: true,
       sortType: "string",
       render: (value) => {
-        const escapeHtml7 = (text) => text.replace(/[&<>"']/g, (char) => ({
+        const escapeHtml6 = (text) => text.replace(/[&<>"']/g, (char) => ({
           "&": "&amp;",
           "<": "&lt;",
           ">": "&gt;",
           '"': "&quot;",
           "'": "&#39;"
         })[char] || char);
-        const escapedEmail = escapeHtml7(value);
+        const escapedEmail = escapeHtml6(value);
         return `<a href="mailto:${escapedEmail}" class="text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors">${escapedEmail}</a>`;
       }
     },
@@ -13468,7 +13468,7 @@ var AVAILABLE_PLUGINS = [
     id: "demo-login-prefill",
     name: "demo-login-plugin",
     display_name: "Demo Login Prefill",
-    description: "Prefills login form with demo credentials (admin@sonicjs.com/admin123) for easy site demonstration",
+    description: "Prefills login form with demo credentials (admin@sonicjs.com/sonicjs!) for easy site demonstration",
     version: "1.0.0-beta.1",
     author: "SonicJS",
     category: "demo",
@@ -13723,7 +13723,7 @@ adminPluginRoutes.post("/install", async (c) => {
         id: "demo-login-prefill",
         name: "demo-login-plugin",
         display_name: "Demo Login Prefill",
-        description: "Prefills login form with demo credentials (admin@sonicjs.com/admin123) for easy site demonstration",
+        description: "Prefills login form with demo credentials (admin@sonicjs.com/sonicjs!) for easy site demonstration",
         version: "1.0.0-beta.1",
         author: "SonicJS",
         category: "demo",
@@ -13733,7 +13733,7 @@ adminPluginRoutes.post("/install", async (c) => {
         settings: {
           enableNotice: true,
           demoEmail: "admin@sonicjs.com",
-          demoPassword: "admin123"
+          demoPassword: "sonicjs!"
         }
       });
       return c.json({ success: true, plugin: demoPlugin });
@@ -15092,611 +15092,6 @@ adminCheckboxRoutes.get("/", (c) => {
   return c.html(renderCheckboxPage(pageData));
 });
 
-// src/templates/pages/admin-faq-form.template.ts
-function renderFAQForm(data) {
-  const { faq, isEdit, errors, message, messageType } = data;
-  const pageTitle = isEdit ? "Edit FAQ" : "New FAQ";
-  const pageContent = `
-    <div class="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      <!-- Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-        <div>
-          <h1 class="text-2xl font-semibold text-white">${pageTitle}</h1>
-          <p class="mt-2 text-sm text-gray-300">
-            ${isEdit ? "Update the FAQ details below" : "Create a new frequently asked question"}
-          </p>
-        </div>
-        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <a href="/admin/faq" 
-             class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/10 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all">
-            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back to List
-          </a>
-        </div>
-      </div>
-
-      ${message ? renderAlert({ type: messageType || "info", message, dismissible: true }) : ""}
-
-      <!-- Form -->
-      <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl">
-        <form ${isEdit ? `hx-put="/admin/faq/${faq?.id}"` : 'hx-post="/admin/faq"'} 
-              hx-target="body" 
-              hx-swap="outerHTML"
-              class="space-y-6 p-6">
-          
-          <!-- Question -->
-          <div>
-            <label for="question" class="block text-sm font-medium text-white">
-              Question <span class="text-red-400">*</span>
-            </label>
-            <div class="mt-1">
-              <textarea name="question" 
-                        id="question" 
-                        rows="3" 
-                        required
-                        maxlength="500"
-                        class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full"
-                        placeholder="Enter the frequently asked question...">${faq?.question || ""}</textarea>
-              <p class="mt-1 text-sm text-gray-300">
-                <span id="question-count">0</span>/500 characters
-              </p>
-            </div>
-            ${errors?.question ? `
-              <div class="mt-1">
-                ${errors.question.map((error) => `
-                  <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
-                `).join("")}
-              </div>
-            ` : ""}
-          </div>
-
-          <!-- Answer -->
-          <div>
-            <label for="answer" class="block text-sm font-medium text-white">
-              Answer <span class="text-red-400">*</span>
-            </label>
-            <div class="mt-1">
-              <textarea name="answer" 
-                        id="answer" 
-                        rows="6" 
-                        required
-                        maxlength="2000"
-                        class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full"
-                        placeholder="Enter the detailed answer...">${faq?.answer || ""}</textarea>
-              <p class="mt-1 text-sm text-gray-300">
-                <span id="answer-count">0</span>/2000 characters. You can use basic HTML for formatting.
-              </p>
-            </div>
-            ${errors?.answer ? `
-              <div class="mt-1">
-                ${errors.answer.map((error) => `
-                  <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
-                `).join("")}
-              </div>
-            ` : ""}
-          </div>
-
-          <!-- Category and Tags Row -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Category -->
-            <div>
-              <label for="category" class="block text-sm font-medium text-white">Category</label>
-              <div class="mt-1">
-                <select name="category" 
-                        id="category" 
-                        class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
-                  <option value="">Select a category</option>
-                  <option value="general" ${faq?.category === "general" ? "selected" : ""}>General</option>
-                  <option value="technical" ${faq?.category === "technical" ? "selected" : ""}>Technical</option>
-                  <option value="billing" ${faq?.category === "billing" ? "selected" : ""}>Billing</option>
-                  <option value="support" ${faq?.category === "support" ? "selected" : ""}>Support</option>
-                  <option value="account" ${faq?.category === "account" ? "selected" : ""}>Account</option>
-                  <option value="features" ${faq?.category === "features" ? "selected" : ""}>Features</option>
-                </select>
-              </div>
-              ${errors?.category ? `
-                <div class="mt-1">
-                  ${errors.category.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
-                  `).join("")}
-                </div>
-              ` : ""}
-            </div>
-
-            <!-- Tags -->
-            <div>
-              <label for="tags" class="block text-sm font-medium text-white">Tags</label>
-              <div class="mt-1">
-                <input type="text" 
-                       name="tags" 
-                       id="tags" 
-                       value="${faq?.tags || ""}"
-                       class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                       placeholder="e.g., payment, setup, troubleshooting">
-                <p class="mt-1 text-sm text-gray-300">Separate multiple tags with commas</p>
-              </div>
-              ${errors?.tags ? `
-                <div class="mt-1">
-                  ${errors.tags.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
-                  `).join("")}
-                </div>
-              ` : ""}
-            </div>
-          </div>
-
-          <!-- Status and Sort Order Row -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Published Status -->
-            <div>
-              <label class="block text-sm font-medium text-white">Status</label>
-              <div class="mt-2 space-y-2">
-                <div class="flex items-center">
-                  <input id="published" 
-                         name="isPublished" 
-                         type="radio" 
-                         value="true"
-                         ${!faq || faq.isPublished ? "checked" : ""}
-                         class="h-4 w-4 text-blue-600 focus:ring-blue-600 border-gray-600 bg-gray-700">
-                  <label for="published" class="ml-2 block text-sm text-white">
-                    Published <span class="text-gray-300">(visible to users)</span>
-                  </label>
-                </div>
-                <div class="flex items-center">
-                  <input id="draft" 
-                         name="isPublished" 
-                         type="radio" 
-                         value="false"
-                         ${faq && !faq.isPublished ? "checked" : ""}
-                         class="h-4 w-4 text-blue-600 focus:ring-blue-600 border-gray-600 bg-gray-700">
-                  <label for="draft" class="ml-2 block text-sm text-white">
-                    Draft <span class="text-gray-300">(not visible to users)</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <!-- Sort Order -->
-            <div>
-              <label for="sortOrder" class="block text-sm font-medium text-white">Sort Order</label>
-              <div class="mt-1">
-                <input type="number" 
-                       name="sortOrder" 
-                       id="sortOrder" 
-                       value="${faq?.sortOrder || 0}"
-                       min="0"
-                       step="1"
-                       class="block w-full rounded-md border-0 bg-gray-700 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
-                <p class="mt-1 text-sm text-gray-300">Lower numbers appear first (0 = highest priority)</p>
-              </div>
-              ${errors?.sortOrder ? `
-                <div class="mt-1">
-                  ${errors.sortOrder.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
-                  `).join("")}
-                </div>
-              ` : ""}
-            </div>
-          </div>
-
-          <!-- Form Actions -->
-          <div class="flex items-center justify-end space-x-3 pt-6 border-t border-white/20">
-            <a href="/admin/faq" 
-               class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/10 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all">
-              Cancel
-            </a>
-            <button type="submit" 
-                    class="inline-flex items-center justify-center rounded-xl backdrop-blur-sm bg-blue-500/80 px-4 py-2 text-sm font-semibold text-white border border-white/20 hover:bg-blue-500 transition-all">
-              <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              ${isEdit ? "Update FAQ" : "Create FAQ"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <script>
-      // Character count for question
-      const questionTextarea = document.getElementById('question');
-      const questionCount = document.getElementById('question-count');
-      
-      function updateQuestionCount() {
-        questionCount.textContent = questionTextarea.value.length;
-      }
-      
-      questionTextarea.addEventListener('input', updateQuestionCount);
-      updateQuestionCount(); // Initial count
-
-      // Character count for answer
-      const answerTextarea = document.getElementById('answer');
-      const answerCount = document.getElementById('answer-count');
-      
-      function updateAnswerCount() {
-        answerCount.textContent = answerTextarea.value.length;
-      }
-      
-      answerTextarea.addEventListener('input', updateAnswerCount);
-      updateAnswerCount(); // Initial count
-    </script>
-  `;
-  const layoutData = {
-    title: `${pageTitle} - Admin`,
-    pageTitle,
-    currentPath: isEdit ? `/admin/faq/${faq?.id}` : "/admin/faq/new",
-    user: data.user,
-    content: pageContent
-  };
-  return renderAdminLayout(layoutData);
-}
-function escapeHtml4(unsafe) {
-  return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
-
-// src/routes/admin-faq.ts
-var faqSchema = z.object({
-  question: z.string().min(1, "Question is required").max(500, "Question must be under 500 characters"),
-  answer: z.string().min(1, "Answer is required").max(2e3, "Answer must be under 2000 characters"),
-  category: z.string().optional(),
-  tags: z.string().optional(),
-  isPublished: z.string().transform((val) => val === "true"),
-  sortOrder: z.string().transform((val) => parseInt(val, 10)).pipe(z.number().min(0))
-});
-var adminFAQRoutes = new Hono();
-adminFAQRoutes.get("/", async (c) => {
-  try {
-    const user = c.get("user");
-    const { category, published, search, page = "1" } = c.req.query();
-    const currentPage = parseInt(page, 10) || 1;
-    const limit = 20;
-    const offset = (currentPage - 1) * limit;
-    const db = c.env?.DB;
-    if (!db) {
-      return c.html(renderFAQList({
-        faqs: [],
-        totalCount: 0,
-        currentPage: 1,
-        totalPages: 1,
-        user: user ? {
-          name: user.email,
-          email: user.email,
-          role: user.role
-        } : void 0,
-        message: "Database not available",
-        messageType: "error"
-      }));
-    }
-    let whereClause = "WHERE 1=1";
-    const params = [];
-    if (category) {
-      whereClause += " AND category = ?";
-      params.push(category);
-    }
-    if (published !== void 0) {
-      whereClause += " AND isPublished = ?";
-      params.push(published === "true" ? 1 : 0);
-    }
-    if (search) {
-      whereClause += " AND (question LIKE ? OR answer LIKE ? OR tags LIKE ?)";
-      const searchTerm = `%${search}%`;
-      params.push(searchTerm, searchTerm, searchTerm);
-    }
-    const countQuery = `SELECT COUNT(*) as count FROM faqs ${whereClause}`;
-    const { results: countResults } = await db.prepare(countQuery).bind(...params).all();
-    const totalCount = countResults?.[0]?.count || 0;
-    const dataQuery = `
-      SELECT * FROM faqs 
-      ${whereClause} 
-      ORDER BY sortOrder ASC, created_at DESC 
-      LIMIT ? OFFSET ?
-    `;
-    const { results: faqs } = await db.prepare(dataQuery).bind(...params, limit, offset).all();
-    const totalPages = Math.ceil(totalCount / limit);
-    return c.html(renderFAQList({
-      faqs: faqs || [],
-      totalCount,
-      currentPage,
-      totalPages,
-      user: user ? {
-        name: user.email,
-        email: user.email,
-        role: user.role
-      } : void 0
-    }));
-  } catch (error) {
-    console.error("Error fetching FAQs:", error);
-    const user = c.get("user");
-    return c.html(renderFAQList({
-      faqs: [],
-      totalCount: 0,
-      currentPage: 1,
-      totalPages: 1,
-      user: user ? {
-        name: user.email,
-        email: user.email,
-        role: user.role
-      } : void 0,
-      message: "Failed to load FAQs",
-      messageType: "error"
-    }));
-  }
-});
-adminFAQRoutes.get("/new", async (c) => {
-  const user = c.get("user");
-  return c.html(renderFAQForm({
-    isEdit: false,
-    user: user ? {
-      name: user.email,
-      email: user.email,
-      role: user.role
-    } : void 0
-  }));
-});
-adminFAQRoutes.post("/", async (c) => {
-  try {
-    const formData = await c.req.formData();
-    const data = Object.fromEntries(formData.entries());
-    const validatedData = faqSchema.parse(data);
-    const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
-      return c.html(renderFAQForm({
-        isEdit: false,
-        user: user ? {
-          name: user.email,
-          email: user.email,
-          role: user.role
-        } : void 0,
-        message: "Database not available",
-        messageType: "error"
-      }));
-    }
-    const { results } = await db.prepare(`
-      INSERT INTO faqs (question, answer, category, tags, isPublished, sortOrder)
-      VALUES (?, ?, ?, ?, ?, ?)
-      RETURNING *
-    `).bind(
-      validatedData.question,
-      validatedData.answer,
-      validatedData.category || null,
-      validatedData.tags || null,
-      validatedData.isPublished ? 1 : 0,
-      validatedData.sortOrder
-    ).all();
-    if (results && results.length > 0) {
-      return c.redirect("/admin/faq?message=FAQ created successfully");
-    } else {
-      return c.html(renderFAQForm({
-        isEdit: false,
-        user: user ? {
-          name: user.email,
-          email: user.email,
-          role: user.role
-        } : void 0,
-        message: "Failed to create FAQ",
-        messageType: "error"
-      }));
-    }
-  } catch (error) {
-    console.error("Error creating FAQ:", error);
-    const user = c.get("user");
-    if (error instanceof z.ZodError) {
-      const errors = {};
-      error.errors.forEach((err) => {
-        const field = err.path[0];
-        if (!errors[field]) errors[field] = [];
-        errors[field].push(err.message);
-      });
-      return c.html(renderFAQForm({
-        isEdit: false,
-        user: user ? {
-          name: user.email,
-          email: user.email,
-          role: user.role
-        } : void 0,
-        errors,
-        message: "Please correct the errors below",
-        messageType: "error"
-      }));
-    }
-    return c.html(renderFAQForm({
-      isEdit: false,
-      user: user ? {
-        name: user.email,
-        email: user.email,
-        role: user.role
-      } : void 0,
-      message: "Failed to create FAQ",
-      messageType: "error"
-    }));
-  }
-});
-adminFAQRoutes.get("/:id", async (c) => {
-  try {
-    const id = parseInt(c.req.param("id"));
-    const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
-      return c.html(renderFAQForm({
-        isEdit: true,
-        user: user ? {
-          name: user.email,
-          email: user.email,
-          role: user.role
-        } : void 0,
-        message: "Database not available",
-        messageType: "error"
-      }));
-    }
-    const { results } = await db.prepare("SELECT * FROM faqs WHERE id = ?").bind(id).all();
-    if (!results || results.length === 0) {
-      return c.redirect("/admin/faq?message=FAQ not found&type=error");
-    }
-    const faq = results[0];
-    return c.html(renderFAQForm({
-      faq: {
-        id: faq.id,
-        question: faq.question,
-        answer: faq.answer,
-        category: faq.category,
-        tags: faq.tags,
-        isPublished: Boolean(faq.isPublished),
-        sortOrder: faq.sortOrder
-      },
-      isEdit: true,
-      user: user ? {
-        name: user.email,
-        email: user.email,
-        role: user.role
-      } : void 0
-    }));
-  } catch (error) {
-    console.error("Error fetching FAQ:", error);
-    const user = c.get("user");
-    return c.html(renderFAQForm({
-      isEdit: true,
-      user: user ? {
-        name: user.email,
-        email: user.email,
-        role: user.role
-      } : void 0,
-      message: "Failed to load FAQ",
-      messageType: "error"
-    }));
-  }
-});
-adminFAQRoutes.put("/:id", async (c) => {
-  try {
-    const id = parseInt(c.req.param("id"));
-    const formData = await c.req.formData();
-    const data = Object.fromEntries(formData.entries());
-    const validatedData = faqSchema.parse(data);
-    const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
-      return c.html(renderFAQForm({
-        isEdit: true,
-        user: user ? {
-          name: user.email,
-          email: user.email,
-          role: user.role
-        } : void 0,
-        message: "Database not available",
-        messageType: "error"
-      }));
-    }
-    const { results } = await db.prepare(`
-      UPDATE faqs 
-      SET question = ?, answer = ?, category = ?, tags = ?, isPublished = ?, sortOrder = ?
-      WHERE id = ?
-      RETURNING *
-    `).bind(
-      validatedData.question,
-      validatedData.answer,
-      validatedData.category || null,
-      validatedData.tags || null,
-      validatedData.isPublished ? 1 : 0,
-      validatedData.sortOrder,
-      id
-    ).all();
-    if (results && results.length > 0) {
-      return c.redirect("/admin/faq?message=FAQ updated successfully");
-    } else {
-      return c.html(renderFAQForm({
-        faq: {
-          id,
-          question: validatedData.question,
-          answer: validatedData.answer,
-          category: validatedData.category,
-          tags: validatedData.tags,
-          isPublished: validatedData.isPublished,
-          sortOrder: validatedData.sortOrder
-        },
-        isEdit: true,
-        user: user ? {
-          name: user.email,
-          email: user.email,
-          role: user.role
-        } : void 0,
-        message: "FAQ not found",
-        messageType: "error"
-      }));
-    }
-  } catch (error) {
-    console.error("Error updating FAQ:", error);
-    const user = c.get("user");
-    const id = parseInt(c.req.param("id"));
-    if (error instanceof z.ZodError) {
-      const errors = {};
-      error.errors.forEach((err) => {
-        const field = err.path[0];
-        if (!errors[field]) errors[field] = [];
-        errors[field].push(err.message);
-      });
-      return c.html(renderFAQForm({
-        faq: {
-          id,
-          question: "",
-          answer: "",
-          category: "",
-          tags: "",
-          isPublished: true,
-          sortOrder: 0
-        },
-        isEdit: true,
-        user: user ? {
-          name: user.email,
-          email: user.email,
-          role: user.role
-        } : void 0,
-        errors,
-        message: "Please correct the errors below",
-        messageType: "error"
-      }));
-    }
-    return c.html(renderFAQForm({
-      faq: {
-        id,
-        question: "",
-        answer: "",
-        category: "",
-        tags: "",
-        isPublished: true,
-        sortOrder: 0
-      },
-      isEdit: true,
-      user: user ? {
-        name: user.email,
-        email: user.email,
-        role: user.role
-      } : void 0,
-      message: "Failed to update FAQ",
-      messageType: "error"
-    }));
-  }
-});
-adminFAQRoutes.delete("/:id", async (c) => {
-  try {
-    const id = parseInt(c.req.param("id"));
-    const db = c.env?.DB;
-    if (!db) {
-      return c.json({ error: "Database not available" }, 500);
-    }
-    const { changes } = await db.prepare("DELETE FROM faqs WHERE id = ?").bind(id).run();
-    if (changes === 0) {
-      return c.json({ error: "FAQ not found" }, 404);
-    }
-    return c.redirect("/admin/faq?message=FAQ deleted successfully");
-  } catch (error) {
-    console.error("Error deleting FAQ:", error);
-    return c.json({ error: "Failed to delete FAQ" }, 500);
-  }
-});
-var admin_faq_default = adminFAQRoutes;
-
 // src/templates/pages/admin-testimonials-form.template.ts
 function renderTestimonialsForm(data) {
   const { testimonial, isEdit, errors, message, messageType } = data;
@@ -15753,7 +15148,7 @@ function renderTestimonialsForm(data) {
               ${errors?.authorName ? `
                 <div class="mt-1">
                   ${errors.authorName.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                    <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
                   `).join("")}
                 </div>
               ` : ""}
@@ -15775,7 +15170,7 @@ function renderTestimonialsForm(data) {
                 ${errors?.authorTitle ? `
                   <div class="mt-1">
                     ${errors.authorTitle.map((error) => `
-                      <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                      <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
                     `).join("")}
                   </div>
                 ` : ""}
@@ -15796,7 +15191,7 @@ function renderTestimonialsForm(data) {
                 ${errors?.authorCompany ? `
                   <div class="mt-1">
                     ${errors.authorCompany.map((error) => `
-                      <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                      <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
                     `).join("")}
                   </div>
                 ` : ""}
@@ -15828,7 +15223,7 @@ function renderTestimonialsForm(data) {
               ${errors?.testimonialText ? `
                 <div class="mt-1">
                   ${errors.testimonialText.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                    <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
                   `).join("")}
                 </div>
               ` : ""}
@@ -15852,7 +15247,7 @@ function renderTestimonialsForm(data) {
               ${errors?.rating ? `
                 <div class="mt-1">
                   ${errors.rating.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                    <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
                   `).join("")}
                 </div>
               ` : ""}
@@ -15906,7 +15301,7 @@ function renderTestimonialsForm(data) {
               ${errors?.sortOrder ? `
                 <div class="mt-1">
                   ${errors.sortOrder.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
+                    <p class="text-sm text-red-400">${escapeHtml4(error)}</p>
                   `).join("")}
                 </div>
               ` : ""}
@@ -15953,7 +15348,7 @@ function renderTestimonialsForm(data) {
   };
   return renderAdminLayout(layoutData);
 }
-function escapeHtml5(unsafe) {
+function escapeHtml4(unsafe) {
   return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
@@ -16381,7 +15776,7 @@ function renderCodeExamplesForm(data) {
               ${errors?.title ? `
                 <div class="mt-1">
                   ${errors.title.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
                   `).join("")}
                 </div>
               ` : ""}
@@ -16404,7 +15799,7 @@ function renderCodeExamplesForm(data) {
               ${errors?.description ? `
                 <div class="mt-1">
                   ${errors.description.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
                   `).join("")}
                 </div>
               ` : ""}
@@ -16436,7 +15831,7 @@ function renderCodeExamplesForm(data) {
                 ${errors?.language ? `
                   <div class="mt-1">
                     ${errors.language.map((error) => `
-                      <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                      <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
                     `).join("")}
                   </div>
                 ` : ""}
@@ -16457,7 +15852,7 @@ function renderCodeExamplesForm(data) {
                 ${errors?.category ? `
                   <div class="mt-1">
                     ${errors.category.map((error) => `
-                      <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                      <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
                     `).join("")}
                   </div>
                 ` : ""}
@@ -16479,7 +15874,7 @@ function renderCodeExamplesForm(data) {
                 ${errors?.tags ? `
                   <div class="mt-1">
                     ${errors.tags.map((error) => `
-                      <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                      <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
                     `).join("")}
                   </div>
                 ` : ""}
@@ -16510,7 +15905,7 @@ function renderCodeExamplesForm(data) {
               ${errors?.code ? `
                 <div class="mt-1">
                   ${errors.code.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
                   `).join("")}
                 </div>
               ` : ""}
@@ -16564,7 +15959,7 @@ function renderCodeExamplesForm(data) {
               ${errors?.sortOrder ? `
                 <div class="mt-1">
                   ${errors.sortOrder.map((error) => `
-                    <p class="text-sm text-red-400">${escapeHtml6(error)}</p>
+                    <p class="text-sm text-red-400">${escapeHtml5(error)}</p>
                   `).join("")}
                 </div>
               ` : ""}
@@ -16622,7 +16017,7 @@ function renderCodeExamplesForm(data) {
   };
   return renderAdminLayout(layoutData);
 }
-function escapeHtml6(unsafe) {
+function escapeHtml5(unsafe) {
   return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
@@ -21668,7 +21063,6 @@ var ROUTES_INFO = {
     "adminLogsRoutes",
     "adminDesignRoutes",
     "adminCheckboxRoutes",
-    "adminFAQRoutes",
     "adminTestimonialsRoutes",
     "adminCodeExamplesRoutes",
     "adminDashboardRoutes",
@@ -21679,6 +21073,6 @@ var ROUTES_INFO = {
   reference: "https://github.com/sonicjs/sonicjs"
 };
 
-export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_faq_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, userRoutes };
-//# sourceMappingURL=chunk-5IASHQNQ.js.map
-//# sourceMappingURL=chunk-5IASHQNQ.js.map
+export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, userRoutes };
+//# sourceMappingURL=chunk-LT4TVKAS.js.map
+//# sourceMappingURL=chunk-LT4TVKAS.js.map
