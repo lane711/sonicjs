@@ -209,46 +209,4 @@ test.describe('Collection Field Edit', () => {
     const optionsValue = await page.locator('#field-options').inputValue();
     expect(optionsValue).toContain('options');
   });
-
-  test('should handle GUID field type correctly when editing', async ({ page }) => {
-    await page.goto(`${BASE_URL}/admin/collections`);
-
-    const firstRow = page.locator('tbody tr').first();
-    await firstRow.click();
-
-    // Create a GUID field
-    await page.click('button:has-text("Add Field")');
-    await page.waitForSelector('#field-modal:not(.hidden)');
-
-    await page.selectOption('#field-type', 'guid');
-
-    // Field name should be auto-filled with 'id'
-    const fieldNameValue = await page.locator('#field-name').inputValue();
-    expect(fieldNameValue).toBe('id');
-
-    // Fill label
-    await page.fill('#field-label', 'Unique ID');
-
-    // Options container should be visible with GUID options
-    await expect(page.locator('#field-options-container')).not.toHaveClass(/hidden/);
-    const helpText = await page.locator('#field-type-help').textContent();
-    expect(helpText).toContain('unique identifier');
-
-    await page.click('#field-modal button[type="submit"]');
-    await page.waitForLoadState('networkidle');
-
-    // Edit the GUID field
-    const guidField = page.locator('.field-item:has(code:has-text("id"))');
-    await guidField.locator('button:has-text("Edit")').click();
-    await page.waitForSelector('#field-modal:not(.hidden)');
-
-    // Verify all GUID properties are preserved
-    expect(await page.locator('#field-name').inputValue()).toBe('id');
-    expect(await page.locator('#field-label').inputValue()).toBe('Unique ID');
-    expect(await page.locator('#field-type').inputValue()).toBe('guid');
-
-    const options = await page.locator('#field-options').inputValue();
-    expect(options).toContain('autoGenerate');
-    expect(options).toContain('uuid-v4');
-  });
 });

@@ -40,9 +40,26 @@ export interface CollectionFormData {
 export function renderCollectionFormPage(data: CollectionFormData): string {
   const isEdit = data.isEdit || !!data.id
   const title = isEdit ? 'Edit Collection' : 'Create New Collection'
-  const subtitle = isEdit 
+  const subtitle = isEdit
     ? `Update collection: ${data.display_name}`
     : 'Define a new content collection with custom fields and settings.'
+
+  // Build editor options based on active plugins
+  function buildEditorOptions() {
+    const options: string[] = []
+    if (data.editorPlugins?.tinymce) {
+      options.push('<option value="richtext">Rich Text (TinyMCE)</option>')
+    }
+    if (data.editorPlugins?.quill) {
+      options.push('<option value="quill">Rich Text (Quill)</option>')
+    }
+    if (data.editorPlugins?.mdxeditor) {
+      options.push('<option value="mdxeditor">Rich Text (MDXEditor)</option>')
+    }
+    return options.join('\n                ')
+  }
+  const editorOptions = buildEditorOptions()
+  console.log('[Template] Editor options built:', { editorOptions, editorPlugins: data.editorPlugins })
 
   const fields: FormField[] = [
     {
@@ -499,9 +516,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
               >
                 <option value="">Select field type...</option>
                 <option value="text">Text</option>
-                ${data.editorPlugins?.tinymce ? '<option value="richtext">Rich Text (TinyMCE)</option>' : ''}
-                ${data.editorPlugins?.quill ? '<option value="quill">Rich Text (Quill)</option>' : ''}
-                ${data.editorPlugins?.mdxeditor ? '<option value="mdxeditor">Rich Text (MDXEditor)</option>' : ''}
+                ${editorOptions}
                 <option value="number">Number</option>
                 <option value="boolean">Boolean</option>
                 <option value="date">Date</option>

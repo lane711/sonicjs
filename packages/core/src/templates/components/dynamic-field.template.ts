@@ -396,34 +396,6 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
       `
       break
 
-    case 'guid':
-      // GUID fields are read-only and auto-generated
-      const ____displayValue = value || '(auto-generated on save)'
-      fieldHTML = `
-        <div class="guid-field-container">
-          <input
-            type="text"
-            id="${fieldId}"
-            name="${fieldName}"
-            value="${escapeHtml(value)}"
-            class="${baseClasses} bg-zinc-100 dark:bg-zinc-800/50 cursor-not-allowed"
-            readonly
-            disabled
-          >
-          <div class="mt-2 flex items-start gap-x-2">
-            <svg class="h-5 w-5 text-cyan-600 dark:text-cyan-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/>
-            </svg>
-            <div class="text-xs text-zinc-600 dark:text-zinc-400">
-              ${value
-                ? 'This unique identifier was automatically generated and cannot be changed.'
-                : 'A unique identifier (UUID) will be automatically generated when you save this content.'}
-            </div>
-          </div>
-        </div>
-      `
-      break
-
     default:
       fieldHTML = `
         <input 
