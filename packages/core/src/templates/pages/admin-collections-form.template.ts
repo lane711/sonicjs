@@ -76,7 +76,9 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
   // Pre-compute badges for all fields
   const fieldsWithBadges = (data.fields || []).map(field => ({
     ...field,
-    typeBadgeHTML: getFieldTypeBadge(field.field_type)
+    typeBadgeHTML: getFieldTypeBadge(field.field_type),
+    // Pre-compute the data attribute value without typeBadgeHTML
+    dataFieldJSON: JSON.stringify(JSON.stringify(field))
   }))
 
   const fields: FormField[] = [
@@ -382,7 +384,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
                 ${fieldsWithBadges.map(field => `
                   <div class="field-item bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-950/5 dark:border-white/10 p-4"
                        data-field-id="${field.id}"
-                       data-field-data="${JSON.stringify(JSON.stringify(field))}">
+                       data-field-data="${field.dataFieldJSON}">
                     <div class="flex items-center justify-between">
                       <div class="flex items-center gap-x-4">
                         <div class="drag-handle cursor-move text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-400">
