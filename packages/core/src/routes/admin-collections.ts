@@ -187,6 +187,12 @@ adminCollectionsRoutes.get('/new', async (c) => {
     isPluginActive(db, 'mdxeditor-plugin')
   ])
 
+  console.log('[Collections /new] Editor plugins status:', {
+    tinymce: tinymceActive,
+    quill: quillActive,
+    mdxeditor: mdxeditorActive
+  })
+
   const formData: CollectionFormData = {
     isEdit: false,
     user: user ? {
@@ -422,7 +428,7 @@ adminCollectionsRoutes.get('/:id', async (c) => {
     // Check which editor plugins are active
     const [tinymceActive, quillActive, mdxeditorActive] = await Promise.all([
       isPluginActive(db, 'tinymce-plugin'),
-      isPluginActive(db, 'quill-plugin'),
+      isPluginActive(db, 'quill-editor'),
       isPluginActive(db, 'mdxeditor-plugin')
     ])
 
@@ -622,6 +628,7 @@ adminCollectionsRoutes.put('/:collectionId/fields/:fieldId', async (c) => {
     const fieldId = c.req.param('fieldId')
     const formData = await c.req.formData()
     const fieldLabel = formData.get('field_label') as string
+    const fieldType = formData.get('field_type') as string
     const isRequired = formData.get('is_required') === '1'
     const isSearchable = formData.get('is_searchable') === '1'
     const fieldOptions = formData.get('field_options') as string || '{}'
@@ -634,11 +641,11 @@ adminCollectionsRoutes.put('/:collectionId/fields/:fieldId', async (c) => {
 
     const updateStmt = db.prepare(`
       UPDATE content_fields
-      SET field_label = ?, field_options = ?, is_required = ?, is_searchable = ?, updated_at = ?
+      SET field_label = ?, field_type = ?, field_options = ?, is_required = ?, is_searchable = ?, updated_at = ?
       WHERE id = ?
     `)
 
-    await updateStmt.bind(fieldLabel, fieldOptions, isRequired ? 1 : 0, isSearchable ? 1 : 0, Date.now(), fieldId).run()
+    await updateStmt.bind(fieldLabel, fieldType, fieldOptions, isRequired ? 1 : 0, isSearchable ? 1 : 0, Date.now(), fieldId).run()
 
     return c.json({ success: true })
   } catch (error) {

@@ -1,0 +1,47 @@
+{
+  "id": "quill-editor",
+  "name": "Quill Rich Text Editor",
+  "version": "1.0.0",
+  "description": "Modern rich text editor for content creation. Provides a clean, intuitive WYSIWYG editor with customizable toolbars for richtext fields.",
+  "author": "SonicJS Team",
+  "homepage": "https://quilljs.com/",
+  "repository": "https://github.com/lane711/sonicjs",
+  "license": "MIT",
+  "category": "editor",
+  "tags": ["editor", "richtext", "wysiwyg", "quill", "content"],
+  "dependencies": [],
+  "settings": {
+    "theme": {
+      "type": "select",
+      "label": "Editor Theme",
+      "description": "Visual theme for the editor",
+      "default": "snow",
+      "options": ["snow", "bubble"]
+    },
+    "defaultHeight": {
+      "type": "number",
+      "label": "Default Editor Height",
+      "description": "Default height in pixels for the editor",
+      "default": 300
+    },
+    "defaultToolbar": {
+      "type": "select",
+      "label": "Default Toolbar",
+      "description": "Default toolbar configuration",
+      "default": "full",
+      "options": ["full", "simple", "minimal"]
+    },
+    "placeholder": {
+      "type": "string",
+      "label": "Placeholder Text",
+      "description": "Default placeholder text for empty editors",
+      "default": "Start writing your content..."
+    }
+  },
+  "hooks": {
+    "onActivate": "activate",
+    "onDeactivate": "deactivate"
+  },
+  "routes": [],
+  "permissions": {}
+}
