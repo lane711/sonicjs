@@ -328,9 +328,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
                         <div>
                           <div class="flex items-center gap-x-2">
                             <span class="text-sm/6 font-medium text-zinc-950 dark:text-white">${field.field_label}</span>
-                            <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-cyan-500/10 dark:bg-cyan-400/10 text-cyan-700 dark:text-cyan-300 ring-1 ring-inset ring-cyan-500/20 dark:ring-cyan-400/20">
-                              ${field.field_type}
-                            </span>
+                            ${field.typeBadgeHTML}
                             ${field.is_required ? `
                               <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-rose-500/10 dark:bg-rose-400/10 text-rose-700 dark:text-rose-300 ring-1 ring-inset ring-rose-500/20 dark:ring-rose-400/20">
                                 Required

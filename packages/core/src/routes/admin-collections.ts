@@ -633,6 +633,16 @@ adminCollectionsRoutes.put('/:collectionId/fields/:fieldId', async (c) => {
     const isSearchable = formData.get('is_searchable') === '1'
     const fieldOptions = formData.get('field_options') as string || '{}'
 
+    // Log all form data for debugging
+    console.log('[Field Update] Field ID:', fieldId)
+    console.log('[Field Update] Form data received:', {
+      field_label: fieldLabel,
+      field_type: fieldType,
+      is_required: formData.get('is_required'),
+      is_searchable: formData.get('is_searchable'),
+      field_options: fieldOptions
+    })
+
     if (!fieldLabel) {
       return c.json({ success: false, error: 'Field label is required.' })
     }
@@ -646,6 +656,8 @@ adminCollectionsRoutes.put('/:collectionId/fields/:fieldId', async (c) => {
     `)
 
     await updateStmt.bind(fieldLabel, fieldType, fieldOptions, isRequired ? 1 : 0, isSearchable ? 1 : 0, Date.now(), fieldId).run()
+
+    console.log('[Field Update] Successfully updated field with type:', fieldType)
 
     return c.json({ success: true })
   } catch (error) {

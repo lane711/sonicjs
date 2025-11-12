@@ -18017,9 +18017,7 @@ function renderCollectionFormPage(data) {
                         <div>
                           <div class="flex items-center gap-x-2">
                             <span class="text-sm/6 font-medium text-zinc-950 dark:text-white">${field.field_label}</span>
-                            <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-cyan-500/10 dark:bg-cyan-400/10 text-cyan-700 dark:text-cyan-300 ring-1 ring-inset ring-cyan-500/20 dark:ring-cyan-400/20">
-                              ${field.field_type}
-                            </span>
+                            ${field.typeBadgeHTML}
                             ${field.is_required ? `
                               <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-rose-500/10 dark:bg-rose-400/10 text-rose-700 dark:text-rose-300 ring-1 ring-inset ring-rose-500/20 dark:ring-rose-400/20">
                                 Required
@@ -19166,6 +19164,14 @@ adminCollectionsRoutes.put("/:collectionId/fields/:fieldId", async (c) => {
     const isRequired = formData.get("is_required") === "1";
     const isSearchable = formData.get("is_searchable") === "1";
     const fieldOptions = formData.get("field_options") || "{}";
+    console.log("[Field Update] Field ID:", fieldId);
+    console.log("[Field Update] Form data received:", {
+      field_label: fieldLabel,
+      field_type: fieldType,
+      is_required: formData.get("is_required"),
+      is_searchable: formData.get("is_searchable"),
+      field_options: fieldOptions
+    });
     if (!fieldLabel) {
       return c.json({ success: false, error: "Field label is required." });
     }
@@ -19176,6 +19182,7 @@ adminCollectionsRoutes.put("/:collectionId/fields/:fieldId", async (c) => {
       WHERE id = ?
     `);
     await updateStmt.bind(fieldLabel, fieldType, fieldOptions, isRequired ? 1 : 0, isSearchable ? 1 : 0, Date.now(), fieldId).run();
+    console.log("[Field Update] Successfully updated field with type:", fieldType);
     return c.json({ success: true });
   } catch (error) {
     console.error("Error updating field:", error);
@@ -21096,5 +21103,5 @@ var ROUTES_INFO = {
 };
 
 export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, userRoutes };
-//# sourceMappingURL=chunk-HIL3EM5D.js.map
-//# sourceMappingURL=chunk-HIL3EM5D.js.map
+//# sourceMappingURL=chunk-YJHTONPY.js.map
+//# sourceMappingURL=chunk-YJHTONPY.js.map
