@@ -37,12 +37,47 @@ export interface CollectionFormData {
   }
 }
 
+// Helper function to get field type badge with color
+function getFieldTypeBadge(fieldType: string): string {
+  const typeLabels: Record<string, string> = {
+    'text': 'Text',
+    'richtext': 'Rich Text (TinyMCE)',
+    'quill': 'Rich Text (Quill)',
+    'mdxeditor': 'Rich Text (MDXEditor)',
+    'number': 'Number',
+    'boolean': 'Boolean',
+    'date': 'Date',
+    'select': 'Select',
+    'media': 'Media'
+  }
+  const typeColors: Record<string, string> = {
+    'text': 'bg-blue-500/10 dark:bg-blue-400/10 text-blue-700 dark:text-blue-300 ring-blue-500/20 dark:ring-blue-400/20',
+    'richtext': 'bg-purple-500/10 dark:bg-purple-400/10 text-purple-700 dark:text-purple-300 ring-purple-500/20 dark:ring-purple-400/20',
+    'quill': 'bg-purple-500/10 dark:bg-purple-400/10 text-purple-700 dark:text-purple-300 ring-purple-500/20 dark:ring-purple-400/20',
+    'mdxeditor': 'bg-purple-500/10 dark:bg-purple-400/10 text-purple-700 dark:text-purple-300 ring-purple-500/20 dark:ring-purple-400/20',
+    'number': 'bg-green-500/10 dark:bg-green-400/10 text-green-700 dark:text-green-300 ring-green-500/20 dark:ring-green-400/20',
+    'boolean': 'bg-amber-500/10 dark:bg-amber-400/10 text-amber-700 dark:text-amber-300 ring-amber-500/20 dark:ring-amber-400/20',
+    'date': 'bg-cyan-500/10 dark:bg-cyan-400/10 text-cyan-700 dark:text-cyan-300 ring-cyan-500/20 dark:ring-cyan-400/20',
+    'select': 'bg-indigo-500/10 dark:bg-indigo-400/10 text-indigo-700 dark:text-indigo-300 ring-indigo-500/20 dark:ring-indigo-400/20',
+    'media': 'bg-rose-500/10 dark:bg-rose-400/10 text-rose-700 dark:text-rose-300 ring-rose-500/20 dark:ring-rose-400/20'
+  }
+  const label = typeLabels[fieldType] || fieldType
+  const color = typeColors[fieldType] || 'bg-zinc-500/10 dark:bg-zinc-400/10 text-zinc-700 dark:text-zinc-300 ring-zinc-500/20 dark:ring-zinc-400/20'
+  return `<span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${color} ring-1 ring-inset">${label}</span>`
+}
+
 export function renderCollectionFormPage(data: CollectionFormData): string {
   const isEdit = data.isEdit || !!data.id
   const title = isEdit ? 'Edit Collection' : 'Create New Collection'
   const subtitle = isEdit
     ? `Update collection: ${data.display_name}`
     : 'Define a new content collection with custom fields and settings.'
+
+  // Pre-compute badges for all fields
+  const fieldsWithBadges = (data.fields || []).map(field => ({
+    ...field,
+    typeBadgeHTML: getFieldTypeBadge(field.field_type)
+  }))
 
   const fields: FormField[] = [
     {
@@ -286,7 +321,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
 
               <!-- Fields List (Read-Only) -->
               <div class="space-y-3">
-                ${(data.fields || []).map(field => `
+                ${fieldsWithBadges.map(field => `
                   <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-950/5 dark:border-white/10 p-4">
                     <div class="flex items-center justify-between">
                       <div class="flex items-center gap-x-4">
@@ -346,7 +381,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
               
               <!-- Fields List -->
               <div id="fields-list" class="space-y-3">
-                ${(data.fields || []).map(field => `
+                ${fieldsWithBadges.map(field => `
                   <div class="field-item bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-950/5 dark:border-white/10 p-4"
                        data-field-id="${field.id}"
                        data-field-data="${JSON.stringify(JSON.stringify(field))}">
@@ -360,33 +395,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
                         <div>
                           <div class="flex items-center gap-x-2">
                             <span class="text-sm/6 font-medium text-zinc-950 dark:text-white">${field.field_label}</span>
-                            ${(() => {
-                              const typeLabels = {
-                                'text': 'Text',
-                                'richtext': 'Rich Text (TinyMCE)',
-                                'quill': 'Rich Text (Quill)',
-                                'mdxeditor': 'Rich Text (MDXEditor)',
-                                'number': 'Number',
-                                'boolean': 'Boolean',
-                                'date': 'Date',
-                                'select': 'Select',
-                                'media': 'Media'
-                              };
-                              const typeColors = {
-                                'text': 'bg-blue-500/10 dark:bg-blue-400/10 text-blue-700 dark:text-blue-300 ring-blue-500/20 dark:ring-blue-400/20',
-                                'richtext': 'bg-purple-500/10 dark:bg-purple-400/10 text-purple-700 dark:text-purple-300 ring-purple-500/20 dark:ring-purple-400/20',
-                                'quill': 'bg-purple-500/10 dark:bg-purple-400/10 text-purple-700 dark:text-purple-300 ring-purple-500/20 dark:ring-purple-400/20',
-                                'mdxeditor': 'bg-purple-500/10 dark:bg-purple-400/10 text-purple-700 dark:text-purple-300 ring-purple-500/20 dark:ring-purple-400/20',
-                                'number': 'bg-green-500/10 dark:bg-green-400/10 text-green-700 dark:text-green-300 ring-green-500/20 dark:ring-green-400/20',
-                                'boolean': 'bg-amber-500/10 dark:bg-amber-400/10 text-amber-700 dark:text-amber-300 ring-amber-500/20 dark:ring-amber-400/20',
-                                'date': 'bg-cyan-500/10 dark:bg-cyan-400/10 text-cyan-700 dark:text-cyan-300 ring-cyan-500/20 dark:ring-cyan-400/20',
-                                'select': 'bg-indigo-500/10 dark:bg-indigo-400/10 text-indigo-700 dark:text-indigo-300 ring-indigo-500/20 dark:ring-indigo-400/20',
-                                'media': 'bg-rose-500/10 dark:bg-rose-400/10 text-rose-700 dark:text-rose-300 ring-rose-500/20 dark:ring-rose-400/20'
-                              };
-                              const label = typeLabels[field.field_type] || field.field_type;
-                              const color = typeColors[field.field_type] || 'bg-zinc-500/10 dark:bg-zinc-400/10 text-zinc-700 dark:text-zinc-300 ring-zinc-500/20 dark:ring-zinc-400/20';
-                              return `<span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${color} ring-1 ring-inset">${label}</span>`;
-                            })()}
+                            ${field.typeBadgeHTML}
                             ${field.is_required ? `
                               <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-pink-500/10 dark:bg-pink-400/10 text-pink-700 dark:text-pink-300 ring-1 ring-inset ring-pink-500/20 dark:ring-pink-400/20">
                                 Required
