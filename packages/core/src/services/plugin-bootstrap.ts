@@ -151,8 +151,8 @@ export class PluginBootstrapService {
       },
     },
     {
-      id: "mdxeditor-plugin",
-      name: "mdxeditor-plugin",
+      id: "easy-mdx",
+      name: "easy-mdx",
       display_name: "EasyMDE Editor",
       description: "Lightweight markdown editor with live preview for richtext fields",
       version: "1.0.0",

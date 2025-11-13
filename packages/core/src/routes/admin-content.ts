@@ -371,11 +371,11 @@ adminContentRoutes.get('/new', async (c) => {
     }
 
     // Check if MDXEditor plugin is active and get settings
-    const mdxeditorEnabled = await isPluginActive(db, 'mdxeditor-plugin')
+    const mdxeditorEnabled = await isPluginActive(db, 'easy-mdx')
     let mdxeditorSettings
     if (mdxeditorEnabled) {
       const pluginService = new PluginService(db)
-      const mdxeditorPlugin = await pluginService.getPlugin('mdxeditor-plugin')
+      const mdxeditorPlugin = await pluginService.getPlugin('easy-mdx')
       mdxeditorSettings = mdxeditorPlugin?.settings
     }
 
@@ -496,11 +496,11 @@ adminContentRoutes.get('/:id/edit', async (c) => {
     }
 
     // Check if MDXEditor plugin is active and get settings
-    const mdxeditorEnabled = await isPluginActive(db, 'mdxeditor-plugin')
+    const mdxeditorEnabled = await isPluginActive(db, 'easy-mdx')
     let mdxeditorSettings
     if (mdxeditorEnabled) {
       const pluginService = new PluginService(db)
-      const mdxeditorPlugin = await pluginService.getPlugin('mdxeditor-plugin')
+      const mdxeditorPlugin = await pluginService.getPlugin('easy-mdx')
       mdxeditorSettings = mdxeditorPlugin?.settings
     }
 

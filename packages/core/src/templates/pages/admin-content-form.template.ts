@@ -4,7 +4,7 @@ import { renderDynamicField, renderFieldGroup, FieldDefinition } from '../compon
 import { renderConfirmationDialog, getConfirmationDialogScript } from '../confirmation-dialog.template'
 import { getTinyMCEScript, getTinyMCEInitScript } from '../../plugins/available/tinymce-plugin'
 import { getQuillCDN, getQuillInitScript } from '../../plugins/core-plugins/quill-editor'
-import { getMDXEditorScripts, getMDXEditorInitScript } from '../../plugins/available/mdxeditor-plugin'
+import { getMDXEditorScripts, getMDXEditorInitScript } from '../../plugins/available/easy-mdx'
 
 export interface Collection {
   id: string

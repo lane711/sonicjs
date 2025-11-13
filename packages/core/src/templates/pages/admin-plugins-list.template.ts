@@ -45,44 +45,6 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
           <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">Plugins</h1>
           <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Manage and extend functionality with plugins</p>
         </div>
-        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <div class="relative inline-block text-left">
-            <button onclick="toggleDropdown()" class="inline-flex items-center justify-center rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm">
-              <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
-              </svg>
-              Install Plugin
-              <svg class="-mr-1 ml-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-            <div id="plugin-dropdown" class="hidden absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-xl bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 focus:outline-none">
-              <div class="py-1">
-                <button onclick="installPlugin('faq-plugin')" class="block w-full text-left px-4 py-2 text-sm text-zinc-950 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors first:rounded-t-xl">
-                  <div class="flex items-center">
-                    <span class="text-lg mr-2">❓</span>
-                    <div>
-                      <div class="font-medium">FAQ System</div>
-                      <div class="text-xs text-zinc-500 dark:text-zinc-400">Community FAQ management plugin</div>
-                    </div>
-                  </div>
-                </button>
-                <div class="border-t border-zinc-950/5 dark:border-white/10 my-1"></div>
-                <button onclick="showNotification('Plugin marketplace coming soon!', 'info')" class="block w-full text-left px-4 py-2 text-sm text-zinc-950 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors last:rounded-b-xl">
-                  <div class="flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-zinc-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    <div>
-                      <div class="font-medium">Browse Marketplace</div>
-                      <div class="text-xs text-zinc-500 dark:text-zinc-400">Discover more plugins</div>
-                    </div>
-                  </div>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- Experimental Notice -->
@@ -413,15 +375,10 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
         notification.className = \`fixed top-4 right-4 px-4 py-2 rounded-lg text-white z-50 \${bgColor}\`;
         notification.textContent = message;
         document.body.appendChild(notification);
-        
+
         setTimeout(() => {
           notification.remove();
         }, 3000);
-      }
-      
-      function toggleDropdown() {
-        const dropdown = document.getElementById('plugin-dropdown');
-        dropdown.classList.toggle('hidden');
       }
 
       function filterPlugins() {
@@ -489,16 +446,6 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
           noResultsMsg.style.display = 'none';
         }
       }
-
-      // Close dropdown when clicking outside
-      document.addEventListener('click', (event) => {
-        const dropdown = document.getElementById('plugin-dropdown');
-        const button = event.target.closest('button[onclick="toggleDropdown()"]');
-
-        if (!button && !dropdown.contains(event.target)) {
-          dropdown.classList.add('hidden');
-        }
-      });
     </script>
 
     <!-- Confirmation Dialogs -->

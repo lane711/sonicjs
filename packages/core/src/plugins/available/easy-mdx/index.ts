@@ -10,7 +10,7 @@ import { PluginBuilder } from '../../sdk/plugin-builder'
  */
 
 const builder = PluginBuilder.create({
-  name: 'mdxeditor-plugin',
+  name: 'easy-mdx',
   version: '1.0.0',
   description: 'Lightweight markdown editor with live preview'
 })
@@ -33,9 +33,9 @@ builder.lifecycle({
   }
 })
 
-const mdxeditorPlugin = builder.build() as Plugin
+const easyMdxPlugin = builder.build() as Plugin
 
-export default mdxeditorPlugin
+export default easyMdxPlugin
 
 /**
  * Get EasyMDE CDN script tags
@@ -239,9 +239,9 @@ export function getMDXEditorInitScript(config?: {
  * @param pluginService - Plugin service instance
  * @returns Promise<boolean>
  */
-export async function isMDXEditorActive(pluginService: any): Promise<boolean> {
+export async function isEasyMdxActive(pluginService: any): Promise<boolean> {
   try {
-    const status = await pluginService.getPluginStatus('mdxeditor-plugin')
+    const status = await pluginService.getPluginStatus('easy-mdx')
     return status?.is_active === true
   } catch (error) {
     console.error('Error checking EasyMDE editor plugin status:', error)

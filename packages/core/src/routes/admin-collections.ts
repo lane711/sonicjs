@@ -184,7 +184,7 @@ adminCollectionsRoutes.get('/new', async (c) => {
   const [tinymceActive, quillActive, mdxeditorActive] = await Promise.all([
     isPluginActive(db, 'tinymce-plugin'),
     isPluginActive(db, 'quill-editor'),
-    isPluginActive(db, 'mdxeditor-plugin')
+    isPluginActive(db, 'easy-mdx')
   ])
 
   console.log('[Collections /new] Editor plugins status:', {
@@ -429,7 +429,7 @@ adminCollectionsRoutes.get('/:id', async (c) => {
     const [tinymceActive, quillActive, mdxeditorActive] = await Promise.all([
       isPluginActive(db, 'tinymce-plugin'),
       isPluginActive(db, 'quill-editor'),
-      isPluginActive(db, 'mdxeditor-plugin')
+      isPluginActive(db, 'easy-mdx')
     ])
 
     const formData: CollectionFormData = {
