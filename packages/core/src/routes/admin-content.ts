@@ -379,6 +379,13 @@ adminContentRoutes.get('/new', async (c) => {
       mdxeditorSettings = mdxeditorPlugin?.settings
     }
 
+    console.log('[Content Form /new] Editor plugins status:', {
+      tinymce: tinymceEnabled,
+      quill: quillEnabled,
+      mdxeditor: mdxeditorEnabled,
+      mdxeditorSettings
+    })
+
     const formData: ContentFormData = {
       collection,
       fields,

@@ -4787,16 +4787,14 @@ function renderContentFormPage(data) {
     skin: data.tinymceSettings?.skin,
     defaultHeight: data.tinymceSettings?.defaultHeight,
     defaultToolbar: data.tinymceSettings?.defaultToolbar
-  })}</script>` : "// TinyMCE plugin not active - richtext fields will use plain textareas"}
+  })}</script>` : ""}
 
       ${data.mdxeditorEnabled ? `<script>${getMDXEditorInitScript({
     theme: data.mdxeditorSettings?.theme,
     defaultHeight: data.mdxeditorSettings?.defaultHeight,
     toolbar: data.mdxeditorSettings?.toolbar,
     placeholder: data.mdxeditorSettings?.placeholder
-  })}</script>` : "// MDXEditor plugin not active - richtext fields will use plain textareas"}
-
-      // Quill initialization is handled by a separate script tag above
+  })}</script>` : ""}
     </script>
   `;
   const layoutData = {
@@ -5942,6 +5940,12 @@ adminContentRoutes.get("/new", async (c) => {
       const mdxeditorPlugin2 = await pluginService.getPlugin("mdxeditor-plugin");
       mdxeditorSettings = mdxeditorPlugin2?.settings;
     }
+    console.log("[Content Form /new] Editor plugins status:", {
+      tinymce: tinymceEnabled,
+      quill: quillEnabled,
+      mdxeditor: mdxeditorEnabled,
+      mdxeditorSettings
+    });
     const formData = {
       collection,
       fields,
@@ -17770,10 +17774,8 @@ function renderCollectionFormPage(data) {
   const isEdit = data.isEdit || !!data.id;
   const title = isEdit ? "Edit Collection" : "Create New Collection";
   const subtitle = isEdit ? `Update collection: ${data.display_name}` : "Define a new content collection with custom fields and settings.";
-  const fieldsWithBadges = (data.fields || []).map((field) => ({
+  const fieldsWithData = (data.fields || []).map((field) => ({
     ...field,
-    typeBadgeHTML: getFieldTypeBadge(field.field_type),
-    // Pre-compute the data attribute value without typeBadgeHTML
     dataFieldJSON: JSON.stringify(JSON.stringify(field))
   }));
   const fields = [
@@ -18012,17 +18014,22 @@ function renderCollectionFormPage(data) {
 
               <!-- Fields List (Read-Only) -->
               <div class="space-y-3">
-                ${fieldsWithBadges.map((field) => `
+                ${fieldsWithData.map((field) => `
                   <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-950/5 dark:border-white/10 p-4">
                     <div class="flex items-center justify-between">
                       <div class="flex items-center gap-x-4">
                         <div>
                           <div class="flex items-center gap-x-2">
                             <span class="text-sm/6 font-medium text-zinc-950 dark:text-white">${field.field_label}</span>
-                            ${field.typeBadgeHTML}
+                            ${getFieldTypeBadge(field.field_type)}
                             ${field.is_required ? `
                               <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-rose-500/10 dark:bg-rose-400/10 text-rose-700 dark:text-rose-300 ring-1 ring-inset ring-rose-500/20 dark:ring-rose-400/20">
                                 Required
+                              </span>
+                            ` : ""}
+                            ${field.is_searchable ? `
+                              <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-emerald-500/10 dark:bg-emerald-400/10 text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-500/20 dark:ring-emerald-400/20">
+                                Searchable
                               </span>
                             ` : ""}
                           </div>
@@ -18070,7 +18077,7 @@ function renderCollectionFormPage(data) {
               
               <!-- Fields List -->
               <div id="fields-list" class="space-y-3">
-                ${fieldsWithBadges.map((field) => `
+                ${fieldsWithData.map((field) => `
                   <div class="field-item bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-950/5 dark:border-white/10 p-4"
                        data-field-id="${field.id}"
                        data-field-data="${field.dataFieldJSON}">
@@ -18084,10 +18091,15 @@ function renderCollectionFormPage(data) {
                         <div>
                           <div class="flex items-center gap-x-2">
                             <span class="text-sm/6 font-medium text-zinc-950 dark:text-white">${field.field_label}</span>
-                            ${field.typeBadgeHTML}
+                            ${getFieldTypeBadge(field.field_type)}
                             ${field.is_required ? `
                               <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-pink-500/10 dark:bg-pink-400/10 text-pink-700 dark:text-pink-300 ring-1 ring-inset ring-pink-500/20 dark:ring-pink-400/20">
                                 Required
+                              </span>
+                            ` : ""}
+                            ${field.is_searchable ? `
+                              <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-emerald-500/10 dark:bg-emerald-400/10 text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-500/20 dark:ring-emerald-400/20">
+                                Searchable
                               </span>
                             ` : ""}
                           </div>
@@ -18253,6 +18265,7 @@ function renderCollectionFormPage(data) {
             <div class="flex gap-3">
               <div class="flex h-6 shrink-0 items-center">
                 <div class="group grid size-4 grid-cols-1">
+                  <input type="hidden" name="is_required" value="0">
                   <input
                     type="checkbox"
                     id="field-required"
@@ -18274,6 +18287,7 @@ function renderCollectionFormPage(data) {
             <div class="flex gap-3">
               <div class="flex h-6 shrink-0 items-center">
                 <div class="group grid size-4 grid-cols-1">
+                  <input type="hidden" name="is_searchable" value="0">
                   <input
                     type="checkbox"
                     id="field-searchable"
@@ -18972,7 +18986,7 @@ adminCollectionsRoutes.get("/:id", async (c) => {
             field_options: fieldConfig,
             field_order: fieldOrder++,
             is_required: fieldConfig.required === true || schema.required && schema.required.includes(fieldName),
-            is_searchable: false
+            is_searchable: fieldConfig.searchable === true || false
           }));
         }
       } catch (e) {
@@ -19160,11 +19174,14 @@ adminCollectionsRoutes.post("/:id/fields", async (c) => {
 adminCollectionsRoutes.put("/:collectionId/fields/:fieldId", async (c) => {
   try {
     const fieldId = c.req.param("fieldId");
+    const collectionId = c.req.param("collectionId");
     const formData = await c.req.formData();
     const fieldLabel = formData.get("field_label");
     const fieldType = formData.get("field_type");
-    const isRequired = formData.get("is_required") === "1";
-    const isSearchable = formData.get("is_searchable") === "1";
+    const isRequiredValues = formData.getAll("is_required");
+    const isSearchableValues = formData.getAll("is_searchable");
+    const isRequired = isRequiredValues[isRequiredValues.length - 1] === "1";
+    const isSearchable = isSearchableValues[isSearchableValues.length - 1] === "1";
     const fieldOptions = formData.get("field_options") || "{}";
     console.log("[Field Update] Field ID:", fieldId);
     console.log("[Field Update] Form data received:", {
@@ -19178,12 +19195,74 @@ adminCollectionsRoutes.put("/:collectionId/fields/:fieldId", async (c) => {
       return c.json({ success: false, error: "Field label is required." });
     }
     const db = c.env.DB;
+    if (fieldId.startsWith("schema-")) {
+      const fieldName = fieldId.replace("schema-", "");
+      console.log("[Field Update] Updating schema field:", fieldName);
+      const getCollectionStmt = db.prepare("SELECT * FROM collections WHERE id = ?");
+      const collection = await getCollectionStmt.bind(collectionId).first();
+      if (!collection) {
+        return c.json({ success: false, error: "Collection not found." });
+      }
+      let schema = typeof collection.schema === "string" ? JSON.parse(collection.schema) : collection.schema;
+      if (!schema) {
+        schema = { type: "object", properties: {}, required: [] };
+      }
+      if (!schema.properties) {
+        schema.properties = {};
+      }
+      if (!schema.required) {
+        schema.required = [];
+      }
+      if (schema.properties[fieldName]) {
+        schema.properties[fieldName] = {
+          ...schema.properties[fieldName],
+          type: fieldType,
+          title: fieldLabel,
+          searchable: isSearchable
+        };
+        const requiredIndex = schema.required.indexOf(fieldName);
+        console.log("[Field Update] Required field handling:", {
+          fieldName,
+          isRequired,
+          currentRequiredArray: schema.required,
+          requiredIndex
+        });
+        if (isRequired && requiredIndex === -1) {
+          schema.required.push(fieldName);
+          console.log("[Field Update] Added field to required array");
+        } else if (!isRequired && requiredIndex !== -1) {
+          schema.required.splice(requiredIndex, 1);
+          console.log("[Field Update] Removed field from required array");
+        }
+        console.log("[Field Update] Final required array:", schema.required);
+      }
+      const updateCollectionStmt = db.prepare(`
+        UPDATE collections
+        SET schema = ?, updated_at = ?
+        WHERE id = ?
+      `);
+      const result2 = await updateCollectionStmt.bind(JSON.stringify(schema), Date.now(), collectionId).run();
+      console.log("[Field Update] Schema update result:", {
+        success: result2.success,
+        changes: result2.meta?.changes
+      });
+      return c.json({ success: true });
+    }
     const updateStmt = db.prepare(`
       UPDATE content_fields
       SET field_label = ?, field_type = ?, field_options = ?, is_required = ?, is_searchable = ?, updated_at = ?
       WHERE id = ?
     `);
-    await updateStmt.bind(fieldLabel, fieldType, fieldOptions, isRequired ? 1 : 0, isSearchable ? 1 : 0, Date.now(), fieldId).run();
+    const result = await updateStmt.bind(fieldLabel, fieldType, fieldOptions, isRequired ? 1 : 0, isSearchable ? 1 : 0, Date.now(), fieldId).run();
+    console.log("[Field Update] Update result:", {
+      success: result.success,
+      meta: result.meta,
+      changes: result.meta?.changes,
+      last_row_id: result.meta?.last_row_id
+    });
+    const verifyStmt = db.prepare("SELECT * FROM content_fields WHERE id = ?");
+    const verifyResult = await verifyStmt.bind(fieldId).first();
+    console.log("[Field Update] Verification - field after update:", verifyResult);
     console.log("[Field Update] Successfully updated field with type:", fieldType);
     return c.json({ success: true });
   } catch (error) {
@@ -21105,5 +21184,5 @@ var ROUTES_INFO = {
 };
 
 export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, userRoutes };
-//# sourceMappingURL=chunk-UCXDLUZR.js.map
-//# sourceMappingURL=chunk-UCXDLUZR.js.map
+//# sourceMappingURL=chunk-ALU4Z6UN.js.map
+//# sourceMappingURL=chunk-ALU4Z6UN.js.map
