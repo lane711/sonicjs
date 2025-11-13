@@ -3069,31 +3069,118 @@ app.post("/test-cleanup", async (c) => {
   }
   try {
     let deletedCount = 0;
-    const collectionsResult = await db.prepare(`
-      DELETE FROM collections
+    const testCollections = await db.prepare(`
+      SELECT id FROM collections
       WHERE name LIKE 'test_%'
       OR name IN ('blog_posts', 'test_collection', 'products', 'articles')
-    `).run();
-    deletedCount += collectionsResult.meta?.changes || 0;
-    const contentResult = await db.prepare(`
-      DELETE FROM content
+    `).all();
+    const testCollectionIds = testCollections.results?.map((c2) => c2.id) || [];
+    const testUsers = await db.prepare(`
+      SELECT id FROM users
+      WHERE email != 'admin@sonicjs.com'
+      AND (email LIKE '%test%' OR email LIKE '%example.com%')
+    `).all();
+    const testUserIds = testUsers.results?.map((u) => u.id) || [];
+    let contentIdsToDelete = [];
+    const batchSize = 500;
+    if (testCollectionIds.length > 0) {
+      for (let i = 0; i < testCollectionIds.length; i += batchSize) {
+        const batch = testCollectionIds.slice(i, i + batchSize);
+        const placeholders = batch.map(() => "?").join(",");
+        const contentFromCollections = await db.prepare(`
+          SELECT id FROM content WHERE collection_id IN (${placeholders})
+        `).bind(...batch).all();
+        contentIdsToDelete.push(...contentFromCollections.results?.map((c2) => c2.id) || []);
+      }
+    }
+    const contentByPattern = await db.prepare(`
+      SELECT id FROM content
       WHERE title LIKE 'Test %'
       OR title LIKE '%E2E%'
       OR title LIKE '%Playwright%'
+      OR title LIKE '%Sample%'
+    `).all();
+    contentIdsToDelete.push(...contentByPattern.results?.map((c2) => c2.id) || []);
+    if (contentIdsToDelete.length > 0) {
+      for (let i = 0; i < contentIdsToDelete.length; i += batchSize) {
+        const batch = contentIdsToDelete.slice(i, i + batchSize);
+        const placeholders = batch.map(() => "?").join(",");
+        await db.prepare(`
+          DELETE FROM content_versions WHERE content_id IN (${placeholders})
+        `).bind(...batch).run();
+        await db.prepare(`
+          DELETE FROM workflow_history WHERE content_id IN (${placeholders})
+        `).bind(...batch).run();
+        await db.prepare(`
+          DELETE FROM content_data WHERE content_id IN (${placeholders})
+        `).bind(...batch).run();
+      }
+    }
+    if (testUserIds.length > 0) {
+      for (let i = 0; i < testUserIds.length; i += batchSize) {
+        const batch = testUserIds.slice(i, i + batchSize);
+        const placeholders = batch.map(() => "?").join(",");
+        await db.prepare(`
+          DELETE FROM api_tokens WHERE user_id IN (${placeholders})
+        `).bind(...batch).run();
+        await db.prepare(`
+          DELETE FROM media WHERE uploaded_by IN (${placeholders})
+        `).bind(...batch).run();
+      }
+    }
+    if (contentIdsToDelete.length > 0) {
+      for (let i = 0; i < contentIdsToDelete.length; i += batchSize) {
+        const batch = contentIdsToDelete.slice(i, i + batchSize);
+        const placeholders = batch.map(() => "?").join(",");
+        const contentResult = await db.prepare(`
+          DELETE FROM content WHERE id IN (${placeholders})
+        `).bind(...batch).run();
+        deletedCount += contentResult.meta?.changes || 0;
+      }
+    }
+    if (testCollectionIds.length > 0) {
+      for (let i = 0; i < testCollectionIds.length; i += batchSize) {
+        const batch = testCollectionIds.slice(i, i + batchSize);
+        const placeholders = batch.map(() => "?").join(",");
+        await db.prepare(`
+          DELETE FROM collection_fields WHERE collection_id IN (${placeholders})
+        `).bind(...batch).run();
+      }
+    }
+    if (testCollectionIds.length > 0) {
+      for (let i = 0; i < testCollectionIds.length; i += batchSize) {
+        const batch = testCollectionIds.slice(i, i + batchSize);
+        const placeholders = batch.map(() => "?").join(",");
+        const collectionsResult = await db.prepare(`
+          DELETE FROM collections WHERE id IN (${placeholders})
+        `).bind(...batch).run();
+        deletedCount += collectionsResult.meta?.changes || 0;
+      }
+    }
+    if (testUserIds.length > 0) {
+      for (let i = 0; i < testUserIds.length; i += batchSize) {
+        const batch = testUserIds.slice(i, i + batchSize);
+        const placeholders = batch.map(() => "?").join(",");
+        const usersResult = await db.prepare(`
+          DELETE FROM users WHERE id IN (${placeholders})
+        `).bind(...batch).run();
+        deletedCount += usersResult.meta?.changes || 0;
+      }
+    }
+    await db.prepare(`
+      DELETE FROM content_data
+      WHERE content_id NOT IN (SELECT id FROM content)
     `).run();
-    deletedCount += contentResult.meta?.changes || 0;
-    const usersResult = await db.prepare(`
-      DELETE FROM users
-      WHERE email != 'admin@sonicjs.com'
-      AND email LIKE '%test%'
-    `).run();
-    deletedCount += usersResult.meta?.changes || 0;
     await db.prepare(`
       DELETE FROM collection_fields
       WHERE collection_id NOT IN (SELECT id FROM collections)
     `).run();
     await db.prepare(`
-      DELETE FROM content_data
+      DELETE FROM content_versions
+      WHERE content_id NOT IN (SELECT id FROM content)
+    `).run();
+    await db.prepare(`
+      DELETE FROM workflow_history
       WHERE content_id NOT IN (SELECT id FROM content)
     `).run();
     await db.prepare(`
@@ -21390,5 +21477,5 @@ var ROUTES_INFO = {
 };
 
 export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, test_cleanup_default, userRoutes };
-//# sourceMappingURL=chunk-OTDKMQYV.js.map
-//# sourceMappingURL=chunk-OTDKMQYV.js.map
+//# sourceMappingURL=chunk-ENIYWHIO.js.map
+//# sourceMappingURL=chunk-ENIYWHIO.js.map
