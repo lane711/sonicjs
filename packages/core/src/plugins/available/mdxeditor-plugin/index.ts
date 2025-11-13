@@ -2,17 +2,17 @@ import { Plugin } from '../../../types/plugin'
 import { PluginBuilder } from '../../sdk/plugin-builder'
 
 /**
- * MDXEditor Rich Text Editor Plugin
+ * EasyMDE Markdown Editor Plugin
  *
- * Provides MDX editing capabilities for richtext fields.
- * When active, this plugin injects the MDXEditor into all richtext field types.
+ * Provides markdown editing capabilities for richtext fields.
+ * When active, this plugin injects the EasyMDE editor into all richtext field types.
  * When inactive, richtext fields fall back to plain textareas.
  */
 
 const builder = PluginBuilder.create({
   name: 'mdxeditor-plugin',
   version: '1.0.0',
-  description: 'Modern React-based MDX editor for content creation'
+  description: 'Lightweight markdown editor with live preview'
 })
 
 builder.metadata({
@@ -26,10 +26,10 @@ builder.metadata({
 
 builder.lifecycle({
   activate: async () => {
-    console.info('✅ MDXEditor plugin activated')
+    console.info('✅ EasyMDE editor plugin activated')
   },
   deactivate: async () => {
-    console.info('❌ MDXEditor plugin deactivated')
+    console.info('❌ EasyMDE editor plugin deactivated')
   }
 })
 
@@ -38,19 +38,119 @@ const mdxeditorPlugin = builder.build() as Plugin
 export default mdxeditorPlugin
 
 /**
- * Get MDXEditor CDN script tags
- * @returns HTML script and style tags for MDXEditor
+ * Get EasyMDE CDN script tags
+ * @returns HTML script and style tags for EasyMDE
  */
 export function getMDXEditorScripts(): string {
   return `
-    <!-- EasyMDE Markdown Editor (simpler alternative to MDXEditor) -->
+    <!-- EasyMDE Markdown Editor -->
     <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
     <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+    <style>
+      /* Dark mode styling for EasyMDE */
+      .EasyMDEContainer {
+        background-color: #1e293b;
+      }
+
+      .EasyMDEContainer .CodeMirror {
+        background-color: #1e293b;
+        color: #e2e8f0;
+        border-color: #334155;
+      }
+
+      .EasyMDEContainer .CodeMirror-scroll {
+        background-color: #1e293b;
+      }
+
+      .EasyMDEContainer .CodeMirror-cursor {
+        border-left-color: #e2e8f0;
+      }
+
+      .EasyMDEContainer .CodeMirror-gutters {
+        background-color: #0f172a;
+        border-right-color: #334155;
+      }
+
+      .EasyMDEContainer .CodeMirror-linenumber {
+        color: #64748b;
+      }
+
+      .editor-toolbar {
+        background-color: #0f172a;
+        border-color: #334155;
+      }
+
+      .editor-toolbar button {
+        color: #94a3b8 !important;
+      }
+
+      .editor-toolbar button:hover,
+      .editor-toolbar button.active {
+        background-color: #334155;
+        border-color: #475569;
+        color: #e2e8f0 !important;
+      }
+
+      .editor-toolbar i.separator {
+        border-left-color: #334155;
+        border-right-color: #334155;
+      }
+
+      .editor-statusbar {
+        background-color: #0f172a;
+        color: #64748b;
+        border-top-color: #334155;
+      }
+
+      .editor-preview,
+      .editor-preview-side {
+        background-color: #1e293b;
+        color: #e2e8f0;
+      }
+
+      .CodeMirror-selected {
+        background-color: #334155 !important;
+      }
+
+      .CodeMirror-focused .CodeMirror-selected {
+        background-color: #475569 !important;
+      }
+
+      /* Syntax highlighting for dark mode */
+      .cm-header {
+        color: #60a5fa;
+      }
+
+      .cm-strong {
+        color: #fbbf24;
+      }
+
+      .cm-em {
+        color: #a78bfa;
+      }
+
+      .cm-link {
+        color: #34d399;
+      }
+
+      .cm-url {
+        color: #34d399;
+      }
+
+      .cm-quote {
+        color: #94a3b8;
+        font-style: italic;
+      }
+
+      .cm-comment {
+        color: #64748b;
+      }
+    </style>
   `
 }
 
 /**
- * Get MDXEditor initialization script
+ * Get EasyMDE initialization script
  * @param config - Optional configuration object
  * @returns JavaScript initialization code
  */
@@ -135,7 +235,7 @@ export function getMDXEditorInitScript(config?: {
 }
 
 /**
- * Check if MDXEditor plugin is active
+ * Check if EasyMDE editor plugin is active
  * @param pluginService - Plugin service instance
  * @returns Promise<boolean>
  */
@@ -144,7 +244,7 @@ export async function isMDXEditorActive(pluginService: any): Promise<boolean> {
     const status = await pluginService.getPluginStatus('mdxeditor-plugin')
     return status?.is_active === true
   } catch (error) {
-    console.error('Error checking MDXEditor plugin status:', error)
+    console.error('Error checking EasyMDE editor plugin status:', error)
     return false
   }
 }
