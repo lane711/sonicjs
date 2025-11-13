@@ -656,6 +656,23 @@ var PluginBootstrapService = class {
         enableAutomation: true,
         enableNotifications: true
       }
+    },
+    {
+      id: "mdxeditor-plugin",
+      name: "mdxeditor-plugin",
+      display_name: "EasyMDE Editor",
+      description: "Lightweight markdown editor with live preview for richtext fields",
+      version: "1.0.0",
+      author: "SonicJS Team",
+      category: "editor",
+      icon: "\u270D\uFE0F",
+      permissions: [],
+      dependencies: [],
+      settings: {
+        defaultHeight: 400,
+        toolbar: "full",
+        placeholder: "Start writing your content..."
+      }
     }
   ];
   /**
@@ -780,5 +797,5 @@ exports.registerCollections = registerCollections;
 exports.syncCollection = syncCollection;
 exports.syncCollections = syncCollections;
 exports.validateCollectionConfig = validateCollectionConfig;
-//# sourceMappingURL=chunk-CRYZYNNJ.cjs.map
-//# sourceMappingURL=chunk-CRYZYNNJ.cjs.map
+//# sourceMappingURL=chunk-AMSTLQFI.cjs.map
+//# sourceMappingURL=chunk-AMSTLQFI.cjs.map

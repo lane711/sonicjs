@@ -150,6 +150,23 @@ export class PluginBootstrapService {
         enableNotifications: true,
       },
     },
+    {
+      id: "mdxeditor-plugin",
+      name: "mdxeditor-plugin",
+      display_name: "EasyMDE Editor",
+      description: "Lightweight markdown editor with live preview for richtext fields",
+      version: "1.0.0",
+      author: "SonicJS Team",
+      category: "editor",
+      icon: "✍️",
+      permissions: [],
+      dependencies: [],
+      settings: {
+        defaultHeight: 400,
+        toolbar: "full",
+        placeholder: "Start writing your content...",
+      },
+    },
   ];
 
   /**
