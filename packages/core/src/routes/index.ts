@@ -15,6 +15,9 @@ export { default as adminApiRoutes } from './admin-api'
 // Auth routes
 export { default as authRoutes } from './auth'
 
+// Test routes (only for development/test environments)
+export { default as testCleanupRoutes } from './test-cleanup'
+
 // Admin UI routes
 export { default as adminContentRoutes } from './admin-content'
 export { userRoutes as adminUsersRoutes } from './admin-users'
@@ -38,6 +41,7 @@ export const ROUTES_INFO = {
     'apiSystemRoutes',
     'adminApiRoutes',
     'authRoutes',
+    'testCleanupRoutes',
     'adminContentRoutes',
     'adminUsersRoutes',
     'adminMediaRoutes',

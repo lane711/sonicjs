@@ -13,6 +13,7 @@ import {
   apiSystemRoutes,
   adminApiRoutes,
   authRoutes,
+  testCleanupRoutes,
   adminContentRoutes,
   adminUsersRoutes,
   adminMediaRoutes,
@@ -182,6 +183,9 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   app.route('/admin/logs', adminLogsRoutes)
   app.route('/admin', adminUsersRoutes)
   app.route('/auth', authRoutes)
+
+  // Test cleanup routes (only for development/test environments)
+  app.route('/', testCleanupRoutes)
 
   // Plugin routes
   if (emailPlugin.routes && emailPlugin.routes.length > 0) {

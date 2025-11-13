@@ -91,6 +91,19 @@ const AVAILABLE_PLUGINS = [
     permissions: [],
     dependencies: [],
     is_core: false
+  },
+  {
+    id: 'easy-mdx',
+    name: 'easy-mdx',
+    display_name: 'EasyMDE Markdown Editor',
+    description: 'Lightweight markdown editor with live preview. Provides a simple and efficient editor with markdown support for richtext fields.',
+    version: '1.0.0',
+    author: 'SonicJS Team',
+    category: 'editor',
+    icon: '📝',
+    permissions: [],
+    dependencies: [],
+    is_core: false
   }
 ]
 
@@ -521,6 +534,31 @@ adminPluginRoutes.post('/install', async (c) => {
       })
 
       return c.json({ success: true, plugin: tinymcePlugin })
+    }
+
+    // Handle Easy MDX plugin installation
+    if (body.name === 'easy-mdx') {
+      const easyMdxPlugin = await pluginService.installPlugin({
+        id: 'easy-mdx',
+        name: 'easy-mdx',
+        display_name: 'EasyMDE Markdown Editor',
+        description: 'Lightweight markdown editor with live preview. Provides a simple and efficient editor with markdown support for richtext fields.',
+        version: '1.0.0',
+        author: 'SonicJS Team',
+        category: 'editor',
+        icon: '📝',
+        permissions: [],
+        dependencies: [],
+        is_core: false,
+        settings: {
+          defaultHeight: 400,
+          theme: 'dark',
+          toolbar: 'full',
+          placeholder: 'Start writing your content...'
+        }
+      })
+
+      return c.json({ success: true, plugin: easyMdxPlugin })
     }
 
     return c.json({ error: 'Plugin not found in registry' }, 404)
