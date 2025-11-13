@@ -683,12 +683,23 @@ adminCollectionsRoutes.put('/:collectionId/fields/:fieldId', async (c) => {
 
       // Update the field in the schema
       if (schema.properties[fieldName]) {
-        schema.properties[fieldName] = {
+        // Build the updated field config
+        const updatedFieldConfig: any = {
           ...schema.properties[fieldName],
           type: fieldType,
           title: fieldLabel,
           searchable: isSearchable
         }
+
+        // Also set/remove the individual required property on the field
+        // This ensures consistency regardless of which format is checked in GET
+        if (isRequired) {
+          updatedFieldConfig.required = true
+        } else {
+          delete updatedFieldConfig.required
+        }
+
+        schema.properties[fieldName] = updatedFieldConfig
 
         // Handle required field in the schema's required array (proper JSON Schema way)
         const requiredIndex = schema.required.indexOf(fieldName)
@@ -710,6 +721,7 @@ adminCollectionsRoutes.put('/:collectionId/fields/:fieldId', async (c) => {
         }
 
         console.log('[Field Update] Final required array:', schema.required)
+        console.log('[Field Update] Final field config:', schema.properties[fieldName])
       }
 
       // Update the collection in the database

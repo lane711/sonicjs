@@ -67,18 +67,23 @@ test.describe('Collection Field Type Badges', () => {
 
       console.log(`Found ${badgeCount} total badges on page`);
 
-      // Filter badges to only field type badges (exclude Required badges)
+      // Filter badges to only field type badges (exclude Required, Draft, Searchable, and version badges)
       let fieldTypeBadge = null;
       for (let i = 0; i < badgeCount; i++) {
         const badge = badges.nth(i);
-        const badgeText = await badge.textContent();
+        const badgeText = ((await badge.textContent()) || '').replace(/\s+/g, ' ').trim();
 
-        // Skip "Required" badges and "Draft" badges
-        if (badgeText?.includes('Required') || badgeText?.includes('Draft')) {
+        // Skip "Required", "Draft", "Searchable" badges and version number badges (e.g., "2.0.10")
+        if (badgeText.includes('Required') ||
+            badgeText.includes('Draft') ||
+            badgeText.includes('Searchable') ||
+            /^\d+\.\d+/.test(badgeText)) {  // Skip version numbers like "2.0.10"
+          console.log(`Skipping badge: "${badgeText}"`);
           continue;
         }
 
         // This should be a field type badge
+        console.log(`Found field type badge: "${badgeText}"`);
         fieldTypeBadge = badge;
         break;
       }

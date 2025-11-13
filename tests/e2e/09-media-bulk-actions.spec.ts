@@ -273,12 +273,12 @@ test.describe('Media Bulk Actions', () => {
     await expect(deleteButton).toBeVisible();
     await deleteButton.click({ force: true });
 
-    // Wait a moment for dialog to appear
-    await page.waitForTimeout(500);
-
-    // Confirm deletion in dialog
+    // Wait for dialog to open (check for open attribute on dialog element)
     const confirmDialog = page.locator('#media-bulk-delete-confirm');
-    await expect(confirmDialog).toBeVisible({ timeout: 5000 });
+    await confirmDialog.waitFor({ state: 'attached', timeout: 5000 });
+
+    // Wait for the dialog to have the open attribute
+    await expect(confirmDialog).toHaveAttribute('open', '', { timeout: 5000 });
 
     const confirmButton = confirmDialog.locator('button:has-text("Delete")');
     await expect(confirmButton).toBeVisible();

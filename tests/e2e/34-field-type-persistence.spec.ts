@@ -39,8 +39,8 @@ test.describe('Field Properties Persistence', () => {
     })
 
     // Change ALL properties to different values
-    // Change field type to quill
-    await page.selectOption('#field-type', 'quill')
+    // Change field type to text (a standard field type that always exists)
+    await page.selectOption('#field-type', 'text')
 
     // Toggle required checkbox
     const requiredCheckbox = page.locator('#field-required')
@@ -69,7 +69,7 @@ test.describe('Field Properties Persistence', () => {
       is_searchable: newSearchable
     })
 
-    expect(newType).toBe('quill')
+    expect(newType).toBe('text')
     expect(newRequired).not.toBe(currentRequired)
     expect(newSearchable).not.toBe(currentSearchable)
 
@@ -101,7 +101,7 @@ test.describe('Field Properties Persistence', () => {
     })
 
     // CRITICAL ASSERTIONS - All properties must persist
-    expect(persistedType).toBe('quill')
+    expect(persistedType).toBe('text')
     expect(persistedRequired).toBe(newRequired)
     expect(persistedSearchable).toBe(newSearchable)
   })
@@ -142,7 +142,7 @@ test.describe('Field Properties Persistence', () => {
     await page.waitForSelector('#field-type', { state: 'visible', timeout: 10000 })
 
     // Change properties
-    await page.selectOption('#field-type', 'quill')
+    await page.selectOption('#field-type', 'text')
     await page.locator('#field-required').check()
     await page.locator('#field-searchable').check()
 

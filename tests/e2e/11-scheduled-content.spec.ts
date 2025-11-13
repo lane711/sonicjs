@@ -17,16 +17,17 @@ test.describe('Scheduled Content Management', () => {
 
   test('should display scheduled content page', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
-    
+    await page.waitForLoadState('networkidle')
+
     if (await skipIfWorkflowInactive(page)) return;
-    
+
     // Check page title and header
     await expect(page).toHaveTitle(/Scheduled Content/)
     await expect(page.locator('h1')).toContainText('Scheduled Content')
-    
+
     // Check breadcrumb navigation
     await expect(page.locator('a[href="/admin/workflow/dashboard"]').first()).toBeVisible()
-    
+
     // Check action buttons
     await expect(page.locator('button:has-text("Bulk Schedule")')).toBeVisible()
     await expect(page.locator('button:has-text("Refresh")')).toBeVisible()
@@ -34,7 +35,8 @@ test.describe('Scheduled Content Management', () => {
 
   test('should display stats overview cards', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
-    
+    await page.waitForLoadState('networkidle')
+
     if (await skipIfWorkflowInactive(page)) return;
     
     // Check for stats cards or general page content
@@ -68,6 +70,7 @@ test.describe('Scheduled Content Management', () => {
   test('should show empty state when no scheduled content', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
     
+    await page.waitForLoadState('networkidle')
     if (await skipIfWorkflowInactive(page)) return;
     
     // May show empty state or actual content
@@ -84,6 +87,7 @@ test.describe('Scheduled Content Management', () => {
   test('should open bulk schedule modal', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
     
+    await page.waitForLoadState('networkidle')
     if (await skipIfWorkflowInactive(page)) return;
     
     // Click bulk schedule button
@@ -103,6 +107,7 @@ test.describe('Scheduled Content Management', () => {
   test('should close bulk schedule modal', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
     
+    await page.waitForLoadState('networkidle')
     if (await skipIfWorkflowInactive(page)) return;
     
     // Open modal
@@ -117,6 +122,7 @@ test.describe('Scheduled Content Management', () => {
   test('should toggle between scheduling methods in bulk modal', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
     
+    await page.waitForLoadState('networkidle')
     if (await skipIfWorkflowInactive(page)) return;
     
     // Open modal
@@ -142,6 +148,7 @@ test.describe('Scheduled Content Management', () => {
   test('should filter scheduled content by status', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
     
+    await page.waitForLoadState('networkidle')
     if (await skipIfWorkflowInactive(page)) return;
     
     // Test status filter
@@ -159,6 +166,7 @@ test.describe('Scheduled Content Management', () => {
   test('should filter scheduled content by action', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
     
+    await page.waitForLoadState('networkidle')
     if (await skipIfWorkflowInactive(page)) return;
     
     // Test action filter
@@ -174,6 +182,7 @@ test.describe('Scheduled Content Management', () => {
   test('should handle refresh button', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
     
+    await page.waitForLoadState('networkidle')
     if (await skipIfWorkflowInactive(page)) return;
     
     // Click refresh button
@@ -203,6 +212,7 @@ test.describe('Scheduled Content Management', () => {
     // Go to scheduled content page
     await page.goto('/admin/workflow/scheduled');
     
+    await page.waitForLoadState('networkidle')
     // Skip if workflow plugin is not active
     if (await skipIfWorkflowInactive(page)) return;
     
@@ -237,6 +247,7 @@ test.describe('Scheduled Content Management', () => {
 
     await page.goto('/admin/workflow/scheduled')
     
+    await page.waitForLoadState('networkidle')
     if (await skipIfWorkflowInactive(page)) return;
     
     // Test that page loads successfully with or without data
@@ -247,6 +258,7 @@ test.describe('Scheduled Content Management', () => {
   test('should show proper status badges', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
     
+    await page.waitForLoadState('networkidle')
     if (await skipIfWorkflowInactive(page)) return;
     
     // Check that status filter options match expected statuses
@@ -262,6 +274,7 @@ test.describe('Scheduled Content Management', () => {
   test('should show proper action badges', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
     
+    await page.waitForLoadState('networkidle')
     if (await skipIfWorkflowInactive(page)) return;
     
     // Check that action filter options match expected actions
@@ -285,6 +298,7 @@ test.describe('Scheduled Content Management', () => {
 
     await page.goto('/admin/workflow/scheduled')
     
+    await page.waitForLoadState('networkidle')
     if (await skipIfWorkflowInactive(page)) return;
     
     // Open bulk schedule modal
@@ -318,6 +332,7 @@ test.describe('Scheduled Content Management', () => {
 
     await page.goto('/admin/workflow/scheduled')
     
+    await page.waitForLoadState('networkidle')
     if (await skipIfWorkflowInactive(page)) return;
     
     // Test cancellation function exists
@@ -336,6 +351,7 @@ test.describe('Scheduled Content Management', () => {
     
     await page.goto('/admin/workflow/scheduled')
     
+    await page.waitForLoadState('networkidle')
     if (await skipIfWorkflowInactive(page)) return;
     
     // Check responsive elements
@@ -356,6 +372,7 @@ test.describe('Scheduled Content Management', () => {
   test('should navigate back to workflow dashboard', async ({ page }) => {
     await page.goto('/admin/workflow/scheduled')
     
+    await page.waitForLoadState('networkidle')
     if (await skipIfWorkflowInactive(page)) return;
     
     // Click breadcrumb

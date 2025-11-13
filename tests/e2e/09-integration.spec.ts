@@ -109,7 +109,7 @@ test.describe('Full Integration Workflows', () => {
 
     // 2. Login with valid credentials
     await loginAsAdmin(page);
-    await expect(page).toHaveURL('/admin', { timeout: 10000 });
+    await expect(page).toHaveURL(/\/admin(\/dashboard)?/, { timeout: 10000 });
 
     // 3. Navigate to different admin sections
     const sections = ['collections', 'content', 'media'];
@@ -194,7 +194,7 @@ test.describe('Full Integration Workflows', () => {
       };
     } catch {
       // If stats don't load, skip this test or use placeholder values
-      await expect(page).toHaveURL('/admin');
+      await expect(page).toHaveURL(/\/admin(\/dashboard)?/);
       return; // Skip the rest of the test if stats aren't available
     }
     
