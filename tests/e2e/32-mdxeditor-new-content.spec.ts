@@ -23,19 +23,19 @@ test.describe('MDXEditor on New Content Form', () => {
     )
     console.log('Scripts loaded:', scripts)
 
-    // Check if MDXEditor script is loaded
-    const hasMDXEditor = scripts.some(src =>
-      src?.includes('mdxeditor') || src?.includes('MDXEditor')
+    // Check if EasyMDE script is loaded
+    const hasEasyMDE = scripts.some(src =>
+      src?.includes('easymde') || src?.includes('EasyMDE')
     )
-    console.log('Has MDXEditor script:', hasMDXEditor)
+    console.log('Has EasyMDE script:', hasEasyMDE)
 
     // Check if there's a richtext field
     const richtextFields = await page.locator('[data-field-type="richtext"]').count()
     console.log('Richtext fields found:', richtextFields)
 
-    // Check for MDXEditor container
-    const mdxEditorExists = await page.locator('.mdxeditor-root').count()
-    console.log('MDXEditor containers found:', mdxEditorExists)
+    // Check for EasyMDE container
+    const easyMDEExists = await page.locator('.CodeMirror').count()
+    console.log('EasyMDE containers found:', easyMDEExists)
 
     // Check browser console for any errors
     const consoleMessages: string[] = []
@@ -55,11 +55,11 @@ test.describe('MDXEditor on New Content Form', () => {
     await page.waitForTimeout(1000)
     console.log('Console messages:', consoleMessages)
 
-    // Expect MDXEditor to be loaded
-    if (hasMDXEditor) {
-      expect(mdxEditorExists).toBeGreaterThan(0)
+    // Expect EasyMDE to be loaded
+    if (hasEasyMDE) {
+      expect(easyMDEExists).toBeGreaterThan(0)
     } else {
-      console.log('MDXEditor script not found - checking why')
+      console.log('EasyMDE script not found - checking why')
 
       // Check if plugin is active
       await page.goto('/admin/plugins')

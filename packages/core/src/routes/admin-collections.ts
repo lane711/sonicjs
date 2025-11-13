@@ -397,7 +397,7 @@ adminCollectionsRoutes.get('/:id', async (c) => {
             field_options: fieldConfig,
             field_order: fieldOrder++,
             is_required: fieldConfig.required === true || (schema.required && schema.required.includes(fieldName)),
-            is_searchable: false
+            is_searchable: fieldConfig.searchable === true || false
           }))
         }
       } catch (e) {
@@ -626,11 +626,15 @@ adminCollectionsRoutes.post('/:id/fields', async (c) => {
 adminCollectionsRoutes.put('/:collectionId/fields/:fieldId', async (c) => {
   try {
     const fieldId = c.req.param('fieldId')
+    const collectionId = c.req.param('collectionId')
     const formData = await c.req.formData()
     const fieldLabel = formData.get('field_label') as string
     const fieldType = formData.get('field_type') as string
-    const isRequired = formData.get('is_required') === '1'
-    const isSearchable = formData.get('is_searchable') === '1'
+    // Use getAll() to handle hidden input + checkbox pattern (get last value)
+    const isRequiredValues = formData.getAll('is_required')
+    const isSearchableValues = formData.getAll('is_searchable')
+    const isRequired = isRequiredValues[isRequiredValues.length - 1] === '1'
+    const isSearchable = isSearchableValues[isSearchableValues.length - 1] === '1'
     const fieldOptions = formData.get('field_options') as string || '{}'
 
     // Log all form data for debugging
@@ -649,13 +653,102 @@ adminCollectionsRoutes.put('/:collectionId/fields/:fieldId', async (c) => {
 
     const db = c.env.DB
 
+    // Check if this is a schema field (starts with "schema-")
+    if (fieldId.startsWith('schema-')) {
+      // Schema fields are part of the collection's JSON schema
+      // We need to update the collection's schema in the database
+      const fieldName = fieldId.replace('schema-', '')
+
+      console.log('[Field Update] Updating schema field:', fieldName)
+
+      // Get the current collection
+      const getCollectionStmt = db.prepare('SELECT * FROM collections WHERE id = ?')
+      const collection = await getCollectionStmt.bind(collectionId).first()
+
+      if (!collection) {
+        return c.json({ success: false, error: 'Collection not found.' })
+      }
+
+      // Parse the current schema
+      let schema = typeof collection.schema === 'string' ? JSON.parse(collection.schema) : collection.schema
+      if (!schema) {
+        schema = { type: 'object', properties: {}, required: [] }
+      }
+      if (!schema.properties) {
+        schema.properties = {}
+      }
+      if (!schema.required) {
+        schema.required = []
+      }
+
+      // Update the field in the schema
+      if (schema.properties[fieldName]) {
+        schema.properties[fieldName] = {
+          ...schema.properties[fieldName],
+          type: fieldType,
+          title: fieldLabel,
+          searchable: isSearchable
+        }
+
+        // Handle required field in the schema's required array (proper JSON Schema way)
+        const requiredIndex = schema.required.indexOf(fieldName)
+        console.log('[Field Update] Required field handling:', {
+          fieldName,
+          isRequired,
+          currentRequiredArray: schema.required,
+          requiredIndex
+        })
+
+        if (isRequired && requiredIndex === -1) {
+          // Add to required array if checked and not already there
+          schema.required.push(fieldName)
+          console.log('[Field Update] Added field to required array')
+        } else if (!isRequired && requiredIndex !== -1) {
+          // Remove from required array if unchecked and currently there
+          schema.required.splice(requiredIndex, 1)
+          console.log('[Field Update] Removed field from required array')
+        }
+
+        console.log('[Field Update] Final required array:', schema.required)
+      }
+
+      // Update the collection in the database
+      const updateCollectionStmt = db.prepare(`
+        UPDATE collections
+        SET schema = ?, updated_at = ?
+        WHERE id = ?
+      `)
+
+      const result = await updateCollectionStmt.bind(JSON.stringify(schema), Date.now(), collectionId).run()
+
+      console.log('[Field Update] Schema update result:', {
+        success: result.success,
+        changes: result.meta?.changes
+      })
+
+      return c.json({ success: true })
+    }
+
+    // For regular database fields
     const updateStmt = db.prepare(`
       UPDATE content_fields
       SET field_label = ?, field_type = ?, field_options = ?, is_required = ?, is_searchable = ?, updated_at = ?
       WHERE id = ?
     `)
 
-    await updateStmt.bind(fieldLabel, fieldType, fieldOptions, isRequired ? 1 : 0, isSearchable ? 1 : 0, Date.now(), fieldId).run()
+    const result = await updateStmt.bind(fieldLabel, fieldType, fieldOptions, isRequired ? 1 : 0, isSearchable ? 1 : 0, Date.now(), fieldId).run()
+
+    console.log('[Field Update] Update result:', {
+      success: result.success,
+      meta: result.meta,
+      changes: result.meta?.changes,
+      last_row_id: result.meta?.last_row_id
+    })
+
+    // Verify the update by reading back the field
+    const verifyStmt = db.prepare('SELECT * FROM content_fields WHERE id = ?')
+    const verifyResult = await verifyStmt.bind(fieldId).first()
+    console.log('[Field Update] Verification - field after update:', verifyResult)
 
     console.log('[Field Update] Successfully updated field with type:', fieldType)
 

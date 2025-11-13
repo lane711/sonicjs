@@ -691,16 +691,14 @@ export function renderContentFormPage(data: ContentFormData): string {
         skin: data.tinymceSettings?.skin,
         defaultHeight: data.tinymceSettings?.defaultHeight,
         defaultToolbar: data.tinymceSettings?.defaultToolbar
-      })}</script>` : '// TinyMCE plugin not active - richtext fields will use plain textareas'}
+      })}</script>` : ''}
 
       ${data.mdxeditorEnabled ? `<script>${getMDXEditorInitScript({
         theme: data.mdxeditorSettings?.theme,
         defaultHeight: data.mdxeditorSettings?.defaultHeight,
         toolbar: data.mdxeditorSettings?.toolbar,
         placeholder: data.mdxeditorSettings?.placeholder
-      })}</script>` : '// MDXEditor plugin not active - richtext fields will use plain textareas'}
-
-      // Quill initialization is handled by a separate script tag above
+      })}</script>` : ''}
     </script>
   `
 

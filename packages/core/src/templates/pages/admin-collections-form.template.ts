@@ -73,11 +73,9 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
     ? `Update collection: ${data.display_name}`
     : 'Define a new content collection with custom fields and settings.'
 
-  // Pre-compute badges for all fields
-  const fieldsWithBadges = (data.fields || []).map(field => ({
+  // Pre-compute data attribute for all fields (without badge HTML to avoid escaping issues)
+  const fieldsWithData = (data.fields || []).map(field => ({
     ...field,
-    typeBadgeHTML: getFieldTypeBadge(field.field_type),
-    // Pre-compute the data attribute value without typeBadgeHTML
     dataFieldJSON: JSON.stringify(JSON.stringify(field))
   }))
 
@@ -323,17 +321,22 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
 
               <!-- Fields List (Read-Only) -->
               <div class="space-y-3">
-                ${fieldsWithBadges.map(field => `
+                ${fieldsWithData.map(field => `
                   <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-950/5 dark:border-white/10 p-4">
                     <div class="flex items-center justify-between">
                       <div class="flex items-center gap-x-4">
                         <div>
                           <div class="flex items-center gap-x-2">
                             <span class="text-sm/6 font-medium text-zinc-950 dark:text-white">${field.field_label}</span>
-                            ${field.typeBadgeHTML}
+                            ${getFieldTypeBadge(field.field_type)}
                             ${field.is_required ? `
                               <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-rose-500/10 dark:bg-rose-400/10 text-rose-700 dark:text-rose-300 ring-1 ring-inset ring-rose-500/20 dark:ring-rose-400/20">
                                 Required
+                              </span>
+                            ` : ''}
+                            ${field.is_searchable ? `
+                              <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-emerald-500/10 dark:bg-emerald-400/10 text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-500/20 dark:ring-emerald-400/20">
+                                Searchable
                               </span>
                             ` : ''}
                           </div>
@@ -381,7 +384,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
               
               <!-- Fields List -->
               <div id="fields-list" class="space-y-3">
-                ${fieldsWithBadges.map(field => `
+                ${fieldsWithData.map(field => `
                   <div class="field-item bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-950/5 dark:border-white/10 p-4"
                        data-field-id="${field.id}"
                        data-field-data="${field.dataFieldJSON}">
@@ -395,10 +398,15 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
                         <div>
                           <div class="flex items-center gap-x-2">
                             <span class="text-sm/6 font-medium text-zinc-950 dark:text-white">${field.field_label}</span>
-                            ${field.typeBadgeHTML}
+                            ${getFieldTypeBadge(field.field_type)}
                             ${field.is_required ? `
                               <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-pink-500/10 dark:bg-pink-400/10 text-pink-700 dark:text-pink-300 ring-1 ring-inset ring-pink-500/20 dark:ring-pink-400/20">
                                 Required
+                              </span>
+                            ` : ''}
+                            ${field.is_searchable ? `
+                              <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-emerald-500/10 dark:bg-emerald-400/10 text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-500/20 dark:ring-emerald-400/20">
+                                Searchable
                               </span>
                             ` : ''}
                           </div>
@@ -564,6 +572,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
             <div class="flex gap-3">
               <div class="flex h-6 shrink-0 items-center">
                 <div class="group grid size-4 grid-cols-1">
+                  <input type="hidden" name="is_required" value="0">
                   <input
                     type="checkbox"
                     id="field-required"
@@ -585,6 +594,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
             <div class="flex gap-3">
               <div class="flex h-6 shrink-0 items-center">
                 <div class="group grid size-4 grid-cols-1">
+                  <input type="hidden" name="is_searchable" value="0">
                   <input
                     type="checkbox"
                     id="field-searchable"
