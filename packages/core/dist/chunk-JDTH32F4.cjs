@@ -3069,13 +3069,42 @@ chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 
 // src/templates/components/dynamic-field.template.ts
 function renderDynamicField(field, options = {}) {
-  const { value = "", errors = [], disabled = false, className = "" } = options;
+  const { value = "", errors = [], disabled = false, className = "", pluginStatuses = {} } = options;
   const opts = field.field_options || {};
   const required = field.is_required ? "required" : "";
   const baseClasses = `w-full rounded-lg px-3 py-2 text-sm text-zinc-950 dark:text-white bg-white dark:bg-zinc-800 shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow ${className}`;
   const errorClasses = errors.length > 0 ? "ring-pink-600 dark:ring-pink-500 focus:ring-pink-600 dark:focus:ring-pink-500" : "";
   const fieldId = `field-${field.field_name}`;
   const fieldName = field.field_name;
+  let fallbackToTextarea = false;
+  let fallbackWarning = "";
+  if (field.field_type === "quill" && !pluginStatuses.quillEnabled) {
+    fallbackToTextarea = true;
+    fallbackWarning = "\u26A0\uFE0F Quill Editor plugin is inactive. Using textarea fallback.";
+  } else if (field.field_type === "mdxeditor" && !pluginStatuses.mdxeditorEnabled) {
+    fallbackToTextarea = true;
+    fallbackWarning = "\u26A0\uFE0F MDXEditor plugin is inactive. Using textarea fallback.";
+  } else if (field.field_type === "tinymce" && !pluginStatuses.tinymceEnabled) {
+    fallbackToTextarea = true;
+    fallbackWarning = "\u26A0\uFE0F TinyMCE plugin is inactive. Using textarea fallback.";
+  }
+  if (fallbackToTextarea) {
+    return `
+      <div>
+        ${fallbackWarning ? `<div class="mb-2 px-3 py-2 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-200 text-xs rounded-lg border border-amber-200 dark:border-amber-800">${fallbackWarning}</div>` : ""}
+        <textarea
+          id="${fieldId}"
+          name="${fieldName}"
+          rows="${opts.rows || opts.height ? Math.floor(opts.height / 25) : 10}"
+          placeholder="${opts.placeholder || ""}"
+          maxlength="${opts.maxLength || ""}"
+          class="${baseClasses} ${errorClasses} resize-y"
+          ${required}
+          ${disabled ? "disabled" : ""}
+        >${escapeHtml2(value)}</textarea>
+      </div>
+    `;
+  }
   let fieldHTML = "";
   switch (field.field_type) {
     case "text":
@@ -4216,17 +4245,25 @@ function renderContentFormPage(data) {
     if (fieldName === "slug") return data.slug || data.data?.[fieldName] || "";
     return data.data?.[fieldName] || "";
   };
+  const pluginStatuses = {
+    quillEnabled: data.quillEnabled || false,
+    mdxeditorEnabled: data.mdxeditorEnabled || false,
+    tinymceEnabled: data.tinymceEnabled || false
+  };
   const coreFieldsHTML = coreFields.sort((a, b) => a.field_order - b.field_order).map((field) => renderDynamicField(field, {
     value: getFieldValue(field.field_name),
-    errors: data.validationErrors?.[field.field_name] || []
+    errors: data.validationErrors?.[field.field_name] || [],
+    pluginStatuses
   }));
   const contentFieldsHTML = contentFields.sort((a, b) => a.field_order - b.field_order).map((field) => renderDynamicField(field, {
     value: getFieldValue(field.field_name),
-    errors: data.validationErrors?.[field.field_name] || []
+    errors: data.validationErrors?.[field.field_name] || [],
+    pluginStatuses
   }));
   const metaFieldsHTML = metaFields.sort((a, b) => a.field_order - b.field_order).map((field) => renderDynamicField(field, {
     value: getFieldValue(field.field_name),
-    errors: data.validationErrors?.[field.field_name] || []
+    errors: data.validationErrors?.[field.field_name] || [],
+    pluginStatuses
   }));
   const pageContent = `
     <div class="space-y-6">
@@ -21237,5 +21274,5 @@ exports.api_system_default = api_system_default;
 exports.auth_default = auth_default;
 exports.router = router;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-VOFFUPW4.cjs.map
-//# sourceMappingURL=chunk-VOFFUPW4.cjs.map
+//# sourceMappingURL=chunk-JDTH32F4.cjs.map
+//# sourceMappingURL=chunk-JDTH32F4.cjs.map

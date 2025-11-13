@@ -153,9 +153,6 @@ var require_identifiers = __commonJS({
   "../../node_modules/semver/internal/identifiers.js"(exports, module) {
     var numeric = /^[0-9]+$/;
     var compareIdentifiers = (a, b) => {
-      if (typeof a === "number" && typeof b === "number") {
-        return a === b ? 0 : a < b ? -1 : 1;
-      }
       const anum = numeric.test(a);
       const bnum = numeric.test(b);
       if (anum && bnum) {
@@ -261,25 +258,7 @@ var require_semver = __commonJS({
         if (!(other instanceof _SemVer)) {
           other = new _SemVer(other, this.options);
         }
-        if (this.major < other.major) {
-          return -1;
-        }
-        if (this.major > other.major) {
-          return 1;
-        }
-        if (this.minor < other.minor) {
-          return -1;
-        }
-        if (this.minor > other.minor) {
-          return 1;
-        }
-        if (this.patch < other.patch) {
-          return -1;
-        }
-        if (this.patch > other.patch) {
-          return 1;
-        }
-        return 0;
+        return compareIdentifiers(this.major, other.major) || compareIdentifiers(this.minor, other.minor) || compareIdentifiers(this.patch, other.patch);
       }
       comparePre(other) {
         if (!(other instanceof _SemVer)) {
@@ -1015,7 +994,6 @@ var require_range = __commonJS({
       return result;
     };
     var parseComparator = (comp, options) => {
-      comp = comp.replace(re[t.BUILD], "");
       debug("comp", comp, options);
       comp = replaceCarets(comp, options);
       debug("caret", comp);
@@ -3082,5 +3060,5 @@ var PluginManager = class {
 };
 
 export { HookSystemImpl, HookUtils, PluginManager, PluginRegistryImpl, PluginValidator, ScopedHookSystem };
-//# sourceMappingURL=chunk-HKEK7UNV.js.map
-//# sourceMappingURL=chunk-HKEK7UNV.js.map
+//# sourceMappingURL=chunk-EAELJXRV.js.map
+//# sourceMappingURL=chunk-EAELJXRV.js.map

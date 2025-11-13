@@ -83,26 +83,36 @@ export function renderContentFormPage(data: ContentFormData): string {
     return data.data?.[fieldName] || ''
   }
 
+  // Prepare plugin statuses for field rendering
+  const pluginStatuses = {
+    quillEnabled: data.quillEnabled || false,
+    mdxeditorEnabled: data.mdxeditorEnabled || false,
+    tinymceEnabled: data.tinymceEnabled || false
+  }
+
   // Render field groups
   const coreFieldsHTML = coreFields
     .sort((a, b) => a.field_order - b.field_order)
     .map(field => renderDynamicField(field, {
       value: getFieldValue(field.field_name),
-      errors: data.validationErrors?.[field.field_name] || []
+      errors: data.validationErrors?.[field.field_name] || [],
+      pluginStatuses
     }))
-  
+
   const contentFieldsHTML = contentFields
     .sort((a, b) => a.field_order - b.field_order)
     .map(field => renderDynamicField(field, {
       value: getFieldValue(field.field_name),
-      errors: data.validationErrors?.[field.field_name] || []
+      errors: data.validationErrors?.[field.field_name] || [],
+      pluginStatuses
     }))
 
   const metaFieldsHTML = metaFields
     .sort((a, b) => a.field_order - b.field_order)
     .map(field => renderDynamicField(field, {
       value: getFieldValue(field.field_name),
-      errors: data.validationErrors?.[field.field_name] || []
+      errors: data.validationErrors?.[field.field_name] || [],
+      pluginStatuses
     }))
 
   const pageContent = `

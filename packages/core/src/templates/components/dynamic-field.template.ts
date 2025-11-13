@@ -14,10 +14,15 @@ export interface FieldRenderOptions {
   errors?: string[]
   disabled?: boolean
   className?: string
+  pluginStatuses?: {
+    quillEnabled?: boolean
+    mdxeditorEnabled?: boolean
+    tinymceEnabled?: boolean
+  }
 }
 
 export function renderDynamicField(field: FieldDefinition, options: FieldRenderOptions = {}): string {
-  const { value = '', errors = [], disabled = false, className = '' } = options
+  const { value = '', errors = [], disabled = false, className = '', pluginStatuses = {} } = options
   const opts = field.field_options || {}
   const required = field.is_required ? 'required' : ''
   const baseClasses = `w-full rounded-lg px-3 py-2 text-sm text-zinc-950 dark:text-white bg-white dark:bg-zinc-800 shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow ${className}`
@@ -25,9 +30,44 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
 
   const fieldId = `field-${field.field_name}`
   const fieldName = field.field_name
-  
+
+  // Check if this is a plugin-based field type and if the plugin is inactive
+  // If so, fall back to textarea with a warning
+  let fallbackToTextarea = false
+  let fallbackWarning = ''
+
+  if (field.field_type === 'quill' && !pluginStatuses.quillEnabled) {
+    fallbackToTextarea = true
+    fallbackWarning = '⚠️ Quill Editor plugin is inactive. Using textarea fallback.'
+  } else if (field.field_type === 'mdxeditor' && !pluginStatuses.mdxeditorEnabled) {
+    fallbackToTextarea = true
+    fallbackWarning = '⚠️ MDXEditor plugin is inactive. Using textarea fallback.'
+  } else if (field.field_type === 'tinymce' && !pluginStatuses.tinymceEnabled) {
+    fallbackToTextarea = true
+    fallbackWarning = '⚠️ TinyMCE plugin is inactive. Using textarea fallback.'
+  }
+
+  // If falling back to textarea, render it with a warning
+  if (fallbackToTextarea) {
+    return `
+      <div>
+        ${fallbackWarning ? `<div class="mb-2 px-3 py-2 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-200 text-xs rounded-lg border border-amber-200 dark:border-amber-800">${fallbackWarning}</div>` : ''}
+        <textarea
+          id="${fieldId}"
+          name="${fieldName}"
+          rows="${opts.rows || opts.height ? Math.floor(opts.height / 25) : 10}"
+          placeholder="${opts.placeholder || ''}"
+          maxlength="${opts.maxLength || ''}"
+          class="${baseClasses} ${errorClasses} resize-y"
+          ${required}
+          ${disabled ? 'disabled' : ''}
+        >${escapeHtml(value)}</textarea>
+      </div>
+    `
+  }
+
   let fieldHTML = ''
-  
+
   switch (field.field_type) {
     case 'text':
       let patternHelp = ''
