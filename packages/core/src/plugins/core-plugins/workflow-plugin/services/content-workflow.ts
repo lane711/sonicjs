@@ -517,7 +517,7 @@ export class WorkflowManager {
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `)
         await auditStmt.bind(
-          globalThis.crypto.randomUUID(),
+          crypto.randomUUID(),
           contentId,
           'bulk_update',
           'unknown',

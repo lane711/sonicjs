@@ -142,7 +142,7 @@ export class PluginValidator implements IPluginValidator {
       // Schema validation
       const result = PluginSchema.safeParse(plugin)
       if (!result.success) {
-        result.error.errors.forEach(err => {
+        result.error.issues.forEach((err: any) => {
           errors.push(`${err.path.join('.')}: ${err.message}`)
         })
       }

@@ -295,7 +295,7 @@ adminCollectionsRoutes.post('/', async (c) => {
     }
 
     // Create collection
-    const collectionId = globalThis.crypto.randomUUID()
+    const collectionId = crypto.randomUUID()
     const now = Date.now()
 
     const insertStmt = db.prepare(`
@@ -632,7 +632,7 @@ adminCollectionsRoutes.post('/:id/fields', async (c) => {
     const nextOrder = (orderResult?.max_order || 0) + 1
 
     // Create field
-    const fieldId = globalThis.crypto.randomUUID()
+    const fieldId = crypto.randomUUID()
     const now = Date.now()
 
     const insertStmt = db.prepare(`
