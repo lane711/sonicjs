@@ -34,37 +34,58 @@ jobs:
       - name: Run unit tests
         run: npm test
 
-      # E2E tests commented out temporarily - require Cloudflare preview deployment
-      # TODO: Set up Cloudflare Workers preview deployment for E2E tests
-      # This requires:
-      # 1. Cloudflare API token and account setup
-      # 2. Deploy to preview environment
-      # 3. Run E2E tests against preview URL
-      # 4. Clean up preview deployment
-      #
-      # For now, rely on:
-      # - Unit tests (325 passing)
-      # - Local manual E2E testing
-      # - Post-merge deployment verification
-      #
-      # - name: Build core package for E2E tests
-      #   run: npm run build:core
-      #
-      # - name: Deploy to Cloudflare Preview
-      #   run: |
-      #     cd my-sonicjs-app
-      #     npx wrangler deploy --env preview
-      #   env:
-      #     CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      #
-      # - name: Install Playwright browsers
-      #   run: npx playwright install --with-deps chromium
-      #
-      # - name: Run E2E tests against preview
-      #   run: npm run e2e
-      #   env:
-      #     CI: true
-      #     BASE_URL: ${{ steps.deploy.outputs.url }}
+      - name: Build core package
+        run: npm run build:core
+
+      - name: Deploy to Cloudflare Workers Preview
+        id: deploy
+        run: |
+          cd my-sonicjs-app
+          # Deploy to preview with unique name based on PR/branch
+          BRANCH_NAME="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+          SAFE_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-50)
+
+          # Deploy and capture the URL
+          echo "Deploying to preview environment: pr-${SAFE_BRANCH}"
+          DEPLOY_OUTPUT=$(npx wrangler deploy --name "sonicjs-pr-${SAFE_BRANCH}" 2>&1)
+          echo "$DEPLOY_OUTPUT"
+
+          # Extract the URL from wrangler output
+          PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oP 'https://[^\s]+\.workers\.dev' | head -1)
+
+          if [ -z "$PREVIEW_URL" ]; then
+            echo "Failed to extract preview URL"
+            exit 1
+          fi
+
+          echo "Preview URL: $PREVIEW_URL"
+          echo "preview_url=$PREVIEW_URL" >> $GITHUB_OUTPUT
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Wait for preview deployment
+        run: |
+          echo "Waiting for preview to be ready..."
+          for i in {1..30}; do
+            if curl -s -o /dev/null -w "%{http_code}" "${{ steps.deploy.outputs.preview_url }}" | grep -q "200\|301\|302"; then
+              echo "Preview is ready!"
+              exit 0
+            fi
+            echo "Attempt $i/30: Preview not ready yet, waiting..."
+            sleep 10
+          done
+          echo "Preview failed to become ready"
+          exit 1
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests against preview
+        run: npm run e2e
+        env:
+          CI: true
+          BASE_URL: ${{ steps.deploy.outputs.preview_url }}
 
       - name: Upload test results
         if: always()

@@ -86,13 +86,14 @@ EOF
 
 Every PR must include:
 
-1. **Unit Tests** - Test individual functions/components (REQUIRED in CI)
-2. **E2E Tests** - Test complete user workflows locally (RECOMMENDED, manual)
-3. **All unit tests passing** - Must pass in CI before merge
+1. **Unit Tests** - Test individual functions/components (REQUIRED)
+2. **E2E Tests** - Test complete user workflows (REQUIRED)
+3. **All tests passing** - Both unit and E2E must pass in CI
 
-**E2E Testing (Local Only)**:
-E2E tests are NOT automated in CI. To run E2E tests locally:
+**E2E Testing**:
+E2E tests run automatically in CI against a Cloudflare Workers preview deployment.
 
+To run E2E tests locally:
 ```bash
 # In one terminal - start dev server
 cd my-sonicjs-app
@@ -102,18 +103,17 @@ npm run dev
 npm run e2e
 ```
 
-**Note**: E2E tests in CI are disabled pending Cloudflare preview deployment setup.
-Manual E2E testing is recommended but not enforced.
+**Note**: CI automatically deploys each PR to a preview environment and runs E2E tests against it.
 
 ## CI/CD Pipeline
 
 GitHub Actions will automatically:
 - Run unit tests (325 tests)
-- Upload test artifacts on failure
+- Deploy PR to Cloudflare Workers preview environment
+- Run E2E tests against preview deployment
+- Upload test artifacts and videos on failure
 
-**E2E tests**: Currently run locally only. CI E2E tests require Cloudflare preview deployment (TODO).
-
-The PR cannot be merged until unit tests pass.
+The PR cannot be merged until all tests pass (unit + E2E).
 
 ## Branch Naming
 
