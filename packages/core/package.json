@@ -102,7 +102,7 @@
     "@cloudflare/workers-types": "^4.20251014.0",
     "@types/node": "^24.9.2",
     "drizzle-orm": "^0.44.7",
-    "hono": "^4.10.4",
+    "hono": "^4.10.3",
     "tsup": "^8.5.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.5",
