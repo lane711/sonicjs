@@ -34,6 +34,9 @@ jobs:
       - name: Run unit tests
         run: npm test
 
+      - name: Build core package for E2E tests
+        run: npm run build:core
+
       - name: Setup D1 database for tests
         run: |
           cd my-sonicjs-app
