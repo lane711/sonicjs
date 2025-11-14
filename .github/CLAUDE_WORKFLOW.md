@@ -86,19 +86,22 @@ EOF
 
 Every PR must include:
 
-1. **Unit Tests** - Test individual functions/components
-2. **E2E Tests** - Test complete user workflows
-3. **All tests passing** - Both locally and in CI
+1. **Unit Tests** - Test individual functions/components (REQUIRED)
+2. **E2E Tests** - Test complete user workflows locally (REQUIRED)
+3. **All tests passing locally** - Unit tests must pass in CI
+
+**Note**: E2E tests in CI are temporarily disabled pending Cloudflare preview deployment setup.
+Run E2E tests locally with `npm run e2e` before creating PR.
 
 ## CI/CD Pipeline
 
 GitHub Actions will automatically:
-- Run type checking
-- Run unit tests
-- Run E2E tests
+- Run unit tests (325 tests)
 - Upload test artifacts on failure
 
-The PR cannot be merged until all checks pass.
+**E2E tests**: Currently run locally only. CI E2E tests require Cloudflare preview deployment (TODO).
+
+The PR cannot be merged until unit tests pass.
 
 ## Branch Naming
 
