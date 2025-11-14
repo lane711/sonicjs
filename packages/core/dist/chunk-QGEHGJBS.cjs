@@ -19127,7 +19127,8 @@ adminCollectionsRoutes.get("/", async (c) => {
     return c.html(renderCollectionsListPage(pageData));
   } catch (error) {
     console.error("Error fetching collections:", error);
-    return c.html(html.html`<p>Error loading collections</p>`);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return c.html(html.html`<p>Error loading collections: ${errorMessage}</p>`);
   }
 });
 adminCollectionsRoutes.get("/new", async (c) => {
@@ -21576,5 +21577,5 @@ exports.auth_default = auth_default;
 exports.router = router;
 exports.test_cleanup_default = test_cleanup_default;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-KF5OHVIB.cjs.map
-//# sourceMappingURL=chunk-KF5OHVIB.cjs.map
+//# sourceMappingURL=chunk-QGEHGJBS.cjs.map
+//# sourceMappingURL=chunk-QGEHGJBS.cjs.map

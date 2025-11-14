@@ -19125,7 +19125,8 @@ adminCollectionsRoutes.get("/", async (c) => {
     return c.html(renderCollectionsListPage(pageData));
   } catch (error) {
     console.error("Error fetching collections:", error);
-    return c.html(html`<p>Error loading collections</p>`);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return c.html(html`<p>Error loading collections: ${errorMessage}</p>`);
   }
 });
 adminCollectionsRoutes.get("/new", async (c) => {
@@ -21554,5 +21555,5 @@ var ROUTES_INFO = {
 };
 
 export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, test_cleanup_default, userRoutes };
-//# sourceMappingURL=chunk-XDTDJLER.js.map
-//# sourceMappingURL=chunk-XDTDJLER.js.map
+//# sourceMappingURL=chunk-GYESTS6U.js.map
+//# sourceMappingURL=chunk-GYESTS6U.js.map

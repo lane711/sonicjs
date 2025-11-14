@@ -171,7 +171,8 @@ adminCollectionsRoutes.get('/', async (c) => {
     return c.html(renderCollectionsListPage(pageData))
   } catch (error) {
     console.error('Error fetching collections:', error)
-    return c.html(html`<p>Error loading collections</p>`)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    return c.html(html`<p>Error loading collections: ${errorMessage}</p>`)
   }
 })
 
