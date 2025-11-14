@@ -7,16 +7,74 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.10] - 2025-11-14
+
 ### Added
+- **PostHog Telemetry System (Phase 1)** - Privacy-first anonymous telemetry tracking
+  - Installation event tracking in create-sonicjs CLI
+  - Anonymous UUID-based tracking (no PII collection)
+  - Multiple opt-out mechanisms: `SONICJS_TELEMETRY=false` and `DO_NOT_TRACK=1`
+  - 35 comprehensive tests for telemetry service
+- **OTP Login Plugin** - One-time password authentication via email
+  - Configurable OTP code length (4-8 digits)
+  - Code expiration (5-60 minutes, default 10)
+  - Rate limiting per hour (default 5)
+  - Max verification attempts (default 3)
+  - Inactive by default
+- **EasyMDE Editor Plugin** - Markdown editor replacing MDXEditor
+  - Dark mode styling
+  - Working CDN support via unpkg
+  - Plugin renamed from `mdxeditor-plugin` to `easy-mdx`
+- **GitHub Actions CI/CD Pipeline**
+  - Automated PR testing workflow with unit and E2E tests
+  - Cloudflare Workers preview deployment for each PR
+  - PR template with test checklist
+- **Email Plugin Enhancements**
+  - Load and display saved settings from database
+  - Functional test email feature using Resend API
+  - Settings persistence to database
+- **TinyMCE Plugin** - Optional richtext editor
+- **Quill Editor Plugin** - Modern richtext editor alternative
 - Magic Link Authentication plugin for passwordless login (inactive by default)
 - Core auth enhancements for plugin extensibility
 - Difficulty field and improved select field handling
-- Experimental notice banner for plugins page with Discord community link
+- Color-coded field type badges for UI clarity
+- Redirect to edit mode after creating new collection
+
+### Changed
+- **Updated Vite from 5.4.20 to 7.2.2** (major version bump)
+- **Default admin password changed from "admin123" to "sonicjs!"**
+- Replaced MDXEditor with EasyMDE for richtext fields
+- Conditional field type options based on plugin activation
+- Improved managed collections display with normalized naming
+- Field type persistence improvements (field_type, is_required, is_searchable)
+- Fallback to textarea when editor plugins are inactive
 
 ### Fixed
 - All unit test failures in core package
+- All 37 authentication E2E tests
+- MDXEditor CDN 404 errors (no UMD builds available)
 - Non-existent created_by column in content INSERT statements
-- Discord invite link updated to correct URL
+- Migration API endpoint paths (404 errors)
+- Content list filter options and title links
+- Quill editor loading issues
+- Field type dropdown empty state
+- HTML escaping in data-field-data attribute
+- Collection field properties persistence
+- Cloudflare Workers fs.readdir error
+- Duplicate ID attributes in MDX headings
+- Wrangler deploy error logging
+
+### Database Migrations
+- `021_add_otp_login.sql` - OTP codes table
+- `022_add_tinymce_plugin.sql`
+- `023_add_mdxeditor_plugin.sql` (updated to use EasyMDE)
+- `024_add_quill_editor_plugin.sql`
+- `025_rename_mdxeditor_to_easy_mdx.sql`
+
+### Security
+- Changed default admin password for better security
+- AuthManager.setAuthCookie() and AuthService interface exposed for plugin extensibility
 
 ## [2.0.9] - 2025-11-04
 
