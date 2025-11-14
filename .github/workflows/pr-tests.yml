@@ -45,16 +45,27 @@ jobs:
           BRANCH_NAME="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
           SAFE_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-50)
 
-          # Deploy and capture the URL
+          # Deploy and capture the URL (don't exit on error)
+          set +e
           echo "Deploying to preview environment: pr-${SAFE_BRANCH}"
           DEPLOY_OUTPUT=$(npx wrangler deploy --name "sonicjs-pr-${SAFE_BRANCH}" 2>&1)
+          DEPLOY_EXIT_CODE=$?
+          set -e
+
+          echo "=== Wrangler Deploy Output ==="
           echo "$DEPLOY_OUTPUT"
+          echo "=== End Deploy Output ==="
+
+          if [ $DEPLOY_EXIT_CODE -ne 0 ]; then
+            echo "Error: Wrangler deploy failed with exit code $DEPLOY_EXIT_CODE"
+            exit 1
+          fi
 
           # Extract the URL from wrangler output
           PREVIEW_URL=$(echo "$DEPLOY_OUTPUT" | grep -oP 'https://[^\s]+\.workers\.dev' | head -1)
 
           if [ -z "$PREVIEW_URL" ]; then
-            echo "Failed to extract preview URL"
+            echo "Failed to extract preview URL from wrangler output"
             exit 1
           fi
 
