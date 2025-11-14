@@ -86,12 +86,24 @@ EOF
 
 Every PR must include:
 
-1. **Unit Tests** - Test individual functions/components (REQUIRED)
-2. **E2E Tests** - Test complete user workflows locally (REQUIRED)
-3. **All tests passing locally** - Unit tests must pass in CI
+1. **Unit Tests** - Test individual functions/components (REQUIRED in CI)
+2. **E2E Tests** - Test complete user workflows locally (RECOMMENDED, manual)
+3. **All unit tests passing** - Must pass in CI before merge
 
-**Note**: E2E tests in CI are temporarily disabled pending Cloudflare preview deployment setup.
-Run E2E tests locally with `npm run e2e` before creating PR.
+**E2E Testing (Local Only)**:
+E2E tests are NOT automated in CI. To run E2E tests locally:
+
+```bash
+# In one terminal - start dev server
+cd my-sonicjs-app
+npm run dev
+
+# In another terminal - run E2E tests
+npm run e2e
+```
+
+**Note**: E2E tests in CI are disabled pending Cloudflare preview deployment setup.
+Manual E2E testing is recommended but not enforced.
 
 ## CI/CD Pipeline
 
