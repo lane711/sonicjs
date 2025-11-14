@@ -1,24 +1,26 @@
-import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-6FR25MPC.js';
-import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-UJ4K4B23.js';
-import { PluginService } from './chunk-LWMMMW43.js';
-import { MigrationService } from './chunk-ZPMFT2JW.js';
-import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-5RKQB2JG.js';
-import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-4ILPYYDM.js';
-import { metricsTracker } from './chunk-FICTAGD4.js';
-import { Hono } from 'hono';
-import { cors } from 'hono/cors';
-import { z } from 'zod';
-import { setCookie } from 'hono/cookie';
-import { html, raw } from 'hono/html';
+'use strict';
+
+var chunkDOR2IU73_cjs = require('./chunk-DOR2IU73.cjs');
+var chunk7EGKU7OO_cjs = require('./chunk-7EGKU7OO.cjs');
+var chunk22EFGHAX_cjs = require('./chunk-22EFGHAX.cjs');
+var chunkT7IYBGGO_cjs = require('./chunk-T7IYBGGO.cjs');
+var chunkYU6QFFI4_cjs = require('./chunk-YU6QFFI4.cjs');
+var chunkPGZZPKZL_cjs = require('./chunk-PGZZPKZL.cjs');
+var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
+var hono = require('hono');
+var cors = require('hono/cors');
+var zod = require('zod');
+var cookie = require('hono/cookie');
+var html = require('hono/html');
 
 // src/schemas/index.ts
 var schemaDefinitions = [];
-var apiContentCrudRoutes = new Hono();
+var apiContentCrudRoutes = new hono.Hono();
 apiContentCrudRoutes.get("/:id", async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
-    const stmt = db.prepare("SELECT * FROM content WHERE id = ?");
+    const db2 = c.env.DB;
+    const stmt = db2.prepare("SELECT * FROM content WHERE id = ?");
     const content = await stmt.bind(id).first();
     if (!content) {
       return c.json({ error: "Content not found" }, 404);
@@ -42,9 +44,9 @@ apiContentCrudRoutes.get("/:id", async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.post("/", requireAuth(), async (c) => {
+apiContentCrudRoutes.post("/", chunk7EGKU7OO_cjs.requireAuth(), async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const user = c.get("user");
     const body = await c.req.json();
     const { collectionId, title, slug, status, data } = body;
@@ -56,7 +58,7 @@ apiContentCrudRoutes.post("/", requireAuth(), async (c) => {
     }
     let finalSlug = slug || title;
     finalSlug = finalSlug.toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
-    const duplicateCheck = db.prepare(
+    const duplicateCheck = db2.prepare(
       "SELECT id FROM content WHERE collection_id = ? AND slug = ?"
     );
     const existing = await duplicateCheck.bind(collectionId, finalSlug).first();
@@ -65,7 +67,7 @@ apiContentCrudRoutes.post("/", requireAuth(), async (c) => {
     }
     const contentId = crypto.randomUUID();
     const now = Date.now();
-    const insertStmt = db.prepare(`
+    const insertStmt = db2.prepare(`
       INSERT INTO content (
         id, collection_id, slug, title, data, status,
         author_id, created_at, updated_at
@@ -83,10 +85,10 @@ apiContentCrudRoutes.post("/", requireAuth(), async (c) => {
       now,
       now
     ).run();
-    const cache = getCacheService(CACHE_CONFIGS.api);
+    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
     await cache.invalidate(`content:list:${collectionId}:*`);
     await cache.invalidate("content-filtered:*");
-    const getStmt = db.prepare("SELECT * FROM content WHERE id = ?");
+    const getStmt = db2.prepare("SELECT * FROM content WHERE id = ?");
     const createdContent = await getStmt.bind(contentId).first();
     return c.json({
       data: {
@@ -108,12 +110,12 @@ apiContentCrudRoutes.post("/", requireAuth(), async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.put("/:id", requireAuth(), async (c) => {
+apiContentCrudRoutes.put("/:id", chunk7EGKU7OO_cjs.requireAuth(), async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const body = await c.req.json();
-    const existingStmt = db.prepare("SELECT * FROM content WHERE id = ?");
+    const existingStmt = db2.prepare("SELECT * FROM content WHERE id = ?");
     const existing = await existingStmt.bind(id).first();
     if (!existing) {
       return c.json({ error: "Content not found" }, 404);
@@ -141,16 +143,16 @@ apiContentCrudRoutes.put("/:id", requireAuth(), async (c) => {
     updates.push("updated_at = ?");
     params.push(now);
     params.push(id);
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE content SET ${updates.join(", ")}
       WHERE id = ?
     `);
     await updateStmt.bind(...params).run();
-    const cache = getCacheService(CACHE_CONFIGS.api);
+    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existing.collection_id}:*`);
     await cache.invalidate("content-filtered:*");
-    const getStmt = db.prepare("SELECT * FROM content WHERE id = ?");
+    const getStmt = db2.prepare("SELECT * FROM content WHERE id = ?");
     const updatedContent = await getStmt.bind(id).first();
     return c.json({
       data: {
@@ -172,18 +174,18 @@ apiContentCrudRoutes.put("/:id", requireAuth(), async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.delete("/:id", requireAuth(), async (c) => {
+apiContentCrudRoutes.delete("/:id", chunk7EGKU7OO_cjs.requireAuth(), async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
-    const existingStmt = db.prepare("SELECT collection_id FROM content WHERE id = ?");
+    const db2 = c.env.DB;
+    const existingStmt = db2.prepare("SELECT collection_id FROM content WHERE id = ?");
     const existing = await existingStmt.bind(id).first();
     if (!existing) {
       return c.json({ error: "Content not found" }, 404);
     }
-    const deleteStmt = db.prepare("DELETE FROM content WHERE id = ?");
+    const deleteStmt = db2.prepare("DELETE FROM content WHERE id = ?");
     await deleteStmt.bind(id).run();
-    const cache = getCacheService(CACHE_CONFIGS.api);
+    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existing.collection_id}:*`);
     await cache.invalidate("content-filtered:*");
@@ -199,7 +201,7 @@ apiContentCrudRoutes.delete("/:id", requireAuth(), async (c) => {
 var api_content_crud_default = apiContentCrudRoutes;
 
 // src/routes/api.ts
-var apiRoutes = new Hono();
+var apiRoutes = new hono.Hono();
 apiRoutes.use("*", async (c, next) => {
   const startTime = Date.now();
   c.set("startTime", startTime);
@@ -208,11 +210,11 @@ apiRoutes.use("*", async (c, next) => {
   c.header("X-Response-Time", `${totalTime}ms`);
 });
 apiRoutes.use("*", async (c, next) => {
-  const cacheEnabled = await isPluginActive(c.env.DB, "core-cache");
+  const cacheEnabled = await chunk7EGKU7OO_cjs.isPluginActive(c.env.DB, "core-cache");
   c.set("cacheEnabled", cacheEnabled);
   await next();
 });
-apiRoutes.use("*", cors({
+apiRoutes.use("*", cors.cors({
   origin: "*",
   allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowHeaders: ["Content-Type", "Authorization"]
@@ -254,9 +256,9 @@ apiRoutes.get("/health", (c) => {
 apiRoutes.get("/collections", async (c) => {
   const executionStart = Date.now();
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = getCacheService(CACHE_CONFIGS.api);
+    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("collections", "all");
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -282,7 +284,7 @@ apiRoutes.get("/collections", async (c) => {
     }
     c.header("X-Cache-Status", "MISS");
     c.header("X-Cache-Source", "database");
-    const stmt = db.prepare("SELECT * FROM collections WHERE is_active = 1");
+    const stmt = db2.prepare("SELECT * FROM collections WHERE is_active = 1");
     const { results } = await stmt.all();
     const transformedResults = results.map((row) => ({
       ...row,
@@ -313,11 +315,11 @@ apiRoutes.get("/collections", async (c) => {
 apiRoutes.get("/content", async (c) => {
   const executionStart = Date.now();
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const queryParams = c.req.query();
     if (queryParams.collection) {
       const collectionName = queryParams.collection;
-      const collectionStmt = db.prepare("SELECT id FROM collections WHERE name = ? AND is_active = 1");
+      const collectionStmt = db2.prepare("SELECT id FROM collections WHERE name = ? AND is_active = 1");
       const collectionResult = await collectionStmt.bind(collectionName).first();
       if (collectionResult) {
         queryParams.collection_id = collectionResult.id;
@@ -333,12 +335,12 @@ apiRoutes.get("/content", async (c) => {
         });
       }
     }
-    const filter = QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunkPGZZPKZL_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.limit) {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder3 = new QueryFilterBuilder();
+    const builder3 = new chunkPGZZPKZL_cjs.QueryFilterBuilder();
     const queryResult = builder3.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -347,7 +349,7 @@ apiRoutes.get("/content", async (c) => {
       }, 400);
     }
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = getCacheService(CACHE_CONFIGS.api);
+    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("content-filtered", JSON.stringify({ filter, query: queryResult.sql }));
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -373,7 +375,7 @@ apiRoutes.get("/content", async (c) => {
     }
     c.header("X-Cache-Status", "MISS");
     c.header("X-Cache-Source", "database");
-    const stmt = db.prepare(queryResult.sql);
+    const stmt = db2.prepare(queryResult.sql);
     const boundStmt = queryResult.params.length > 0 ? stmt.bind(...queryResult.params) : stmt;
     const { results } = await boundStmt.all();
     const transformedResults = results.map((row) => ({
@@ -418,14 +420,14 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
   const executionStart = Date.now();
   try {
     const collection = c.req.param("collection");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const queryParams = c.req.query();
-    const collectionStmt = db.prepare("SELECT * FROM collections WHERE name = ? AND is_active = 1");
+    const collectionStmt = db2.prepare("SELECT * FROM collections WHERE name = ? AND is_active = 1");
     const collectionResult = await collectionStmt.bind(collection).first();
     if (!collectionResult) {
       return c.json({ error: "Collection not found" }, 404);
     }
-    const filter = QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunkPGZZPKZL_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.where) {
       filter.where = { and: [] };
     }
@@ -441,7 +443,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder3 = new QueryFilterBuilder();
+    const builder3 = new chunkPGZZPKZL_cjs.QueryFilterBuilder();
     const queryResult = builder3.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -450,7 +452,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
       }, 400);
     }
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = getCacheService(CACHE_CONFIGS.api);
+    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("collection-content-filtered", `${collection}:${JSON.stringify({ filter, query: queryResult.sql })}`);
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -476,7 +478,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
     }
     c.header("X-Cache-Status", "MISS");
     c.header("X-Cache-Source", "database");
-    const stmt = db.prepare(queryResult.sql);
+    const stmt = db2.prepare(queryResult.sql);
     const boundStmt = queryResult.params.length > 0 ? stmt.bind(...queryResult.params) : stmt;
     const { results } = await boundStmt.all();
     const transformedResults = results.map((row) => ({
@@ -529,9 +531,9 @@ function generateId() {
 async function emitEvent(eventName, data) {
   console.log(`[Event] ${eventName}:`, data);
 }
-var fileValidationSchema = z.object({
-  name: z.string().min(1).max(255),
-  type: z.string().refine(
+var fileValidationSchema = zod.z.object({
+  name: zod.z.string().min(1).max(255),
+  type: zod.z.string().refine(
     (type) => {
       const allowedTypes = [
         // Images
@@ -562,11 +564,11 @@ var fileValidationSchema = z.object({
     },
     { message: "Unsupported file type" }
   ),
-  size: z.number().min(1).max(50 * 1024 * 1024)
+  size: zod.z.number().min(1).max(50 * 1024 * 1024)
   // 50MB max
 });
-var apiMediaRoutes = new Hono();
-apiMediaRoutes.use("*", requireAuth());
+var apiMediaRoutes = new hono.Hono();
+apiMediaRoutes.use("*", chunk7EGKU7OO_cjs.requireAuth());
 apiMediaRoutes.post("/upload", async (c) => {
   try {
     const user = c.get("user");
@@ -1148,7 +1150,7 @@ function getPNGDimensions(uint8Array) {
   };
 }
 var api_media_default = apiMediaRoutes;
-var apiSystemRoutes = new Hono();
+var apiSystemRoutes = new hono.Hono();
 apiSystemRoutes.get("/health", async (c) => {
   try {
     const startTime = Date.now();
@@ -1240,20 +1242,20 @@ apiSystemRoutes.get("/info", (c) => {
 });
 apiSystemRoutes.get("/stats", async (c) => {
   try {
-    const db = c.env.DB;
-    const contentStats = await db.prepare(`
+    const db2 = c.env.DB;
+    const contentStats = await db2.prepare(`
       SELECT COUNT(*) as total_content
       FROM content
       WHERE deleted_at IS NULL
     `).first();
-    const mediaStats = await db.prepare(`
+    const mediaStats = await db2.prepare(`
       SELECT
         COUNT(*) as total_files,
         SUM(size) as total_size
       FROM media
       WHERE deleted_at IS NULL
     `).first();
-    const userStats = await db.prepare(`
+    const userStats = await db2.prepare(`
       SELECT COUNT(*) as total_users
       FROM users
     `).first();
@@ -1309,15 +1311,15 @@ apiSystemRoutes.get("/env", (c) => {
   });
 });
 var api_system_default = apiSystemRoutes;
-var adminApiRoutes = new Hono();
-adminApiRoutes.use("*", requireAuth());
-adminApiRoutes.use("*", requireRole(["admin", "editor"]));
+var adminApiRoutes = new hono.Hono();
+adminApiRoutes.use("*", chunk7EGKU7OO_cjs.requireAuth());
+adminApiRoutes.use("*", chunk7EGKU7OO_cjs.requireRole(["admin", "editor"]));
 adminApiRoutes.get("/stats", async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     let collectionsCount = 0;
     try {
-      const collectionsStmt = db.prepare("SELECT COUNT(*) as count FROM collections WHERE is_active = 1");
+      const collectionsStmt = db2.prepare("SELECT COUNT(*) as count FROM collections WHERE is_active = 1");
       const collectionsResult = await collectionsStmt.first();
       collectionsCount = collectionsResult?.count || 0;
     } catch (error) {
@@ -1325,7 +1327,7 @@ adminApiRoutes.get("/stats", async (c) => {
     }
     let contentCount = 0;
     try {
-      const contentStmt = db.prepare("SELECT COUNT(*) as count FROM content WHERE deleted_at IS NULL");
+      const contentStmt = db2.prepare("SELECT COUNT(*) as count FROM content WHERE deleted_at IS NULL");
       const contentResult = await contentStmt.first();
       contentCount = contentResult?.count || 0;
     } catch (error) {
@@ -1334,7 +1336,7 @@ adminApiRoutes.get("/stats", async (c) => {
     let mediaCount = 0;
     let mediaSize = 0;
     try {
-      const mediaStmt = db.prepare("SELECT COUNT(*) as count, COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL");
+      const mediaStmt = db2.prepare("SELECT COUNT(*) as count, COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL");
       const mediaResult = await mediaStmt.first();
       mediaCount = mediaResult?.count || 0;
       mediaSize = mediaResult?.total_size || 0;
@@ -1343,7 +1345,7 @@ adminApiRoutes.get("/stats", async (c) => {
     }
     let usersCount = 0;
     try {
-      const usersStmt = db.prepare("SELECT COUNT(*) as count FROM users WHERE is_active = 1");
+      const usersStmt = db2.prepare("SELECT COUNT(*) as count FROM users WHERE is_active = 1");
       const usersResult = await usersStmt.first();
       usersCount = usersResult?.count || 0;
     } catch (error) {
@@ -1364,17 +1366,17 @@ adminApiRoutes.get("/stats", async (c) => {
 });
 adminApiRoutes.get("/storage", async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     let databaseSize = 0;
     try {
-      const result = await db.prepare("SELECT 1").run();
+      const result = await db2.prepare("SELECT 1").run();
       databaseSize = result?.meta?.size_after || 0;
     } catch (error) {
       console.error("Error fetching database size:", error);
     }
     let mediaSize = 0;
     try {
-      const mediaStmt = db.prepare("SELECT COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL");
+      const mediaStmt = db2.prepare("SELECT COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL");
       const mediaResult = await mediaStmt.first();
       mediaSize = mediaResult?.total_size || 0;
     } catch (error) {
@@ -1393,9 +1395,9 @@ adminApiRoutes.get("/storage", async (c) => {
 });
 adminApiRoutes.get("/activity", async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const limit = parseInt(c.req.query("limit") || "10");
-    const activityStmt = db.prepare(`
+    const activityStmt = db2.prepare(`
       SELECT
         a.id,
         a.action,
@@ -1441,29 +1443,29 @@ adminApiRoutes.get("/activity", async (c) => {
     return c.json({ error: "Failed to fetch recent activity" }, 500);
   }
 });
-var createCollectionSchema = z.object({
-  name: z.string().min(1).max(255).regex(/^[a-z0-9_]+$/, "Must contain only lowercase letters, numbers, and underscores"),
-  displayName: z.string().min(1).max(255).optional(),
-  display_name: z.string().min(1).max(255).optional(),
-  description: z.string().optional()
+var createCollectionSchema = zod.z.object({
+  name: zod.z.string().min(1).max(255).regex(/^[a-z0-9_]+$/, "Must contain only lowercase letters, numbers, and underscores"),
+  displayName: zod.z.string().min(1).max(255).optional(),
+  display_name: zod.z.string().min(1).max(255).optional(),
+  description: zod.z.string().optional()
 }).refine((data) => data.displayName || data.display_name, {
   message: "Either displayName or display_name is required",
   path: ["displayName"]
 });
-var updateCollectionSchema = z.object({
-  display_name: z.string().min(1).max(255).optional(),
-  description: z.string().optional(),
-  is_active: z.boolean().optional()
+var updateCollectionSchema = zod.z.object({
+  display_name: zod.z.string().min(1).max(255).optional(),
+  description: zod.z.string().optional(),
+  is_active: zod.z.boolean().optional()
 });
 adminApiRoutes.get("/collections", async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const search = c.req.query("search") || "";
     const includeInactive = c.req.query("includeInactive") === "true";
     let stmt;
     let results;
     if (search) {
-      stmt = db.prepare(`
+      stmt = db2.prepare(`
         SELECT id, name, display_name, description, created_at, updated_at, is_active, managed
         FROM collections
         WHERE ${includeInactive ? "1=1" : "is_active = 1"}
@@ -1474,7 +1476,7 @@ adminApiRoutes.get("/collections", async (c) => {
       const queryResults = await stmt.bind(searchParam, searchParam, searchParam).all();
       results = queryResults.results;
     } else {
-      stmt = db.prepare(`
+      stmt = db2.prepare(`
         SELECT id, name, display_name, description, created_at, updated_at, is_active, managed
         FROM collections
         ${includeInactive ? "" : "WHERE is_active = 1"}
@@ -1483,7 +1485,7 @@ adminApiRoutes.get("/collections", async (c) => {
       const queryResults = await stmt.all();
       results = queryResults.results;
     }
-    const fieldCountStmt = db.prepare("SELECT collection_id, COUNT(*) as count FROM content_fields GROUP BY collection_id");
+    const fieldCountStmt = db2.prepare("SELECT collection_id, COUNT(*) as count FROM content_fields GROUP BY collection_id");
     const { results: fieldCountResults } = await fieldCountStmt.all();
     const fieldCounts = new Map((fieldCountResults || []).map((row) => [String(row.collection_id), Number(row.count)]));
     const collections = (results || []).map((row) => ({
@@ -1510,13 +1512,13 @@ adminApiRoutes.get("/collections", async (c) => {
 adminApiRoutes.get("/collections/:id", async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
-    const stmt = db.prepare("SELECT * FROM collections WHERE id = ?");
+    const db2 = c.env.DB;
+    const stmt = db2.prepare("SELECT * FROM collections WHERE id = ?");
     const collection = await stmt.bind(id).first();
     if (!collection) {
       return c.json({ error: "Collection not found" }, 404);
     }
-    const fieldsStmt = db.prepare(`
+    const fieldsStmt = db2.prepare(`
       SELECT * FROM content_fields
       WHERE collection_id = ?
       ORDER BY field_order ASC
@@ -1568,10 +1570,10 @@ adminApiRoutes.post("/collections", async (c) => {
       return c.json({ error: "Validation failed", details: validation.error.errors }, 400);
     }
     const validatedData = validation.data;
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const ____user = c.get("user");
     const displayName = validatedData.displayName || validatedData.display_name || "";
-    const existingStmt = db.prepare("SELECT id FROM collections WHERE name = ?");
+    const existingStmt = db2.prepare("SELECT id FROM collections WHERE name = ?");
     const existing = await existingStmt.bind(validatedData.name).first();
     if (existing) {
       return c.json({ error: "A collection with this name already exists" }, 400);
@@ -1600,7 +1602,7 @@ adminApiRoutes.post("/collections", async (c) => {
     };
     const collectionId = crypto.randomUUID();
     const now = Date.now();
-    const insertStmt = db.prepare(`
+    const insertStmt = db2.prepare(`
         INSERT INTO collections (id, name, display_name, description, schema, is_active, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `);
@@ -1642,8 +1644,8 @@ adminApiRoutes.patch("/collections/:id", async (c) => {
       return c.json({ error: "Validation failed", details: validation.error.errors }, 400);
     }
     const validatedData = validation.data;
-    const db = c.env.DB;
-    const checkStmt = db.prepare("SELECT * FROM collections WHERE id = ?");
+    const db2 = c.env.DB;
+    const checkStmt = db2.prepare("SELECT * FROM collections WHERE id = ?");
     const existing = await checkStmt.bind(id).first();
     if (!existing) {
       return c.json({ error: "Collection not found" }, 404);
@@ -1668,7 +1670,7 @@ adminApiRoutes.patch("/collections/:id", async (c) => {
     updateFields.push("updated_at = ?");
     updateParams.push(Date.now());
     updateParams.push(id);
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
         UPDATE collections
         SET ${updateFields.join(", ")}
         WHERE id = ?
@@ -1689,22 +1691,22 @@ adminApiRoutes.patch("/collections/:id", async (c) => {
 adminApiRoutes.delete("/collections/:id", async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
-    const collectionStmt = db.prepare("SELECT name FROM collections WHERE id = ?");
+    const db2 = c.env.DB;
+    const collectionStmt = db2.prepare("SELECT name FROM collections WHERE id = ?");
     const collection = await collectionStmt.bind(id).first();
     if (!collection) {
       return c.json({ error: "Collection not found" }, 404);
     }
-    const contentStmt = db.prepare("SELECT COUNT(*) as count FROM content WHERE collection_id = ?");
+    const contentStmt = db2.prepare("SELECT COUNT(*) as count FROM content WHERE collection_id = ?");
     const contentResult = await contentStmt.bind(id).first();
     if (contentResult && contentResult.count > 0) {
       return c.json({
         error: `Cannot delete collection: it contains ${contentResult.count} content item(s). Delete all content first.`
       }, 400);
     }
-    const deleteFieldsStmt = db.prepare("DELETE FROM content_fields WHERE collection_id = ?");
+    const deleteFieldsStmt = db2.prepare("DELETE FROM content_fields WHERE collection_id = ?");
     await deleteFieldsStmt.bind(id).run();
-    const deleteStmt = db.prepare("DELETE FROM collections WHERE id = ?");
+    const deleteStmt = db2.prepare("DELETE FROM collections WHERE id = ?");
     await deleteStmt.bind(id).run();
     try {
       await c.env.CACHE_KV.delete("cache:collections:all");
@@ -1720,9 +1722,9 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
 });
 adminApiRoutes.get("/migrations/status", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-IHERIQVD.js');
-    const db = c.env.DB;
-    const migrationService = new MigrationService2(db);
+    const { MigrationService: MigrationService2 } = await import('./migrations-POFD5KNG.cjs');
+    const db2 = c.env.DB;
+    const migrationService = new MigrationService2(db2);
     const status = await migrationService.getMigrationStatus();
     return c.json({
       success: true,
@@ -1745,9 +1747,9 @@ adminApiRoutes.post("/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const { MigrationService: MigrationService2 } = await import('./migrations-IHERIQVD.js');
-    const db = c.env.DB;
-    const migrationService = new MigrationService2(db);
+    const { MigrationService: MigrationService2 } = await import('./migrations-POFD5KNG.cjs');
+    const db2 = c.env.DB;
+    const migrationService = new MigrationService2(db2);
     const result = await migrationService.runPendingMigrations();
     return c.json({
       success: result.success,
@@ -1764,9 +1766,9 @@ adminApiRoutes.post("/migrations/run", async (c) => {
 });
 adminApiRoutes.get("/migrations/validate", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-IHERIQVD.js');
-    const db = c.env.DB;
-    const migrationService = new MigrationService2(db);
+    const { MigrationService: MigrationService2 } = await import('./migrations-POFD5KNG.cjs');
+    const db2 = c.env.DB;
+    const migrationService = new MigrationService2(db2);
     const validation = await migrationService.validateSchema();
     return c.json({
       success: true,
@@ -1839,8 +1841,8 @@ function renderLoginPage(data, demoLoginActive = false) {
         <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div class="bg-zinc-900 shadow-sm ring-1 ring-white/10 rounded-xl px-6 py-8 sm:px-10">
             <!-- Alerts -->
-            ${data.error ? `<div class="mb-6">${renderAlert({ type: "error", message: data.error })}</div>` : ""}
-            ${data.message ? `<div class="mb-6">${renderAlert({ type: "success", message: data.message })}</div>` : ""}
+            ${data.error ? `<div class="mb-6">${chunkYU6QFFI4_cjs.renderAlert({ type: "error", message: data.error })}</div>` : ""}
+            ${data.message ? `<div class="mb-6">${chunkYU6QFFI4_cjs.renderAlert({ type: "success", message: data.message })}</div>` : ""}
 
             <!-- Form Response (HTMX target) -->
             <div id="form-response" class="mb-6"></div>
@@ -2004,7 +2006,7 @@ function renderRegisterPage(data) {
         <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div class="bg-zinc-900 shadow-sm ring-1 ring-white/10 rounded-xl px-6 py-8 sm:px-10">
             <!-- Alerts -->
-            ${data.error ? `<div class="mb-6">${renderAlert({ type: "error", message: data.error })}</div>` : ""}
+            ${data.error ? `<div class="mb-6">${chunkYU6QFFI4_cjs.renderAlert({ type: "error", message: data.error })}</div>` : ""}
 
             <!-- Form -->
             <form
@@ -2123,12 +2125,12 @@ var authValidationService = {
    * For now, returns a static schema with standard fields
    */
   async buildRegistrationSchema(_db) {
-    return z.object({
-      email: z.string().email("Valid email is required"),
-      password: z.string().min(8, "Password must be at least 8 characters"),
-      username: z.string().min(3, "Username must be at least 3 characters").optional(),
-      firstName: z.string().min(1, "First name is required").optional(),
-      lastName: z.string().min(1, "Last name is required").optional()
+    return zod.z.object({
+      email: zod.z.string().email("Valid email is required"),
+      password: zod.z.string().min(8, "Password must be at least 8 characters"),
+      username: zod.z.string().min(3, "Username must be at least 3 characters").optional(),
+      firstName: zod.z.string().min(1, "First name is required").optional(),
+      lastName: zod.z.string().min(1, "Last name is required").optional()
     });
   },
   /**
@@ -2149,7 +2151,7 @@ var authValidationService = {
 };
 
 // src/routes/auth.ts
-var authRoutes = new Hono();
+var authRoutes = new hono.Hono();
 authRoutes.get("/login", async (c) => {
   const error = c.req.query("error");
   const message = c.req.query("message");
@@ -2158,10 +2160,10 @@ authRoutes.get("/login", async (c) => {
     message: message || void 0,
     version: c.get("appVersion")
   };
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   let demoLoginActive = false;
   try {
-    const plugin = await db.prepare("SELECT * FROM plugins WHERE id = ? AND status = ?").bind("demo-login-prefill", "active").first();
+    const plugin = await db2.prepare("SELECT * FROM plugins WHERE id = ? AND status = ?").bind("demo-login-prefill", "active").first();
     demoLoginActive = !!plugin;
   } catch (error2) {
   }
@@ -2174,22 +2176,22 @@ authRoutes.get("/register", (c) => {
   };
   return c.html(renderRegisterPage(pageData));
 });
-var loginSchema = z.object({
-  email: z.string().email("Valid email is required"),
-  password: z.string().min(1, "Password is required")
+var loginSchema = zod.z.object({
+  email: zod.z.string().email("Valid email is required"),
+  password: zod.z.string().min(1, "Password is required")
 });
 authRoutes.post(
   "/register",
   async (c) => {
     try {
-      const db = c.env.DB;
+      const db2 = c.env.DB;
       let requestData;
       try {
         requestData = await c.req.json();
       } catch (parseError) {
         return c.json({ error: "Invalid JSON in request body" }, 400);
       }
-      const validationSchema = await authValidationService.buildRegistrationSchema(db);
+      const validationSchema = await authValidationService.buildRegistrationSchema(db2);
       let validatedData;
       try {
         validatedData = await validationSchema.parseAsync(requestData);
@@ -2205,14 +2207,14 @@ authRoutes.post(
       const firstName = validatedData.firstName || authValidationService.generateDefaultValue("firstName", validatedData);
       const lastName = validatedData.lastName || authValidationService.generateDefaultValue("lastName", validatedData);
       const normalizedEmail = email.toLowerCase();
-      const existingUser = await db.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind(normalizedEmail, username).first();
+      const existingUser = await db2.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind(normalizedEmail, username).first();
       if (existingUser) {
         return c.json({ error: "User with this email or username already exists" }, 400);
       }
-      const passwordHash = await AuthManager.hashPassword(password);
+      const passwordHash = await chunk7EGKU7OO_cjs.AuthManager.hashPassword(password);
       const userId = crypto.randomUUID();
       const now = /* @__PURE__ */ new Date();
-      await db.prepare(`
+      await db2.prepare(`
         INSERT INTO users (id, email, username, first_name, last_name, password_hash, role, is_active, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
@@ -2229,8 +2231,8 @@ authRoutes.post(
         now.getTime(),
         now.getTime()
       ).run();
-      const token = await AuthManager.generateToken(userId, normalizedEmail, "viewer");
-      setCookie(c, "auth_token", token, {
+      const token = await chunk7EGKU7OO_cjs.AuthManager.generateToken(userId, normalizedEmail, "viewer");
+      cookie.setCookie(c, "auth_token", token, {
         httpOnly: true,
         secure: true,
         sameSite: "Strict",
@@ -2268,12 +2270,12 @@ authRoutes.post("/login", async (c) => {
       return c.json({ error: "Validation failed", details: validation.error.errors }, 400);
     }
     const { email, password } = validation.data;
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const normalizedEmail = email.toLowerCase();
-    const cache = getCacheService(CACHE_CONFIGS.user);
+    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.user);
     let user = await cache.get(cache.generateKey("user", `email:${normalizedEmail}`));
     if (!user) {
-      user = await db.prepare("SELECT * FROM users WHERE email = ? AND is_active = 1").bind(normalizedEmail).first();
+      user = await db2.prepare("SELECT * FROM users WHERE email = ? AND is_active = 1").bind(normalizedEmail).first();
       if (user) {
         await cache.set(cache.generateKey("user", `email:${normalizedEmail}`), user);
         await cache.set(cache.generateKey("user", user.id), user);
@@ -2282,19 +2284,19 @@ authRoutes.post("/login", async (c) => {
     if (!user) {
       return c.json({ error: "Invalid email or password" }, 401);
     }
-    const isValidPassword = await AuthManager.verifyPassword(password, user.password_hash);
+    const isValidPassword = await chunk7EGKU7OO_cjs.AuthManager.verifyPassword(password, user.password_hash);
     if (!isValidPassword) {
       return c.json({ error: "Invalid email or password" }, 401);
     }
-    const token = await AuthManager.generateToken(user.id, user.email, user.role);
-    setCookie(c, "auth_token", token, {
+    const token = await chunk7EGKU7OO_cjs.AuthManager.generateToken(user.id, user.email, user.role);
+    cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: true,
       sameSite: "Strict",
       maxAge: 60 * 60 * 24
       // 24 hours
     });
-    await db.prepare("UPDATE users SET last_login_at = ? WHERE id = ?").bind((/* @__PURE__ */ new Date()).getTime(), user.id).run();
+    await db2.prepare("UPDATE users SET last_login_at = ? WHERE id = ?").bind((/* @__PURE__ */ new Date()).getTime(), user.id).run();
     await cache.delete(cache.generateKey("user", user.id));
     await cache.delete(cache.generateKey("user", `email:${normalizedEmail}`));
     return c.json({
@@ -2314,7 +2316,7 @@ authRoutes.post("/login", async (c) => {
   }
 });
 authRoutes.post("/logout", (c) => {
-  setCookie(c, "auth_token", "", {
+  cookie.setCookie(c, "auth_token", "", {
     httpOnly: true,
     secure: false,
     // Set to true in production with HTTPS
@@ -2325,7 +2327,7 @@ authRoutes.post("/logout", (c) => {
   return c.json({ message: "Logged out successfully" });
 });
 authRoutes.get("/logout", (c) => {
-  setCookie(c, "auth_token", "", {
+  cookie.setCookie(c, "auth_token", "", {
     httpOnly: true,
     secure: false,
     // Set to true in production with HTTPS
@@ -2335,14 +2337,14 @@ authRoutes.get("/logout", (c) => {
   });
   return c.redirect("/auth/login?message=You have been logged out successfully");
 });
-authRoutes.get("/me", requireAuth(), async (c) => {
+authRoutes.get("/me", chunk7EGKU7OO_cjs.requireAuth(), async (c) => {
   try {
     const user = c.get("user");
     if (!user) {
       return c.json({ error: "Not authenticated" }, 401);
     }
-    const db = c.env.DB;
-    const userData = await db.prepare("SELECT id, email, username, first_name, last_name, role, created_at FROM users WHERE id = ?").bind(user.userId).first();
+    const db2 = c.env.DB;
+    const userData = await db2.prepare("SELECT id, email, username, first_name, last_name, role, created_at FROM users WHERE id = ?").bind(user.userId).first();
     if (!userData) {
       return c.json({ error: "User not found" }, 404);
     }
@@ -2352,14 +2354,14 @@ authRoutes.get("/me", requireAuth(), async (c) => {
     return c.json({ error: "Failed to get user" }, 500);
   }
 });
-authRoutes.post("/refresh", requireAuth(), async (c) => {
+authRoutes.post("/refresh", chunk7EGKU7OO_cjs.requireAuth(), async (c) => {
   try {
     const user = c.get("user");
     if (!user) {
       return c.json({ error: "Not authenticated" }, 401);
     }
-    const token = await AuthManager.generateToken(user.userId, user.email, user.role);
-    setCookie(c, "auth_token", token, {
+    const token = await chunk7EGKU7OO_cjs.AuthManager.generateToken(user.userId, user.email, user.role);
+    cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: true,
       sameSite: "Strict",
@@ -2374,7 +2376,7 @@ authRoutes.post("/refresh", requireAuth(), async (c) => {
 });
 authRoutes.post("/register/form", async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const formData = await c.req.formData();
     const requestData = {
       email: formData.get("email"),
@@ -2385,10 +2387,10 @@ authRoutes.post("/register/form", async (c) => {
     };
     const normalizedEmail = requestData.email?.toLowerCase();
     requestData.email = normalizedEmail;
-    const validationSchema = await authValidationService.buildRegistrationSchema(db);
+    const validationSchema = await authValidationService.buildRegistrationSchema(db2);
     const validation = await validationSchema.safeParseAsync(requestData);
     if (!validation.success) {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           ${validation.error.errors.map((err) => err.message).join(", ")}
         </div>
@@ -2399,18 +2401,18 @@ authRoutes.post("/register/form", async (c) => {
     const username = validatedData.username || authValidationService.generateDefaultValue("username", validatedData);
     const firstName = validatedData.firstName || authValidationService.generateDefaultValue("firstName", validatedData);
     const lastName = validatedData.lastName || authValidationService.generateDefaultValue("lastName", validatedData);
-    const existingUser = await db.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind(normalizedEmail, username).first();
+    const existingUser = await db2.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind(normalizedEmail, username).first();
     if (existingUser) {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           User with this email or username already exists
         </div>
       `);
     }
-    const passwordHash = await AuthManager.hashPassword(password);
+    const passwordHash = await chunk7EGKU7OO_cjs.AuthManager.hashPassword(password);
     const userId = crypto.randomUUID();
     const now = /* @__PURE__ */ new Date();
-    await db.prepare(`
+    await db2.prepare(`
       INSERT INTO users (id, email, username, first_name, last_name, password_hash, role, is_active, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
@@ -2427,8 +2429,8 @@ authRoutes.post("/register/form", async (c) => {
       now.getTime(),
       now.getTime()
     ).run();
-    const token = await AuthManager.generateToken(userId, normalizedEmail, "admin");
-    setCookie(c, "auth_token", token, {
+    const token = await chunk7EGKU7OO_cjs.AuthManager.generateToken(userId, normalizedEmail, "admin");
+    cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: false,
       // Set to true in production with HTTPS
@@ -2436,7 +2438,7 @@ authRoutes.post("/register/form", async (c) => {
       maxAge: 60 * 60 * 24
       // 24 hours
     });
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
         Account created successfully! Redirecting to admin dashboard...
         <script>
@@ -2448,7 +2450,7 @@ authRoutes.post("/register/form", async (c) => {
     `);
   } catch (error) {
     console.error("Registration error:", error);
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         Registration failed. Please try again.
       </div>
@@ -2463,31 +2465,31 @@ authRoutes.post("/login/form", async (c) => {
     const normalizedEmail = email.toLowerCase();
     const validation = loginSchema.safeParse({ email: normalizedEmail, password });
     if (!validation.success) {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           ${validation.error.errors.map((err) => err.message).join(", ")}
         </div>
       `);
     }
-    const db = c.env.DB;
-    const user = await db.prepare("SELECT * FROM users WHERE email = ? AND is_active = 1").bind(normalizedEmail).first();
+    const db2 = c.env.DB;
+    const user = await db2.prepare("SELECT * FROM users WHERE email = ? AND is_active = 1").bind(normalizedEmail).first();
     if (!user) {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Invalid email or password
         </div>
       `);
     }
-    const isValidPassword = await AuthManager.verifyPassword(password, user.password_hash);
+    const isValidPassword = await chunk7EGKU7OO_cjs.AuthManager.verifyPassword(password, user.password_hash);
     if (!isValidPassword) {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Invalid email or password
         </div>
       `);
     }
-    const token = await AuthManager.generateToken(user.id, user.email, user.role);
-    setCookie(c, "auth_token", token, {
+    const token = await chunk7EGKU7OO_cjs.AuthManager.generateToken(user.id, user.email, user.role);
+    cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: false,
       // Set to true in production with HTTPS
@@ -2495,8 +2497,8 @@ authRoutes.post("/login/form", async (c) => {
       maxAge: 60 * 60 * 24
       // 24 hours
     });
-    await db.prepare("UPDATE users SET last_login_at = ? WHERE id = ?").bind((/* @__PURE__ */ new Date()).getTime(), user.id).run();
-    return c.html(html`
+    await db2.prepare("UPDATE users SET last_login_at = ? WHERE id = ?").bind((/* @__PURE__ */ new Date()).getTime(), user.id).run();
+    return c.html(html.html`
       <div id="form-response">
         <div class="rounded-lg bg-green-100 dark:bg-lime-500/10 p-4 ring-1 ring-green-400 dark:ring-lime-500/20">
           <div class="flex items-start gap-x-3">
@@ -2517,7 +2519,7 @@ authRoutes.post("/login/form", async (c) => {
     `);
   } catch (error) {
     console.error("Login error:", error);
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         Login failed. Please try again.
       </div>
@@ -2526,8 +2528,8 @@ authRoutes.post("/login/form", async (c) => {
 });
 authRoutes.post("/seed-admin", async (c) => {
   try {
-    const db = c.env.DB;
-    await db.prepare(`
+    const db2 = c.env.DB;
+    await db2.prepare(`
       CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
         email TEXT NOT NULL UNIQUE,
@@ -2543,10 +2545,10 @@ authRoutes.post("/seed-admin", async (c) => {
         updated_at INTEGER NOT NULL
       )
     `).run();
-    const existingAdmin = await db.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind("admin@sonicjs.com", "admin").first();
+    const existingAdmin = await db2.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind("admin@sonicjs.com", "admin").first();
     if (existingAdmin) {
-      const passwordHash2 = await AuthManager.hashPassword("sonicjs!");
-      await db.prepare("UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?").bind(passwordHash2, Date.now(), existingAdmin.id).run();
+      const passwordHash2 = await chunk7EGKU7OO_cjs.AuthManager.hashPassword("sonicjs!");
+      await db2.prepare("UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?").bind(passwordHash2, Date.now(), existingAdmin.id).run();
       return c.json({
         message: "Admin user already exists (password updated)",
         user: {
@@ -2557,11 +2559,11 @@ authRoutes.post("/seed-admin", async (c) => {
         }
       });
     }
-    const passwordHash = await AuthManager.hashPassword("sonicjs!");
+    const passwordHash = await chunk7EGKU7OO_cjs.AuthManager.hashPassword("sonicjs!");
     const userId = "admin-user-id";
     const now = Date.now();
     const adminEmail = "admin@sonicjs.com".toLowerCase();
-    await db.prepare(`
+    await db2.prepare(`
       INSERT INTO users (id, email, username, first_name, last_name, password_hash, role, is_active, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
@@ -2608,8 +2610,8 @@ authRoutes.get("/accept-invitation", async (c) => {
         </html>
       `);
     }
-    const db = c.env.DB;
-    const userStmt = db.prepare(`
+    const db2 = c.env.DB;
+    const userStmt = db2.prepare(`
       SELECT id, email, first_name, last_name, role, invited_at
       FROM users 
       WHERE invitation_token = ? AND is_active = 0
@@ -2755,8 +2757,8 @@ authRoutes.post("/accept-invitation", async (c) => {
     if (password.length < 8) {
       return c.json({ error: "Password must be at least 8 characters long" }, 400);
     }
-    const db = c.env.DB;
-    const userStmt = db.prepare(`
+    const db2 = c.env.DB;
+    const userStmt = db2.prepare(`
       SELECT id, email, first_name, last_name, role, invited_at
       FROM users 
       WHERE invitation_token = ? AND is_active = 0
@@ -2770,15 +2772,15 @@ authRoutes.post("/accept-invitation", async (c) => {
     if (invitationAge > maxAge) {
       return c.json({ error: "Invitation has expired" }, 400);
     }
-    const existingUsernameStmt = db.prepare(`
+    const existingUsernameStmt = db2.prepare(`
       SELECT id FROM users WHERE username = ? AND id != ?
     `);
     const existingUsername = await existingUsernameStmt.bind(username, invitedUser.id).first();
     if (existingUsername) {
       return c.json({ error: "Username is already taken" }, 400);
     }
-    const passwordHash = await AuthManager.hashPassword(password);
-    const updateStmt = db.prepare(`
+    const passwordHash = await chunk7EGKU7OO_cjs.AuthManager.hashPassword(password);
+    const updateStmt = db2.prepare(`
       UPDATE users SET 
         username = ?,
         password_hash = ?,
@@ -2796,8 +2798,8 @@ authRoutes.post("/accept-invitation", async (c) => {
       Date.now(),
       invitedUser.id
     ).run();
-    const authToken = await AuthManager.generateToken(invitedUser.id, invitedUser.email, invitedUser.role);
-    setCookie(c, "auth_token", authToken, {
+    const authToken = await chunk7EGKU7OO_cjs.AuthManager.generateToken(invitedUser.id, invitedUser.email, invitedUser.role);
+    cookie.setCookie(c, "auth_token", authToken, {
       httpOnly: true,
       secure: true,
       sameSite: "Strict",
@@ -2821,8 +2823,8 @@ authRoutes.post("/request-password-reset", async (c) => {
     if (!emailRegex.test(email)) {
       return c.json({ error: "Please enter a valid email address" }, 400);
     }
-    const db = c.env.DB;
-    const userStmt = db.prepare(`
+    const db2 = c.env.DB;
+    const userStmt = db2.prepare(`
       SELECT id, email, first_name, last_name FROM users 
       WHERE email = ? AND is_active = 1
     `);
@@ -2835,7 +2837,7 @@ authRoutes.post("/request-password-reset", async (c) => {
     }
     const resetToken = crypto.randomUUID();
     const resetExpires = Date.now() + 60 * 60 * 1e3;
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE users SET 
         password_reset_token = ?,
         password_reset_expires = ?,
@@ -2875,8 +2877,8 @@ authRoutes.get("/reset-password", async (c) => {
         </html>
       `);
     }
-    const db = c.env.DB;
-    const userStmt = db.prepare(`
+    const db2 = c.env.DB;
+    const userStmt = db2.prepare(`
       SELECT id, email, first_name, last_name, password_reset_expires
       FROM users 
       WHERE password_reset_token = ? AND is_active = 1
@@ -3013,8 +3015,8 @@ authRoutes.post("/reset-password", async (c) => {
     if (password.length < 8) {
       return c.json({ error: "Password must be at least 8 characters long" }, 400);
     }
-    const db = c.env.DB;
-    const userStmt = db.prepare(`
+    const db2 = c.env.DB;
+    const userStmt = db2.prepare(`
       SELECT id, email, password_hash, password_reset_expires
       FROM users
       WHERE password_reset_token = ? AND is_active = 1
@@ -3026,9 +3028,9 @@ authRoutes.post("/reset-password", async (c) => {
     if (Date.now() > user.password_reset_expires) {
       return c.json({ error: "Reset token has expired" }, 400);
     }
-    const newPasswordHash = await AuthManager.hashPassword(password);
+    const newPasswordHash = await chunk7EGKU7OO_cjs.AuthManager.hashPassword(password);
     try {
-      const historyStmt = db.prepare(`
+      const historyStmt = db2.prepare(`
         INSERT INTO password_history (id, user_id, password_hash, created_at)
         VALUES (?, ?, ?, ?)
       `);
@@ -3041,7 +3043,7 @@ authRoutes.post("/reset-password", async (c) => {
     } catch (historyError) {
       console.warn("Could not store password history:", historyError);
     }
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE users SET
         password_hash = ?,
         password_reset_token = NULL,
@@ -3061,129 +3063,109 @@ authRoutes.post("/reset-password", async (c) => {
   }
 });
 var auth_default = authRoutes;
-var app = new Hono();
+var app = new hono.Hono();
 app.post("/test-cleanup", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   if (c.env.ENVIRONMENT === "production") {
     return c.json({ error: "Cleanup endpoint not available in production" }, 403);
   }
   try {
     let deletedCount = 0;
-    const testCollections = await db.prepare(`
-      SELECT id FROM collections
-      WHERE name LIKE 'test_%'
-      OR name IN ('blog_posts', 'test_collection', 'products', 'articles')
-    `).all();
-    const testCollectionIds = testCollections.results?.map((c2) => c2.id) || [];
-    const testUsers = await db.prepare(`
-      SELECT id FROM users
-      WHERE email != 'admin@sonicjs.com'
-      AND (email LIKE '%test%' OR email LIKE '%example.com%')
-    `).all();
-    const testUserIds = testUsers.results?.map((u) => u.id) || [];
-    let contentIdsToDelete = [];
-    const batchSize = 500;
-    if (testCollectionIds.length > 0) {
-      for (let i = 0; i < testCollectionIds.length; i += batchSize) {
-        const batch = testCollectionIds.slice(i, i + batchSize);
-        const placeholders = batch.map(() => "?").join(",");
-        const contentFromCollections = await db.prepare(`
-          SELECT id FROM content WHERE collection_id IN (${placeholders})
-        `).bind(...batch).all();
-        contentIdsToDelete.push(...contentFromCollections.results?.map((c2) => c2.id) || []);
-      }
-    }
-    const contentByPattern = await db.prepare(`
-      SELECT id FROM content
-      WHERE title LIKE 'Test %'
-      OR title LIKE '%E2E%'
-      OR title LIKE '%Playwright%'
-      OR title LIKE '%Sample%'
-    `).all();
-    contentIdsToDelete.push(...contentByPattern.results?.map((c2) => c2.id) || []);
-    if (contentIdsToDelete.length > 0) {
-      for (let i = 0; i < contentIdsToDelete.length; i += batchSize) {
-        const batch = contentIdsToDelete.slice(i, i + batchSize);
-        const placeholders = batch.map(() => "?").join(",");
-        await db.prepare(`
-          DELETE FROM content_versions WHERE content_id IN (${placeholders})
-        `).bind(...batch).run();
-        await db.prepare(`
-          DELETE FROM workflow_history WHERE content_id IN (${placeholders})
-        `).bind(...batch).run();
-        await db.prepare(`
-          DELETE FROM content_data WHERE content_id IN (${placeholders})
-        `).bind(...batch).run();
-      }
-    }
-    if (testUserIds.length > 0) {
-      for (let i = 0; i < testUserIds.length; i += batchSize) {
-        const batch = testUserIds.slice(i, i + batchSize);
-        const placeholders = batch.map(() => "?").join(",");
-        await db.prepare(`
-          DELETE FROM api_tokens WHERE user_id IN (${placeholders})
-        `).bind(...batch).run();
-        await db.prepare(`
-          DELETE FROM media WHERE uploaded_by IN (${placeholders})
-        `).bind(...batch).run();
-      }
-    }
-    if (contentIdsToDelete.length > 0) {
-      for (let i = 0; i < contentIdsToDelete.length; i += batchSize) {
-        const batch = contentIdsToDelete.slice(i, i + batchSize);
-        const placeholders = batch.map(() => "?").join(",");
-        const contentResult = await db.prepare(`
-          DELETE FROM content WHERE id IN (${placeholders})
-        `).bind(...batch).run();
-        deletedCount += contentResult.meta?.changes || 0;
-      }
-    }
-    if (testCollectionIds.length > 0) {
-      for (let i = 0; i < testCollectionIds.length; i += batchSize) {
-        const batch = testCollectionIds.slice(i, i + batchSize);
-        const placeholders = batch.map(() => "?").join(",");
-        await db.prepare(`
-          DELETE FROM collection_fields WHERE collection_id IN (${placeholders})
-        `).bind(...batch).run();
-      }
-    }
-    if (testCollectionIds.length > 0) {
-      for (let i = 0; i < testCollectionIds.length; i += batchSize) {
-        const batch = testCollectionIds.slice(i, i + batchSize);
-        const placeholders = batch.map(() => "?").join(",");
-        const collectionsResult = await db.prepare(`
-          DELETE FROM collections WHERE id IN (${placeholders})
-        `).bind(...batch).run();
-        deletedCount += collectionsResult.meta?.changes || 0;
-      }
-    }
-    if (testUserIds.length > 0) {
-      for (let i = 0; i < testUserIds.length; i += batchSize) {
-        const batch = testUserIds.slice(i, i + batchSize);
-        const placeholders = batch.map(() => "?").join(",");
-        const usersResult = await db.prepare(`
-          DELETE FROM users WHERE id IN (${placeholders})
-        `).bind(...batch).run();
-        deletedCount += usersResult.meta?.changes || 0;
-      }
-    }
-    await db.prepare(`
-      DELETE FROM content_data
-      WHERE content_id NOT IN (SELECT id FROM content)
-    `).run();
-    await db.prepare(`
-      DELETE FROM collection_fields
-      WHERE collection_id NOT IN (SELECT id FROM collections)
-    `).run();
-    await db.prepare(`
+    await db2.prepare(`
       DELETE FROM content_versions
-      WHERE content_id NOT IN (SELECT id FROM content)
+      WHERE content_id IN (
+        SELECT id FROM content
+        WHERE title LIKE 'Test %' OR title LIKE '%E2E%' OR title LIKE '%Playwright%' OR title LIKE '%Sample%'
+      )
     `).run();
-    await db.prepare(`
+    await db2.prepare(`
       DELETE FROM workflow_history
-      WHERE content_id NOT IN (SELECT id FROM content)
+      WHERE content_id IN (
+        SELECT id FROM content
+        WHERE title LIKE 'Test %' OR title LIKE '%E2E%' OR title LIKE '%Playwright%' OR title LIKE '%Sample%'
+      )
     `).run();
-    await db.prepare(`
+    try {
+      await db2.prepare(`
+        DELETE FROM content_data
+        WHERE content_id IN (
+          SELECT id FROM content
+          WHERE title LIKE 'Test %' OR title LIKE '%E2E%' OR title LIKE '%Playwright%' OR title LIKE '%Sample%'
+        )
+      `).run();
+    } catch (e) {
+    }
+    const contentResult = await db2.prepare(`
+      DELETE FROM content
+      WHERE title LIKE 'Test %' OR title LIKE '%E2E%' OR title LIKE '%Playwright%' OR title LIKE '%Sample%'
+    `).run();
+    deletedCount += contentResult.meta?.changes || 0;
+    await db2.prepare(`
+      DELETE FROM api_tokens
+      WHERE user_id IN (
+        SELECT id FROM users
+        WHERE email != 'admin@sonicjs.com' AND (email LIKE '%test%' OR email LIKE '%example.com%')
+      )
+    `).run();
+    await db2.prepare(`
+      DELETE FROM media
+      WHERE uploaded_by IN (
+        SELECT id FROM users
+        WHERE email != 'admin@sonicjs.com' AND (email LIKE '%test%' OR email LIKE '%example.com%')
+      )
+    `).run();
+    const usersResult = await db2.prepare(`
+      DELETE FROM users
+      WHERE email != 'admin@sonicjs.com' AND (email LIKE '%test%' OR email LIKE '%example.com%')
+    `).run();
+    deletedCount += usersResult.meta?.changes || 0;
+    try {
+      await db2.prepare(`
+        DELETE FROM collection_fields
+        WHERE collection_id IN (
+          SELECT id FROM collections
+          WHERE name LIKE 'test_%' OR name IN ('blog_posts', 'test_collection', 'products', 'articles')
+        )
+      `).run();
+    } catch (e) {
+    }
+    await db2.prepare(`
+      DELETE FROM content
+      WHERE collection_id IN (
+        SELECT id FROM collections
+        WHERE name LIKE 'test_%' OR name IN ('blog_posts', 'test_collection', 'products', 'articles')
+      )
+    `).run();
+    const collectionsResult = await db2.prepare(`
+      DELETE FROM collections
+      WHERE name LIKE 'test_%' OR name IN ('blog_posts', 'test_collection', 'products', 'articles')
+    `).run();
+    deletedCount += collectionsResult.meta?.changes || 0;
+    try {
+      await db2.prepare(`
+        DELETE FROM content_data WHERE content_id NOT IN (SELECT id FROM content)
+      `).run();
+    } catch (e) {
+    }
+    try {
+      await db2.prepare(`
+        DELETE FROM collection_fields WHERE collection_id NOT IN (SELECT id FROM collections)
+      `).run();
+    } catch (e) {
+    }
+    try {
+      await db2.prepare(`
+        DELETE FROM content_versions WHERE content_id NOT IN (SELECT id FROM content)
+      `).run();
+    } catch (e) {
+    }
+    try {
+      await db2.prepare(`
+        DELETE FROM workflow_history WHERE content_id NOT IN (SELECT id FROM content)
+      `).run();
+    } catch (e) {
+    }
+    await db2.prepare(`
       DELETE FROM activity_logs
       WHERE id NOT IN (
         SELECT id FROM activity_logs
@@ -3205,12 +3187,12 @@ app.post("/test-cleanup", async (c) => {
   }
 });
 app.post("/test-cleanup/users", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   if (c.env.ENVIRONMENT === "production") {
     return c.json({ error: "Cleanup endpoint not available in production" }, 403);
   }
   try {
-    const result = await db.prepare(`
+    const result = await db2.prepare(`
       DELETE FROM users
       WHERE email != 'admin@sonicjs.com'
       AND (
@@ -3233,13 +3215,13 @@ app.post("/test-cleanup/users", async (c) => {
   }
 });
 app.post("/test-cleanup/collections", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   if (c.env.ENVIRONMENT === "production") {
     return c.json({ error: "Cleanup endpoint not available in production" }, 403);
   }
   try {
     let deletedCount = 0;
-    const collections = await db.prepare(`
+    const collections = await db2.prepare(`
       SELECT id FROM collections
       WHERE name LIKE 'test_%'
       OR name IN ('blog_posts', 'test_collection', 'products', 'articles')
@@ -3247,12 +3229,12 @@ app.post("/test-cleanup/collections", async (c) => {
     if (collections.results && collections.results.length > 0) {
       const collectionIds = collections.results.map((c2) => c2.id);
       for (const id of collectionIds) {
-        await db.prepare("DELETE FROM collection_fields WHERE collection_id = ?").bind(id).run();
+        await db2.prepare("DELETE FROM collection_fields WHERE collection_id = ?").bind(id).run();
       }
       for (const id of collectionIds) {
-        await db.prepare("DELETE FROM content WHERE collection_id = ?").bind(id).run();
+        await db2.prepare("DELETE FROM content WHERE collection_id = ?").bind(id).run();
       }
-      const result = await db.prepare(`
+      const result = await db2.prepare(`
         DELETE FROM collections
         WHERE id IN (${collectionIds.map(() => "?").join(",")})
       `).bind(...collectionIds).run();
@@ -3272,19 +3254,19 @@ app.post("/test-cleanup/collections", async (c) => {
   }
 });
 app.post("/test-cleanup/content", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   if (c.env.ENVIRONMENT === "production") {
     return c.json({ error: "Cleanup endpoint not available in production" }, 403);
   }
   try {
-    const result = await db.prepare(`
+    const result = await db2.prepare(`
       DELETE FROM content
       WHERE title LIKE 'Test %'
       OR title LIKE '%E2E%'
       OR title LIKE '%Playwright%'
       OR title LIKE '%Sample%'
     `).run();
-    await db.prepare(`
+    await db2.prepare(`
       DELETE FROM content_data
       WHERE content_id NOT IN (SELECT id FROM content)
     `).run();
@@ -3304,7 +3286,7 @@ app.post("/test-cleanup/content", async (c) => {
 var test_cleanup_default = app;
 
 // src/templates/pages/admin-content-form.template.ts
-init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 
 // src/templates/components/dynamic-field.template.ts
 function renderDynamicField(field, options = {}) {
@@ -4544,8 +4526,8 @@ function renderContentFormPage(data) {
         <!-- Form Content -->
         <div class="px-6 py-6">
           <div id="form-messages">
-            ${data.error ? renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
-            ${data.success ? renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
+            ${data.error ? chunkYU6QFFI4_cjs.renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
+            ${data.success ? chunkYU6QFFI4_cjs.renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -4780,7 +4762,7 @@ function renderContentFormPage(data) {
     </div>
 
     <!-- Confirmation Dialogs -->
-    ${renderConfirmationDialog({
+    ${chunkYU6QFFI4_cjs.renderConfirmationDialog({
     id: "duplicate-content-confirm",
     title: "Duplicate Content",
     message: "Create a copy of this content?",
@@ -4791,7 +4773,7 @@ function renderContentFormPage(data) {
     onConfirm: "performDuplicateContent()"
   })}
 
-    ${renderConfirmationDialog({
+    ${chunkYU6QFFI4_cjs.renderConfirmationDialog({
     id: "delete-content-confirm",
     title: "Delete Content",
     message: "Are you sure you want to delete this content? This action cannot be undone.",
@@ -4802,7 +4784,7 @@ function renderContentFormPage(data) {
     onConfirm: `performDeleteContent('${data.id}')`
   })}
 
-    ${getConfirmationDialogScript()}
+    ${chunkYU6QFFI4_cjs.getConfirmationDialogScript()}
 
     ${data.tinymceEnabled ? getTinyMCEScript(data.tinymceSettings?.apiKey) : "<!-- TinyMCE plugin not active -->"}
 
@@ -5108,11 +5090,11 @@ function renderContentFormPage(data) {
     content: pageContent,
     version: data.version
   };
-  return renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/pages/admin-content-list.template.ts
-init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function renderContentListPage(data) {
   const urlParams = new URLSearchParams();
   if (data.modelName && data.modelName !== "all") urlParams.set("model", data.modelName);
@@ -5517,8 +5499,8 @@ function renderContentListPage(data) {
       
       <!-- Content List -->
       <div id="content-list">
-        ${renderTable(tableData)}
-        ${renderPagination(paginationData)}
+        ${chunkYU6QFFI4_cjs.renderTable(tableData)}
+        ${chunkYU6QFFI4_cjs.renderPagination(paginationData)}
       </div>
       
     </div>
@@ -5727,7 +5709,7 @@ function renderContentListPage(data) {
     </script>
 
     <!-- Confirmation Dialog for Bulk Actions -->
-    ${renderConfirmationDialog({
+    ${chunkYU6QFFI4_cjs.renderConfirmationDialog({
     id: "bulk-action-confirm",
     title: "Confirm Bulk Action",
     message: "Are you sure you want to perform this action? This operation will affect multiple items.",
@@ -5739,7 +5721,7 @@ function renderContentListPage(data) {
   })}
 
     <!-- Confirmation Dialog Script -->
-    ${getConfirmationDialogScript()}
+    ${chunkYU6QFFI4_cjs.getConfirmationDialogScript()}
   `;
   const layoutData = {
     title: "Content Management",
@@ -5749,7 +5731,7 @@ function renderContentListPage(data) {
     version: data.version,
     content: pageContent
   };
-  return renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/components/version-history.template.ts
@@ -5931,9 +5913,9 @@ function escapeHtml3(text) {
 }
 
 // src/middleware/plugin-middleware.ts
-async function isPluginActive2(db, pluginId) {
+async function isPluginActive2(db2, pluginId) {
   try {
-    const result = await db.prepare("SELECT status FROM plugins WHERE id = ?").bind(pluginId).first();
+    const result = await db2.prepare("SELECT status FROM plugins WHERE id = ?").bind(pluginId).first();
     return result?.status === "active";
   } catch (error) {
     console.error(`[isPluginActive] Error checking plugin status for ${pluginId}:`, error);
@@ -5942,14 +5924,14 @@ async function isPluginActive2(db, pluginId) {
 }
 
 // src/routes/admin-content.ts
-var adminContentRoutes = new Hono();
-adminContentRoutes.use("*", requireAuth());
-async function getCollectionFields(db, collectionId) {
-  const cache = getCacheService(CACHE_CONFIGS.collection);
+var adminContentRoutes = new hono.Hono();
+adminContentRoutes.use("*", chunk7EGKU7OO_cjs.requireAuth());
+async function getCollectionFields(db2, collectionId) {
+  const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.collection);
   return cache.getOrSet(
     cache.generateKey("fields", collectionId),
     async () => {
-      const collectionStmt = db.prepare("SELECT schema FROM collections WHERE id = ?");
+      const collectionStmt = db2.prepare("SELECT schema FROM collections WHERE id = ?");
       const collectionRow = await collectionStmt.bind(collectionId).first();
       if (collectionRow && collectionRow.schema) {
         try {
@@ -5980,7 +5962,7 @@ async function getCollectionFields(db, collectionId) {
           console.error("Error parsing collection schema:", e);
         }
       }
-      const stmt = db.prepare(`
+      const stmt = db2.prepare(`
         SELECT * FROM content_fields
         WHERE collection_id = ?
         ORDER BY field_order ASC
@@ -5999,12 +5981,12 @@ async function getCollectionFields(db, collectionId) {
     }
   );
 }
-async function getCollection(db, collectionId) {
-  const cache = getCacheService(CACHE_CONFIGS.collection);
+async function getCollection(db2, collectionId) {
+  const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.collection);
   return cache.getOrSet(
     cache.generateKey("collection", collectionId),
     async () => {
-      const stmt = db.prepare("SELECT * FROM collections WHERE id = ? AND is_active = 1");
+      const stmt = db2.prepare("SELECT * FROM collections WHERE id = ? AND is_active = 1");
       const collection = await stmt.bind(collectionId).first();
       if (!collection) return null;
       return {
@@ -6021,14 +6003,14 @@ adminContentRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
     const url = new URL(c.req.url);
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const page = parseInt(url.searchParams.get("page") || "1");
     const limit = parseInt(url.searchParams.get("limit") || "20");
     const modelName = url.searchParams.get("model") || "all";
     const status = url.searchParams.get("status") || "all";
     const search = url.searchParams.get("search") || "";
     const offset = (page - 1) * limit;
-    const collectionsStmt = db.prepare("SELECT id, name, display_name FROM collections WHERE is_active = 1 ORDER BY display_name");
+    const collectionsStmt = db2.prepare("SELECT id, name, display_name FROM collections WHERE is_active = 1 ORDER BY display_name");
     const { results: collectionsResults } = await collectionsStmt.all();
     const models = (collectionsResults || []).map((row) => ({
       name: row.name,
@@ -6054,7 +6036,7 @@ adminContentRoutes.get("/", async (c) => {
       conditions.push("c.status = 'deleted'");
     }
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
-    const countStmt = db.prepare(`
+    const countStmt = db2.prepare(`
       SELECT COUNT(*) as count 
       FROM content c
       JOIN collections col ON c.collection_id = col.id
@@ -6062,7 +6044,7 @@ adminContentRoutes.get("/", async (c) => {
     `);
     const countResult = await countStmt.bind(...params).first();
     const totalItems = countResult?.count || 0;
-    const contentStmt = db.prepare(`
+    const contentStmt = db2.prepare(`
       SELECT c.id, c.title, c.slug, c.status, c.created_at, c.updated_at,
              col.name as collection_name, col.display_name as collection_display_name,
              u.first_name, u.last_name, u.email as author_email
@@ -6163,8 +6145,8 @@ adminContentRoutes.get("/new", async (c) => {
     const url = new URL(c.req.url);
     const collectionId = url.searchParams.get("collection");
     if (!collectionId) {
-      const db2 = c.env.DB;
-      const collectionsStmt = db2.prepare("SELECT id, name, display_name, description FROM collections WHERE is_active = 1 ORDER BY display_name");
+      const db3 = c.env.DB;
+      const collectionsStmt = db3.prepare("SELECT id, name, display_name, description FROM collections WHERE is_active = 1 ORDER BY display_name");
       const { results } = await collectionsStmt.all();
       const collections = (results || []).map((row) => ({
         id: row.id,
@@ -6205,8 +6187,8 @@ adminContentRoutes.get("/new", async (c) => {
       `;
       return c.html(selectionHTML);
     }
-    const db = c.env.DB;
-    const collection = await getCollection(db, collectionId);
+    const db2 = c.env.DB;
+    const collection = await getCollection(db2, collectionId);
     if (!collection) {
       const formData2 = {
         collection: { id: "", name: "", display_name: "Unknown", schema: {} },
@@ -6220,26 +6202,26 @@ adminContentRoutes.get("/new", async (c) => {
       };
       return c.html(renderContentFormPage(formData2));
     }
-    const fields = await getCollectionFields(db, collectionId);
-    const workflowEnabled = await isPluginActive2(db, "workflow");
-    const tinymceEnabled = await isPluginActive2(db, "tinymce-plugin");
+    const fields = await getCollectionFields(db2, collectionId);
+    const workflowEnabled = await isPluginActive2(db2, "workflow");
+    const tinymceEnabled = await isPluginActive2(db2, "tinymce-plugin");
     let tinymceSettings;
     if (tinymceEnabled) {
-      const pluginService = new PluginService(db);
+      const pluginService = new chunk22EFGHAX_cjs.PluginService(db2);
       const tinymcePlugin2 = await pluginService.getPlugin("tinymce-plugin");
       tinymceSettings = tinymcePlugin2?.settings;
     }
-    const quillEnabled = await isPluginActive2(db, "quill-editor");
+    const quillEnabled = await isPluginActive2(db2, "quill-editor");
     let quillSettings;
     if (quillEnabled) {
-      const pluginService = new PluginService(db);
+      const pluginService = new chunk22EFGHAX_cjs.PluginService(db2);
       const quillPlugin = await pluginService.getPlugin("quill-editor");
       quillSettings = quillPlugin?.settings;
     }
-    const mdxeditorEnabled = await isPluginActive2(db, "easy-mdx");
+    const mdxeditorEnabled = await isPluginActive2(db2, "easy-mdx");
     let mdxeditorSettings;
     if (mdxeditorEnabled) {
-      const pluginService = new PluginService(db);
+      const pluginService = new chunk22EFGHAX_cjs.PluginService(db2);
       const mdxeditorPlugin = await pluginService.getPlugin("easy-mdx");
       mdxeditorSettings = mdxeditorPlugin?.settings;
     }
@@ -6286,14 +6268,14 @@ adminContentRoutes.get("/:id/edit", async (c) => {
   try {
     const id = c.req.param("id");
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const url = new URL(c.req.url);
     const referrerParams = url.searchParams.get("ref") || "";
-    const cache = getCacheService(CACHE_CONFIGS.content);
+    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.content);
     const content = await cache.getOrSet(
       cache.generateKey("content", id),
       async () => {
-        const contentStmt = db.prepare(`
+        const contentStmt = db2.prepare(`
           SELECT c.*, col.id as collection_id, col.name as collection_name,
                  col.display_name as collection_display_name, col.description as collection_description,
                  col.schema as collection_schema
@@ -6324,27 +6306,27 @@ adminContentRoutes.get("/:id/edit", async (c) => {
       description: content.collection_description,
       schema: content.collection_schema ? JSON.parse(content.collection_schema) : {}
     };
-    const fields = await getCollectionFields(db, content.collection_id);
+    const fields = await getCollectionFields(db2, content.collection_id);
     const contentData = content.data ? JSON.parse(content.data) : {};
-    const workflowEnabled = await isPluginActive2(db, "workflow");
-    const tinymceEnabled = await isPluginActive2(db, "tinymce-plugin");
+    const workflowEnabled = await isPluginActive2(db2, "workflow");
+    const tinymceEnabled = await isPluginActive2(db2, "tinymce-plugin");
     let tinymceSettings;
     if (tinymceEnabled) {
-      const pluginService = new PluginService(db);
+      const pluginService = new chunk22EFGHAX_cjs.PluginService(db2);
       const tinymcePlugin2 = await pluginService.getPlugin("tinymce-plugin");
       tinymceSettings = tinymcePlugin2?.settings;
     }
-    const quillEnabled = await isPluginActive2(db, "quill-editor");
+    const quillEnabled = await isPluginActive2(db2, "quill-editor");
     let quillSettings;
     if (quillEnabled) {
-      const pluginService = new PluginService(db);
+      const pluginService = new chunk22EFGHAX_cjs.PluginService(db2);
       const quillPlugin = await pluginService.getPlugin("quill-editor");
       quillSettings = quillPlugin?.settings;
     }
-    const mdxeditorEnabled = await isPluginActive2(db, "easy-mdx");
+    const mdxeditorEnabled = await isPluginActive2(db2, "easy-mdx");
     let mdxeditorSettings;
     if (mdxeditorEnabled) {
-      const pluginService = new PluginService(db);
+      const pluginService = new chunk22EFGHAX_cjs.PluginService(db2);
       const mdxeditorPlugin = await pluginService.getPlugin("easy-mdx");
       mdxeditorSettings = mdxeditorPlugin?.settings;
     }
@@ -6400,22 +6382,22 @@ adminContentRoutes.post("/", async (c) => {
     const collectionId = formData.get("collection_id");
     const action = formData.get("action");
     if (!collectionId) {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Collection ID is required.
         </div>
       `);
     }
-    const db = c.env.DB;
-    const collection = await getCollection(db, collectionId);
+    const db2 = c.env.DB;
+    const collection = await getCollection(db2, collectionId);
     if (!collection) {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Collection not found.
         </div>
       `);
     }
-    const fields = await getCollectionFields(db, collectionId);
+    const fields = await getCollectionFields(db2, collectionId);
     const data = {};
     const errors = {};
     for (const field of fields) {
@@ -6473,13 +6455,13 @@ adminContentRoutes.post("/", async (c) => {
     const scheduledUnpublishAt = formData.get("scheduled_unpublish_at");
     const contentId = crypto.randomUUID();
     const now = Date.now();
-    const insertStmt = db.prepare(`
+    const insertStmt = db2.prepare(`
       INSERT INTO content (
         id, collection_id, slug, title, data, status,
         scheduled_publish_at, scheduled_unpublish_at,
-        meta_title, meta_description, author_id, created_at, updated_at
+        meta_title, meta_description, author_id, created_by, created_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     await insertStmt.bind(
       contentId,
@@ -6493,12 +6475,13 @@ adminContentRoutes.post("/", async (c) => {
       data.meta_title || null,
       data.meta_description || null,
       user?.userId || "unknown",
+      user?.userId || "unknown",
       now,
       now
     ).run();
-    const cache = getCacheService(CACHE_CONFIGS.content);
+    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.content);
     await cache.invalidate(`content:list:${collectionId}:*`);
-    const versionStmt = db.prepare(`
+    const versionStmt = db2.prepare(`
       INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
       VALUES (?, ?, ?, ?, ?, ?)
     `);
@@ -6510,7 +6493,7 @@ adminContentRoutes.post("/", async (c) => {
       user?.userId || "unknown",
       now
     ).run();
-    const workflowStmt = db.prepare(`
+    const workflowStmt = db2.prepare(`
       INSERT INTO workflow_history (id, content_id, action, from_status, to_status, user_id, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
@@ -6535,7 +6518,7 @@ adminContentRoutes.post("/", async (c) => {
     }
   } catch (error) {
     console.error("Error creating content:", error);
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         Failed to create content. Please try again.
       </div>
@@ -6548,25 +6531,25 @@ adminContentRoutes.put("/:id", async (c) => {
     const user = c.get("user");
     const formData = await c.req.formData();
     const action = formData.get("action");
-    const db = c.env.DB;
-    const contentStmt = db.prepare("SELECT * FROM content WHERE id = ?");
+    const db2 = c.env.DB;
+    const contentStmt = db2.prepare("SELECT * FROM content WHERE id = ?");
     const existingContent = await contentStmt.bind(id).first();
     if (!existingContent) {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Content not found.
         </div>
       `);
     }
-    const collection = await getCollection(db, existingContent.collection_id);
+    const collection = await getCollection(db2, existingContent.collection_id);
     if (!collection) {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Collection not found.
         </div>
       `);
     }
-    const fields = await getCollectionFields(db, existingContent.collection_id);
+    const fields = await getCollectionFields(db2, existingContent.collection_id);
     const data = {};
     const errors = {};
     for (const field of fields) {
@@ -6625,7 +6608,7 @@ adminContentRoutes.put("/:id", async (c) => {
     const scheduledPublishAt = formData.get("scheduled_publish_at");
     const scheduledUnpublishAt = formData.get("scheduled_unpublish_at");
     const now = Date.now();
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE content SET
         slug = ?, title = ?, data = ?, status = ?,
         scheduled_publish_at = ?, scheduled_unpublish_at = ?,
@@ -6644,15 +6627,15 @@ adminContentRoutes.put("/:id", async (c) => {
       now,
       id
     ).run();
-    const cache = getCacheService(CACHE_CONFIGS.content);
+    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.content);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existingContent.collection_id}:*`);
     const existingData = JSON.parse(existingContent.data || "{}");
     if (JSON.stringify(existingData) !== JSON.stringify(data)) {
-      const versionCountStmt = db.prepare("SELECT MAX(version) as max_version FROM content_versions WHERE content_id = ?");
+      const versionCountStmt = db2.prepare("SELECT MAX(version) as max_version FROM content_versions WHERE content_id = ?");
       const versionResult = await versionCountStmt.bind(id).first();
       const nextVersion = (versionResult?.max_version || 0) + 1;
-      const versionStmt = db.prepare(`
+      const versionStmt = db2.prepare(`
         INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
         VALUES (?, ?, ?, ?, ?, ?)
       `);
@@ -6666,7 +6649,7 @@ adminContentRoutes.put("/:id", async (c) => {
       ).run();
     }
     if (status !== existingContent.status) {
-      const workflowStmt = db.prepare(`
+      const workflowStmt = db2.prepare(`
         INSERT INTO workflow_history (id, content_id, action, from_status, to_status, user_id, created_at)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `);
@@ -6692,7 +6675,7 @@ adminContentRoutes.put("/:id", async (c) => {
     }
   } catch (error) {
     console.error("Error updating content:", error);
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         Failed to update content. Please try again.
       </div>
@@ -6703,12 +6686,12 @@ adminContentRoutes.post("/preview", async (c) => {
   try {
     const formData = await c.req.formData();
     const collectionId = formData.get("collection_id");
-    const db = c.env.DB;
-    const collection = await getCollection(db, collectionId);
+    const db2 = c.env.DB;
+    const collection = await getCollection(db2, collectionId);
     if (!collection) {
       return c.html("<p>Collection not found</p>");
     }
-    const fields = await getCollectionFields(db, collectionId);
+    const fields = await getCollectionFields(db2, collectionId);
     const data = {};
     for (const field of fields) {
       const value = formData.get(field.field_name);
@@ -6782,8 +6765,8 @@ adminContentRoutes.post("/duplicate", async (c) => {
     if (!originalId) {
       return c.json({ success: false, error: "Content ID required" });
     }
-    const db = c.env.DB;
-    const contentStmt = db.prepare("SELECT * FROM content WHERE id = ?");
+    const db2 = c.env.DB;
+    const contentStmt = db2.prepare("SELECT * FROM content WHERE id = ?");
     const original = await contentStmt.bind(originalId).first();
     if (!original) {
       return c.json({ success: false, error: "Content not found" });
@@ -6792,7 +6775,7 @@ adminContentRoutes.post("/duplicate", async (c) => {
     const now = Date.now();
     const originalData = JSON.parse(original.data || "{}");
     originalData.title = `${originalData.title || "Untitled"} (Copy)`;
-    const insertStmt = db.prepare(`
+    const insertStmt = db2.prepare(`
       INSERT INTO content (
         id, collection_id, slug, title, data, status,
         author_id, created_at, updated_at
@@ -6915,11 +6898,11 @@ adminContentRoutes.post("/bulk-action", async (c) => {
     if (!action || !ids || ids.length === 0) {
       return c.json({ success: false, error: "Action and IDs required" });
     }
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const now = Date.now();
     if (action === "delete") {
       const placeholders = ids.map(() => "?").join(",");
-      const stmt = db.prepare(`
+      const stmt = db2.prepare(`
         UPDATE content
         SET status = 'deleted', updated_at = ?
         WHERE id IN (${placeholders})
@@ -6928,7 +6911,7 @@ adminContentRoutes.post("/bulk-action", async (c) => {
     } else if (action === "publish" || action === "draft") {
       const placeholders = ids.map(() => "?").join(",");
       const publishedAt = action === "publish" ? now : null;
-      const stmt = db.prepare(`
+      const stmt = db2.prepare(`
         UPDATE content
         SET status = ?, published_at = ?, updated_at = ?
         WHERE id IN (${placeholders})
@@ -6937,7 +6920,7 @@ adminContentRoutes.post("/bulk-action", async (c) => {
     } else {
       return c.json({ success: false, error: "Invalid action" });
     }
-    const cache = getCacheService(CACHE_CONFIGS.content);
+    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.content);
     for (const contentId of ids) {
       await cache.delete(cache.generateKey("content", contentId));
     }
@@ -6951,21 +6934,21 @@ adminContentRoutes.post("/bulk-action", async (c) => {
 adminContentRoutes.delete("/:id", async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const user = c.get("user");
-    const contentStmt = db.prepare("SELECT id, title FROM content WHERE id = ?");
+    const contentStmt = db2.prepare("SELECT id, title FROM content WHERE id = ?");
     const content = await contentStmt.bind(id).first();
     if (!content) {
       return c.json({ success: false, error: "Content not found" }, 404);
     }
     const now = Date.now();
-    const deleteStmt = db.prepare(`
+    const deleteStmt = db2.prepare(`
       UPDATE content
       SET status = 'deleted', updated_at = ?
       WHERE id = ?
     `);
     await deleteStmt.bind(now, id).run();
-    const cache = getCacheService(CACHE_CONFIGS.content);
+    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.content);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate("content:list:*");
     return c.html(`
@@ -6988,13 +6971,13 @@ adminContentRoutes.delete("/:id", async (c) => {
 adminContentRoutes.get("/:id/versions", async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
-    const contentStmt = db.prepare("SELECT * FROM content WHERE id = ?");
+    const db2 = c.env.DB;
+    const contentStmt = db2.prepare("SELECT * FROM content WHERE id = ?");
     const content = await contentStmt.bind(id).first();
     if (!content) {
       return c.html("<p>Content not found</p>");
     }
-    const versionsStmt = db.prepare(`
+    const versionsStmt = db2.prepare(`
       SELECT cv.*, u.first_name, u.last_name, u.email
       FROM content_versions cv
       LEFT JOIN users u ON cv.author_id = u.id
@@ -7031,8 +7014,8 @@ adminContentRoutes.post("/:id/restore/:version", async (c) => {
     const id = c.req.param("id");
     const version = parseInt(c.req.param("version"));
     const user = c.get("user");
-    const db = c.env.DB;
-    const versionStmt = db.prepare(`
+    const db2 = c.env.DB;
+    const versionStmt = db2.prepare(`
       SELECT * FROM content_versions 
       WHERE content_id = ? AND version = ?
     `);
@@ -7040,14 +7023,14 @@ adminContentRoutes.post("/:id/restore/:version", async (c) => {
     if (!versionData) {
       return c.json({ success: false, error: "Version not found" });
     }
-    const contentStmt = db.prepare("SELECT * FROM content WHERE id = ?");
+    const contentStmt = db2.prepare("SELECT * FROM content WHERE id = ?");
     const currentContent = await contentStmt.bind(id).first();
     if (!currentContent) {
       return c.json({ success: false, error: "Content not found" });
     }
     const restoredData = JSON.parse(versionData.data);
     const now = Date.now();
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE content SET
         title = ?, data = ?, updated_at = ?
       WHERE id = ?
@@ -7058,10 +7041,10 @@ adminContentRoutes.post("/:id/restore/:version", async (c) => {
       now,
       id
     ).run();
-    const nextVersionStmt = db.prepare("SELECT MAX(version) as max_version FROM content_versions WHERE content_id = ?");
+    const nextVersionStmt = db2.prepare("SELECT MAX(version) as max_version FROM content_versions WHERE content_id = ?");
     const nextVersionResult = await nextVersionStmt.bind(id).first();
     const nextVersion = (nextVersionResult?.max_version || 0) + 1;
-    const newVersionStmt = db.prepare(`
+    const newVersionStmt = db2.prepare(`
       INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
       VALUES (?, ?, ?, ?, ?, ?)
     `);
@@ -7073,7 +7056,7 @@ adminContentRoutes.post("/:id/restore/:version", async (c) => {
       user?.userId || "unknown",
       now
     ).run();
-    const workflowStmt = db.prepare(`
+    const workflowStmt = db2.prepare(`
       INSERT INTO workflow_history (id, content_id, action, from_status, to_status, user_id, comment, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
@@ -7097,8 +7080,8 @@ adminContentRoutes.get("/:id/version/:version/preview", async (c) => {
   try {
     const id = c.req.param("id");
     const version = parseInt(c.req.param("version"));
-    const db = c.env.DB;
-    const versionStmt = db.prepare(`
+    const db2 = c.env.DB;
+    const versionStmt = db2.prepare(`
       SELECT cv.*, c.collection_id, col.display_name as collection_name
       FROM content_versions cv
       JOIN content c ON cv.content_id = c.id
@@ -7157,7 +7140,7 @@ ${JSON.stringify(data, null, 2)}
 var admin_content_default = adminContentRoutes;
 
 // src/templates/pages/admin-profile.template.ts
-init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function renderAvatarImage(avatarUrl, firstName, lastName) {
   return `<div id="avatar-image-container" class="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden bg-gradient-to-br from-cyan-400 to-purple-400 flex items-center justify-center ring-4 ring-zinc-950/5 dark:ring-white/10">
     ${avatarUrl ? `<img src="${avatarUrl}" alt="Profile picture" class="w-full h-full object-cover">` : `<span class="text-2xl font-bold text-white">${firstName.charAt(0)}${lastName.charAt(0)}</span>`}
@@ -7177,8 +7160,8 @@ function renderProfilePage(data) {
       </div>
 
       <!-- Alert Messages -->
-      ${data.error ? renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
-      ${data.success ? renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
+      ${data.error ? chunkYU6QFFI4_cjs.renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
+      ${data.success ? chunkYU6QFFI4_cjs.renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
 
       <!-- Profile Form -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -7565,7 +7548,7 @@ function renderProfilePage(data) {
     version: data.version,
     content: pageContent
   };
-  return renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/components/alert.template.ts
@@ -7848,7 +7831,7 @@ function renderActivityLogsPage(data) {
     user: data.user,
     content: pageContent
   };
-  return renderAdminLayout(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayout(layoutData);
 }
 function getActionBadgeClass(action) {
   if (action.includes("login") || action.includes("logout")) {
@@ -7868,7 +7851,7 @@ function formatAction(action) {
 }
 
 // src/templates/pages/admin-user-edit.template.ts
-init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 
 // src/templates/components/confirmation-dialog.template.ts
 function renderConfirmationDialog2(options) {
@@ -7989,8 +7972,8 @@ function renderUserEditPage(data) {
 
       <!-- Alert Messages -->
       <div id="form-messages">
-        ${data.error ? renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
-        ${data.success ? renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
+        ${data.error ? chunkYU6QFFI4_cjs.renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
+        ${data.success ? chunkYU6QFFI4_cjs.renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
       </div>
 
       <!-- User Edit Form -->
@@ -8009,7 +7992,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="first_name"
-                      value="${escapeHtml(data.userToEdit.firstName || "")}"
+                      value="${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.firstName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -8020,7 +8003,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="last_name"
-                      value="${escapeHtml(data.userToEdit.lastName || "")}"
+                      value="${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.lastName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -8031,7 +8014,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="username"
-                      value="${escapeHtml(data.userToEdit.username || "")}"
+                      value="${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.username || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -8042,7 +8025,7 @@ function renderUserEditPage(data) {
                     <input
                       type="email"
                       name="email"
-                      value="${escapeHtml(data.userToEdit.email || "")}"
+                      value="${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.email || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -8053,7 +8036,7 @@ function renderUserEditPage(data) {
                     <input
                       type="tel"
                       name="phone"
-                      value="${escapeHtml(data.userToEdit.phone || "")}"
+                      value="${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.phone || "")}"
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
                   </div>
@@ -8067,7 +8050,7 @@ function renderUserEditPage(data) {
                         class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-zinc-500/30 dark:outline-zinc-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-500 dark:focus-visible:outline-zinc-400 sm:text-sm/6"
                       >
                         ${data.roles.map((role) => `
-                          <option value="${escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${escapeHtml(role.label)}</option>
+                          <option value="${chunkPGZZPKZL_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunkPGZZPKZL_cjs.escapeHtml(role.label)}</option>
                         `).join("")}
                       </select>
                       <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-zinc-600 dark:text-zinc-400 sm:size-4">
@@ -8083,7 +8066,7 @@ function renderUserEditPage(data) {
                     name="bio"
                     rows="3"
                     class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-                  >${escapeHtml(data.userToEdit.bio || "")}</textarea>
+                  >${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.bio || "")}</textarea>
                 </div>
               </div>
 
@@ -8283,11 +8266,11 @@ function renderUserEditPage(data) {
     user: data.user,
     content: pageContent
   };
-  return renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/pages/admin-user-new.template.ts
-init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function renderUserNewPage(data) {
   const pageContent = `
     <div>
@@ -8326,8 +8309,8 @@ function renderUserNewPage(data) {
 
       <!-- Alert Messages -->
       <div id="form-messages">
-        ${data.error ? renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
-        ${data.success ? renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
+        ${data.error ? chunkYU6QFFI4_cjs.renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
+        ${data.success ? chunkYU6QFFI4_cjs.renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
       </div>
 
       <!-- User New Form -->
@@ -8571,11 +8554,11 @@ function renderUserNewPage(data) {
     user: data.user,
     content: pageContent
   };
-  return renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/pages/admin-users-list.template.ts
-init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function renderUsersListPage(data) {
   const columns = [
     {
@@ -8726,8 +8709,8 @@ function renderUsersListPage(data) {
       </div>
 
       <!-- Alert Messages -->
-      ${data.error ? renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
-      ${data.success ? renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
+      ${data.error ? chunkYU6QFFI4_cjs.renderAlert({ type: "error", message: data.error, dismissible: true }) : ""}
+      ${data.success ? chunkYU6QFFI4_cjs.renderAlert({ type: "success", message: data.success, dismissible: true }) : ""}
 
       <!-- Stats -->
       <div class="mb-6">
@@ -8904,10 +8887,10 @@ function renderUsersListPage(data) {
       </div>
 
       <!-- Users Table -->
-      ${renderTable(tableData)}
+      ${chunkYU6QFFI4_cjs.renderTable(tableData)}
 
       <!-- Pagination -->
-      ${data.pagination ? renderPagination(data.pagination) : ""}
+      ${data.pagination ? chunkYU6QFFI4_cjs.renderPagination(data.pagination) : ""}
     </div>
 
     <script>
@@ -8978,12 +8961,12 @@ function renderUsersListPage(data) {
     version: data.version,
     content: pageContent
   };
-  return renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/routes/admin-users.ts
-var userRoutes = new Hono();
-userRoutes.use("*", requireAuth());
+var userRoutes = new hono.Hono();
+userRoutes.use("*", chunk7EGKU7OO_cjs.requireAuth());
 userRoutes.get("/", (c) => {
   return c.redirect("/admin/dashboard");
 });
@@ -9019,9 +9002,9 @@ var ROLES = [
 ];
 userRoutes.get("/profile", async (c) => {
   const user = c.get("user");
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   try {
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT id, email, username, first_name, last_name, phone, bio, avatar_url,
              timezone, language, theme, email_notifications, two_factor_enabled,
              role, created_at, last_login_at
@@ -9079,15 +9062,15 @@ userRoutes.get("/profile", async (c) => {
 });
 userRoutes.put("/profile", async (c) => {
   const user = c.get("user");
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   try {
     const formData = await c.req.formData();
-    const firstName = sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = sanitizeInput(formData.get("last_name")?.toString());
-    const username = sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const timezone = formData.get("timezone")?.toString() || "UTC";
     const language = formData.get("language")?.toString() || "en";
     const emailNotifications = formData.get("email_notifications") === "1";
@@ -9106,7 +9089,7 @@ userRoutes.put("/profile", async (c) => {
         dismissible: true
       }));
     }
-    const checkStmt = db.prepare(`
+    const checkStmt = db2.prepare(`
       SELECT id FROM users 
       WHERE (username = ? OR email = ?) AND id != ? AND is_active = 1
     `);
@@ -9118,7 +9101,7 @@ userRoutes.put("/profile", async (c) => {
         dismissible: true
       }));
     }
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE users SET 
         first_name = ?, last_name = ?, username = ?, email = ?,
         phone = ?, bio = ?, timezone = ?, language = ?,
@@ -9138,8 +9121,8 @@ userRoutes.put("/profile", async (c) => {
       Date.now(),
       user.userId
     ).run();
-    await logActivity(
-      db,
+    await chunk7EGKU7OO_cjs.logActivity(
+      db2,
       user.userId,
       "profile.update",
       "users",
@@ -9164,7 +9147,7 @@ userRoutes.put("/profile", async (c) => {
 });
 userRoutes.post("/profile/avatar", async (c) => {
   const user = c.get("user");
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   try {
     const formData = await c.req.formData();
     const avatarFile = formData.get("avatar");
@@ -9192,17 +9175,17 @@ userRoutes.post("/profile/avatar", async (c) => {
       }));
     }
     const avatarUrl = `/uploads/avatars/${user.userId}-${Date.now()}.${avatarFile.type.split("/")[1]}`;
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE users SET avatar_url = ?, updated_at = ?
       WHERE id = ?
     `);
     await updateStmt.bind(avatarUrl, Date.now(), user.userId).run();
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT first_name, last_name FROM users WHERE id = ?
     `);
     const userData = await userStmt.bind(user.userId).first();
-    await logActivity(
-      db,
+    await chunk7EGKU7OO_cjs.logActivity(
+      db2,
       user.userId,
       "profile.avatar_update",
       "users",
@@ -9234,7 +9217,7 @@ userRoutes.post("/profile/avatar", async (c) => {
 });
 userRoutes.post("/profile/password", async (c) => {
   const user = c.get("user");
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   try {
     const formData = await c.req.formData();
     const currentPassword = formData.get("current_password")?.toString() || "";
@@ -9261,7 +9244,7 @@ userRoutes.post("/profile/password", async (c) => {
         dismissible: true
       }));
     }
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT password_hash FROM users WHERE id = ? AND is_active = 1
     `);
     const userData = await userStmt.bind(user.userId).first();
@@ -9272,7 +9255,7 @@ userRoutes.post("/profile/password", async (c) => {
         dismissible: true
       }));
     }
-    const validPassword = await AuthManager.verifyPassword(currentPassword, userData.password_hash);
+    const validPassword = await chunk7EGKU7OO_cjs.AuthManager.verifyPassword(currentPassword, userData.password_hash);
     if (!validPassword) {
       return c.html(renderAlert2({
         type: "error",
@@ -9280,8 +9263,8 @@ userRoutes.post("/profile/password", async (c) => {
         dismissible: true
       }));
     }
-    const newPasswordHash = await AuthManager.hashPassword(newPassword);
-    const historyStmt = db.prepare(`
+    const newPasswordHash = await chunk7EGKU7OO_cjs.AuthManager.hashPassword(newPassword);
+    const historyStmt = db2.prepare(`
       INSERT INTO password_history (id, user_id, password_hash, created_at)
       VALUES (?, ?, ?, ?)
     `);
@@ -9291,13 +9274,13 @@ userRoutes.post("/profile/password", async (c) => {
       userData.password_hash,
       Date.now()
     ).run();
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE users SET password_hash = ?, updated_at = ?
       WHERE id = ?
     `);
     await updateStmt.bind(newPasswordHash, Date.now(), user.userId).run();
-    await logActivity(
-      db,
+    await chunk7EGKU7OO_cjs.logActivity(
+      db2,
       user.userId,
       "profile.password_change",
       "users",
@@ -9321,7 +9304,7 @@ userRoutes.post("/profile/password", async (c) => {
   }
 });
 userRoutes.get("/users", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   try {
     const page = parseInt(c.req.query("page") || "1");
@@ -9348,7 +9331,7 @@ userRoutes.get("/users", async (c) => {
       whereClause += " AND u.role = ?";
       params.push(roleFilter);
     }
-    const usersStmt = db.prepare(`
+    const usersStmt = db2.prepare(`
       SELECT u.id, u.email, u.username, u.first_name, u.last_name,
              u.role, u.avatar_url, u.created_at, u.last_login_at, u.updated_at,
              u.email_verified, u.two_factor_enabled, u.is_active
@@ -9358,13 +9341,13 @@ userRoutes.get("/users", async (c) => {
       LIMIT ? OFFSET ?
     `);
     const { results: usersData } = await usersStmt.bind(...params, limit, offset).all();
-    const countStmt = db.prepare(`
+    const countStmt = db2.prepare(`
       SELECT COUNT(*) as total FROM users u ${whereClause}
     `);
     const countResult = await countStmt.bind(...params).first();
     const totalUsers = countResult?.total || 0;
-    await logActivity(
-      db,
+    await chunk7EGKU7OO_cjs.logActivity(
+      db2,
       user.userId,
       "users.list_view",
       "users",
@@ -9461,16 +9444,16 @@ userRoutes.get("/users/new", async (c) => {
   }
 });
 userRoutes.post("/users/new", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   try {
     const formData = await c.req.formData();
-    const firstName = sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = sanitizeInput(formData.get("last_name")?.toString());
-    const username = sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const password = formData.get("password")?.toString() || "";
     const confirmPassword = formData.get("confirm_password")?.toString() || "";
@@ -9505,7 +9488,7 @@ userRoutes.post("/users/new", async (c) => {
         dismissible: true
       }));
     }
-    const checkStmt = db.prepare(`
+    const checkStmt = db2.prepare(`
       SELECT id FROM users
       WHERE username = ? OR email = ?
     `);
@@ -9517,9 +9500,9 @@ userRoutes.post("/users/new", async (c) => {
         dismissible: true
       }));
     }
-    const passwordHash = await AuthManager.hashPassword(password);
+    const passwordHash = await chunk7EGKU7OO_cjs.AuthManager.hashPassword(password);
     const userId = crypto.randomUUID();
-    const createStmt = db.prepare(`
+    const createStmt = db2.prepare(`
       INSERT INTO users (
         id, email, username, first_name, last_name, phone, bio,
         password_hash, role, is_active, email_verified, created_at, updated_at
@@ -9540,8 +9523,8 @@ userRoutes.post("/users/new", async (c) => {
       Date.now(),
       Date.now()
     ).run();
-    await logActivity(
-      db,
+    await chunk7EGKU7OO_cjs.logActivity(
+      db2,
       user.userId,
       "user!.create",
       "users",
@@ -9564,11 +9547,11 @@ userRoutes.get("/users/:id", async (c) => {
   if (c.req.path.endsWith("/edit")) {
     return c.notFound();
   }
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
   try {
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT id, email, username, first_name, last_name, phone, bio, avatar_url,
              role, is_active, email_verified, two_factor_enabled, created_at, last_login_at
       FROM users
@@ -9578,8 +9561,8 @@ userRoutes.get("/users/:id", async (c) => {
     if (!userRecord) {
       return c.json({ error: "User not found" }, 404);
     }
-    await logActivity(
-      db,
+    await chunk7EGKU7OO_cjs.logActivity(
+      db2,
       user.userId,
       "user!.view",
       "users",
@@ -9612,11 +9595,11 @@ userRoutes.get("/users/:id", async (c) => {
   }
 });
 userRoutes.get("/users/:id/edit", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
   try {
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT id, email, username, first_name, last_name, phone, bio, avatar_url,
              role, is_active, email_verified, two_factor_enabled, created_at, last_login_at
       FROM users
@@ -9666,17 +9649,17 @@ userRoutes.get("/users/:id/edit", async (c) => {
   }
 });
 userRoutes.put("/users/:id", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
   try {
     const formData = await c.req.formData();
-    const firstName = sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = sanitizeInput(formData.get("last_name")?.toString());
-    const username = sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const isActive = formData.get("is_active") === "1";
     const emailVerified = formData.get("email_verified") === "1";
@@ -9695,7 +9678,7 @@ userRoutes.put("/users/:id", async (c) => {
         dismissible: true
       }));
     }
-    const checkStmt = db.prepare(`
+    const checkStmt = db2.prepare(`
       SELECT id FROM users
       WHERE (username = ? OR email = ?) AND id != ?
     `);
@@ -9707,7 +9690,7 @@ userRoutes.put("/users/:id", async (c) => {
         dismissible: true
       }));
     }
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE users SET
         first_name = ?, last_name = ?, username = ?, email = ?,
         phone = ?, bio = ?, role = ?, is_active = ?, email_verified = ?,
@@ -9727,8 +9710,8 @@ userRoutes.put("/users/:id", async (c) => {
       Date.now(),
       userId
     ).run();
-    await logActivity(
-      db,
+    await chunk7EGKU7OO_cjs.logActivity(
+      db2,
       user.userId,
       "user!.update",
       "users",
@@ -9752,7 +9735,7 @@ userRoutes.put("/users/:id", async (c) => {
   }
 });
 userRoutes.post("/users/:id/toggle", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
   try {
@@ -9761,19 +9744,19 @@ userRoutes.post("/users/:id/toggle", async (c) => {
     if (userId === user.userId && !active) {
       return c.json({ error: "You cannot deactivate your own account" }, 400);
     }
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT id, email FROM users WHERE id = ?
     `);
     const userToToggle = await userStmt.bind(userId).first();
     if (!userToToggle) {
       return c.json({ error: "User not found" }, 404);
     }
-    const toggleStmt = db.prepare(`
+    const toggleStmt = db2.prepare(`
       UPDATE users SET is_active = ?, updated_at = ? WHERE id = ?
     `);
     await toggleStmt.bind(active ? 1 : 0, Date.now(), userId).run();
-    await logActivity(
-      db,
+    await chunk7EGKU7OO_cjs.logActivity(
+      db2,
       user.userId,
       active ? "user.activate" : "user.deactivate",
       "users",
@@ -9792,7 +9775,7 @@ userRoutes.post("/users/:id/toggle", async (c) => {
   }
 });
 userRoutes.delete("/users/:id", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
   try {
@@ -9801,7 +9784,7 @@ userRoutes.delete("/users/:id", async (c) => {
     if (userId === user.userId) {
       return c.json({ error: "You cannot delete your own account" }, 400);
     }
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT id, email FROM users WHERE id = ?
     `);
     const userToDelete = await userStmt.bind(userId).first();
@@ -9809,12 +9792,12 @@ userRoutes.delete("/users/:id", async (c) => {
       return c.json({ error: "User not found" }, 404);
     }
     if (hardDelete) {
-      const deleteStmt = db.prepare(`
+      const deleteStmt = db2.prepare(`
         DELETE FROM users WHERE id = ?
       `);
       await deleteStmt.bind(userId).run();
-      await logActivity(
-        db,
+      await chunk7EGKU7OO_cjs.logActivity(
+        db2,
         user.userId,
         "user!.hard_delete",
         "users",
@@ -9828,12 +9811,12 @@ userRoutes.delete("/users/:id", async (c) => {
         message: "User permanently deleted"
       });
     } else {
-      const deleteStmt = db.prepare(`
+      const deleteStmt = db2.prepare(`
         UPDATE users SET is_active = 0, updated_at = ? WHERE id = ?
       `);
       await deleteStmt.bind(Date.now(), userId).run();
-      await logActivity(
-        db,
+      await chunk7EGKU7OO_cjs.logActivity(
+        db2,
         user.userId,
         "user!.soft_delete",
         "users",
@@ -9853,14 +9836,14 @@ userRoutes.delete("/users/:id", async (c) => {
   }
 });
 userRoutes.post("/invite-user", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   try {
     const formData = await c.req.formData();
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
     const role = formData.get("role")?.toString()?.trim() || "viewer";
-    const firstName = sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = sanitizeInput(formData.get("last_name")?.toString());
+    const firstName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("last_name")?.toString());
     if (!email || !firstName || !lastName) {
       return c.json({ error: "Email, first name, and last name are required" }, 400);
     }
@@ -9868,7 +9851,7 @@ userRoutes.post("/invite-user", async (c) => {
     if (!emailRegex.test(email)) {
       return c.json({ error: "Please enter a valid email address" }, 400);
     }
-    const existingUserStmt = db.prepare(`
+    const existingUserStmt = db2.prepare(`
       SELECT id FROM users WHERE email = ?
     `);
     const existingUser = await existingUserStmt.bind(email).first();
@@ -9877,7 +9860,7 @@ userRoutes.post("/invite-user", async (c) => {
     }
     const invitationToken = crypto.randomUUID();
     const userId = crypto.randomUUID();
-    const createUserStmt = db.prepare(`
+    const createUserStmt = db2.prepare(`
       INSERT INTO users (
         id, email, first_name, last_name, role, 
         invitation_token, invited_by, invited_at,
@@ -9898,8 +9881,8 @@ userRoutes.post("/invite-user", async (c) => {
       Date.now(),
       Date.now()
     ).run();
-    await logActivity(
-      db,
+    await chunk7EGKU7OO_cjs.logActivity(
+      db2,
       user.userId,
       "user!.invite_sent",
       "users",
@@ -9928,11 +9911,11 @@ userRoutes.post("/invite-user", async (c) => {
   }
 });
 userRoutes.post("/resend-invitation/:id", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
   try {
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT id, email, first_name, last_name, role, invitation_token
       FROM users 
       WHERE id = ? AND is_active = 0 AND invitation_token IS NOT NULL
@@ -9942,7 +9925,7 @@ userRoutes.post("/resend-invitation/:id", async (c) => {
       return c.json({ error: "User not found or invitation not valid" }, 404);
     }
     const newInvitationToken = crypto.randomUUID();
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE users SET 
         invitation_token = ?, 
         invited_at = ?, 
@@ -9955,8 +9938,8 @@ userRoutes.post("/resend-invitation/:id", async (c) => {
       Date.now(),
       userId
     ).run();
-    await logActivity(
-      db,
+    await chunk7EGKU7OO_cjs.logActivity(
+      db2,
       user.userId,
       "user!.invitation_resent",
       "users",
@@ -9977,11 +9960,11 @@ userRoutes.post("/resend-invitation/:id", async (c) => {
   }
 });
 userRoutes.delete("/cancel-invitation/:id", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
   try {
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT id, email FROM users 
       WHERE id = ? AND is_active = 0 AND invitation_token IS NOT NULL
     `);
@@ -9989,10 +9972,10 @@ userRoutes.delete("/cancel-invitation/:id", async (c) => {
     if (!invitedUser) {
       return c.json({ error: "User not found or invitation not valid" }, 404);
     }
-    const deleteStmt = db.prepare(`DELETE FROM users WHERE id = ?`);
+    const deleteStmt = db2.prepare(`DELETE FROM users WHERE id = ?`);
     await deleteStmt.bind(userId).run();
-    await logActivity(
-      db,
+    await chunk7EGKU7OO_cjs.logActivity(
+      db2,
       user.userId,
       "user!.invitation_cancelled",
       "users",
@@ -10011,7 +9994,7 @@ userRoutes.delete("/cancel-invitation/:id", async (c) => {
   }
 });
 userRoutes.get("/activity-logs", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   try {
     const page = parseInt(c.req.query("page") || "1");
@@ -10049,7 +10032,7 @@ userRoutes.get("/activity-logs", async (c) => {
       params.push(toTimestamp);
     }
     const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";
-    const logsStmt = db.prepare(`
+    const logsStmt = db2.prepare(`
       SELECT 
         al.id, al.user_id, al.action, al.resource_type, al.resource_id,
         al.details, al.ip_address, al.user_agent, al.created_at,
@@ -10062,7 +10045,7 @@ userRoutes.get("/activity-logs", async (c) => {
       LIMIT ? OFFSET ?
     `);
     const { results: logs } = await logsStmt.bind(...params, limit, offset).all();
-    const countStmt = db.prepare(`
+    const countStmt = db2.prepare(`
       SELECT COUNT(*) as total 
       FROM activity_logs al
       LEFT JOIN users u ON al.user_id = u.id
@@ -10074,8 +10057,8 @@ userRoutes.get("/activity-logs", async (c) => {
       ...log,
       details: log.details ? JSON.parse(log.details) : null
     }));
-    await logActivity(
-      db,
+    await chunk7EGKU7OO_cjs.logActivity(
+      db2,
       user.userId,
       "activity.logs_viewed",
       void 0,
@@ -10117,7 +10100,7 @@ userRoutes.get("/activity-logs", async (c) => {
   }
 });
 userRoutes.get("/activity-logs/export", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   try {
     const filters = {
@@ -10152,7 +10135,7 @@ userRoutes.get("/activity-logs/export", async (c) => {
       params.push(toTimestamp);
     }
     const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";
-    const logsStmt = db.prepare(`
+    const logsStmt = db2.prepare(`
       SELECT 
         al.id, al.user_id, al.action, al.resource_type, al.resource_id,
         al.details, al.ip_address, al.user_agent, al.created_at,
@@ -10181,8 +10164,8 @@ userRoutes.get("/activity-logs/export", async (c) => {
       csvRows.push(row.join(","));
     }
     const csvContent = csvRows.join("\n");
-    await logActivity(
-      db,
+    await chunk7EGKU7OO_cjs.logActivity(
+      db2,
       user.userId,
       "activity.logs_exported",
       void 0,
@@ -10399,7 +10382,7 @@ function getFileIcon(mimeType) {
 }
 
 // src/templates/pages/admin-media-library.template.ts
-init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function renderMediaLibraryPage(data) {
   const pageContent = `
     <div>
@@ -11334,7 +11317,7 @@ function renderMediaLibraryPage(data) {
     version: data.version,
     content: pageContent
   };
-  return renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/components/media-file-details.template.ts
@@ -11483,9 +11466,9 @@ function renderMediaFileDetails(data) {
 }
 
 // src/routes/admin-media.ts
-var fileValidationSchema2 = z.object({
-  name: z.string().min(1).max(255),
-  type: z.string().refine(
+var fileValidationSchema2 = zod.z.object({
+  name: zod.z.string().min(1).max(255),
+  type: zod.z.string().refine(
     (type) => {
       const allowedTypes = [
         // Images
@@ -11516,11 +11499,11 @@ var fileValidationSchema2 = z.object({
     },
     { message: "Unsupported file type" }
   ),
-  size: z.number().min(1).max(50 * 1024 * 1024)
+  size: zod.z.number().min(1).max(50 * 1024 * 1024)
   // 50MB max
 });
-var adminMediaRoutes = new Hono();
-adminMediaRoutes.use("*", requireAuth());
+var adminMediaRoutes = new hono.Hono();
+adminMediaRoutes.use("*", chunk7EGKU7OO_cjs.requireAuth());
 adminMediaRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -11532,7 +11515,7 @@ adminMediaRoutes.get("/", async (c) => {
     const ____cacheBust = searchParams.get("t");
     const limit = 24;
     const offset = (page - 1) * limit;
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     let query = "SELECT * FROM media";
     const params = [];
     const conditions = ["deleted_at IS NULL"];
@@ -11560,9 +11543,9 @@ adminMediaRoutes.get("/", async (c) => {
       query += ` WHERE ${conditions.join(" AND ")}`;
     }
     query += ` ORDER BY uploaded_at DESC LIMIT ${limit} OFFSET ${offset}`;
-    const stmt = db.prepare(query);
+    const stmt = db2.prepare(query);
     const { results } = await stmt.bind(...params).all();
-    const foldersStmt = db.prepare(`
+    const foldersStmt = db2.prepare(`
       SELECT folder, COUNT(*) as count, SUM(size) as totalSize
       FROM media
       WHERE deleted_at IS NULL
@@ -11570,7 +11553,7 @@ adminMediaRoutes.get("/", async (c) => {
       ORDER BY folder
     `);
     const { results: folders } = await foldersStmt.all();
-    const typesStmt = db.prepare(`
+    const typesStmt = db2.prepare(`
       SELECT
         CASE
           WHEN mime_type LIKE 'image/%' THEN 'images'
@@ -11629,14 +11612,14 @@ adminMediaRoutes.get("/", async (c) => {
     return c.html(renderMediaLibraryPage(pageData));
   } catch (error) {
     console.error("Error loading media library:", error);
-    return c.html(html`<p>Error loading media library</p>`);
+    return c.html(html.html`<p>Error loading media library</p>`);
   }
 });
 adminMediaRoutes.get("/selector", async (c) => {
   try {
     const { searchParams } = new URL(c.req.url);
     const search = searchParams.get("search") || "";
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     let query = "SELECT * FROM media WHERE deleted_at IS NULL";
     const params = [];
     if (search.trim()) {
@@ -11645,7 +11628,7 @@ adminMediaRoutes.get("/selector", async (c) => {
       params.push(searchTerm, searchTerm, searchTerm);
     }
     query += " ORDER BY uploaded_at DESC LIMIT 24";
-    const stmt = db.prepare(query);
+    const stmt = db2.prepare(query);
     const { results } = await stmt.bind(...params).all();
     const mediaFiles = results.map((row) => ({
       id: row.id,
@@ -11664,7 +11647,7 @@ adminMediaRoutes.get("/selector", async (c) => {
       isVideo: row.mime_type.startsWith("video/"),
       isDocument: !row.mime_type.startsWith("image/") && !row.mime_type.startsWith("video/")
     }));
-    return c.html(html`
+    return c.html(html.html`
       <div class="mb-4">
         <input
           type="search"
@@ -11679,7 +11662,7 @@ adminMediaRoutes.get("/selector", async (c) => {
       </div>
 
       <div id="media-selector-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
-        ${raw(mediaFiles.map((file) => `
+        ${html.raw(mediaFiles.map((file) => `
           <div
             class="relative group cursor-pointer rounded-lg overflow-hidden bg-zinc-50 dark:bg-zinc-800 shadow-sm hover:shadow-md transition-shadow"
             data-media-id="${file.id}"
@@ -11732,7 +11715,7 @@ adminMediaRoutes.get("/selector", async (c) => {
         `).join(""))}
       </div>
 
-      ${mediaFiles.length === 0 ? html`
+      ${mediaFiles.length === 0 ? html.html`
         <div class="text-center py-12 text-zinc-500 dark:text-zinc-400">
           <svg class="mx-auto h-12 w-12 text-zinc-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -11743,7 +11726,7 @@ adminMediaRoutes.get("/selector", async (c) => {
     `);
   } catch (error) {
     console.error("Error loading media selector:", error);
-    return c.html(html`<div class="text-red-500 dark:text-red-400">Error loading media files</div>`);
+    return c.html(html.html`<div class="text-red-500 dark:text-red-400">Error loading media files</div>`);
   }
 });
 adminMediaRoutes.get("/search", async (c) => {
@@ -11752,7 +11735,7 @@ adminMediaRoutes.get("/search", async (c) => {
     const search = searchParams.get("search") || "";
     const folder = searchParams.get("folder") || "all";
     const type = searchParams.get("type") || "all";
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     let query = "SELECT * FROM media";
     const params = [];
     const conditions = [];
@@ -11785,7 +11768,7 @@ adminMediaRoutes.get("/search", async (c) => {
       query += ` WHERE ${conditions.join(" AND ")}`;
     }
     query += ` ORDER BY uploaded_at DESC LIMIT 24`;
-    const stmt = db.prepare(query);
+    const stmt = db2.prepare(query);
     const { results } = await stmt.bind(...params).all();
     const mediaFiles = results.map((row) => ({
       ...row,
@@ -11799,7 +11782,7 @@ adminMediaRoutes.get("/search", async (c) => {
       isDocument: !row.mime_type.startsWith("image/") && !row.mime_type.startsWith("video/")
     }));
     const gridHTML = mediaFiles.map((file) => generateMediaItemHTML(file)).join("");
-    return c.html(raw(gridHTML));
+    return c.html(html.raw(gridHTML));
   } catch (error) {
     console.error("Error searching media:", error);
     return c.html('<div class="text-red-500">Error searching files</div>');
@@ -11808,8 +11791,8 @@ adminMediaRoutes.get("/search", async (c) => {
 adminMediaRoutes.get("/:id/details", async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
-    const stmt = db.prepare("SELECT * FROM media WHERE id = ?");
+    const db2 = c.env.DB;
+    const stmt = db2.prepare("SELECT * FROM media WHERE id = ?");
     const result = await stmt.bind(id).first();
     if (!result) {
       return c.html('<div class="text-red-500">File not found</div>');
@@ -11848,7 +11831,7 @@ adminMediaRoutes.post("/upload", async (c) => {
     const formData = await c.req.formData();
     const files = formData.getAll("files");
     if (!files || files.length === 0) {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           No files provided
         </div>
@@ -11861,7 +11844,7 @@ adminMediaRoutes.post("/upload", async (c) => {
     console.log("[MEDIA UPLOAD] MEDIA_BUCKET type:", typeof c.env.MEDIA_BUCKET);
     if (!c.env.MEDIA_BUCKET) {
       console.error("[MEDIA UPLOAD] MEDIA_BUCKET is not available! Available env keys:", Object.keys(c.env));
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Media storage (R2) is not configured. Please check your wrangler.toml configuration.
           <br><small>Debug: Available bindings: ${Object.keys(c.env).join(", ")}</small>
@@ -11983,25 +11966,25 @@ adminMediaRoutes.post("/upload", async (c) => {
         console.error("Error fetching updated media list:", error);
       }
     }
-    return c.html(html`
-      ${uploadResults.length > 0 ? html`
+    return c.html(html.html`
+      ${uploadResults.length > 0 ? html.html`
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
           Successfully uploaded ${uploadResults.length} file${uploadResults.length > 1 ? "s" : ""}
         </div>
       ` : ""}
 
-      ${errors.length > 0 ? html`
+      ${errors.length > 0 ? html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           <p class="font-medium">Upload errors:</p>
           <ul class="list-disc list-inside mt-2">
-            ${errors.map((error) => html`
+            ${errors.map((error) => html.html`
               <li>${error.filename}: ${error.error}</li>
             `)}
           </ul>
         </div>
       ` : ""}
 
-      ${uploadResults.length > 0 ? html`
+      ${uploadResults.length > 0 ? html.html`
         <script>
           // Close modal and refresh page after successful upload with cache busting
           setTimeout(() => {
@@ -12013,7 +11996,7 @@ adminMediaRoutes.post("/upload", async (c) => {
     `);
   } catch (error) {
     console.error("Upload error:", error);
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         Upload failed: ${error instanceof Error ? error.message : "Unknown error"}
       </div>
@@ -12050,14 +12033,14 @@ adminMediaRoutes.put("/:id", async (c) => {
     const stmt = c.env.DB.prepare("SELECT * FROM media WHERE id = ? AND deleted_at IS NULL");
     const fileRecord = await stmt.bind(fileId).first();
     if (!fileRecord) {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           File not found
         </div>
       `);
     }
     if (fileRecord.uploaded_by !== user.userId && user.role !== "admin") {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           Permission denied
         </div>
@@ -12079,7 +12062,7 @@ adminMediaRoutes.put("/:id", async (c) => {
       Math.floor(Date.now() / 1e3),
       fileId
     ).run();
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
         File updated successfully
       </div>
@@ -12092,19 +12075,19 @@ adminMediaRoutes.put("/:id", async (c) => {
     `);
   } catch (error) {
     console.error("Update error:", error);
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
         Update failed: ${error instanceof Error ? error.message : "Unknown error"}
       </div>
     `);
   }
 });
-adminMediaRoutes.delete("/cleanup", requireRole("admin"), async (c) => {
+adminMediaRoutes.delete("/cleanup", chunk7EGKU7OO_cjs.requireRole("admin"), async (c) => {
   try {
-    const db = c.env.DB;
-    const allMediaStmt = db.prepare("SELECT id, r2_key, filename FROM media WHERE deleted_at IS NULL");
+    const db2 = c.env.DB;
+    const allMediaStmt = db2.prepare("SELECT id, r2_key, filename FROM media WHERE deleted_at IS NULL");
     const { results: allMedia } = await allMediaStmt.all();
-    const contentStmt = db.prepare("SELECT data FROM content");
+    const contentStmt = db2.prepare("SELECT data FROM content");
     const { results: contentRecords } = await contentStmt.all();
     const referencedUrls = /* @__PURE__ */ new Set();
     for (const record of contentRecords) {
@@ -12118,7 +12101,7 @@ adminMediaRoutes.delete("/cleanup", requireRole("admin"), async (c) => {
     }
     const unusedFiles = allMedia.filter((file) => !referencedUrls.has(file.r2_key));
     if (unusedFiles.length === 0) {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded">
           No unused media files found. All files are referenced in content.
         </div>
@@ -12134,7 +12117,7 @@ adminMediaRoutes.delete("/cleanup", requireRole("admin"), async (c) => {
     for (const file of unusedFiles) {
       try {
         await c.env.MEDIA_BUCKET.delete(file.r2_key);
-        const deleteStmt = db.prepare("UPDATE media SET deleted_at = ? WHERE id = ?");
+        const deleteStmt = db2.prepare("UPDATE media SET deleted_at = ? WHERE id = ?");
         await deleteStmt.bind(Math.floor(Date.now() / 1e3), file.id).run();
         deletedCount++;
       } catch (error) {
@@ -12145,19 +12128,19 @@ adminMediaRoutes.delete("/cleanup", requireRole("admin"), async (c) => {
         });
       }
     }
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
         Successfully cleaned up ${deletedCount} unused media file${deletedCount !== 1 ? "s" : ""}.
-        ${errors.length > 0 ? html`
+        ${errors.length > 0 ? html.html`
           <br><span class="text-sm">Failed to delete ${errors.length} file${errors.length !== 1 ? "s" : ""}.</span>
         ` : ""}
       </div>
 
-      ${errors.length > 0 ? html`
+      ${errors.length > 0 ? html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           <p class="font-medium">Cleanup errors:</p>
           <ul class="list-disc list-inside mt-2 text-sm">
-            ${errors.map((error) => html`
+            ${errors.map((error) => html.html`
               <li>${error.filename}: ${error.error}</li>
             `)}
           </ul>
@@ -12173,7 +12156,7 @@ adminMediaRoutes.delete("/cleanup", requireRole("admin"), async (c) => {
     `);
   } catch (error) {
     console.error("Cleanup error:", error);
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         Cleanup failed: ${error instanceof Error ? error.message : "Unknown error"}
       </div>
@@ -12187,14 +12170,14 @@ adminMediaRoutes.delete("/:id", async (c) => {
     const stmt = c.env.DB.prepare("SELECT * FROM media WHERE id = ? AND deleted_at IS NULL");
     const fileRecord = await stmt.bind(fileId).first();
     if (!fileRecord) {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           File not found
         </div>
       `);
     }
     if (fileRecord.uploaded_by !== user.userId && user.role !== "admin") {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           Permission denied
         </div>
@@ -12207,7 +12190,7 @@ adminMediaRoutes.delete("/:id", async (c) => {
     }
     const deleteStmt = c.env.DB.prepare("UPDATE media SET deleted_at = ? WHERE id = ?");
     await deleteStmt.bind(Math.floor(Date.now() / 1e3), fileId).run();
-    return c.html(html`
+    return c.html(html.html`
       <script>
         // Close modal if open
         const modal = document.getElementById('file-modal');
@@ -12220,7 +12203,7 @@ adminMediaRoutes.delete("/:id", async (c) => {
     `);
   } catch (error) {
     console.error("Delete error:", error);
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
         Delete failed: ${error instanceof Error ? error.message : "Unknown error"}
       </div>
@@ -12348,7 +12331,7 @@ function formatFileSize(bytes) {
 }
 
 // src/templates/pages/admin-plugins-list.template.ts
-init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function renderPluginsListPage(data) {
   const pageContent = `
     <div>
@@ -12783,7 +12766,7 @@ function renderPluginsListPage(data) {
     version: data.version,
     content: pageContent
   };
-  return renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 function renderPluginCard(plugin) {
   const statusColors = {
@@ -13440,7 +13423,7 @@ function renderPluginSettingsPage(data) {
     user,
     content: pageContent
   };
-  return renderAdminLayout(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayout(layoutData);
 }
 function renderStatusBadge(status) {
   const statusColors = {
@@ -13702,8 +13685,8 @@ function formatTimestamp(timestamp) {
 }
 
 // src/routes/admin-plugins.ts
-var adminPluginRoutes = new Hono();
-adminPluginRoutes.use("*", requireAuth());
+var adminPluginRoutes = new hono.Hono();
+adminPluginRoutes.use("*", chunk7EGKU7OO_cjs.requireAuth());
 var AVAILABLE_PLUGINS = [
   {
     id: "third-party-faq",
@@ -13800,11 +13783,11 @@ var AVAILABLE_PLUGINS = [
 adminPluginRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     if (user?.role !== "admin") {
       return c.text("Access denied", 403);
     }
-    const pluginService = new PluginService(db);
+    const pluginService = new chunk22EFGHAX_cjs.PluginService(db2);
     let installedPlugins = [];
     let stats = { total: 0, active: 0, inactive: 0, errors: 0, uninstalled: 0 };
     try {
@@ -13871,12 +13854,12 @@ adminPluginRoutes.get("/", async (c) => {
 adminPluginRoutes.get("/:id", async (c) => {
   try {
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const pluginId = c.req.param("id");
     if (user?.role !== "admin") {
       return c.redirect("/admin/plugins");
     }
-    const pluginService = new PluginService(db);
+    const pluginService = new chunk22EFGHAX_cjs.PluginService(db2);
     const plugin = await pluginService.getPlugin(pluginId);
     if (!plugin) {
       return c.text("Plugin not found", 404);
@@ -13925,12 +13908,12 @@ adminPluginRoutes.get("/:id", async (c) => {
 adminPluginRoutes.post("/:id/activate", async (c) => {
   try {
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const pluginId = c.req.param("id");
     if (user?.role !== "admin") {
       return c.json({ error: "Access denied" }, 403);
     }
-    const pluginService = new PluginService(db);
+    const pluginService = new chunk22EFGHAX_cjs.PluginService(db2);
     await pluginService.activatePlugin(pluginId);
     return c.json({ success: true });
   } catch (error) {
@@ -13942,12 +13925,12 @@ adminPluginRoutes.post("/:id/activate", async (c) => {
 adminPluginRoutes.post("/:id/deactivate", async (c) => {
   try {
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const pluginId = c.req.param("id");
     if (user?.role !== "admin") {
       return c.json({ error: "Access denied" }, 403);
     }
-    const pluginService = new PluginService(db);
+    const pluginService = new chunk22EFGHAX_cjs.PluginService(db2);
     await pluginService.deactivatePlugin(pluginId);
     return c.json({ success: true });
   } catch (error) {
@@ -13959,12 +13942,12 @@ adminPluginRoutes.post("/:id/deactivate", async (c) => {
 adminPluginRoutes.post("/install", async (c) => {
   try {
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     if (user?.role !== "admin") {
       return c.json({ error: "Access denied" }, 403);
     }
     const body = await c.req.json();
-    const pluginService = new PluginService(db);
+    const pluginService = new chunk22EFGHAX_cjs.PluginService(db2);
     if (body.name === "faq-plugin") {
       const faqPlugin = await pluginService.installPlugin({
         id: "third-party-faq",
@@ -14175,12 +14158,12 @@ adminPluginRoutes.post("/install", async (c) => {
 adminPluginRoutes.post("/:id/uninstall", async (c) => {
   try {
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const pluginId = c.req.param("id");
     if (user?.role !== "admin") {
       return c.json({ error: "Access denied" }, 403);
     }
-    const pluginService = new PluginService(db);
+    const pluginService = new chunk22EFGHAX_cjs.PluginService(db2);
     await pluginService.uninstallPlugin(pluginId);
     return c.json({ success: true });
   } catch (error) {
@@ -14192,13 +14175,13 @@ adminPluginRoutes.post("/:id/uninstall", async (c) => {
 adminPluginRoutes.post("/:id/settings", async (c) => {
   try {
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const pluginId = c.req.param("id");
     if (user?.role !== "admin") {
       return c.json({ error: "Access denied" }, 403);
     }
     const settings = await c.req.json();
-    const pluginService = new PluginService(db);
+    const pluginService = new chunk22EFGHAX_cjs.PluginService(db2);
     await pluginService.updatePluginSettings(pluginId, settings);
     return c.json({ success: true });
   } catch (error) {
@@ -14219,7 +14202,7 @@ function formatLastUpdated(timestamp) {
 }
 
 // src/templates/pages/admin-logs-list.template.ts
-init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function renderLogsListPage(data) {
   const { logs, pagination, filters, user } = data;
   const content = `
@@ -14530,11 +14513,11 @@ function renderLogsListPage(data) {
     user,
     content
   };
-  return renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 function renderLogDetailsPage(data) {
   const { log, user } = data;
-  const content = html`
+  const content = html.html`
     <div class="px-4 sm:px-6 lg:px-8">
       <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
@@ -14595,59 +14578,59 @@ function renderLogDetailsPage(data) {
               </dd>
             </div>
             
-            ${log.source ? html`
+            ${log.source ? html.html`
               <div>
                 <dt class="text-sm font-medium text-gray-500">Source</dt>
                 <dd class="mt-1 text-sm text-gray-900">${log.source}</dd>
               </div>
             ` : ""}
             
-            ${log.userId ? html`
+            ${log.userId ? html.html`
               <div>
                 <dt class="text-sm font-medium text-gray-500">User ID</dt>
                 <dd class="mt-1 text-sm text-gray-900 font-mono">${log.userId}</dd>
               </div>
             ` : ""}
             
-            ${log.sessionId ? html`
+            ${log.sessionId ? html.html`
               <div>
                 <dt class="text-sm font-medium text-gray-500">Session ID</dt>
                 <dd class="mt-1 text-sm text-gray-900 font-mono">${log.sessionId}</dd>
               </div>
             ` : ""}
             
-            ${log.requestId ? html`
+            ${log.requestId ? html.html`
               <div>
                 <dt class="text-sm font-medium text-gray-500">Request ID</dt>
                 <dd class="mt-1 text-sm text-gray-900 font-mono">${log.requestId}</dd>
               </div>
             ` : ""}
             
-            ${log.ipAddress ? html`
+            ${log.ipAddress ? html.html`
               <div>
                 <dt class="text-sm font-medium text-gray-500">IP Address</dt>
                 <dd class="mt-1 text-sm text-gray-900">${log.ipAddress}</dd>
               </div>
             ` : ""}
             
-            ${log.method && log.url ? html`
+            ${log.method && log.url ? html.html`
               <div class="sm:col-span-2">
                 <dt class="text-sm font-medium text-gray-500">HTTP Request</dt>
                 <dd class="mt-1 text-sm text-gray-900">
                   <span class="font-medium">${log.method}</span> ${log.url}
-                  ${log.statusCode ? html`<span class="ml-2 text-gray-500">(${log.statusCode})</span>` : ""}
+                  ${log.statusCode ? html.html`<span class="ml-2 text-gray-500">(${log.statusCode})</span>` : ""}
                 </dd>
               </div>
             ` : ""}
             
-            ${log.duration ? html`
+            ${log.duration ? html.html`
               <div>
                 <dt class="text-sm font-medium text-gray-500">Duration</dt>
                 <dd class="mt-1 text-sm text-gray-900">${log.formattedDuration}</dd>
               </div>
             ` : ""}
             
-            ${log.userAgent ? html`
+            ${log.userAgent ? html.html`
               <div class="sm:col-span-2">
                 <dt class="text-sm font-medium text-gray-500">User Agent</dt>
                 <dd class="mt-1 text-sm text-gray-900 break-all">${log.userAgent}</dd>
@@ -14670,14 +14653,14 @@ function renderLogDetailsPage(data) {
       </div>
 
       <!-- Tags -->
-      ${log.tags && log.tags.length > 0 ? html`
+      ${log.tags && log.tags.length > 0 ? html.html`
         <div class="mt-6 bg-white shadow rounded-lg overflow-hidden">
           <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Tags</h3>
           </div>
           <div class="px-6 py-4">
             <div class="flex flex-wrap gap-2">
-              ${log.tags.map((tag) => html`
+              ${log.tags.map((tag) => html.html`
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                   ${tag}
                 </span>
@@ -14688,7 +14671,7 @@ function renderLogDetailsPage(data) {
       ` : ""}
 
       <!-- Additional Data -->
-      ${log.data ? html`
+      ${log.data ? html.html`
         <div class="mt-6 bg-white shadow rounded-lg overflow-hidden">
           <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Additional Data</h3>
@@ -14700,7 +14683,7 @@ function renderLogDetailsPage(data) {
       ` : ""}
 
       <!-- Stack Trace -->
-      ${log.stackTrace ? html`
+      ${log.stackTrace ? html.html`
         <div class="mt-6 bg-white shadow rounded-lg overflow-hidden">
           <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Stack Trace</h3>
@@ -14721,7 +14704,7 @@ function renderLogDetailsPage(data) {
         </a>
         
         <div class="flex space-x-3">
-          ${log.level === "error" || log.level === "fatal" ? html`
+          ${log.level === "error" || log.level === "fatal" ? html.html`
             <button
               type="button"
               class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
@@ -14742,7 +14725,7 @@ function renderLogDetailsPage(data) {
       </div>
     </div>
   `;
-  return adminLayoutV2({
+  return chunkYU6QFFI4_cjs.adminLayoutV2({
     title: `Log Details - ${log.id}`,
     user,
     content
@@ -14750,7 +14733,7 @@ function renderLogDetailsPage(data) {
 }
 function renderLogConfigPage(data) {
   const { configs, user } = data;
-  const content = html`
+  const content = html.html`
     <div class="px-4 sm:px-6 lg:px-8">
       <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
@@ -14822,17 +14805,17 @@ function renderLogConfigPage(data) {
 
       <!-- Configuration Cards -->
       <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        ${configs.map((config) => html`
+        ${configs.map((config) => html.html`
           <div class="bg-white shadow rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200">
               <div class="flex items-center justify-between">
                 <h3 class="text-lg font-medium text-gray-900 capitalize">${config.category}</h3>
                 <div class="flex items-center">
-                  ${config.enabled ? html`
+                  ${config.enabled ? html.html`
                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                       Enabled
                     </span>
-                  ` : html`
+                  ` : html.html`
                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                       Disabled
                     </span>
@@ -14985,7 +14968,7 @@ function renderLogConfigPage(data) {
 
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
   `;
-  return adminLayoutV2({
+  return chunkYU6QFFI4_cjs.adminLayoutV2({
     title: "Log Configuration",
     user,
     content
@@ -14993,12 +14976,12 @@ function renderLogConfigPage(data) {
 }
 
 // src/routes/admin-logs.ts
-var adminLogsRoutes = new Hono();
-adminLogsRoutes.use("*", requireAuth());
+var adminLogsRoutes = new hono.Hono();
+adminLogsRoutes.use("*", chunk7EGKU7OO_cjs.requireAuth());
 adminLogsRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
-    const logger = getLogger(c.env.DB);
+    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
     const query = c.req.query();
     const page = parseInt(query.page || "1");
     const limit = parseInt(query.limit || "50");
@@ -15071,14 +15054,14 @@ adminLogsRoutes.get("/", async (c) => {
     return c.html(renderLogsListPage(pageData));
   } catch (error) {
     console.error("Error fetching logs:", error);
-    return c.html(html`<p>Error loading logs: ${error}</p>`);
+    return c.html(html.html`<p>Error loading logs: ${error}</p>`);
   }
 });
 adminLogsRoutes.get("/:id", async (c) => {
   try {
     const id = c.req.param("id");
     const user = c.get("user");
-    const logger = getLogger(c.env.DB);
+    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
     const { logs } = await logger.getLogs({
       limit: 1,
       offset: 0,
@@ -15087,7 +15070,7 @@ adminLogsRoutes.get("/:id", async (c) => {
     });
     const log = logs.find((l) => l.id === id);
     if (!log) {
-      return c.html(html`<p>Log entry not found</p>`);
+      return c.html(html.html`<p>Log entry not found</p>`);
     }
     const formattedLog = {
       ...log,
@@ -15109,13 +15092,13 @@ adminLogsRoutes.get("/:id", async (c) => {
     return c.html(renderLogDetailsPage(pageData));
   } catch (error) {
     console.error("Error fetching log details:", error);
-    return c.html(html`<p>Error loading log details: ${error}</p>`);
+    return c.html(html.html`<p>Error loading log details: ${error}</p>`);
   }
 });
 adminLogsRoutes.get("/config", async (c) => {
   try {
     const user = c.get("user");
-    const logger = getLogger(c.env.DB);
+    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
     const configs = await logger.getAllConfigs();
     const pageData = {
       configs,
@@ -15128,7 +15111,7 @@ adminLogsRoutes.get("/config", async (c) => {
     return c.html(renderLogConfigPage(pageData));
   } catch (error) {
     console.error("Error fetching log config:", error);
-    return c.html(html`<p>Error loading log configuration: ${error}</p>`);
+    return c.html(html.html`<p>Error loading log configuration: ${error}</p>`);
   }
 });
 adminLogsRoutes.post("/config/:category", async (c) => {
@@ -15139,21 +15122,21 @@ adminLogsRoutes.post("/config/:category", async (c) => {
     const level = formData.get("level");
     const retention = parseInt(formData.get("retention"));
     const maxSize = parseInt(formData.get("max_size"));
-    const logger = getLogger(c.env.DB);
+    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
     await logger.updateConfig(category, {
       enabled,
       level,
       retention,
       maxSize
     });
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
         Configuration updated successfully!
       </div>
     `);
   } catch (error) {
     console.error("Error updating log config:", error);
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         Failed to update configuration. Please try again.
       </div>
@@ -15168,7 +15151,7 @@ adminLogsRoutes.get("/export", async (c) => {
     const category = query.category;
     const startDate = query.start_date;
     const endDate = query.end_date;
-    const logger = getLogger(c.env.DB);
+    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
     const filter = {
       limit: 1e4,
       // Export up to 10k logs
@@ -15249,16 +15232,16 @@ adminLogsRoutes.post("/cleanup", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const logger = getLogger(c.env.DB);
+    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
     await logger.cleanupByRetention();
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
         Log cleanup completed successfully!
       </div>
     `);
   } catch (error) {
     console.error("Error cleaning up logs:", error);
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         Failed to clean up logs. Please try again.
       </div>
@@ -15271,7 +15254,7 @@ adminLogsRoutes.post("/search", async (c) => {
     const search = formData.get("search");
     const level = formData.get("level");
     const category = formData.get("category");
-    const logger = getLogger(c.env.DB);
+    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
     const filter = {
       limit: 20,
       offset: 0,
@@ -15315,7 +15298,7 @@ adminLogsRoutes.post("/search", async (c) => {
     return c.html(rows);
   } catch (error) {
     console.error("Error searching logs:", error);
-    return c.html(html`<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Error searching logs</td></tr>`);
+    return c.html(html.html`<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Error searching logs</td></tr>`);
   }
 });
 function getLevelClass(level) {
@@ -15356,7 +15339,7 @@ function getCategoryClass(category) {
       return "bg-gray-100 text-gray-800";
   }
 }
-var adminDesignRoutes = new Hono();
+var adminDesignRoutes = new hono.Hono();
 adminDesignRoutes.get("/", (c) => {
   const user = c.get("user");
   const pageData = {
@@ -15366,9 +15349,9 @@ adminDesignRoutes.get("/", (c) => {
       role: user.role
     } : void 0
   };
-  return c.html(renderDesignPage(pageData));
+  return c.html(chunkYU6QFFI4_cjs.renderDesignPage(pageData));
 });
-var adminCheckboxRoutes = new Hono();
+var adminCheckboxRoutes = new hono.Hono();
 adminCheckboxRoutes.get("/", (c) => {
   const user = c.get("user");
   const pageData = {
@@ -15378,7 +15361,7 @@ adminCheckboxRoutes.get("/", (c) => {
       role: user.role
     } : void 0
   };
-  return c.html(renderCheckboxPage(pageData));
+  return c.html(chunkYU6QFFI4_cjs.renderCheckboxPage(pageData));
 });
 
 // src/templates/pages/admin-testimonials-form.template.ts
@@ -15406,7 +15389,7 @@ function renderTestimonialsForm(data) {
         </div>
       </div>
 
-      ${message ? renderAlert({ type: messageType || "info", message, dismissible: true }) : ""}
+      ${message ? chunkYU6QFFI4_cjs.renderAlert({ type: messageType || "info", message, dismissible: true }) : ""}
 
       <!-- Form -->
       <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl">
@@ -15635,23 +15618,23 @@ function renderTestimonialsForm(data) {
     user: data.user,
     content: pageContent
   };
-  return renderAdminLayout(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayout(layoutData);
 }
 function escapeHtml4(unsafe) {
   return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
 // src/routes/admin-testimonials.ts
-var testimonialSchema = z.object({
-  authorName: z.string().min(1, "Author name is required").max(100, "Author name must be under 100 characters"),
-  authorTitle: z.string().optional(),
-  authorCompany: z.string().optional(),
-  testimonialText: z.string().min(1, "Testimonial is required").max(1e3, "Testimonial must be under 1000 characters"),
-  rating: z.string().transform((val) => val ? parseInt(val, 10) : void 0).pipe(z.number().min(1).max(5).optional()),
-  isPublished: z.string().transform((val) => val === "true"),
-  sortOrder: z.string().transform((val) => parseInt(val, 10)).pipe(z.number().min(0))
+var testimonialSchema = zod.z.object({
+  authorName: zod.z.string().min(1, "Author name is required").max(100, "Author name must be under 100 characters"),
+  authorTitle: zod.z.string().optional(),
+  authorCompany: zod.z.string().optional(),
+  testimonialText: zod.z.string().min(1, "Testimonial is required").max(1e3, "Testimonial must be under 1000 characters"),
+  rating: zod.z.string().transform((val) => val ? parseInt(val, 10) : void 0).pipe(zod.z.number().min(1).max(5).optional()),
+  isPublished: zod.z.string().transform((val) => val === "true"),
+  sortOrder: zod.z.string().transform((val) => parseInt(val, 10)).pipe(zod.z.number().min(0))
 });
-var adminTestimonialsRoutes = new Hono();
+var adminTestimonialsRoutes = new hono.Hono();
 adminTestimonialsRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -15659,9 +15642,9 @@ adminTestimonialsRoutes.get("/", async (c) => {
     const currentPage = parseInt(page, 10) || 1;
     const limit = 20;
     const offset = (currentPage - 1) * limit;
-    const db = c.env?.DB;
-    if (!db) {
-      return c.html(renderTestimonialsList({
+    const db2 = c.env?.DB;
+    if (!db2) {
+      return c.html(chunkYU6QFFI4_cjs.renderTestimonialsList({
         testimonials: [],
         totalCount: 0,
         currentPage: 1,
@@ -15691,7 +15674,7 @@ adminTestimonialsRoutes.get("/", async (c) => {
       params.push(searchTerm, searchTerm, searchTerm);
     }
     const countQuery = `SELECT COUNT(*) as count FROM testimonials ${whereClause}`;
-    const { results: countResults } = await db.prepare(countQuery).bind(...params).all();
+    const { results: countResults } = await db2.prepare(countQuery).bind(...params).all();
     const totalCount = countResults?.[0]?.count || 0;
     const dataQuery = `
       SELECT * FROM testimonials
@@ -15699,9 +15682,9 @@ adminTestimonialsRoutes.get("/", async (c) => {
       ORDER BY sortOrder ASC, created_at DESC
       LIMIT ? OFFSET ?
     `;
-    const { results: testimonials } = await db.prepare(dataQuery).bind(...params, limit, offset).all();
+    const { results: testimonials } = await db2.prepare(dataQuery).bind(...params, limit, offset).all();
     const totalPages = Math.ceil(totalCount / limit);
-    return c.html(renderTestimonialsList({
+    return c.html(chunkYU6QFFI4_cjs.renderTestimonialsList({
       testimonials: testimonials || [],
       totalCount,
       currentPage,
@@ -15715,7 +15698,7 @@ adminTestimonialsRoutes.get("/", async (c) => {
   } catch (error) {
     console.error("Error fetching testimonials:", error);
     const user = c.get("user");
-    return c.html(renderTestimonialsList({
+    return c.html(chunkYU6QFFI4_cjs.renderTestimonialsList({
       testimonials: [],
       totalCount: 0,
       currentPage: 1,
@@ -15747,8 +15730,8 @@ adminTestimonialsRoutes.post("/", async (c) => {
     const data = Object.fromEntries(formData.entries());
     const validatedData = testimonialSchema.parse(data);
     const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.html(renderTestimonialsForm({
         isEdit: false,
         user: user ? {
@@ -15760,7 +15743,7 @@ adminTestimonialsRoutes.post("/", async (c) => {
         messageType: "error"
       }));
     }
-    const { results } = await db.prepare(`
+    const { results } = await db2.prepare(`
       INSERT INTO testimonials (author_name, author_title, author_company, testimonial_text, rating, isPublished, sortOrder)
       VALUES (?, ?, ?, ?, ?, ?, ?)
       RETURNING *
@@ -15790,7 +15773,7 @@ adminTestimonialsRoutes.post("/", async (c) => {
   } catch (error) {
     console.error("Error creating testimonial:", error);
     const user = c.get("user");
-    if (error instanceof z.ZodError) {
+    if (error instanceof zod.z.ZodError) {
       const errors = {};
       error.errors.forEach((err) => {
         const field = err.path[0];
@@ -15825,8 +15808,8 @@ adminTestimonialsRoutes.get("/:id", async (c) => {
   try {
     const id = parseInt(c.req.param("id"));
     const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.html(renderTestimonialsForm({
         isEdit: true,
         user: user ? {
@@ -15838,7 +15821,7 @@ adminTestimonialsRoutes.get("/:id", async (c) => {
         messageType: "error"
       }));
     }
-    const { results } = await db.prepare("SELECT * FROM testimonials WHERE id = ?").bind(id).all();
+    const { results } = await db2.prepare("SELECT * FROM testimonials WHERE id = ?").bind(id).all();
     if (!results || results.length === 0) {
       return c.redirect("/admin/testimonials?message=Testimonial not found&type=error");
     }
@@ -15883,8 +15866,8 @@ adminTestimonialsRoutes.put("/:id", async (c) => {
     const data = Object.fromEntries(formData.entries());
     const validatedData = testimonialSchema.parse(data);
     const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.html(renderTestimonialsForm({
         isEdit: true,
         user: user ? {
@@ -15896,7 +15879,7 @@ adminTestimonialsRoutes.put("/:id", async (c) => {
         messageType: "error"
       }));
     }
-    const { results } = await db.prepare(`
+    const { results } = await db2.prepare(`
       UPDATE testimonials
       SET author_name = ?, author_title = ?, author_company = ?, testimonial_text = ?, rating = ?, isPublished = ?, sortOrder = ?
       WHERE id = ?
@@ -15939,7 +15922,7 @@ adminTestimonialsRoutes.put("/:id", async (c) => {
     console.error("Error updating testimonial:", error);
     const user = c.get("user");
     const id = parseInt(c.req.param("id"));
-    if (error instanceof z.ZodError) {
+    if (error instanceof zod.z.ZodError) {
       const errors = {};
       error.errors.forEach((err) => {
         const field = err.path[0];
@@ -15993,11 +15976,11 @@ adminTestimonialsRoutes.put("/:id", async (c) => {
 adminTestimonialsRoutes.delete("/:id", async (c) => {
   try {
     const id = parseInt(c.req.param("id"));
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.json({ error: "Database not available" }, 500);
     }
-    const { changes } = await db.prepare("DELETE FROM testimonials WHERE id = ?").bind(id).run();
+    const { changes } = await db2.prepare("DELETE FROM testimonials WHERE id = ?").bind(id).run();
     if (changes === 0) {
       return c.json({ error: "Testimonial not found" }, 404);
     }
@@ -16034,7 +16017,7 @@ function renderCodeExamplesForm(data) {
         </div>
       </div>
 
-      ${message ? renderAlert({ type: messageType || "info", message, dismissible: true }) : ""}
+      ${message ? chunkYU6QFFI4_cjs.renderAlert({ type: messageType || "info", message, dismissible: true }) : ""}
 
       <!-- Form -->
       <div class="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 shadow-2xl">
@@ -16304,24 +16287,24 @@ function renderCodeExamplesForm(data) {
     user: data.user,
     content: pageContent
   };
-  return renderAdminLayout(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayout(layoutData);
 }
 function escapeHtml5(unsafe) {
   return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
 // src/routes/admin-code-examples.ts
-var codeExampleSchema = z.object({
-  title: z.string().min(1, "Title is required").max(200, "Title must be under 200 characters"),
-  description: z.string().max(500, "Description must be under 500 characters").optional(),
-  code: z.string().min(1, "Code is required"),
-  language: z.string().min(1, "Language is required"),
-  category: z.string().max(50, "Category must be under 50 characters").optional(),
-  tags: z.string().max(200, "Tags must be under 200 characters").optional(),
-  isPublished: z.string().transform((val) => val === "true"),
-  sortOrder: z.string().transform((val) => parseInt(val, 10)).pipe(z.number().min(0))
+var codeExampleSchema = zod.z.object({
+  title: zod.z.string().min(1, "Title is required").max(200, "Title must be under 200 characters"),
+  description: zod.z.string().max(500, "Description must be under 500 characters").optional(),
+  code: zod.z.string().min(1, "Code is required"),
+  language: zod.z.string().min(1, "Language is required"),
+  category: zod.z.string().max(50, "Category must be under 50 characters").optional(),
+  tags: zod.z.string().max(200, "Tags must be under 200 characters").optional(),
+  isPublished: zod.z.string().transform((val) => val === "true"),
+  sortOrder: zod.z.string().transform((val) => parseInt(val, 10)).pipe(zod.z.number().min(0))
 });
-var adminCodeExamplesRoutes = new Hono();
+var adminCodeExamplesRoutes = new hono.Hono();
 adminCodeExamplesRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -16329,9 +16312,9 @@ adminCodeExamplesRoutes.get("/", async (c) => {
     const currentPage = parseInt(page, 10) || 1;
     const limit = 20;
     const offset = (currentPage - 1) * limit;
-    const db = c.env?.DB;
-    if (!db) {
-      return c.html(renderCodeExamplesList({
+    const db2 = c.env?.DB;
+    if (!db2) {
+      return c.html(chunkYU6QFFI4_cjs.renderCodeExamplesList({
         codeExamples: [],
         totalCount: 0,
         currentPage: 1,
@@ -16361,7 +16344,7 @@ adminCodeExamplesRoutes.get("/", async (c) => {
       params.push(searchTerm, searchTerm, searchTerm, searchTerm);
     }
     const countQuery = `SELECT COUNT(*) as count FROM code_examples ${whereClause}`;
-    const { results: countResults } = await db.prepare(countQuery).bind(...params).all();
+    const { results: countResults } = await db2.prepare(countQuery).bind(...params).all();
     const totalCount = countResults?.[0]?.count || 0;
     const dataQuery = `
       SELECT * FROM code_examples
@@ -16369,9 +16352,9 @@ adminCodeExamplesRoutes.get("/", async (c) => {
       ORDER BY sortOrder ASC, created_at DESC
       LIMIT ? OFFSET ?
     `;
-    const { results: codeExamples } = await db.prepare(dataQuery).bind(...params, limit, offset).all();
+    const { results: codeExamples } = await db2.prepare(dataQuery).bind(...params, limit, offset).all();
     const totalPages = Math.ceil(totalCount / limit);
-    return c.html(renderCodeExamplesList({
+    return c.html(chunkYU6QFFI4_cjs.renderCodeExamplesList({
       codeExamples: codeExamples || [],
       totalCount,
       currentPage,
@@ -16385,7 +16368,7 @@ adminCodeExamplesRoutes.get("/", async (c) => {
   } catch (error) {
     console.error("Error fetching code examples:", error);
     const user = c.get("user");
-    return c.html(renderCodeExamplesList({
+    return c.html(chunkYU6QFFI4_cjs.renderCodeExamplesList({
       codeExamples: [],
       totalCount: 0,
       currentPage: 1,
@@ -16417,8 +16400,8 @@ adminCodeExamplesRoutes.post("/", async (c) => {
     const data = Object.fromEntries(formData.entries());
     const validatedData = codeExampleSchema.parse(data);
     const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.html(renderCodeExamplesForm({
         isEdit: false,
         user: user ? {
@@ -16430,7 +16413,7 @@ adminCodeExamplesRoutes.post("/", async (c) => {
         messageType: "error"
       }));
     }
-    const { results } = await db.prepare(`
+    const { results } = await db2.prepare(`
       INSERT INTO code_examples (title, description, code, language, category, tags, isPublished, sortOrder)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       RETURNING *
@@ -16461,7 +16444,7 @@ adminCodeExamplesRoutes.post("/", async (c) => {
   } catch (error) {
     console.error("Error creating code example:", error);
     const user = c.get("user");
-    if (error instanceof z.ZodError) {
+    if (error instanceof zod.z.ZodError) {
       const errors = {};
       error.errors.forEach((err) => {
         const field = err.path[0];
@@ -16496,8 +16479,8 @@ adminCodeExamplesRoutes.get("/:id", async (c) => {
   try {
     const id = parseInt(c.req.param("id"));
     const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.html(renderCodeExamplesForm({
         isEdit: true,
         user: user ? {
@@ -16509,7 +16492,7 @@ adminCodeExamplesRoutes.get("/:id", async (c) => {
         messageType: "error"
       }));
     }
-    const { results } = await db.prepare("SELECT * FROM code_examples WHERE id = ?").bind(id).all();
+    const { results } = await db2.prepare("SELECT * FROM code_examples WHERE id = ?").bind(id).all();
     if (!results || results.length === 0) {
       return c.redirect("/admin/code-examples?message=Code example not found&type=error");
     }
@@ -16555,8 +16538,8 @@ adminCodeExamplesRoutes.put("/:id", async (c) => {
     const data = Object.fromEntries(formData.entries());
     const validatedData = codeExampleSchema.parse(data);
     const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.html(renderCodeExamplesForm({
         isEdit: true,
         user: user ? {
@@ -16568,7 +16551,7 @@ adminCodeExamplesRoutes.put("/:id", async (c) => {
         messageType: "error"
       }));
     }
-    const { results } = await db.prepare(`
+    const { results } = await db2.prepare(`
       UPDATE code_examples
       SET title = ?, description = ?, code = ?, language = ?, category = ?, tags = ?, isPublished = ?, sortOrder = ?
       WHERE id = ?
@@ -16613,7 +16596,7 @@ adminCodeExamplesRoutes.put("/:id", async (c) => {
     console.error("Error updating code example:", error);
     const user = c.get("user");
     const id = parseInt(c.req.param("id"));
-    if (error instanceof z.ZodError) {
+    if (error instanceof zod.z.ZodError) {
       const errors = {};
       error.errors.forEach((err) => {
         const field = err.path[0];
@@ -16669,11 +16652,11 @@ adminCodeExamplesRoutes.put("/:id", async (c) => {
 adminCodeExamplesRoutes.delete("/:id", async (c) => {
   try {
     const id = parseInt(c.req.param("id"));
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.json({ error: "Database not available" }, 500);
     }
-    const { changes } = await db.prepare("DELETE FROM code_examples WHERE id = ?").bind(id).run();
+    const { changes } = await db2.prepare("DELETE FROM code_examples WHERE id = ?").bind(id).run();
     if (changes === 0) {
       return c.json({ error: "Code example not found" }, 404);
     }
@@ -16774,7 +16757,7 @@ function renderDashboardPage(data) {
     version: data.version,
     content: pageContent
   };
-  return renderAdminLayout(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayout(layoutData);
 }
 function renderStatsCards(stats) {
   const cards = [
@@ -17322,9 +17305,9 @@ function renderStorageUsage(databaseSizeBytes, mediaSizeBytes) {
 }
 
 // src/routes/admin-dashboard.ts
-var VERSION = getCoreVersion();
-var router = new Hono();
-router.use("*", requireAuth());
+var VERSION = chunkPGZZPKZL_cjs.getCoreVersion();
+var router = new hono.Hono();
+router.use("*", chunk7EGKU7OO_cjs.requireAuth());
 router.get("/", async (c) => {
   const user = c.get("user");
   try {
@@ -17352,10 +17335,10 @@ router.get("/", async (c) => {
 });
 router.get("/stats", async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     let collectionsCount = 0;
     try {
-      const collectionsStmt = db.prepare("SELECT COUNT(*) as count FROM collections WHERE is_active = 1");
+      const collectionsStmt = db2.prepare("SELECT COUNT(*) as count FROM collections WHERE is_active = 1");
       const collectionsResult = await collectionsStmt.first();
       collectionsCount = collectionsResult?.count || 0;
     } catch (error) {
@@ -17363,7 +17346,7 @@ router.get("/stats", async (c) => {
     }
     let contentCount = 0;
     try {
-      const contentStmt = db.prepare("SELECT COUNT(*) as count FROM content");
+      const contentStmt = db2.prepare("SELECT COUNT(*) as count FROM content");
       const contentResult = await contentStmt.first();
       contentCount = contentResult?.count || 0;
     } catch (error) {
@@ -17372,7 +17355,7 @@ router.get("/stats", async (c) => {
     let mediaCount = 0;
     let mediaSize = 0;
     try {
-      const mediaStmt = db.prepare("SELECT COUNT(*) as count, COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL");
+      const mediaStmt = db2.prepare("SELECT COUNT(*) as count, COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL");
       const mediaResult = await mediaStmt.first();
       mediaCount = mediaResult?.count || 0;
       mediaSize = mediaResult?.total_size || 0;
@@ -17381,7 +17364,7 @@ router.get("/stats", async (c) => {
     }
     let usersCount = 0;
     try {
-      const usersStmt = db.prepare("SELECT COUNT(*) as count FROM users WHERE is_active = 1");
+      const usersStmt = db2.prepare("SELECT COUNT(*) as count FROM users WHERE is_active = 1");
       const usersResult = await usersStmt.first();
       usersCount = usersResult?.count || 0;
     } catch (error) {
@@ -17402,17 +17385,17 @@ router.get("/stats", async (c) => {
 });
 router.get("/storage", async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     let databaseSize = 0;
     try {
-      const result = await db.prepare("SELECT 1").run();
+      const result = await db2.prepare("SELECT 1").run();
       databaseSize = result?.meta?.size_after || 0;
     } catch (error) {
       console.error("Error fetching database size:", error);
     }
     let mediaSize = 0;
     try {
-      const mediaStmt = db.prepare("SELECT COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL");
+      const mediaStmt = db2.prepare("SELECT COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL");
       const mediaResult = await mediaStmt.first();
       mediaSize = mediaResult?.total_size || 0;
     } catch (error) {
@@ -17427,9 +17410,9 @@ router.get("/storage", async (c) => {
 });
 router.get("/recent-activity", async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const limit = parseInt(c.req.query("limit") || "5");
-    const activityStmt = db.prepare(`
+    const activityStmt = db2.prepare(`
       SELECT
         a.id,
         a.action,
@@ -17478,9 +17461,9 @@ router.get("/recent-activity", async (c) => {
 });
 router.get("/api/metrics", async (c) => {
   return c.json({
-    requestsPerSecond: metricsTracker.getRequestsPerSecond(),
-    totalRequests: metricsTracker.getTotalRequests(),
-    averageRPS: Number(metricsTracker.getAverageRPS().toFixed(2)),
+    requestsPerSecond: chunkRCQ2HIQD_cjs.metricsTracker.getRequestsPerSecond(),
+    totalRequests: chunkRCQ2HIQD_cjs.metricsTracker.getTotalRequests(),
+    averageRPS: Number(chunkRCQ2HIQD_cjs.metricsTracker.getAverageRPS().toFixed(2)),
     timestamp: (/* @__PURE__ */ new Date()).toISOString()
   });
 });
@@ -17549,7 +17532,7 @@ router.get("/system-status", async (c) => {
 });
 
 // src/templates/pages/admin-collections-list.template.ts
-init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 
 // src/templates/components/table.template.ts
 function renderTable2(data) {
@@ -18023,17 +18006,17 @@ function renderCollectionsListPage(data) {
     version: data.version,
     content: pageContent
   };
-  return renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/templates/pages/admin-collections-form.template.ts
-init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function getFieldTypeBadge(fieldType) {
   const typeLabels = {
     "text": "Text",
     "richtext": "Rich Text (TinyMCE)",
     "quill": "Rich Text (Quill)",
-    "mdxeditor": "Rich Text (MDXEditor)",
+    "mdxeditor": "EasyMDX",
     "number": "Number",
     "boolean": "Boolean",
     "date": "Date",
@@ -18056,6 +18039,7 @@ function getFieldTypeBadge(fieldType) {
   return `<span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${color} ring-1 ring-inset">${label}</span>`;
 }
 function renderCollectionFormPage(data) {
+  console.log("[renderCollectionFormPage] editorPlugins:", data.editorPlugins);
   const isEdit = data.isEdit || !!data.id;
   const title = isEdit ? "Edit Collection" : "Create New Collection";
   const subtitle = isEdit ? `Update collection: ${data.display_name}` : "Define a new content collection with custom fields and settings.";
@@ -18287,7 +18271,7 @@ function renderCollectionFormPage(data) {
             }
           </style>
           
-          ${renderForm(formData)}
+          ${chunkYU6QFFI4_cjs.renderForm(formData)}
 
           ${isEdit && data.managed ? `
             <!-- Read-Only Fields Display for Managed Collections -->
@@ -18520,7 +18504,7 @@ function renderCollectionFormPage(data) {
                 <option value="text">Text</option>
                 ${data.editorPlugins?.tinymce ? '<option value="richtext">Rich Text (TinyMCE)</option>' : ""}
                 ${data.editorPlugins?.quill ? '<option value="quill">Rich Text (Quill)</option>' : ""}
-                ${data.editorPlugins?.mdxeditor ? '<option value="mdxeditor">Rich Text (MDXEditor)</option>' : ""}
+                ${data.editorPlugins?.easyMdx ? '<option value="mdxeditor">EasyMDX</option>' : ""}
                 <option value="number">Number</option>
                 <option value="boolean">Boolean</option>
                 <option value="date">Date</option>
@@ -18742,12 +18726,13 @@ function renderCollectionFormPage(data) {
 
           // Check if it's a schema field with field_options that might indicate the actual type
           if (field.field_options && typeof field.field_options === 'object') {
-            // Check for richtext format
-            if (field.field_options.format === 'richtext') {
+            // Only convert to richtext if type is explicitly 'string' and format is richtext
+            // Don't convert if it's already a specific editor type like 'mdxeditor', 'quill', etc.
+            if (field.field_options.format === 'richtext' && uiFieldType === 'string') {
               uiFieldType = 'richtext';
             }
             // Check for other format indicators
-            else if (field.field_options.type) {
+            else if (field.field_options.type && !uiFieldType) {
               uiFieldType = field.field_options.type;
             }
           }
@@ -18763,8 +18748,60 @@ function renderCollectionFormPage(data) {
             uiFieldType = typeMapping[uiFieldType];
           }
 
+          // Log all available options
+          const availableOptions = Array.from(fieldTypeSelect.options).map(opt => ({ value: opt.value, text: opt.text }));
+          console.log('Available dropdown options:', availableOptions);
+          console.log('Trying to set field-type to:', uiFieldType);
+
+          // Clear any existing selections first
+          Array.from(fieldTypeSelect.options).forEach(opt => opt.selected = false);
+
+          // Try multiple approaches to set the value
+          let selectionSucceeded = false;
+
+          // Approach 1: Direct value assignment
           fieldTypeSelect.value = uiFieldType;
-          console.log('Set field-type to:', fieldTypeSelect.value, '(original:', field.field_type, ')');
+          if (fieldTypeSelect.value === uiFieldType) {
+            selectionSucceeded = true;
+            console.log('\u2713 Approach 1 (direct value) succeeded');
+          }
+
+          // Approach 2: Find and select the specific option
+          if (!selectionSucceeded) {
+            console.log('Approach 1 failed, trying approach 2 (direct option selection)');
+            const optionToSelect = Array.from(fieldTypeSelect.options).find(opt => opt.value === uiFieldType);
+            if (optionToSelect) {
+              optionToSelect.selected = true;
+              // Trigger change event
+              fieldTypeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+              if (fieldTypeSelect.value === uiFieldType) {
+                selectionSucceeded = true;
+                console.log('\u2713 Approach 2 (option.selected) succeeded');
+              }
+            }
+          }
+
+          // Approach 3: Set selectedIndex
+          if (!selectionSucceeded) {
+            console.log('Approach 2 failed, trying approach 3 (selectedIndex)');
+            const optionIndex = Array.from(fieldTypeSelect.options).findIndex(opt => opt.value === uiFieldType);
+            if (optionIndex !== -1) {
+              fieldTypeSelect.selectedIndex = optionIndex;
+              if (fieldTypeSelect.value === uiFieldType) {
+                selectionSucceeded = true;
+                console.log('\u2713 Approach 3 (selectedIndex) succeeded');
+              }
+            }
+          }
+
+          console.log('Final field-type value:', fieldTypeSelect.value, '(wanted:', uiFieldType, ')');
+
+          if (!selectionSucceeded) {
+            console.error('\u274C All approaches failed to set field-type!');
+            console.error('Wanted:', uiFieldType);
+            console.error('Got:', fieldTypeSelect.value);
+            console.error('Available options:', availableOptions);
+          }
         } else {
           console.error('field-type select not found!');
         }
@@ -18835,9 +18872,15 @@ function renderCollectionFormPage(data) {
         setTimeout(() => {
           isEditingField = false;
           console.log('Cleared isEditingField flag');
-        }, 100);
 
-        }, 10); // Small delay to ensure modal is fully rendered
+          // Double-check the field-type value after the flag is cleared
+          const finalCheck = document.getElementById('field-type');
+          if (finalCheck) {
+            console.log('Post-flag-clear check - field-type value:', finalCheck.value);
+          }
+        }, 200); // Increased delay
+
+        }, 50); // Increased delay to ensure modal is fully rendered
       }
 
       function closeFieldModal() {
@@ -19013,22 +19056,22 @@ function renderCollectionFormPage(data) {
     version: data.version,
     content: pageContent
   };
-  return renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 
 // src/routes/admin-collections.ts
-var adminCollectionsRoutes = new Hono();
-adminCollectionsRoutes.use("*", requireAuth());
+var adminCollectionsRoutes = new hono.Hono();
+adminCollectionsRoutes.use("*", chunk7EGKU7OO_cjs.requireAuth());
 adminCollectionsRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const url = new URL(c.req.url);
     const search = url.searchParams.get("search") || "";
     let stmt;
     let results;
     if (search) {
-      stmt = db.prepare(`
+      stmt = db2.prepare(`
         SELECT id, name, display_name, description, created_at, managed, schema
         FROM collections
         WHERE is_active = 1
@@ -19039,11 +19082,11 @@ adminCollectionsRoutes.get("/", async (c) => {
       const queryResults = await stmt.bind(searchParam, searchParam, searchParam).all();
       results = queryResults.results;
     } else {
-      stmt = db.prepare("SELECT id, name, display_name, description, created_at, managed, schema FROM collections WHERE is_active = 1 ORDER BY created_at DESC");
+      stmt = db2.prepare("SELECT id, name, display_name, description, created_at, managed, schema FROM collections WHERE is_active = 1 ORDER BY created_at DESC");
       const queryResults = await stmt.all();
       results = queryResults.results;
     }
-    const fieldCountStmt = db.prepare("SELECT collection_id, COUNT(*) as count FROM content_fields GROUP BY collection_id");
+    const fieldCountStmt = db2.prepare("SELECT collection_id, COUNT(*) as count FROM content_fields GROUP BY collection_id");
     const { results: fieldCountResults } = await fieldCountStmt.all();
     const fieldCounts = new Map((fieldCountResults || []).map((row) => [String(row.collection_id), Number(row.count)]));
     const collections = (results || []).filter((row) => row && row.id).map((row) => {
@@ -19084,21 +19127,21 @@ adminCollectionsRoutes.get("/", async (c) => {
     return c.html(renderCollectionsListPage(pageData));
   } catch (error) {
     console.error("Error fetching collections:", error);
-    return c.html(html`<p>Error loading collections</p>`);
+    return c.html(html.html`<p>Error loading collections</p>`);
   }
 });
 adminCollectionsRoutes.get("/new", async (c) => {
   const user = c.get("user");
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const [tinymceActive, quillActive, mdxeditorActive] = await Promise.all([
-    isPluginActive2(db, "tinymce-plugin"),
-    isPluginActive2(db, "quill-editor"),
-    isPluginActive2(db, "easy-mdx")
+    isPluginActive2(db2, "tinymce-plugin"),
+    isPluginActive2(db2, "quill-editor"),
+    isPluginActive2(db2, "easy-mdx")
   ]);
   console.log("[Collections /new] Editor plugins status:", {
     tinymce: tinymceActive,
     quill: quillActive,
-    mdxeditor: mdxeditorActive
+    easyMdx: mdxeditorActive
   });
   const formData = {
     isEdit: false,
@@ -19111,7 +19154,7 @@ adminCollectionsRoutes.get("/new", async (c) => {
     editorPlugins: {
       tinymce: tinymceActive,
       quill: quillActive,
-      mdxeditor: mdxeditorActive
+      easyMdx: mdxeditorActive
     }
   };
   return c.html(renderCollectionFormPage(formData));
@@ -19126,7 +19169,7 @@ adminCollectionsRoutes.post("/", async (c) => {
     if (!name || !displayName) {
       const errorMsg = "Name and display name are required.";
       if (isHtmx) {
-        return c.html(html`
+        return c.html(html.html`
           <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             ${errorMsg}
           </div>
@@ -19138,7 +19181,7 @@ adminCollectionsRoutes.post("/", async (c) => {
     if (!/^[a-z0-9_]+$/.test(name)) {
       const errorMsg = "Collection name must contain only lowercase letters, numbers, and underscores.";
       if (isHtmx) {
-        return c.html(html`
+        return c.html(html.html`
           <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             ${errorMsg}
           </div>
@@ -19147,13 +19190,13 @@ adminCollectionsRoutes.post("/", async (c) => {
         return c.redirect("/admin/collections/new");
       }
     }
-    const db = c.env.DB;
-    const existingStmt = db.prepare("SELECT id FROM collections WHERE name = ?");
+    const db2 = c.env.DB;
+    const existingStmt = db2.prepare("SELECT id FROM collections WHERE name = ?");
     const existing = await existingStmt.bind(name).first();
     if (existing) {
       const errorMsg = "A collection with this name already exists.";
       if (isHtmx) {
-        return c.html(html`
+        return c.html(html.html`
           <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             ${errorMsg}
           </div>
@@ -19186,7 +19229,7 @@ adminCollectionsRoutes.post("/", async (c) => {
     };
     const collectionId = globalThis.crypto.randomUUID();
     const now = Date.now();
-    const insertStmt = db.prepare(`
+    const insertStmt = db2.prepare(`
       INSERT INTO collections (id, name, display_name, description, schema, is_active, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
@@ -19210,7 +19253,7 @@ adminCollectionsRoutes.post("/", async (c) => {
       }
     }
     if (isHtmx) {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
           Collection created successfully! Redirecting to edit mode...
           <script>
@@ -19227,7 +19270,7 @@ adminCollectionsRoutes.post("/", async (c) => {
     console.error("Error creating collection:", error);
     const isHtmx = c.req.header("HX-Request") === "true";
     if (isHtmx) {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Failed to create collection. Please try again.
         </div>
@@ -19241,10 +19284,15 @@ adminCollectionsRoutes.get("/:id", async (c) => {
   try {
     const id = c.req.param("id");
     const user = c.get("user");
-    const db = c.env.DB;
-    const stmt = db.prepare("SELECT * FROM collections WHERE id = ?");
+    const db2 = c.env.DB;
+    const stmt = db2.prepare("SELECT * FROM collections WHERE id = ?");
     const collection = await stmt.bind(id).first();
     if (!collection) {
+      const [tinymceActive2, quillActive2, mdxeditorActive2] = await Promise.all([
+        isPluginActive2(db2, "tinymce-plugin"),
+        isPluginActive2(db2, "quill-editor"),
+        isPluginActive2(db2, "easy-mdx")
+      ]);
       const formData2 = {
         isEdit: true,
         error: "Collection not found.",
@@ -19253,7 +19301,12 @@ adminCollectionsRoutes.get("/:id", async (c) => {
           email: user.email,
           role: user.role
         } : void 0,
-        version: c.get("appVersion")
+        version: c.get("appVersion"),
+        editorPlugins: {
+          tinymce: tinymceActive2,
+          quill: quillActive2,
+          easyMdx: mdxeditorActive2
+        }
       };
       return c.html(renderCollectionFormPage(formData2));
     }
@@ -19279,28 +19332,44 @@ adminCollectionsRoutes.get("/:id", async (c) => {
       }
     }
     if (fields.length === 0) {
-      const fieldsStmt = db.prepare(`
+      const fieldsStmt = db2.prepare(`
         SELECT * FROM content_fields
         WHERE collection_id = ?
         ORDER BY field_order ASC
       `);
       const { results: fieldsResults } = await fieldsStmt.bind(id).all();
-      fields = (fieldsResults || []).map((row) => ({
-        id: row.id,
-        field_name: row.field_name,
-        field_type: row.field_type,
-        field_label: row.field_label,
-        field_options: row.field_options ? JSON.parse(row.field_options) : {},
-        field_order: row.field_order,
-        is_required: row.is_required === 1,
-        is_searchable: row.is_searchable === 1
-      }));
+      fields = (fieldsResults || []).map((row) => {
+        let fieldOptions = {};
+        if (row.field_options) {
+          try {
+            fieldOptions = typeof row.field_options === "string" ? JSON.parse(row.field_options) : row.field_options;
+          } catch (e) {
+            console.error("Error parsing field_options for field:", row.field_name, e);
+            fieldOptions = {};
+          }
+        }
+        return {
+          id: row.id,
+          field_name: row.field_name,
+          field_type: row.field_type,
+          field_label: row.field_label,
+          field_options: fieldOptions,
+          field_order: row.field_order,
+          is_required: row.is_required === 1,
+          is_searchable: row.is_searchable === 1
+        };
+      });
     }
     const [tinymceActive, quillActive, mdxeditorActive] = await Promise.all([
-      isPluginActive2(db, "tinymce-plugin"),
-      isPluginActive2(db, "quill-editor"),
-      isPluginActive2(db, "easy-mdx")
+      isPluginActive2(db2, "tinymce-plugin"),
+      isPluginActive2(db2, "quill-editor"),
+      isPluginActive2(db2, "easy-mdx")
     ]);
+    console.log("[Collections /:id] Editor plugins status:", {
+      tinymce: tinymceActive,
+      quill: quillActive,
+      easyMdx: mdxeditorActive
+    });
     const formData = {
       id: collection.id,
       name: collection.name,
@@ -19318,13 +19387,18 @@ adminCollectionsRoutes.get("/:id", async (c) => {
       editorPlugins: {
         tinymce: tinymceActive,
         quill: quillActive,
-        mdxeditor: mdxeditorActive
+        easyMdx: mdxeditorActive
       }
     };
     return c.html(renderCollectionFormPage(formData));
   } catch (error) {
     console.error("Error fetching collection:", error);
     const user = c.get("user");
+    const [tinymceActive, quillActive, mdxeditorActive] = await Promise.all([
+      isPluginActive2(db, "tinymce-plugin"),
+      isPluginActive2(db, "quill-editor"),
+      isPluginActive2(db, "easy-mdx")
+    ]);
     const formData = {
       isEdit: true,
       error: "Failed to load collection.",
@@ -19333,7 +19407,12 @@ adminCollectionsRoutes.get("/:id", async (c) => {
         email: user.email,
         role: user.role
       } : void 0,
-      version: c.get("appVersion")
+      version: c.get("appVersion"),
+      editorPlugins: {
+        tinymce: tinymceActive,
+        quill: quillActive,
+        easyMdx: mdxeditorActive
+      }
     };
     return c.html(renderCollectionFormPage(formData));
   }
@@ -19345,27 +19424,27 @@ adminCollectionsRoutes.put("/:id", async (c) => {
     const displayName = formData.get("displayName");
     const description = formData.get("description");
     if (!displayName) {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Display name is required.
         </div>
       `);
     }
-    const db = c.env.DB;
-    const updateStmt = db.prepare(`
+    const db2 = c.env.DB;
+    const updateStmt = db2.prepare(`
       UPDATE collections
       SET display_name = ?, description = ?, updated_at = ?
       WHERE id = ?
     `);
     await updateStmt.bind(displayName, description || null, Date.now(), id).run();
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
         Collection updated successfully!
       </div>
     `);
   } catch (error) {
     console.error("Error updating collection:", error);
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         Failed to update collection. Please try again.
       </div>
@@ -19375,28 +19454,28 @@ adminCollectionsRoutes.put("/:id", async (c) => {
 adminCollectionsRoutes.delete("/:id", async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
-    const contentStmt = db.prepare("SELECT COUNT(*) as count FROM content WHERE collection_id = ?");
+    const db2 = c.env.DB;
+    const contentStmt = db2.prepare("SELECT COUNT(*) as count FROM content WHERE collection_id = ?");
     const contentResult = await contentStmt.bind(id).first();
     if (contentResult && contentResult.count > 0) {
-      return c.html(html`
+      return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           Cannot delete collection: it contains ${contentResult.count} content item(s). Delete all content first.
         </div>
       `);
     }
-    const deleteFieldsStmt = db.prepare("DELETE FROM content_fields WHERE collection_id = ?");
+    const deleteFieldsStmt = db2.prepare("DELETE FROM content_fields WHERE collection_id = ?");
     await deleteFieldsStmt.bind(id).run();
-    const deleteStmt = db.prepare("DELETE FROM collections WHERE id = ?");
+    const deleteStmt = db2.prepare("DELETE FROM collections WHERE id = ?");
     await deleteStmt.bind(id).run();
-    return c.html(html`
+    return c.html(html.html`
       <script>
         window.location.href = '/admin/collections';
       </script>
     `);
   } catch (error) {
     console.error("Error deleting collection:", error);
-    return c.html(html`
+    return c.html(html.html`
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         Failed to delete collection. Please try again.
       </div>
@@ -19419,18 +19498,18 @@ adminCollectionsRoutes.post("/:id/fields", async (c) => {
     if (!/^[a-z0-9_]+$/.test(fieldName)) {
       return c.json({ success: false, error: "Field name must contain only lowercase letters, numbers, and underscores." });
     }
-    const db = c.env.DB;
-    const existingStmt = db.prepare("SELECT id FROM content_fields WHERE collection_id = ? AND field_name = ?");
+    const db2 = c.env.DB;
+    const existingStmt = db2.prepare("SELECT id FROM content_fields WHERE collection_id = ? AND field_name = ?");
     const existing = await existingStmt.bind(collectionId, fieldName).first();
     if (existing) {
       return c.json({ success: false, error: "A field with this name already exists." });
     }
-    const orderStmt = db.prepare("SELECT MAX(field_order) as max_order FROM content_fields WHERE collection_id = ?");
+    const orderStmt = db2.prepare("SELECT MAX(field_order) as max_order FROM content_fields WHERE collection_id = ?");
     const orderResult = await orderStmt.bind(collectionId).first();
     const nextOrder = (orderResult?.max_order || 0) + 1;
     const fieldId = globalThis.crypto.randomUUID();
     const now = Date.now();
-    const insertStmt = db.prepare(`
+    const insertStmt = db2.prepare(`
       INSERT INTO content_fields (
         id, collection_id, field_name, field_type, field_label,
         field_options, field_order, is_required, is_searchable,
@@ -19479,11 +19558,11 @@ adminCollectionsRoutes.put("/:collectionId/fields/:fieldId", async (c) => {
     if (!fieldLabel) {
       return c.json({ success: false, error: "Field label is required." });
     }
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     if (fieldId.startsWith("schema-")) {
       const fieldName = fieldId.replace("schema-", "");
       console.log("[Field Update] Updating schema field:", fieldName);
-      const getCollectionStmt = db.prepare("SELECT * FROM collections WHERE id = ?");
+      const getCollectionStmt = db2.prepare("SELECT * FROM collections WHERE id = ?");
       const collection = await getCollectionStmt.bind(collectionId).first();
       if (!collection) {
         return c.json({ success: false, error: "Collection not found." });
@@ -19528,7 +19607,7 @@ adminCollectionsRoutes.put("/:collectionId/fields/:fieldId", async (c) => {
         console.log("[Field Update] Final required array:", schema.required);
         console.log("[Field Update] Final field config:", schema.properties[fieldName]);
       }
-      const updateCollectionStmt = db.prepare(`
+      const updateCollectionStmt = db2.prepare(`
         UPDATE collections
         SET schema = ?, updated_at = ?
         WHERE id = ?
@@ -19540,7 +19619,7 @@ adminCollectionsRoutes.put("/:collectionId/fields/:fieldId", async (c) => {
       });
       return c.json({ success: true });
     }
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE content_fields
       SET field_label = ?, field_type = ?, field_options = ?, is_required = ?, is_searchable = ?, updated_at = ?
       WHERE id = ?
@@ -19552,7 +19631,7 @@ adminCollectionsRoutes.put("/:collectionId/fields/:fieldId", async (c) => {
       changes: result.meta?.changes,
       last_row_id: result.meta?.last_row_id
     });
-    const verifyStmt = db.prepare("SELECT * FROM content_fields WHERE id = ?");
+    const verifyStmt = db2.prepare("SELECT * FROM content_fields WHERE id = ?");
     const verifyResult = await verifyStmt.bind(fieldId).first();
     console.log("[Field Update] Verification - field after update:", verifyResult);
     console.log("[Field Update] Successfully updated field with type:", fieldType);
@@ -19565,8 +19644,8 @@ adminCollectionsRoutes.put("/:collectionId/fields/:fieldId", async (c) => {
 adminCollectionsRoutes.delete("/:collectionId/fields/:fieldId", async (c) => {
   try {
     const fieldId = c.req.param("fieldId");
-    const db = c.env.DB;
-    const deleteStmt = db.prepare("DELETE FROM content_fields WHERE id = ?");
+    const db2 = c.env.DB;
+    const deleteStmt = db2.prepare("DELETE FROM content_fields WHERE id = ?");
     await deleteStmt.bind(fieldId).run();
     return c.json({ success: true });
   } catch (error) {
@@ -19581,9 +19660,9 @@ adminCollectionsRoutes.post("/:collectionId/fields/reorder", async (c) => {
     if (!Array.isArray(fieldIds)) {
       return c.json({ success: false, error: "Invalid field order data." });
     }
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     for (let i = 0; i < fieldIds.length; i++) {
-      const updateStmt = db.prepare("UPDATE content_fields SET field_order = ?, updated_at = ? WHERE id = ?");
+      const updateStmt = db2.prepare("UPDATE content_fields SET field_order = ?, updated_at = ? WHERE id = ?");
       await updateStmt.bind(i + 1, Date.now(), fieldIds[i]).run();
     }
     return c.json({ success: true });
@@ -19594,7 +19673,7 @@ adminCollectionsRoutes.post("/:collectionId/fields/reorder", async (c) => {
 });
 
 // src/templates/pages/admin-settings.template.ts
-init_admin_layout_catalyst_template();
+chunkYU6QFFI4_cjs.init_admin_layout_catalyst_template();
 function renderSettingsPage(data) {
   const activeTab = data.activeTab || "general";
   const pageContent = `
@@ -20025,7 +20104,7 @@ function renderSettingsPage(data) {
     version: data.version,
     content: pageContent
   };
-  return renderAdminLayoutCatalyst(layoutData);
+  return chunkYU6QFFI4_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 function renderTabButton(tabId, label, iconPath, activeTab) {
   const isActive = activeTab === tabId;
@@ -21041,8 +21120,8 @@ function renderDatabaseToolsSettings(settings) {
 }
 
 // src/routes/admin-settings.ts
-var adminSettingsRoutes = new Hono();
-adminSettingsRoutes.use("*", requireAuth());
+var adminSettingsRoutes = new hono.Hono();
+adminSettingsRoutes.use("*", chunk7EGKU7OO_cjs.requireAuth());
 function getMockSettings(user) {
   return {
     general: {
@@ -21106,8 +21185,8 @@ adminSettingsRoutes.get("/", (c) => {
 });
 adminSettingsRoutes.get("/general", async (c) => {
   const user = c.get("user");
-  const db = c.env.DB;
-  const settingsService = new SettingsService(db);
+  const db2 = c.env.DB;
+  const settingsService = new chunkDOR2IU73_cjs.SettingsService(db2);
   const generalSettings = await settingsService.getGeneralSettings(user?.email);
   const mockSettings = getMockSettings(user);
   mockSettings.general = generalSettings;
@@ -21209,8 +21288,8 @@ adminSettingsRoutes.get("/database-tools", (c) => {
 });
 adminSettingsRoutes.get("/api/migrations/status", async (c) => {
   try {
-    const db = c.env.DB;
-    const migrationService = new MigrationService(db);
+    const db2 = c.env.DB;
+    const migrationService = new chunkT7IYBGGO_cjs.MigrationService(db2);
     const status = await migrationService.getMigrationStatus();
     return c.json({
       success: true,
@@ -21233,8 +21312,8 @@ adminSettingsRoutes.post("/api/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const db = c.env.DB;
-    const migrationService = new MigrationService(db);
+    const db2 = c.env.DB;
+    const migrationService = new chunkT7IYBGGO_cjs.MigrationService(db2);
     const result = await migrationService.runPendingMigrations();
     return c.json({
       success: result.success,
@@ -21251,8 +21330,8 @@ adminSettingsRoutes.post("/api/migrations/run", async (c) => {
 });
 adminSettingsRoutes.get("/api/migrations/validate", async (c) => {
   try {
-    const db = c.env.DB;
-    const migrationService = new MigrationService(db);
+    const db2 = c.env.DB;
+    const migrationService = new chunkT7IYBGGO_cjs.MigrationService(db2);
     const validation = await migrationService.validateSchema();
     return c.json({
       success: true,
@@ -21268,8 +21347,8 @@ adminSettingsRoutes.get("/api/migrations/validate", async (c) => {
 });
 adminSettingsRoutes.get("/api/database-tools/stats", async (c) => {
   try {
-    const db = c.env.DB;
-    const tablesQuery = await db.prepare(`
+    const db2 = c.env.DB;
+    const tablesQuery = await db2.prepare(`
       SELECT name FROM sqlite_master
       WHERE type='table'
       AND name NOT LIKE 'sqlite_%'
@@ -21281,7 +21360,7 @@ adminSettingsRoutes.get("/api/database-tools/stats", async (c) => {
     const tableStats = await Promise.all(
       tables.map(async (table) => {
         try {
-          const countResult = await db.prepare(`SELECT COUNT(*) as count FROM ${table.name}`).first();
+          const countResult = await db2.prepare(`SELECT COUNT(*) as count FROM ${table.name}`).first();
           const rowCount = countResult?.count || 0;
           totalRows += rowCount;
           return {
@@ -21318,8 +21397,8 @@ adminSettingsRoutes.get("/api/database-tools/stats", async (c) => {
 });
 adminSettingsRoutes.get("/api/database-tools/validate", async (c) => {
   try {
-    const db = c.env.DB;
-    const integrityResult = await db.prepare("PRAGMA integrity_check").first();
+    const db2 = c.env.DB;
+    const integrityResult = await db2.prepare("PRAGMA integrity_check").first();
     const isValid = integrityResult?.integrity_check === "ok";
     return c.json({
       success: true,
@@ -21374,11 +21453,11 @@ adminSettingsRoutes.post("/api/database-tools/truncate", async (c) => {
         error: "No tables specified for truncation"
       }, 400);
     }
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const results = [];
     for (const tableName of tablesToTruncate) {
       try {
-        await db.prepare(`DELETE FROM ${tableName}`).run();
+        await db2.prepare(`DELETE FROM ${tableName}`).run();
         results.push({ table: tableName, success: true });
       } catch (error) {
         console.error(`Error truncating ${tableName}:`, error);
@@ -21408,8 +21487,8 @@ adminSettingsRoutes.post("/general", async (c) => {
       }, 403);
     }
     const formData = await c.req.formData();
-    const db = c.env.DB;
-    const settingsService = new SettingsService(db);
+    const db2 = c.env.DB;
+    const settingsService = new chunkDOR2IU73_cjs.SettingsService(db2);
     const settings = {
       siteName: formData.get("siteName"),
       siteDescription: formData.get("siteDescription"),
@@ -21476,6 +21555,26 @@ var ROUTES_INFO = {
   reference: "https://github.com/sonicjs/sonicjs"
 };
 
-export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, test_cleanup_default, userRoutes };
-//# sourceMappingURL=chunk-ENIYWHIO.js.map
-//# sourceMappingURL=chunk-ENIYWHIO.js.map
+exports.PluginBuilder = PluginBuilder;
+exports.ROUTES_INFO = ROUTES_INFO;
+exports.adminCheckboxRoutes = adminCheckboxRoutes;
+exports.adminCollectionsRoutes = adminCollectionsRoutes;
+exports.adminDesignRoutes = adminDesignRoutes;
+exports.adminLogsRoutes = adminLogsRoutes;
+exports.adminMediaRoutes = adminMediaRoutes;
+exports.adminPluginRoutes = adminPluginRoutes;
+exports.adminSettingsRoutes = adminSettingsRoutes;
+exports.admin_api_default = admin_api_default;
+exports.admin_code_examples_default = admin_code_examples_default;
+exports.admin_content_default = admin_content_default;
+exports.admin_testimonials_default = admin_testimonials_default;
+exports.api_content_crud_default = api_content_crud_default;
+exports.api_default = api_default;
+exports.api_media_default = api_media_default;
+exports.api_system_default = api_system_default;
+exports.auth_default = auth_default;
+exports.router = router;
+exports.test_cleanup_default = test_cleanup_default;
+exports.userRoutes = userRoutes;
+//# sourceMappingURL=chunk-4EZXGVYP.cjs.map
+//# sourceMappingURL=chunk-4EZXGVYP.cjs.map

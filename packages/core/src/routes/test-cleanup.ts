@@ -26,155 +26,133 @@ app.post('/test-cleanup', async (c: Context) => {
   try {
     let deletedCount = 0
 
-    // Step 1: Get test collection IDs and test user IDs
-    const testCollections = await db.prepare(`
-      SELECT id FROM collections
-      WHERE name LIKE 'test_%'
-      OR name IN ('blog_posts', 'test_collection', 'products', 'articles')
-    `).all()
-    const testCollectionIds = testCollections.results?.map((c: any) => c.id) || []
+    // Use pattern-based deletes to avoid SQL variable limits
+    // This approach uses subqueries instead of building large IN lists
 
-    const testUsers = await db.prepare(`
-      SELECT id FROM users
-      WHERE email != 'admin@sonicjs.com'
-      AND (email LIKE '%test%' OR email LIKE '%example.com%')
-    `).all()
-    const testUserIds = testUsers.results?.map((u: any) => u.id) || []
-
-    // Step 2: Get content IDs that will be deleted (batched to avoid SQL variable limit)
-    let contentIdsToDelete: string[] = []
-    const batchSize = 500
-
-    if (testCollectionIds.length > 0) {
-      for (let i = 0; i < testCollectionIds.length; i += batchSize) {
-        const batch = testCollectionIds.slice(i, i + batchSize)
-        const placeholders = batch.map(() => '?').join(',')
-        const contentFromCollections = await db.prepare(`
-          SELECT id FROM content WHERE collection_id IN (${placeholders})
-        `).bind(...batch).all()
-        contentIdsToDelete.push(...(contentFromCollections.results?.map((c: any) => c.id) || []))
-      }
-    }
-
-    const contentByPattern = await db.prepare(`
-      SELECT id FROM content
-      WHERE title LIKE 'Test %'
-      OR title LIKE '%E2E%'
-      OR title LIKE '%Playwright%'
-      OR title LIKE '%Sample%'
-    `).all()
-    contentIdsToDelete.push(...(contentByPattern.results?.map((c: any) => c.id) || []))
-
-    // Step 3: Delete data that references content (child tables first)
-    if (contentIdsToDelete.length > 0) {
-      for (let i = 0; i < contentIdsToDelete.length; i += batchSize) {
-        const batch = contentIdsToDelete.slice(i, i + batchSize)
-        const placeholders = batch.map(() => '?').join(',')
-
-        // Delete content_versions
-        await db.prepare(`
-          DELETE FROM content_versions WHERE content_id IN (${placeholders})
-        `).bind(...batch).run()
-
-        // Delete workflow_history
-        await db.prepare(`
-          DELETE FROM workflow_history WHERE content_id IN (${placeholders})
-        `).bind(...batch).run()
-
-        // Delete content_data
-        await db.prepare(`
-          DELETE FROM content_data WHERE content_id IN (${placeholders})
-        `).bind(...batch).run()
-      }
-    }
-
-    // Step 4: Delete data that references test users (batched)
-    if (testUserIds.length > 0) {
-      for (let i = 0; i < testUserIds.length; i += batchSize) {
-        const batch = testUserIds.slice(i, i + batchSize)
-        const placeholders = batch.map(() => '?').join(',')
-
-        // Delete API tokens
-        await db.prepare(`
-          DELETE FROM api_tokens WHERE user_id IN (${placeholders})
-        `).bind(...batch).run()
-
-        // Delete media uploaded by test users
-        await db.prepare(`
-          DELETE FROM media WHERE uploaded_by IN (${placeholders})
-        `).bind(...batch).run()
-      }
-    }
-
-    // Step 5: Now delete the content itself (batched)
-    if (contentIdsToDelete.length > 0) {
-      for (let i = 0; i < contentIdsToDelete.length; i += batchSize) {
-        const batch = contentIdsToDelete.slice(i, i + batchSize)
-        const placeholders = batch.map(() => '?').join(',')
-        const contentResult = await db.prepare(`
-          DELETE FROM content WHERE id IN (${placeholders})
-        `).bind(...batch).run()
-        deletedCount += contentResult.meta?.changes || 0
-      }
-    }
-
-    // Step 6: Delete collection_fields for test collections (batched)
-    if (testCollectionIds.length > 0) {
-      for (let i = 0; i < testCollectionIds.length; i += batchSize) {
-        const batch = testCollectionIds.slice(i, i + batchSize)
-        const placeholders = batch.map(() => '?').join(',')
-        await db.prepare(`
-          DELETE FROM collection_fields WHERE collection_id IN (${placeholders})
-        `).bind(...batch).run()
-      }
-    }
-
-    // Step 7: Delete test collections (batched)
-    if (testCollectionIds.length > 0) {
-      for (let i = 0; i < testCollectionIds.length; i += batchSize) {
-        const batch = testCollectionIds.slice(i, i + batchSize)
-        const placeholders = batch.map(() => '?').join(',')
-        const collectionsResult = await db.prepare(`
-          DELETE FROM collections WHERE id IN (${placeholders})
-        `).bind(...batch).run()
-        deletedCount += collectionsResult.meta?.changes || 0
-      }
-    }
-
-    // Step 8: Delete test users (batched)
-    if (testUserIds.length > 0) {
-      for (let i = 0; i < testUserIds.length; i += batchSize) {
-        const batch = testUserIds.slice(i, i + batchSize)
-        const placeholders = batch.map(() => '?').join(',')
-        const usersResult = await db.prepare(`
-          DELETE FROM users WHERE id IN (${placeholders})
-        `).bind(...batch).run()
-        deletedCount += usersResult.meta?.changes || 0
-      }
-    }
-
-    // Step 9: Clean up any remaining orphaned data
-    await db.prepare(`
-      DELETE FROM content_data
-      WHERE content_id NOT IN (SELECT id FROM content)
-    `).run()
-
-    await db.prepare(`
-      DELETE FROM collection_fields
-      WHERE collection_id NOT IN (SELECT id FROM collections)
-    `).run()
-
+    // Step 1: Delete child data for test content (by pattern)
     await db.prepare(`
       DELETE FROM content_versions
-      WHERE content_id NOT IN (SELECT id FROM content)
+      WHERE content_id IN (
+        SELECT id FROM content
+        WHERE title LIKE 'Test %' OR title LIKE '%E2E%' OR title LIKE '%Playwright%' OR title LIKE '%Sample%'
+      )
     `).run()
 
     await db.prepare(`
       DELETE FROM workflow_history
-      WHERE content_id NOT IN (SELECT id FROM content)
+      WHERE content_id IN (
+        SELECT id FROM content
+        WHERE title LIKE 'Test %' OR title LIKE '%E2E%' OR title LIKE '%Playwright%' OR title LIKE '%Sample%'
+      )
     `).run()
 
-    // Step 10: Delete old activity logs (keep only last 100)
+    // Note: content_data table may not exist in all schemas
+    try {
+      await db.prepare(`
+        DELETE FROM content_data
+        WHERE content_id IN (
+          SELECT id FROM content
+          WHERE title LIKE 'Test %' OR title LIKE '%E2E%' OR title LIKE '%Playwright%' OR title LIKE '%Sample%'
+        )
+      `).run()
+    } catch (e) {
+      // Table doesn't exist, skip
+    }
+
+    // Step 2: Delete test content by pattern
+    const contentResult = await db.prepare(`
+      DELETE FROM content
+      WHERE title LIKE 'Test %' OR title LIKE '%E2E%' OR title LIKE '%Playwright%' OR title LIKE '%Sample%'
+    `).run()
+    deletedCount += contentResult.meta?.changes || 0
+
+    // Step 3: Delete child data for test users
+    await db.prepare(`
+      DELETE FROM api_tokens
+      WHERE user_id IN (
+        SELECT id FROM users
+        WHERE email != 'admin@sonicjs.com' AND (email LIKE '%test%' OR email LIKE '%example.com%')
+      )
+    `).run()
+
+    await db.prepare(`
+      DELETE FROM media
+      WHERE uploaded_by IN (
+        SELECT id FROM users
+        WHERE email != 'admin@sonicjs.com' AND (email LIKE '%test%' OR email LIKE '%example.com%')
+      )
+    `).run()
+
+    // Step 4: Delete test users
+    const usersResult = await db.prepare(`
+      DELETE FROM users
+      WHERE email != 'admin@sonicjs.com' AND (email LIKE '%test%' OR email LIKE '%example.com%')
+    `).run()
+    deletedCount += usersResult.meta?.changes || 0
+
+    // Step 5: Delete child data for test collections
+    try {
+      await db.prepare(`
+        DELETE FROM collection_fields
+        WHERE collection_id IN (
+          SELECT id FROM collections
+          WHERE name LIKE 'test_%' OR name IN ('blog_posts', 'test_collection', 'products', 'articles')
+        )
+      `).run()
+    } catch (e) {
+      // Table doesn't exist
+    }
+
+    // Delete remaining content from test collections
+    await db.prepare(`
+      DELETE FROM content
+      WHERE collection_id IN (
+        SELECT id FROM collections
+        WHERE name LIKE 'test_%' OR name IN ('blog_posts', 'test_collection', 'products', 'articles')
+      )
+    `).run()
+
+    // Step 6: Delete test collections
+    const collectionsResult = await db.prepare(`
+      DELETE FROM collections
+      WHERE name LIKE 'test_%' OR name IN ('blog_posts', 'test_collection', 'products', 'articles')
+    `).run()
+    deletedCount += collectionsResult.meta?.changes || 0
+
+    // Step 7: Clean up orphaned data (skip if tables don't exist)
+    try {
+      await db.prepare(`
+        DELETE FROM content_data WHERE content_id NOT IN (SELECT id FROM content)
+      `).run()
+    } catch (e) {
+      // Table doesn't exist
+    }
+
+    try {
+      await db.prepare(`
+        DELETE FROM collection_fields WHERE collection_id NOT IN (SELECT id FROM collections)
+      `).run()
+    } catch (e) {
+      // Table doesn't exist
+    }
+
+    try {
+      await db.prepare(`
+        DELETE FROM content_versions WHERE content_id NOT IN (SELECT id FROM content)
+      `).run()
+    } catch (e) {
+      // Table doesn't exist
+    }
+
+    try {
+      await db.prepare(`
+        DELETE FROM workflow_history WHERE content_id NOT IN (SELECT id FROM content)
+      `).run()
+    } catch (e) {
+      // Table doesn't exist
+    }
+
+    // Step 8: Delete old activity logs (keep only last 100)
     await db.prepare(`
       DELETE FROM activity_logs
       WHERE id NOT IN (

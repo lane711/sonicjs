@@ -36,7 +36,7 @@ interface CollectionFormData {
   editorPlugins?: {
     tinymce: boolean
     quill: boolean
-    mdxeditor: boolean
+    easyMdx: boolean
   }
 }
 
@@ -190,7 +190,7 @@ adminCollectionsRoutes.get('/new', async (c) => {
   console.log('[Collections /new] Editor plugins status:', {
     tinymce: tinymceActive,
     quill: quillActive,
-    mdxeditor: mdxeditorActive
+    easyMdx: mdxeditorActive
   })
 
   const formData: CollectionFormData = {
@@ -204,7 +204,7 @@ adminCollectionsRoutes.get('/new', async (c) => {
     editorPlugins: {
       tinymce: tinymceActive,
       quill: quillActive,
-      mdxeditor: mdxeditorActive
+      easyMdx: mdxeditorActive
     }
   }
 
@@ -366,6 +366,13 @@ adminCollectionsRoutes.get('/:id', async (c) => {
     const collection = await stmt.bind(id).first() as any
 
     if (!collection) {
+      // Check which editor plugins are active
+      const [tinymceActive, quillActive, mdxeditorActive] = await Promise.all([
+        isPluginActive(db, 'tinymce-plugin'),
+        isPluginActive(db, 'quill-editor'),
+        isPluginActive(db, 'easy-mdx')
+      ])
+
       const formData: CollectionFormData = {
         isEdit: true,
         error: 'Collection not found.',
@@ -374,7 +381,12 @@ adminCollectionsRoutes.get('/:id', async (c) => {
           email: user.email,
           role: user.role
         } : undefined,
-        version: c.get('appVersion')
+        version: c.get('appVersion'),
+        editorPlugins: {
+          tinymce: tinymceActive,
+          quill: quillActive,
+          easyMdx: mdxeditorActive
+        }
       }
       return c.html(renderCollectionFormPage(formData))
     }
@@ -413,16 +425,27 @@ adminCollectionsRoutes.get('/:id', async (c) => {
         ORDER BY field_order ASC
       `)
       const { results: fieldsResults } = await fieldsStmt.bind(id).all()
-      fields = (fieldsResults || []).map((row: any) => ({
-        id: row.id,
-        field_name: row.field_name,
-        field_type: row.field_type,
-        field_label: row.field_label,
-        field_options: row.field_options ? JSON.parse(row.field_options) : {},
-        field_order: row.field_order,
-        is_required: row.is_required === 1,
-        is_searchable: row.is_searchable === 1
-      }))
+      fields = (fieldsResults || []).map((row: any) => {
+        let fieldOptions = {}
+        if (row.field_options) {
+          try {
+            fieldOptions = typeof row.field_options === 'string' ? JSON.parse(row.field_options) : row.field_options
+          } catch (e) {
+            console.error('Error parsing field_options for field:', row.field_name, e)
+            fieldOptions = {}
+          }
+        }
+        return {
+          id: row.id,
+          field_name: row.field_name,
+          field_type: row.field_type,
+          field_label: row.field_label,
+          field_options: fieldOptions,
+          field_order: row.field_order,
+          is_required: row.is_required === 1,
+          is_searchable: row.is_searchable === 1
+        }
+      })
     }
 
     // Check which editor plugins are active
@@ -431,6 +454,12 @@ adminCollectionsRoutes.get('/:id', async (c) => {
       isPluginActive(db, 'quill-editor'),
       isPluginActive(db, 'easy-mdx')
     ])
+
+    console.log('[Collections /:id] Editor plugins status:', {
+      tinymce: tinymceActive,
+      quill: quillActive,
+      easyMdx: mdxeditorActive
+    })
 
     const formData: CollectionFormData = {
       id: collection.id,
@@ -449,7 +478,7 @@ adminCollectionsRoutes.get('/:id', async (c) => {
       editorPlugins: {
         tinymce: tinymceActive,
         quill: quillActive,
-        mdxeditor: mdxeditorActive
+        easyMdx: mdxeditorActive
       }
     }
 
@@ -457,6 +486,14 @@ adminCollectionsRoutes.get('/:id', async (c) => {
   } catch (error) {
     console.error('Error fetching collection:', error)
     const user = c.get('user')
+
+    // Check which editor plugins are active (even in error state)
+    const [tinymceActive, quillActive, mdxeditorActive] = await Promise.all([
+      isPluginActive(db, 'tinymce-plugin'),
+      isPluginActive(db, 'quill-editor'),
+      isPluginActive(db, 'easy-mdx')
+    ])
+
     const formData: CollectionFormData = {
       isEdit: true,
       error: 'Failed to load collection.',
@@ -465,7 +502,12 @@ adminCollectionsRoutes.get('/:id', async (c) => {
         email: user.email,
         role: user.role
       } : undefined,
-      version: c.get('appVersion')
+      version: c.get('appVersion'),
+      editorPlugins: {
+        tinymce: tinymceActive,
+        quill: quillActive,
+        easyMdx: mdxeditorActive
+      }
     }
     return c.html(renderCollectionFormPage(formData))
   }

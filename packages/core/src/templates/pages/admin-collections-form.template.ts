@@ -33,7 +33,7 @@ export interface CollectionFormData {
   editorPlugins?: {
     tinymce: boolean
     quill: boolean
-    mdxeditor: boolean
+    easyMdx: boolean
   }
 }
 
@@ -43,7 +43,7 @@ function getFieldTypeBadge(fieldType: string): string {
     'text': 'Text',
     'richtext': 'Rich Text (TinyMCE)',
     'quill': 'Rich Text (Quill)',
-    'mdxeditor': 'Rich Text (MDXEditor)',
+    'mdxeditor': 'EasyMDX',
     'number': 'Number',
     'boolean': 'Boolean',
     'date': 'Date',
@@ -67,6 +67,8 @@ function getFieldTypeBadge(fieldType: string): string {
 }
 
 export function renderCollectionFormPage(data: CollectionFormData): string {
+  console.log('[renderCollectionFormPage] editorPlugins:', data.editorPlugins)
+
   const isEdit = data.isEdit || !!data.id
   const title = isEdit ? 'Edit Collection' : 'Create New Collection'
   const subtitle = isEdit
@@ -542,7 +544,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
                 <option value="text">Text</option>
                 ${data.editorPlugins?.tinymce ? '<option value="richtext">Rich Text (TinyMCE)</option>' : ''}
                 ${data.editorPlugins?.quill ? '<option value="quill">Rich Text (Quill)</option>' : ''}
-                ${data.editorPlugins?.mdxeditor ? '<option value="mdxeditor">Rich Text (MDXEditor)</option>' : ''}
+                ${data.editorPlugins?.easyMdx ? '<option value="mdxeditor">EasyMDX</option>' : ''}
                 <option value="number">Number</option>
                 <option value="boolean">Boolean</option>
                 <option value="date">Date</option>
@@ -764,12 +766,13 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
 
           // Check if it's a schema field with field_options that might indicate the actual type
           if (field.field_options && typeof field.field_options === 'object') {
-            // Check for richtext format
-            if (field.field_options.format === 'richtext') {
+            // Only convert to richtext if type is explicitly 'string' and format is richtext
+            // Don't convert if it's already a specific editor type like 'mdxeditor', 'quill', etc.
+            if (field.field_options.format === 'richtext' && uiFieldType === 'string') {
               uiFieldType = 'richtext';
             }
             // Check for other format indicators
-            else if (field.field_options.type) {
+            else if (field.field_options.type && !uiFieldType) {
               uiFieldType = field.field_options.type;
             }
           }
@@ -785,8 +788,60 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
             uiFieldType = typeMapping[uiFieldType];
           }
 
+          // Log all available options
+          const availableOptions = Array.from(fieldTypeSelect.options).map(opt => ({ value: opt.value, text: opt.text }));
+          console.log('Available dropdown options:', availableOptions);
+          console.log('Trying to set field-type to:', uiFieldType);
+
+          // Clear any existing selections first
+          Array.from(fieldTypeSelect.options).forEach(opt => opt.selected = false);
+
+          // Try multiple approaches to set the value
+          let selectionSucceeded = false;
+
+          // Approach 1: Direct value assignment
           fieldTypeSelect.value = uiFieldType;
-          console.log('Set field-type to:', fieldTypeSelect.value, '(original:', field.field_type, ')');
+          if (fieldTypeSelect.value === uiFieldType) {
+            selectionSucceeded = true;
+            console.log('✓ Approach 1 (direct value) succeeded');
+          }
+
+          // Approach 2: Find and select the specific option
+          if (!selectionSucceeded) {
+            console.log('Approach 1 failed, trying approach 2 (direct option selection)');
+            const optionToSelect = Array.from(fieldTypeSelect.options).find(opt => opt.value === uiFieldType);
+            if (optionToSelect) {
+              optionToSelect.selected = true;
+              // Trigger change event
+              fieldTypeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+              if (fieldTypeSelect.value === uiFieldType) {
+                selectionSucceeded = true;
+                console.log('✓ Approach 2 (option.selected) succeeded');
+              }
+            }
+          }
+
+          // Approach 3: Set selectedIndex
+          if (!selectionSucceeded) {
+            console.log('Approach 2 failed, trying approach 3 (selectedIndex)');
+            const optionIndex = Array.from(fieldTypeSelect.options).findIndex(opt => opt.value === uiFieldType);
+            if (optionIndex !== -1) {
+              fieldTypeSelect.selectedIndex = optionIndex;
+              if (fieldTypeSelect.value === uiFieldType) {
+                selectionSucceeded = true;
+                console.log('✓ Approach 3 (selectedIndex) succeeded');
+              }
+            }
+          }
+
+          console.log('Final field-type value:', fieldTypeSelect.value, '(wanted:', uiFieldType, ')');
+
+          if (!selectionSucceeded) {
+            console.error('❌ All approaches failed to set field-type!');
+            console.error('Wanted:', uiFieldType);
+            console.error('Got:', fieldTypeSelect.value);
+            console.error('Available options:', availableOptions);
+          }
         } else {
           console.error('field-type select not found!');
         }
@@ -857,9 +912,15 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         setTimeout(() => {
           isEditingField = false;
           console.log('Cleared isEditingField flag');
-        }, 100);
 
-        }, 10); // Small delay to ensure modal is fully rendered
+          // Double-check the field-type value after the flag is cleared
+          const finalCheck = document.getElementById('field-type');
+          if (finalCheck) {
+            console.log('Post-flag-clear check - field-type value:', finalCheck.value);
+          }
+        }, 200); // Increased delay
+
+        }, 50); // Increased delay to ensure modal is fully rendered
       }
 
       function closeFieldModal() {
