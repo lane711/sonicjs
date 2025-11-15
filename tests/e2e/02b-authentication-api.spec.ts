@@ -10,6 +10,15 @@ test.describe('Authentication API', () => {
     lastName: 'User'
   };
 
+  // Seed admin user before all tests
+  test.beforeAll(async ({ request }) => {
+    try {
+      await request.post('/auth/seed-admin');
+    } catch (error) {
+      // Admin might already exist, ignore errors
+    }
+  });
+
   // Clean up test user after tests
   test.afterAll(async ({ request }) => {
     // We'll implement cleanup when we have admin API access

@@ -171,7 +171,8 @@ adminCollectionsRoutes.get('/', async (c) => {
     return c.html(renderCollectionsListPage(pageData))
   } catch (error) {
     console.error('Error fetching collections:', error)
-    return c.html(html`<p>Error loading collections</p>`)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    return c.html(html`<p>Error loading collections: ${errorMessage}</p>`)
   }
 })
 
@@ -295,7 +296,7 @@ adminCollectionsRoutes.post('/', async (c) => {
     }
 
     // Create collection
-    const collectionId = globalThis.crypto.randomUUID()
+    const collectionId = crypto.randomUUID()
     const now = Date.now()
 
     const insertStmt = db.prepare(`
@@ -632,7 +633,7 @@ adminCollectionsRoutes.post('/:id/fields', async (c) => {
     const nextOrder = (orderResult?.max_order || 0) + 1
 
     // Create field
-    const fieldId = globalThis.crypto.randomUUID()
+    const fieldId = crypto.randomUUID()
     const now = Date.now()
 
     const insertStmt = db.prepare(`

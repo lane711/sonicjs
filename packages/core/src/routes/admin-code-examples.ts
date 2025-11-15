@@ -188,7 +188,7 @@ adminCodeExamplesRoutes.post('/', async (c) => {
 
     if (error instanceof z.ZodError) {
       const errors: Record<string, string[]> = {}
-      error.errors.forEach(err => {
+      error.issues.forEach(err => {
         const field = err.path[0] as string
         if (!errors[field]) errors[field] = []
         errors[field].push(err.message)
@@ -354,7 +354,7 @@ adminCodeExamplesRoutes.put('/:id', async (c) => {
 
     if (error instanceof z.ZodError) {
       const errors: Record<string, string[]> = {}
-      error.errors.forEach(err => {
+      error.issues.forEach(err => {
         const field = err.path[0] as string
         if (!errors[field]) errors[field] = []
         errors[field].push(err.message)

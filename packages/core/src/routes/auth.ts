@@ -78,7 +78,7 @@ authRoutes.post('/register',
       } catch (validationError: any) {
         return c.json({
           error: 'Validation failed',
-          details: validationError.errors?.map((e: any) => e.message) || [validationError.message || 'Invalid request data']
+          details: validationError.issues?.map((e: any) => e.message) || [validationError.message || 'Invalid request data']
         }, 400)
       }
 
@@ -166,7 +166,7 @@ authRoutes.post('/login', async (c) => {
       const body = await c.req.json()
       const validation = loginSchema.safeParse(body)
       if (!validation.success) {
-        return c.json({ error: 'Validation failed', details: validation.error.errors }, 400)
+        return c.json({ error: 'Validation failed', details: validation.error.issues }, 400)
       }
       const { email, password } = validation.data
       const db = c.env.DB
@@ -341,7 +341,7 @@ authRoutes.post('/register/form', async (c) => {
     if (!validation.success) {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          ${validation.error.errors.map((err: { message: string }) => err.message).join(', ')}
+          ${validation.error.issues.map((err: { message: string }) => err.message).join(', ')}
         </div>
       `)
     }
@@ -438,7 +438,7 @@ authRoutes.post('/login/form', async (c) => {
     if (!validation.success) {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          ${validation.error.errors.map((err: { message: string }) => err.message).join(', ')}
+          ${validation.error.issues.map((err: { message: string }) => err.message).join(', ')}
         </div>
       `)
     }

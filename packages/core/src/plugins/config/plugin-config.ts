@@ -300,7 +300,7 @@ export class PluginConfigManager {
       return { valid: true, errors: [] }
     }
     
-    const errors = validation.error.errors.map(err => 
+    const errors = validation.error.issues.map((err: any) =>
       `${err.path.join('.')}: ${err.message}`
     )
     
