@@ -1,6 +1,6 @@
 'use strict';
 
-var chunkM75ELOTB_cjs = require('./chunk-M75ELOTB.cjs');
+var chunkZUSBGTB2_cjs = require('./chunk-ZUSBGTB2.cjs');
 var chunkNORPK4UQ_cjs = require('./chunk-NORPK4UQ.cjs');
 var chunk7EGKU7OO_cjs = require('./chunk-7EGKU7OO.cjs');
 var chunk22EFGHAX_cjs = require('./chunk-22EFGHAX.cjs');
@@ -736,7 +736,7 @@ function createDatabaseToolsAdminRoutes() {
   return router2;
 }
 function createEmailPlugin() {
-  const builder = chunkM75ELOTB_cjs.PluginBuilder.create({
+  const builder = chunkZUSBGTB2_cjs.PluginBuilder.create({
     name: "email",
     version: "1.0.0-beta.1",
     description: "Send transactional emails using Resend"
@@ -1131,21 +1131,21 @@ function createSonicJSApp(config = {}) {
       app.use("*", middleware);
     }
   }
-  app.route("/api", chunkM75ELOTB_cjs.api_default);
-  app.route("/api/media", chunkM75ELOTB_cjs.api_media_default);
-  app.route("/api/system", chunkM75ELOTB_cjs.api_system_default);
-  app.route("/admin/api", chunkM75ELOTB_cjs.admin_api_default);
-  app.route("/admin/dashboard", chunkM75ELOTB_cjs.router);
-  app.route("/admin/collections", chunkM75ELOTB_cjs.adminCollectionsRoutes);
-  app.route("/admin/settings", chunkM75ELOTB_cjs.adminSettingsRoutes);
+  app.route("/api", chunkZUSBGTB2_cjs.api_default);
+  app.route("/api/media", chunkZUSBGTB2_cjs.api_media_default);
+  app.route("/api/system", chunkZUSBGTB2_cjs.api_system_default);
+  app.route("/admin/api", chunkZUSBGTB2_cjs.admin_api_default);
+  app.route("/admin/dashboard", chunkZUSBGTB2_cjs.router);
+  app.route("/admin/collections", chunkZUSBGTB2_cjs.adminCollectionsRoutes);
+  app.route("/admin/settings", chunkZUSBGTB2_cjs.adminSettingsRoutes);
   app.route("/admin/database-tools", createDatabaseToolsAdminRoutes());
-  app.route("/admin/content", chunkM75ELOTB_cjs.admin_content_default);
-  app.route("/admin/media", chunkM75ELOTB_cjs.adminMediaRoutes);
-  app.route("/admin/plugins", chunkM75ELOTB_cjs.adminPluginRoutes);
-  app.route("/admin/logs", chunkM75ELOTB_cjs.adminLogsRoutes);
-  app.route("/admin", chunkM75ELOTB_cjs.userRoutes);
-  app.route("/auth", chunkM75ELOTB_cjs.auth_default);
-  app.route("/", chunkM75ELOTB_cjs.test_cleanup_default);
+  app.route("/admin/content", chunkZUSBGTB2_cjs.admin_content_default);
+  app.route("/admin/media", chunkZUSBGTB2_cjs.adminMediaRoutes);
+  app.route("/admin/plugins", chunkZUSBGTB2_cjs.adminPluginRoutes);
+  app.route("/admin/logs", chunkZUSBGTB2_cjs.adminLogsRoutes);
+  app.route("/admin", chunkZUSBGTB2_cjs.userRoutes);
+  app.route("/auth", chunkZUSBGTB2_cjs.auth_default);
+  app.route("/", chunkZUSBGTB2_cjs.test_cleanup_default);
   if (emailPlugin.routes && emailPlugin.routes.length > 0) {
     for (const route of emailPlugin.routes) {
       app.route(route.path, route.handler);
@@ -1218,79 +1218,79 @@ var VERSION = chunkPGZZPKZL_cjs.package_default.version;
 
 Object.defineProperty(exports, "ROUTES_INFO", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.ROUTES_INFO; }
+  get: function () { return chunkZUSBGTB2_cjs.ROUTES_INFO; }
 });
 Object.defineProperty(exports, "adminApiRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.admin_api_default; }
+  get: function () { return chunkZUSBGTB2_cjs.admin_api_default; }
 });
 Object.defineProperty(exports, "adminCheckboxRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.adminCheckboxRoutes; }
+  get: function () { return chunkZUSBGTB2_cjs.adminCheckboxRoutes; }
 });
 Object.defineProperty(exports, "adminCodeExamplesRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.admin_code_examples_default; }
+  get: function () { return chunkZUSBGTB2_cjs.admin_code_examples_default; }
 });
 Object.defineProperty(exports, "adminCollectionsRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.adminCollectionsRoutes; }
+  get: function () { return chunkZUSBGTB2_cjs.adminCollectionsRoutes; }
 });
 Object.defineProperty(exports, "adminContentRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.admin_content_default; }
+  get: function () { return chunkZUSBGTB2_cjs.admin_content_default; }
 });
 Object.defineProperty(exports, "adminDashboardRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.router; }
+  get: function () { return chunkZUSBGTB2_cjs.router; }
 });
 Object.defineProperty(exports, "adminDesignRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.adminDesignRoutes; }
+  get: function () { return chunkZUSBGTB2_cjs.adminDesignRoutes; }
 });
 Object.defineProperty(exports, "adminLogsRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.adminLogsRoutes; }
+  get: function () { return chunkZUSBGTB2_cjs.adminLogsRoutes; }
 });
 Object.defineProperty(exports, "adminMediaRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.adminMediaRoutes; }
+  get: function () { return chunkZUSBGTB2_cjs.adminMediaRoutes; }
 });
 Object.defineProperty(exports, "adminPluginRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.adminPluginRoutes; }
+  get: function () { return chunkZUSBGTB2_cjs.adminPluginRoutes; }
 });
 Object.defineProperty(exports, "adminSettingsRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.adminSettingsRoutes; }
+  get: function () { return chunkZUSBGTB2_cjs.adminSettingsRoutes; }
 });
 Object.defineProperty(exports, "adminTestimonialsRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.admin_testimonials_default; }
+  get: function () { return chunkZUSBGTB2_cjs.admin_testimonials_default; }
 });
 Object.defineProperty(exports, "adminUsersRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.userRoutes; }
+  get: function () { return chunkZUSBGTB2_cjs.userRoutes; }
 });
 Object.defineProperty(exports, "apiContentCrudRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.api_content_crud_default; }
+  get: function () { return chunkZUSBGTB2_cjs.api_content_crud_default; }
 });
 Object.defineProperty(exports, "apiMediaRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.api_media_default; }
+  get: function () { return chunkZUSBGTB2_cjs.api_media_default; }
 });
 Object.defineProperty(exports, "apiRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.api_default; }
+  get: function () { return chunkZUSBGTB2_cjs.api_default; }
 });
 Object.defineProperty(exports, "apiSystemRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.api_system_default; }
+  get: function () { return chunkZUSBGTB2_cjs.api_system_default; }
 });
 Object.defineProperty(exports, "authRoutes", {
   enumerable: true,
-  get: function () { return chunkM75ELOTB_cjs.auth_default; }
+  get: function () { return chunkZUSBGTB2_cjs.auth_default; }
 });
 Object.defineProperty(exports, "Logger", {
   enumerable: true,
