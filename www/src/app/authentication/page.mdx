@@ -7,9 +7,9 @@ export const metadata = {
 export const sections = [
   { title: 'Overview', id: 'overview' },
   { title: 'JWT Authentication', id: 'jwt-authentication' },
+  { title: 'Passwordless Authentication', id: 'passwordless-authentication' },
   { title: 'User Management', id: 'user-management' },
   { title: 'RBAC', id: 'rbac' },
-  { title: 'API Usage', id: 'api-usage' },
 ]
 
 # Authentication
@@ -125,6 +125,132 @@ const response = await fetch('http://localhost:8787/admin/content', {
 </CodeGroup>
 
 For browser-based applications, the token is automatically stored as an HTTP-only cookie named `auth_token`.
+
+---
+
+## Passwordless Authentication
+
+SonicJS offers multiple passwordless authentication methods through plugins. These plugins are **inactive by default** and need to be enabled in the admin panel.
+
+### OTP Login Plugin
+
+The **OTP (One-Time Password) Login Plugin** provides email-based authentication with temporary codes.
+
+**Features:**
+- Configurable OTP code length (4-8 digits)
+- Code expiration (5-60 minutes, default: 10 minutes)
+- Rate limiting (default: 5 codes per hour)
+- Max verification attempts (default: 3)
+- Optional new user registration support
+
+**Installation:**
+
+1. Navigate to **Admin** → **Plugins**
+2. Find **OTP Login** plugin
+3. Click **Activate**
+4. Configure settings:
+   - **Code Length**: 4-8 digits (default: 6)
+   - **Code Expiration**: 5-60 minutes (default: 10)
+   - **Max Attempts**: 3-10 (default: 3)
+   - **Rate Limit**: Codes per hour (default: 5)
+   - **Allow Registration**: Enable if you want new users to register via OTP
+
+**API Usage:**
+
+<CodeGroup title="OTP Login Flow">
+
+```bash {{title:'Request OTP Code'}}
+# Step 1: Request OTP code
+curl -X POST http://localhost:8787/auth/otp/request \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com"
+  }'
+
+# Response: { "message": "OTP code sent to email" }
+```
+
+```bash {{title:'Verify OTP Code'}}
+# Step 2: Verify OTP code
+curl -X POST http://localhost:8787/auth/otp/verify \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "code": "123456"
+  }'
+
+# Response: { "user": {...}, "token": "eyJhbGc..." }
+```
+
+</CodeGroup>
+
+**Database Schema:**
+
+The OTP plugin creates a new table `otp_codes`:
+
+```sql
+CREATE TABLE otp_codes (
+  id TEXT PRIMARY KEY,
+  user_email TEXT NOT NULL,
+  code TEXT NOT NULL,
+  expires_at INTEGER NOT NULL,
+  attempts INTEGER DEFAULT 0,
+  created_at INTEGER DEFAULT (unixepoch())
+);
+```
+
+### Magic Link Authentication Plugin
+
+The **Magic Link Plugin** enables passwordless login via email links.
+
+**Features:**
+- One-click email authentication
+- No password required
+- Secure token-based links
+- Optional user registration
+
+**Installation:**
+
+1. Navigate to **Admin** → **Plugins**
+2. Find **Magic Link Auth** plugin
+3. Click **Activate**
+4. Configure email settings (requires Email Plugin)
+
+**API Usage:**
+
+<CodeGroup title="Magic Link Flow">
+
+```bash {{title:'Request Magic Link'}}
+# Step 1: Request magic link
+curl -X POST http://localhost:8787/auth/magic-link/request \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com"
+  }'
+
+# Response: { "message": "Magic link sent to email" }
+```
+
+```bash {{title:'Verify Magic Link'}}
+# Step 2: User clicks link in email
+# GET /auth/magic-link/verify?token=abc123...
+
+# Automatically redirects to admin with auth cookie set
+```
+
+</CodeGroup>
+
+### Choosing an Authentication Method
+
+| Method | Best For | Security | User Experience |
+|--------|----------|----------|-----------------|
+| **Email + Password** | Traditional apps, maximum control | ⭐⭐⭐⭐ | Familiar, requires password management |
+| **OTP Login** | Mobile apps, high-security environments | ⭐⭐⭐⭐⭐ | Easy, no password needed, limited time |
+| **Magic Link** | Simplified onboarding, newsletters | ⭐⭐⭐⭐ | Seamless, requires email access |
+
+<Callout type="info">
+**Email Plugin Required:** Both OTP and Magic Link authentication require the Email Plugin to be configured with a valid email service (e.g., Resend, SendGrid).
+</Callout>
 
 ---
 
