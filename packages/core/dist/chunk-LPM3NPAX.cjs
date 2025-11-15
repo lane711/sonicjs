@@ -1,11 +1,11 @@
 'use strict';
 
-var chunkDOR2IU73_cjs = require('./chunk-DOR2IU73.cjs');
+var chunkYP52USGX_cjs = require('./chunk-YP52USGX.cjs');
 var chunk7EGKU7OO_cjs = require('./chunk-7EGKU7OO.cjs');
 var chunk22EFGHAX_cjs = require('./chunk-22EFGHAX.cjs');
 var chunkT7IYBGGO_cjs = require('./chunk-T7IYBGGO.cjs');
 var chunkYU6QFFI4_cjs = require('./chunk-YU6QFFI4.cjs');
-var chunkPGZZPKZL_cjs = require('./chunk-PGZZPKZL.cjs');
+var chunk2MBNRFS5_cjs = require('./chunk-2MBNRFS5.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 var hono = require('hono');
 var cors = require('hono/cors');
@@ -85,7 +85,7 @@ apiContentCrudRoutes.post("/", chunk7EGKU7OO_cjs.requireAuth(), async (c) => {
       now,
       now
     ).run();
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
+    const cache = chunkYP52USGX_cjs.getCacheService(chunkYP52USGX_cjs.CACHE_CONFIGS.api);
     await cache.invalidate(`content:list:${collectionId}:*`);
     await cache.invalidate("content-filtered:*");
     const getStmt = db2.prepare("SELECT * FROM content WHERE id = ?");
@@ -148,7 +148,7 @@ apiContentCrudRoutes.put("/:id", chunk7EGKU7OO_cjs.requireAuth(), async (c) => {
       WHERE id = ?
     `);
     await updateStmt.bind(...params).run();
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
+    const cache = chunkYP52USGX_cjs.getCacheService(chunkYP52USGX_cjs.CACHE_CONFIGS.api);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existing.collection_id}:*`);
     await cache.invalidate("content-filtered:*");
@@ -185,7 +185,7 @@ apiContentCrudRoutes.delete("/:id", chunk7EGKU7OO_cjs.requireAuth(), async (c) =
     }
     const deleteStmt = db2.prepare("DELETE FROM content WHERE id = ?");
     await deleteStmt.bind(id).run();
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
+    const cache = chunkYP52USGX_cjs.getCacheService(chunkYP52USGX_cjs.CACHE_CONFIGS.api);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existing.collection_id}:*`);
     await cache.invalidate("content-filtered:*");
@@ -258,7 +258,7 @@ apiRoutes.get("/collections", async (c) => {
   try {
     const db2 = c.env.DB;
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
+    const cache = chunkYP52USGX_cjs.getCacheService(chunkYP52USGX_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("collections", "all");
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -335,12 +335,12 @@ apiRoutes.get("/content", async (c) => {
         });
       }
     }
-    const filter = chunkPGZZPKZL_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunk2MBNRFS5_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.limit) {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder3 = new chunkPGZZPKZL_cjs.QueryFilterBuilder();
+    const builder3 = new chunk2MBNRFS5_cjs.QueryFilterBuilder();
     const queryResult = builder3.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -349,7 +349,7 @@ apiRoutes.get("/content", async (c) => {
       }, 400);
     }
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
+    const cache = chunkYP52USGX_cjs.getCacheService(chunkYP52USGX_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("content-filtered", JSON.stringify({ filter, query: queryResult.sql }));
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -427,7 +427,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
     if (!collectionResult) {
       return c.json({ error: "Collection not found" }, 404);
     }
-    const filter = chunkPGZZPKZL_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunk2MBNRFS5_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.where) {
       filter.where = { and: [] };
     }
@@ -443,7 +443,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder3 = new chunkPGZZPKZL_cjs.QueryFilterBuilder();
+    const builder3 = new chunk2MBNRFS5_cjs.QueryFilterBuilder();
     const queryResult = builder3.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -452,7 +452,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
       }, 400);
     }
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
+    const cache = chunkYP52USGX_cjs.getCacheService(chunkYP52USGX_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("collection-content-filtered", `${collection}:${JSON.stringify({ filter, query: queryResult.sql })}`);
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -2272,7 +2272,7 @@ authRoutes.post("/login", async (c) => {
     const { email, password } = validation.data;
     const db2 = c.env.DB;
     const normalizedEmail = email.toLowerCase();
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.user);
+    const cache = chunkYP52USGX_cjs.getCacheService(chunkYP52USGX_cjs.CACHE_CONFIGS.user);
     let user = await cache.get(cache.generateKey("user", `email:${normalizedEmail}`));
     if (!user) {
       user = await db2.prepare("SELECT * FROM users WHERE email = ? AND is_active = 1").bind(normalizedEmail).first();
@@ -5927,7 +5927,7 @@ async function isPluginActive2(db2, pluginId) {
 var adminContentRoutes = new hono.Hono();
 adminContentRoutes.use("*", chunk7EGKU7OO_cjs.requireAuth());
 async function getCollectionFields(db2, collectionId) {
-  const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.collection);
+  const cache = chunkYP52USGX_cjs.getCacheService(chunkYP52USGX_cjs.CACHE_CONFIGS.collection);
   return cache.getOrSet(
     cache.generateKey("fields", collectionId),
     async () => {
@@ -5982,7 +5982,7 @@ async function getCollectionFields(db2, collectionId) {
   );
 }
 async function getCollection(db2, collectionId) {
-  const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.collection);
+  const cache = chunkYP52USGX_cjs.getCacheService(chunkYP52USGX_cjs.CACHE_CONFIGS.collection);
   return cache.getOrSet(
     cache.generateKey("collection", collectionId),
     async () => {
@@ -6271,7 +6271,7 @@ adminContentRoutes.get("/:id/edit", async (c) => {
     const db2 = c.env.DB;
     const url = new URL(c.req.url);
     const referrerParams = url.searchParams.get("ref") || "";
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.content);
+    const cache = chunkYP52USGX_cjs.getCacheService(chunkYP52USGX_cjs.CACHE_CONFIGS.content);
     const content = await cache.getOrSet(
       cache.generateKey("content", id),
       async () => {
@@ -6479,7 +6479,7 @@ adminContentRoutes.post("/", async (c) => {
       now,
       now
     ).run();
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.content);
+    const cache = chunkYP52USGX_cjs.getCacheService(chunkYP52USGX_cjs.CACHE_CONFIGS.content);
     await cache.invalidate(`content:list:${collectionId}:*`);
     const versionStmt = db2.prepare(`
       INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
@@ -6627,7 +6627,7 @@ adminContentRoutes.put("/:id", async (c) => {
       now,
       id
     ).run();
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.content);
+    const cache = chunkYP52USGX_cjs.getCacheService(chunkYP52USGX_cjs.CACHE_CONFIGS.content);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existingContent.collection_id}:*`);
     const existingData = JSON.parse(existingContent.data || "{}");
@@ -6920,7 +6920,7 @@ adminContentRoutes.post("/bulk-action", async (c) => {
     } else {
       return c.json({ success: false, error: "Invalid action" });
     }
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.content);
+    const cache = chunkYP52USGX_cjs.getCacheService(chunkYP52USGX_cjs.CACHE_CONFIGS.content);
     for (const contentId of ids) {
       await cache.delete(cache.generateKey("content", contentId));
     }
@@ -6948,7 +6948,7 @@ adminContentRoutes.delete("/:id", async (c) => {
       WHERE id = ?
     `);
     await deleteStmt.bind(now, id).run();
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.content);
+    const cache = chunkYP52USGX_cjs.getCacheService(chunkYP52USGX_cjs.CACHE_CONFIGS.content);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate("content:list:*");
     return c.html(`
@@ -7992,7 +7992,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="first_name"
-                      value="${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.firstName || "")}"
+                      value="${chunk2MBNRFS5_cjs.escapeHtml(data.userToEdit.firstName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -8003,7 +8003,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="last_name"
-                      value="${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.lastName || "")}"
+                      value="${chunk2MBNRFS5_cjs.escapeHtml(data.userToEdit.lastName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -8014,7 +8014,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="username"
-                      value="${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.username || "")}"
+                      value="${chunk2MBNRFS5_cjs.escapeHtml(data.userToEdit.username || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -8025,7 +8025,7 @@ function renderUserEditPage(data) {
                     <input
                       type="email"
                       name="email"
-                      value="${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.email || "")}"
+                      value="${chunk2MBNRFS5_cjs.escapeHtml(data.userToEdit.email || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -8036,7 +8036,7 @@ function renderUserEditPage(data) {
                     <input
                       type="tel"
                       name="phone"
-                      value="${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.phone || "")}"
+                      value="${chunk2MBNRFS5_cjs.escapeHtml(data.userToEdit.phone || "")}"
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
                   </div>
@@ -8050,7 +8050,7 @@ function renderUserEditPage(data) {
                         class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-zinc-500/30 dark:outline-zinc-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-500 dark:focus-visible:outline-zinc-400 sm:text-sm/6"
                       >
                         ${data.roles.map((role) => `
-                          <option value="${chunkPGZZPKZL_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunkPGZZPKZL_cjs.escapeHtml(role.label)}</option>
+                          <option value="${chunk2MBNRFS5_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunk2MBNRFS5_cjs.escapeHtml(role.label)}</option>
                         `).join("")}
                       </select>
                       <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-zinc-600 dark:text-zinc-400 sm:size-4">
@@ -8066,7 +8066,7 @@ function renderUserEditPage(data) {
                     name="bio"
                     rows="3"
                     class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-                  >${chunkPGZZPKZL_cjs.escapeHtml(data.userToEdit.bio || "")}</textarea>
+                  >${chunk2MBNRFS5_cjs.escapeHtml(data.userToEdit.bio || "")}</textarea>
                 </div>
               </div>
 
@@ -9065,12 +9065,12 @@ userRoutes.put("/profile", async (c) => {
   const db2 = c.env.DB;
   try {
     const formData = await c.req.formData();
-    const firstName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunk2MBNRFS5_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunk2MBNRFS5_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunk2MBNRFS5_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunk2MBNRFS5_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunk2MBNRFS5_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const timezone = formData.get("timezone")?.toString() || "UTC";
     const language = formData.get("language")?.toString() || "en";
     const emailNotifications = formData.get("email_notifications") === "1";
@@ -9448,12 +9448,12 @@ userRoutes.post("/users/new", async (c) => {
   const user = c.get("user");
   try {
     const formData = await c.req.formData();
-    const firstName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunk2MBNRFS5_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunk2MBNRFS5_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunk2MBNRFS5_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunk2MBNRFS5_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunk2MBNRFS5_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const password = formData.get("password")?.toString() || "";
     const confirmPassword = formData.get("confirm_password")?.toString() || "";
@@ -9654,12 +9654,12 @@ userRoutes.put("/users/:id", async (c) => {
   const userId = c.req.param("id");
   try {
     const formData = await c.req.formData();
-    const firstName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunk2MBNRFS5_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunk2MBNRFS5_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunk2MBNRFS5_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunk2MBNRFS5_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunk2MBNRFS5_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const isActive = formData.get("is_active") === "1";
     const emailVerified = formData.get("email_verified") === "1";
@@ -9842,8 +9842,8 @@ userRoutes.post("/invite-user", async (c) => {
     const formData = await c.req.formData();
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
     const role = formData.get("role")?.toString()?.trim() || "viewer";
-    const firstName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkPGZZPKZL_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const firstName = chunk2MBNRFS5_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunk2MBNRFS5_cjs.sanitizeInput(formData.get("last_name")?.toString());
     if (!email || !firstName || !lastName) {
       return c.json({ error: "Email, first name, and last name are required" }, 400);
     }
@@ -14981,7 +14981,7 @@ adminLogsRoutes.use("*", chunk7EGKU7OO_cjs.requireAuth());
 adminLogsRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
-    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
+    const logger = chunkYP52USGX_cjs.getLogger(c.env.DB);
     const query = c.req.query();
     const page = parseInt(query.page || "1");
     const limit = parseInt(query.limit || "50");
@@ -15061,7 +15061,7 @@ adminLogsRoutes.get("/:id", async (c) => {
   try {
     const id = c.req.param("id");
     const user = c.get("user");
-    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
+    const logger = chunkYP52USGX_cjs.getLogger(c.env.DB);
     const { logs } = await logger.getLogs({
       limit: 1,
       offset: 0,
@@ -15098,7 +15098,7 @@ adminLogsRoutes.get("/:id", async (c) => {
 adminLogsRoutes.get("/config", async (c) => {
   try {
     const user = c.get("user");
-    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
+    const logger = chunkYP52USGX_cjs.getLogger(c.env.DB);
     const configs = await logger.getAllConfigs();
     const pageData = {
       configs,
@@ -15122,7 +15122,7 @@ adminLogsRoutes.post("/config/:category", async (c) => {
     const level = formData.get("level");
     const retention = parseInt(formData.get("retention"));
     const maxSize = parseInt(formData.get("max_size"));
-    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
+    const logger = chunkYP52USGX_cjs.getLogger(c.env.DB);
     await logger.updateConfig(category, {
       enabled,
       level,
@@ -15151,7 +15151,7 @@ adminLogsRoutes.get("/export", async (c) => {
     const category = query.category;
     const startDate = query.start_date;
     const endDate = query.end_date;
-    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
+    const logger = chunkYP52USGX_cjs.getLogger(c.env.DB);
     const filter = {
       limit: 1e4,
       // Export up to 10k logs
@@ -15232,7 +15232,7 @@ adminLogsRoutes.post("/cleanup", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
+    const logger = chunkYP52USGX_cjs.getLogger(c.env.DB);
     await logger.cleanupByRetention();
     return c.html(html.html`
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
@@ -15254,7 +15254,7 @@ adminLogsRoutes.post("/search", async (c) => {
     const search = formData.get("search");
     const level = formData.get("level");
     const category = formData.get("category");
-    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
+    const logger = chunkYP52USGX_cjs.getLogger(c.env.DB);
     const filter = {
       limit: 20,
       offset: 0,
@@ -17305,7 +17305,7 @@ function renderStorageUsage(databaseSizeBytes, mediaSizeBytes) {
 }
 
 // src/routes/admin-dashboard.ts
-var VERSION = chunkPGZZPKZL_cjs.getCoreVersion();
+var VERSION = chunk2MBNRFS5_cjs.getCoreVersion();
 var router = new hono.Hono();
 router.use("*", chunk7EGKU7OO_cjs.requireAuth());
 router.get("/", async (c) => {
@@ -21186,7 +21186,7 @@ adminSettingsRoutes.get("/", (c) => {
 adminSettingsRoutes.get("/general", async (c) => {
   const user = c.get("user");
   const db2 = c.env.DB;
-  const settingsService = new chunkDOR2IU73_cjs.SettingsService(db2);
+  const settingsService = new chunkYP52USGX_cjs.SettingsService(db2);
   const generalSettings = await settingsService.getGeneralSettings(user?.email);
   const mockSettings = getMockSettings(user);
   mockSettings.general = generalSettings;
@@ -21488,7 +21488,7 @@ adminSettingsRoutes.post("/general", async (c) => {
     }
     const formData = await c.req.formData();
     const db2 = c.env.DB;
-    const settingsService = new chunkDOR2IU73_cjs.SettingsService(db2);
+    const settingsService = new chunkYP52USGX_cjs.SettingsService(db2);
     const settings = {
       siteName: formData.get("siteName"),
       siteDescription: formData.get("siteDescription"),
@@ -21576,5 +21576,5 @@ exports.auth_default = auth_default;
 exports.router = router;
 exports.test_cleanup_default = test_cleanup_default;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-4EZXGVYP.cjs.map
-//# sourceMappingURL=chunk-4EZXGVYP.cjs.map
+//# sourceMappingURL=chunk-LPM3NPAX.cjs.map
+//# sourceMappingURL=chunk-LPM3NPAX.cjs.map

@@ -41,6 +41,8 @@ export default defineConfig({
     'hono',
     'drizzle-orm',
     'zod',
+    'crypto',
+    'posthog-node',
   ],
 
   // Configure esbuild to drop unused imports

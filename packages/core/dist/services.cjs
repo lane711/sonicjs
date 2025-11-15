@@ -1,39 +1,56 @@
 'use strict';
 
-var chunkDOR2IU73_cjs = require('./chunk-DOR2IU73.cjs');
+var chunkYP52USGX_cjs = require('./chunk-YP52USGX.cjs');
 var chunk22EFGHAX_cjs = require('./chunk-22EFGHAX.cjs');
 var chunkT7IYBGGO_cjs = require('./chunk-T7IYBGGO.cjs');
+require('./chunk-WBX5YMTB.cjs');
 require('./chunk-IGJUBJBW.cjs');
 
 
 
 Object.defineProperty(exports, "CACHE_CONFIGS", {
   enumerable: true,
-  get: function () { return chunkDOR2IU73_cjs.CACHE_CONFIGS; }
+  get: function () { return chunkYP52USGX_cjs.CACHE_CONFIGS; }
 });
 Object.defineProperty(exports, "CacheService", {
   enumerable: true,
-  get: function () { return chunkDOR2IU73_cjs.CacheService; }
+  get: function () { return chunkYP52USGX_cjs.CacheService; }
 });
 Object.defineProperty(exports, "Logger", {
   enumerable: true,
-  get: function () { return chunkDOR2IU73_cjs.Logger; }
+  get: function () { return chunkYP52USGX_cjs.Logger; }
 });
 Object.defineProperty(exports, "SettingsService", {
   enumerable: true,
-  get: function () { return chunkDOR2IU73_cjs.SettingsService; }
+  get: function () { return chunkYP52USGX_cjs.SettingsService; }
+});
+Object.defineProperty(exports, "TelemetryService", {
+  enumerable: true,
+  get: function () { return chunkYP52USGX_cjs.TelemetryService; }
+});
+Object.defineProperty(exports, "createInstallationIdentity", {
+  enumerable: true,
+  get: function () { return chunkYP52USGX_cjs.createInstallationIdentity; }
 });
 Object.defineProperty(exports, "getCacheService", {
   enumerable: true,
-  get: function () { return chunkDOR2IU73_cjs.getCacheService; }
+  get: function () { return chunkYP52USGX_cjs.getCacheService; }
 });
 Object.defineProperty(exports, "getLogger", {
   enumerable: true,
-  get: function () { return chunkDOR2IU73_cjs.getLogger; }
+  get: function () { return chunkYP52USGX_cjs.getLogger; }
+});
+Object.defineProperty(exports, "getTelemetryService", {
+  enumerable: true,
+  get: function () { return chunkYP52USGX_cjs.getTelemetryService; }
 });
 Object.defineProperty(exports, "initLogger", {
   enumerable: true,
-  get: function () { return chunkDOR2IU73_cjs.initLogger; }
+  get: function () { return chunkYP52USGX_cjs.initLogger; }
+});
+Object.defineProperty(exports, "initTelemetry", {
+  enumerable: true,
+  get: function () { return chunkYP52USGX_cjs.initTelemetry; }
 });
 Object.defineProperty(exports, "PluginBootstrapService", {
   enumerable: true,

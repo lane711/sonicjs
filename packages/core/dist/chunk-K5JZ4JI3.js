@@ -1,5 +1,3 @@
-'use strict';
-
 // src/utils/sanitize.ts
 function escapeHtml(text) {
   if (typeof text !== "string") {
@@ -415,7 +413,7 @@ function buildQuery(table, filter) {
 // package.json
 var package_default = {
   name: "@sonicjs-cms/core",
-  version: "2.0.10",
+  version: "2.1.0",
   description: "Core framework for SonicJS headless CMS - Edge-first, TypeScript-native CMS built for Cloudflare Workers",
   type: "module",
   main: "./dist/index.cjs",
@@ -511,7 +509,8 @@ var package_default = {
     "drizzle-zod": "^0.8.3",
     marked: "^16.4.1",
     "highlight.js": "^11.11.1",
-    semver: "^7.7.3"
+    semver: "^7.7.3",
+    "posthog-node": "^4.0.0"
   },
   devDependencies: {
     "@cloudflare/workers-types": "^4.20251014.0",
@@ -538,16 +537,6 @@ function getCoreVersion() {
   return SONICJS_VERSION;
 }
 
-exports.QueryFilterBuilder = QueryFilterBuilder;
-exports.SONICJS_VERSION = SONICJS_VERSION;
-exports.TemplateRenderer = TemplateRenderer;
-exports.buildQuery = buildQuery;
-exports.escapeHtml = escapeHtml;
-exports.getCoreVersion = getCoreVersion;
-exports.package_default = package_default;
-exports.renderTemplate = renderTemplate;
-exports.sanitizeInput = sanitizeInput;
-exports.sanitizeObject = sanitizeObject;
-exports.templateRenderer = templateRenderer;
-//# sourceMappingURL=chunk-PGZZPKZL.cjs.map
-//# sourceMappingURL=chunk-PGZZPKZL.cjs.map
+export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, package_default, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer };
+//# sourceMappingURL=chunk-K5JZ4JI3.js.map
+//# sourceMappingURL=chunk-K5JZ4JI3.js.map

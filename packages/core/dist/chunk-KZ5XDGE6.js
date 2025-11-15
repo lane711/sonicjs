@@ -1,9 +1,9 @@
-import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-6FR25MPC.js';
+import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-F4K5QAN6.js';
 import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-UJ4K4B23.js';
 import { PluginService } from './chunk-LWMMMW43.js';
 import { MigrationService } from './chunk-ZPMFT2JW.js';
 import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-5RKQB2JG.js';
-import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-4ILPYYDM.js';
+import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-K5JZ4JI3.js';
 import { metricsTracker } from './chunk-FICTAGD4.js';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
@@ -21554,5 +21554,5 @@ var ROUTES_INFO = {
 };
 
 export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, test_cleanup_default, userRoutes };
-//# sourceMappingURL=chunk-H7YGFSC2.js.map
-//# sourceMappingURL=chunk-H7YGFSC2.js.map
+//# sourceMappingURL=chunk-KZ5XDGE6.js.map
+//# sourceMappingURL=chunk-KZ5XDGE6.js.map
