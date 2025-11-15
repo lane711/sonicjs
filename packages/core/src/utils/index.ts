@@ -26,3 +26,18 @@ export { metricsTracker } from './metrics'
 
 // Version Info
 export { SONICJS_VERSION, getCoreVersion } from './version'
+
+// Telemetry Utilities
+export {
+  generateInstallationId,
+  generateProjectId,
+  sanitizeErrorMessage,
+  sanitizeRoute
+} from './telemetry-id'
+
+export {
+  getTelemetryConfig,
+  isTelemetryEnabled,
+  shouldSkipEvent,
+  DEFAULT_TELEMETRY_CONFIG
+} from './telemetry-config'
