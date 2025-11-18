@@ -1,6 +1,6 @@
 # Deployment Guide for SonicJS Documentation
 
-This guide covers deploying the SonicJS documentation site to Cloudflare Workers.
+This guide covers deploying the SonicJS documentation site to Cloudflare.
 
 ## Prerequisites
 
@@ -9,9 +9,17 @@ This guide covers deploying the SonicJS documentation site to Cloudflare Workers
 - Cloudflare account
 - Wrangler CLI (installed as dev dependency)
 
-## Quick Deploy to Cloudflare Workers
+## ⚠️ Current Status (November 2025)
 
-⚠️ **IMPORTANT**: This project uses `@opennextjs/cloudflare` to deploy Next.js to Cloudflare Workers.
+**Important:** As of Next.js 15.5.6, there is a compatibility issue with `@opennextjs/cloudflare` v1.11.0 that prevents deployment to Cloudflare Workers.
+
+**Recommended Solution:** Use **Cloudflare Pages** instead (see below), which has full Next.js 15 support and better integration.
+
+**Status:** The build completes successfully, but the OpenNext bundling phase fails with module resolution errors. This is being tracked in the OpenNext.js project.
+
+## Quick Deploy to Cloudflare Pages (Recommended)
+
+✅ **RECOMMENDED**: Cloudflare Pages has native Next.js 15 support and is the easiest deployment method.
 
 ### 1. Install Dependencies
 
@@ -25,30 +33,29 @@ npm install
 npx wrangler login
 ```
 
-### 3. Deploy
+### 3. Attempt Deploy (Will Fail)
 
 ```bash
-# Build and deploy in one command (RECOMMENDED)
+# This currently fails with OpenNext bundling errors
 npm run deploy
 ```
 
-This will:
-1. Build the Next.js site
-2. Transform it for Cloudflare Workers using OpenNext
-3. Deploy to Cloudflare
+**Known Issue:**
+```
+Error: Could not resolve "./node-environment"
+Error: Could not resolve "./node-polyfill-crypto"
+...multiple module resolution errors...
+```
 
-**What happens:**
-- Creates `.open-next/` directory with Worker-compatible code
-- Deploys via Wrangler
-- Your site will be live at `https://sonicjs-docs.workers.dev`
+**Workaround:** Use Cloudflare Pages (recommended above) until OpenNext.js adds Next.js 15 support.
 
 ## Deployment Commands
 
-| Command | Description |
-|---------|-------------|
-| `npm run preview` | Build and preview locally before deploying |
-| `npm run deploy` | Build and deploy to Cloudflare Workers |
-| `npm run upload` | Alias for deploy command |
+| Command | Description | Status |
+|---------|-------------|--------|
+| `npm run preview` | Build and preview locally before deploying | ✅ Works |
+| `npm run deploy` | Build and deploy to Cloudflare Workers | ❌ Fails (OpenNext issue) |
+| `npm run upload` | Alias for deploy command | ❌ Fails (OpenNext issue) |
 
 ## Configuration Files
 
@@ -80,9 +87,11 @@ The Cloudflare Workers configuration:
 - `.nvmrc` - For nvm users
 - `package.json` engines field - Enforces minimum Node.js version
 
-## Cloudflare Pages Alternative
+## Cloudflare Workers (Legacy - Currently Not Working)
 
-If you prefer Cloudflare Pages over Workers:
+⚠️ **Note:** Cloudflare Workers deployment is currently blocked by OpenNext.js compatibility issues with Next.js 15.5.6.
+
+If you want to attempt Cloudflare Workers deployment:
 
 ### 1. Create Cloudflare Pages Project
 
@@ -174,6 +183,26 @@ npm run deploy
 ```
 
 ## Troubleshooting
+
+### OpenNext.js Bundling Errors (Current Issue)
+
+**Error**: Multiple "Could not resolve" errors during deployment:
+```
+✘ [ERROR] Could not resolve "./node-environment"
+✘ [ERROR] Could not resolve "./node-polyfill-crypto"
+✘ [ERROR] Could not resolve "../shared/lib/utils"
+...
+```
+
+**Cause**: `@opennextjs/cloudflare` v1.11.0 is not compatible with Next.js 15.5.6
+
+**Solution**: Use Cloudflare Pages instead (recommended method above)
+
+**Alternative**: Wait for OpenNext.js update or downgrade to Next.js 14 (not recommended)
+
+**Tracking**: https://github.com/opennextjs/opennextjs-cloudflare/issues
+
+---
 
 ### Node.js Version Error
 
