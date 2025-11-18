@@ -1,4 +1,4 @@
-import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-6FR25MPC.js';
+import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-PUM2T7AF.js';
 import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-UJ4K4B23.js';
 import { PluginService } from './chunk-LWMMMW43.js';
 import { MigrationService } from './chunk-ZPMFT2JW.js';
@@ -21554,5 +21554,5 @@ var ROUTES_INFO = {
 };
 
 export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, test_cleanup_default, userRoutes };
-//# sourceMappingURL=chunk-H7YGFSC2.js.map
-//# sourceMappingURL=chunk-H7YGFSC2.js.map
+//# sourceMappingURL=chunk-6HZT6OGU.js.map
+//# sourceMappingURL=chunk-6HZT6OGU.js.map

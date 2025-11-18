@@ -1,6 +1,6 @@
 'use strict';
 
-var chunkDOR2IU73_cjs = require('./chunk-DOR2IU73.cjs');
+var chunkNORPK4UQ_cjs = require('./chunk-NORPK4UQ.cjs');
 var chunk7EGKU7OO_cjs = require('./chunk-7EGKU7OO.cjs');
 var chunk22EFGHAX_cjs = require('./chunk-22EFGHAX.cjs');
 var chunkT7IYBGGO_cjs = require('./chunk-T7IYBGGO.cjs');
@@ -85,7 +85,7 @@ apiContentCrudRoutes.post("/", chunk7EGKU7OO_cjs.requireAuth(), async (c) => {
       now,
       now
     ).run();
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
+    const cache = chunkNORPK4UQ_cjs.getCacheService(chunkNORPK4UQ_cjs.CACHE_CONFIGS.api);
     await cache.invalidate(`content:list:${collectionId}:*`);
     await cache.invalidate("content-filtered:*");
     const getStmt = db2.prepare("SELECT * FROM content WHERE id = ?");
@@ -148,7 +148,7 @@ apiContentCrudRoutes.put("/:id", chunk7EGKU7OO_cjs.requireAuth(), async (c) => {
       WHERE id = ?
     `);
     await updateStmt.bind(...params).run();
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
+    const cache = chunkNORPK4UQ_cjs.getCacheService(chunkNORPK4UQ_cjs.CACHE_CONFIGS.api);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existing.collection_id}:*`);
     await cache.invalidate("content-filtered:*");
@@ -185,7 +185,7 @@ apiContentCrudRoutes.delete("/:id", chunk7EGKU7OO_cjs.requireAuth(), async (c) =
     }
     const deleteStmt = db2.prepare("DELETE FROM content WHERE id = ?");
     await deleteStmt.bind(id).run();
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
+    const cache = chunkNORPK4UQ_cjs.getCacheService(chunkNORPK4UQ_cjs.CACHE_CONFIGS.api);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existing.collection_id}:*`);
     await cache.invalidate("content-filtered:*");
@@ -258,7 +258,7 @@ apiRoutes.get("/collections", async (c) => {
   try {
     const db2 = c.env.DB;
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
+    const cache = chunkNORPK4UQ_cjs.getCacheService(chunkNORPK4UQ_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("collections", "all");
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -349,7 +349,7 @@ apiRoutes.get("/content", async (c) => {
       }, 400);
     }
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
+    const cache = chunkNORPK4UQ_cjs.getCacheService(chunkNORPK4UQ_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("content-filtered", JSON.stringify({ filter, query: queryResult.sql }));
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -452,7 +452,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
       }, 400);
     }
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.api);
+    const cache = chunkNORPK4UQ_cjs.getCacheService(chunkNORPK4UQ_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("collection-content-filtered", `${collection}:${JSON.stringify({ filter, query: queryResult.sql })}`);
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -2272,7 +2272,7 @@ authRoutes.post("/login", async (c) => {
     const { email, password } = validation.data;
     const db2 = c.env.DB;
     const normalizedEmail = email.toLowerCase();
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.user);
+    const cache = chunkNORPK4UQ_cjs.getCacheService(chunkNORPK4UQ_cjs.CACHE_CONFIGS.user);
     let user = await cache.get(cache.generateKey("user", `email:${normalizedEmail}`));
     if (!user) {
       user = await db2.prepare("SELECT * FROM users WHERE email = ? AND is_active = 1").bind(normalizedEmail).first();
@@ -5927,7 +5927,7 @@ async function isPluginActive2(db2, pluginId) {
 var adminContentRoutes = new hono.Hono();
 adminContentRoutes.use("*", chunk7EGKU7OO_cjs.requireAuth());
 async function getCollectionFields(db2, collectionId) {
-  const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.collection);
+  const cache = chunkNORPK4UQ_cjs.getCacheService(chunkNORPK4UQ_cjs.CACHE_CONFIGS.collection);
   return cache.getOrSet(
     cache.generateKey("fields", collectionId),
     async () => {
@@ -5982,7 +5982,7 @@ async function getCollectionFields(db2, collectionId) {
   );
 }
 async function getCollection(db2, collectionId) {
-  const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.collection);
+  const cache = chunkNORPK4UQ_cjs.getCacheService(chunkNORPK4UQ_cjs.CACHE_CONFIGS.collection);
   return cache.getOrSet(
     cache.generateKey("collection", collectionId),
     async () => {
@@ -6271,7 +6271,7 @@ adminContentRoutes.get("/:id/edit", async (c) => {
     const db2 = c.env.DB;
     const url = new URL(c.req.url);
     const referrerParams = url.searchParams.get("ref") || "";
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.content);
+    const cache = chunkNORPK4UQ_cjs.getCacheService(chunkNORPK4UQ_cjs.CACHE_CONFIGS.content);
     const content = await cache.getOrSet(
       cache.generateKey("content", id),
       async () => {
@@ -6479,7 +6479,7 @@ adminContentRoutes.post("/", async (c) => {
       now,
       now
     ).run();
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.content);
+    const cache = chunkNORPK4UQ_cjs.getCacheService(chunkNORPK4UQ_cjs.CACHE_CONFIGS.content);
     await cache.invalidate(`content:list:${collectionId}:*`);
     const versionStmt = db2.prepare(`
       INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
@@ -6627,7 +6627,7 @@ adminContentRoutes.put("/:id", async (c) => {
       now,
       id
     ).run();
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.content);
+    const cache = chunkNORPK4UQ_cjs.getCacheService(chunkNORPK4UQ_cjs.CACHE_CONFIGS.content);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existingContent.collection_id}:*`);
     const existingData = JSON.parse(existingContent.data || "{}");
@@ -6920,7 +6920,7 @@ adminContentRoutes.post("/bulk-action", async (c) => {
     } else {
       return c.json({ success: false, error: "Invalid action" });
     }
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.content);
+    const cache = chunkNORPK4UQ_cjs.getCacheService(chunkNORPK4UQ_cjs.CACHE_CONFIGS.content);
     for (const contentId of ids) {
       await cache.delete(cache.generateKey("content", contentId));
     }
@@ -6948,7 +6948,7 @@ adminContentRoutes.delete("/:id", async (c) => {
       WHERE id = ?
     `);
     await deleteStmt.bind(now, id).run();
-    const cache = chunkDOR2IU73_cjs.getCacheService(chunkDOR2IU73_cjs.CACHE_CONFIGS.content);
+    const cache = chunkNORPK4UQ_cjs.getCacheService(chunkNORPK4UQ_cjs.CACHE_CONFIGS.content);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate("content:list:*");
     return c.html(`
@@ -14981,7 +14981,7 @@ adminLogsRoutes.use("*", chunk7EGKU7OO_cjs.requireAuth());
 adminLogsRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
-    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
+    const logger = chunkNORPK4UQ_cjs.getLogger(c.env.DB);
     const query = c.req.query();
     const page = parseInt(query.page || "1");
     const limit = parseInt(query.limit || "50");
@@ -15061,7 +15061,7 @@ adminLogsRoutes.get("/:id", async (c) => {
   try {
     const id = c.req.param("id");
     const user = c.get("user");
-    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
+    const logger = chunkNORPK4UQ_cjs.getLogger(c.env.DB);
     const { logs } = await logger.getLogs({
       limit: 1,
       offset: 0,
@@ -15098,7 +15098,7 @@ adminLogsRoutes.get("/:id", async (c) => {
 adminLogsRoutes.get("/config", async (c) => {
   try {
     const user = c.get("user");
-    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
+    const logger = chunkNORPK4UQ_cjs.getLogger(c.env.DB);
     const configs = await logger.getAllConfigs();
     const pageData = {
       configs,
@@ -15122,7 +15122,7 @@ adminLogsRoutes.post("/config/:category", async (c) => {
     const level = formData.get("level");
     const retention = parseInt(formData.get("retention"));
     const maxSize = parseInt(formData.get("max_size"));
-    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
+    const logger = chunkNORPK4UQ_cjs.getLogger(c.env.DB);
     await logger.updateConfig(category, {
       enabled,
       level,
@@ -15151,7 +15151,7 @@ adminLogsRoutes.get("/export", async (c) => {
     const category = query.category;
     const startDate = query.start_date;
     const endDate = query.end_date;
-    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
+    const logger = chunkNORPK4UQ_cjs.getLogger(c.env.DB);
     const filter = {
       limit: 1e4,
       // Export up to 10k logs
@@ -15232,7 +15232,7 @@ adminLogsRoutes.post("/cleanup", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
+    const logger = chunkNORPK4UQ_cjs.getLogger(c.env.DB);
     await logger.cleanupByRetention();
     return c.html(html.html`
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
@@ -15254,7 +15254,7 @@ adminLogsRoutes.post("/search", async (c) => {
     const search = formData.get("search");
     const level = formData.get("level");
     const category = formData.get("category");
-    const logger = chunkDOR2IU73_cjs.getLogger(c.env.DB);
+    const logger = chunkNORPK4UQ_cjs.getLogger(c.env.DB);
     const filter = {
       limit: 20,
       offset: 0,
@@ -21186,7 +21186,7 @@ adminSettingsRoutes.get("/", (c) => {
 adminSettingsRoutes.get("/general", async (c) => {
   const user = c.get("user");
   const db2 = c.env.DB;
-  const settingsService = new chunkDOR2IU73_cjs.SettingsService(db2);
+  const settingsService = new chunkNORPK4UQ_cjs.SettingsService(db2);
   const generalSettings = await settingsService.getGeneralSettings(user?.email);
   const mockSettings = getMockSettings(user);
   mockSettings.general = generalSettings;
@@ -21488,7 +21488,7 @@ adminSettingsRoutes.post("/general", async (c) => {
     }
     const formData = await c.req.formData();
     const db2 = c.env.DB;
-    const settingsService = new chunkDOR2IU73_cjs.SettingsService(db2);
+    const settingsService = new chunkNORPK4UQ_cjs.SettingsService(db2);
     const settings = {
       siteName: formData.get("siteName"),
       siteDescription: formData.get("siteDescription"),
@@ -21576,5 +21576,5 @@ exports.auth_default = auth_default;
 exports.router = router;
 exports.test_cleanup_default = test_cleanup_default;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-4EZXGVYP.cjs.map
-//# sourceMappingURL=chunk-4EZXGVYP.cjs.map
+//# sourceMappingURL=chunk-ZYOO5NA2.cjs.map
+//# sourceMappingURL=chunk-ZYOO5NA2.cjs.map
