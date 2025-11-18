@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin, logout, isAuthenticated, ADMIN_CREDENTIALS } from './utils/test-helpers';
 
-test.describe.skip('Authentication', () => {
+test.describe('Authentication', () => {
   test.beforeEach(async ({ page }) => {
     // Ensure we start logged out
     await logout(page);

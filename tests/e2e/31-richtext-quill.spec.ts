@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin, navigateToAdminSection } from './utils/test-helpers';
 
-test.describe.skip('Rich Text Editor (Quill)', () => {
+test.describe('Rich Text Editor (Quill)', () => {
   // Activate plugin before all tests
   test.beforeAll(async ({ request }) => {
     // Install and activate Quill plugin via API

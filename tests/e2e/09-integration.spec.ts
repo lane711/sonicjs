@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin, navigateToAdminSection, createTestCollection, deleteTestCollection, TEST_DATA } from './utils/test-helpers';
 
-test.describe.skip('Full Integration Workflows', () => {
+test.describe('Full Integration Workflows', () => {
   test('should complete full collection and content workflow', async ({ page }) => {
     await loginAsAdmin(page);
     

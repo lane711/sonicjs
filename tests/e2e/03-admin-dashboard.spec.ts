@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { loginAsAdmin, navigateToAdminSection } from './utils/test-helpers';
 import corePackageJson from '../../packages/core/package.json';
 
-test.describe.skip('Admin Dashboard', () => {
+test.describe('Admin Dashboard', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
   });
