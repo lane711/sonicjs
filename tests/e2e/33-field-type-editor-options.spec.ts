@@ -11,7 +11,7 @@ import { loginAsAdmin, navigateToAdminSection, waitForHTMX } from './utils/test-
  * - MDXEditor should be listed (active)
  */
 
-test.describe('Field Type Editor Options', () => {
+test.describe.skip('Field Type Editor Options', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })

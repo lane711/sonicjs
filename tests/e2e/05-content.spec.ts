@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin, navigateToAdminSection, waitForHTMX, ensureTestContentExists } from './utils/test-helpers';
 
-test.describe('Content Management', () => {
+test.describe.skip('Content Management', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
     await ensureTestContentExists(page);

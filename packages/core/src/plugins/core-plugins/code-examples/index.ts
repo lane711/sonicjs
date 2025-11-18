@@ -151,7 +151,7 @@ codeExampleAPIRoutes.post('/', async (c) => {
       return c.json({
         success: false,
         error: 'Validation failed',
-        details: error.errors
+        details: error.issues
       }, 400)
     }
 
@@ -236,7 +236,7 @@ codeExampleAPIRoutes.put('/:id', async (c) => {
       return c.json({
         success: false,
         error: 'Validation failed',
-        details: error.errors
+        details: error.issues
       }, 400)
     }
 

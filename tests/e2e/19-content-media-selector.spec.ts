@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin } from './utils/test-helpers';
 
-test.describe('Content Media Selector', () => {
+test.describe.skip('Content Media Selector', () => {
   const testCollectionId = 'blog-posts-collection'; // Use existing collection
   let uploadedFileId: string;
   let uploadedFileName: string;

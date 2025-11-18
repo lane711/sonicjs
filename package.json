@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "npm run dev --workspace=my-sonicjs-app",
     "dev:www": "npm run dev --workspace=www",
+    "build": "npm run build:core && npm run build --workspace=my-sonicjs-app",
     "build:www": "npm run build --workspace=www",
     "build:core": "npm run build --workspace=@sonicjs-cms/core",
     "deploy": "npm run deploy --workspace=my-sonicjs-app",

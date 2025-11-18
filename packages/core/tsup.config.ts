@@ -59,7 +59,7 @@ export default defineConfig({
 
   // Target environment
   target: 'es2022',
-  platform: 'neutral',
+  platform: 'node',
 
   // Output extension
   outExtension({ format }) {

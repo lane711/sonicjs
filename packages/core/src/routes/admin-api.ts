@@ -342,7 +342,7 @@ adminApiRoutes.post('/collections', async (c) => {
 
       const validation = createCollectionSchema.safeParse(body)
       if (!validation.success) {
-        return c.json({ error: 'Validation failed', details: validation.error.errors }, 400)
+        return c.json({ error: 'Validation failed', details: validation.error.issues }, 400)
       }
       const validatedData = validation.data
       const db = c.env.DB
@@ -433,7 +433,7 @@ adminApiRoutes.patch('/collections/:id', async (c) => {
       const body = await c.req.json()
       const validation = updateCollectionSchema.safeParse(body)
       if (!validation.success) {
-        return c.json({ error: 'Validation failed', details: validation.error.errors }, 400)
+        return c.json({ error: 'Validation failed', details: validation.error.issues }, 400)
       }
       const validatedData = validation.data
       const db = c.env.DB

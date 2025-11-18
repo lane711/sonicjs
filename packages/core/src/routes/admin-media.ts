@@ -460,7 +460,7 @@ adminMediaRoutes.post('/upload', async (c) => {
         }
 
         // Generate unique filename and R2 key
-        const fileId = globalThis.crypto.randomUUID()
+        const fileId = crypto.randomUUID()
         const fileExtension = file.name.split('.').pop() || ''
         const filename = `${fileId}.${fileExtension}`
         const folder = formData.get('folder') as string || 'uploads'
