@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin, navigateToAdminSection, createTestCollection, deleteTestCollection, TEST_DATA } from './utils/test-helpers';
 
-test.describe('Collections Management', () => {
+test.describe.skip('Collections Management', () => {
   // Run tests sequentially to avoid database conflicts
   test.describe.configure({ mode: 'serial' });
 

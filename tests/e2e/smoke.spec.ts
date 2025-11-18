@@ -79,7 +79,7 @@ test.describe('Smoke Tests - Critical Path', () => {
 
   test('Collections API is accessible and returns data', async ({ request }) => {
     // Use public API endpoint which doesn't require auth
-    const response = await request.get('http://localhost:8787/api/collections');
+    const response = await request.get('/api/collections');
     expect(response.ok()).toBeTruthy();
 
     const collectionsData = await response.json();
@@ -96,7 +96,7 @@ test.describe('Smoke Tests - Critical Path', () => {
     const testTitle = `Smoke Test Content ${timestamp}`;
 
     // Create content using the create endpoint which handles auth automatically
-    const createResponse = await context.request.post('http://localhost:8787/api/content/create', {
+    const createResponse = await context.request.post('/api/content/create', {
       data: {
         collectionName: 'blog_posts', // Use a collection that should exist
         title: testTitle,
@@ -120,15 +120,15 @@ test.describe('Smoke Tests - Critical Path', () => {
     const contentId = created.id;
 
     // Retrieve content (public endpoint, no auth needed)
-    const getResponse = await context.request.get(`http://localhost:8787/api/content/${contentId}`);
+    const getResponse = await context.request.get(`/api/content/${contentId}`);
     expect(getResponse.ok()).toBeTruthy();
 
     // Delete content (requires auth)
-    const deleteResponse = await context.request.delete(`http://localhost:8787/api/content/${contentId}`);
+    const deleteResponse = await context.request.delete(`/api/content/${contentId}`);
     expect(deleteResponse.ok()).toBeTruthy();
 
     // Verify deletion
-    const checkResponse = await context.request.get(`http://localhost:8787/api/content/${contentId}`);
+    const checkResponse = await context.request.get(`/api/content/${contentId}`);
     expect(checkResponse.status()).toBe(404);
   });
 
@@ -159,7 +159,7 @@ test.describe('Smoke Tests - Critical Path', () => {
     formData.append('files', blob, `smoke-test-${timestamp}.jpg`);
     formData.append('folder', 'test');
 
-    const uploadResponse = await context.request.post('http://localhost:8787/api/media/upload-multiple', {
+    const uploadResponse = await context.request.post('/api/media/upload-multiple', {
       multipart: formData
     });
 
@@ -171,7 +171,7 @@ test.describe('Smoke Tests - Critical Path', () => {
 
     // Cleanup - delete the uploaded file
     const fileId = result.uploaded[0].id;
-    const deleteResponse = await context.request.post('http://localhost:8787/api/media/bulk-delete', {
+    const deleteResponse = await context.request.post('/api/media/bulk-delete', {
       data: { fileIds: [fileId] }
     });
 

@@ -9,6 +9,7 @@
     "dev:build": "cd ../packages/core && npm run build",
     "dev:watch": "npm run dev:core & wrangler dev 2>&1 | grep -v '\\[wrangler:inf\\]'",
     "dev:core": "cd ../packages/core && npm run dev",
+    "build": "echo 'Worker build is handled by wrangler during deployment'",
     "deploy": "wrangler deploy",
     "db:migrate": "wrangler d1 migrations apply DB",
     "db:migrate:local": "wrangler d1 migrations apply DB --local",

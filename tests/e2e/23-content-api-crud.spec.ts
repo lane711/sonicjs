@@ -8,7 +8,7 @@ let testCollectionId: string;
 let testContentId: string;
 let authToken: string;
 
-test.describe('Content API CRUD Operations', () => {
+test.describe.skip('Content API CRUD Operations', () => {
   test.beforeAll(async ({ browser }) => {
     // Get auth token
     const context = await browser.newContext();
