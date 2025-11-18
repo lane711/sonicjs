@@ -20,6 +20,7 @@ import {
   useState,
 } from 'react'
 import Highlighter from 'react-highlight-words'
+import type { ComponentType } from 'react'
 
 import { navigation } from '@/components/Navigation'
 import { type Result } from '@/mdx/search.mjs'
@@ -144,8 +145,9 @@ function LoadingIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
 }
 
 function HighlightQuery({ text, query }: { text: string; query: string }) {
+  const HighlighterComponent = Highlighter as ComponentType<any>
   return (
-    <Highlighter
+    <HighlighterComponent
       highlightClassName="underline bg-transparent text-emerald-500"
       searchWords={[query]}
       autoEscape={true}
