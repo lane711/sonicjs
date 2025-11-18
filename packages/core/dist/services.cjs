@@ -1,39 +1,56 @@
 'use strict';
 
-var chunkNORPK4UQ_cjs = require('./chunk-NORPK4UQ.cjs');
+var chunk3F4LF7LW_cjs = require('./chunk-3F4LF7LW.cjs');
 var chunk22EFGHAX_cjs = require('./chunk-22EFGHAX.cjs');
 var chunkT7IYBGGO_cjs = require('./chunk-T7IYBGGO.cjs');
+require('./chunk-3OKKNBPD.cjs');
 require('./chunk-IGJUBJBW.cjs');
 
 
 
 Object.defineProperty(exports, "CACHE_CONFIGS", {
   enumerable: true,
-  get: function () { return chunkNORPK4UQ_cjs.CACHE_CONFIGS; }
+  get: function () { return chunk3F4LF7LW_cjs.CACHE_CONFIGS; }
 });
 Object.defineProperty(exports, "CacheService", {
   enumerable: true,
-  get: function () { return chunkNORPK4UQ_cjs.CacheService; }
+  get: function () { return chunk3F4LF7LW_cjs.CacheService; }
 });
 Object.defineProperty(exports, "Logger", {
   enumerable: true,
-  get: function () { return chunkNORPK4UQ_cjs.Logger; }
+  get: function () { return chunk3F4LF7LW_cjs.Logger; }
 });
 Object.defineProperty(exports, "SettingsService", {
   enumerable: true,
-  get: function () { return chunkNORPK4UQ_cjs.SettingsService; }
+  get: function () { return chunk3F4LF7LW_cjs.SettingsService; }
+});
+Object.defineProperty(exports, "TelemetryService", {
+  enumerable: true,
+  get: function () { return chunk3F4LF7LW_cjs.TelemetryService; }
+});
+Object.defineProperty(exports, "createInstallationIdentity", {
+  enumerable: true,
+  get: function () { return chunk3F4LF7LW_cjs.createInstallationIdentity; }
 });
 Object.defineProperty(exports, "getCacheService", {
   enumerable: true,
-  get: function () { return chunkNORPK4UQ_cjs.getCacheService; }
+  get: function () { return chunk3F4LF7LW_cjs.getCacheService; }
 });
 Object.defineProperty(exports, "getLogger", {
   enumerable: true,
-  get: function () { return chunkNORPK4UQ_cjs.getLogger; }
+  get: function () { return chunk3F4LF7LW_cjs.getLogger; }
+});
+Object.defineProperty(exports, "getTelemetryService", {
+  enumerable: true,
+  get: function () { return chunk3F4LF7LW_cjs.getTelemetryService; }
 });
 Object.defineProperty(exports, "initLogger", {
   enumerable: true,
-  get: function () { return chunkNORPK4UQ_cjs.initLogger; }
+  get: function () { return chunk3F4LF7LW_cjs.initLogger; }
+});
+Object.defineProperty(exports, "initTelemetry", {
+  enumerable: true,
+  get: function () { return chunk3F4LF7LW_cjs.initTelemetry; }
 });
 Object.defineProperty(exports, "PluginBootstrapService", {
   enumerable: true,

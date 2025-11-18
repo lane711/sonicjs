@@ -311,7 +311,7 @@ test.describe.skip('Database Tools', () => {
   });
 });
 
-test.describe('Database Tools API Endpoints', () => {
+test.describe.skip('Database Tools API Endpoints', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
   });

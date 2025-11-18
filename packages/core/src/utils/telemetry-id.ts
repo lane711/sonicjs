@@ -4,7 +4,7 @@
  * Generates and manages anonymous installation IDs
  */
 
-import { randomUUID } from 'crypto'
+import { randomUUID } from 'node:crypto'
 
 /**
  * Generate a new anonymous installation ID

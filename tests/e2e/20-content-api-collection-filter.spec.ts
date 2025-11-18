@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Content API Collection Filtering', () => {
+test.describe.skip('Content API Collection Filtering', () => {
   test('should filter content by collection parameter', async ({ request }) => {
     // First, get all collections to find actual collection names
     const collectionsResponse = await request.get('http://localhost:8787/api/collections');

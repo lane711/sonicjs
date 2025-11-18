@@ -1,4 +1,4 @@
-export { HookSystemImpl, HookUtils, PluginManager, PluginRegistryImpl, PluginValidator, ScopedHookSystem } from './chunk-7HBEA7JK.js';
+export { HookSystemImpl, HookUtils, PluginManager, PluginRegistryImpl, PluginValidator, ScopedHookSystem } from './chunk-CPXAVWCU.js';
 import './chunk-LOUJRBXV.js';
 import './chunk-V4OQ3NZ2.js';
 //# sourceMappingURL=plugins.js.map
