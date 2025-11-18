@@ -42,3 +42,11 @@ export type { CacheConfig } from './cache'
 // Settings Service
 export { SettingsService } from './settings'
 export type { Setting, GeneralSettings } from './settings'
+
+// Telemetry Service
+export {
+  TelemetryService,
+  getTelemetryService,
+  initTelemetry,
+  createInstallationIdentity
+} from './telemetry-service'

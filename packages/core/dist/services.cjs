@@ -1,7 +1,7 @@
 'use strict';
 
-var chunkNORPK4UQ_cjs = require('./chunk-NORPK4UQ.cjs');
-var chunk22EFGHAX_cjs = require('./chunk-22EFGHAX.cjs');
+var chunkDOR2IU73_cjs = require('./chunk-DOR2IU73.cjs');
+var chunkAMSTLQFI_cjs = require('./chunk-AMSTLQFI.cjs');
 var chunkT7IYBGGO_cjs = require('./chunk-T7IYBGGO.cjs');
 require('./chunk-IGJUBJBW.cjs');
 
@@ -9,83 +9,83 @@ require('./chunk-IGJUBJBW.cjs');
 
 Object.defineProperty(exports, "CACHE_CONFIGS", {
   enumerable: true,
-  get: function () { return chunkNORPK4UQ_cjs.CACHE_CONFIGS; }
+  get: function () { return chunkDOR2IU73_cjs.CACHE_CONFIGS; }
 });
 Object.defineProperty(exports, "CacheService", {
   enumerable: true,
-  get: function () { return chunkNORPK4UQ_cjs.CacheService; }
+  get: function () { return chunkDOR2IU73_cjs.CacheService; }
 });
 Object.defineProperty(exports, "Logger", {
   enumerable: true,
-  get: function () { return chunkNORPK4UQ_cjs.Logger; }
+  get: function () { return chunkDOR2IU73_cjs.Logger; }
 });
 Object.defineProperty(exports, "SettingsService", {
   enumerable: true,
-  get: function () { return chunkNORPK4UQ_cjs.SettingsService; }
+  get: function () { return chunkDOR2IU73_cjs.SettingsService; }
 });
 Object.defineProperty(exports, "getCacheService", {
   enumerable: true,
-  get: function () { return chunkNORPK4UQ_cjs.getCacheService; }
+  get: function () { return chunkDOR2IU73_cjs.getCacheService; }
 });
 Object.defineProperty(exports, "getLogger", {
   enumerable: true,
-  get: function () { return chunkNORPK4UQ_cjs.getLogger; }
+  get: function () { return chunkDOR2IU73_cjs.getLogger; }
 });
 Object.defineProperty(exports, "initLogger", {
   enumerable: true,
-  get: function () { return chunkNORPK4UQ_cjs.initLogger; }
+  get: function () { return chunkDOR2IU73_cjs.initLogger; }
 });
 Object.defineProperty(exports, "PluginBootstrapService", {
   enumerable: true,
-  get: function () { return chunk22EFGHAX_cjs.PluginBootstrapService; }
+  get: function () { return chunkAMSTLQFI_cjs.PluginBootstrapService; }
 });
 Object.defineProperty(exports, "PluginService", {
   enumerable: true,
-  get: function () { return chunk22EFGHAX_cjs.PluginService; }
+  get: function () { return chunkAMSTLQFI_cjs.PluginService; }
 });
 Object.defineProperty(exports, "cleanupRemovedCollections", {
   enumerable: true,
-  get: function () { return chunk22EFGHAX_cjs.cleanupRemovedCollections; }
+  get: function () { return chunkAMSTLQFI_cjs.cleanupRemovedCollections; }
 });
 Object.defineProperty(exports, "fullCollectionSync", {
   enumerable: true,
-  get: function () { return chunk22EFGHAX_cjs.fullCollectionSync; }
+  get: function () { return chunkAMSTLQFI_cjs.fullCollectionSync; }
 });
 Object.defineProperty(exports, "getAvailableCollectionNames", {
   enumerable: true,
-  get: function () { return chunk22EFGHAX_cjs.getAvailableCollectionNames; }
+  get: function () { return chunkAMSTLQFI_cjs.getAvailableCollectionNames; }
 });
 Object.defineProperty(exports, "getManagedCollections", {
   enumerable: true,
-  get: function () { return chunk22EFGHAX_cjs.getManagedCollections; }
+  get: function () { return chunkAMSTLQFI_cjs.getManagedCollections; }
 });
 Object.defineProperty(exports, "isCollectionManaged", {
   enumerable: true,
-  get: function () { return chunk22EFGHAX_cjs.isCollectionManaged; }
+  get: function () { return chunkAMSTLQFI_cjs.isCollectionManaged; }
 });
 Object.defineProperty(exports, "loadCollectionConfig", {
   enumerable: true,
-  get: function () { return chunk22EFGHAX_cjs.loadCollectionConfig; }
+  get: function () { return chunkAMSTLQFI_cjs.loadCollectionConfig; }
 });
 Object.defineProperty(exports, "loadCollectionConfigs", {
   enumerable: true,
-  get: function () { return chunk22EFGHAX_cjs.loadCollectionConfigs; }
+  get: function () { return chunkAMSTLQFI_cjs.loadCollectionConfigs; }
 });
 Object.defineProperty(exports, "registerCollections", {
   enumerable: true,
-  get: function () { return chunk22EFGHAX_cjs.registerCollections; }
+  get: function () { return chunkAMSTLQFI_cjs.registerCollections; }
 });
 Object.defineProperty(exports, "syncCollection", {
   enumerable: true,
-  get: function () { return chunk22EFGHAX_cjs.syncCollection; }
+  get: function () { return chunkAMSTLQFI_cjs.syncCollection; }
 });
 Object.defineProperty(exports, "syncCollections", {
   enumerable: true,
-  get: function () { return chunk22EFGHAX_cjs.syncCollections; }
+  get: function () { return chunkAMSTLQFI_cjs.syncCollections; }
 });
 Object.defineProperty(exports, "validateCollectionConfig", {
   enumerable: true,
-  get: function () { return chunk22EFGHAX_cjs.validateCollectionConfig; }
+  get: function () { return chunkAMSTLQFI_cjs.validateCollectionConfig; }
 });
 Object.defineProperty(exports, "MigrationService", {
   enumerable: true,

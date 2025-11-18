@@ -1,35 +1,387 @@
 export const metadata = {
-  title: 'Plugin System Overview',
-  description: 'Learn about the SonicJS plugin architecture and ecosystem',
+  title: 'Plugin System - SonicJS',
+  description: 'Extend SonicJS with plugins for authentication, rich text editing, email, and more. Learn about core and community plugins.',
 }
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Core Plugins', id: 'core-plugins' },
+  { title: 'Authentication Plugins', id: 'authentication-plugins' },
+  { title: 'Editor Plugins', id: 'editor-plugins' },
+  { title: 'Utility Plugins', id: 'utility-plugins' },
+  { title: 'Plugin Management', id: 'plugin-management' },
+]
 
 # Plugin System
 
-## Coming Soon
+Extend SonicJS functionality with a powerful plugin architecture. Install, configure, and manage plugins through the admin interface. {{ className: 'lead' }}
 
-This page is currently under construction. We're working on comprehensive documentation about the SonicJS plugin system.
+---
 
-### What to Expect
+## Overview
 
-- **Plugin architecture** - How the plugin system works
-- **Core vs custom plugins** - Understanding plugin types
-- **Plugin lifecycle** - Plugin initialization and execution
-- **Available plugins** - Overview of core and community plugins
-- **Plugin configuration** - How to configure and enable plugins
+SonicJS plugins provide modular functionality that can be enabled or disabled without modifying core code.
 
-### Explore Plugin Documentation
+**Plugin Types:**
 
-While this overview page is being developed, check out our detailed plugin documentation:
+- **Core Plugins** - Built-in plugins installed with SonicJS
+- **Authentication Plugins** - Passwordless login, OTP, magic links
+- **Editor Plugins** - Rich text and markdown editors
+- **Utility Plugins** - Email, workflows, database tools
 
-- [Plugin Development Guide](/plugins/development) - Create your own plugins
-- [Core Plugins](/plugins/core) - Built-in plugins reference
+**Key Features:**
 
-### In the Meantime
+<FeatureGrid
+  features={[
+    {
+      icon: '🔌',
+      title: 'Hot-Swappable',
+      description: 'Enable or disable plugins without restarting the server',
+    },
+    {
+      icon: '⚙️',
+      title: 'Configurable',
+      description: 'Each plugin has its own settings and configuration',
+    },
+    {
+      icon: '🔒',
+      title: 'Isolated',
+      description: 'Plugins run in isolation and cannot break core functionality',
+    },
+    {
+      icon: '📦',
+      title: 'Packaged',
+      description: 'Self-contained with routes, templates, and migrations',
+    },
+  ]}
+  columns={2}
+/>
 
-Check out our other documentation sections:
+---
 
-- [Architecture](/architecture) - Understand the overall system
-- [Database](/database) - Data persistence layer
-- [Routing & Middleware](/routing) - Request handling
+## Core Plugins
 
-For immediate help, visit our [Community](/community) page or check the [FAQ](/faq).
+These plugins are included with every SonicJS installation and provide essential functionality.
+
+### Database Tools Plugin
+
+**Status:** Active by default
+**Version:** 1.0.0
+
+View and manage your database directly from the admin interface.
+
+**Features:**
+- Browse all database tables
+- Execute SQL queries
+- View table schemas
+- Export data
+
+**Access:** Navigate to **Admin** → **Tools** → **Database**
+
+---
+
+### Email Plugin
+
+**Status:** Core plugin (requires configuration)
+**Version:** 1.0.0-beta.1
+
+Send transactional emails via Resend, SendGrid, or other email services.
+
+**Features:**
+- Email template management
+- Test email functionality
+- Settings persistence
+- Multiple provider support (Resend, SendGrid, SMTP)
+
+**Configuration:**
+
+1. Navigate to **Admin** → **Plugins** → **Email Plugin**
+2. Configure your email provider:
+   - **Resend**: Add your API key
+   - **SendGrid**: Add your API key
+   - **SMTP**: Configure server settings
+3. Test with "Send Test Email" button
+
+**Required for:**
+- OTP Login Plugin
+- Magic Link Authentication
+- Password reset emails
+
+---
+
+### Seed Data Plugin
+
+**Status:** Active by default
+**Version:** 1.0.0
+
+Generate sample data for testing and development.
+
+**Features:**
+- Create demo users
+- Generate sample content
+- Populate media library
+- Configurable data size
+
+**Access:** **Admin** → **Tools** → **Seed Data**
+
+---
+
+### Demo Login Plugin
+
+**Status:** Active in development only
+**Version:** 1.0.0
+
+Auto-fills admin credentials on login screen for faster development.
+
+**Default Credentials:**
+- Email: admin@sonicjs.com
+- Password: sonicjs!
+
+<Callout type="warning">
+This plugin is **automatically disabled in production** for security.
+</Callout>
+
+---
+
+## Authentication Plugins
+
+Extend authentication with passwordless login methods.
+
+### OTP Login Plugin
+
+**Status:** Inactive by default
+**Version:** 1.0.0-beta.1
+
+One-time password authentication via email.
+
+**Features:**
+- Configurable OTP code length (4-8 digits)
+- Code expiration (5-60 minutes, default: 10)
+- Rate limiting (default: 5 codes per hour)
+- Max verification attempts (default: 3)
+- Optional new user registration
+
+**Database Migration:** `021_add_otp_login.sql`
+
+**Installation:**
+
+1. Navigate to **Admin** → **Plugins**
+2. Find **OTP Login** plugin
+3. Click **Activate**
+4. Configure settings
+5. Ensure **Email Plugin** is configured
+
+**Usage:** See [Authentication - OTP Login](/authentication#passwordless-authentication)
+
+---
+
+### Magic Link Authentication
+
+**Status:** Inactive by default
+**Version:** 1.0.0-beta.1
+
+Passwordless login via email magic links.
+
+**Features:**
+- One-click email authentication
+- No password required
+- Secure token-based links
+- Optional user registration
+
+**Installation:**
+
+1. Navigate to **Admin** → **Plugins**
+2. Find **Magic Link Auth** plugin
+3. Click **Activate**
+4. Ensure **Email Plugin** is configured
+
+**Usage:** See [Authentication - Magic Link](/authentication#passwordless-authentication)
+
+---
+
+## Editor Plugins
+
+Rich text and markdown editing plugins for content fields.
+
+### EasyMDE Plugin (Markdown)
+
+**Status:** Active by default
+**Version:** 1.0.0
+**Plugin ID:** `easy-mdx`
+
+Modern markdown editor with live preview and dark mode support.
+
+**Features:**
+- Markdown editing with toolbar
+- Live preview pane
+- Dark mode styling
+- Working CDN support via unpkg
+- Keyboard shortcuts
+
+**Field Type:** `easymde` or `markdown`
+
+**Replaced:** MDXEditor plugin (due to CDN issues)
+
+**Configuration:**
+```javascript
+{
+  fieldType: 'easymde',
+  label: 'Content',
+  required: true
+}
+```
+
+---
+
+### TinyMCE Plugin
+
+**Status:** Inactive by default
+**Version:** 1.0.0-beta.1
+
+Full-featured WYSIWYG rich text editor.
+
+**Features:**
+- Complete rich text editing
+- Image upload integration
+- Table support
+- Custom toolbar configuration
+- Extensive formatting options
+
+**Database Migration:** `022_add_tinymce_plugin.sql`
+
+**Installation:**
+
+1. Navigate to **Admin** → **Plugins**
+2. Find **TinyMCE** plugin
+3. Click **Activate**
+
+**Field Type:** `tinymce`
+
+---
+
+### Quill Editor Plugin
+
+**Status:** Inactive by default
+**Version:** 1.0.0
+**Plugin ID:** `quill-editor`
+
+Modern, lightweight rich text editor.
+
+**Features:**
+- Clean, minimal interface
+- Mobile-friendly
+- Customizable toolbar
+- Fast performance
+- Module-based architecture
+
+**Database Migration:** `024_add_quill_editor_plugin.sql`
+
+**Installation:**
+
+1. Navigate to **Admin** → **Plugins**
+2. Find **Quill Editor** plugin
+3. Click **Activate**
+
+**Field Type:** `quill`
+
+---
+
+## Utility Plugins
+
+Additional functionality and workflow automation.
+
+### Workflow Plugin
+
+**Status:** Core plugin
+**Version:** 1.0.0
+
+Automate content workflows and approvals.
+
+**Features:**
+- Content approval workflows
+- Multi-step processes
+- Automated actions
+- Notification triggers
+
+**Access:** **Admin** → **Workflows**
+
+---
+
+## Plugin Management
+
+### Activating Plugins
+
+1. Navigate to **Admin** → **Plugins**
+2. Browse available plugins
+3. Click **Activate** on desired plugin
+4. Configure plugin settings (if applicable)
+5. Plugin is immediately available
+
+### Deactivating Plugins
+
+1. Navigate to **Admin** → **Plugins**
+2. Find active plugin
+3. Click **Deactivate**
+4. Plugin features are disabled (data is preserved)
+
+### Plugin Settings
+
+Each plugin can have custom settings:
+
+1. Navigate to **Admin** → **Plugins**
+2. Click plugin name or **Settings** button
+3. Configure options
+4. Click **Save**
+
+**Plugin Settings Persistence:**
+- Settings are stored in database
+- Survive server restarts
+- Can be exported/imported
+
+---
+
+## Editor Selection Guide
+
+When choosing a rich text editor plugin, consider:
+
+| Editor | Best For | Size | Learning Curve |
+|--------|----------|------|----------------|
+| **EasyMDE** | Markdown content, developers | Small | Low |
+| **Quill** | Clean UI, mobile apps | Medium | Medium |
+| **TinyMCE** | Full-featured editing, complex formatting | Large | Medium |
+
+**Fallback Behavior:**
+- If no editor plugin is active, fields use plain textarea
+- Content is preserved when switching editors
+- Each editor stores content in compatible formats
+
+---
+
+## Next Steps
+
+<div className="not-prose my-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
+  <div className="group relative rounded-xl border border-zinc-950/10 dark:border-white/10">
+    <div className="absolute -inset-px rounded-xl border-2 border-transparent opacity-0 [background:linear-gradient(var(--quick-links-hover-bg,theme(colors.sky.50)),var(--quick-links-hover-bg,theme(colors.sky.50)))_padding-box,linear-gradient(to_top,theme(colors.indigo.400),theme(colors.cyan.400),theme(colors.sky.500))_border-box] group-hover:opacity-100 dark:[--quick-links-hover-bg:theme(colors.zinc.800)]" />
+    <div className="relative overflow-hidden rounded-xl p-6">
+      <h3 className="font-semibold text-zinc-900 dark:text-white">
+        <a href="/plugins/development">
+          <span className="absolute -inset-px rounded-xl" />
+          Plugin Development
+        </a>
+      </h3>
+      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Create your own custom plugins</p>
+    </div>
+  </div>
+  <div className="group relative rounded-xl border border-zinc-950/10 dark:border-white/10">
+    <div className="absolute -inset-px rounded-xl border-2 border-transparent opacity-0 [background:linear-gradient(var(--quick-links-hover-bg,theme(colors.sky.50)),var(--quick-links-hover-bg,theme(colors.sky.50)))_padding-box,linear-gradient(to_top,theme(colors.indigo.400),theme(colors.cyan.400),theme(colors.sky.500))_border-box] group-hover:opacity-100 dark:[--quick-links-hover-bg:theme(colors.zinc.800)]" />
+    <div className="relative overflow-hidden rounded-xl p-6">
+      <h3 className="font-semibold text-zinc-900 dark:text-white">
+        <a href="/plugins/core">
+          <span className="absolute -inset-px rounded-xl" />
+          Core Plugins Reference
+        </a>
+      </h3>
+      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Detailed documentation for built-in plugins</p>
+    </div>
+  </div>
+</div>
