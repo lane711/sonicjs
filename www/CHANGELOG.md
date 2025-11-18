@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Known Issues
+- Cloudflare Workers deployment blocked by OpenNext.js v1.11.0 compatibility with Next.js 15.5.6
+- Recommended workaround: Use Cloudflare Pages for deployment
+
 ## [2.0.10] - 2025-11-14
 
 ### Added
