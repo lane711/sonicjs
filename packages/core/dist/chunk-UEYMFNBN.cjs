@@ -1,6 +1,6 @@
 'use strict';
 
-var chunk22EFGHAX_cjs = require('./chunk-22EFGHAX.cjs');
+var chunkHV2I6API_cjs = require('./chunk-HV2I6API.cjs');
 var chunkT7IYBGGO_cjs = require('./chunk-T7IYBGGO.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 var jwt = require('hono/jwt');
@@ -24,13 +24,13 @@ function bootstrapMiddleware(config = {}) {
       await migrationService.runPendingMigrations();
       console.log("[Bootstrap] Syncing collection configurations...");
       try {
-        await chunk22EFGHAX_cjs.syncCollections(c.env.DB);
+        await chunkHV2I6API_cjs.syncCollections(c.env.DB);
       } catch (error) {
         console.error("[Bootstrap] Error syncing collections:", error);
       }
       if (!config.plugins?.disableAll) {
         console.log("[Bootstrap] Bootstrapping core plugins...");
-        const bootstrapService = new chunk22EFGHAX_cjs.PluginBootstrapService(c.env.DB);
+        const bootstrapService = new chunkHV2I6API_cjs.PluginBootstrapService(c.env.DB);
         const needsBootstrap = await bootstrapService.isBootstrapNeeded();
         if (needsBootstrap) {
           await bootstrapService.bootstrapCorePlugins();
@@ -200,6 +200,33 @@ var metricsMiddleware = () => {
   };
 };
 
+// src/middleware/telemetry.ts
+var telemetryService = null;
+var isInitialized = false;
+async function initializeTelemetry() {
+  if (isInitialized) return;
+  try {
+    const identity = chunkHV2I6API_cjs.createInstallationIdentity();
+    telemetryService = chunkHV2I6API_cjs.getTelemetryService();
+    await telemetryService.initialize(identity);
+    await telemetryService.trackDevServerStarted({
+      timestamp: (/* @__PURE__ */ new Date()).toISOString()
+    });
+    isInitialized = true;
+  } catch (error) {
+    console.error("[Telemetry] Initialization failed:", error);
+  }
+}
+async function telemetryMiddleware(c, next) {
+  if (!isInitialized) {
+    await initializeTelemetry();
+  }
+  await next();
+}
+function getTelemetry() {
+  return telemetryService;
+}
+
 // src/middleware/index.ts
 var loggingMiddleware = () => async (_c, next) => await next();
 var detailedLoggingMiddleware = () => async (_c, next) => await next();
@@ -225,6 +252,7 @@ exports.cacheHeaders = cacheHeaders;
 exports.compressionMiddleware = compressionMiddleware;
 exports.detailedLoggingMiddleware = detailedLoggingMiddleware;
 exports.getActivePlugins = getActivePlugins;
+exports.getTelemetry = getTelemetry;
 exports.isPluginActive = isPluginActive;
 exports.logActivity = logActivity;
 exports.loggingMiddleware = loggingMiddleware;
@@ -239,5 +267,6 @@ exports.requirePermission = requirePermission;
 exports.requireRole = requireRole;
 exports.securityHeaders = securityHeaders;
 exports.securityLoggingMiddleware = securityLoggingMiddleware;
-//# sourceMappingURL=chunk-7EGKU7OO.cjs.map
-//# sourceMappingURL=chunk-7EGKU7OO.cjs.map
+exports.telemetryMiddleware = telemetryMiddleware;
+//# sourceMappingURL=chunk-UEYMFNBN.cjs.map
+//# sourceMappingURL=chunk-UEYMFNBN.cjs.map

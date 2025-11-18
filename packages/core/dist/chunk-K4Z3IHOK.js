@@ -1,3 +1,5 @@
+import { getTelemetryConfig, sanitizeErrorMessage, sanitizeRoute, generateInstallationId, generateProjectId } from './chunk-NMVOTNSL.js';
+
 // src/services/collection-loader.ts
 var registeredCollections = [];
 function registerCollections(collections) {
@@ -782,6 +784,248 @@ var PluginBootstrapService = class {
   }
 };
 
-export { PluginBootstrapService, PluginService, cleanupRemovedCollections, fullCollectionSync, getAvailableCollectionNames, getManagedCollections, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, registerCollections, syncCollection, syncCollections, validateCollectionConfig };
-//# sourceMappingURL=chunk-LWMMMW43.js.map
-//# sourceMappingURL=chunk-LWMMMW43.js.map
+// src/services/telemetry-service.ts
+var TelemetryService = class {
+  config;
+  identity = null;
+  client = null;
+  enabled = true;
+  eventQueue = [];
+  isInitialized = false;
+  constructor(config) {
+    this.config = {
+      ...getTelemetryConfig(),
+      ...config
+    };
+    this.enabled = this.config.enabled;
+  }
+  /**
+   * Initialize the telemetry service
+   */
+  async initialize(identity) {
+    if (!this.enabled) {
+      if (this.config.debug) {
+        console.log("[Telemetry] Disabled via configuration");
+      }
+      return;
+    }
+    try {
+      this.identity = identity;
+      if (this.config.apiKey) {
+        const { PostHog } = await import('posthog-node');
+        this.client = new PostHog(this.config.apiKey, {
+          host: this.config.host,
+          flushAt: 20,
+          // Batch events
+          flushInterval: 1e4
+          // Flush every 10 seconds
+        });
+        if (this.config.debug) {
+          console.log("[Telemetry] Initialized with installation ID:", identity.installationId);
+        }
+      } else if (this.config.debug) {
+        console.log("[Telemetry] No API key provided, tracking will be logged only");
+      }
+      this.isInitialized = true;
+      await this.flushQueue();
+    } catch (error) {
+      if (this.config.debug) {
+        console.error("[Telemetry] Initialization failed:", error);
+      }
+      this.enabled = false;
+    }
+  }
+  /**
+   * Track a telemetry event
+   */
+  async track(event, properties) {
+    if (!this.enabled) return;
+    try {
+      const sanitizedProps = this.sanitizeProperties(properties);
+      const enrichedProps = {
+        ...sanitizedProps,
+        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+        version: this.getVersion()
+      };
+      if (!this.isInitialized) {
+        this.eventQueue.push({ event, properties: enrichedProps });
+        if (this.config.debug) {
+          console.log("[Telemetry] Queued event:", event, enrichedProps);
+        }
+        return;
+      }
+      if (this.client && this.identity) {
+        this.client.capture({
+          distinctId: this.identity.installationId,
+          event,
+          properties: enrichedProps
+        });
+        if (this.config.debug) {
+          console.log("[Telemetry] Tracked event:", event, enrichedProps);
+        }
+      } else if (this.config.debug) {
+        console.log("[Telemetry] Event (no client):", event, enrichedProps);
+      }
+    } catch (error) {
+      if (this.config.debug) {
+        console.error("[Telemetry] Failed to track event:", error);
+      }
+    }
+  }
+  /**
+   * Track installation started
+   */
+  async trackInstallationStarted(properties) {
+    await this.track("installation_started", properties);
+  }
+  /**
+   * Track installation completed
+   */
+  async trackInstallationCompleted(properties) {
+    await this.track("installation_completed", properties);
+  }
+  /**
+   * Track installation failed
+   */
+  async trackInstallationFailed(error, properties) {
+    await this.track("installation_failed", {
+      ...properties,
+      errorType: sanitizeErrorMessage(error)
+    });
+  }
+  /**
+   * Track dev server started
+   */
+  async trackDevServerStarted(properties) {
+    await this.track("dev_server_started", properties);
+  }
+  /**
+   * Track page view in admin UI
+   */
+  async trackPageView(route, properties) {
+    await this.track("page_viewed", {
+      ...properties,
+      route: sanitizeRoute(route)
+    });
+  }
+  /**
+   * Track error (sanitized)
+   */
+  async trackError(error, properties) {
+    await this.track("error_occurred", {
+      ...properties,
+      errorType: sanitizeErrorMessage(error)
+    });
+  }
+  /**
+   * Track plugin activation
+   */
+  async trackPluginActivated(properties) {
+    await this.track("plugin_activated", properties);
+  }
+  /**
+   * Track migration run
+   */
+  async trackMigrationRun(properties) {
+    await this.track("migration_run", properties);
+  }
+  /**
+   * Flush queued events
+   */
+  async flushQueue() {
+    if (this.eventQueue.length === 0) return;
+    const queue = [...this.eventQueue];
+    this.eventQueue = [];
+    for (const { event, properties } of queue) {
+      await this.track(event, properties);
+    }
+  }
+  /**
+   * Sanitize properties to ensure no PII
+   */
+  sanitizeProperties(properties) {
+    if (!properties) return {};
+    const sanitized = {};
+    for (const [key, value] of Object.entries(properties)) {
+      if (value === void 0) continue;
+      if (key === "route" && typeof value === "string") {
+        sanitized[key] = sanitizeRoute(value);
+        continue;
+      }
+      if (key.toLowerCase().includes("error") && typeof value === "string") {
+        sanitized[key] = sanitizeErrorMessage(value);
+        continue;
+      }
+      if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+        sanitized[key] = value;
+      }
+    }
+    return sanitized;
+  }
+  /**
+   * Get SonicJS version
+   */
+  getVersion() {
+    try {
+      return process.env.SONICJS_VERSION || "2.0.0";
+    } catch {
+      return "unknown";
+    }
+  }
+  /**
+   * Shutdown the telemetry service
+   */
+  async shutdown() {
+    try {
+      if (this.client) {
+        await this.client.shutdown();
+      }
+    } catch (error) {
+      if (this.config.debug) {
+        console.error("[Telemetry] Shutdown failed:", error);
+      }
+    }
+  }
+  /**
+   * Enable telemetry
+   */
+  enable() {
+    this.enabled = true;
+  }
+  /**
+   * Disable telemetry
+   */
+  disable() {
+    this.enabled = false;
+  }
+  /**
+   * Check if telemetry is enabled
+   */
+  isEnabled() {
+    return this.enabled;
+  }
+};
+var telemetryInstance = null;
+function getTelemetryService(config) {
+  if (!telemetryInstance) {
+    telemetryInstance = new TelemetryService(config);
+  }
+  return telemetryInstance;
+}
+async function initTelemetry(identity, config) {
+  const service = getTelemetryService(config);
+  await service.initialize(identity);
+  return service;
+}
+function createInstallationIdentity(projectName) {
+  const installationId = generateInstallationId();
+  const identity = { installationId };
+  if (projectName) {
+    identity.projectId = generateProjectId(projectName);
+  }
+  return identity;
+}
+
+export { PluginBootstrapService, PluginService, TelemetryService, cleanupRemovedCollections, createInstallationIdentity, fullCollectionSync, getAvailableCollectionNames, getManagedCollections, getTelemetryService, initTelemetry, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, registerCollections, syncCollection, syncCollections, validateCollectionConfig };
+//# sourceMappingURL=chunk-K4Z3IHOK.js.map
+//# sourceMappingURL=chunk-K4Z3IHOK.js.map

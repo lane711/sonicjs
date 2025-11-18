@@ -1,4 +1,4 @@
-import { syncCollections, PluginBootstrapService } from './chunk-LWMMMW43.js';
+import { syncCollections, PluginBootstrapService, createInstallationIdentity, getTelemetryService } from './chunk-K4Z3IHOK.js';
 import { MigrationService } from './chunk-ZPMFT2JW.js';
 import { metricsTracker } from './chunk-FICTAGD4.js';
 import { sign, verify } from 'hono/jwt';
@@ -198,6 +198,33 @@ var metricsMiddleware = () => {
   };
 };
 
+// src/middleware/telemetry.ts
+var telemetryService = null;
+var isInitialized = false;
+async function initializeTelemetry() {
+  if (isInitialized) return;
+  try {
+    const identity = createInstallationIdentity();
+    telemetryService = getTelemetryService();
+    await telemetryService.initialize(identity);
+    await telemetryService.trackDevServerStarted({
+      timestamp: (/* @__PURE__ */ new Date()).toISOString()
+    });
+    isInitialized = true;
+  } catch (error) {
+    console.error("[Telemetry] Initialization failed:", error);
+  }
+}
+async function telemetryMiddleware(c, next) {
+  if (!isInitialized) {
+    await initializeTelemetry();
+  }
+  await next();
+}
+function getTelemetry() {
+  return telemetryService;
+}
+
 // src/middleware/index.ts
 var loggingMiddleware = () => async (_c, next) => await next();
 var detailedLoggingMiddleware = () => async (_c, next) => await next();
@@ -216,6 +243,6 @@ var requireActivePlugins = () => async (_c, next) => await next();
 var getActivePlugins = () => [];
 var isPluginActive = () => false;
 
-export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, metricsMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware };
-//# sourceMappingURL=chunk-UJ4K4B23.js.map
-//# sourceMappingURL=chunk-UJ4K4B23.js.map
+export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, getTelemetry, isPluginActive, logActivity, loggingMiddleware, metricsMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware, telemetryMiddleware };
+//# sourceMappingURL=chunk-OORGXYDA.js.map
+//# sourceMappingURL=chunk-OORGXYDA.js.map

@@ -50,6 +50,11 @@ export {
   // Plugin Services - Class implementations
   PluginService as PluginServiceClass,
   PluginBootstrapService,
+  // Telemetry Services
+  TelemetryService,
+  getTelemetryService,
+  initTelemetry,
+  createInstallationIdentity,
 } from './services'
 
 export type { Migration, MigrationStatus, LogLevel, LogCategory, LogEntry, LogFilter, CorePlugin } from './services'
@@ -82,6 +87,9 @@ export {
   isPluginActive,
   // Bootstrap
   bootstrapMiddleware,
+  // Telemetry
+  telemetryMiddleware,
+  getTelemetry,
 } from './middleware'
 
 export type { Permission, UserPermissions } from './middleware'
@@ -193,6 +201,11 @@ export type {
   HookName,
   // Plugin manifest
   PluginManifest,
+  // Telemetry types
+  TelemetryEvent,
+  TelemetryProperties,
+  TelemetryConfig,
+  TelemetryIdentity,
 } from './types'
 
 export { HOOKS } from './types'
