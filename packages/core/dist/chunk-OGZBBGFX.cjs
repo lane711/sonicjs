@@ -511,7 +511,8 @@ var package_default = {
     "drizzle-zod": "^0.8.3",
     marked: "^16.4.1",
     "highlight.js": "^11.11.1",
-    semver: "^7.7.3"
+    semver: "^7.7.3",
+    "posthog-node": "^4.0.0"
   },
   devDependencies: {
     "@cloudflare/workers-types": "^4.20251014.0",
@@ -549,5 +550,5 @@ exports.renderTemplate = renderTemplate;
 exports.sanitizeInput = sanitizeInput;
 exports.sanitizeObject = sanitizeObject;
 exports.templateRenderer = templateRenderer;
-//# sourceMappingURL=chunk-PGZZPKZL.cjs.map
-//# sourceMappingURL=chunk-PGZZPKZL.cjs.map
+//# sourceMappingURL=chunk-OGZBBGFX.cjs.map
+//# sourceMappingURL=chunk-OGZBBGFX.cjs.map

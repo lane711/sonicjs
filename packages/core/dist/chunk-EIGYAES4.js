@@ -1,9 +1,9 @@
-import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-6FR25MPC.js';
-import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-FYWJMETG.js';
-import { PluginService } from './chunk-I5ZPYKNX.js';
+import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-GMI2NZE7.js';
+import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-UJ4K4B23.js';
+import { PluginService } from './chunk-LWMMMW43.js';
 import { MigrationService } from './chunk-ZPMFT2JW.js';
 import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-5RKQB2JG.js';
-import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-4ILPYYDM.js';
+import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-HBSI25OP.js';
 import { metricsTracker } from './chunk-FICTAGD4.js';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
@@ -17,8 +17,8 @@ var apiContentCrudRoutes = new Hono();
 apiContentCrudRoutes.get("/:id", async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
-    const stmt = db.prepare("SELECT * FROM content WHERE id = ?");
+    const db2 = c.env.DB;
+    const stmt = db2.prepare("SELECT * FROM content WHERE id = ?");
     const content = await stmt.bind(id).first();
     if (!content) {
       return c.json({ error: "Content not found" }, 404);
@@ -44,7 +44,7 @@ apiContentCrudRoutes.get("/:id", async (c) => {
 });
 apiContentCrudRoutes.post("/", requireAuth(), async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const user = c.get("user");
     const body = await c.req.json();
     const { collectionId, title, slug, status, data } = body;
@@ -56,7 +56,7 @@ apiContentCrudRoutes.post("/", requireAuth(), async (c) => {
     }
     let finalSlug = slug || title;
     finalSlug = finalSlug.toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
-    const duplicateCheck = db.prepare(
+    const duplicateCheck = db2.prepare(
       "SELECT id FROM content WHERE collection_id = ? AND slug = ?"
     );
     const existing = await duplicateCheck.bind(collectionId, finalSlug).first();
@@ -65,7 +65,7 @@ apiContentCrudRoutes.post("/", requireAuth(), async (c) => {
     }
     const contentId = crypto.randomUUID();
     const now = Date.now();
-    const insertStmt = db.prepare(`
+    const insertStmt = db2.prepare(`
       INSERT INTO content (
         id, collection_id, slug, title, data, status,
         author_id, created_at, updated_at
@@ -86,7 +86,7 @@ apiContentCrudRoutes.post("/", requireAuth(), async (c) => {
     const cache = getCacheService(CACHE_CONFIGS.api);
     await cache.invalidate(`content:list:${collectionId}:*`);
     await cache.invalidate("content-filtered:*");
-    const getStmt = db.prepare("SELECT * FROM content WHERE id = ?");
+    const getStmt = db2.prepare("SELECT * FROM content WHERE id = ?");
     const createdContent = await getStmt.bind(contentId).first();
     return c.json({
       data: {
@@ -111,9 +111,9 @@ apiContentCrudRoutes.post("/", requireAuth(), async (c) => {
 apiContentCrudRoutes.put("/:id", requireAuth(), async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const body = await c.req.json();
-    const existingStmt = db.prepare("SELECT * FROM content WHERE id = ?");
+    const existingStmt = db2.prepare("SELECT * FROM content WHERE id = ?");
     const existing = await existingStmt.bind(id).first();
     if (!existing) {
       return c.json({ error: "Content not found" }, 404);
@@ -141,7 +141,7 @@ apiContentCrudRoutes.put("/:id", requireAuth(), async (c) => {
     updates.push("updated_at = ?");
     params.push(now);
     params.push(id);
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE content SET ${updates.join(", ")}
       WHERE id = ?
     `);
@@ -150,7 +150,7 @@ apiContentCrudRoutes.put("/:id", requireAuth(), async (c) => {
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existing.collection_id}:*`);
     await cache.invalidate("content-filtered:*");
-    const getStmt = db.prepare("SELECT * FROM content WHERE id = ?");
+    const getStmt = db2.prepare("SELECT * FROM content WHERE id = ?");
     const updatedContent = await getStmt.bind(id).first();
     return c.json({
       data: {
@@ -175,13 +175,13 @@ apiContentCrudRoutes.put("/:id", requireAuth(), async (c) => {
 apiContentCrudRoutes.delete("/:id", requireAuth(), async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
-    const existingStmt = db.prepare("SELECT collection_id FROM content WHERE id = ?");
+    const db2 = c.env.DB;
+    const existingStmt = db2.prepare("SELECT collection_id FROM content WHERE id = ?");
     const existing = await existingStmt.bind(id).first();
     if (!existing) {
       return c.json({ error: "Content not found" }, 404);
     }
-    const deleteStmt = db.prepare("DELETE FROM content WHERE id = ?");
+    const deleteStmt = db2.prepare("DELETE FROM content WHERE id = ?");
     await deleteStmt.bind(id).run();
     const cache = getCacheService(CACHE_CONFIGS.api);
     await cache.delete(cache.generateKey("content", id));
@@ -254,7 +254,7 @@ apiRoutes.get("/health", (c) => {
 apiRoutes.get("/collections", async (c) => {
   const executionStart = Date.now();
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const cacheEnabled = c.get("cacheEnabled");
     const cache = getCacheService(CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("collections", "all");
@@ -282,7 +282,7 @@ apiRoutes.get("/collections", async (c) => {
     }
     c.header("X-Cache-Status", "MISS");
     c.header("X-Cache-Source", "database");
-    const stmt = db.prepare("SELECT * FROM collections WHERE is_active = 1");
+    const stmt = db2.prepare("SELECT * FROM collections WHERE is_active = 1");
     const { results } = await stmt.all();
     const transformedResults = results.map((row) => ({
       ...row,
@@ -313,11 +313,11 @@ apiRoutes.get("/collections", async (c) => {
 apiRoutes.get("/content", async (c) => {
   const executionStart = Date.now();
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const queryParams = c.req.query();
     if (queryParams.collection) {
       const collectionName = queryParams.collection;
-      const collectionStmt = db.prepare("SELECT id FROM collections WHERE name = ? AND is_active = 1");
+      const collectionStmt = db2.prepare("SELECT id FROM collections WHERE name = ? AND is_active = 1");
       const collectionResult = await collectionStmt.bind(collectionName).first();
       if (collectionResult) {
         queryParams.collection_id = collectionResult.id;
@@ -373,7 +373,7 @@ apiRoutes.get("/content", async (c) => {
     }
     c.header("X-Cache-Status", "MISS");
     c.header("X-Cache-Source", "database");
-    const stmt = db.prepare(queryResult.sql);
+    const stmt = db2.prepare(queryResult.sql);
     const boundStmt = queryResult.params.length > 0 ? stmt.bind(...queryResult.params) : stmt;
     const { results } = await boundStmt.all();
     const transformedResults = results.map((row) => ({
@@ -418,9 +418,9 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
   const executionStart = Date.now();
   try {
     const collection = c.req.param("collection");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const queryParams = c.req.query();
-    const collectionStmt = db.prepare("SELECT * FROM collections WHERE name = ? AND is_active = 1");
+    const collectionStmt = db2.prepare("SELECT * FROM collections WHERE name = ? AND is_active = 1");
     const collectionResult = await collectionStmt.bind(collection).first();
     if (!collectionResult) {
       return c.json({ error: "Collection not found" }, 404);
@@ -476,7 +476,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
     }
     c.header("X-Cache-Status", "MISS");
     c.header("X-Cache-Source", "database");
-    const stmt = db.prepare(queryResult.sql);
+    const stmt = db2.prepare(queryResult.sql);
     const boundStmt = queryResult.params.length > 0 ? stmt.bind(...queryResult.params) : stmt;
     const { results } = await boundStmt.all();
     const transformedResults = results.map((row) => ({
@@ -1240,20 +1240,20 @@ apiSystemRoutes.get("/info", (c) => {
 });
 apiSystemRoutes.get("/stats", async (c) => {
   try {
-    const db = c.env.DB;
-    const contentStats = await db.prepare(`
+    const db2 = c.env.DB;
+    const contentStats = await db2.prepare(`
       SELECT COUNT(*) as total_content
       FROM content
       WHERE deleted_at IS NULL
     `).first();
-    const mediaStats = await db.prepare(`
+    const mediaStats = await db2.prepare(`
       SELECT
         COUNT(*) as total_files,
         SUM(size) as total_size
       FROM media
       WHERE deleted_at IS NULL
     `).first();
-    const userStats = await db.prepare(`
+    const userStats = await db2.prepare(`
       SELECT COUNT(*) as total_users
       FROM users
     `).first();
@@ -1314,10 +1314,10 @@ adminApiRoutes.use("*", requireAuth());
 adminApiRoutes.use("*", requireRole(["admin", "editor"]));
 adminApiRoutes.get("/stats", async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     let collectionsCount = 0;
     try {
-      const collectionsStmt = db.prepare("SELECT COUNT(*) as count FROM collections WHERE is_active = 1");
+      const collectionsStmt = db2.prepare("SELECT COUNT(*) as count FROM collections WHERE is_active = 1");
       const collectionsResult = await collectionsStmt.first();
       collectionsCount = collectionsResult?.count || 0;
     } catch (error) {
@@ -1325,7 +1325,7 @@ adminApiRoutes.get("/stats", async (c) => {
     }
     let contentCount = 0;
     try {
-      const contentStmt = db.prepare("SELECT COUNT(*) as count FROM content WHERE deleted_at IS NULL");
+      const contentStmt = db2.prepare("SELECT COUNT(*) as count FROM content WHERE deleted_at IS NULL");
       const contentResult = await contentStmt.first();
       contentCount = contentResult?.count || 0;
     } catch (error) {
@@ -1334,7 +1334,7 @@ adminApiRoutes.get("/stats", async (c) => {
     let mediaCount = 0;
     let mediaSize = 0;
     try {
-      const mediaStmt = db.prepare("SELECT COUNT(*) as count, COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL");
+      const mediaStmt = db2.prepare("SELECT COUNT(*) as count, COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL");
       const mediaResult = await mediaStmt.first();
       mediaCount = mediaResult?.count || 0;
       mediaSize = mediaResult?.total_size || 0;
@@ -1343,7 +1343,7 @@ adminApiRoutes.get("/stats", async (c) => {
     }
     let usersCount = 0;
     try {
-      const usersStmt = db.prepare("SELECT COUNT(*) as count FROM users WHERE is_active = 1");
+      const usersStmt = db2.prepare("SELECT COUNT(*) as count FROM users WHERE is_active = 1");
       const usersResult = await usersStmt.first();
       usersCount = usersResult?.count || 0;
     } catch (error) {
@@ -1364,17 +1364,17 @@ adminApiRoutes.get("/stats", async (c) => {
 });
 adminApiRoutes.get("/storage", async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     let databaseSize = 0;
     try {
-      const result = await db.prepare("SELECT 1").run();
+      const result = await db2.prepare("SELECT 1").run();
       databaseSize = result?.meta?.size_after || 0;
     } catch (error) {
       console.error("Error fetching database size:", error);
     }
     let mediaSize = 0;
     try {
-      const mediaStmt = db.prepare("SELECT COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL");
+      const mediaStmt = db2.prepare("SELECT COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL");
       const mediaResult = await mediaStmt.first();
       mediaSize = mediaResult?.total_size || 0;
     } catch (error) {
@@ -1393,9 +1393,9 @@ adminApiRoutes.get("/storage", async (c) => {
 });
 adminApiRoutes.get("/activity", async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const limit = parseInt(c.req.query("limit") || "10");
-    const activityStmt = db.prepare(`
+    const activityStmt = db2.prepare(`
       SELECT
         a.id,
         a.action,
@@ -1457,13 +1457,13 @@ var updateCollectionSchema = z.object({
 });
 adminApiRoutes.get("/collections", async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const search = c.req.query("search") || "";
     const includeInactive = c.req.query("includeInactive") === "true";
     let stmt;
     let results;
     if (search) {
-      stmt = db.prepare(`
+      stmt = db2.prepare(`
         SELECT id, name, display_name, description, created_at, updated_at, is_active, managed
         FROM collections
         WHERE ${includeInactive ? "1=1" : "is_active = 1"}
@@ -1474,7 +1474,7 @@ adminApiRoutes.get("/collections", async (c) => {
       const queryResults = await stmt.bind(searchParam, searchParam, searchParam).all();
       results = queryResults.results;
     } else {
-      stmt = db.prepare(`
+      stmt = db2.prepare(`
         SELECT id, name, display_name, description, created_at, updated_at, is_active, managed
         FROM collections
         ${includeInactive ? "" : "WHERE is_active = 1"}
@@ -1483,7 +1483,7 @@ adminApiRoutes.get("/collections", async (c) => {
       const queryResults = await stmt.all();
       results = queryResults.results;
     }
-    const fieldCountStmt = db.prepare("SELECT collection_id, COUNT(*) as count FROM content_fields GROUP BY collection_id");
+    const fieldCountStmt = db2.prepare("SELECT collection_id, COUNT(*) as count FROM content_fields GROUP BY collection_id");
     const { results: fieldCountResults } = await fieldCountStmt.all();
     const fieldCounts = new Map((fieldCountResults || []).map((row) => [String(row.collection_id), Number(row.count)]));
     const collections = (results || []).map((row) => ({
@@ -1510,13 +1510,13 @@ adminApiRoutes.get("/collections", async (c) => {
 adminApiRoutes.get("/collections/:id", async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
-    const stmt = db.prepare("SELECT * FROM collections WHERE id = ?");
+    const db2 = c.env.DB;
+    const stmt = db2.prepare("SELECT * FROM collections WHERE id = ?");
     const collection = await stmt.bind(id).first();
     if (!collection) {
       return c.json({ error: "Collection not found" }, 404);
     }
-    const fieldsStmt = db.prepare(`
+    const fieldsStmt = db2.prepare(`
       SELECT * FROM content_fields
       WHERE collection_id = ?
       ORDER BY field_order ASC
@@ -1565,13 +1565,13 @@ adminApiRoutes.post("/collections", async (c) => {
     }
     const validation = createCollectionSchema.safeParse(body);
     if (!validation.success) {
-      return c.json({ error: "Validation failed", details: validation.error.errors }, 400);
+      return c.json({ error: "Validation failed", details: validation.error.issues }, 400);
     }
     const validatedData = validation.data;
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const ____user = c.get("user");
     const displayName = validatedData.displayName || validatedData.display_name || "";
-    const existingStmt = db.prepare("SELECT id FROM collections WHERE name = ?");
+    const existingStmt = db2.prepare("SELECT id FROM collections WHERE name = ?");
     const existing = await existingStmt.bind(validatedData.name).first();
     if (existing) {
       return c.json({ error: "A collection with this name already exists" }, 400);
@@ -1600,7 +1600,7 @@ adminApiRoutes.post("/collections", async (c) => {
     };
     const collectionId = crypto.randomUUID();
     const now = Date.now();
-    const insertStmt = db.prepare(`
+    const insertStmt = db2.prepare(`
         INSERT INTO collections (id, name, display_name, description, schema, is_active, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `);
@@ -1639,11 +1639,11 @@ adminApiRoutes.patch("/collections/:id", async (c) => {
     const body = await c.req.json();
     const validation = updateCollectionSchema.safeParse(body);
     if (!validation.success) {
-      return c.json({ error: "Validation failed", details: validation.error.errors }, 400);
+      return c.json({ error: "Validation failed", details: validation.error.issues }, 400);
     }
     const validatedData = validation.data;
-    const db = c.env.DB;
-    const checkStmt = db.prepare("SELECT * FROM collections WHERE id = ?");
+    const db2 = c.env.DB;
+    const checkStmt = db2.prepare("SELECT * FROM collections WHERE id = ?");
     const existing = await checkStmt.bind(id).first();
     if (!existing) {
       return c.json({ error: "Collection not found" }, 404);
@@ -1668,7 +1668,7 @@ adminApiRoutes.patch("/collections/:id", async (c) => {
     updateFields.push("updated_at = ?");
     updateParams.push(Date.now());
     updateParams.push(id);
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
         UPDATE collections
         SET ${updateFields.join(", ")}
         WHERE id = ?
@@ -1689,22 +1689,22 @@ adminApiRoutes.patch("/collections/:id", async (c) => {
 adminApiRoutes.delete("/collections/:id", async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
-    const collectionStmt = db.prepare("SELECT name FROM collections WHERE id = ?");
+    const db2 = c.env.DB;
+    const collectionStmt = db2.prepare("SELECT name FROM collections WHERE id = ?");
     const collection = await collectionStmt.bind(id).first();
     if (!collection) {
       return c.json({ error: "Collection not found" }, 404);
     }
-    const contentStmt = db.prepare("SELECT COUNT(*) as count FROM content WHERE collection_id = ?");
+    const contentStmt = db2.prepare("SELECT COUNT(*) as count FROM content WHERE collection_id = ?");
     const contentResult = await contentStmt.bind(id).first();
     if (contentResult && contentResult.count > 0) {
       return c.json({
         error: `Cannot delete collection: it contains ${contentResult.count} content item(s). Delete all content first.`
       }, 400);
     }
-    const deleteFieldsStmt = db.prepare("DELETE FROM content_fields WHERE collection_id = ?");
+    const deleteFieldsStmt = db2.prepare("DELETE FROM content_fields WHERE collection_id = ?");
     await deleteFieldsStmt.bind(id).run();
-    const deleteStmt = db.prepare("DELETE FROM collections WHERE id = ?");
+    const deleteStmt = db2.prepare("DELETE FROM collections WHERE id = ?");
     await deleteStmt.bind(id).run();
     try {
       await c.env.CACHE_KV.delete("cache:collections:all");
@@ -1721,8 +1721,8 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
 adminApiRoutes.get("/migrations/status", async (c) => {
   try {
     const { MigrationService: MigrationService2 } = await import('./migrations-IHERIQVD.js');
-    const db = c.env.DB;
-    const migrationService = new MigrationService2(db);
+    const db2 = c.env.DB;
+    const migrationService = new MigrationService2(db2);
     const status = await migrationService.getMigrationStatus();
     return c.json({
       success: true,
@@ -1746,8 +1746,8 @@ adminApiRoutes.post("/migrations/run", async (c) => {
       }, 403);
     }
     const { MigrationService: MigrationService2 } = await import('./migrations-IHERIQVD.js');
-    const db = c.env.DB;
-    const migrationService = new MigrationService2(db);
+    const db2 = c.env.DB;
+    const migrationService = new MigrationService2(db2);
     const result = await migrationService.runPendingMigrations();
     return c.json({
       success: result.success,
@@ -1765,8 +1765,8 @@ adminApiRoutes.post("/migrations/run", async (c) => {
 adminApiRoutes.get("/migrations/validate", async (c) => {
   try {
     const { MigrationService: MigrationService2 } = await import('./migrations-IHERIQVD.js');
-    const db = c.env.DB;
-    const migrationService = new MigrationService2(db);
+    const db2 = c.env.DB;
+    const migrationService = new MigrationService2(db2);
     const validation = await migrationService.validateSchema();
     return c.json({
       success: true,
@@ -2158,10 +2158,10 @@ authRoutes.get("/login", async (c) => {
     message: message || void 0,
     version: c.get("appVersion")
   };
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   let demoLoginActive = false;
   try {
-    const plugin = await db.prepare("SELECT * FROM plugins WHERE id = ? AND status = ?").bind("demo-login-prefill", "active").first();
+    const plugin = await db2.prepare("SELECT * FROM plugins WHERE id = ? AND status = ?").bind("demo-login-prefill", "active").first();
     demoLoginActive = !!plugin;
   } catch (error2) {
   }
@@ -2182,21 +2182,21 @@ authRoutes.post(
   "/register",
   async (c) => {
     try {
-      const db = c.env.DB;
+      const db2 = c.env.DB;
       let requestData;
       try {
         requestData = await c.req.json();
       } catch (parseError) {
         return c.json({ error: "Invalid JSON in request body" }, 400);
       }
-      const validationSchema = await authValidationService.buildRegistrationSchema(db);
+      const validationSchema = await authValidationService.buildRegistrationSchema(db2);
       let validatedData;
       try {
         validatedData = await validationSchema.parseAsync(requestData);
       } catch (validationError) {
         return c.json({
           error: "Validation failed",
-          details: validationError.errors?.map((e) => e.message) || [validationError.message || "Invalid request data"]
+          details: validationError.issues?.map((e) => e.message) || [validationError.message || "Invalid request data"]
         }, 400);
       }
       const email = validatedData.email;
@@ -2205,14 +2205,14 @@ authRoutes.post(
       const firstName = validatedData.firstName || authValidationService.generateDefaultValue("firstName", validatedData);
       const lastName = validatedData.lastName || authValidationService.generateDefaultValue("lastName", validatedData);
       const normalizedEmail = email.toLowerCase();
-      const existingUser = await db.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind(normalizedEmail, username).first();
+      const existingUser = await db2.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind(normalizedEmail, username).first();
       if (existingUser) {
         return c.json({ error: "User with this email or username already exists" }, 400);
       }
       const passwordHash = await AuthManager.hashPassword(password);
       const userId = crypto.randomUUID();
       const now = /* @__PURE__ */ new Date();
-      await db.prepare(`
+      await db2.prepare(`
         INSERT INTO users (id, email, username, first_name, last_name, password_hash, role, is_active, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
@@ -2265,15 +2265,15 @@ authRoutes.post("/login", async (c) => {
     const body = await c.req.json();
     const validation = loginSchema.safeParse(body);
     if (!validation.success) {
-      return c.json({ error: "Validation failed", details: validation.error.errors }, 400);
+      return c.json({ error: "Validation failed", details: validation.error.issues }, 400);
     }
     const { email, password } = validation.data;
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const normalizedEmail = email.toLowerCase();
     const cache = getCacheService(CACHE_CONFIGS.user);
     let user = await cache.get(cache.generateKey("user", `email:${normalizedEmail}`));
     if (!user) {
-      user = await db.prepare("SELECT * FROM users WHERE email = ? AND is_active = 1").bind(normalizedEmail).first();
+      user = await db2.prepare("SELECT * FROM users WHERE email = ? AND is_active = 1").bind(normalizedEmail).first();
       if (user) {
         await cache.set(cache.generateKey("user", `email:${normalizedEmail}`), user);
         await cache.set(cache.generateKey("user", user.id), user);
@@ -2294,7 +2294,7 @@ authRoutes.post("/login", async (c) => {
       maxAge: 60 * 60 * 24
       // 24 hours
     });
-    await db.prepare("UPDATE users SET last_login_at = ? WHERE id = ?").bind((/* @__PURE__ */ new Date()).getTime(), user.id).run();
+    await db2.prepare("UPDATE users SET last_login_at = ? WHERE id = ?").bind((/* @__PURE__ */ new Date()).getTime(), user.id).run();
     await cache.delete(cache.generateKey("user", user.id));
     await cache.delete(cache.generateKey("user", `email:${normalizedEmail}`));
     return c.json({
@@ -2341,8 +2341,8 @@ authRoutes.get("/me", requireAuth(), async (c) => {
     if (!user) {
       return c.json({ error: "Not authenticated" }, 401);
     }
-    const db = c.env.DB;
-    const userData = await db.prepare("SELECT id, email, username, first_name, last_name, role, created_at FROM users WHERE id = ?").bind(user.userId).first();
+    const db2 = c.env.DB;
+    const userData = await db2.prepare("SELECT id, email, username, first_name, last_name, role, created_at FROM users WHERE id = ?").bind(user.userId).first();
     if (!userData) {
       return c.json({ error: "User not found" }, 404);
     }
@@ -2374,7 +2374,7 @@ authRoutes.post("/refresh", requireAuth(), async (c) => {
 });
 authRoutes.post("/register/form", async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const formData = await c.req.formData();
     const requestData = {
       email: formData.get("email"),
@@ -2385,12 +2385,12 @@ authRoutes.post("/register/form", async (c) => {
     };
     const normalizedEmail = requestData.email?.toLowerCase();
     requestData.email = normalizedEmail;
-    const validationSchema = await authValidationService.buildRegistrationSchema(db);
+    const validationSchema = await authValidationService.buildRegistrationSchema(db2);
     const validation = await validationSchema.safeParseAsync(requestData);
     if (!validation.success) {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          ${validation.error.errors.map((err) => err.message).join(", ")}
+          ${validation.error.issues.map((err) => err.message).join(", ")}
         </div>
       `);
     }
@@ -2399,7 +2399,7 @@ authRoutes.post("/register/form", async (c) => {
     const username = validatedData.username || authValidationService.generateDefaultValue("username", validatedData);
     const firstName = validatedData.firstName || authValidationService.generateDefaultValue("firstName", validatedData);
     const lastName = validatedData.lastName || authValidationService.generateDefaultValue("lastName", validatedData);
-    const existingUser = await db.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind(normalizedEmail, username).first();
+    const existingUser = await db2.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind(normalizedEmail, username).first();
     if (existingUser) {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -2410,7 +2410,7 @@ authRoutes.post("/register/form", async (c) => {
     const passwordHash = await AuthManager.hashPassword(password);
     const userId = crypto.randomUUID();
     const now = /* @__PURE__ */ new Date();
-    await db.prepare(`
+    await db2.prepare(`
       INSERT INTO users (id, email, username, first_name, last_name, password_hash, role, is_active, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
@@ -2465,12 +2465,12 @@ authRoutes.post("/login/form", async (c) => {
     if (!validation.success) {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          ${validation.error.errors.map((err) => err.message).join(", ")}
+          ${validation.error.issues.map((err) => err.message).join(", ")}
         </div>
       `);
     }
-    const db = c.env.DB;
-    const user = await db.prepare("SELECT * FROM users WHERE email = ? AND is_active = 1").bind(normalizedEmail).first();
+    const db2 = c.env.DB;
+    const user = await db2.prepare("SELECT * FROM users WHERE email = ? AND is_active = 1").bind(normalizedEmail).first();
     if (!user) {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -2495,7 +2495,7 @@ authRoutes.post("/login/form", async (c) => {
       maxAge: 60 * 60 * 24
       // 24 hours
     });
-    await db.prepare("UPDATE users SET last_login_at = ? WHERE id = ?").bind((/* @__PURE__ */ new Date()).getTime(), user.id).run();
+    await db2.prepare("UPDATE users SET last_login_at = ? WHERE id = ?").bind((/* @__PURE__ */ new Date()).getTime(), user.id).run();
     return c.html(html`
       <div id="form-response">
         <div class="rounded-lg bg-green-100 dark:bg-lime-500/10 p-4 ring-1 ring-green-400 dark:ring-lime-500/20">
@@ -2526,8 +2526,8 @@ authRoutes.post("/login/form", async (c) => {
 });
 authRoutes.post("/seed-admin", async (c) => {
   try {
-    const db = c.env.DB;
-    await db.prepare(`
+    const db2 = c.env.DB;
+    await db2.prepare(`
       CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
         email TEXT NOT NULL UNIQUE,
@@ -2543,10 +2543,10 @@ authRoutes.post("/seed-admin", async (c) => {
         updated_at INTEGER NOT NULL
       )
     `).run();
-    const existingAdmin = await db.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind("admin@sonicjs.com", "admin").first();
+    const existingAdmin = await db2.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind("admin@sonicjs.com", "admin").first();
     if (existingAdmin) {
       const passwordHash2 = await AuthManager.hashPassword("sonicjs!");
-      await db.prepare("UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?").bind(passwordHash2, Date.now(), existingAdmin.id).run();
+      await db2.prepare("UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?").bind(passwordHash2, Date.now(), existingAdmin.id).run();
       return c.json({
         message: "Admin user already exists (password updated)",
         user: {
@@ -2561,7 +2561,7 @@ authRoutes.post("/seed-admin", async (c) => {
     const userId = "admin-user-id";
     const now = Date.now();
     const adminEmail = "admin@sonicjs.com".toLowerCase();
-    await db.prepare(`
+    await db2.prepare(`
       INSERT INTO users (id, email, username, first_name, last_name, password_hash, role, is_active, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
@@ -2608,8 +2608,8 @@ authRoutes.get("/accept-invitation", async (c) => {
         </html>
       `);
     }
-    const db = c.env.DB;
-    const userStmt = db.prepare(`
+    const db2 = c.env.DB;
+    const userStmt = db2.prepare(`
       SELECT id, email, first_name, last_name, role, invited_at
       FROM users 
       WHERE invitation_token = ? AND is_active = 0
@@ -2755,8 +2755,8 @@ authRoutes.post("/accept-invitation", async (c) => {
     if (password.length < 8) {
       return c.json({ error: "Password must be at least 8 characters long" }, 400);
     }
-    const db = c.env.DB;
-    const userStmt = db.prepare(`
+    const db2 = c.env.DB;
+    const userStmt = db2.prepare(`
       SELECT id, email, first_name, last_name, role, invited_at
       FROM users 
       WHERE invitation_token = ? AND is_active = 0
@@ -2770,7 +2770,7 @@ authRoutes.post("/accept-invitation", async (c) => {
     if (invitationAge > maxAge) {
       return c.json({ error: "Invitation has expired" }, 400);
     }
-    const existingUsernameStmt = db.prepare(`
+    const existingUsernameStmt = db2.prepare(`
       SELECT id FROM users WHERE username = ? AND id != ?
     `);
     const existingUsername = await existingUsernameStmt.bind(username, invitedUser.id).first();
@@ -2778,7 +2778,7 @@ authRoutes.post("/accept-invitation", async (c) => {
       return c.json({ error: "Username is already taken" }, 400);
     }
     const passwordHash = await AuthManager.hashPassword(password);
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE users SET 
         username = ?,
         password_hash = ?,
@@ -2821,8 +2821,8 @@ authRoutes.post("/request-password-reset", async (c) => {
     if (!emailRegex.test(email)) {
       return c.json({ error: "Please enter a valid email address" }, 400);
     }
-    const db = c.env.DB;
-    const userStmt = db.prepare(`
+    const db2 = c.env.DB;
+    const userStmt = db2.prepare(`
       SELECT id, email, first_name, last_name FROM users 
       WHERE email = ? AND is_active = 1
     `);
@@ -2835,7 +2835,7 @@ authRoutes.post("/request-password-reset", async (c) => {
     }
     const resetToken = crypto.randomUUID();
     const resetExpires = Date.now() + 60 * 60 * 1e3;
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE users SET 
         password_reset_token = ?,
         password_reset_expires = ?,
@@ -2875,8 +2875,8 @@ authRoutes.get("/reset-password", async (c) => {
         </html>
       `);
     }
-    const db = c.env.DB;
-    const userStmt = db.prepare(`
+    const db2 = c.env.DB;
+    const userStmt = db2.prepare(`
       SELECT id, email, first_name, last_name, password_reset_expires
       FROM users 
       WHERE password_reset_token = ? AND is_active = 1
@@ -3013,8 +3013,8 @@ authRoutes.post("/reset-password", async (c) => {
     if (password.length < 8) {
       return c.json({ error: "Password must be at least 8 characters long" }, 400);
     }
-    const db = c.env.DB;
-    const userStmt = db.prepare(`
+    const db2 = c.env.DB;
+    const userStmt = db2.prepare(`
       SELECT id, email, password_hash, password_reset_expires
       FROM users
       WHERE password_reset_token = ? AND is_active = 1
@@ -3028,7 +3028,7 @@ authRoutes.post("/reset-password", async (c) => {
     }
     const newPasswordHash = await AuthManager.hashPassword(password);
     try {
-      const historyStmt = db.prepare(`
+      const historyStmt = db2.prepare(`
         INSERT INTO password_history (id, user_id, password_hash, created_at)
         VALUES (?, ?, ?, ?)
       `);
@@ -3041,7 +3041,7 @@ authRoutes.post("/reset-password", async (c) => {
     } catch (historyError) {
       console.warn("Could not store password history:", historyError);
     }
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE users SET
         password_hash = ?,
         password_reset_token = NULL,
@@ -3061,19 +3061,269 @@ authRoutes.post("/reset-password", async (c) => {
   }
 });
 var auth_default = authRoutes;
+var app = new Hono();
+app.post("/test-cleanup", async (c) => {
+  const db2 = c.env.DB;
+  if (c.env.ENVIRONMENT === "production") {
+    return c.json({ error: "Cleanup endpoint not available in production" }, 403);
+  }
+  try {
+    let deletedCount = 0;
+    await db2.prepare(`
+      DELETE FROM content_versions
+      WHERE content_id IN (
+        SELECT id FROM content
+        WHERE title LIKE 'Test %' OR title LIKE '%E2E%' OR title LIKE '%Playwright%' OR title LIKE '%Sample%'
+      )
+    `).run();
+    await db2.prepare(`
+      DELETE FROM workflow_history
+      WHERE content_id IN (
+        SELECT id FROM content
+        WHERE title LIKE 'Test %' OR title LIKE '%E2E%' OR title LIKE '%Playwright%' OR title LIKE '%Sample%'
+      )
+    `).run();
+    try {
+      await db2.prepare(`
+        DELETE FROM content_data
+        WHERE content_id IN (
+          SELECT id FROM content
+          WHERE title LIKE 'Test %' OR title LIKE '%E2E%' OR title LIKE '%Playwright%' OR title LIKE '%Sample%'
+        )
+      `).run();
+    } catch (e) {
+    }
+    const contentResult = await db2.prepare(`
+      DELETE FROM content
+      WHERE title LIKE 'Test %' OR title LIKE '%E2E%' OR title LIKE '%Playwright%' OR title LIKE '%Sample%'
+    `).run();
+    deletedCount += contentResult.meta?.changes || 0;
+    await db2.prepare(`
+      DELETE FROM api_tokens
+      WHERE user_id IN (
+        SELECT id FROM users
+        WHERE email != 'admin@sonicjs.com' AND (email LIKE '%test%' OR email LIKE '%example.com%')
+      )
+    `).run();
+    await db2.prepare(`
+      DELETE FROM media
+      WHERE uploaded_by IN (
+        SELECT id FROM users
+        WHERE email != 'admin@sonicjs.com' AND (email LIKE '%test%' OR email LIKE '%example.com%')
+      )
+    `).run();
+    const usersResult = await db2.prepare(`
+      DELETE FROM users
+      WHERE email != 'admin@sonicjs.com' AND (email LIKE '%test%' OR email LIKE '%example.com%')
+    `).run();
+    deletedCount += usersResult.meta?.changes || 0;
+    try {
+      await db2.prepare(`
+        DELETE FROM collection_fields
+        WHERE collection_id IN (
+          SELECT id FROM collections
+          WHERE name LIKE 'test_%' OR name IN ('blog_posts', 'test_collection', 'products', 'articles')
+        )
+      `).run();
+    } catch (e) {
+    }
+    await db2.prepare(`
+      DELETE FROM content
+      WHERE collection_id IN (
+        SELECT id FROM collections
+        WHERE name LIKE 'test_%' OR name IN ('blog_posts', 'test_collection', 'products', 'articles')
+      )
+    `).run();
+    const collectionsResult = await db2.prepare(`
+      DELETE FROM collections
+      WHERE name LIKE 'test_%' OR name IN ('blog_posts', 'test_collection', 'products', 'articles')
+    `).run();
+    deletedCount += collectionsResult.meta?.changes || 0;
+    try {
+      await db2.prepare(`
+        DELETE FROM content_data WHERE content_id NOT IN (SELECT id FROM content)
+      `).run();
+    } catch (e) {
+    }
+    try {
+      await db2.prepare(`
+        DELETE FROM collection_fields WHERE collection_id NOT IN (SELECT id FROM collections)
+      `).run();
+    } catch (e) {
+    }
+    try {
+      await db2.prepare(`
+        DELETE FROM content_versions WHERE content_id NOT IN (SELECT id FROM content)
+      `).run();
+    } catch (e) {
+    }
+    try {
+      await db2.prepare(`
+        DELETE FROM workflow_history WHERE content_id NOT IN (SELECT id FROM content)
+      `).run();
+    } catch (e) {
+    }
+    await db2.prepare(`
+      DELETE FROM activity_logs
+      WHERE id NOT IN (
+        SELECT id FROM activity_logs
+        ORDER BY created_at DESC
+        LIMIT 100
+      )
+    `).run();
+    return c.json({
+      success: true,
+      deletedCount,
+      message: "Test data cleaned up successfully"
+    });
+  } catch (error) {
+    console.error("Test cleanup error:", error);
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error"
+    }, 500);
+  }
+});
+app.post("/test-cleanup/users", async (c) => {
+  const db2 = c.env.DB;
+  if (c.env.ENVIRONMENT === "production") {
+    return c.json({ error: "Cleanup endpoint not available in production" }, 403);
+  }
+  try {
+    const result = await db2.prepare(`
+      DELETE FROM users
+      WHERE email != 'admin@sonicjs.com'
+      AND (
+        email LIKE '%test%'
+        OR email LIKE '%example.com%'
+        OR first_name = 'Test'
+      )
+    `).run();
+    return c.json({
+      success: true,
+      deletedCount: result.meta?.changes || 0,
+      message: "Test users cleaned up successfully"
+    });
+  } catch (error) {
+    console.error("User cleanup error:", error);
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error"
+    }, 500);
+  }
+});
+app.post("/test-cleanup/collections", async (c) => {
+  const db2 = c.env.DB;
+  if (c.env.ENVIRONMENT === "production") {
+    return c.json({ error: "Cleanup endpoint not available in production" }, 403);
+  }
+  try {
+    let deletedCount = 0;
+    const collections = await db2.prepare(`
+      SELECT id FROM collections
+      WHERE name LIKE 'test_%'
+      OR name IN ('blog_posts', 'test_collection', 'products', 'articles')
+    `).all();
+    if (collections.results && collections.results.length > 0) {
+      const collectionIds = collections.results.map((c2) => c2.id);
+      for (const id of collectionIds) {
+        await db2.prepare("DELETE FROM collection_fields WHERE collection_id = ?").bind(id).run();
+      }
+      for (const id of collectionIds) {
+        await db2.prepare("DELETE FROM content WHERE collection_id = ?").bind(id).run();
+      }
+      const result = await db2.prepare(`
+        DELETE FROM collections
+        WHERE id IN (${collectionIds.map(() => "?").join(",")})
+      `).bind(...collectionIds).run();
+      deletedCount = result.meta?.changes || 0;
+    }
+    return c.json({
+      success: true,
+      deletedCount,
+      message: "Test collections cleaned up successfully"
+    });
+  } catch (error) {
+    console.error("Collection cleanup error:", error);
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error"
+    }, 500);
+  }
+});
+app.post("/test-cleanup/content", async (c) => {
+  const db2 = c.env.DB;
+  if (c.env.ENVIRONMENT === "production") {
+    return c.json({ error: "Cleanup endpoint not available in production" }, 403);
+  }
+  try {
+    const result = await db2.prepare(`
+      DELETE FROM content
+      WHERE title LIKE 'Test %'
+      OR title LIKE '%E2E%'
+      OR title LIKE '%Playwright%'
+      OR title LIKE '%Sample%'
+    `).run();
+    await db2.prepare(`
+      DELETE FROM content_data
+      WHERE content_id NOT IN (SELECT id FROM content)
+    `).run();
+    return c.json({
+      success: true,
+      deletedCount: result.meta?.changes || 0,
+      message: "Test content cleaned up successfully"
+    });
+  } catch (error) {
+    console.error("Content cleanup error:", error);
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error"
+    }, 500);
+  }
+});
+var test_cleanup_default = app;
 
 // src/templates/pages/admin-content-form.template.ts
 init_admin_layout_catalyst_template();
 
 // src/templates/components/dynamic-field.template.ts
 function renderDynamicField(field, options = {}) {
-  const { value = "", errors = [], disabled = false, className = "" } = options;
+  const { value = "", errors = [], disabled = false, className = "", pluginStatuses = {} } = options;
   const opts = field.field_options || {};
   const required = field.is_required ? "required" : "";
   const baseClasses = `w-full rounded-lg px-3 py-2 text-sm text-zinc-950 dark:text-white bg-white dark:bg-zinc-800 shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow ${className}`;
   const errorClasses = errors.length > 0 ? "ring-pink-600 dark:ring-pink-500 focus:ring-pink-600 dark:focus:ring-pink-500" : "";
   const fieldId = `field-${field.field_name}`;
   const fieldName = field.field_name;
+  let fallbackToTextarea = false;
+  let fallbackWarning = "";
+  if (field.field_type === "quill" && !pluginStatuses.quillEnabled) {
+    fallbackToTextarea = true;
+    fallbackWarning = "\u26A0\uFE0F Quill Editor plugin is inactive. Using textarea fallback.";
+  } else if (field.field_type === "mdxeditor" && !pluginStatuses.mdxeditorEnabled) {
+    fallbackToTextarea = true;
+    fallbackWarning = "\u26A0\uFE0F MDXEditor plugin is inactive. Using textarea fallback.";
+  } else if (field.field_type === "tinymce" && !pluginStatuses.tinymceEnabled) {
+    fallbackToTextarea = true;
+    fallbackWarning = "\u26A0\uFE0F TinyMCE plugin is inactive. Using textarea fallback.";
+  }
+  if (fallbackToTextarea) {
+    return `
+      <div>
+        ${fallbackWarning ? `<div class="mb-2 px-3 py-2 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-200 text-xs rounded-lg border border-amber-200 dark:border-amber-800">${fallbackWarning}</div>` : ""}
+        <textarea
+          id="${fieldId}"
+          name="${fieldName}"
+          rows="${opts.rows || opts.height ? Math.floor(opts.height / 25) : 10}"
+          placeholder="${opts.placeholder || ""}"
+          maxlength="${opts.maxLength || ""}"
+          class="${baseClasses} ${errorClasses} resize-y"
+          ${required}
+          ${disabled ? "disabled" : ""}
+        >${escapeHtml2(value)}</textarea>
+      </div>
+    `;
+  }
   let fieldHTML = "";
   switch (field.field_type) {
     case "text":
@@ -3996,9 +4246,9 @@ function createQuillEditorPlugin() {
 }
 createQuillEditorPlugin();
 
-// src/plugins/available/mdxeditor-plugin/index.ts
+// src/plugins/available/easy-mdx/index.ts
 var builder2 = PluginBuilder.create({
-  name: "mdxeditor-plugin",
+  name: "easy-mdx",
   version: "1.0.0",
   description: "Lightweight markdown editor with live preview"
 });
@@ -4214,17 +4464,25 @@ function renderContentFormPage(data) {
     if (fieldName === "slug") return data.slug || data.data?.[fieldName] || "";
     return data.data?.[fieldName] || "";
   };
+  const pluginStatuses = {
+    quillEnabled: data.quillEnabled || false,
+    mdxeditorEnabled: data.mdxeditorEnabled || false,
+    tinymceEnabled: data.tinymceEnabled || false
+  };
   const coreFieldsHTML = coreFields.sort((a, b) => a.field_order - b.field_order).map((field) => renderDynamicField(field, {
     value: getFieldValue(field.field_name),
-    errors: data.validationErrors?.[field.field_name] || []
+    errors: data.validationErrors?.[field.field_name] || [],
+    pluginStatuses
   }));
   const contentFieldsHTML = contentFields.sort((a, b) => a.field_order - b.field_order).map((field) => renderDynamicField(field, {
     value: getFieldValue(field.field_name),
-    errors: data.validationErrors?.[field.field_name] || []
+    errors: data.validationErrors?.[field.field_name] || [],
+    pluginStatuses
   }));
   const metaFieldsHTML = metaFields.sort((a, b) => a.field_order - b.field_order).map((field) => renderDynamicField(field, {
     value: getFieldValue(field.field_name),
-    errors: data.validationErrors?.[field.field_name] || []
+    errors: data.validationErrors?.[field.field_name] || [],
+    pluginStatuses
   }));
   const pageContent = `
     <div class="space-y-6">
@@ -4808,6 +5066,8 @@ function renderContentFormPage(data) {
         form.addEventListener('change', scheduleAutoSave);
       });
 
+    </script>
+
       ${data.tinymceEnabled ? `<script>${getTinyMCEInitScript({
     skin: data.tinymceSettings?.skin,
     defaultHeight: data.tinymceSettings?.defaultHeight,
@@ -4820,7 +5080,6 @@ function renderContentFormPage(data) {
     toolbar: data.mdxeditorSettings?.toolbar,
     placeholder: data.mdxeditorSettings?.placeholder
   })}</script>` : ""}
-    </script>
   `;
   const layoutData = {
     title,
@@ -5653,9 +5912,9 @@ function escapeHtml3(text) {
 }
 
 // src/middleware/plugin-middleware.ts
-async function isPluginActive2(db, pluginId) {
+async function isPluginActive2(db2, pluginId) {
   try {
-    const result = await db.prepare("SELECT status FROM plugins WHERE id = ?").bind(pluginId).first();
+    const result = await db2.prepare("SELECT status FROM plugins WHERE id = ?").bind(pluginId).first();
     return result?.status === "active";
   } catch (error) {
     console.error(`[isPluginActive] Error checking plugin status for ${pluginId}:`, error);
@@ -5666,12 +5925,12 @@ async function isPluginActive2(db, pluginId) {
 // src/routes/admin-content.ts
 var adminContentRoutes = new Hono();
 adminContentRoutes.use("*", requireAuth());
-async function getCollectionFields(db, collectionId) {
+async function getCollectionFields(db2, collectionId) {
   const cache = getCacheService(CACHE_CONFIGS.collection);
   return cache.getOrSet(
     cache.generateKey("fields", collectionId),
     async () => {
-      const collectionStmt = db.prepare("SELECT schema FROM collections WHERE id = ?");
+      const collectionStmt = db2.prepare("SELECT schema FROM collections WHERE id = ?");
       const collectionRow = await collectionStmt.bind(collectionId).first();
       if (collectionRow && collectionRow.schema) {
         try {
@@ -5702,7 +5961,7 @@ async function getCollectionFields(db, collectionId) {
           console.error("Error parsing collection schema:", e);
         }
       }
-      const stmt = db.prepare(`
+      const stmt = db2.prepare(`
         SELECT * FROM content_fields
         WHERE collection_id = ?
         ORDER BY field_order ASC
@@ -5721,12 +5980,12 @@ async function getCollectionFields(db, collectionId) {
     }
   );
 }
-async function getCollection(db, collectionId) {
+async function getCollection(db2, collectionId) {
   const cache = getCacheService(CACHE_CONFIGS.collection);
   return cache.getOrSet(
     cache.generateKey("collection", collectionId),
     async () => {
-      const stmt = db.prepare("SELECT * FROM collections WHERE id = ? AND is_active = 1");
+      const stmt = db2.prepare("SELECT * FROM collections WHERE id = ? AND is_active = 1");
       const collection = await stmt.bind(collectionId).first();
       if (!collection) return null;
       return {
@@ -5743,14 +6002,14 @@ adminContentRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
     const url = new URL(c.req.url);
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const page = parseInt(url.searchParams.get("page") || "1");
     const limit = parseInt(url.searchParams.get("limit") || "20");
     const modelName = url.searchParams.get("model") || "all";
     const status = url.searchParams.get("status") || "all";
     const search = url.searchParams.get("search") || "";
     const offset = (page - 1) * limit;
-    const collectionsStmt = db.prepare("SELECT id, name, display_name FROM collections WHERE is_active = 1 ORDER BY display_name");
+    const collectionsStmt = db2.prepare("SELECT id, name, display_name FROM collections WHERE is_active = 1 ORDER BY display_name");
     const { results: collectionsResults } = await collectionsStmt.all();
     const models = (collectionsResults || []).map((row) => ({
       name: row.name,
@@ -5776,7 +6035,7 @@ adminContentRoutes.get("/", async (c) => {
       conditions.push("c.status = 'deleted'");
     }
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
-    const countStmt = db.prepare(`
+    const countStmt = db2.prepare(`
       SELECT COUNT(*) as count 
       FROM content c
       JOIN collections col ON c.collection_id = col.id
@@ -5784,7 +6043,7 @@ adminContentRoutes.get("/", async (c) => {
     `);
     const countResult = await countStmt.bind(...params).first();
     const totalItems = countResult?.count || 0;
-    const contentStmt = db.prepare(`
+    const contentStmt = db2.prepare(`
       SELECT c.id, c.title, c.slug, c.status, c.created_at, c.updated_at,
              col.name as collection_name, col.display_name as collection_display_name,
              u.first_name, u.last_name, u.email as author_email
@@ -5885,8 +6144,8 @@ adminContentRoutes.get("/new", async (c) => {
     const url = new URL(c.req.url);
     const collectionId = url.searchParams.get("collection");
     if (!collectionId) {
-      const db2 = c.env.DB;
-      const collectionsStmt = db2.prepare("SELECT id, name, display_name, description FROM collections WHERE is_active = 1 ORDER BY display_name");
+      const db3 = c.env.DB;
+      const collectionsStmt = db3.prepare("SELECT id, name, display_name, description FROM collections WHERE is_active = 1 ORDER BY display_name");
       const { results } = await collectionsStmt.all();
       const collections = (results || []).map((row) => ({
         id: row.id,
@@ -5927,8 +6186,8 @@ adminContentRoutes.get("/new", async (c) => {
       `;
       return c.html(selectionHTML);
     }
-    const db = c.env.DB;
-    const collection = await getCollection(db, collectionId);
+    const db2 = c.env.DB;
+    const collection = await getCollection(db2, collectionId);
     if (!collection) {
       const formData2 = {
         collection: { id: "", name: "", display_name: "Unknown", schema: {} },
@@ -5942,34 +6201,35 @@ adminContentRoutes.get("/new", async (c) => {
       };
       return c.html(renderContentFormPage(formData2));
     }
-    const fields = await getCollectionFields(db, collectionId);
-    const workflowEnabled = await isPluginActive2(db, "workflow");
-    const tinymceEnabled = await isPluginActive2(db, "tinymce-plugin");
+    const fields = await getCollectionFields(db2, collectionId);
+    const workflowEnabled = await isPluginActive2(db2, "workflow");
+    const tinymceEnabled = await isPluginActive2(db2, "tinymce-plugin");
     let tinymceSettings;
     if (tinymceEnabled) {
-      const pluginService = new PluginService(db);
+      const pluginService = new PluginService(db2);
       const tinymcePlugin2 = await pluginService.getPlugin("tinymce-plugin");
       tinymceSettings = tinymcePlugin2?.settings;
     }
-    const quillEnabled = await isPluginActive2(db, "quill-editor");
+    const quillEnabled = await isPluginActive2(db2, "quill-editor");
     let quillSettings;
     if (quillEnabled) {
-      const pluginService = new PluginService(db);
+      const pluginService = new PluginService(db2);
       const quillPlugin = await pluginService.getPlugin("quill-editor");
       quillSettings = quillPlugin?.settings;
     }
-    const mdxeditorEnabled = await isPluginActive2(db, "mdxeditor-plugin");
+    const mdxeditorEnabled = await isPluginActive2(db2, "easy-mdx");
     let mdxeditorSettings;
     if (mdxeditorEnabled) {
-      const pluginService = new PluginService(db);
-      const mdxeditorPlugin2 = await pluginService.getPlugin("mdxeditor-plugin");
-      mdxeditorSettings = mdxeditorPlugin2?.settings;
+      const pluginService = new PluginService(db2);
+      const mdxeditorPlugin = await pluginService.getPlugin("easy-mdx");
+      mdxeditorSettings = mdxeditorPlugin?.settings;
     }
     console.log("[Content Form /new] Editor plugins status:", {
       tinymce: tinymceEnabled,
       quill: quillEnabled,
       mdxeditor: mdxeditorEnabled,
-      mdxeditorSettings
+      mdxeditorSettings,
+      willIncludeScripts: mdxeditorEnabled ? "YES" : "NO"
     });
     const formData = {
       collection,
@@ -6008,14 +6268,14 @@ adminContentRoutes.get("/:id/edit", async (c) => {
   try {
     const id = c.req.param("id");
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const url = new URL(c.req.url);
     const referrerParams = url.searchParams.get("ref") || "";
     const cache = getCacheService(CACHE_CONFIGS.content);
     const content = await cache.getOrSet(
       cache.generateKey("content", id),
       async () => {
-        const contentStmt = db.prepare(`
+        const contentStmt = db2.prepare(`
           SELECT c.*, col.id as collection_id, col.name as collection_name,
                  col.display_name as collection_display_name, col.description as collection_description,
                  col.schema as collection_schema
@@ -6046,29 +6306,29 @@ adminContentRoutes.get("/:id/edit", async (c) => {
       description: content.collection_description,
       schema: content.collection_schema ? JSON.parse(content.collection_schema) : {}
     };
-    const fields = await getCollectionFields(db, content.collection_id);
+    const fields = await getCollectionFields(db2, content.collection_id);
     const contentData = content.data ? JSON.parse(content.data) : {};
-    const workflowEnabled = await isPluginActive2(db, "workflow");
-    const tinymceEnabled = await isPluginActive2(db, "tinymce-plugin");
+    const workflowEnabled = await isPluginActive2(db2, "workflow");
+    const tinymceEnabled = await isPluginActive2(db2, "tinymce-plugin");
     let tinymceSettings;
     if (tinymceEnabled) {
-      const pluginService = new PluginService(db);
+      const pluginService = new PluginService(db2);
       const tinymcePlugin2 = await pluginService.getPlugin("tinymce-plugin");
       tinymceSettings = tinymcePlugin2?.settings;
     }
-    const quillEnabled = await isPluginActive2(db, "quill-editor");
+    const quillEnabled = await isPluginActive2(db2, "quill-editor");
     let quillSettings;
     if (quillEnabled) {
-      const pluginService = new PluginService(db);
+      const pluginService = new PluginService(db2);
       const quillPlugin = await pluginService.getPlugin("quill-editor");
       quillSettings = quillPlugin?.settings;
     }
-    const mdxeditorEnabled = await isPluginActive2(db, "mdxeditor-plugin");
+    const mdxeditorEnabled = await isPluginActive2(db2, "easy-mdx");
     let mdxeditorSettings;
     if (mdxeditorEnabled) {
-      const pluginService = new PluginService(db);
-      const mdxeditorPlugin2 = await pluginService.getPlugin("mdxeditor-plugin");
-      mdxeditorSettings = mdxeditorPlugin2?.settings;
+      const pluginService = new PluginService(db2);
+      const mdxeditorPlugin = await pluginService.getPlugin("easy-mdx");
+      mdxeditorSettings = mdxeditorPlugin?.settings;
     }
     const formData = {
       id: content.id,
@@ -6128,8 +6388,8 @@ adminContentRoutes.post("/", async (c) => {
         </div>
       `);
     }
-    const db = c.env.DB;
-    const collection = await getCollection(db, collectionId);
+    const db2 = c.env.DB;
+    const collection = await getCollection(db2, collectionId);
     if (!collection) {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -6137,7 +6397,7 @@ adminContentRoutes.post("/", async (c) => {
         </div>
       `);
     }
-    const fields = await getCollectionFields(db, collectionId);
+    const fields = await getCollectionFields(db2, collectionId);
     const data = {};
     const errors = {};
     for (const field of fields) {
@@ -6195,13 +6455,13 @@ adminContentRoutes.post("/", async (c) => {
     const scheduledUnpublishAt = formData.get("scheduled_unpublish_at");
     const contentId = crypto.randomUUID();
     const now = Date.now();
-    const insertStmt = db.prepare(`
+    const insertStmt = db2.prepare(`
       INSERT INTO content (
         id, collection_id, slug, title, data, status,
         scheduled_publish_at, scheduled_unpublish_at,
-        meta_title, meta_description, author_id, created_at, updated_at
+        meta_title, meta_description, author_id, created_by, created_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     await insertStmt.bind(
       contentId,
@@ -6215,12 +6475,13 @@ adminContentRoutes.post("/", async (c) => {
       data.meta_title || null,
       data.meta_description || null,
       user?.userId || "unknown",
+      user?.userId || "unknown",
       now,
       now
     ).run();
     const cache = getCacheService(CACHE_CONFIGS.content);
     await cache.invalidate(`content:list:${collectionId}:*`);
-    const versionStmt = db.prepare(`
+    const versionStmt = db2.prepare(`
       INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
       VALUES (?, ?, ?, ?, ?, ?)
     `);
@@ -6232,7 +6493,7 @@ adminContentRoutes.post("/", async (c) => {
       user?.userId || "unknown",
       now
     ).run();
-    const workflowStmt = db.prepare(`
+    const workflowStmt = db2.prepare(`
       INSERT INTO workflow_history (id, content_id, action, from_status, to_status, user_id, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
@@ -6270,8 +6531,8 @@ adminContentRoutes.put("/:id", async (c) => {
     const user = c.get("user");
     const formData = await c.req.formData();
     const action = formData.get("action");
-    const db = c.env.DB;
-    const contentStmt = db.prepare("SELECT * FROM content WHERE id = ?");
+    const db2 = c.env.DB;
+    const contentStmt = db2.prepare("SELECT * FROM content WHERE id = ?");
     const existingContent = await contentStmt.bind(id).first();
     if (!existingContent) {
       return c.html(html`
@@ -6280,7 +6541,7 @@ adminContentRoutes.put("/:id", async (c) => {
         </div>
       `);
     }
-    const collection = await getCollection(db, existingContent.collection_id);
+    const collection = await getCollection(db2, existingContent.collection_id);
     if (!collection) {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -6288,7 +6549,7 @@ adminContentRoutes.put("/:id", async (c) => {
         </div>
       `);
     }
-    const fields = await getCollectionFields(db, existingContent.collection_id);
+    const fields = await getCollectionFields(db2, existingContent.collection_id);
     const data = {};
     const errors = {};
     for (const field of fields) {
@@ -6347,7 +6608,7 @@ adminContentRoutes.put("/:id", async (c) => {
     const scheduledPublishAt = formData.get("scheduled_publish_at");
     const scheduledUnpublishAt = formData.get("scheduled_unpublish_at");
     const now = Date.now();
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE content SET
         slug = ?, title = ?, data = ?, status = ?,
         scheduled_publish_at = ?, scheduled_unpublish_at = ?,
@@ -6371,10 +6632,10 @@ adminContentRoutes.put("/:id", async (c) => {
     await cache.invalidate(`content:list:${existingContent.collection_id}:*`);
     const existingData = JSON.parse(existingContent.data || "{}");
     if (JSON.stringify(existingData) !== JSON.stringify(data)) {
-      const versionCountStmt = db.prepare("SELECT MAX(version) as max_version FROM content_versions WHERE content_id = ?");
+      const versionCountStmt = db2.prepare("SELECT MAX(version) as max_version FROM content_versions WHERE content_id = ?");
       const versionResult = await versionCountStmt.bind(id).first();
       const nextVersion = (versionResult?.max_version || 0) + 1;
-      const versionStmt = db.prepare(`
+      const versionStmt = db2.prepare(`
         INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
         VALUES (?, ?, ?, ?, ?, ?)
       `);
@@ -6388,7 +6649,7 @@ adminContentRoutes.put("/:id", async (c) => {
       ).run();
     }
     if (status !== existingContent.status) {
-      const workflowStmt = db.prepare(`
+      const workflowStmt = db2.prepare(`
         INSERT INTO workflow_history (id, content_id, action, from_status, to_status, user_id, created_at)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `);
@@ -6425,12 +6686,12 @@ adminContentRoutes.post("/preview", async (c) => {
   try {
     const formData = await c.req.formData();
     const collectionId = formData.get("collection_id");
-    const db = c.env.DB;
-    const collection = await getCollection(db, collectionId);
+    const db2 = c.env.DB;
+    const collection = await getCollection(db2, collectionId);
     if (!collection) {
       return c.html("<p>Collection not found</p>");
     }
-    const fields = await getCollectionFields(db, collectionId);
+    const fields = await getCollectionFields(db2, collectionId);
     const data = {};
     for (const field of fields) {
       const value = formData.get(field.field_name);
@@ -6504,8 +6765,8 @@ adminContentRoutes.post("/duplicate", async (c) => {
     if (!originalId) {
       return c.json({ success: false, error: "Content ID required" });
     }
-    const db = c.env.DB;
-    const contentStmt = db.prepare("SELECT * FROM content WHERE id = ?");
+    const db2 = c.env.DB;
+    const contentStmt = db2.prepare("SELECT * FROM content WHERE id = ?");
     const original = await contentStmt.bind(originalId).first();
     if (!original) {
       return c.json({ success: false, error: "Content not found" });
@@ -6514,7 +6775,7 @@ adminContentRoutes.post("/duplicate", async (c) => {
     const now = Date.now();
     const originalData = JSON.parse(original.data || "{}");
     originalData.title = `${originalData.title || "Untitled"} (Copy)`;
-    const insertStmt = db.prepare(`
+    const insertStmt = db2.prepare(`
       INSERT INTO content (
         id, collection_id, slug, title, data, status,
         author_id, created_at, updated_at
@@ -6637,11 +6898,11 @@ adminContentRoutes.post("/bulk-action", async (c) => {
     if (!action || !ids || ids.length === 0) {
       return c.json({ success: false, error: "Action and IDs required" });
     }
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const now = Date.now();
     if (action === "delete") {
       const placeholders = ids.map(() => "?").join(",");
-      const stmt = db.prepare(`
+      const stmt = db2.prepare(`
         UPDATE content
         SET status = 'deleted', updated_at = ?
         WHERE id IN (${placeholders})
@@ -6650,7 +6911,7 @@ adminContentRoutes.post("/bulk-action", async (c) => {
     } else if (action === "publish" || action === "draft") {
       const placeholders = ids.map(() => "?").join(",");
       const publishedAt = action === "publish" ? now : null;
-      const stmt = db.prepare(`
+      const stmt = db2.prepare(`
         UPDATE content
         SET status = ?, published_at = ?, updated_at = ?
         WHERE id IN (${placeholders})
@@ -6673,15 +6934,15 @@ adminContentRoutes.post("/bulk-action", async (c) => {
 adminContentRoutes.delete("/:id", async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const user = c.get("user");
-    const contentStmt = db.prepare("SELECT id, title FROM content WHERE id = ?");
+    const contentStmt = db2.prepare("SELECT id, title FROM content WHERE id = ?");
     const content = await contentStmt.bind(id).first();
     if (!content) {
       return c.json({ success: false, error: "Content not found" }, 404);
     }
     const now = Date.now();
-    const deleteStmt = db.prepare(`
+    const deleteStmt = db2.prepare(`
       UPDATE content
       SET status = 'deleted', updated_at = ?
       WHERE id = ?
@@ -6710,13 +6971,13 @@ adminContentRoutes.delete("/:id", async (c) => {
 adminContentRoutes.get("/:id/versions", async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
-    const contentStmt = db.prepare("SELECT * FROM content WHERE id = ?");
+    const db2 = c.env.DB;
+    const contentStmt = db2.prepare("SELECT * FROM content WHERE id = ?");
     const content = await contentStmt.bind(id).first();
     if (!content) {
       return c.html("<p>Content not found</p>");
     }
-    const versionsStmt = db.prepare(`
+    const versionsStmt = db2.prepare(`
       SELECT cv.*, u.first_name, u.last_name, u.email
       FROM content_versions cv
       LEFT JOIN users u ON cv.author_id = u.id
@@ -6753,8 +7014,8 @@ adminContentRoutes.post("/:id/restore/:version", async (c) => {
     const id = c.req.param("id");
     const version = parseInt(c.req.param("version"));
     const user = c.get("user");
-    const db = c.env.DB;
-    const versionStmt = db.prepare(`
+    const db2 = c.env.DB;
+    const versionStmt = db2.prepare(`
       SELECT * FROM content_versions 
       WHERE content_id = ? AND version = ?
     `);
@@ -6762,14 +7023,14 @@ adminContentRoutes.post("/:id/restore/:version", async (c) => {
     if (!versionData) {
       return c.json({ success: false, error: "Version not found" });
     }
-    const contentStmt = db.prepare("SELECT * FROM content WHERE id = ?");
+    const contentStmt = db2.prepare("SELECT * FROM content WHERE id = ?");
     const currentContent = await contentStmt.bind(id).first();
     if (!currentContent) {
       return c.json({ success: false, error: "Content not found" });
     }
     const restoredData = JSON.parse(versionData.data);
     const now = Date.now();
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE content SET
         title = ?, data = ?, updated_at = ?
       WHERE id = ?
@@ -6780,10 +7041,10 @@ adminContentRoutes.post("/:id/restore/:version", async (c) => {
       now,
       id
     ).run();
-    const nextVersionStmt = db.prepare("SELECT MAX(version) as max_version FROM content_versions WHERE content_id = ?");
+    const nextVersionStmt = db2.prepare("SELECT MAX(version) as max_version FROM content_versions WHERE content_id = ?");
     const nextVersionResult = await nextVersionStmt.bind(id).first();
     const nextVersion = (nextVersionResult?.max_version || 0) + 1;
-    const newVersionStmt = db.prepare(`
+    const newVersionStmt = db2.prepare(`
       INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
       VALUES (?, ?, ?, ?, ?, ?)
     `);
@@ -6795,7 +7056,7 @@ adminContentRoutes.post("/:id/restore/:version", async (c) => {
       user?.userId || "unknown",
       now
     ).run();
-    const workflowStmt = db.prepare(`
+    const workflowStmt = db2.prepare(`
       INSERT INTO workflow_history (id, content_id, action, from_status, to_status, user_id, comment, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
@@ -6819,8 +7080,8 @@ adminContentRoutes.get("/:id/version/:version/preview", async (c) => {
   try {
     const id = c.req.param("id");
     const version = parseInt(c.req.param("version"));
-    const db = c.env.DB;
-    const versionStmt = db.prepare(`
+    const db2 = c.env.DB;
+    const versionStmt = db2.prepare(`
       SELECT cv.*, c.collection_id, col.display_name as collection_name
       FROM content_versions cv
       JOIN content c ON cv.content_id = c.id
@@ -8741,9 +9002,9 @@ var ROLES = [
 ];
 userRoutes.get("/profile", async (c) => {
   const user = c.get("user");
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   try {
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT id, email, username, first_name, last_name, phone, bio, avatar_url,
              timezone, language, theme, email_notifications, two_factor_enabled,
              role, created_at, last_login_at
@@ -8801,7 +9062,7 @@ userRoutes.get("/profile", async (c) => {
 });
 userRoutes.put("/profile", async (c) => {
   const user = c.get("user");
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   try {
     const formData = await c.req.formData();
     const firstName = sanitizeInput(formData.get("first_name")?.toString());
@@ -8828,7 +9089,7 @@ userRoutes.put("/profile", async (c) => {
         dismissible: true
       }));
     }
-    const checkStmt = db.prepare(`
+    const checkStmt = db2.prepare(`
       SELECT id FROM users 
       WHERE (username = ? OR email = ?) AND id != ? AND is_active = 1
     `);
@@ -8840,7 +9101,7 @@ userRoutes.put("/profile", async (c) => {
         dismissible: true
       }));
     }
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE users SET 
         first_name = ?, last_name = ?, username = ?, email = ?,
         phone = ?, bio = ?, timezone = ?, language = ?,
@@ -8861,7 +9122,7 @@ userRoutes.put("/profile", async (c) => {
       user.userId
     ).run();
     await logActivity(
-      db,
+      db2,
       user.userId,
       "profile.update",
       "users",
@@ -8886,7 +9147,7 @@ userRoutes.put("/profile", async (c) => {
 });
 userRoutes.post("/profile/avatar", async (c) => {
   const user = c.get("user");
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   try {
     const formData = await c.req.formData();
     const avatarFile = formData.get("avatar");
@@ -8914,17 +9175,17 @@ userRoutes.post("/profile/avatar", async (c) => {
       }));
     }
     const avatarUrl = `/uploads/avatars/${user.userId}-${Date.now()}.${avatarFile.type.split("/")[1]}`;
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE users SET avatar_url = ?, updated_at = ?
       WHERE id = ?
     `);
     await updateStmt.bind(avatarUrl, Date.now(), user.userId).run();
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT first_name, last_name FROM users WHERE id = ?
     `);
     const userData = await userStmt.bind(user.userId).first();
     await logActivity(
-      db,
+      db2,
       user.userId,
       "profile.avatar_update",
       "users",
@@ -8956,7 +9217,7 @@ userRoutes.post("/profile/avatar", async (c) => {
 });
 userRoutes.post("/profile/password", async (c) => {
   const user = c.get("user");
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   try {
     const formData = await c.req.formData();
     const currentPassword = formData.get("current_password")?.toString() || "";
@@ -8983,7 +9244,7 @@ userRoutes.post("/profile/password", async (c) => {
         dismissible: true
       }));
     }
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT password_hash FROM users WHERE id = ? AND is_active = 1
     `);
     const userData = await userStmt.bind(user.userId).first();
@@ -9003,7 +9264,7 @@ userRoutes.post("/profile/password", async (c) => {
       }));
     }
     const newPasswordHash = await AuthManager.hashPassword(newPassword);
-    const historyStmt = db.prepare(`
+    const historyStmt = db2.prepare(`
       INSERT INTO password_history (id, user_id, password_hash, created_at)
       VALUES (?, ?, ?, ?)
     `);
@@ -9013,13 +9274,13 @@ userRoutes.post("/profile/password", async (c) => {
       userData.password_hash,
       Date.now()
     ).run();
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE users SET password_hash = ?, updated_at = ?
       WHERE id = ?
     `);
     await updateStmt.bind(newPasswordHash, Date.now(), user.userId).run();
     await logActivity(
-      db,
+      db2,
       user.userId,
       "profile.password_change",
       "users",
@@ -9043,7 +9304,7 @@ userRoutes.post("/profile/password", async (c) => {
   }
 });
 userRoutes.get("/users", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   try {
     const page = parseInt(c.req.query("page") || "1");
@@ -9070,7 +9331,7 @@ userRoutes.get("/users", async (c) => {
       whereClause += " AND u.role = ?";
       params.push(roleFilter);
     }
-    const usersStmt = db.prepare(`
+    const usersStmt = db2.prepare(`
       SELECT u.id, u.email, u.username, u.first_name, u.last_name,
              u.role, u.avatar_url, u.created_at, u.last_login_at, u.updated_at,
              u.email_verified, u.two_factor_enabled, u.is_active
@@ -9080,13 +9341,13 @@ userRoutes.get("/users", async (c) => {
       LIMIT ? OFFSET ?
     `);
     const { results: usersData } = await usersStmt.bind(...params, limit, offset).all();
-    const countStmt = db.prepare(`
+    const countStmt = db2.prepare(`
       SELECT COUNT(*) as total FROM users u ${whereClause}
     `);
     const countResult = await countStmt.bind(...params).first();
     const totalUsers = countResult?.total || 0;
     await logActivity(
-      db,
+      db2,
       user.userId,
       "users.list_view",
       "users",
@@ -9183,7 +9444,7 @@ userRoutes.get("/users/new", async (c) => {
   }
 });
 userRoutes.post("/users/new", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   try {
     const formData = await c.req.formData();
@@ -9227,7 +9488,7 @@ userRoutes.post("/users/new", async (c) => {
         dismissible: true
       }));
     }
-    const checkStmt = db.prepare(`
+    const checkStmt = db2.prepare(`
       SELECT id FROM users
       WHERE username = ? OR email = ?
     `);
@@ -9241,7 +9502,7 @@ userRoutes.post("/users/new", async (c) => {
     }
     const passwordHash = await AuthManager.hashPassword(password);
     const userId = crypto.randomUUID();
-    const createStmt = db.prepare(`
+    const createStmt = db2.prepare(`
       INSERT INTO users (
         id, email, username, first_name, last_name, phone, bio,
         password_hash, role, is_active, email_verified, created_at, updated_at
@@ -9263,7 +9524,7 @@ userRoutes.post("/users/new", async (c) => {
       Date.now()
     ).run();
     await logActivity(
-      db,
+      db2,
       user.userId,
       "user!.create",
       "users",
@@ -9286,11 +9547,11 @@ userRoutes.get("/users/:id", async (c) => {
   if (c.req.path.endsWith("/edit")) {
     return c.notFound();
   }
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
   try {
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT id, email, username, first_name, last_name, phone, bio, avatar_url,
              role, is_active, email_verified, two_factor_enabled, created_at, last_login_at
       FROM users
@@ -9301,7 +9562,7 @@ userRoutes.get("/users/:id", async (c) => {
       return c.json({ error: "User not found" }, 404);
     }
     await logActivity(
-      db,
+      db2,
       user.userId,
       "user!.view",
       "users",
@@ -9334,11 +9595,11 @@ userRoutes.get("/users/:id", async (c) => {
   }
 });
 userRoutes.get("/users/:id/edit", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
   try {
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT id, email, username, first_name, last_name, phone, bio, avatar_url,
              role, is_active, email_verified, two_factor_enabled, created_at, last_login_at
       FROM users
@@ -9388,7 +9649,7 @@ userRoutes.get("/users/:id/edit", async (c) => {
   }
 });
 userRoutes.put("/users/:id", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
   try {
@@ -9417,7 +9678,7 @@ userRoutes.put("/users/:id", async (c) => {
         dismissible: true
       }));
     }
-    const checkStmt = db.prepare(`
+    const checkStmt = db2.prepare(`
       SELECT id FROM users
       WHERE (username = ? OR email = ?) AND id != ?
     `);
@@ -9429,7 +9690,7 @@ userRoutes.put("/users/:id", async (c) => {
         dismissible: true
       }));
     }
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE users SET
         first_name = ?, last_name = ?, username = ?, email = ?,
         phone = ?, bio = ?, role = ?, is_active = ?, email_verified = ?,
@@ -9450,7 +9711,7 @@ userRoutes.put("/users/:id", async (c) => {
       userId
     ).run();
     await logActivity(
-      db,
+      db2,
       user.userId,
       "user!.update",
       "users",
@@ -9474,7 +9735,7 @@ userRoutes.put("/users/:id", async (c) => {
   }
 });
 userRoutes.post("/users/:id/toggle", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
   try {
@@ -9483,19 +9744,19 @@ userRoutes.post("/users/:id/toggle", async (c) => {
     if (userId === user.userId && !active) {
       return c.json({ error: "You cannot deactivate your own account" }, 400);
     }
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT id, email FROM users WHERE id = ?
     `);
     const userToToggle = await userStmt.bind(userId).first();
     if (!userToToggle) {
       return c.json({ error: "User not found" }, 404);
     }
-    const toggleStmt = db.prepare(`
+    const toggleStmt = db2.prepare(`
       UPDATE users SET is_active = ?, updated_at = ? WHERE id = ?
     `);
     await toggleStmt.bind(active ? 1 : 0, Date.now(), userId).run();
     await logActivity(
-      db,
+      db2,
       user.userId,
       active ? "user.activate" : "user.deactivate",
       "users",
@@ -9514,7 +9775,7 @@ userRoutes.post("/users/:id/toggle", async (c) => {
   }
 });
 userRoutes.delete("/users/:id", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
   try {
@@ -9523,7 +9784,7 @@ userRoutes.delete("/users/:id", async (c) => {
     if (userId === user.userId) {
       return c.json({ error: "You cannot delete your own account" }, 400);
     }
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT id, email FROM users WHERE id = ?
     `);
     const userToDelete = await userStmt.bind(userId).first();
@@ -9531,12 +9792,12 @@ userRoutes.delete("/users/:id", async (c) => {
       return c.json({ error: "User not found" }, 404);
     }
     if (hardDelete) {
-      const deleteStmt = db.prepare(`
+      const deleteStmt = db2.prepare(`
         DELETE FROM users WHERE id = ?
       `);
       await deleteStmt.bind(userId).run();
       await logActivity(
-        db,
+        db2,
         user.userId,
         "user!.hard_delete",
         "users",
@@ -9550,12 +9811,12 @@ userRoutes.delete("/users/:id", async (c) => {
         message: "User permanently deleted"
       });
     } else {
-      const deleteStmt = db.prepare(`
+      const deleteStmt = db2.prepare(`
         UPDATE users SET is_active = 0, updated_at = ? WHERE id = ?
       `);
       await deleteStmt.bind(Date.now(), userId).run();
       await logActivity(
-        db,
+        db2,
         user.userId,
         "user!.soft_delete",
         "users",
@@ -9575,7 +9836,7 @@ userRoutes.delete("/users/:id", async (c) => {
   }
 });
 userRoutes.post("/invite-user", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   try {
     const formData = await c.req.formData();
@@ -9590,7 +9851,7 @@ userRoutes.post("/invite-user", async (c) => {
     if (!emailRegex.test(email)) {
       return c.json({ error: "Please enter a valid email address" }, 400);
     }
-    const existingUserStmt = db.prepare(`
+    const existingUserStmt = db2.prepare(`
       SELECT id FROM users WHERE email = ?
     `);
     const existingUser = await existingUserStmt.bind(email).first();
@@ -9599,7 +9860,7 @@ userRoutes.post("/invite-user", async (c) => {
     }
     const invitationToken = crypto.randomUUID();
     const userId = crypto.randomUUID();
-    const createUserStmt = db.prepare(`
+    const createUserStmt = db2.prepare(`
       INSERT INTO users (
         id, email, first_name, last_name, role, 
         invitation_token, invited_by, invited_at,
@@ -9621,7 +9882,7 @@ userRoutes.post("/invite-user", async (c) => {
       Date.now()
     ).run();
     await logActivity(
-      db,
+      db2,
       user.userId,
       "user!.invite_sent",
       "users",
@@ -9650,11 +9911,11 @@ userRoutes.post("/invite-user", async (c) => {
   }
 });
 userRoutes.post("/resend-invitation/:id", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
   try {
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT id, email, first_name, last_name, role, invitation_token
       FROM users 
       WHERE id = ? AND is_active = 0 AND invitation_token IS NOT NULL
@@ -9664,7 +9925,7 @@ userRoutes.post("/resend-invitation/:id", async (c) => {
       return c.json({ error: "User not found or invitation not valid" }, 404);
     }
     const newInvitationToken = crypto.randomUUID();
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE users SET 
         invitation_token = ?, 
         invited_at = ?, 
@@ -9678,7 +9939,7 @@ userRoutes.post("/resend-invitation/:id", async (c) => {
       userId
     ).run();
     await logActivity(
-      db,
+      db2,
       user.userId,
       "user!.invitation_resent",
       "users",
@@ -9699,11 +9960,11 @@ userRoutes.post("/resend-invitation/:id", async (c) => {
   }
 });
 userRoutes.delete("/cancel-invitation/:id", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   const userId = c.req.param("id");
   try {
-    const userStmt = db.prepare(`
+    const userStmt = db2.prepare(`
       SELECT id, email FROM users 
       WHERE id = ? AND is_active = 0 AND invitation_token IS NOT NULL
     `);
@@ -9711,10 +9972,10 @@ userRoutes.delete("/cancel-invitation/:id", async (c) => {
     if (!invitedUser) {
       return c.json({ error: "User not found or invitation not valid" }, 404);
     }
-    const deleteStmt = db.prepare(`DELETE FROM users WHERE id = ?`);
+    const deleteStmt = db2.prepare(`DELETE FROM users WHERE id = ?`);
     await deleteStmt.bind(userId).run();
     await logActivity(
-      db,
+      db2,
       user.userId,
       "user!.invitation_cancelled",
       "users",
@@ -9733,7 +9994,7 @@ userRoutes.delete("/cancel-invitation/:id", async (c) => {
   }
 });
 userRoutes.get("/activity-logs", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   try {
     const page = parseInt(c.req.query("page") || "1");
@@ -9771,7 +10032,7 @@ userRoutes.get("/activity-logs", async (c) => {
       params.push(toTimestamp);
     }
     const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";
-    const logsStmt = db.prepare(`
+    const logsStmt = db2.prepare(`
       SELECT 
         al.id, al.user_id, al.action, al.resource_type, al.resource_id,
         al.details, al.ip_address, al.user_agent, al.created_at,
@@ -9784,7 +10045,7 @@ userRoutes.get("/activity-logs", async (c) => {
       LIMIT ? OFFSET ?
     `);
     const { results: logs } = await logsStmt.bind(...params, limit, offset).all();
-    const countStmt = db.prepare(`
+    const countStmt = db2.prepare(`
       SELECT COUNT(*) as total 
       FROM activity_logs al
       LEFT JOIN users u ON al.user_id = u.id
@@ -9797,7 +10058,7 @@ userRoutes.get("/activity-logs", async (c) => {
       details: log.details ? JSON.parse(log.details) : null
     }));
     await logActivity(
-      db,
+      db2,
       user.userId,
       "activity.logs_viewed",
       void 0,
@@ -9839,7 +10100,7 @@ userRoutes.get("/activity-logs", async (c) => {
   }
 });
 userRoutes.get("/activity-logs/export", async (c) => {
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const user = c.get("user");
   try {
     const filters = {
@@ -9874,7 +10135,7 @@ userRoutes.get("/activity-logs/export", async (c) => {
       params.push(toTimestamp);
     }
     const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";
-    const logsStmt = db.prepare(`
+    const logsStmt = db2.prepare(`
       SELECT 
         al.id, al.user_id, al.action, al.resource_type, al.resource_id,
         al.details, al.ip_address, al.user_agent, al.created_at,
@@ -9904,7 +10165,7 @@ userRoutes.get("/activity-logs/export", async (c) => {
     }
     const csvContent = csvRows.join("\n");
     await logActivity(
-      db,
+      db2,
       user.userId,
       "activity.logs_exported",
       void 0,
@@ -11254,7 +11515,7 @@ adminMediaRoutes.get("/", async (c) => {
     const ____cacheBust = searchParams.get("t");
     const limit = 24;
     const offset = (page - 1) * limit;
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     let query = "SELECT * FROM media";
     const params = [];
     const conditions = ["deleted_at IS NULL"];
@@ -11282,9 +11543,9 @@ adminMediaRoutes.get("/", async (c) => {
       query += ` WHERE ${conditions.join(" AND ")}`;
     }
     query += ` ORDER BY uploaded_at DESC LIMIT ${limit} OFFSET ${offset}`;
-    const stmt = db.prepare(query);
+    const stmt = db2.prepare(query);
     const { results } = await stmt.bind(...params).all();
-    const foldersStmt = db.prepare(`
+    const foldersStmt = db2.prepare(`
       SELECT folder, COUNT(*) as count, SUM(size) as totalSize
       FROM media
       WHERE deleted_at IS NULL
@@ -11292,7 +11553,7 @@ adminMediaRoutes.get("/", async (c) => {
       ORDER BY folder
     `);
     const { results: folders } = await foldersStmt.all();
-    const typesStmt = db.prepare(`
+    const typesStmt = db2.prepare(`
       SELECT
         CASE
           WHEN mime_type LIKE 'image/%' THEN 'images'
@@ -11358,7 +11619,7 @@ adminMediaRoutes.get("/selector", async (c) => {
   try {
     const { searchParams } = new URL(c.req.url);
     const search = searchParams.get("search") || "";
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     let query = "SELECT * FROM media WHERE deleted_at IS NULL";
     const params = [];
     if (search.trim()) {
@@ -11367,7 +11628,7 @@ adminMediaRoutes.get("/selector", async (c) => {
       params.push(searchTerm, searchTerm, searchTerm);
     }
     query += " ORDER BY uploaded_at DESC LIMIT 24";
-    const stmt = db.prepare(query);
+    const stmt = db2.prepare(query);
     const { results } = await stmt.bind(...params).all();
     const mediaFiles = results.map((row) => ({
       id: row.id,
@@ -11474,7 +11735,7 @@ adminMediaRoutes.get("/search", async (c) => {
     const search = searchParams.get("search") || "";
     const folder = searchParams.get("folder") || "all";
     const type = searchParams.get("type") || "all";
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     let query = "SELECT * FROM media";
     const params = [];
     const conditions = [];
@@ -11507,7 +11768,7 @@ adminMediaRoutes.get("/search", async (c) => {
       query += ` WHERE ${conditions.join(" AND ")}`;
     }
     query += ` ORDER BY uploaded_at DESC LIMIT 24`;
-    const stmt = db.prepare(query);
+    const stmt = db2.prepare(query);
     const { results } = await stmt.bind(...params).all();
     const mediaFiles = results.map((row) => ({
       ...row,
@@ -11530,8 +11791,8 @@ adminMediaRoutes.get("/search", async (c) => {
 adminMediaRoutes.get("/:id/details", async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
-    const stmt = db.prepare("SELECT * FROM media WHERE id = ?");
+    const db2 = c.env.DB;
+    const stmt = db2.prepare("SELECT * FROM media WHERE id = ?");
     const result = await stmt.bind(id).first();
     if (!result) {
       return c.html('<div class="text-red-500">File not found</div>');
@@ -11604,7 +11865,7 @@ adminMediaRoutes.post("/upload", async (c) => {
           });
           continue;
         }
-        const fileId = globalThis.crypto.randomUUID();
+        const fileId = crypto.randomUUID();
         const fileExtension = file.name.split(".").pop() || "";
         const filename = `${fileId}.${fileExtension}`;
         const folder = formData.get("folder") || "uploads";
@@ -11823,10 +12084,10 @@ adminMediaRoutes.put("/:id", async (c) => {
 });
 adminMediaRoutes.delete("/cleanup", requireRole("admin"), async (c) => {
   try {
-    const db = c.env.DB;
-    const allMediaStmt = db.prepare("SELECT id, r2_key, filename FROM media WHERE deleted_at IS NULL");
+    const db2 = c.env.DB;
+    const allMediaStmt = db2.prepare("SELECT id, r2_key, filename FROM media WHERE deleted_at IS NULL");
     const { results: allMedia } = await allMediaStmt.all();
-    const contentStmt = db.prepare("SELECT data FROM content");
+    const contentStmt = db2.prepare("SELECT data FROM content");
     const { results: contentRecords } = await contentStmt.all();
     const referencedUrls = /* @__PURE__ */ new Set();
     for (const record of contentRecords) {
@@ -11856,7 +12117,7 @@ adminMediaRoutes.delete("/cleanup", requireRole("admin"), async (c) => {
     for (const file of unusedFiles) {
       try {
         await c.env.MEDIA_BUCKET.delete(file.r2_key);
-        const deleteStmt = db.prepare("UPDATE media SET deleted_at = ? WHERE id = ?");
+        const deleteStmt = db2.prepare("UPDATE media SET deleted_at = ? WHERE id = ?");
         await deleteStmt.bind(Math.floor(Date.now() / 1e3), file.id).run();
         deletedCount++;
       } catch (error) {
@@ -12079,44 +12340,6 @@ function renderPluginsListPage(data) {
         <div>
           <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">Plugins</h1>
           <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Manage and extend functionality with plugins</p>
-        </div>
-        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <div class="relative inline-block text-left">
-            <button onclick="toggleDropdown()" class="inline-flex items-center justify-center rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm">
-              <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
-              </svg>
-              Install Plugin
-              <svg class="-mr-1 ml-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-            <div id="plugin-dropdown" class="hidden absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-xl bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 focus:outline-none">
-              <div class="py-1">
-                <button onclick="installPlugin('faq-plugin')" class="block w-full text-left px-4 py-2 text-sm text-zinc-950 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors first:rounded-t-xl">
-                  <div class="flex items-center">
-                    <span class="text-lg mr-2">\u2753</span>
-                    <div>
-                      <div class="font-medium">FAQ System</div>
-                      <div class="text-xs text-zinc-500 dark:text-zinc-400">Community FAQ management plugin</div>
-                    </div>
-                  </div>
-                </button>
-                <div class="border-t border-zinc-950/5 dark:border-white/10 my-1"></div>
-                <button onclick="showNotification('Plugin marketplace coming soon!', 'info')" class="block w-full text-left px-4 py-2 text-sm text-zinc-950 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors last:rounded-b-xl">
-                  <div class="flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-zinc-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    <div>
-                      <div class="font-medium">Browse Marketplace</div>
-                      <div class="text-xs text-zinc-500 dark:text-zinc-400">Discover more plugins</div>
-                    </div>
-                  </div>
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -12448,15 +12671,10 @@ function renderPluginsListPage(data) {
         notification.className = \`fixed top-4 right-4 px-4 py-2 rounded-lg text-white z-50 \${bgColor}\`;
         notification.textContent = message;
         document.body.appendChild(notification);
-        
+
         setTimeout(() => {
           notification.remove();
         }, 3000);
-      }
-      
-      function toggleDropdown() {
-        const dropdown = document.getElementById('plugin-dropdown');
-        dropdown.classList.toggle('hidden');
       }
 
       function filterPlugins() {
@@ -12524,16 +12742,6 @@ function renderPluginsListPage(data) {
           noResultsMsg.style.display = 'none';
         }
       }
-
-      // Close dropdown when clicking outside
-      document.addEventListener('click', (event) => {
-        const dropdown = document.getElementById('plugin-dropdown');
-        const button = event.target.closest('button[onclick="toggleDropdown()"]');
-
-        if (!button && !dropdown.contains(event.target)) {
-          dropdown.classList.add('hidden');
-        }
-      });
     </script>
 
     <!-- Confirmation Dialogs -->
@@ -13557,16 +13765,29 @@ var AVAILABLE_PLUGINS = [
     permissions: [],
     dependencies: [],
     is_core: false
+  },
+  {
+    id: "easy-mdx",
+    name: "easy-mdx",
+    display_name: "EasyMDE Markdown Editor",
+    description: "Lightweight markdown editor with live preview. Provides a simple and efficient editor with markdown support for richtext fields.",
+    version: "1.0.0",
+    author: "SonicJS Team",
+    category: "editor",
+    icon: "\u{1F4DD}",
+    permissions: [],
+    dependencies: [],
+    is_core: false
   }
 ];
 adminPluginRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     if (user?.role !== "admin") {
       return c.text("Access denied", 403);
     }
-    const pluginService = new PluginService(db);
+    const pluginService = new PluginService(db2);
     let installedPlugins = [];
     let stats = { total: 0, active: 0, inactive: 0, errors: 0, uninstalled: 0 };
     try {
@@ -13633,12 +13854,12 @@ adminPluginRoutes.get("/", async (c) => {
 adminPluginRoutes.get("/:id", async (c) => {
   try {
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const pluginId = c.req.param("id");
     if (user?.role !== "admin") {
       return c.redirect("/admin/plugins");
     }
-    const pluginService = new PluginService(db);
+    const pluginService = new PluginService(db2);
     const plugin = await pluginService.getPlugin(pluginId);
     if (!plugin) {
       return c.text("Plugin not found", 404);
@@ -13687,12 +13908,12 @@ adminPluginRoutes.get("/:id", async (c) => {
 adminPluginRoutes.post("/:id/activate", async (c) => {
   try {
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const pluginId = c.req.param("id");
     if (user?.role !== "admin") {
       return c.json({ error: "Access denied" }, 403);
     }
-    const pluginService = new PluginService(db);
+    const pluginService = new PluginService(db2);
     await pluginService.activatePlugin(pluginId);
     return c.json({ success: true });
   } catch (error) {
@@ -13704,12 +13925,12 @@ adminPluginRoutes.post("/:id/activate", async (c) => {
 adminPluginRoutes.post("/:id/deactivate", async (c) => {
   try {
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const pluginId = c.req.param("id");
     if (user?.role !== "admin") {
       return c.json({ error: "Access denied" }, 403);
     }
-    const pluginService = new PluginService(db);
+    const pluginService = new PluginService(db2);
     await pluginService.deactivatePlugin(pluginId);
     return c.json({ success: true });
   } catch (error) {
@@ -13721,12 +13942,12 @@ adminPluginRoutes.post("/:id/deactivate", async (c) => {
 adminPluginRoutes.post("/install", async (c) => {
   try {
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     if (user?.role !== "admin") {
       return c.json({ error: "Access denied" }, 403);
     }
     const body = await c.req.json();
-    const pluginService = new PluginService(db);
+    const pluginService = new PluginService(db2);
     if (body.name === "faq-plugin") {
       const faqPlugin = await pluginService.installPlugin({
         id: "third-party-faq",
@@ -13905,6 +14126,28 @@ adminPluginRoutes.post("/install", async (c) => {
       });
       return c.json({ success: true, plugin: tinymcePlugin2 });
     }
+    if (body.name === "easy-mdx") {
+      const easyMdxPlugin2 = await pluginService.installPlugin({
+        id: "easy-mdx",
+        name: "easy-mdx",
+        display_name: "EasyMDE Markdown Editor",
+        description: "Lightweight markdown editor with live preview. Provides a simple and efficient editor with markdown support for richtext fields.",
+        version: "1.0.0",
+        author: "SonicJS Team",
+        category: "editor",
+        icon: "\u{1F4DD}",
+        permissions: [],
+        dependencies: [],
+        is_core: false,
+        settings: {
+          defaultHeight: 400,
+          theme: "dark",
+          toolbar: "full",
+          placeholder: "Start writing your content..."
+        }
+      });
+      return c.json({ success: true, plugin: easyMdxPlugin2 });
+    }
     return c.json({ error: "Plugin not found in registry" }, 404);
   } catch (error) {
     console.error("Error installing plugin:", error);
@@ -13915,12 +14158,12 @@ adminPluginRoutes.post("/install", async (c) => {
 adminPluginRoutes.post("/:id/uninstall", async (c) => {
   try {
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const pluginId = c.req.param("id");
     if (user?.role !== "admin") {
       return c.json({ error: "Access denied" }, 403);
     }
-    const pluginService = new PluginService(db);
+    const pluginService = new PluginService(db2);
     await pluginService.uninstallPlugin(pluginId);
     return c.json({ success: true });
   } catch (error) {
@@ -13932,13 +14175,13 @@ adminPluginRoutes.post("/:id/uninstall", async (c) => {
 adminPluginRoutes.post("/:id/settings", async (c) => {
   try {
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const pluginId = c.req.param("id");
     if (user?.role !== "admin") {
       return c.json({ error: "Access denied" }, 403);
     }
     const settings = await c.req.json();
-    const pluginService = new PluginService(db);
+    const pluginService = new PluginService(db2);
     await pluginService.updatePluginSettings(pluginId, settings);
     return c.json({ success: true });
   } catch (error) {
@@ -15399,8 +15642,8 @@ adminTestimonialsRoutes.get("/", async (c) => {
     const currentPage = parseInt(page, 10) || 1;
     const limit = 20;
     const offset = (currentPage - 1) * limit;
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.html(renderTestimonialsList({
         testimonials: [],
         totalCount: 0,
@@ -15431,7 +15674,7 @@ adminTestimonialsRoutes.get("/", async (c) => {
       params.push(searchTerm, searchTerm, searchTerm);
     }
     const countQuery = `SELECT COUNT(*) as count FROM testimonials ${whereClause}`;
-    const { results: countResults } = await db.prepare(countQuery).bind(...params).all();
+    const { results: countResults } = await db2.prepare(countQuery).bind(...params).all();
     const totalCount = countResults?.[0]?.count || 0;
     const dataQuery = `
       SELECT * FROM testimonials
@@ -15439,7 +15682,7 @@ adminTestimonialsRoutes.get("/", async (c) => {
       ORDER BY sortOrder ASC, created_at DESC
       LIMIT ? OFFSET ?
     `;
-    const { results: testimonials } = await db.prepare(dataQuery).bind(...params, limit, offset).all();
+    const { results: testimonials } = await db2.prepare(dataQuery).bind(...params, limit, offset).all();
     const totalPages = Math.ceil(totalCount / limit);
     return c.html(renderTestimonialsList({
       testimonials: testimonials || [],
@@ -15487,8 +15730,8 @@ adminTestimonialsRoutes.post("/", async (c) => {
     const data = Object.fromEntries(formData.entries());
     const validatedData = testimonialSchema.parse(data);
     const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.html(renderTestimonialsForm({
         isEdit: false,
         user: user ? {
@@ -15500,7 +15743,7 @@ adminTestimonialsRoutes.post("/", async (c) => {
         messageType: "error"
       }));
     }
-    const { results } = await db.prepare(`
+    const { results } = await db2.prepare(`
       INSERT INTO testimonials (author_name, author_title, author_company, testimonial_text, rating, isPublished, sortOrder)
       VALUES (?, ?, ?, ?, ?, ?, ?)
       RETURNING *
@@ -15532,7 +15775,7 @@ adminTestimonialsRoutes.post("/", async (c) => {
     const user = c.get("user");
     if (error instanceof z.ZodError) {
       const errors = {};
-      error.errors.forEach((err) => {
+      error.issues.forEach((err) => {
         const field = err.path[0];
         if (!errors[field]) errors[field] = [];
         errors[field].push(err.message);
@@ -15565,8 +15808,8 @@ adminTestimonialsRoutes.get("/:id", async (c) => {
   try {
     const id = parseInt(c.req.param("id"));
     const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.html(renderTestimonialsForm({
         isEdit: true,
         user: user ? {
@@ -15578,7 +15821,7 @@ adminTestimonialsRoutes.get("/:id", async (c) => {
         messageType: "error"
       }));
     }
-    const { results } = await db.prepare("SELECT * FROM testimonials WHERE id = ?").bind(id).all();
+    const { results } = await db2.prepare("SELECT * FROM testimonials WHERE id = ?").bind(id).all();
     if (!results || results.length === 0) {
       return c.redirect("/admin/testimonials?message=Testimonial not found&type=error");
     }
@@ -15623,8 +15866,8 @@ adminTestimonialsRoutes.put("/:id", async (c) => {
     const data = Object.fromEntries(formData.entries());
     const validatedData = testimonialSchema.parse(data);
     const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.html(renderTestimonialsForm({
         isEdit: true,
         user: user ? {
@@ -15636,7 +15879,7 @@ adminTestimonialsRoutes.put("/:id", async (c) => {
         messageType: "error"
       }));
     }
-    const { results } = await db.prepare(`
+    const { results } = await db2.prepare(`
       UPDATE testimonials
       SET author_name = ?, author_title = ?, author_company = ?, testimonial_text = ?, rating = ?, isPublished = ?, sortOrder = ?
       WHERE id = ?
@@ -15681,7 +15924,7 @@ adminTestimonialsRoutes.put("/:id", async (c) => {
     const id = parseInt(c.req.param("id"));
     if (error instanceof z.ZodError) {
       const errors = {};
-      error.errors.forEach((err) => {
+      error.issues.forEach((err) => {
         const field = err.path[0];
         if (!errors[field]) errors[field] = [];
         errors[field].push(err.message);
@@ -15733,11 +15976,11 @@ adminTestimonialsRoutes.put("/:id", async (c) => {
 adminTestimonialsRoutes.delete("/:id", async (c) => {
   try {
     const id = parseInt(c.req.param("id"));
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.json({ error: "Database not available" }, 500);
     }
-    const { changes } = await db.prepare("DELETE FROM testimonials WHERE id = ?").bind(id).run();
+    const { changes } = await db2.prepare("DELETE FROM testimonials WHERE id = ?").bind(id).run();
     if (changes === 0) {
       return c.json({ error: "Testimonial not found" }, 404);
     }
@@ -16069,8 +16312,8 @@ adminCodeExamplesRoutes.get("/", async (c) => {
     const currentPage = parseInt(page, 10) || 1;
     const limit = 20;
     const offset = (currentPage - 1) * limit;
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.html(renderCodeExamplesList({
         codeExamples: [],
         totalCount: 0,
@@ -16101,7 +16344,7 @@ adminCodeExamplesRoutes.get("/", async (c) => {
       params.push(searchTerm, searchTerm, searchTerm, searchTerm);
     }
     const countQuery = `SELECT COUNT(*) as count FROM code_examples ${whereClause}`;
-    const { results: countResults } = await db.prepare(countQuery).bind(...params).all();
+    const { results: countResults } = await db2.prepare(countQuery).bind(...params).all();
     const totalCount = countResults?.[0]?.count || 0;
     const dataQuery = `
       SELECT * FROM code_examples
@@ -16109,7 +16352,7 @@ adminCodeExamplesRoutes.get("/", async (c) => {
       ORDER BY sortOrder ASC, created_at DESC
       LIMIT ? OFFSET ?
     `;
-    const { results: codeExamples } = await db.prepare(dataQuery).bind(...params, limit, offset).all();
+    const { results: codeExamples } = await db2.prepare(dataQuery).bind(...params, limit, offset).all();
     const totalPages = Math.ceil(totalCount / limit);
     return c.html(renderCodeExamplesList({
       codeExamples: codeExamples || [],
@@ -16157,8 +16400,8 @@ adminCodeExamplesRoutes.post("/", async (c) => {
     const data = Object.fromEntries(formData.entries());
     const validatedData = codeExampleSchema.parse(data);
     const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.html(renderCodeExamplesForm({
         isEdit: false,
         user: user ? {
@@ -16170,7 +16413,7 @@ adminCodeExamplesRoutes.post("/", async (c) => {
         messageType: "error"
       }));
     }
-    const { results } = await db.prepare(`
+    const { results } = await db2.prepare(`
       INSERT INTO code_examples (title, description, code, language, category, tags, isPublished, sortOrder)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       RETURNING *
@@ -16203,7 +16446,7 @@ adminCodeExamplesRoutes.post("/", async (c) => {
     const user = c.get("user");
     if (error instanceof z.ZodError) {
       const errors = {};
-      error.errors.forEach((err) => {
+      error.issues.forEach((err) => {
         const field = err.path[0];
         if (!errors[field]) errors[field] = [];
         errors[field].push(err.message);
@@ -16236,8 +16479,8 @@ adminCodeExamplesRoutes.get("/:id", async (c) => {
   try {
     const id = parseInt(c.req.param("id"));
     const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.html(renderCodeExamplesForm({
         isEdit: true,
         user: user ? {
@@ -16249,7 +16492,7 @@ adminCodeExamplesRoutes.get("/:id", async (c) => {
         messageType: "error"
       }));
     }
-    const { results } = await db.prepare("SELECT * FROM code_examples WHERE id = ?").bind(id).all();
+    const { results } = await db2.prepare("SELECT * FROM code_examples WHERE id = ?").bind(id).all();
     if (!results || results.length === 0) {
       return c.redirect("/admin/code-examples?message=Code example not found&type=error");
     }
@@ -16295,8 +16538,8 @@ adminCodeExamplesRoutes.put("/:id", async (c) => {
     const data = Object.fromEntries(formData.entries());
     const validatedData = codeExampleSchema.parse(data);
     const user = c.get("user");
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.html(renderCodeExamplesForm({
         isEdit: true,
         user: user ? {
@@ -16308,7 +16551,7 @@ adminCodeExamplesRoutes.put("/:id", async (c) => {
         messageType: "error"
       }));
     }
-    const { results } = await db.prepare(`
+    const { results } = await db2.prepare(`
       UPDATE code_examples
       SET title = ?, description = ?, code = ?, language = ?, category = ?, tags = ?, isPublished = ?, sortOrder = ?
       WHERE id = ?
@@ -16355,7 +16598,7 @@ adminCodeExamplesRoutes.put("/:id", async (c) => {
     const id = parseInt(c.req.param("id"));
     if (error instanceof z.ZodError) {
       const errors = {};
-      error.errors.forEach((err) => {
+      error.issues.forEach((err) => {
         const field = err.path[0];
         if (!errors[field]) errors[field] = [];
         errors[field].push(err.message);
@@ -16409,11 +16652,11 @@ adminCodeExamplesRoutes.put("/:id", async (c) => {
 adminCodeExamplesRoutes.delete("/:id", async (c) => {
   try {
     const id = parseInt(c.req.param("id"));
-    const db = c.env?.DB;
-    if (!db) {
+    const db2 = c.env?.DB;
+    if (!db2) {
       return c.json({ error: "Database not available" }, 500);
     }
-    const { changes } = await db.prepare("DELETE FROM code_examples WHERE id = ?").bind(id).run();
+    const { changes } = await db2.prepare("DELETE FROM code_examples WHERE id = ?").bind(id).run();
     if (changes === 0) {
       return c.json({ error: "Code example not found" }, 404);
     }
@@ -17092,10 +17335,10 @@ router.get("/", async (c) => {
 });
 router.get("/stats", async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     let collectionsCount = 0;
     try {
-      const collectionsStmt = db.prepare("SELECT COUNT(*) as count FROM collections WHERE is_active = 1");
+      const collectionsStmt = db2.prepare("SELECT COUNT(*) as count FROM collections WHERE is_active = 1");
       const collectionsResult = await collectionsStmt.first();
       collectionsCount = collectionsResult?.count || 0;
     } catch (error) {
@@ -17103,7 +17346,7 @@ router.get("/stats", async (c) => {
     }
     let contentCount = 0;
     try {
-      const contentStmt = db.prepare("SELECT COUNT(*) as count FROM content");
+      const contentStmt = db2.prepare("SELECT COUNT(*) as count FROM content");
       const contentResult = await contentStmt.first();
       contentCount = contentResult?.count || 0;
     } catch (error) {
@@ -17112,7 +17355,7 @@ router.get("/stats", async (c) => {
     let mediaCount = 0;
     let mediaSize = 0;
     try {
-      const mediaStmt = db.prepare("SELECT COUNT(*) as count, COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL");
+      const mediaStmt = db2.prepare("SELECT COUNT(*) as count, COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL");
       const mediaResult = await mediaStmt.first();
       mediaCount = mediaResult?.count || 0;
       mediaSize = mediaResult?.total_size || 0;
@@ -17121,7 +17364,7 @@ router.get("/stats", async (c) => {
     }
     let usersCount = 0;
     try {
-      const usersStmt = db.prepare("SELECT COUNT(*) as count FROM users WHERE is_active = 1");
+      const usersStmt = db2.prepare("SELECT COUNT(*) as count FROM users WHERE is_active = 1");
       const usersResult = await usersStmt.first();
       usersCount = usersResult?.count || 0;
     } catch (error) {
@@ -17142,17 +17385,17 @@ router.get("/stats", async (c) => {
 });
 router.get("/storage", async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     let databaseSize = 0;
     try {
-      const result = await db.prepare("SELECT 1").run();
+      const result = await db2.prepare("SELECT 1").run();
       databaseSize = result?.meta?.size_after || 0;
     } catch (error) {
       console.error("Error fetching database size:", error);
     }
     let mediaSize = 0;
     try {
-      const mediaStmt = db.prepare("SELECT COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL");
+      const mediaStmt = db2.prepare("SELECT COALESCE(SUM(size), 0) as total_size FROM media WHERE deleted_at IS NULL");
       const mediaResult = await mediaStmt.first();
       mediaSize = mediaResult?.total_size || 0;
     } catch (error) {
@@ -17167,9 +17410,9 @@ router.get("/storage", async (c) => {
 });
 router.get("/recent-activity", async (c) => {
   try {
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const limit = parseInt(c.req.query("limit") || "5");
-    const activityStmt = db.prepare(`
+    const activityStmt = db2.prepare(`
       SELECT
         a.id,
         a.action,
@@ -17773,7 +18016,7 @@ function getFieldTypeBadge(fieldType) {
     "text": "Text",
     "richtext": "Rich Text (TinyMCE)",
     "quill": "Rich Text (Quill)",
-    "mdxeditor": "Rich Text (MDXEditor)",
+    "mdxeditor": "EasyMDX",
     "number": "Number",
     "boolean": "Boolean",
     "date": "Date",
@@ -17796,6 +18039,7 @@ function getFieldTypeBadge(fieldType) {
   return `<span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${color} ring-1 ring-inset">${label}</span>`;
 }
 function renderCollectionFormPage(data) {
+  console.log("[renderCollectionFormPage] editorPlugins:", data.editorPlugins);
   const isEdit = data.isEdit || !!data.id;
   const title = isEdit ? "Edit Collection" : "Create New Collection";
   const subtitle = isEdit ? `Update collection: ${data.display_name}` : "Define a new content collection with custom fields and settings.";
@@ -18260,7 +18504,7 @@ function renderCollectionFormPage(data) {
                 <option value="text">Text</option>
                 ${data.editorPlugins?.tinymce ? '<option value="richtext">Rich Text (TinyMCE)</option>' : ""}
                 ${data.editorPlugins?.quill ? '<option value="quill">Rich Text (Quill)</option>' : ""}
-                ${data.editorPlugins?.mdxeditor ? '<option value="mdxeditor">Rich Text (MDXEditor)</option>' : ""}
+                ${data.editorPlugins?.easyMdx ? '<option value="mdxeditor">EasyMDX</option>' : ""}
                 <option value="number">Number</option>
                 <option value="boolean">Boolean</option>
                 <option value="date">Date</option>
@@ -18482,12 +18726,13 @@ function renderCollectionFormPage(data) {
 
           // Check if it's a schema field with field_options that might indicate the actual type
           if (field.field_options && typeof field.field_options === 'object') {
-            // Check for richtext format
-            if (field.field_options.format === 'richtext') {
+            // Only convert to richtext if type is explicitly 'string' and format is richtext
+            // Don't convert if it's already a specific editor type like 'mdxeditor', 'quill', etc.
+            if (field.field_options.format === 'richtext' && uiFieldType === 'string') {
               uiFieldType = 'richtext';
             }
             // Check for other format indicators
-            else if (field.field_options.type) {
+            else if (field.field_options.type && !uiFieldType) {
               uiFieldType = field.field_options.type;
             }
           }
@@ -18503,8 +18748,60 @@ function renderCollectionFormPage(data) {
             uiFieldType = typeMapping[uiFieldType];
           }
 
+          // Log all available options
+          const availableOptions = Array.from(fieldTypeSelect.options).map(opt => ({ value: opt.value, text: opt.text }));
+          console.log('Available dropdown options:', availableOptions);
+          console.log('Trying to set field-type to:', uiFieldType);
+
+          // Clear any existing selections first
+          Array.from(fieldTypeSelect.options).forEach(opt => opt.selected = false);
+
+          // Try multiple approaches to set the value
+          let selectionSucceeded = false;
+
+          // Approach 1: Direct value assignment
           fieldTypeSelect.value = uiFieldType;
-          console.log('Set field-type to:', fieldTypeSelect.value, '(original:', field.field_type, ')');
+          if (fieldTypeSelect.value === uiFieldType) {
+            selectionSucceeded = true;
+            console.log('\u2713 Approach 1 (direct value) succeeded');
+          }
+
+          // Approach 2: Find and select the specific option
+          if (!selectionSucceeded) {
+            console.log('Approach 1 failed, trying approach 2 (direct option selection)');
+            const optionToSelect = Array.from(fieldTypeSelect.options).find(opt => opt.value === uiFieldType);
+            if (optionToSelect) {
+              optionToSelect.selected = true;
+              // Trigger change event
+              fieldTypeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+              if (fieldTypeSelect.value === uiFieldType) {
+                selectionSucceeded = true;
+                console.log('\u2713 Approach 2 (option.selected) succeeded');
+              }
+            }
+          }
+
+          // Approach 3: Set selectedIndex
+          if (!selectionSucceeded) {
+            console.log('Approach 2 failed, trying approach 3 (selectedIndex)');
+            const optionIndex = Array.from(fieldTypeSelect.options).findIndex(opt => opt.value === uiFieldType);
+            if (optionIndex !== -1) {
+              fieldTypeSelect.selectedIndex = optionIndex;
+              if (fieldTypeSelect.value === uiFieldType) {
+                selectionSucceeded = true;
+                console.log('\u2713 Approach 3 (selectedIndex) succeeded');
+              }
+            }
+          }
+
+          console.log('Final field-type value:', fieldTypeSelect.value, '(wanted:', uiFieldType, ')');
+
+          if (!selectionSucceeded) {
+            console.error('\u274C All approaches failed to set field-type!');
+            console.error('Wanted:', uiFieldType);
+            console.error('Got:', fieldTypeSelect.value);
+            console.error('Available options:', availableOptions);
+          }
         } else {
           console.error('field-type select not found!');
         }
@@ -18575,9 +18872,15 @@ function renderCollectionFormPage(data) {
         setTimeout(() => {
           isEditingField = false;
           console.log('Cleared isEditingField flag');
-        }, 100);
 
-        }, 10); // Small delay to ensure modal is fully rendered
+          // Double-check the field-type value after the flag is cleared
+          const finalCheck = document.getElementById('field-type');
+          if (finalCheck) {
+            console.log('Post-flag-clear check - field-type value:', finalCheck.value);
+          }
+        }, 200); // Increased delay
+
+        }, 50); // Increased delay to ensure modal is fully rendered
       }
 
       function closeFieldModal() {
@@ -18762,13 +19065,13 @@ adminCollectionsRoutes.use("*", requireAuth());
 adminCollectionsRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const url = new URL(c.req.url);
     const search = url.searchParams.get("search") || "";
     let stmt;
     let results;
     if (search) {
-      stmt = db.prepare(`
+      stmt = db2.prepare(`
         SELECT id, name, display_name, description, created_at, managed, schema
         FROM collections
         WHERE is_active = 1
@@ -18779,11 +19082,11 @@ adminCollectionsRoutes.get("/", async (c) => {
       const queryResults = await stmt.bind(searchParam, searchParam, searchParam).all();
       results = queryResults.results;
     } else {
-      stmt = db.prepare("SELECT id, name, display_name, description, created_at, managed, schema FROM collections WHERE is_active = 1 ORDER BY created_at DESC");
+      stmt = db2.prepare("SELECT id, name, display_name, description, created_at, managed, schema FROM collections WHERE is_active = 1 ORDER BY created_at DESC");
       const queryResults = await stmt.all();
       results = queryResults.results;
     }
-    const fieldCountStmt = db.prepare("SELECT collection_id, COUNT(*) as count FROM content_fields GROUP BY collection_id");
+    const fieldCountStmt = db2.prepare("SELECT collection_id, COUNT(*) as count FROM content_fields GROUP BY collection_id");
     const { results: fieldCountResults } = await fieldCountStmt.all();
     const fieldCounts = new Map((fieldCountResults || []).map((row) => [String(row.collection_id), Number(row.count)]));
     const collections = (results || []).filter((row) => row && row.id).map((row) => {
@@ -18824,21 +19127,22 @@ adminCollectionsRoutes.get("/", async (c) => {
     return c.html(renderCollectionsListPage(pageData));
   } catch (error) {
     console.error("Error fetching collections:", error);
-    return c.html(html`<p>Error loading collections</p>`);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return c.html(html`<p>Error loading collections: ${errorMessage}</p>`);
   }
 });
 adminCollectionsRoutes.get("/new", async (c) => {
   const user = c.get("user");
-  const db = c.env.DB;
+  const db2 = c.env.DB;
   const [tinymceActive, quillActive, mdxeditorActive] = await Promise.all([
-    isPluginActive2(db, "tinymce-plugin"),
-    isPluginActive2(db, "quill-editor"),
-    isPluginActive2(db, "mdxeditor-plugin")
+    isPluginActive2(db2, "tinymce-plugin"),
+    isPluginActive2(db2, "quill-editor"),
+    isPluginActive2(db2, "easy-mdx")
   ]);
   console.log("[Collections /new] Editor plugins status:", {
     tinymce: tinymceActive,
     quill: quillActive,
-    mdxeditor: mdxeditorActive
+    easyMdx: mdxeditorActive
   });
   const formData = {
     isEdit: false,
@@ -18851,7 +19155,7 @@ adminCollectionsRoutes.get("/new", async (c) => {
     editorPlugins: {
       tinymce: tinymceActive,
       quill: quillActive,
-      mdxeditor: mdxeditorActive
+      easyMdx: mdxeditorActive
     }
   };
   return c.html(renderCollectionFormPage(formData));
@@ -18887,8 +19191,8 @@ adminCollectionsRoutes.post("/", async (c) => {
         return c.redirect("/admin/collections/new");
       }
     }
-    const db = c.env.DB;
-    const existingStmt = db.prepare("SELECT id FROM collections WHERE name = ?");
+    const db2 = c.env.DB;
+    const existingStmt = db2.prepare("SELECT id FROM collections WHERE name = ?");
     const existing = await existingStmt.bind(name).first();
     if (existing) {
       const errorMsg = "A collection with this name already exists.";
@@ -18924,9 +19228,9 @@ adminCollectionsRoutes.post("/", async (c) => {
       },
       required: ["title"]
     };
-    const collectionId = globalThis.crypto.randomUUID();
+    const collectionId = crypto.randomUUID();
     const now = Date.now();
-    const insertStmt = db.prepare(`
+    const insertStmt = db2.prepare(`
       INSERT INTO collections (id, name, display_name, description, schema, is_active, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
@@ -18981,10 +19285,15 @@ adminCollectionsRoutes.get("/:id", async (c) => {
   try {
     const id = c.req.param("id");
     const user = c.get("user");
-    const db = c.env.DB;
-    const stmt = db.prepare("SELECT * FROM collections WHERE id = ?");
+    const db2 = c.env.DB;
+    const stmt = db2.prepare("SELECT * FROM collections WHERE id = ?");
     const collection = await stmt.bind(id).first();
     if (!collection) {
+      const [tinymceActive2, quillActive2, mdxeditorActive2] = await Promise.all([
+        isPluginActive2(db2, "tinymce-plugin"),
+        isPluginActive2(db2, "quill-editor"),
+        isPluginActive2(db2, "easy-mdx")
+      ]);
       const formData2 = {
         isEdit: true,
         error: "Collection not found.",
@@ -18993,7 +19302,12 @@ adminCollectionsRoutes.get("/:id", async (c) => {
           email: user.email,
           role: user.role
         } : void 0,
-        version: c.get("appVersion")
+        version: c.get("appVersion"),
+        editorPlugins: {
+          tinymce: tinymceActive2,
+          quill: quillActive2,
+          easyMdx: mdxeditorActive2
+        }
       };
       return c.html(renderCollectionFormPage(formData2));
     }
@@ -19019,28 +19333,44 @@ adminCollectionsRoutes.get("/:id", async (c) => {
       }
     }
     if (fields.length === 0) {
-      const fieldsStmt = db.prepare(`
+      const fieldsStmt = db2.prepare(`
         SELECT * FROM content_fields
         WHERE collection_id = ?
         ORDER BY field_order ASC
       `);
       const { results: fieldsResults } = await fieldsStmt.bind(id).all();
-      fields = (fieldsResults || []).map((row) => ({
-        id: row.id,
-        field_name: row.field_name,
-        field_type: row.field_type,
-        field_label: row.field_label,
-        field_options: row.field_options ? JSON.parse(row.field_options) : {},
-        field_order: row.field_order,
-        is_required: row.is_required === 1,
-        is_searchable: row.is_searchable === 1
-      }));
+      fields = (fieldsResults || []).map((row) => {
+        let fieldOptions = {};
+        if (row.field_options) {
+          try {
+            fieldOptions = typeof row.field_options === "string" ? JSON.parse(row.field_options) : row.field_options;
+          } catch (e) {
+            console.error("Error parsing field_options for field:", row.field_name, e);
+            fieldOptions = {};
+          }
+        }
+        return {
+          id: row.id,
+          field_name: row.field_name,
+          field_type: row.field_type,
+          field_label: row.field_label,
+          field_options: fieldOptions,
+          field_order: row.field_order,
+          is_required: row.is_required === 1,
+          is_searchable: row.is_searchable === 1
+        };
+      });
     }
     const [tinymceActive, quillActive, mdxeditorActive] = await Promise.all([
-      isPluginActive2(db, "tinymce-plugin"),
-      isPluginActive2(db, "quill-editor"),
-      isPluginActive2(db, "mdxeditor-plugin")
+      isPluginActive2(db2, "tinymce-plugin"),
+      isPluginActive2(db2, "quill-editor"),
+      isPluginActive2(db2, "easy-mdx")
     ]);
+    console.log("[Collections /:id] Editor plugins status:", {
+      tinymce: tinymceActive,
+      quill: quillActive,
+      easyMdx: mdxeditorActive
+    });
     const formData = {
       id: collection.id,
       name: collection.name,
@@ -19058,13 +19388,18 @@ adminCollectionsRoutes.get("/:id", async (c) => {
       editorPlugins: {
         tinymce: tinymceActive,
         quill: quillActive,
-        mdxeditor: mdxeditorActive
+        easyMdx: mdxeditorActive
       }
     };
     return c.html(renderCollectionFormPage(formData));
   } catch (error) {
     console.error("Error fetching collection:", error);
     const user = c.get("user");
+    const [tinymceActive, quillActive, mdxeditorActive] = await Promise.all([
+      isPluginActive2(db, "tinymce-plugin"),
+      isPluginActive2(db, "quill-editor"),
+      isPluginActive2(db, "easy-mdx")
+    ]);
     const formData = {
       isEdit: true,
       error: "Failed to load collection.",
@@ -19073,7 +19408,12 @@ adminCollectionsRoutes.get("/:id", async (c) => {
         email: user.email,
         role: user.role
       } : void 0,
-      version: c.get("appVersion")
+      version: c.get("appVersion"),
+      editorPlugins: {
+        tinymce: tinymceActive,
+        quill: quillActive,
+        easyMdx: mdxeditorActive
+      }
     };
     return c.html(renderCollectionFormPage(formData));
   }
@@ -19091,8 +19431,8 @@ adminCollectionsRoutes.put("/:id", async (c) => {
         </div>
       `);
     }
-    const db = c.env.DB;
-    const updateStmt = db.prepare(`
+    const db2 = c.env.DB;
+    const updateStmt = db2.prepare(`
       UPDATE collections
       SET display_name = ?, description = ?, updated_at = ?
       WHERE id = ?
@@ -19115,8 +19455,8 @@ adminCollectionsRoutes.put("/:id", async (c) => {
 adminCollectionsRoutes.delete("/:id", async (c) => {
   try {
     const id = c.req.param("id");
-    const db = c.env.DB;
-    const contentStmt = db.prepare("SELECT COUNT(*) as count FROM content WHERE collection_id = ?");
+    const db2 = c.env.DB;
+    const contentStmt = db2.prepare("SELECT COUNT(*) as count FROM content WHERE collection_id = ?");
     const contentResult = await contentStmt.bind(id).first();
     if (contentResult && contentResult.count > 0) {
       return c.html(html`
@@ -19125,9 +19465,9 @@ adminCollectionsRoutes.delete("/:id", async (c) => {
         </div>
       `);
     }
-    const deleteFieldsStmt = db.prepare("DELETE FROM content_fields WHERE collection_id = ?");
+    const deleteFieldsStmt = db2.prepare("DELETE FROM content_fields WHERE collection_id = ?");
     await deleteFieldsStmt.bind(id).run();
-    const deleteStmt = db.prepare("DELETE FROM collections WHERE id = ?");
+    const deleteStmt = db2.prepare("DELETE FROM collections WHERE id = ?");
     await deleteStmt.bind(id).run();
     return c.html(html`
       <script>
@@ -19159,18 +19499,18 @@ adminCollectionsRoutes.post("/:id/fields", async (c) => {
     if (!/^[a-z0-9_]+$/.test(fieldName)) {
       return c.json({ success: false, error: "Field name must contain only lowercase letters, numbers, and underscores." });
     }
-    const db = c.env.DB;
-    const existingStmt = db.prepare("SELECT id FROM content_fields WHERE collection_id = ? AND field_name = ?");
+    const db2 = c.env.DB;
+    const existingStmt = db2.prepare("SELECT id FROM content_fields WHERE collection_id = ? AND field_name = ?");
     const existing = await existingStmt.bind(collectionId, fieldName).first();
     if (existing) {
       return c.json({ success: false, error: "A field with this name already exists." });
     }
-    const orderStmt = db.prepare("SELECT MAX(field_order) as max_order FROM content_fields WHERE collection_id = ?");
+    const orderStmt = db2.prepare("SELECT MAX(field_order) as max_order FROM content_fields WHERE collection_id = ?");
     const orderResult = await orderStmt.bind(collectionId).first();
     const nextOrder = (orderResult?.max_order || 0) + 1;
-    const fieldId = globalThis.crypto.randomUUID();
+    const fieldId = crypto.randomUUID();
     const now = Date.now();
-    const insertStmt = db.prepare(`
+    const insertStmt = db2.prepare(`
       INSERT INTO content_fields (
         id, collection_id, field_name, field_type, field_label,
         field_options, field_order, is_required, is_searchable,
@@ -19219,11 +19559,11 @@ adminCollectionsRoutes.put("/:collectionId/fields/:fieldId", async (c) => {
     if (!fieldLabel) {
       return c.json({ success: false, error: "Field label is required." });
     }
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     if (fieldId.startsWith("schema-")) {
       const fieldName = fieldId.replace("schema-", "");
       console.log("[Field Update] Updating schema field:", fieldName);
-      const getCollectionStmt = db.prepare("SELECT * FROM collections WHERE id = ?");
+      const getCollectionStmt = db2.prepare("SELECT * FROM collections WHERE id = ?");
       const collection = await getCollectionStmt.bind(collectionId).first();
       if (!collection) {
         return c.json({ success: false, error: "Collection not found." });
@@ -19268,7 +19608,7 @@ adminCollectionsRoutes.put("/:collectionId/fields/:fieldId", async (c) => {
         console.log("[Field Update] Final required array:", schema.required);
         console.log("[Field Update] Final field config:", schema.properties[fieldName]);
       }
-      const updateCollectionStmt = db.prepare(`
+      const updateCollectionStmt = db2.prepare(`
         UPDATE collections
         SET schema = ?, updated_at = ?
         WHERE id = ?
@@ -19280,7 +19620,7 @@ adminCollectionsRoutes.put("/:collectionId/fields/:fieldId", async (c) => {
       });
       return c.json({ success: true });
     }
-    const updateStmt = db.prepare(`
+    const updateStmt = db2.prepare(`
       UPDATE content_fields
       SET field_label = ?, field_type = ?, field_options = ?, is_required = ?, is_searchable = ?, updated_at = ?
       WHERE id = ?
@@ -19292,7 +19632,7 @@ adminCollectionsRoutes.put("/:collectionId/fields/:fieldId", async (c) => {
       changes: result.meta?.changes,
       last_row_id: result.meta?.last_row_id
     });
-    const verifyStmt = db.prepare("SELECT * FROM content_fields WHERE id = ?");
+    const verifyStmt = db2.prepare("SELECT * FROM content_fields WHERE id = ?");
     const verifyResult = await verifyStmt.bind(fieldId).first();
     console.log("[Field Update] Verification - field after update:", verifyResult);
     console.log("[Field Update] Successfully updated field with type:", fieldType);
@@ -19305,8 +19645,8 @@ adminCollectionsRoutes.put("/:collectionId/fields/:fieldId", async (c) => {
 adminCollectionsRoutes.delete("/:collectionId/fields/:fieldId", async (c) => {
   try {
     const fieldId = c.req.param("fieldId");
-    const db = c.env.DB;
-    const deleteStmt = db.prepare("DELETE FROM content_fields WHERE id = ?");
+    const db2 = c.env.DB;
+    const deleteStmt = db2.prepare("DELETE FROM content_fields WHERE id = ?");
     await deleteStmt.bind(fieldId).run();
     return c.json({ success: true });
   } catch (error) {
@@ -19321,9 +19661,9 @@ adminCollectionsRoutes.post("/:collectionId/fields/reorder", async (c) => {
     if (!Array.isArray(fieldIds)) {
       return c.json({ success: false, error: "Invalid field order data." });
     }
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     for (let i = 0; i < fieldIds.length; i++) {
-      const updateStmt = db.prepare("UPDATE content_fields SET field_order = ?, updated_at = ? WHERE id = ?");
+      const updateStmt = db2.prepare("UPDATE content_fields SET field_order = ?, updated_at = ? WHERE id = ?");
       await updateStmt.bind(i + 1, Date.now(), fieldIds[i]).run();
     }
     return c.json({ success: true });
@@ -20846,8 +21186,8 @@ adminSettingsRoutes.get("/", (c) => {
 });
 adminSettingsRoutes.get("/general", async (c) => {
   const user = c.get("user");
-  const db = c.env.DB;
-  const settingsService = new SettingsService(db);
+  const db2 = c.env.DB;
+  const settingsService = new SettingsService(db2);
   const generalSettings = await settingsService.getGeneralSettings(user?.email);
   const mockSettings = getMockSettings(user);
   mockSettings.general = generalSettings;
@@ -20949,8 +21289,8 @@ adminSettingsRoutes.get("/database-tools", (c) => {
 });
 adminSettingsRoutes.get("/api/migrations/status", async (c) => {
   try {
-    const db = c.env.DB;
-    const migrationService = new MigrationService(db);
+    const db2 = c.env.DB;
+    const migrationService = new MigrationService(db2);
     const status = await migrationService.getMigrationStatus();
     return c.json({
       success: true,
@@ -20973,8 +21313,8 @@ adminSettingsRoutes.post("/api/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const db = c.env.DB;
-    const migrationService = new MigrationService(db);
+    const db2 = c.env.DB;
+    const migrationService = new MigrationService(db2);
     const result = await migrationService.runPendingMigrations();
     return c.json({
       success: result.success,
@@ -20991,8 +21331,8 @@ adminSettingsRoutes.post("/api/migrations/run", async (c) => {
 });
 adminSettingsRoutes.get("/api/migrations/validate", async (c) => {
   try {
-    const db = c.env.DB;
-    const migrationService = new MigrationService(db);
+    const db2 = c.env.DB;
+    const migrationService = new MigrationService(db2);
     const validation = await migrationService.validateSchema();
     return c.json({
       success: true,
@@ -21008,8 +21348,8 @@ adminSettingsRoutes.get("/api/migrations/validate", async (c) => {
 });
 adminSettingsRoutes.get("/api/database-tools/stats", async (c) => {
   try {
-    const db = c.env.DB;
-    const tablesQuery = await db.prepare(`
+    const db2 = c.env.DB;
+    const tablesQuery = await db2.prepare(`
       SELECT name FROM sqlite_master
       WHERE type='table'
       AND name NOT LIKE 'sqlite_%'
@@ -21021,7 +21361,7 @@ adminSettingsRoutes.get("/api/database-tools/stats", async (c) => {
     const tableStats = await Promise.all(
       tables.map(async (table) => {
         try {
-          const countResult = await db.prepare(`SELECT COUNT(*) as count FROM ${table.name}`).first();
+          const countResult = await db2.prepare(`SELECT COUNT(*) as count FROM ${table.name}`).first();
           const rowCount = countResult?.count || 0;
           totalRows += rowCount;
           return {
@@ -21058,8 +21398,8 @@ adminSettingsRoutes.get("/api/database-tools/stats", async (c) => {
 });
 adminSettingsRoutes.get("/api/database-tools/validate", async (c) => {
   try {
-    const db = c.env.DB;
-    const integrityResult = await db.prepare("PRAGMA integrity_check").first();
+    const db2 = c.env.DB;
+    const integrityResult = await db2.prepare("PRAGMA integrity_check").first();
     const isValid = integrityResult?.integrity_check === "ok";
     return c.json({
       success: true,
@@ -21114,11 +21454,11 @@ adminSettingsRoutes.post("/api/database-tools/truncate", async (c) => {
         error: "No tables specified for truncation"
       }, 400);
     }
-    const db = c.env.DB;
+    const db2 = c.env.DB;
     const results = [];
     for (const tableName of tablesToTruncate) {
       try {
-        await db.prepare(`DELETE FROM ${tableName}`).run();
+        await db2.prepare(`DELETE FROM ${tableName}`).run();
         results.push({ table: tableName, success: true });
       } catch (error) {
         console.error(`Error truncating ${tableName}:`, error);
@@ -21148,8 +21488,8 @@ adminSettingsRoutes.post("/general", async (c) => {
       }, 403);
     }
     const formData = await c.req.formData();
-    const db = c.env.DB;
-    const settingsService = new SettingsService(db);
+    const db2 = c.env.DB;
+    const settingsService = new SettingsService(db2);
     const settings = {
       siteName: formData.get("siteName"),
       siteDescription: formData.get("siteDescription"),
@@ -21198,6 +21538,7 @@ var ROUTES_INFO = {
     "apiSystemRoutes",
     "adminApiRoutes",
     "authRoutes",
+    "testCleanupRoutes",
     "adminContentRoutes",
     "adminUsersRoutes",
     "adminMediaRoutes",
@@ -21215,6 +21556,6 @@ var ROUTES_INFO = {
   reference: "https://github.com/sonicjs/sonicjs"
 };
 
-export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, userRoutes };
-//# sourceMappingURL=chunk-YPVIB554.js.map
-//# sourceMappingURL=chunk-YPVIB554.js.map
+export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, test_cleanup_default, userRoutes };
+//# sourceMappingURL=chunk-EIGYAES4.js.map
+//# sourceMappingURL=chunk-EIGYAES4.js.map

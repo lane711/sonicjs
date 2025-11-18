@@ -1,6 +1,6 @@
 'use strict';
 
-var chunkAMSTLQFI_cjs = require('./chunk-AMSTLQFI.cjs');
+var chunk22EFGHAX_cjs = require('./chunk-22EFGHAX.cjs');
 var chunkT7IYBGGO_cjs = require('./chunk-T7IYBGGO.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 var jwt = require('hono/jwt');
@@ -24,13 +24,13 @@ function bootstrapMiddleware(config = {}) {
       await migrationService.runPendingMigrations();
       console.log("[Bootstrap] Syncing collection configurations...");
       try {
-        await chunkAMSTLQFI_cjs.syncCollections(c.env.DB);
+        await chunk22EFGHAX_cjs.syncCollections(c.env.DB);
       } catch (error) {
         console.error("[Bootstrap] Error syncing collections:", error);
       }
       if (!config.plugins?.disableAll) {
         console.log("[Bootstrap] Bootstrapping core plugins...");
-        const bootstrapService = new chunkAMSTLQFI_cjs.PluginBootstrapService(c.env.DB);
+        const bootstrapService = new chunk22EFGHAX_cjs.PluginBootstrapService(c.env.DB);
         const needsBootstrap = await bootstrapService.isBootstrapNeeded();
         if (needsBootstrap) {
           await bootstrapService.bootstrapCorePlugins();
@@ -239,5 +239,5 @@ exports.requirePermission = requirePermission;
 exports.requireRole = requireRole;
 exports.securityHeaders = securityHeaders;
 exports.securityLoggingMiddleware = securityLoggingMiddleware;
-//# sourceMappingURL=chunk-X2VADBA4.cjs.map
-//# sourceMappingURL=chunk-X2VADBA4.cjs.map
+//# sourceMappingURL=chunk-7EGKU7OO.cjs.map
+//# sourceMappingURL=chunk-7EGKU7OO.cjs.map

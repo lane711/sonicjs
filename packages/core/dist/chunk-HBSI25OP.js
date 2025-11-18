@@ -509,7 +509,8 @@ var package_default = {
     "drizzle-zod": "^0.8.3",
     marked: "^16.4.1",
     "highlight.js": "^11.11.1",
-    semver: "^7.7.3"
+    semver: "^7.7.3",
+    "posthog-node": "^4.0.0"
   },
   devDependencies: {
     "@cloudflare/workers-types": "^4.20251014.0",
@@ -537,5 +538,5 @@ function getCoreVersion() {
 }
 
 export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, package_default, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer };
-//# sourceMappingURL=chunk-4ILPYYDM.js.map
-//# sourceMappingURL=chunk-4ILPYYDM.js.map
+//# sourceMappingURL=chunk-HBSI25OP.js.map
+//# sourceMappingURL=chunk-HBSI25OP.js.map

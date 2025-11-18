@@ -41,9 +41,32 @@ test.describe('EasyMDE Editor - Pages Collection', () => {
   });
 
   test('should load EasyMDE scripts when plugin is active on pages-collection', async ({ page }) => {
+    // Enable console logging from the page
+    page.on('console', msg => {
+      if (msg.text().includes('Editor plugins status') || msg.text().includes('mdxeditor')) {
+        console.log('PAGE LOG:', msg.text());
+      }
+    });
+
     // Navigate to pages-collection new content page
     await page.goto('http://localhost:8787/admin/content/new?collection=pages-collection');
     await page.waitForLoadState('networkidle');
+
+    // Get and save the HTML
+    const htmlContent = await page.content();
+    const fs = require('fs');
+    fs.writeFileSync('/tmp/page-content-form.html', htmlContent);
+    console.log('Saved HTML to /tmp/page-content-form.html');
+
+    // Check for mdxeditorEnabled in page
+    const hasMdxEditorEnabledTrue = htmlContent.includes('mdxeditorEnabled') && htmlContent.includes('true');
+    const hasMdxEditorComment = htmlContent.includes('MDXEditor plugin not active') || htmlContent.includes('MDXEditor plugin active');
+    console.log('HTML contains mdxeditorEnabled=true:', hasMdxEditorEnabledTrue);
+    console.log('HTML has MDXEditor comment:', hasMdxEditorComment);
+
+    // Check for EasyMDE script URLs
+    const hasEasyMdeUrl = htmlContent.includes('easymde');
+    console.log('HTML contains "easymde":', hasEasyMdeUrl);
 
     // Check if EasyMDE CDN scripts are loaded
     const hasEasyMDE = await page.evaluate(() => {
@@ -61,6 +84,11 @@ test.describe('EasyMDE Editor - Pages Collection', () => {
       await expect(easyMdeScript).toHaveCount(1, { timeout: 5000 });
     } else {
       console.log('⚠ EasyMDE script tag not found - plugin may not be active');
+      console.log('Checking for MDXEditor comment in HTML...');
+      const commentMatch = htmlContent.match(/<!-- (MDX.+?) -->/);
+      if (commentMatch) {
+        console.log('Found comment:', commentMatch[1]);
+      }
     }
 
     // Check for EasyMDE CSS

@@ -1,5 +1,3 @@
-'use strict';
-
 // src/services/collection-loader.ts
 var registeredCollections = [];
 function registerCollections(collections) {
@@ -20,7 +18,7 @@ function registerCollections(collections) {
 async function loadCollectionConfigs() {
   const collections = [...registeredCollections];
   try {
-    const modules = undefined?.("../collections/*.collection.ts", { eager: true }) || {};
+    const modules = import.meta.glob?.("../collections/*.collection.ts", { eager: true }) || {};
     for (const [path, module] of Object.entries(modules)) {
       try {
         const configModule = module;
@@ -62,7 +60,7 @@ async function loadCollectionConfig(name) {
 }
 async function getAvailableCollectionNames() {
   try {
-    const modules = undefined?.("../collections/*.collection.ts") || {};
+    const modules = import.meta.glob?.("../collections/*.collection.ts") || {};
     const names = [];
     for (const path of Object.keys(modules)) {
       const match = path.match(/\/([^/]+)\.collection\.ts$/);
@@ -658,8 +656,8 @@ var PluginBootstrapService = class {
       }
     },
     {
-      id: "mdxeditor-plugin",
-      name: "mdxeditor-plugin",
+      id: "easy-mdx",
+      name: "easy-mdx",
       display_name: "EasyMDE Editor",
       description: "Lightweight markdown editor with live preview for richtext fields",
       version: "1.0.0",
@@ -784,18 +782,6 @@ var PluginBootstrapService = class {
   }
 };
 
-exports.PluginBootstrapService = PluginBootstrapService;
-exports.PluginService = PluginService;
-exports.cleanupRemovedCollections = cleanupRemovedCollections;
-exports.fullCollectionSync = fullCollectionSync;
-exports.getAvailableCollectionNames = getAvailableCollectionNames;
-exports.getManagedCollections = getManagedCollections;
-exports.isCollectionManaged = isCollectionManaged;
-exports.loadCollectionConfig = loadCollectionConfig;
-exports.loadCollectionConfigs = loadCollectionConfigs;
-exports.registerCollections = registerCollections;
-exports.syncCollection = syncCollection;
-exports.syncCollections = syncCollections;
-exports.validateCollectionConfig = validateCollectionConfig;
-//# sourceMappingURL=chunk-AMSTLQFI.cjs.map
-//# sourceMappingURL=chunk-AMSTLQFI.cjs.map
+export { PluginBootstrapService, PluginService, cleanupRemovedCollections, fullCollectionSync, getAvailableCollectionNames, getManagedCollections, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, registerCollections, syncCollection, syncCollections, validateCollectionConfig };
+//# sourceMappingURL=chunk-LWMMMW43.js.map
+//# sourceMappingURL=chunk-LWMMMW43.js.map
