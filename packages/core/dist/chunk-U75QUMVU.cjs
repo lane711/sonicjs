@@ -1,3 +1,5 @@
+'use strict';
+
 // src/services/migrations.ts
 var MigrationService = class {
   constructor(db) {
@@ -39,7 +41,13 @@ var MigrationService = class {
       { id: "014", name: "Fix Plugin Registry", filename: "014_fix_plugin_registry.sql", description: "Fix plugin registry issues" },
       { id: "015", name: "Add Remaining Plugins", filename: "015_add_remaining_plugins.sql", description: "Add remaining core plugins" },
       { id: "016", name: "Remove Duplicate Cache Plugin", filename: "016_remove_duplicate_cache_plugin.sql", description: "Remove duplicate cache plugin entries" },
-      { id: "017", name: "Auth Configurable Fields", filename: "017_auth_configurable_fields.sql", description: "Configurable authentication fields" }
+      { id: "017", name: "Auth Configurable Fields", filename: "017_auth_configurable_fields.sql", description: "Configurable authentication fields" },
+      { id: "020", name: "Add Email Plugin", filename: "020_add_email_plugin.sql", description: "Email notification plugin" },
+      { id: "021", name: "Add OTP Login", filename: "021_add_otp_login.sql", description: "One-time password login functionality" },
+      { id: "022", name: "Add TinyMCE Plugin", filename: "022_add_tinymce_plugin.sql", description: "TinyMCE rich text editor plugin" },
+      { id: "023", name: "Add EasyMDE Plugin", filename: "023_add_easy_mdx_plugin.sql", description: "EasyMDE markdown editor plugin" },
+      { id: "024", name: "Add Quill Editor Plugin", filename: "024_add_quill_editor_plugin.sql", description: "Quill rich text editor plugin" },
+      { id: "025", name: "Rename MDXEditor to EasyMDX", filename: "025_rename_mdxeditor_to_easy_mdx.sql", description: "Rename mdxeditor-plugin to easy-mdx" }
     ];
     const appliedResult = await this.db.prepare(
       "SELECT id, name, filename, applied_at FROM migrations ORDER BY applied_at ASC"
@@ -695,6 +703,114 @@ INSERT OR IGNORE INTO content (
               unixepoch()
           );
         `;
+      case "020":
+        return `
+INSERT OR IGNORE INTO plugins (
+    id, name, display_name, description, version, author, category, icon,
+    status, is_core, permissions, installed_at, last_updated
+) VALUES (
+    'email',
+    'email',
+    'Email',
+    'Send transactional emails using Resend',
+    '1.0.0-beta.1',
+    'SonicJS Team',
+    'communication',
+    '\u{1F4E7}',
+    'inactive',
+    TRUE,
+    '["email:manage", "email:send", "email:view-logs"]',
+    unixepoch(),
+    unixepoch()
+);
+        `;
+      case "022":
+        return `
+INSERT OR IGNORE INTO plugins (
+    id, name, display_name, description, version, author, category, icon,
+    status, is_core, permissions, dependencies, settings, installed_at, last_updated
+) VALUES (
+    'tinymce-plugin',
+    'tinymce-plugin',
+    'TinyMCE Rich Text Editor',
+    'Powerful WYSIWYG rich text editor for content creation. Provides a full-featured editor with formatting, media embedding, and customizable toolbars for richtext fields.',
+    '1.0.0',
+    'SonicJS Team',
+    'editor',
+    '\u270F\uFE0F',
+    'active',
+    FALSE,
+    '[]',
+    '[]',
+    '{"apiKey":"no-api-key","defaultHeight":300,"defaultToolbar":"full","skin":"oxide-dark"}',
+    unixepoch(),
+    unixepoch()
+);
+        `;
+      case "023":
+        return `
+INSERT OR REPLACE INTO plugins (
+    id, name, display_name, description, version, author, category, icon,
+    status, is_core, permissions, dependencies, settings, installed_at, last_updated
+) VALUES (
+    'easy-mdx',
+    'easy-mdx',
+    'EasyMDE Markdown Editor',
+    'Lightweight markdown editor with live preview. Provides a simple and efficient editor with markdown support for richtext fields.',
+    '1.0.0',
+    'SonicJS Team',
+    'editor',
+    '\u270D\uFE0F',
+    'active',
+    1,
+    '[]',
+    '[]',
+    '{"defaultHeight":400,"theme":"dark","toolbar":"full","placeholder":"Start writing your content..."}',
+    unixepoch(),
+    unixepoch()
+);
+        `;
+      case "024":
+        return `
+INSERT OR IGNORE INTO plugins (
+    id, name, display_name, description, version, author, category, icon,
+    status, is_core, permissions, dependencies, settings, installed_at, last_updated
+) VALUES (
+    'quill-editor',
+    'quill-editor',
+    'Quill Rich Text Editor',
+    'Modern rich text editor for content creation. Provides a clean, intuitive WYSIWYG editor with customizable toolbars for richtext fields.',
+    '1.0.0',
+    'SonicJS Team',
+    'editor',
+    '\u270D\uFE0F',
+    'active',
+    FALSE,
+    '[]',
+    '[]',
+    '{"theme":"snow","defaultHeight":300,"defaultToolbar":"full","placeholder":"Start writing your content..."}',
+    unixepoch(),
+    unixepoch()
+);
+        `;
+      case "025":
+        return `
+UPDATE plugins
+SET
+    id = 'easy-mdx',
+    name = 'easy-mdx',
+    display_name = 'EasyMDE Markdown Editor',
+    description = 'Lightweight markdown editor with live preview. Provides a simple and efficient editor with markdown support for richtext fields.'
+WHERE id = 'mdxeditor-plugin';
+
+UPDATE plugin_hooks
+SET plugin_id = 'easy-mdx'
+WHERE plugin_id = 'mdxeditor-plugin';
+
+UPDATE plugin_activity_log
+SET plugin_id = 'easy-mdx'
+WHERE plugin_id = 'mdxeditor-plugin';
+        `;
       case "003":
       case "004":
       case "005":
@@ -708,6 +824,7 @@ INSERT OR IGNORE INTO content (
       case "015":
       case "016":
       case "017":
+      case "021":
         return "";
       default:
         return null;
@@ -739,6 +856,6 @@ INSERT OR IGNORE INTO content (
   }
 };
 
-export { MigrationService };
-//# sourceMappingURL=chunk-ZPMFT2JW.js.map
-//# sourceMappingURL=chunk-ZPMFT2JW.js.map
+exports.MigrationService = MigrationService;
+//# sourceMappingURL=chunk-U75QUMVU.cjs.map
+//# sourceMappingURL=chunk-U75QUMVU.cjs.map
