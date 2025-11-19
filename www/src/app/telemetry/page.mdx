@@ -1,0 +1,221 @@
+export const metadata = {
+  title: 'Telemetry - SonicJS',
+  description:
+    'Learn about SonicJS anonymous telemetry data collection, what data is collected, how to opt-out, and our commitment to privacy.',
+}
+
+export const sections = [
+  { title: 'What is Telemetry?', id: 'what-is-telemetry' },
+  { title: 'What Data is Collected', id: 'what-data-is-collected' },
+  { title: 'What Data is NOT Collected', id: 'what-data-is-not-collected' },
+  { title: 'How to Opt-Out', id: 'how-to-opt-out' },
+  { title: 'Why We Collect Telemetry', id: 'why-we-collect-telemetry' },
+  { title: 'Data Retention', id: 'data-retention' },
+]
+
+# Telemetry
+
+Learn about SonicJS's privacy-respecting anonymous telemetry system and how to opt-out. {{ className: 'lead' }}
+
+---
+
+## What is Telemetry?
+
+SonicJS collects **anonymous, non-identifiable telemetry data** to help us understand how the framework is being used and to improve the product. We take your privacy seriously and follow industry best practices for telemetry collection.
+
+**Key Principles:**
+- **Anonymous** - No personally identifiable information (PII) is collected
+- **Transparent** - This page clearly explains what is collected
+- **Optional** - You can easily opt-out at any time
+- **Minimal** - We only collect what's necessary to improve the product
+
+---
+
+## What Data is Collected
+
+SonicJS telemetry collects the following anonymous data during installation and usage:
+
+### Installation Events
+
+**Installation Success/Failure:**
+- Whether the installation completed successfully
+- Installation timestamp
+- Installation method (npm, pnpm, yarn, etc.)
+
+**System Information:**
+- Operating system type (Linux, macOS, Windows)
+- Node.js version
+- Package manager type and version
+
+**Anonymous Identifiers:**
+- Randomly generated installation ID (UUID)
+- Project hash (one-way hash of project path, no path information is sent)
+
+### Example Data Payload
+
+```json
+{
+  "event": "installation_complete",
+  "timestamp": "2025-01-15T10:30:00Z",
+  "installation_id": "550e8400-e29b-41d4-a716-446655440000",
+  "node_version": "18.17.0",
+  "os": "darwin",
+  "package_manager": "npm",
+  "success": true
+}
+```
+
+---
+
+## What Data is NOT Collected
+
+We are committed to protecting your privacy. The following data is **NEVER** collected:
+
+- Personal information (name, email, address, etc.)
+- IP addresses or geolocation data
+- File paths or directory structures
+- Code or content from your projects
+- Environment variables or secrets
+- Database contents or connection strings
+- API keys or credentials
+- Custom configuration details
+- Any personally identifiable information (PII)
+
+---
+
+## How to Opt-Out
+
+You can disable telemetry at any time using one of the following methods:
+
+### Environment Variable (Recommended)
+
+Set the `SONICJS_TELEMETRY` environment variable to `false`:
+
+<CodeGroup title="Disable Telemetry">
+
+```bash {{ title: 'Bash/Zsh' }}
+# Add to ~/.bashrc or ~/.zshrc
+export SONICJS_TELEMETRY=false
+```
+
+```bash {{ title: 'Windows PowerShell' }}
+# Add to PowerShell profile
+$env:SONICJS_TELEMETRY = "false"
+```
+
+```bash {{ title: 'Windows Command Prompt' }}
+# Set for current session
+set SONICJS_TELEMETRY=false
+
+# Set permanently
+setx SONICJS_TELEMETRY false
+```
+
+</CodeGroup>
+
+### Per-Project Configuration
+
+Create a `.env` file in your project root:
+
+```bash
+SONICJS_TELEMETRY=false
+```
+
+### Verify Telemetry Status
+
+You can verify that telemetry is disabled by checking for the telemetry notice during installation. When telemetry is disabled, you will not see the telemetry notice.
+
+---
+
+## Why We Collect Telemetry
+
+Anonymous telemetry helps us improve SonicJS in several ways:
+
+### Understand Installation Success
+
+- Identify installation failures and their causes
+- Improve installation experience across different environments
+- Prioritize support for popular operating systems and Node.js versions
+
+### Improve Compatibility
+
+- Ensure SonicJS works across different Node.js versions
+- Optimize for popular package managers
+- Support a wide range of operating systems
+
+### Prioritize Development
+
+- Understand which features are most used
+- Identify patterns that help guide our roadmap
+- Make data-driven decisions about where to focus development efforts
+
+### Maintain Quality
+
+- Detect and fix issues early
+- Measure the impact of changes
+- Ensure a smooth experience for all users
+
+**Important:** All insights are derived from aggregated, anonymous data. We never track individual users or projects.
+
+---
+
+## Data Retention
+
+We retain anonymous telemetry data for the following periods:
+
+**Short-term Data:**
+- Raw event data: 90 days
+- Used for debugging and immediate insights
+
+**Long-term Data:**
+- Aggregated statistics: Indefinitely
+- Used for trend analysis and long-term planning
+- All personally identifiable information removed before aggregation
+
+**Data Deletion:**
+- Individual telemetry events cannot be deleted as they are anonymous
+- To stop future data collection, simply opt-out using the methods above
+
+---
+
+## Open Source Commitment
+
+SonicJS is open source, and so is our approach to telemetry:
+
+**Transparency:**
+- Telemetry code is available in our [GitHub repository](https://github.com/lane711/sonicjs)
+- You can review exactly what data is collected
+- Submit pull requests to improve our telemetry practices
+
+**Community Feedback:**
+- We welcome feedback on our telemetry practices
+- Join the discussion on [GitHub Discussions](https://github.com/lane711/sonicjs/discussions)
+- Help us balance improvement with privacy
+
+---
+
+## Questions or Concerns?
+
+If you have questions about our telemetry practices or concerns about your privacy:
+
+**Community:**
+- [GitHub Discussions](https://github.com/lane711/sonicjs/discussions)
+- [Discord Server](https://discord.gg/sonicjs)
+
+**Direct Contact:**
+- Email: privacy@sonicjs.com
+- Create an issue: [GitHub Issues](https://github.com/lane711/sonicjs/issues)
+
+We take privacy seriously and are committed to addressing any concerns promptly.
+
+---
+
+## Summary
+
+- **Telemetry is anonymous** - No PII is collected
+- **Easy to opt-out** - Set `SONICJS_TELEMETRY=false`
+- **Transparent** - You know exactly what we collect
+- **Purpose-driven** - Helps us improve SonicJS for everyone
+- **Privacy-first** - Your data and privacy are protected
+
+Thank you for helping us make SonicJS better while respecting your privacy.

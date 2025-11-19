@@ -26,7 +26,7 @@ export function displayTelemetryNotice() {
   console.log(kleur.dim('To disable telemetry, set:'))
   console.log(kleur.cyan('  export SONICJS_TELEMETRY=false'))
   console.log()
-  console.log(kleur.dim('Learn more: https://docs.sonicjs.com/telemetry'))
+  console.log(kleur.dim('Learn more: https://sonicjs.com/telemetry'))
   console.log()
   console.log(kleur.dim('━'.repeat(60)))
   console.log()
