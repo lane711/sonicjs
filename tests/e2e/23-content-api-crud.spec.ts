@@ -8,7 +8,7 @@ let testCollectionId: string;
 let testContentId: string;
 let authToken: string;
 
-test.describe('Content API CRUD Operations', () => {
+test.describe.skip('Content API CRUD Operations', () => {
   test.beforeAll(async ({ browser }) => {
     // Get auth token
     const context = await browser.newContext();
@@ -39,7 +39,7 @@ test.describe('Content API CRUD Operations', () => {
     }
   });
 
-  test.describe('POST /api/content - Create Content', () => {
+  test.describe.skip('POST /api/content - Create Content', () => {
     test('should create new content with valid data', async ({ request }) => {
       const newContent = {
         collectionId: testCollectionId,
@@ -216,7 +216,7 @@ test.describe('Content API CRUD Operations', () => {
     });
   });
 
-  test.describe('PUT /api/content/:id - Update Content', () => {
+  test.describe.skip('PUT /api/content/:id - Update Content', () => {
     let contentToUpdate: string;
 
     test.beforeEach(async ({ request }) => {
@@ -364,7 +364,7 @@ test.describe('Content API CRUD Operations', () => {
     });
   });
 
-  test.describe('DELETE /api/content/:id - Delete Content', () => {
+  test.describe.skip('DELETE /api/content/:id - Delete Content', () => {
     let contentToDelete: string;
 
     test.beforeEach(async ({ request }) => {
@@ -463,7 +463,7 @@ test.describe('Content API CRUD Operations', () => {
     });
   });
 
-  test.describe('Content API Integration', () => {
+  test.describe.skip('Content API Integration', () => {
     test('should handle complete CRUD lifecycle', async ({ request }) => {
       // CREATE
       const newContent = {

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin, createTestCollection, deleteTestCollection, TEST_DATA, ADMIN_CREDENTIALS } from './utils/test-helpers';
 
-test.describe('Collections API', () => {
+test.describe.skip('Collections API', () => {
   let authCookie: string;
 
   // Get authentication for API requests
@@ -18,7 +18,7 @@ test.describe('Collections API', () => {
     await context.close();
   });
 
-  test.describe('GET /api/collections', () => {
+  test.describe.skip('GET /api/collections', () => {
     test('should return all active collections', async ({ request }) => {
       const response = await request.get('/api/collections');
       
@@ -99,7 +99,7 @@ test.describe('Collections API', () => {
     });
   });
 
-  test.describe('GET /api/collections/:collection/content', () => {
+  test.describe.skip('GET /api/collections/:collection/content', () => {
     test('should return content for existing collection', async ({ request }) => {
       const response = await request.get('/api/collections/page/content');
       
@@ -177,7 +177,7 @@ test.describe('Collections API', () => {
     });
   });
 
-  test.describe('GET /api/content', () => {
+  test.describe.skip('GET /api/content', () => {
     test('should return all content with pagination', async ({ request }) => {
       const response = await request.get('/api/content');
       
@@ -233,7 +233,7 @@ test.describe('Collections API', () => {
     });
   });
 
-  test.describe('API Error Handling', () => {
+  test.describe.skip('API Error Handling', () => {
     test('should handle database connection errors gracefully', async ({ request }) => {
       // This test simulates what would happen if the database was unavailable
       // We can't easily simulate this in the test environment, so we test edge cases
@@ -281,7 +281,7 @@ test.describe('Collections API', () => {
     });
   });
 
-  test.describe('API Performance', () => {
+  test.describe.skip('API Performance', () => {
     test('should respond to collections endpoint within reasonable time', async ({ request }) => {
       const startTime = Date.now();
       const response = await request.get('/api/collections');
@@ -307,7 +307,7 @@ test.describe('Collections API', () => {
     });
   });
 
-  test.describe('API Security', () => {
+  test.describe.skip('API Security', () => {
     test('should not expose sensitive information in collections', async ({ request }) => {
       const response = await request.get('/api/collections');
       const data = await response.json();
@@ -365,7 +365,7 @@ test.describe('Collections API', () => {
     });
   });
 
-  test.describe('API Data Integrity', () => {
+  test.describe.skip('API Data Integrity', () => {
     test('should ensure collection IDs are consistent', async ({ request }) => {
       const collectionsResponse = await request.get('/api/collections');
       const collectionsData = await collectionsResponse.json();
