@@ -2,7 +2,7 @@
 
 var chunk2FXIDRNT_cjs = require('./chunk-2FXIDRNT.cjs');
 var chunk22EFGHAX_cjs = require('./chunk-22EFGHAX.cjs');
-var chunkOWIJ57JW_cjs = require('./chunk-OWIJ57JW.cjs');
+var chunkNRFRVH4G_cjs = require('./chunk-NRFRVH4G.cjs');
 require('./chunk-3OKKNBPD.cjs');
 require('./chunk-IGJUBJBW.cjs');
 
@@ -106,7 +106,7 @@ Object.defineProperty(exports, "validateCollectionConfig", {
 });
 Object.defineProperty(exports, "MigrationService", {
   enumerable: true,
-  get: function () { return chunkOWIJ57JW_cjs.MigrationService; }
+  get: function () { return chunkNRFRVH4G_cjs.MigrationService; }
 });
 //# sourceMappingURL=services.cjs.map
 //# sourceMappingURL=services.cjs.map

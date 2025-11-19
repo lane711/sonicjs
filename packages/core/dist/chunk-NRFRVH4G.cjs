@@ -1198,55 +1198,6 @@ INSERT OR IGNORE INTO plugins (
 `
   },
   {
-    id: "021",
-    name: "Add Otp Login",
-    filename: "021_add_otp_login.sql",
-    description: "Migration 021: Add Otp Login",
-    sql: `-- Add OTP Login Plugin
--- Migration: 021_add_otp_login
--- Description: Add OTP login plugin for passwordless authentication via email codes
-
--- Create table for OTP codes
-CREATE TABLE IF NOT EXISTS otp_codes (
-  id TEXT PRIMARY KEY,
-  user_email TEXT NOT NULL,
-  code TEXT NOT NULL,
-  expires_at INTEGER NOT NULL,
-  used INTEGER DEFAULT 0,
-  used_at INTEGER,
-  ip_address TEXT,
-  user_agent TEXT,
-  attempts INTEGER DEFAULT 0,
-  created_at INTEGER NOT NULL
-);
-
--- Create indexes for performance
-CREATE INDEX IF NOT EXISTS idx_otp_email_code ON otp_codes(user_email, code);
-CREATE INDEX IF NOT EXISTS idx_otp_expires ON otp_codes(expires_at);
-CREATE INDEX IF NOT EXISTS idx_otp_used ON otp_codes(used);
-
--- Add plugin record
-INSERT OR IGNORE INTO plugins (
-    id, name, display_name, description, version, author, category, icon,
-    status, is_core, permissions, installed_at, last_updated
-) VALUES (
-    'otp-login',
-    'otp-login',
-    'OTP Login',
-    'Passwordless authentication via email one-time codes',
-    '1.0.0-beta.1',
-    'SonicJS Team',
-    'authentication',
-    '\u{1F522}',
-    'inactive',
-    TRUE,
-    '["otp:manage", "otp:request", "otp:verify"]',
-    unixepoch(),
-    unixepoch()
-);
-`
-  },
-  {
     id: "022",
     name: "Add Tinymce Plugin",
     filename: "022_add_tinymce_plugin.sql",
@@ -1348,6 +1299,55 @@ INSERT OR IGNORE INTO plugins (
     filename: "025_rename_mdxeditor_to_easy_mdx.sql",
     description: "Migration 025: Rename Mdxeditor To Easy Mdx",
     sql: "-- Rename mdxeditor-plugin to easy-mdx\n-- Migration: 025_rename_mdxeditor_to_easy_mdx\n-- Description: Update plugin ID from mdxeditor-plugin to easy-mdx to reflect the change to EasyMDE editor\n\n-- Update the plugin record if it exists with the old ID\nUPDATE plugins\nSET\n    id = 'easy-mdx',\n    name = 'easy-mdx',\n    display_name = 'EasyMDE Markdown Editor',\n    description = 'Lightweight markdown editor with live preview. Provides a simple and efficient editor with markdown support for richtext fields.'\nWHERE id = 'mdxeditor-plugin';\n\n-- Update any plugin_hooks references\nUPDATE plugin_hooks\nSET plugin_id = 'easy-mdx'\nWHERE plugin_id = 'mdxeditor-plugin';\n\n-- Update any plugin_activity_log references\nUPDATE plugin_activity_log\nSET plugin_id = 'easy-mdx'\nWHERE plugin_id = 'mdxeditor-plugin';\n"
+  },
+  {
+    id: "026",
+    name: "Add Otp Login",
+    filename: "026_add_otp_login.sql",
+    description: "Migration 026: Add Otp Login",
+    sql: `-- Add OTP Login Plugin
+-- Migration: 021_add_otp_login
+-- Description: Add OTP login plugin for passwordless authentication via email codes
+
+-- Create table for OTP codes
+CREATE TABLE IF NOT EXISTS otp_codes (
+  id TEXT PRIMARY KEY,
+  user_email TEXT NOT NULL,
+  code TEXT NOT NULL,
+  expires_at INTEGER NOT NULL,
+  used INTEGER DEFAULT 0,
+  used_at INTEGER,
+  ip_address TEXT,
+  user_agent TEXT,
+  attempts INTEGER DEFAULT 0,
+  created_at INTEGER NOT NULL
+);
+
+-- Create indexes for performance
+CREATE INDEX IF NOT EXISTS idx_otp_email_code ON otp_codes(user_email, code);
+CREATE INDEX IF NOT EXISTS idx_otp_expires ON otp_codes(expires_at);
+CREATE INDEX IF NOT EXISTS idx_otp_used ON otp_codes(used);
+
+-- Add plugin record
+INSERT OR IGNORE INTO plugins (
+    id, name, display_name, description, version, author, category, icon,
+    status, is_core, permissions, installed_at, last_updated
+) VALUES (
+    'otp-login',
+    'otp-login',
+    'OTP Login',
+    'Passwordless authentication via email one-time codes',
+    '1.0.0-beta.1',
+    'SonicJS Team',
+    'authentication',
+    '\u{1F522}',
+    'inactive',
+    TRUE,
+    '["otp:manage", "otp:request", "otp:verify"]',
+    unixepoch(),
+    unixepoch()
+);
+`
   }
 ];
 var migrationsByIdMap = new Map(
@@ -1468,17 +1468,19 @@ var MigrationService = class {
         await this.markMigrationApplied("006", "Plugin System", "006_plugin_system.sql");
       }
     }
-    if (!appliedMigrations.has("011")) {
-      const hasManagedColumn = await this.checkColumnExists("collections", "managed");
-      if (hasManagedColumn) {
-        appliedMigrations.set("011", {
-          id: "011",
-          applied_at: (/* @__PURE__ */ new Date()).toISOString(),
-          name: "Config Managed Collections",
-          filename: "011_config_managed_collections.sql"
-        });
-        await this.markMigrationApplied("011", "Config Managed Collections", "011_config_managed_collections.sql");
-      }
+    const hasManagedColumn = await this.checkColumnExists("collections", "managed");
+    if (!appliedMigrations.has("011") && hasManagedColumn) {
+      appliedMigrations.set("011", {
+        id: "011",
+        applied_at: (/* @__PURE__ */ new Date()).toISOString(),
+        name: "Config Managed Collections",
+        filename: "011_config_managed_collections.sql"
+      });
+      await this.markMigrationApplied("011", "Config Managed Collections", "011_config_managed_collections.sql");
+    } else if (appliedMigrations.has("011") && !hasManagedColumn) {
+      console.log("[Migration] Migration 011 marked as applied but managed column missing - will re-run");
+      appliedMigrations.delete("011");
+      await this.removeMigrationApplied("011");
     }
     if (!appliedMigrations.has("009")) {
       const hasLoggingTables = await this.checkTablesExist(["system_logs", "log_config"]);
@@ -1561,6 +1563,15 @@ var MigrationService = class {
     await this.db.prepare(
       "INSERT OR REPLACE INTO migrations (id, name, filename, applied_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)"
     ).bind(migrationId, name, filename).run();
+  }
+  /**
+   * Remove a migration from the applied list (so it can be re-run)
+   */
+  async removeMigrationApplied(migrationId) {
+    await this.initializeMigrationsTable();
+    await this.db.prepare(
+      "DELETE FROM migrations WHERE id = ?"
+    ).bind(migrationId).run();
   }
   /**
    * Check if a specific migration has been applied
@@ -1721,5 +1732,5 @@ var MigrationService = class {
 };
 
 exports.MigrationService = MigrationService;
-//# sourceMappingURL=chunk-OWIJ57JW.cjs.map
-//# sourceMappingURL=chunk-OWIJ57JW.cjs.map
+//# sourceMappingURL=chunk-NRFRVH4G.cjs.map
+//# sourceMappingURL=chunk-NRFRVH4G.cjs.map

@@ -119,10 +119,15 @@ wrangler d1 migrations apply DB --remote
 
 **Creating New Migrations:**
 
-1. Create a new migration file in `packages/core/migrations/` following the naming pattern: `NNN_description.sql`
+SonicJS uses a **build-time migration bundler** because Cloudflare Workers cannot access the filesystem at runtime. All migration SQL must be bundled into the application code.
+
+1. Create a new migration file in `packages/core/migrations/` following the naming pattern: `NNN_description.sql` (e.g., `027_add_user_preferences.sql`)
 2. Write your migration SQL (use `CREATE TABLE IF NOT EXISTS` and `INSERT OR IGNORE` for idempotency)
-3. Rebuild the core package: `npm run build:core`
-4. Apply to your test database: `cd my-sonicjs-app && wrangler d1 migrations apply DB --local`
+3. Regenerate the migrations bundle: `cd packages/core && npm run generate:migrations`
+4. Rebuild the core package: `npm run build:core` (or just `npm run build` from packages/core - the bundle generation runs automatically as a prebuild step)
+5. Apply to your test database: `cd my-sonicjs-app && wrangler d1 migrations apply DB --local`
+
+**Important**: After modifying any `.sql` files in `migrations/`, you **must** rebuild the package. The SQL files are not used at runtime - only the generated `migrations-bundle.ts` file is included in the build.
 
 ### Common Commands (For Apps)
 

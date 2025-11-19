@@ -151,17 +151,23 @@ export class MigrationService {
     }
 
     // Check if managed column exists (migration 011)
-    if (!appliedMigrations.has('011')) {
-      const hasManagedColumn = await this.checkColumnExists('collections', 'managed')
-      if (hasManagedColumn) {
-        appliedMigrations.set('011', {
-          id: '011',
-          applied_at: new Date().toISOString(),
-          name: 'Config Managed Collections',
-          filename: '011_config_managed_collections.sql'
-        })
-        await this.markMigrationApplied('011', 'Config Managed Collections', '011_config_managed_collections.sql')
-      }
+    // This handles both cases:
+    // 1. Migration not marked as applied but column exists -> mark as applied
+    // 2. Migration marked as applied but column doesn't exist -> remove from applied (will re-run)
+    const hasManagedColumn = await this.checkColumnExists('collections', 'managed')
+    if (!appliedMigrations.has('011') && hasManagedColumn) {
+      appliedMigrations.set('011', {
+        id: '011',
+        applied_at: new Date().toISOString(),
+        name: 'Config Managed Collections',
+        filename: '011_config_managed_collections.sql'
+      })
+      await this.markMigrationApplied('011', 'Config Managed Collections', '011_config_managed_collections.sql')
+    } else if (appliedMigrations.has('011') && !hasManagedColumn) {
+      // Migration was marked as applied but column doesn't exist - remove it so it will re-run
+      console.log('[Migration] Migration 011 marked as applied but managed column missing - will re-run')
+      appliedMigrations.delete('011')
+      await this.removeMigrationApplied('011')
     }
 
     // Check if system_logs table exists (migration 009)
@@ -260,6 +266,17 @@ export class MigrationService {
     await this.db.prepare(
       'INSERT OR REPLACE INTO migrations (id, name, filename, applied_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)'
     ).bind(migrationId, name, filename).run()
+  }
+
+  /**
+   * Remove a migration from the applied list (so it can be re-run)
+   */
+  async removeMigrationApplied(migrationId: string): Promise<void> {
+    await this.initializeMigrationsTable()
+
+    await this.db.prepare(
+      'DELETE FROM migrations WHERE id = ?'
+    ).bind(migrationId).run()
   }
 
   /**
