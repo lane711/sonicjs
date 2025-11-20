@@ -48,6 +48,26 @@ export const sections = [
   <div className="space-y-4">
     <div>
       <h4 className="text-sm font-bold text-gray-800 dark:text-gray-300 mb-2 flex items-center gap-2">
+        <span className="text-lg">🔧</span> Fixed
+      </h4>
+      <ul className="space-y-2 ml-6">
+        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+          <span className="text-gray-500 mt-0.5">▸</span>
+          <span><strong className="font-semibold">Migration System Refactor</strong> - Build-time migration bundler for Cloudflare Workers (fixes "no such column: managed" error on preview deployments)</span>
+        </li>
+        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+          <span className="text-gray-500 mt-0.5">▸</span>
+          <span><strong className="font-semibold">Duplicate Migration ID</strong> - Fixed migration 021 renamed to 026 for add_otp_login</span>
+        </li>
+        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+          <span className="text-gray-500 mt-0.5">▸</span>
+          <span><strong className="font-semibold">Auto-detection for Managed Column</strong> - Graceful handling when managed column doesn't exist</span>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 className="text-sm font-bold text-gray-800 dark:text-gray-300 mb-2 flex items-center gap-2">
         <span className="text-lg">🚀</span> Planned
       </h4>
       <ul className="space-y-2 ml-6">

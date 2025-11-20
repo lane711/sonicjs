@@ -56,6 +56,8 @@
     "LICENSE"
   ],
   "scripts": {
+    "generate:migrations": "npx tsx scripts/generate-migrations.ts",
+    "prebuild": "npm run generate:migrations",
     "build": "tsup",
     "dev": "tsup --watch",
     "type-check": "tsc --noEmit",

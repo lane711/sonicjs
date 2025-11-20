@@ -471,6 +471,8 @@ var package_default = {
     "LICENSE"
   ],
   scripts: {
+    "generate:migrations": "npx tsx scripts/generate-migrations.ts",
+    prebuild: "npm run generate:migrations",
     build: "tsup",
     dev: "tsup --watch",
     "type-check": "tsc --noEmit",
@@ -550,5 +552,5 @@ exports.renderTemplate = renderTemplate;
 exports.sanitizeInput = sanitizeInput;
 exports.sanitizeObject = sanitizeObject;
 exports.templateRenderer = templateRenderer;
-//# sourceMappingURL=chunk-OGZBBGFX.cjs.map
-//# sourceMappingURL=chunk-OGZBBGFX.cjs.map
+//# sourceMappingURL=chunk-TRT7KX7P.cjs.map
+//# sourceMappingURL=chunk-TRT7KX7P.cjs.map
