@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin, navigateToAdminSection, waitForHTMX } from './utils/test-helpers';
 
-test.describe('MDXEditor Rich Text Editor', () => {
+// Skip: MDXEditor was replaced by EasyMDE - these tests are for the old React-based editor
+test.describe.skip('MDXEditor Rich Text Editor', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
   });

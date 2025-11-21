@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test'
 import { loginAsAdmin } from './utils/test-helpers'
 
-test.describe('MDXEditor on New Content Form', () => {
+// Skip: MDXEditor was replaced by EasyMDE - these tests are for the old React-based editor
+test.describe.skip('MDXEditor on New Content Form', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })
