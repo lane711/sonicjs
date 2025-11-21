@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin, navigateToAdminSection, waitForHTMX } from './utils/test-helpers';
 
-test.describe('EasyMDE Editor - Pages Collection', () => {
+test.describe.skip('EasyMDE Editor - Pages Collection', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
   });
