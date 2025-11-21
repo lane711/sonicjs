@@ -13,6 +13,7 @@
     "deploy": "wrangler deploy",
     "db:migrate": "wrangler d1 migrations apply DB",
     "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "db:reset:local": "rm -rf .wrangler/state/v3/d1/ && npm run db:migrate:local",
     "db:studio": "drizzle-kit studio",
     "type-check": "tsc --noEmit",
     "test": "vitest --run",
