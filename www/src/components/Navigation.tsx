@@ -281,6 +281,7 @@ export const navigation: Array<NavGroup> = [
       { title: 'FAQ', href: '/faq' },
       { title: 'Changelog', href: '/changelog' },
       { title: 'Community', href: '/community' },
+      { title: 'Telemetry', href: '/telemetry' },
     ],
   },
 ]

@@ -319,6 +319,7 @@ await migrationService.runAllMigrations()
 ├── src/
 │   ├── app.ts              # Application factory
 │   ├── db/                 # Database schemas & utilities
+│   │   └── migrations-bundle.ts  # Auto-generated migration bundle
 │   ├── services/           # Business logic
 │   ├── middleware/         # Request processing
 │   ├── routes/             # HTTP handlers
@@ -326,9 +327,82 @@ await migrationService.runAllMigrations()
 │   ├── plugins/            # Plugin system & core plugins
 │   ├── types/              # TypeScript definitions
 │   └── utils/              # Utility functions
-├── migrations/             # Core database migrations
+├── migrations/             # Core database migrations (.sql files)
+├── scripts/
+│   └── generate-migrations.ts  # Migration bundler script
 └── dist/                   # Compiled output
 ```
+
+## 🔄 Development Workflow
+
+### Migration System
+
+SonicJS uses a **build-time migration bundler** because Cloudflare Workers cannot access the filesystem at runtime. All migration SQL is bundled into TypeScript during the build process.
+
+#### Creating New Migrations
+
+1. **Create the SQL file** in `migrations/`:
+   ```bash
+   # Use sequential three-digit numbering
+   touch migrations/027_add_your_feature.sql
+   ```
+
+2. **Write idempotent SQL**:
+   ```sql
+   -- migrations/027_add_your_feature.sql
+   CREATE TABLE IF NOT EXISTS your_table (
+     id TEXT PRIMARY KEY,
+     name TEXT NOT NULL
+   );
+
+   CREATE INDEX IF NOT EXISTS idx_your_table_name ON your_table(name);
+   ```
+
+3. **Regenerate the bundle**:
+   ```bash
+   npm run generate:migrations
+   # Or this runs automatically during: npm run build
+   ```
+
+4. **Build the package**:
+   ```bash
+   npm run build
+   ```
+
+5. **Apply to your test database**:
+   ```bash
+   cd ../my-sonicjs-app
+   wrangler d1 migrations apply DB --local
+   ```
+
+#### Available Scripts
+
+```bash
+# Generate migrations bundle only
+npm run generate:migrations
+
+# Build (automatically runs generate:migrations first)
+npm run build
+
+# Type check
+npm run type-check
+
+# Run tests
+npm run test
+```
+
+#### How It Works
+
+```
+migrations/*.sql → scripts/generate-migrations.ts → src/db/migrations-bundle.ts → dist/
+```
+
+The `generate-migrations.ts` script:
+- Reads all `.sql` files from `migrations/`
+- Generates `src/db/migrations-bundle.ts` with embedded SQL
+- Provides `getMigrationSQLById()` for runtime access
+
+**Important**: Always rebuild after modifying migration files. The `.sql` files are not used at runtime.
 
 ## 🔄 Versioning
 

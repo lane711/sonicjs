@@ -469,6 +469,8 @@ var package_default = {
     "LICENSE"
   ],
   scripts: {
+    "generate:migrations": "npx tsx scripts/generate-migrations.ts",
+    prebuild: "npm run generate:migrations",
     build: "tsup",
     dev: "tsup --watch",
     "type-check": "tsc --noEmit",
@@ -538,5 +540,5 @@ function getCoreVersion() {
 }
 
 export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, package_default, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer };
-//# sourceMappingURL=chunk-HBSI25OP.js.map
-//# sourceMappingURL=chunk-HBSI25OP.js.map
+//# sourceMappingURL=chunk-V4YGBVTE.js.map
+//# sourceMappingURL=chunk-V4YGBVTE.js.map

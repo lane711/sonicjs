@@ -10,6 +10,7 @@ export const sections = [
   { title: 'Complete Database Schema', id: 'complete-database-schema' },
   { title: 'Drizzle ORM Integration', id: 'drizzle-orm-integration' },
   { title: 'Migration System', id: 'migration-system' },
+  { title: 'Creating New Migrations', id: 'creating-new-migrations' },
   { title: 'Collection Sync System', id: 'collection-sync-system' },
   { title: 'Query Patterns and Examples', id: 'query-patterns-and-examples' },
   { title: 'Prepared Statements', id: 'prepared-statements' },
@@ -383,6 +384,55 @@ export default {
 
 ## Migration System
 
+### Overview
+
+SonicJS uses a **build-time migration bundler** to handle database migrations. This is necessary because Cloudflare Workers don't have filesystem access at runtime, so all migration SQL must be bundled into the application code during the build process.
+
+### How It Works
+
+```
+Migration SQL Files (.sql)
+         ↓
+   Build Script (generate-migrations.ts)
+         ↓
+   TypeScript Bundle (migrations-bundle.ts)
+         ↓
+   Runtime Execution (MigrationService)
+```
+
+The migration bundler:
+1. Reads all `.sql` files from `packages/core/migrations/`
+2. Generates `src/db/migrations-bundle.ts` with all SQL embedded
+3. Provides type-safe access to migrations at runtime
+
+### Migration Bundler Script
+
+The bundler runs automatically as part of the build process via the `prebuild` npm script:
+
+<CodeGroup title="Migration Bundler">
+
+```typescript
+// scripts/generate-migrations.ts
+// Reads SQL files and generates TypeScript bundle
+
+// Generated output structure:
+export interface BundledMigration {
+  id: string           // e.g., '001'
+  name: string         // e.g., 'Create Users'
+  filename: string     // e.g., '001_create_users.sql'
+  description: string  // e.g., 'Migration 001: Create Users'
+  sql: string          // The actual SQL content
+}
+
+export const bundledMigrations: BundledMigration[] = [...]
+
+// Helper functions
+export function getMigrationSQLById(id: string): string | null
+export function getMigrationList(): Array<Omit<BundledMigration, 'sql'>>
+```
+
+</CodeGroup>
+
 ### Migration Service
 
 The migration system handles database schema changes in a versioned, controlled manner.
@@ -467,6 +517,57 @@ export class MigrationService {
 
 </CodeGroup>
 
+### Creating New Migrations {{ id: 'creating-new-migrations' }}
+
+When developing the SonicJS core package, follow these steps to create new migrations:
+
+<CodeGroup title="Creating Migrations">
+
+```bash {{ title: 'Step 1: Create SQL File' }}
+# Create a new migration file with sequential numbering
+# File: packages/core/migrations/027_your_migration.sql
+
+CREATE TABLE IF NOT EXISTS your_table (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_your_table_name ON your_table(name);
+```
+
+```bash {{ title: 'Step 2: Regenerate Bundle' }}
+# Regenerate the migrations bundle (also runs as prebuild)
+cd packages/core
+npm run generate:migrations
+
+# Output:
+# Generated migrations bundle with 27 migrations:
+#   - 001: Create Users (1234 bytes)
+#   - 002: Create Collections (567 bytes)
+#   ...
+#   - 027: Your Migration (890 bytes)
+```
+
+```bash {{ title: 'Step 3: Rebuild Package' }}
+# Rebuild the core package to include the new bundle
+npm run build
+
+# Or from monorepo root:
+npm run build:core
+```
+
+```bash {{ title: 'Step 4: Apply to Database' }}
+# Apply migrations to your test app's local database
+cd my-sonicjs-app
+wrangler d1 migrations apply DB --local
+
+# Apply to production
+wrangler d1 migrations apply DB --remote
+```
+
+</CodeGroup>
+
 ### Running Migrations
 
 <CodeGroup title="Migration Commands">
@@ -482,12 +583,23 @@ npm run db:migrate:prod
 wrangler d1 migrations apply DB --local
 wrangler d1 migrations apply DB --env production
 
-# Create new migration
-# Create file: migrations/012_your_migration.sql
-# Then run: npm run db:migrate
+# Check migration status
+wrangler d1 migrations list DB --local
 ```
 
 </CodeGroup>
+
+<Callout type="warning" title="Important: Always Rebuild After Changes">
+After creating or modifying migration SQL files, you **must** run `npm run build:core` (or `npm run generate:migrations` followed by `npm run build`) to regenerate the migrations bundle. The SQL files themselves are not used at runtime - only the bundled TypeScript file is.
+</Callout>
+
+### Migration Best Practices
+
+- **Sequential Numbering**: Use three-digit sequential numbers (001, 002, 027) to ensure correct order
+- **Idempotent SQL**: Use `IF NOT EXISTS`, `INSERT OR IGNORE` to make migrations safe to re-run
+- **Descriptive Names**: Name files clearly (e.g., `015_add_user_preferences.sql`)
+- **Single Responsibility**: Each migration should handle one logical change
+- **Test Locally First**: Always apply to local database before production
 
 ---
 
