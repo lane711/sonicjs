@@ -1,3 +1,5 @@
+'use strict';
+
 // src/db/migrations-bundle.ts
 var bundledMigrations = [
   {
@@ -146,7 +148,7 @@ INSERT OR IGNORE INTO users (
   'admin',
   'Admin',
   'User',
-  'd1c379e871838f44e21d5a55841349e50636f06df139bfef11870eec74c381db', -- SHA-256 hash of 'sonicjs!'
+  '9c9ec10df964f588e51acc794a63f18d5582e9b91c8366ba292ebde84d3834fd', -- SHA-256 hash of 'sonicjs!' with salt
   'admin',
   1,
   strftime('%s', 'now') * 1000,
@@ -1545,6 +1547,6 @@ var MigrationService = class {
   }
 };
 
-export { MigrationService };
-//# sourceMappingURL=chunk-VXKQB5DN.js.map
-//# sourceMappingURL=chunk-VXKQB5DN.js.map
+exports.MigrationService = MigrationService;
+//# sourceMappingURL=chunk-Z3U7DVUD.cjs.map
+//# sourceMappingURL=chunk-Z3U7DVUD.cjs.map

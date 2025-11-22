@@ -1,7 +1,7 @@
 'use strict';
 
 var chunkTRT7KX7P_cjs = require('./chunk-TRT7KX7P.cjs');
-var chunk3OKKNBPD_cjs = require('./chunk-3OKKNBPD.cjs');
+var chunkHFFNEGZB_cjs = require('./chunk-HFFNEGZB.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 require('./chunk-IGJUBJBW.cjs');
 
@@ -49,35 +49,35 @@ Object.defineProperty(exports, "templateRenderer", {
 });
 Object.defineProperty(exports, "DEFAULT_TELEMETRY_CONFIG", {
   enumerable: true,
-  get: function () { return chunk3OKKNBPD_cjs.DEFAULT_TELEMETRY_CONFIG; }
+  get: function () { return chunkHFFNEGZB_cjs.DEFAULT_TELEMETRY_CONFIG; }
 });
 Object.defineProperty(exports, "generateInstallationId", {
   enumerable: true,
-  get: function () { return chunk3OKKNBPD_cjs.generateInstallationId; }
+  get: function () { return chunkHFFNEGZB_cjs.generateInstallationId; }
 });
 Object.defineProperty(exports, "generateProjectId", {
   enumerable: true,
-  get: function () { return chunk3OKKNBPD_cjs.generateProjectId; }
+  get: function () { return chunkHFFNEGZB_cjs.generateProjectId; }
 });
 Object.defineProperty(exports, "getTelemetryConfig", {
   enumerable: true,
-  get: function () { return chunk3OKKNBPD_cjs.getTelemetryConfig; }
+  get: function () { return chunkHFFNEGZB_cjs.getTelemetryConfig; }
 });
 Object.defineProperty(exports, "isTelemetryEnabled", {
   enumerable: true,
-  get: function () { return chunk3OKKNBPD_cjs.isTelemetryEnabled; }
+  get: function () { return chunkHFFNEGZB_cjs.isTelemetryEnabled; }
 });
 Object.defineProperty(exports, "sanitizeErrorMessage", {
   enumerable: true,
-  get: function () { return chunk3OKKNBPD_cjs.sanitizeErrorMessage; }
+  get: function () { return chunkHFFNEGZB_cjs.sanitizeErrorMessage; }
 });
 Object.defineProperty(exports, "sanitizeRoute", {
   enumerable: true,
-  get: function () { return chunk3OKKNBPD_cjs.sanitizeRoute; }
+  get: function () { return chunkHFFNEGZB_cjs.sanitizeRoute; }
 });
 Object.defineProperty(exports, "shouldSkipEvent", {
   enumerable: true,
-  get: function () { return chunk3OKKNBPD_cjs.shouldSkipEvent; }
+  get: function () { return chunkHFFNEGZB_cjs.shouldSkipEvent; }
 });
 Object.defineProperty(exports, "metricsTracker", {
   enumerable: true,

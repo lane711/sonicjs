@@ -7,7 +7,7 @@
  * - Opt-out via environment variable
  */
 
-import { randomUUID } from 'crypto'
+import { randomUUID } from 'node:crypto'
 import os from 'os'
 import fs from 'fs-extra'
 import path from 'path'

@@ -1,4 +1,4 @@
-import { randomUUID } from 'crypto';
+'use strict';
 
 // src/utils/telemetry-config.ts
 var DEFAULT_TELEMETRY_CONFIG = {
@@ -34,8 +34,10 @@ function shouldSkipEvent(eventName, sampleRate = 1) {
   }
   return Math.abs(hash % 100) / 100 > sampleRate;
 }
+
+// src/utils/telemetry-id.ts
 function generateInstallationId() {
-  return randomUUID();
+  return crypto.randomUUID();
 }
 function generateProjectId(projectName) {
   let hash = 0;
@@ -56,6 +58,13 @@ function sanitizeRoute(route) {
   return route.replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi, ":id").replace(/\/\d+/g, "/:id").replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, ":email");
 }
 
-export { DEFAULT_TELEMETRY_CONFIG, generateInstallationId, generateProjectId, getTelemetryConfig, isTelemetryEnabled, sanitizeErrorMessage, sanitizeRoute, shouldSkipEvent };
-//# sourceMappingURL=chunk-RKNHW6QU.js.map
-//# sourceMappingURL=chunk-RKNHW6QU.js.map
+exports.DEFAULT_TELEMETRY_CONFIG = DEFAULT_TELEMETRY_CONFIG;
+exports.generateInstallationId = generateInstallationId;
+exports.generateProjectId = generateProjectId;
+exports.getTelemetryConfig = getTelemetryConfig;
+exports.isTelemetryEnabled = isTelemetryEnabled;
+exports.sanitizeErrorMessage = sanitizeErrorMessage;
+exports.sanitizeRoute = sanitizeRoute;
+exports.shouldSkipEvent = shouldSkipEvent;
+//# sourceMappingURL=chunk-HFFNEGZB.cjs.map
+//# sourceMappingURL=chunk-HFFNEGZB.cjs.map

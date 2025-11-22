@@ -1,7 +1,3 @@
-'use strict';
-
-var crypto = require('crypto');
-
 // src/utils/telemetry-config.ts
 var DEFAULT_TELEMETRY_CONFIG = {
   enabled: true,
@@ -36,6 +32,8 @@ function shouldSkipEvent(eventName, sampleRate = 1) {
   }
   return Math.abs(hash % 100) / 100 > sampleRate;
 }
+
+// src/utils/telemetry-id.ts
 function generateInstallationId() {
   return crypto.randomUUID();
 }
@@ -58,13 +56,6 @@ function sanitizeRoute(route) {
   return route.replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi, ":id").replace(/\/\d+/g, "/:id").replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, ":email");
 }
 
-exports.DEFAULT_TELEMETRY_CONFIG = DEFAULT_TELEMETRY_CONFIG;
-exports.generateInstallationId = generateInstallationId;
-exports.generateProjectId = generateProjectId;
-exports.getTelemetryConfig = getTelemetryConfig;
-exports.isTelemetryEnabled = isTelemetryEnabled;
-exports.sanitizeErrorMessage = sanitizeErrorMessage;
-exports.sanitizeRoute = sanitizeRoute;
-exports.shouldSkipEvent = shouldSkipEvent;
-//# sourceMappingURL=chunk-3OKKNBPD.cjs.map
-//# sourceMappingURL=chunk-3OKKNBPD.cjs.map
+export { DEFAULT_TELEMETRY_CONFIG, generateInstallationId, generateProjectId, getTelemetryConfig, isTelemetryEnabled, sanitizeErrorMessage, sanitizeRoute, shouldSkipEvent };
+//# sourceMappingURL=chunk-MOWI4WYE.js.map
+//# sourceMappingURL=chunk-MOWI4WYE.js.map
