@@ -383,7 +383,8 @@ adminContentRoutes.get('/new', async (c) => {
       tinymce: tinymceEnabled,
       quill: quillEnabled,
       mdxeditor: mdxeditorEnabled,
-      mdxeditorSettings
+      mdxeditorSettings,
+      willIncludeScripts: mdxeditorEnabled ? 'YES' : 'NO'
     })
 
     const formData: ContentFormData = {

@@ -4,6 +4,7 @@ import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers';
 // Use environment variable for port or default to 8787
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8787';
 
+// Skip: These tests need UI fixes - Collections page doesn't load properly in test environment
 test.describe.skip('Collection Field EasyMDX Edit', () => {
   test.beforeEach(async ({ page }) => {
     await ensureAdminUserExists(page);

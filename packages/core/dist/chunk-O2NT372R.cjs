@@ -1,3 +1,5 @@
+'use strict';
+
 // src/db/migrations-bundle.ts
 var bundledMigrations = [
   {
@@ -1053,7 +1055,8 @@ INSERT OR IGNORE INTO plugins (
 -- Description: Add EasyMDE plugin for lightweight markdown editing
 
 -- Register the plugin (active by default)
-INSERT OR IGNORE INTO plugins (
+-- Use INSERT OR REPLACE to ensure plugin is active even if it already exists
+INSERT OR REPLACE INTO plugins (
     id, name, display_name, description, version, author, category, icon,
     status, is_core, permissions, dependencies, settings, installed_at, last_updated
 ) VALUES (
@@ -1064,9 +1067,9 @@ INSERT OR IGNORE INTO plugins (
     '1.0.0',
     'SonicJS Team',
     'editor',
-    '\u{1F4DD}',
+    '\u270D\uFE0F',
     'active',
-    FALSE,
+    1,
     '[]',
     '[]',
     '{"defaultHeight":400,"theme":"dark","toolbar":"full","placeholder":"Start writing your content..."}',
@@ -1545,6 +1548,6 @@ var MigrationService = class {
   }
 };
 
-export { MigrationService };
-//# sourceMappingURL=chunk-VXKQB5DN.js.map
-//# sourceMappingURL=chunk-VXKQB5DN.js.map
+exports.MigrationService = MigrationService;
+//# sourceMappingURL=chunk-O2NT372R.cjs.map
+//# sourceMappingURL=chunk-O2NT372R.cjs.map

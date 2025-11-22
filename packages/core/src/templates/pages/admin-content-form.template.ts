@@ -697,6 +697,8 @@ export function renderContentFormPage(data: ContentFormData): string {
         form.addEventListener('change', scheduleAutoSave);
       });
 
+    </script>
+
       ${data.tinymceEnabled ? `<script>${getTinyMCEInitScript({
         skin: data.tinymceSettings?.skin,
         defaultHeight: data.tinymceSettings?.defaultHeight,
@@ -709,7 +711,6 @@ export function renderContentFormPage(data: ContentFormData): string {
         toolbar: data.mdxeditorSettings?.toolbar,
         placeholder: data.mdxeditorSettings?.placeholder
       })}</script>` : ''}
-    </script>
   `
 
   const layoutData: AdminLayoutCatalystData = {
