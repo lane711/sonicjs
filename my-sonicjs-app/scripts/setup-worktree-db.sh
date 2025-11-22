@@ -81,16 +81,28 @@ fi
 echo "Updated wrangler.toml:"
 grep -A2 "d1_databases" wrangler.toml
 
-# Run migrations
+# Reset local database by removing it
 echo ""
-echo "Running migrations..."
+echo "Resetting local database..."
+rm -rf .wrangler/state/v3/d1
+echo "Local database cleared."
+
+# Run migrations on remote
+echo ""
+echo "Running migrations on remote database..."
 npx wrangler d1 migrations apply "$DB_NAME" --remote
+
+# Run migrations on local
+echo ""
+echo "Running migrations on local database..."
+npx wrangler d1 migrations apply "$DB_NAME" --local
 
 echo ""
 echo "=========================================="
 echo "Database setup complete!"
 echo "Database name: $DB_NAME"
 echo "Database ID: $DB_ID"
+echo "Both remote and local databases are ready."
 echo "=========================================="
 echo ""
 echo "You can now run: npm run dev"
