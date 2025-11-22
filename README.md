@@ -94,6 +94,20 @@ npx create-sonicjs@latest my-sonicjs-app
 npm test
 ```
 
+#### Setting Up a Fresh Database
+
+When working in a new worktree or wanting to reset your local database, run from the project root:
+
+```bash
+# Create a fresh D1 database for your branch
+npm run db:reset
+```
+
+This will:
+- Create a new D1 database named `sonicjs-worktree-<branch-name>`
+- Apply all migrations
+- Update `wrangler.toml` with the new database ID
+
 #### Working with Database Migrations
 
 When developing the core package, migrations are located in `packages/core/migrations/`. Your test app will reference these migrations through the npm workspace symlink.
