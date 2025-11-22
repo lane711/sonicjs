@@ -37,6 +37,64 @@ jobs:
       - name: Build core package
         run: npm run build:core
 
+      - name: Create fresh D1 database for PR
+        id: create-db
+        run: |
+          cd my-sonicjs-app
+          BRANCH_NAME="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+          SAFE_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-50)
+          DB_NAME="sonicjs-pr-${SAFE_BRANCH}"
+
+          echo "Creating fresh D1 database: $DB_NAME"
+
+          # Check if database already exists
+          EXISTING_DB=$(npx wrangler d1 list --json | jq -r ".[] | select(.name == \"$DB_NAME\") | .uuid" 2>/dev/null || echo "")
+
+          if [ -n "$EXISTING_DB" ]; then
+            echo "Database $DB_NAME already exists with ID: $EXISTING_DB"
+            DB_ID="$EXISTING_DB"
+          else
+            # Create new database
+            CREATE_OUTPUT=$(npx wrangler d1 create "$DB_NAME" 2>&1)
+            echo "$CREATE_OUTPUT"
+
+            # Extract database ID from creation output
+            DB_ID=$(echo "$CREATE_OUTPUT" | grep -oP 'database_id\s*=\s*"\K[^"]+' || echo "")
+
+            if [ -z "$DB_ID" ]; then
+              # Try alternative extraction method
+              DB_ID=$(npx wrangler d1 list --json | jq -r ".[] | select(.name == \"$DB_NAME\") | .uuid")
+            fi
+          fi
+
+          if [ -z "$DB_ID" ]; then
+            echo "Error: Failed to get database ID"
+            exit 1
+          fi
+
+          echo "Database ID: $DB_ID"
+          echo "db_id=$DB_ID" >> $GITHUB_OUTPUT
+          echo "db_name=$DB_NAME" >> $GITHUB_OUTPUT
+
+          # Update wrangler.toml with the new database ID
+          sed -i "s/database_id = \"[^\"]*\"/database_id = \"$DB_ID\"/" wrangler.toml
+          sed -i "s/database_name = \"[^\"]*\"/database_name = \"$DB_NAME\"/" wrangler.toml
+
+          echo "Updated wrangler.toml with new database"
+          grep -A2 "d1_databases" wrangler.toml
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Run D1 migrations
+        run: |
+          cd my-sonicjs-app
+          echo "Applying migrations to database: ${{ steps.create-db.outputs.db_name }}"
+          npx wrangler d1 migrations apply ${{ steps.create-db.outputs.db_name }} --remote
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
       - name: Deploy to Cloudflare Workers Preview
         id: deploy
         run: |
@@ -47,7 +105,7 @@ jobs:
 
           # Deploy and capture the URL (don't exit on error)
           set +e
-          echo "Deploying to preview environment: pr-${SAFE_BRANCH}"
+          echo "Deploying to preview environment: sonicjs-pr-${SAFE_BRANCH}"
           DEPLOY_OUTPUT=$(npx wrangler deploy --name "sonicjs-pr-${SAFE_BRANCH}" 2>&1)
           DEPLOY_EXIT_CODE=$?
           set -e

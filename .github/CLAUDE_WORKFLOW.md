@@ -5,10 +5,35 @@ This document outlines the workflow for using Claude in Conductor to fix GitHub 
 ## Workflow Overview
 
 1. **Start in Conductor** - Conductor automatically creates a worktree and branch
-2. **Claude fixes the issue** - Implement the fix with tests
-3. **Create PR** - Push changes and create pull request
-4. **CI runs tests** - GitHub Actions runs unit and E2E tests
-5. **Manual review** - You review and merge the PR
+2. **Setup fresh database** - Run `npm run setup:db` in my-sonicjs-app to create a clean D1 database
+3. **Claude fixes the issue** - Implement the fix with tests
+4. **Create PR** - Push changes and create pull request
+5. **CI runs tests** - GitHub Actions creates a fresh D1 database and runs unit/E2E tests
+6. **Manual review** - You review and merge the PR
+
+## Database Setup
+
+Each PR and worktree gets a fresh D1 database to ensure clean testing environments.
+
+### For Local Development (Worktrees)
+
+```bash
+cd my-sonicjs-app
+npm run setup:db
+```
+
+This script:
+- Creates a new D1 database named after your branch (e.g., `sonicjs-worktree-fix-auth-bug`)
+- Updates `wrangler.toml` with the new database ID
+- Runs all migrations against the fresh database
+
+### For PRs (Automatic)
+
+GitHub Actions automatically:
+- Creates a D1 database named `sonicjs-pr-<branch-name>`
+- Applies all migrations
+- Deploys the preview with the fresh database
+- Runs E2E tests against it
 
 ## Steps for Claude
 
