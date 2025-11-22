@@ -1,8 +1,8 @@
 'use strict';
 
-var chunkD4WS4G5F_cjs = require('./chunk-D4WS4G5F.cjs');
+var chunkU2WYUO32_cjs = require('./chunk-U2WYUO32.cjs');
 var chunk22EFGHAX_cjs = require('./chunk-22EFGHAX.cjs');
-var chunkZ3U7DVUD_cjs = require('./chunk-Z3U7DVUD.cjs');
+var chunkJQIQRMPA_cjs = require('./chunk-JQIQRMPA.cjs');
 require('./chunk-HFFNEGZB.cjs');
 require('./chunk-IGJUBJBW.cjs');
 
@@ -10,47 +10,47 @@ require('./chunk-IGJUBJBW.cjs');
 
 Object.defineProperty(exports, "CACHE_CONFIGS", {
   enumerable: true,
-  get: function () { return chunkD4WS4G5F_cjs.CACHE_CONFIGS; }
+  get: function () { return chunkU2WYUO32_cjs.CACHE_CONFIGS; }
 });
 Object.defineProperty(exports, "CacheService", {
   enumerable: true,
-  get: function () { return chunkD4WS4G5F_cjs.CacheService; }
+  get: function () { return chunkU2WYUO32_cjs.CacheService; }
 });
 Object.defineProperty(exports, "Logger", {
   enumerable: true,
-  get: function () { return chunkD4WS4G5F_cjs.Logger; }
+  get: function () { return chunkU2WYUO32_cjs.Logger; }
 });
 Object.defineProperty(exports, "SettingsService", {
   enumerable: true,
-  get: function () { return chunkD4WS4G5F_cjs.SettingsService; }
+  get: function () { return chunkU2WYUO32_cjs.SettingsService; }
 });
 Object.defineProperty(exports, "TelemetryService", {
   enumerable: true,
-  get: function () { return chunkD4WS4G5F_cjs.TelemetryService; }
+  get: function () { return chunkU2WYUO32_cjs.TelemetryService; }
 });
 Object.defineProperty(exports, "createInstallationIdentity", {
   enumerable: true,
-  get: function () { return chunkD4WS4G5F_cjs.createInstallationIdentity; }
+  get: function () { return chunkU2WYUO32_cjs.createInstallationIdentity; }
 });
 Object.defineProperty(exports, "getCacheService", {
   enumerable: true,
-  get: function () { return chunkD4WS4G5F_cjs.getCacheService; }
+  get: function () { return chunkU2WYUO32_cjs.getCacheService; }
 });
 Object.defineProperty(exports, "getLogger", {
   enumerable: true,
-  get: function () { return chunkD4WS4G5F_cjs.getLogger; }
+  get: function () { return chunkU2WYUO32_cjs.getLogger; }
 });
 Object.defineProperty(exports, "getTelemetryService", {
   enumerable: true,
-  get: function () { return chunkD4WS4G5F_cjs.getTelemetryService; }
+  get: function () { return chunkU2WYUO32_cjs.getTelemetryService; }
 });
 Object.defineProperty(exports, "initLogger", {
   enumerable: true,
-  get: function () { return chunkD4WS4G5F_cjs.initLogger; }
+  get: function () { return chunkU2WYUO32_cjs.initLogger; }
 });
 Object.defineProperty(exports, "initTelemetry", {
   enumerable: true,
-  get: function () { return chunkD4WS4G5F_cjs.initTelemetry; }
+  get: function () { return chunkU2WYUO32_cjs.initTelemetry; }
 });
 Object.defineProperty(exports, "PluginBootstrapService", {
   enumerable: true,
@@ -106,7 +106,7 @@ Object.defineProperty(exports, "validateCollectionConfig", {
 });
 Object.defineProperty(exports, "MigrationService", {
   enumerable: true,
-  get: function () { return chunkZ3U7DVUD_cjs.MigrationService; }
+  get: function () { return chunkJQIQRMPA_cjs.MigrationService; }
 });
 //# sourceMappingURL=services.cjs.map
 //# sourceMappingURL=services.cjs.map
