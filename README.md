@@ -10,10 +10,11 @@ A modern, TypeScript-first headless CMS built for Cloudflare's edge platform wit
 
 ### Core Platform
 - **⚡ Edge-First**: Built specifically for Cloudflare Workers with global performance
-- **🔧 Developer-Centric**: Configuration over UI, TypeScript-first approach  
+- **🔧 Developer-Centric**: Configuration over UI, TypeScript-first approach
 - **🤖 AI-Friendly**: Structured codebase designed for AI-assisted development
 - **🔌 Plugin System**: Extensible architecture without core modifications
 - **📱 Modern Stack**: Hono.js, TypeScript, D1, R2, and HTMX
+- **🚀 Fast & Lightweight**: Optimized for edge computing performance
 
 ### Advanced Content Management (Stage 5)
 - **📝 Rich Text Editor**: TinyMCE integration with customizable toolbars
