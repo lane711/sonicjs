@@ -4,13 +4,12 @@
  * Generates and manages anonymous installation IDs
  */
 
-import { randomUUID } from 'node:crypto'
-
 /**
  * Generate a new anonymous installation ID
+ * Uses globalThis.crypto for Cloudflare Workers compatibility
  */
 export function generateInstallationId(): string {
-  return randomUUID()
+  return crypto.randomUUID()
 }
 
 /**
