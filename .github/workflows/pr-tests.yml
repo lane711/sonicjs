@@ -42,7 +42,8 @@ jobs:
         run: |
           cd my-sonicjs-app
           BRANCH_NAME="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
-          SAFE_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-50)
+          # Limit to 43 chars to allow for "sonicjs-pr-" prefix (11 chars) = 54 total
+          SAFE_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-43)
           DB_NAME="sonicjs-pr-${SAFE_BRANCH}"
 
           echo "Creating fresh D1 database: $DB_NAME"
@@ -101,7 +102,8 @@ jobs:
           cd my-sonicjs-app
           # Deploy to preview with unique name based on PR/branch
           BRANCH_NAME="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
-          SAFE_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-50)
+          # Limit to 43 chars to allow for "sonicjs-pr-" prefix (11 chars) = 54 total
+          SAFE_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-43)
 
           # Deploy and capture the URL (don't exit on error)
           set +e
