@@ -1,6 +1,6 @@
 'use strict';
 
-var chunk3OKKNBPD_cjs = require('./chunk-3OKKNBPD.cjs');
+var chunkHFFNEGZB_cjs = require('./chunk-HFFNEGZB.cjs');
 var chunkIGJUBJBW_cjs = require('./chunk-IGJUBJBW.cjs');
 var sqliteCore = require('drizzle-orm/sqlite-core');
 var v4 = require('zod/v4');
@@ -1146,7 +1146,7 @@ var TelemetryService = class {
   isInitialized = false;
   constructor(config) {
     this.config = {
-      ...chunk3OKKNBPD_cjs.getTelemetryConfig(),
+      ...chunkHFFNEGZB_cjs.getTelemetryConfig(),
       ...config
     };
     this.enabled = this.config.enabled;
@@ -1242,7 +1242,7 @@ var TelemetryService = class {
   async trackInstallationFailed(error, properties) {
     await this.track("installation_failed", {
       ...properties,
-      errorType: chunk3OKKNBPD_cjs.sanitizeErrorMessage(error)
+      errorType: chunkHFFNEGZB_cjs.sanitizeErrorMessage(error)
     });
   }
   /**
@@ -1257,7 +1257,7 @@ var TelemetryService = class {
   async trackPageView(route, properties) {
     await this.track("page_viewed", {
       ...properties,
-      route: chunk3OKKNBPD_cjs.sanitizeRoute(route)
+      route: chunkHFFNEGZB_cjs.sanitizeRoute(route)
     });
   }
   /**
@@ -1266,7 +1266,7 @@ var TelemetryService = class {
   async trackError(error, properties) {
     await this.track("error_occurred", {
       ...properties,
-      errorType: chunk3OKKNBPD_cjs.sanitizeErrorMessage(error)
+      errorType: chunkHFFNEGZB_cjs.sanitizeErrorMessage(error)
     });
   }
   /**
@@ -1301,11 +1301,11 @@ var TelemetryService = class {
     for (const [key, value] of Object.entries(properties)) {
       if (value === void 0) continue;
       if (key === "route" && typeof value === "string") {
-        sanitized[key] = chunk3OKKNBPD_cjs.sanitizeRoute(value);
+        sanitized[key] = chunkHFFNEGZB_cjs.sanitizeRoute(value);
         continue;
       }
       if (key.toLowerCase().includes("error") && typeof value === "string") {
-        sanitized[key] = chunk3OKKNBPD_cjs.sanitizeErrorMessage(value);
+        sanitized[key] = chunkHFFNEGZB_cjs.sanitizeErrorMessage(value);
         continue;
       }
       if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
@@ -1370,10 +1370,10 @@ async function initTelemetry(identity, config) {
   return service;
 }
 function createInstallationIdentity(projectName) {
-  const installationId = chunk3OKKNBPD_cjs.generateInstallationId();
+  const installationId = chunkHFFNEGZB_cjs.generateInstallationId();
   const identity = { installationId };
   if (projectName) {
-    identity.projectId = chunk3OKKNBPD_cjs.generateProjectId(projectName);
+    identity.projectId = chunkHFFNEGZB_cjs.generateProjectId(projectName);
   }
   return identity;
 }
@@ -1428,5 +1428,5 @@ exports.selectWorkflowHistorySchema = selectWorkflowHistorySchema;
 exports.systemLogs = systemLogs;
 exports.users = users;
 exports.workflowHistory = workflowHistory;
-//# sourceMappingURL=chunk-2FXIDRNT.cjs.map
-//# sourceMappingURL=chunk-2FXIDRNT.cjs.map
+//# sourceMappingURL=chunk-D4WS4G5F.cjs.map
+//# sourceMappingURL=chunk-D4WS4G5F.cjs.map

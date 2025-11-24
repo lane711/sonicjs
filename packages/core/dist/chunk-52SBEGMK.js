@@ -1,4 +1,4 @@
-import { getTelemetryConfig, sanitizeErrorMessage, sanitizeRoute, generateInstallationId, generateProjectId } from './chunk-RKNHW6QU.js';
+import { getTelemetryConfig, sanitizeErrorMessage, sanitizeRoute, generateInstallationId, generateProjectId } from './chunk-MOWI4WYE.js';
 import { __export } from './chunk-V4OQ3NZ2.js';
 import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
 import { z } from 'zod/v4';
@@ -1377,5 +1377,5 @@ function createInstallationIdentity(projectName) {
 }
 
 export { CACHE_CONFIGS, CacheService, Logger, SettingsService, TelemetryService, apiTokens, collections, content, contentVersions, createInstallationIdentity, getCacheService, getLogger, getTelemetryService, initLogger, initTelemetry, insertCollectionSchema, insertContentSchema, insertLogConfigSchema, insertMediaSchema, insertPluginActivityLogSchema, insertPluginAssetSchema, insertPluginHookSchema, insertPluginRouteSchema, insertPluginSchema, insertSystemLogSchema, insertUserSchema, insertWorkflowHistorySchema, logConfig, media, pluginActivityLog, pluginAssets, pluginHooks, pluginRoutes, plugins, schema_exports, selectCollectionSchema, selectContentSchema, selectLogConfigSchema, selectMediaSchema, selectPluginActivityLogSchema, selectPluginAssetSchema, selectPluginHookSchema, selectPluginRouteSchema, selectPluginSchema, selectSystemLogSchema, selectUserSchema, selectWorkflowHistorySchema, systemLogs, users, workflowHistory };
-//# sourceMappingURL=chunk-GMI2NZE7.js.map
-//# sourceMappingURL=chunk-GMI2NZE7.js.map
+//# sourceMappingURL=chunk-52SBEGMK.js.map
+//# sourceMappingURL=chunk-52SBEGMK.js.map
