@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "npm run dev --workspace=my-sonicjs-app",
     "dev:www": "npm run dev --workspace=www",
+    "build": "npm run build:core && npm run build --workspace=my-sonicjs-app",
     "build:www": "npm run build --workspace=www",
     "build:core": "npm run build --workspace=@sonicjs-cms/core",
     "deploy": "npm run deploy --workspace=my-sonicjs-app",
@@ -32,7 +33,8 @@
     "publish:all": "npm run publish:core && npm run publish:create-app",
     "release:patch": "npm run version:patch && npm run publish:all",
     "release:minor": "npm run version:minor && npm run publish:all",
-    "release:major": "npm run version:major && npm run publish:all"
+    "release:major": "npm run version:major && npm run publish:all",
+    "db:reset": "npm run setup:db --workspace=my-sonicjs-app"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",

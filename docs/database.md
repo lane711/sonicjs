@@ -723,9 +723,48 @@ export default {
 
 ## Migration System
 
-File: `/src/services/migrations.ts`
+SonicJS uses a **build-time migration bundler** to handle database migrations. This is necessary because Cloudflare Workers don't have filesystem access at runtime, so all migration SQL must be bundled into the application code during the build process.
+
+### How It Works
+
+```
+Migration SQL Files (.sql)     →  packages/core/migrations/
+         ↓
+   Build Script                →  scripts/generate-migrations.ts
+         ↓
+   TypeScript Bundle           →  src/db/migrations-bundle.ts
+         ↓
+   Runtime Execution           →  MigrationService
+```
+
+The migration bundler:
+1. Reads all `.sql` files from `packages/core/migrations/`
+2. Generates `src/db/migrations-bundle.ts` with all SQL embedded
+3. Provides type-safe access to migrations at runtime via `getMigrationSQLById()`
+
+### Migration Bundler Output
+
+```typescript
+// src/db/migrations-bundle.ts (AUTO-GENERATED - DO NOT EDIT)
+
+export interface BundledMigration {
+  id: string           // e.g., '001'
+  name: string         // e.g., 'Create Users'
+  filename: string     // e.g., '001_create_users.sql'
+  description: string  // e.g., 'Migration 001: Create Users'
+  sql: string          // The actual SQL content
+}
+
+export const bundledMigrations: BundledMigration[] = [...]
+
+// Helper functions
+export function getMigrationSQLById(id: string): string | null
+export function getMigrationList(): Array<Omit<BundledMigration, 'sql'>>
+```
 
 ### Migration Service Class
+
+File: `/src/services/migrations.ts`
 
 ```typescript
 export class MigrationService {
@@ -863,6 +902,32 @@ migrations/
 └── 011_config_managed_collections.sql # Config-managed collections
 ```
 
+### Creating New Migrations
+
+When developing the SonicJS core package:
+
+```bash
+# Step 1: Create a new migration file
+touch packages/core/migrations/027_add_feature.sql
+
+# Step 2: Write idempotent SQL in the file
+# Use CREATE TABLE IF NOT EXISTS, INSERT OR IGNORE, etc.
+
+# Step 3: Regenerate the migrations bundle
+cd packages/core
+npm run generate:migrations
+# This runs automatically during: npm run build
+
+# Step 4: Rebuild the package
+npm run build
+
+# Step 5: Apply to your test database
+cd my-sonicjs-app
+wrangler d1 migrations apply DB --local
+```
+
+**Important**: After creating or modifying migration SQL files, you MUST rebuild the package. The SQL files themselves are not used at runtime - only the bundled TypeScript file is.
+
 ### Running Migrations
 
 ```bash
@@ -876,9 +941,8 @@ npm run db:migrate:prod
 wrangler d1 migrations apply DB --local
 wrangler d1 migrations apply DB --env production
 
-# Create new migration
-# Create file: migrations/012_your_migration.sql
-# Then run: npm run db:migrate
+# Check migration status
+wrangler d1 migrations list DB --local
 ```
 
 ### Example Migration File

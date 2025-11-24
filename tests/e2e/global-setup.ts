@@ -11,8 +11,10 @@ async function globalSetup(config: FullConfig) {
   const page = await browser.newPage();
 
   try {
-    // Get the base URL from the config
-    const baseURL = config.projects[0].use.baseURL || 'http://localhost:8787';
+    // Get the base URL from environment or config
+    const baseURL = process.env.BASE_URL || config.projects[0]?.use?.baseURL || 'http://localhost:8787';
+
+    console.log(`Using base URL: ${baseURL}`);
 
     // Call the cleanup endpoint (public, no auth required)
     const response = await page.request.post(`${baseURL}/test-cleanup`, {

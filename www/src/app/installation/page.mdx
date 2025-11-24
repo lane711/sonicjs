@@ -7,6 +7,7 @@ export const metadata = {
 export const sections = [
   { title: 'Prerequisites', id: 'prerequisites' },
   { title: 'Quick Start', id: 'quick-start' },
+  { title: 'Privacy & Telemetry', id: 'privacy-telemetry' },
   { title: 'Development Setup', id: 'development-setup' },
   { title: 'Environment Configuration', id: 'environment-configuration' },
   { title: 'First Steps', id: 'first-steps' },
@@ -24,7 +25,7 @@ Get SonicJS running locally or deploy to production. This guide covers everythin
 
 Before you begin, ensure you have the following installed:
 
-- **Node.js** (version 20 or higher)
+- **Node.js** (version 18.0.0 or higher)
 - **npm** or **pnpm**
 - **Git**
 - **Cloudflare account** (for deployment and production use)
@@ -56,6 +57,10 @@ npm run dev
 
 Your SonicJS instance will be available at **http://localhost:8787**
 
+<Callout type="info">
+The `create-sonicjs` CLI collects anonymous usage data to help improve the project. No personally identifiable information (PII) is collected. See the [Privacy & Telemetry](#privacy-telemetry) section below for details on how to opt out.
+</Callout>
+
 ### Option 2: Clone Repository (Development)
 
 For contributing or developing SonicJS itself:
@@ -71,6 +76,67 @@ npm install
 # Start development server
 npm run dev
 ```
+
+---
+
+## Privacy & Telemetry
+
+SonicJS uses privacy-first anonymous telemetry to help improve the project. This section explains what data is collected and how to opt out.
+
+### What Data is Collected
+
+**Installation Events Only (Phase 1):**
+- Anonymous installation UUID (no personal information)
+- Node.js version and platform (e.g., "darwin", "linux")
+- Timestamp of installation
+- SonicJS version being installed
+
+**What is NOT Collected:**
+- No personally identifiable information (PII)
+- No IP addresses
+- No file paths or project names
+- No code or content from your project
+- No runtime behavior or application data
+
+### How to Opt Out
+
+You have multiple ways to disable telemetry:
+
+**Option 1: Environment Variable (Recommended)**
+```bash
+# Disable telemetry before installation
+export SONICJS_TELEMETRY=false
+npx create-sonicjs my-cms
+```
+
+**Option 2: System-wide Do Not Track**
+```bash
+# Honor system-wide do-not-track setting
+export DO_NOT_TRACK=1
+npx create-sonicjs my-cms
+```
+
+**Option 3: Per-command**
+```bash
+# Disable for single command
+SONICJS_TELEMETRY=false npx create-sonicjs my-cms
+```
+
+### Why Telemetry?
+
+Anonymous telemetry helps us:
+- Understand which platforms and Node versions to support
+- Measure adoption and growth
+- Prioritize bug fixes and features
+- Make data-driven decisions for the project
+
+**Privacy Commitment:**
+- All data is anonymous
+- No tracking across projects
+- Fully transparent and opt-out friendly
+- Open source telemetry implementation
+
+For more details, see our [GitHub repository](https://github.com/lane711/sonicjs-ai).
 
 ---
 
@@ -193,6 +259,10 @@ Navigate to **http://localhost:8787/admin**
 
 - Email: admin@sonicjs.com
 - Password: sonicjs!
+
+<Callout type="warning">
+**Security Notice:** The default admin password was changed from `admin123` to `sonicjs!` in version 2.0.10. Always change this password in production environments.
+</Callout>
 
 **Note:** The `demo-login-plugin` auto-fills these credentials in development.
 

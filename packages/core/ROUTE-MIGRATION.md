@@ -227,7 +227,7 @@ curl -X POST http://localhost:8787/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@sonicjs.com",
-    "password": "admin123"
+    "password": "sonicjs!"
   }'
 
 # Get current user (requires auth cookie)

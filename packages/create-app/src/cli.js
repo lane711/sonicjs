@@ -8,6 +8,8 @@ import kleur from 'kleur'
 import ora from 'ora'
 import { execa } from 'execa'
 import validatePackageName from 'validate-npm-package-name'
+import { initTelemetry, track, shutdown, isEnabled } from './telemetry.js'
+import { displayTelemetryNotice } from './telemetry-notice.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -52,22 +54,66 @@ const flags = {
 }
 
 async function main() {
+  const startTime = Date.now()
+
   try {
+    // Initialize telemetry
+    await initTelemetry()
+
+    // Show telemetry notice if enabled
+    if (isEnabled()) {
+      displayTelemetryNotice()
+    }
+
+    // Track installation started
+    await track('installation_started', {
+      template: flags.template || 'starter',
+      skipInstall: flags.skipInstall || false,
+      skipGit: flags.skipGit || false,
+      skipCloudflare: flags.skipCloudflare || false
+    })
+
     // Get project details
     const answers = await getProjectDetails(projectName)
 
     // Create project
     await createProject(answers, flags)
 
+    // Track installation completed
+    const duration = Date.now() - startTime
+    await track('installation_completed', {
+      duration,
+      template: answers.template,
+      createResources: answers.createResources || false,
+      initGit: answers.initGit || false,
+      skipInstall: answers.skipInstall || false,
+      includeExample: answers.includeExample || false
+    })
+
     // Success message
     printSuccessMessage(answers)
 
+    // Shutdown telemetry (flush events)
+    await shutdown()
+
   } catch (error) {
     if (error.message === 'cancelled') {
+      // Track cancellation
+      await track('installation_cancelled')
+      await shutdown()
+
       console.log()
       console.log(kleur.yellow('⚠ Cancelled'))
       process.exit(0)
     }
+
+    // Track failure
+    const duration = Date.now() - startTime
+    await track('installation_failed', {
+      duration,
+      errorType: error.message.split(':')[0].trim()
+    })
+    await shutdown()
 
     console.error()
     console.error(kleur.red('✖ Error:'), error.message)
@@ -372,7 +418,7 @@ async function copyTemplate(templateName, targetDir, options) {
 
   // Add @sonicjs-cms/core dependency
   packageJson.dependencies = {
-    '@sonicjs-cms/core': '^2.0.10',
+    '@sonicjs-cms/core': '^2.0.13',
     ...packageJson.dependencies
   }
 

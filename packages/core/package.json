@@ -1,6 +1,6 @@
 {
   "name": "@sonicjs-cms/core",
-  "version": "2.0.10",
+  "version": "2.0.13",
   "description": "Core framework for SonicJS headless CMS - Edge-first, TypeScript-native CMS built for Cloudflare Workers",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -56,6 +56,8 @@
     "LICENSE"
   ],
   "scripts": {
+    "generate:migrations": "npx tsx scripts/generate-migrations.ts",
+    "prebuild": "npm run generate:migrations",
     "build": "tsup",
     "dev": "tsup --watch",
     "type-check": "tsc --noEmit",
@@ -96,7 +98,8 @@
     "drizzle-zod": "^0.8.3",
     "marked": "^16.4.1",
     "highlight.js": "^11.11.1",
-    "semver": "^7.7.3"
+    "semver": "^7.7.3",
+    "posthog-node": "^4.0.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20251014.0",
