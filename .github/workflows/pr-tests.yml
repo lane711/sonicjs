@@ -42,12 +42,14 @@ jobs:
         run: |
           cd my-sonicjs-app
           # Deploy to preview with unique name based on PR/branch
+          # Cloudflare Workers has a 54 character limit for script names with previews
+          # Prefix "sonicjs-pr-" is 11 chars, so max branch name is 43 chars
           BRANCH_NAME="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
-          SAFE_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-50)
+          SAFE_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-43)
 
           # Deploy and capture the URL (don't exit on error)
           set +e
-          echo "Deploying to preview environment: pr-${SAFE_BRANCH}"
+          echo "Deploying to preview environment: sonicjs-pr-${SAFE_BRANCH}"
           DEPLOY_OUTPUT=$(npx wrangler deploy --name "sonicjs-pr-${SAFE_BRANCH}" 2>&1)
           DEPLOY_EXIT_CODE=$?
           set -e
