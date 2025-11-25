@@ -102,6 +102,8 @@ jobs:
         run: |
           cd my-sonicjs-app
           # Deploy to preview with unique name based on PR/branch
+          # Cloudflare Workers has a 54 character limit for script names with previews
+          # Prefix "sonicjs-pr-" is 11 chars, so max branch name is 43 chars
           BRANCH_NAME="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
           # Limit to 43 chars to allow for "sonicjs-pr-" prefix (11 chars) = 54 total
           # Remove trailing hyphens to avoid invalid worker names
