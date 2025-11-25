@@ -10,10 +10,11 @@ A modern, TypeScript-first headless CMS built for Cloudflare's edge platform wit
 
 ### Core Platform
 - **⚡ Edge-First**: Built specifically for Cloudflare Workers with global performance
-- **🔧 Developer-Centric**: Configuration over UI, TypeScript-first approach  
+- **🔧 Developer-Centric**: Configuration over UI, TypeScript-first approach
 - **🤖 AI-Friendly**: Structured codebase designed for AI-assisted development
 - **🔌 Plugin System**: Extensible architecture without core modifications
 - **📱 Modern Stack**: Hono.js, TypeScript, D1, R2, and HTMX
+- **🚀 Fast & Lightweight**: Optimized for edge computing performance
 
 ### Advanced Content Management (Stage 5)
 - **📝 Rich Text Editor**: TinyMCE integration with customizable toolbars
@@ -93,6 +94,20 @@ npx create-sonicjs@latest my-sonicjs-app
 # Run tests
 npm test
 ```
+
+#### Setting Up a Fresh Database
+
+When working in a new worktree or wanting to reset your local database, run from the project root:
+
+```bash
+# Create a fresh D1 database for your branch
+npm run db:reset
+```
+
+This will:
+- Create a new D1 database named `sonicjs-worktree-<branch-name>`
+- Apply all migrations
+- Update `wrangler.toml` with the new database ID
 
 #### Working with Database Migrations
 
