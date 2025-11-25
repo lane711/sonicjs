@@ -1,11 +1,14 @@
 {
   "name": "@sonicjs-cms/core",
-  "version": "2.3.0",
+  "version": "2.3.2",
   "description": "Core framework for SonicJS headless CMS - Edge-first, TypeScript-native CMS built for Cloudflare Workers",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "sonicjs-db-reset": "./bin/db-reset.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -50,6 +53,7 @@
     "./package.json": "./package.json"
   },
   "files": [
+    "bin",
     "dist",
     "migrations",
     "README.md",
