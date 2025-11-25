@@ -10,7 +10,7 @@ export interface Setting {
 export interface GeneralSettings {
   siteName: string
   siteDescription: string
-  adminEmail?: string
+  adminEmail: string
   timezone: string
   language: string
   maintenanceMode: boolean

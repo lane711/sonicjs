@@ -40,7 +40,8 @@ export class OTPService {
     for (let i = 0; i < length; i++) {
       const randomValues = new Uint8Array(1)
       crypto.getRandomValues(randomValues)
-      code += digits[randomValues[0] % digits.length]
+      const randomValue = randomValues[0] ?? 0
+      code += digits[randomValue % digits.length]
     }
 
     return code
@@ -180,7 +181,8 @@ export class OTPService {
       LIMIT ?
     `).bind(limit).all()
 
-    return result.results as OTPCode[]
+    const rows = (result.results || []) as Record<string, unknown>[]
+    return rows.map(row => this.mapRowToOTP(row))
   }
 
   /**
@@ -195,6 +197,21 @@ export class OTPService {
     `).bind(now, now - (30 * 24 * 60 * 60 * 1000)).run() // Keep used codes for 30 days
 
     return result.meta.changes || 0
+  }
+
+  private mapRowToOTP(row: Record<string, unknown>): OTPCode {
+    return {
+      id: String(row.id),
+      user_email: String(row.user_email),
+      code: String(row.code),
+      expires_at: Number(row.expires_at ?? Date.now()),
+      used: Number(row.used ?? 0),
+      used_at: row.used_at === null || row.used_at === undefined ? null : Number(row.used_at),
+      ip_address: typeof row.ip_address === 'string' ? row.ip_address : null,
+      user_agent: typeof row.user_agent === 'string' ? row.user_agent : null,
+      attempts: Number(row.attempts ?? 0),
+      created_at: Number(row.created_at ?? Date.now())
+    }
   }
 
   /**

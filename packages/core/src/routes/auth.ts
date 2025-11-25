@@ -8,6 +8,7 @@ import { renderLoginPage, LoginPageData } from '../templates/pages/auth-login.te
 import { renderRegisterPage, RegisterPageData } from '../templates/pages/auth-register.template'
 import { getCacheService, CACHE_CONFIGS } from '../services'
 import { authValidationService } from '../services/auth-validation'
+import type { RegistrationData } from '../services/auth-validation'
 import type { Bindings, Variables } from '../app'
 
 const authRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
@@ -72,7 +73,7 @@ authRoutes.post('/register',
       // Build and validate using dynamic schema
       const validationSchema = await authValidationService.buildRegistrationSchema(db)
 
-      let validatedData
+      let validatedData: RegistrationData
       try {
         validatedData = await validationSchema.parseAsync(requestData)
       } catch (validationError: any) {
@@ -335,8 +336,8 @@ authRoutes.post('/register/form', async (c) => {
     requestData.email = normalizedEmail
 
     // Build and validate using dynamic schema
-    const validationSchema = await authValidationService.buildRegistrationSchema(db)
-    const validation = await validationSchema.safeParseAsync(requestData)
+      const validationSchema = await authValidationService.buildRegistrationSchema(db)
+      const validation = await validationSchema.safeParseAsync(requestData)
 
     if (!validation.success) {
       return c.html(html`
@@ -346,7 +347,7 @@ authRoutes.post('/register/form', async (c) => {
       `)
     }
 
-    const validatedData = validation.data
+      const validatedData: RegistrationData = validation.data
 
     // Extract fields with defaults for optional ones
     // const email = validatedData.email

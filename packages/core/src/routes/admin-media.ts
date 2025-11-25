@@ -414,7 +414,14 @@ adminMediaRoutes.post('/upload', async (c) => {
   try {
     const user = c.get('user')
     const formData = await c.req.formData()
-    const files = formData.getAll('files') as File[]
+    const fileEntries = formData.getAll('files') as unknown[]
+    const files: File[] = []
+
+    for (const entry of fileEntries) {
+      if (entry instanceof File) {
+        files.push(entry)
+      }
+    }
     
     if (!files || files.length === 0) {
       return c.html(html`
@@ -549,10 +556,11 @@ adminMediaRoutes.post('/upload', async (c) => {
     // TODO: Cache invalidation removed during migration
 
     // Fetch updated media list to include in response
-    let __mediaGridHTML = ''
+    let mediaGridHTML = ''
     if (uploadResults.length > 0) {
       try {
-        const folder = formData.get('folder') as string || 'uploads'
+        const folderEntry = formData.get('folder')
+        const folder = typeof folderEntry === 'string' ? folderEntry : 'uploads'
         const query = 'SELECT * FROM media WHERE deleted_at IS NULL ORDER BY uploaded_at DESC LIMIT 24'
         const stmt = c.env.DB.prepare(query)
         const { results } = await stmt.all()
@@ -728,16 +736,16 @@ adminMediaRoutes.delete('/cleanup', requireRole('admin'), async (c) => {
 
     // Find all media files
     const allMediaStmt = db.prepare('SELECT id, r2_key, filename FROM media WHERE deleted_at IS NULL')
-    const { results: allMedia } = await allMediaStmt.all()
+    const { results: allMedia } = await allMediaStmt.all<{ id: string; r2_key: string; filename: string }>()
 
     // Find media files referenced in content
     // Content can reference media in various JSON fields like data, hero_image, etc.
     const contentStmt = db.prepare('SELECT data FROM content')
-    const { results: contentRecords } = await contentStmt.all()
+    const { results: contentRecords } = await contentStmt.all<{ data: unknown }>()
 
     // Extract all media URLs from content
     const referencedUrls = new Set<string>()
-    for (const record of contentRecords) {
+    for (const record of contentRecords || []) {
       if (record.data) {
         const dataStr = typeof record.data === 'string' ? record.data : JSON.stringify(record.data)
         // Find all /files/ URLs in the content
@@ -749,7 +757,8 @@ adminMediaRoutes.delete('/cleanup', requireRole('admin'), async (c) => {
     }
 
     // Find unreferenced media files
-    const unusedFiles = allMedia.filter((file: any) => !referencedUrls.has(file.r2_key))
+    const mediaRows = allMedia || []
+    const unusedFiles = mediaRows.filter((file) => !referencedUrls.has(file.r2_key))
 
     if (unusedFiles.length === 0) {
       return c.html(html`

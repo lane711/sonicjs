@@ -34,7 +34,8 @@ export function sanitizeErrorMessage(error: Error | string): string {
   const message = typeof error === 'string' ? error : error.message
 
   // Extract error type/category only
-  const errorType = message.split(':')[0].trim()
+  const [errorTypeRaw] = message.split(':')
+  const errorType = (errorTypeRaw || message).trim()
 
   // Remove file paths that might contain usernames
   const sanitized = errorType

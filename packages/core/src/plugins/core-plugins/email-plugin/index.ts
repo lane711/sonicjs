@@ -32,7 +32,7 @@ export function createEmailPlugin(): Plugin {
   const emailRoutes = new Hono()
 
   emailRoutes.get('/settings', async (c: any) => {
-    const user = c.get('user') as { email?: string; role?: string } | undefined
+    const user = c.get('user') as { email?: string; role?: string; name?: string } | undefined
     const db = c.env.DB
 
     // Load current settings from database
@@ -42,7 +42,7 @@ export function createEmailPlugin(): Plugin {
 
     const settings = plugin?.settings ? JSON.parse(plugin.settings) : {}
 
-    const contentHTML = html`
+    const contentHTML = await html`
       <div class="p-8">
         <!-- Header -->
         <div class="mb-8">
@@ -269,11 +269,17 @@ export function createEmailPlugin(): Plugin {
       </script>
     `
 
+    const templateUser = user ? {
+      name: user.name ?? user.email ?? 'Admin',
+      email: user.email ?? 'admin@sonicjs.com',
+      role: user.role ?? 'admin'
+    } : undefined
+
     return c.html(
       renderAdminLayout({
         title: 'Email Settings',
         content: contentHTML,
-        user,
+        user: templateUser,
         currentPath: '/admin/plugins/email/settings'
       })
     )

@@ -304,8 +304,7 @@ export function createQuillEditorPlugin(): Plugin {
       email: 'team@sonicjs.com'
     },
     license: 'MIT',
-    compatibility: '^2.0.0',
-    tags: ['editor', 'rich-text', 'wysiwyg', 'quill']
+    compatibility: '^2.0.0'
   })
 
   // Add lifecycle hooks

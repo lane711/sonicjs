@@ -57,8 +57,8 @@ vi.mock('../../services', () => ({
       total: 2,
       active: 1,
       inactive: 1,
-      core: 2,
-      custom: 0
+      errors: 0,
+      uninstalled: 0
     })
   }
 }))

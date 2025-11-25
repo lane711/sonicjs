@@ -8,14 +8,19 @@
 
     /* Modules */
     "moduleResolution": "bundler",
+    "baseUrl": "./",
+    "paths": {
+      "@sonicjs-cms/templates": ["../templates/src/index.ts"],
+      "@sonicjs-cms/templates/*": ["../templates/src/*"]
+    },
     "resolveJsonModule": true,
-    "types": ["@cloudflare/workers-types"],
+    "types": ["@cloudflare/workers-types", "node"],
 
     /* Emit */
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "rootDir": "./src",
+    "rootDir": "../",
     "outDir": "./dist",
     "removeComments": false,
     "importHelpers": true,

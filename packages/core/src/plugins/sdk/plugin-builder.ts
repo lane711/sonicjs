@@ -297,7 +297,7 @@ export class PluginHelpers {
     }
   }): Hono {
     const app = new Hono()
-    const ___basePath = options?.basePath || `/${modelName.toLowerCase()}`
+    const basePath = options?.basePath || `/${modelName.toLowerCase()}`
 
     // GET /models - List all
     app.get('/', async (c) => {
@@ -347,7 +347,7 @@ export class PluginHelpers {
     pages: PluginAdminPage[]
     menuItems: PluginMenuItem[]
   } {
-    const ___basePath = `/admin/${modelName.toLowerCase()}`
+    const basePath = `/admin/${modelName.toLowerCase()}`
     const displayName = modelName.charAt(0).toUpperCase() + modelName.slice(1)
 
     const pages: PluginAdminPage[] = [

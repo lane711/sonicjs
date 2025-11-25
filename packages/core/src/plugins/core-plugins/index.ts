@@ -22,7 +22,20 @@ export { emailPlugin, createEmailPlugin } from './email-plugin'
 export { otpLoginPlugin, createOTPLoginPlugin } from './otp-login-plugin'
 
 // Core plugins list - now imported from auto-generated registry
-import { CORE_PLUGIN_IDS } from '../plugin-registry'
-export { CORE_PLUGIN_IDS as corePlugins, PLUGIN_REGISTRY } from '../plugin-registry'
+export const CORE_PLUGIN_IDS = [
+  'core-auth',
+  'core-media',
+  'core-analytics',
+  'testimonials-plugin',
+  'code-examples-plugin',
+  'demo-login-plugin',
+  'workflow-plugin',
+  'seed-data',
+  'database-tools',
+  'hello-world',
+  'quill-editor',
+  'email',
+  'otp-login'
+] as const
 
 export type CorePluginNames = (typeof CORE_PLUGIN_IDS)[number]
