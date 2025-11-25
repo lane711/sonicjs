@@ -1,7 +1,7 @@
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
 import { renderPagination, PaginationData } from '../pagination.template'
 import { renderTable, TableData, TableColumn } from '../table.template'
-// import { renderFilterBar, FilterBarData } from '../filter-bar.template'
+import type { FilterBarData } from '../filter-bar.template'
 import { renderConfirmationDialog, getConfirmationDialogScript } from '../confirmation-dialog.template'
 
 export interface ContentItem {
@@ -54,9 +54,9 @@ export function renderContentListPage(data: ContentListPageData): string {
         name: 'model',
         label: 'Model',
         options: [
-          { __value: 'all', label: 'All Models', selected: data.modelName === 'all' },
+          { value: 'all', label: 'All Models', selected: data.modelName === 'all' },
           ...data.models.map(model => ({
-            __value: model.name,
+            value: model.name,
             label: model.displayName,
             selected: data.modelName === model.name
           }))
@@ -66,13 +66,13 @@ export function renderContentListPage(data: ContentListPageData): string {
         name: 'status',
         label: 'Status',
         options: [
-          { __value: 'all', label: 'All Status', selected: data.status === 'all' },
-          { __value: 'draft', label: 'Draft', selected: data.status === 'draft' },
-          { __value: 'review', label: 'Under Review', selected: data.status === 'review' },
-          { __value: 'scheduled', label: 'Scheduled', selected: data.status === 'scheduled' },
-          { __value: 'published', label: 'Published', selected: data.status === 'published' },
-          { __value: 'archived', label: 'Archived', selected: data.status === 'archived' },
-          { __value: 'deleted', label: 'Deleted', selected: data.status === 'deleted' }
+          { value: 'all', label: 'All Status', selected: data.status === 'all' },
+          { value: 'draft', label: 'Draft', selected: data.status === 'draft' },
+          { value: 'review', label: 'Under Review', selected: data.status === 'review' },
+          { value: 'scheduled', label: 'Scheduled', selected: data.status === 'scheduled' },
+          { value: 'published', label: 'Published', selected: data.status === 'published' },
+          { value: 'archived', label: 'Archived', selected: data.status === 'archived' },
+          { value: 'deleted', label: 'Deleted', selected: data.status === 'deleted' }
         ]
       }
     ],
@@ -84,9 +84,9 @@ export function renderContentListPage(data: ContentListPageData): string {
       }
     ],
     bulkActions: [
-      { label: 'Publish', ___value: 'publish', icon: 'check-circle' },
-      { label: 'Unpublish', ___value: 'unpublish', icon: 'x-circle' },
-      { label: 'Delete', ___value: 'delete', icon: 'trash', className: 'text-pink-600' }
+      { label: 'Publish', value: 'publish', icon: 'check-circle' },
+      { label: 'Unpublish', value: 'unpublish', icon: 'x-circle' },
+      { label: 'Delete', value: 'delete', icon: 'trash', className: 'text-pink-600' }
     ]
   }
 
@@ -347,7 +347,7 @@ export function renderContentListPage(data: ContentListPageData): string {
                         class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 ${filter.name === 'status' ? 'pl-8' : 'pl-3'} pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-cyan-500/30 dark:outline-cyan-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-500 dark:focus-visible:outline-cyan-400 sm:text-sm/6 min-w-48"
                       >
                         ${filter.options.map(opt => `
-                          <option value="${opt.__value}" ${opt.selected ? 'selected' : ''}>${opt.label}</option>
+                          <option value="${opt.value}" ${opt.selected ? 'selected' : ''}>${opt.label}</option>
                         `).join('')}
                       </select>
                       <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-cyan-600 dark:text-cyan-400 sm:size-4">

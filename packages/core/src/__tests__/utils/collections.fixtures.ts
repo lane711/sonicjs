@@ -177,7 +177,7 @@ export const mockUsers = {
 }
 
 // Database mock factory
-export function createMockDatabase() {
+export function createMockDatabase(): { db: any; preparedStatement: any } {
   const db = {
     select: vi.fn(),
     insert: vi.fn(),
@@ -365,13 +365,13 @@ export const errorMessages = {
 // Async helpers for testing
 export const waitFor = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-export const createAsyncMock = <T>(value: T, delay: number = 0) => 
-  vi.fn().mockImplementation(() => 
+export const createAsyncMock = <T>(value: T, delay: number = 0): any =>
+  vi.fn().mockImplementation(() =>
     delay > 0 ? waitFor(delay).then(() => value) : Promise.resolve(value)
   )
 
 // HTTP request mocking utilities
-export const createMockRequest = (method: string, url: string, body?: any) => ({
+export const createMockRequest = (method: string, url: string, body?: any): any => ({
   method,
   url,
   headers: new Headers({
@@ -381,7 +381,7 @@ export const createMockRequest = (method: string, url: string, body?: any) => ({
   text: vi.fn().mockResolvedValue(JSON.stringify(body || {}))
 })
 
-export const createMockResponse = (status: number = 200, data?: any) => ({
+export const createMockResponse = (status: number = 200, data?: any): any => ({
   status,
   statusText: status === 200 ? 'OK' : 'Error',
   headers: new Headers({

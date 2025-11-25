@@ -89,3 +89,24 @@ declare module 'marked' {
   export function marked(src: string, options?: { renderer?: Renderer }): Promise<string>;
   export function setOptions(options: any): void;
 }
+
+declare module 'posthog-node' {
+  export interface PostHogOptions {
+    host?: string;
+    flushAt?: number;
+    flushInterval?: number;
+  }
+
+  export interface CaptureOptions {
+    distinctId: string;
+    event: string;
+    properties?: Record<string, unknown>;
+  }
+
+  export class PostHog {
+    constructor(apiKey: string, options?: PostHogOptions);
+    capture(options: CaptureOptions): void;
+    identify?(options: Record<string, unknown>): void;
+    shutdown(): Promise<void>;
+  }
+}

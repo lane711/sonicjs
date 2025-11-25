@@ -11,7 +11,7 @@ import { PluginConfig } from '@sonicjs-cms/core'
 const PluginConfigSchema = z.object({
   enabled: z.boolean().default(true),
   priority: z.number().optional(),
-  config: z.record(z.any()).optional(),
+  config: z.record(z.string(), z.any()).optional(),
   installedAt: z.number().optional(),
   updatedAt: z.number().optional(),
   version: z.string().optional(),
@@ -20,7 +20,7 @@ const PluginConfigSchema = z.object({
   environments: z.array(z.enum(['development', 'staging', 'production'])).optional(),
   
   // Feature flags
-  features: z.record(z.boolean()).optional(),
+  features: z.record(z.string(), z.boolean()).optional(),
   
   // Resource limits
   limits: z.object({

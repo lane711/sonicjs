@@ -282,9 +282,9 @@ export function createOTPLoginPlugin(): Plugin {
 
   // Settings page
   adminRoutes.get('/settings', async (c: any) => {
-    const user = c.get('user') as { email?: string; role?: string } | undefined
+    const user = c.get('user') as { email?: string; role?: string; name?: string } | undefined
 
-    const contentHTML = html`
+    const contentHTML = await html`
       <div class="p-8">
         <div class="mb-8">
           <h1 class="text-3xl font-bold mb-2">OTP Login Settings</h1>
@@ -449,11 +449,17 @@ export function createOTPLoginPlugin(): Plugin {
       </script>
     `
 
+    const templateUser = user ? {
+      name: user.name ?? user.email ?? 'Admin',
+      email: user.email ?? 'admin@sonicjs.com',
+      role: user.role ?? 'admin'
+    } : undefined
+
     return c.html(
       adminLayoutV2({
         title: 'OTP Login Settings',
         content: contentHTML,
-        user,
+        user: templateUser,
         currentPath: '/admin/plugins/otp-login/settings'
       })
     )

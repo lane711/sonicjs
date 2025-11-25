@@ -202,16 +202,16 @@ export function createMediaPlugin(): Plugin {
       }
     },
     
-    deleteFile: async (_id: string) => {
+    deleteFile: async (fileId: string) => {
       // File deletion implementation
-      console.info(`Deleting media file: ${id}`)
+      console.info(`Deleting media file: ${fileId}`)
       return true
     },
     
-    processImage: async (_id: string, operations: any[]) => {
+    processImage: async (fileId: string, operations: any[]) => {
       // Image processing implementation
-      console.info(`Processing image ${id} with operations:`, operations)
-      return { jobId: `job-${id}-${Date.now()}` }
+      console.info(`Processing image ${fileId} with operations:`, operations)
+      return { jobId: `job-${fileId}-${Date.now()}` }
     },
     
     getMetadata: async (_id: string) => {

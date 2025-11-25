@@ -123,7 +123,7 @@ export class ContentWorkflow {
     action: WorkflowAction,
     currentStatus: ContentStatus,
     userRole: string,
-    _isAuthor: boolean = false,
+    isAuthor: boolean = false,
     permissions: WorkflowPermissions = defaultWorkflowPermissions
   ): boolean {
     // Check if action is valid for current status
@@ -149,12 +149,12 @@ export class ContentWorkflow {
   static getAvailableActions(
     currentStatus: ContentStatus,
     userRole: string,
-    _isAuthor: boolean = false,
+    isAuthor: boolean = false,
     permissions: WorkflowPermissions = defaultWorkflowPermissions
   ): WorkflowAction[] {
     const allActions = workflowTransitions[currentStatus] || []
     
-    return allActions.filter(action => 
+    return allActions.filter(action =>
       this.canPerformAction(action, currentStatus, userRole, isAuthor, permissions)
     )
   }

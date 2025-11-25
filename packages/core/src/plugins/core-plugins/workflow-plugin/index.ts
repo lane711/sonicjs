@@ -4,7 +4,7 @@ import { PluginBuilder } from '../../sdk/plugin-builder'
 import { workflowMigration } from './migrations'
 // import { createWorkflowRoutes } from './routes'
 // import { createWorkflowAdminRoutes } from './admin-routes'
-import { WorkflowService, WorkflowEngine, _workflowSchemas } from './services/workflow-service'
+import { WorkflowService, WorkflowEngine } from './services/workflow-service'
 import { SchedulerService } from './services/scheduler'
 import { AutomationEngine } from './services/automation'
 import { NotificationService } from './services/notifications'
@@ -154,9 +154,11 @@ export function createWorkflowPlugin(): Plugin {
   })
 
   // Register hooks
-  builder.addHook('content:create', async (data: any, _context: any) => {
-    const workflowEngine = new WorkflowEngine(context.db)
-    await workflowEngine.initializeContentWorkflow(data.id, data.collectionId || data.collection_id)
+  builder.addHook('content:create', async (data: any, context: any) => {
+    if (context?.db) {
+      const workflowEngine = new WorkflowEngine(context.db)
+      await workflowEngine.initializeContentWorkflow(data.id, data.collectionId || data.collection_id)
+    }
     return data
   })
 

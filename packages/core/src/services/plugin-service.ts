@@ -30,6 +30,7 @@ export interface PluginStats {
   active: number
   inactive: number
   errors: number
+  uninstalled: number
 }
 
 export class PluginService {
@@ -92,7 +93,8 @@ export class PluginService {
       total: stats.total || 0,
       active: stats.active || 0,
       inactive: stats.inactive || 0,
-      errors: stats.errors || 0
+      errors: stats.errors || 0,
+      uninstalled: 0
     }
   }
 

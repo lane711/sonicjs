@@ -358,10 +358,10 @@ adminCollectionsRoutes.post('/', async (c) => {
 
 // Edit collection form
 adminCollectionsRoutes.get('/:id', async (c) => {
+  const db = c.env.DB
   try {
     const id = c.req.param('id')
     const user = c.get('user')
-    const db = c.env.DB
 
     const stmt = db.prepare('SELECT * FROM collections WHERE id = ?')
     const collection = await stmt.bind(id).first() as any

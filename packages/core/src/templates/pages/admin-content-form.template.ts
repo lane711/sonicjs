@@ -704,7 +704,6 @@ export function renderContentFormPage(data: ContentFormData): string {
       })}</script>` : ''}
 
       ${data.mdxeditorEnabled ? `<script>${getMDXEditorInitScript({
-        theme: data.mdxeditorSettings?.theme,
         defaultHeight: data.mdxeditorSettings?.defaultHeight,
         toolbar: data.mdxeditorSettings?.toolbar,
         placeholder: data.mdxeditorSettings?.placeholder
