@@ -17,8 +17,7 @@ export default defineConfig({
   format: ['esm', 'cjs'],
 
   // Generate TypeScript definitions
-  // Temporarily disabled - needs type error fixes in routes
-  dts: false,
+  dts: true,
 
   // Code splitting for better tree-shaking
   splitting: true,
@@ -73,7 +72,6 @@ export default defineConfig({
 
   // Build hooks
   onSuccess: async () => {
-    // Create stub type definition files since dts generation is disabled
     const fs = await import('fs')
     const path = await import('path')
 
@@ -95,43 +93,6 @@ export default defineConfig({
       fs.writeFileSync(indexCjs, content, 'utf-8')
     }
 
-    const typeFiles = {
-      'index.d.ts': `// Main exports from @sonicjs-cms/core package
-export * from '../src/index'
-
-// Explicitly re-export key types and classes
-export type { Plugin, PluginContext } from '../src/types/index'
-export { TemplateRenderer, templateRenderer, renderTemplate } from '../src/utils/template-renderer'
-`,
-      'templates.d.ts': `// Template exports from core package
-export * from '../src/templates/index'
-`,
-      'routes.d.ts': `// Route exports from core package
-export * from '../src/routes/index'
-`,
-      'middleware.d.ts': `// Middleware exports from core package
-export * from '../src/middleware/index'
-`,
-      'services.d.ts': `// Service exports from core package
-export * from '../src/services/index'
-`,
-      'plugins.d.ts': `// Plugin exports from core package
-export * from '../src/plugins/index'
-`,
-      'utils.d.ts': `// Utility exports from core package
-export * from '../src/utils/index'
-`,
-      'types.d.ts': `// Type exports from core package
-export * from '../src/types/index'
-`,
-    }
-
-    for (const [filename, content] of Object.entries(typeFiles)) {
-      const filePath = path.join(distDir, filename)
-      fs.writeFileSync(filePath, content, 'utf-8')
-    }
-
-    console.log('✓ Type definition files created')
     console.log('✓ Build complete!')
   },
 })
