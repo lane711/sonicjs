@@ -95,23 +95,25 @@ export class MigrationService {
     }
 
     // Check if FAQ tables exist (migration 002)
+    // Migration 002 creates only the 'faqs' table
     if (!appliedMigrations.has('002')) {
-      const hasFaqTables = await this.checkTablesExist(['faqs', 'faq_categories'])
+      const hasFaqTables = await this.checkTablesExist(['faqs'])
       if (hasFaqTables) {
         appliedMigrations.set('002', {
           id: '002',
           applied_at: new Date().toISOString(),
-          name: 'FAQ Plugin',
+          name: 'Faq Plugin',
           filename: '002_faq_plugin.sql'
         })
-        await this.markMigrationApplied('002', 'FAQ Plugin', '002_faq_plugin.sql')
+        await this.markMigrationApplied('002', 'Faq Plugin', '002_faq_plugin.sql')
       }
     }
 
-    // Check if enhanced tables exist (migration 003)
+    // Check if stage 5 enhancement tables exist (migration 003)
+    // Migration 003 creates content_fields, content_relationships, workflow_templates tables
     if (!appliedMigrations.has('003')) {
-      const hasEnhancedTables = await this.checkTablesExist(['content_versions', 'email_themes', 'email_templates'])
-      if (hasEnhancedTables) {
+      const hasStage5Tables = await this.checkTablesExist(['content_fields', 'content_relationships', 'workflow_templates'])
+      if (hasStage5Tables) {
         appliedMigrations.set('003', {
           id: '003',
           applied_at: new Date().toISOString(),
@@ -119,6 +121,34 @@ export class MigrationService {
           filename: '003_stage5_enhancements.sql'
         })
         await this.markMigrationApplied('003', 'Stage 5 Enhancements', '003_stage5_enhancements.sql')
+      }
+    }
+
+    // Check if testimonials table exists (migration 012)
+    if (!appliedMigrations.has('012')) {
+      const hasTestimonialsTables = await this.checkTablesExist(['testimonials'])
+      if (hasTestimonialsTables) {
+        appliedMigrations.set('012', {
+          id: '012',
+          applied_at: new Date().toISOString(),
+          name: 'Testimonials Plugin',
+          filename: '012_testimonials_plugin.sql'
+        })
+        await this.markMigrationApplied('012', 'Testimonials Plugin', '012_testimonials_plugin.sql')
+      }
+    }
+
+    // Check if code_examples table exists (migration 013)
+    if (!appliedMigrations.has('013')) {
+      const hasCodeExamplesTables = await this.checkTablesExist(['code_examples'])
+      if (hasCodeExamplesTables) {
+        appliedMigrations.set('013', {
+          id: '013',
+          applied_at: new Date().toISOString(),
+          name: 'Code Examples Plugin',
+          filename: '013_code_examples_plugin.sql'
+        })
+        await this.markMigrationApplied('013', 'Code Examples Plugin', '013_code_examples_plugin.sql')
       }
     }
 
