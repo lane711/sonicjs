@@ -37,7 +37,7 @@ export {
 
 export {
   getTelemetryConfig,
+  getDefaultTelemetryConfig,
   isTelemetryEnabled,
-  shouldSkipEvent,
-  DEFAULT_TELEMETRY_CONFIG
+  shouldSkipEvent
 } from './telemetry-config'

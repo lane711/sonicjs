@@ -118,7 +118,17 @@ export class PluginConfigManager {
    * Load configuration from environment variables
    */
   private async loadFromEnvironment(): Promise<void> {
-    const env = process.env
+    // Safe environment access for Cloudflare Workers compatibility
+    let env: Record<string, string | undefined> = {}
+    try {
+      if (typeof process !== 'undefined' && process.env) {
+        env = process.env
+      }
+    } catch {
+      // process is not defined in this runtime (e.g., Cloudflare Workers)
+      console.info('Environment variables not available in this runtime')
+      return
+    }
 
     // Parse environment variables for plugin configuration
     const pluginConfigs: Array<{ name: string } & PluginConfig> = []

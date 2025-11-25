@@ -244,9 +244,11 @@ export class TelemetryService {
    */
   private getVersion(): string {
     try {
-      // In production, this would read from package.json
-      // For now, return a placeholder
-      return process.env.SONICJS_VERSION || '2.0.0'
+      // Safe environment access for Cloudflare Workers compatibility
+      if (typeof process !== 'undefined' && process.env) {
+        return process.env.SONICJS_VERSION || '2.0.0'
+      }
+      return '2.0.0'
     } catch {
       return 'unknown'
     }

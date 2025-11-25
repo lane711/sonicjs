@@ -7,13 +7,31 @@
 import type { TelemetryConfig } from '../types/telemetry'
 
 /**
- * Default telemetry configuration
+ * Safely get an environment variable
+ * Works in both Node.js and Cloudflare Workers environments
  */
-export const DEFAULT_TELEMETRY_CONFIG: TelemetryConfig = {
-  enabled: true,
-  apiKey: process.env.POSTHOG_API_KEY || 'phc_VuhFUIJLXzwyGjlgQ67dbNeSh5x4cp9F8i15hZFIDhs',
-  host: process.env.POSTHOG_HOST || 'https://us.i.posthog.com',
-  debug: process.env.NODE_ENV === 'development'
+function safeGetEnv(key: string): string | undefined {
+  try {
+    if (typeof process !== 'undefined' && process.env) {
+      return process.env[key]
+    }
+  } catch {
+    // process is not defined in this runtime (e.g., Cloudflare Workers)
+  }
+  return undefined
+}
+
+/**
+ * Get default telemetry configuration
+ * Uses lazy evaluation to avoid accessing process.env at module load time
+ */
+export function getDefaultTelemetryConfig(): TelemetryConfig {
+  return {
+    enabled: true,
+    apiKey: safeGetEnv('POSTHOG_API_KEY') || 'phc_VuhFUIJLXzwyGjlgQ67dbNeSh5x4cp9F8i15hZFIDhs',
+    host: safeGetEnv('POSTHOG_HOST') || 'https://us.i.posthog.com',
+    debug: safeGetEnv('NODE_ENV') === 'development'
+  }
 }
 
 /**
@@ -21,13 +39,13 @@ export const DEFAULT_TELEMETRY_CONFIG: TelemetryConfig = {
  */
 export function isTelemetryEnabled(): boolean {
   // Check for explicit opt-out
-  const telemetryEnv = process.env.SONICJS_TELEMETRY
+  const telemetryEnv = safeGetEnv('SONICJS_TELEMETRY')
   if (telemetryEnv === 'false' || telemetryEnv === '0' || telemetryEnv === 'disabled') {
     return false
   }
 
   // Check for DO_NOT_TRACK environment variable (common standard)
-  const doNotTrack = process.env.DO_NOT_TRACK
+  const doNotTrack = safeGetEnv('DO_NOT_TRACK')
   if (doNotTrack === '1' || doNotTrack === 'true') {
     return false
   }
@@ -41,7 +59,7 @@ export function isTelemetryEnabled(): boolean {
  */
 export function getTelemetryConfig(): TelemetryConfig {
   return {
-    ...DEFAULT_TELEMETRY_CONFIG,
+    ...getDefaultTelemetryConfig(),
     enabled: isTelemetryEnabled()
   }
 }
