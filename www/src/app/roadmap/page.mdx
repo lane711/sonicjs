@@ -1,0 +1,453 @@
+export const metadata = {
+  title: 'Roadmap - SonicJS',
+  description:
+    'Development roadmap and progress tracking for SonicJS. See completed features, current work, and planned enhancements.',
+}
+
+# Roadmap
+
+Track our development progress and see what's coming next for SonicJS. Features with ~~strikethrough~~ are completed.
+
+---
+
+## Development Progress
+
+<div className="my-8 p-6 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border border-emerald-200 dark:border-emerald-800">
+  <div className="flex items-center justify-between mb-4">
+    <h3 className="text-xl font-bold text-gray-900 dark:text-white">Overall Progress</h3>
+    <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400">87.5%</span>
+  </div>
+  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
+    <div className="bg-gradient-to-r from-emerald-500 to-teal-500 h-4 rounded-full" style={{ width: '87.5%' }}></div>
+  </div>
+  <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">7 of 8 development stages complete</p>
+</div>
+
+---
+
+## Stage 1: Foundation & Core Infrastructure
+
+<div className="text-emerald-600 dark:text-emerald-400 font-bold mb-4">Status: Complete</div>
+
+- ~~Project setup with Hono.js, TypeScript, and Cloudflare Workers~~
+- ~~Cloudflare D1 database integration with Drizzle ORM~~
+- ~~Basic schema definition system with Zod validation~~
+- ~~Development environment configuration with Wrangler~~
+- ~~Testing framework setup (Vitest, Playwright)~~
+- ~~CLI scaffolding tool (`npx create-sonicjs`)~~
+- ~~Basic project documentation~~
+- ~~CI/CD pipeline with GitHub Actions~~
+
+---
+
+## Stage 2: Core API & Authentication
+
+<div className="text-emerald-600 dark:text-emerald-400 font-bold mb-4">Status: Complete</div>
+
+### REST API
+- ~~Hono.js REST API endpoints with OpenAPI schema~~
+- ~~Auto-generated CRUD endpoints for all collections~~
+- ~~API documentation with Scalar/Swagger at `/docs`~~
+- ~~Rate limiting and CORS configuration~~
+- ~~Request validation middleware~~
+- ~~Pagination with cursor support~~
+- ~~Filtering and sorting~~
+- ~~Field selection (include/exclude patterns)~~
+
+### Authentication
+- ~~JWT-based authentication middleware~~
+- ~~Session management with HTTP-only cookies~~
+- ~~Secure password hashing with bcrypt~~
+- ~~API token management for programmatic access~~
+
+### Role-Based Access Control (RBAC)
+- ~~Admin role - Full system access~~
+- ~~Editor role - Content and user management~~
+- ~~Author role - Own content management~~
+- ~~Viewer role - Read-only access~~
+- ~~Granular permissions system~~
+
+---
+
+## Stage 3: Content Management System
+
+<div className="text-emerald-600 dark:text-emerald-400 font-bold mb-4">Status: Complete</div>
+
+### Dynamic Content Types
+- ~~Schema-driven collections with JSON schemas~~
+- ~~Text fields (single/multi-line with validation)~~
+- ~~Rich Text fields (TinyMCE/EasyMDE integration)~~
+- ~~Number fields (integer/decimal with ranges)~~
+- ~~Boolean fields (toggles/checkboxes)~~
+- ~~Date/DateTime fields (with timezone support)~~
+- ~~Select fields (single/multiple with options)~~
+- ~~Media fields (file/image references)~~
+- ~~JSON fields (structured data storage)~~
+- ~~Relationship fields (content references)~~
+
+### Content Operations
+- ~~Full CRUD operations~~
+- ~~Bulk operations (publish/unpublish, archive, delete)~~
+- ~~Content cloning~~
+- ~~Import/Export (JSON/CSV)~~
+
+### Version Control
+- ~~Full history tracking~~
+- ~~Version comparison (side-by-side diff)~~
+- ~~One-click rollback~~
+- ~~Audit trail (who, what, when)~~
+
+### Search & Filtering
+- ~~Full-text search across all fields~~
+- ~~Advanced filters (collection, status, author, date range)~~
+- ~~Saved searches~~
+
+---
+
+## Stage 4: Media Management & File Handling
+
+<div className="text-emerald-600 dark:text-emerald-400 font-bold mb-4">Status: Complete</div>
+
+### File Storage
+- ~~Cloudflare R2 integration~~
+- ~~Unlimited storage capacity~~
+- ~~S3-compatible API~~
+- ~~Direct CDN delivery~~
+
+### Supported Formats
+- ~~Images: JPG, PNG, WebP, AVIF, GIF, SVG~~
+- ~~Documents: PDF, DOC, DOCX, XLS, XLSX~~
+- ~~Videos: MP4, WebM, MOV~~
+- ~~Audio: MP3, WAV, OGG~~
+
+### Image Processing
+- ~~Automatic format conversion (WebP/AVIF)~~
+- ~~Compression and optimization~~
+- ~~Responsive variants~~
+- ~~Thumbnail generation~~
+
+### Media Library
+- ~~Folder organization~~
+- ~~Tagging system~~
+- ~~Metadata management~~
+- ~~Drag-and-drop upload~~
+- ~~Bulk uploads with progress tracking~~
+
+---
+
+## Stage 5: Plugin Framework & Extensibility
+
+<div className="text-emerald-600 dark:text-emerald-400 font-bold mb-4">Status: Complete</div>
+
+### Plugin System
+- ~~Plugin manager with install/uninstall~~
+- ~~Activation/deactivation support~~
+- ~~Dependency resolution~~
+- ~~Version management~~
+- ~~Hook system (pre/post actions, filters)~~
+- ~~Plugin configuration management~~
+
+### Included Plugins (13 Total)
+
+**Core Plugins:**
+- ~~Cache System - Three-tiered caching with KV storage~~
+- ~~Analytics & Insights - Usage tracking and dashboards~~
+- ~~Authentication System - JWT auth and RBAC~~
+- ~~Media Manager - R2 integration and optimization~~
+
+**Content Plugins:**
+- ~~FAQ Manager - FAQ content with categorization~~
+- ~~Testimonials - Customer reviews and ratings~~
+- ~~Code Examples - Syntax-highlighted code snippets~~
+- ~~Workflow Engine - Approval workflows~~
+
+**Development Plugins:**
+- ~~Database Tools - Migrations and admin tools~~
+- ~~Seed Data Generator - Demo data generation~~
+
+**Utility Plugins:**
+- ~~Demo Login - Quick demo access~~
+- ~~Hello World - Plugin development reference~~
+
+**UI Plugins:**
+- ~~Design System - Theme and component management~~
+
+### Plugin SDK
+- ~~TypeScript Plugin Builder API~~
+- ~~Plugin manifest structure~~
+- ~~Custom route registration~~
+- ~~Admin menu integration~~
+- ~~Permission definitions~~
+- Plugin development documentation
+- Plugin marketplace foundation
+
+---
+
+## Stage 6: User Management & Permissions
+
+<div className="text-emerald-600 dark:text-emerald-400 font-bold mb-4">Status: Complete</div>
+
+### User Management
+- ~~Enhanced user management interface~~
+- ~~Team and organization support~~
+- ~~User profile management with avatars~~
+- ~~Password reset functionality~~
+- ~~Account lockout policies~~
+
+### Permissions
+- ~~Advanced role-based permissions~~
+- ~~Collection-level access control~~
+- ~~Field-level restrictions~~
+- ~~Action-based permissions~~
+
+### Activity & Audit
+- ~~User activity logging~~
+- ~~Comprehensive audit trails~~
+- ~~Email notification preferences~~
+
+---
+
+## Stage 7: Workflow & Automation
+
+<div className="text-emerald-600 dark:text-emerald-400 font-bold mb-4">Status: Complete</div>
+
+### Content Workflows
+- ~~Multi-stage approval workflows (Draft → Review → Approved → Published)~~
+- ~~Configurable state transitions~~
+- ~~Role-based workflow permissions~~
+- ~~Workflow history tracking~~
+
+### Scheduled Publishing
+- ~~Publish at specific date/time~~
+- ~~Unpublish scheduling~~
+- ~~Timezone awareness~~
+- ~~Automated execution~~
+
+### Email Notifications
+- ~~Template-based email system~~
+- ~~Handlebars-style variable substitution~~
+- ~~HTML and plain text versions~~
+- ~~User notification preferences~~
+- ~~Digest functionality~~
+
+### Automation Engine
+- ~~Rule-based automation triggers~~
+- ~~Configurable actions (email, webhook, state change)~~
+- ~~Event-driven execution~~
+
+### Webhooks
+- ~~HMAC signature validation~~
+- ~~Retry with exponential backoff~~
+- ~~Comprehensive logging~~
+- ~~Payload customization~~
+
+---
+
+## Stage 8: Advanced Features & Optimization
+
+<div className="text-amber-600 dark:text-amber-400 font-bold mb-4">Status: In Progress (40%)</div>
+
+### Performance & Security
+- ~~Performance optimization~~
+- ~~Security hardening~~
+- ~~Rate limiting~~
+
+### In Development
+- WebSocket real-time collaboration (0%)
+- Advanced search with Cloudflare Search (0%)
+- Internationalization (i18n) support (0%)
+- Multi-tenancy implementation (20%)
+
+---
+
+## Admin Interface
+
+<div className="text-emerald-600 dark:text-emerald-400 font-bold mb-4">Status: Complete</div>
+
+### Design System
+- ~~Modern glassmorphism UI~~
+- ~~Smooth animations and transitions~~
+- ~~Consistent color scheme~~
+- ~~Responsive grid layouts~~
+
+### Components
+- ~~Data tables with sorting/filtering~~
+- ~~Forms with validation~~
+- ~~Modals and dialogs~~
+- ~~Toast notifications~~
+- ~~Loading states~~
+
+### Features
+- ~~Dashboard with analytics overview~~
+- ~~Rich text editor (TinyMCE/EasyMDE/Quill)~~
+- ~~Auto-save (every 30 seconds)~~
+- ~~Preview mode~~
+- ~~Fullscreen editing~~
+- ~~Dark mode support~~
+
+### Responsive Design
+- ~~Desktop (1920px+)~~
+- ~~Laptop (1024px-1920px)~~
+- ~~Tablet (768px-1024px)~~
+- ~~Mobile (320px-768px)~~
+
+---
+
+## Developer Experience
+
+<div className="text-emerald-600 dark:text-emerald-400 font-bold mb-4">Status: Complete</div>
+
+### CLI Tools
+- ~~`npx create-sonicjs` - Initialize new project~~
+- ~~`npm run dev` - Start development server~~
+- ~~`npm run build` - Build for production~~
+- ~~Wrangler integration for deployment~~
+
+### Development Features
+- ~~Hot module reload~~
+- ~~Full TypeScript support (strict mode)~~
+- ~~Debug logging and inspection~~
+- ~~Mock data seeding utilities~~
+
+### Testing
+- ~~435 unit tests (100% pass rate)~~
+- ~~49 E2E tests with Playwright~~
+- ~~78 integration tests~~
+- ~~Performance benchmarks~~
+- ~~Security test scenarios~~
+
+### Documentation
+- ~~Getting started guide~~
+- ~~API reference~~
+- ~~Plugin development guide~~
+- ~~Deployment guide~~
+- Video tutorials (planned)
+
+---
+
+## Telemetry & Analytics
+
+<div className="text-emerald-600 dark:text-emerald-400 font-bold mb-4">Status: Complete</div>
+
+- ~~PostHog integration~~
+- ~~Privacy-first anonymous telemetry~~
+- ~~Easy opt-out mechanism~~
+- ~~Installation tracking~~
+- ~~Feature usage analytics~~
+- ~~Error rate monitoring~~
+
+---
+
+## Planned Features
+
+### Near-Term
+
+<div className="text-blue-600 dark:text-blue-400 font-bold mb-4">Next Up</div>
+
+- Enhanced analytics dashboard
+- Plugin marketplace with ratings
+- AI integration for content generation
+- Auto-tagging with AI
+- Two-factor authentication (2FA)
+- Magic link authentication
+
+### Mid-Term
+
+<div className="text-purple-600 dark:text-purple-400 font-bold mb-4">Coming Soon</div>
+
+- GraphQL API implementation
+- Advanced caching strategies with KV
+- Form builder with drag-and-drop
+- A/B testing capabilities
+- Content scheduling calendar view
+- Bulk import from other CMS platforms
+
+### Long-Term
+
+<div className="text-pink-600 dark:text-pink-400 font-bold mb-4">Future Vision</div>
+
+- Machine learning content recommendations
+- Predictive analytics
+- Voice interface support
+- Multi-region database replication
+- Enterprise SSO (SAML/OIDC)
+
+---
+
+## Quality & Performance
+
+### Current Metrics
+
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 my-8">
+  <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-center">
+    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">435</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">Unit Tests</div>
+  </div>
+  <div className="p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 text-center">
+    <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">49</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">E2E Tests</div>
+  </div>
+  <div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-center">
+    <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">&lt;50ms</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">API Response (p50)</div>
+  </div>
+  <div className="p-4 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 text-center">
+    <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">15+</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">Database Tables</div>
+  </div>
+</div>
+
+### Performance Targets
+
+- ~~API response time: &lt;50ms (p50)~~
+- ~~Admin UI load: &lt;100ms (p50)~~
+- ~~Media delivery: &lt;30ms (p50)~~
+- ~~Zero cold starts with Cloudflare Workers~~
+- ~~Unlimited auto-scaling~~
+
+### Security Standards
+
+- ~~OWASP Top 10 compliance~~
+- ~~XSS protection~~
+- ~~CSRF protection~~
+- ~~SQL injection prevention~~
+- ~~Rate limiting~~
+- GDPR ready
+- SOC 2 (planned)
+- ISO 27001 (planned)
+
+---
+
+## Contributing
+
+Want to help shape the future of SonicJS? We welcome contributions!
+
+<div className="flex flex-col sm:flex-row gap-4 my-8">
+  <a href="https://github.com/lane711/sonicjs" className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-semibold hover:opacity-90 transition-opacity">
+    <span>View on GitHub</span>
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+  </a>
+  <a href="https://discord.gg/8bMy6bv3sZ" className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:opacity-90 transition-opacity">
+    <span>Join Discord</span>
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>
+  </a>
+</div>
+
+### How to Contribute
+
+1. **Report Issues** - Found a bug? [Open an issue](https://github.com/lane711/sonicjs/issues)
+2. **Suggest Features** - Have an idea? Start a [discussion](https://github.com/lane711/sonicjs/discussions)
+3. **Submit PRs** - Ready to code? Check our [contributing guide](https://github.com/lane711/sonicjs/blob/main/CONTRIBUTING.md)
+4. **Write Docs** - Help improve our documentation
+5. **Spread the Word** - Star us on GitHub and share with others!
+
+---
+
+<div className="my-8 p-6 rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 text-center">
+  <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">
+    SonicJS is actively maintained with <strong>3,683+ commits</strong> and <strong>7 years of development</strong>.
+  </p>
+  <p className="text-sm text-gray-500 dark:text-gray-400">
+    Last updated: November 2025 | Version 2.3.2
+  </p>
+</div>
