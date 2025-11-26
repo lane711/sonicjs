@@ -277,6 +277,7 @@ export const navigation: Array<NavGroup> = [
   {
     title: 'Resources',
     links: [
+      { title: 'Roadmap', href: '/roadmap' },
       { title: 'Examples', href: '/examples' },
       { title: 'FAQ', href: '/faq' },
       { title: 'Changelog', href: '/changelog' },
