@@ -50,18 +50,23 @@ async function seed() {
 
     // Hash password using bcrypt
     const passwordHash = await bcrypt.hash('sonicjs!', 10)
+    const now = Date.now()
+    const odid = `admin-${now}-${Math.random().toString(36).substr(2, 9)}`
 
     // Create admin user
     await db
       .insert(users)
       .values({
+        id: odid,
         email: 'admin@sonicjs.com',
         username: 'admin',
-        password: passwordHash,
+        firstName: 'Admin',
+        lastName: 'User',
+        passwordHash: passwordHash,
         role: 'admin',
-        isActive: 1,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        isActive: true,
+        createdAt: now,
+        updatedAt: now
       })
       .run()
 

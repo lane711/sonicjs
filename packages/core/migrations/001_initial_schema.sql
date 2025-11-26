@@ -129,22 +129,8 @@ CREATE INDEX IF NOT EXISTS idx_api_tokens_token ON api_tokens(token);
 CREATE INDEX IF NOT EXISTS idx_workflow_history_content ON workflow_history(content_id);
 CREATE INDEX IF NOT EXISTS idx_workflow_history_user ON workflow_history(user_id);
 
--- Insert default admin user (password: sonicjs!)
-INSERT OR IGNORE INTO users (
-  id, email, username, first_name, last_name, password_hash, 
-  role, is_active, created_at, updated_at
-) VALUES (
-  'admin-user-id',
-  'admin@sonicjs.com',
-  'admin',
-  'Admin',
-  'User',
-  '9c9ec10df964f588e51acc794a63f18d5582e9b91c8366ba292ebde84d3834fd', -- SHA-256 hash of 'sonicjs!' with salt
-  'admin',
-  1,
-  strftime('%s', 'now') * 1000,
-  strftime('%s', 'now') * 1000
-);
+-- Note: Admin user is created via the seed script with user-provided credentials
+-- Run 'npm run seed' after migrations to create the admin user
 
 -- Insert sample collections
 INSERT OR IGNORE INTO collections (
@@ -181,18 +167,4 @@ INSERT OR IGNORE INTO collections (
   strftime('%s', 'now') * 1000
 );
 
--- Insert sample content
-INSERT OR IGNORE INTO content (
-  id, collection_id, slug, title, data, status, 
-  author_id, created_at, updated_at
-) VALUES (
-  'welcome-blog-post',
-  'blog-posts-collection',
-  'welcome-to-sonicjs-ai',
-  'Welcome to SonicJS AI',
-  '{"title":"Welcome to SonicJS AI","content":"<h1>Welcome to SonicJS AI</h1><p>This is your first blog post created with SonicJS AI, a modern headless CMS built on Cloudflare Workers.</p><h2>Features</h2><ul><li>Cloudflare-native architecture</li><li>TypeScript-first development</li><li>Hono.js framework</li><li>D1 database</li><li>R2 media storage</li><li>Edge computing</li></ul><p>Get started by exploring the admin interface and creating your own content!</p>","excerpt":"Welcome to SonicJS AI, a modern headless CMS built on Cloudflare Workers with TypeScript and Hono.js.","status":"published","tags":["welcome","cms","cloudflare"]}',
-  'published',
-  'admin-user-id',
-  strftime('%s', 'now') * 1000,
-  strftime('%s', 'now') * 1000
-);
+-- Note: Sample content can be created via the admin interface after the admin user is seeded
