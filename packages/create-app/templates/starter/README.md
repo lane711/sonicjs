@@ -42,9 +42,7 @@ A modern headless CMS built with [SonicJS](https://sonicjs.com) on Cloudflare's 
 6. **Open your browser:**
    Navigate to `http://localhost:8787/admin` to access the admin interface.
 
-   Default credentials:
-   - Email: `admin@sonicjs.com`
-   - Password: `admin`
+   Use the admin credentials you provided during project setup.
 
 ## Project Structure
 

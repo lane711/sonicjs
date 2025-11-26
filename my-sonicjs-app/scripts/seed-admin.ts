@@ -1,6 +1,7 @@
 import { createDb, users } from '@sonicjs-cms/core'
 import { eq } from 'drizzle-orm'
 import bcrypt from 'bcryptjs'
+import { getPlatformProxy } from 'wrangler'
 
 /**
  * Seed script to create initial admin user
@@ -14,17 +15,11 @@ import bcrypt from 'bcryptjs'
  * Password: [as entered during setup]
  */
 
-interface Env {
-  DB: D1Database
-}
-
 async function seed() {
-  // Get D1 database from Cloudflare environment
-  // @ts-ignore - getPlatformProxy is available in wrangler
-  const { env } = await import('@cloudflare/workers-types/experimental')
-  const platform = (env as any).getPlatformProxy?.() || { env: {} }
+  // Get D1 database from Cloudflare environment using wrangler's getPlatformProxy
+  const { env, dispose } = await getPlatformProxy()
 
-  if (!platform.env?.DB) {
+  if (!env?.DB) {
     console.error('❌ Error: DB binding not found')
     console.error('')
     console.error('Make sure you have:')
@@ -35,7 +30,7 @@ async function seed() {
     process.exit(1)
   }
 
-  const db = createDb(platform.env.DB)
+  const db = createDb(env.DB)
 
   try {
     // Check if admin user already exists
@@ -49,6 +44,7 @@ async function seed() {
       console.log('✓ Admin user already exists')
       console.log(`  Email: admin@sonicjs.com`)
       console.log(`  Role: ${existingUser.role}`)
+      await dispose()
       return
     }
 
@@ -76,8 +72,12 @@ async function seed() {
     console.log('You can now login at: http://localhost:8787/auth/login')
   } catch (error) {
     console.error('❌ Error creating admin user:', error)
+    await dispose()
     process.exit(1)
   }
+
+  // Clean up the platform proxy
+  await dispose()
 }
 
 // Run seed
