@@ -11,7 +11,7 @@ import { Navigation } from '@/components/Navigation'
 import { SectionProvider, type Section } from '@/components/SectionProvider'
 
 // Version from core package
-const version = '2.0.10'
+const version = '2.3.2'
 
 export function Layout({
   children,
