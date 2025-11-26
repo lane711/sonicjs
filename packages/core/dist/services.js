@@ -1,7 +1,7 @@
-export { CACHE_CONFIGS, CacheService, Logger, SettingsService, TelemetryService, createInstallationIdentity, getCacheService, getLogger, getTelemetryService, initLogger, initTelemetry } from './chunk-ZNESOOF2.js';
-export { PluginBootstrapService, PluginService, cleanupRemovedCollections, fullCollectionSync, getAvailableCollectionNames, getManagedCollections, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, registerCollections, syncCollection, syncCollections, validateCollectionConfig } from './chunk-LWMMMW43.js';
-export { MigrationService } from './chunk-I3R77LQC.js';
-import './chunk-MOWI4WYE.js';
+export { CACHE_CONFIGS, CacheService, Logger, SettingsService, TelemetryService, createInstallationIdentity, getCacheService, getLogger, getTelemetryService, initLogger, initTelemetry } from './chunk-Q52ZQFMB.js';
+export { PluginBootstrapService, PluginService, cleanupRemovedCollections, fullCollectionSync, getAvailableCollectionNames, getManagedCollections, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, registerCollections, syncCollection, syncCollections, validateCollectionConfig } from './chunk-7CXL5K7N.js';
+export { MigrationService } from './chunk-PSPLHFXB.js';
+import './chunk-RRKXFGIO.js';
 import './chunk-V4OQ3NZ2.js';
 //# sourceMappingURL=services.js.map
 //# sourceMappingURL=services.js.map
