@@ -31,9 +31,10 @@
     "publish:core": "npm run build:core && npm publish --workspace=@sonicjs-cms/core",
     "publish:create-app": "npm publish --workspace=create-sonicjs",
     "publish:all": "npm run publish:core && npm run publish:create-app",
-    "release:patch": "npm run version:patch && npm run publish:all",
-    "release:minor": "npm run version:minor && npm run publish:all",
-    "release:major": "npm run version:major && npm run publish:all",
+    "release:patch": "npm run version:patch && npm run publish:all && node scripts/notify-discord.js",
+    "release:minor": "npm run version:minor && npm run publish:all && node scripts/notify-discord.js",
+    "release:major": "npm run version:major && npm run publish:all && node scripts/notify-discord.js",
+    "notify:discord": "node scripts/notify-discord.js",
     "db:reset": "npm run setup:db --workspace=my-sonicjs-app"
   },
   "dependencies": {
