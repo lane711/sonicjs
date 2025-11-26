@@ -451,7 +451,7 @@ async function copyTemplate(templateName, targetDir, options) {
 async function createAdminSeedScript(targetDir, { email, password }) {
   const seedScriptContent = `import { createDb, users } from '@sonicjs-cms/core'
 import { eq } from 'drizzle-orm'
-import bcrypt from 'bcryptjs'
+import * as crypto from 'crypto'
 import { getPlatformProxy } from 'wrangler'
 
 /**
@@ -498,8 +498,9 @@ async function seed() {
       return
     }
 
-    // Hash password using bcrypt
-    const passwordHash = await bcrypt.hash('${password}', 10)
+    // Hash password using SHA-256 (same as SonicJS auth system)
+    const data = '${password}' + 'salt-change-in-production'
+    const passwordHash = crypto.createHash('sha256').update(data).digest('hex')
     const now = Date.now()
     const odid = \`admin-\${now}-\${Math.random().toString(36).substr(2, 9)}\`
 

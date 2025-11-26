@@ -1,6 +1,6 @@
 import { createDb, users } from '@sonicjs-cms/core'
 import { eq } from 'drizzle-orm'
-import bcrypt from 'bcryptjs'
+import * as crypto from 'crypto'
 import { getPlatformProxy } from 'wrangler'
 
 /**
@@ -12,7 +12,7 @@ import { getPlatformProxy } from 'wrangler'
  *
  * Admin credentials:
  * Email: admin@sonicjs.com
- * Password: [as entered during setup]
+ * Password: sonicjs!
  */
 
 async function seed() {
@@ -48,8 +48,9 @@ async function seed() {
       return
     }
 
-    // Hash password using bcrypt
-    const passwordHash = await bcrypt.hash('sonicjs!', 10)
+    // Hash password using SHA-256 (same as SonicJS auth system)
+    const data = 'sonicjs!' + 'salt-change-in-production'
+    const passwordHash = crypto.createHash('sha256').update(data).digest('hex')
     const now = Date.now()
     const odid = `admin-${now}-${Math.random().toString(36).substr(2, 9)}`
 
