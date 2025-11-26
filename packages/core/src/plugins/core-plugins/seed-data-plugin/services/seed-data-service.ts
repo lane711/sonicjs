@@ -259,9 +259,9 @@ export class SeedDataService {
     const deleteContentStmt = this.db.prepare('DELETE FROM content')
     await deleteContentStmt.run()
 
-    // Delete users (but keep the admin user if it exists)
+    // Delete users (but keep admin users)
     const deleteUsersStmt = this.db.prepare(
-      "DELETE FROM users WHERE email != 'admin@sonicjs.com'"
+      "DELETE FROM users WHERE role != 'admin'"
     )
     await deleteUsersStmt.run()
   }
