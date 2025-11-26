@@ -9,7 +9,7 @@ export const emailTemplatesPlugin = {
   version: '1.0.0',
   author: 'SonicJS Team',
   isCore: false,
-  isActive: false, // Disabled by default - requires manual activation
+  isActive: false, // Not registered in plugin system - see core-plugins/email-plugin instead
   status: 'inactive', // Plugin starts as inactive
   
   // Plugin capabilities
