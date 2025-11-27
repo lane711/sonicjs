@@ -24,6 +24,7 @@
     "drizzle-kit": "^0.30.3",
     "drizzle-orm": "^0.44.7",
     "hono": "^4.10.4",
+    "tsx": "^4.20.3",
     "typescript": "^5.9.3",
     "vitest": "^4.0.5",
     "wrangler": "^3.110.4",

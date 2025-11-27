@@ -7,6 +7,7 @@
  * 1. Reads the version from packages/core/package.json
  * 2. Updates the version in packages/create-app/src/cli.js
  * 3. Syncs the create-sonicjs package version to match core version
+ * 4. Syncs the root package.json version to match core version
  */
 
 import fs from 'fs'
@@ -17,6 +18,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const rootDir = path.join(__dirname, '..')
+const rootPackageJsonPath = path.join(rootDir, 'package.json')
 const corePackageJsonPath = path.join(rootDir, 'packages/core/package.json')
 const createAppCliPath = path.join(rootDir, 'packages/create-app/src/cli.js')
 const createAppPackageJsonPath = path.join(rootDir, 'packages/create-app/package.json')
@@ -50,6 +52,15 @@ async function syncVersions() {
     fs.writeFileSync(createAppPackageJsonPath, JSON.stringify(createAppPackageJson, null, 2) + '\n', 'utf8')
 
     console.log(`✓ Synced create-sonicjs from ${oldCreateAppVersion} to ${coreVersion}`)
+
+    // Sync root package.json version to match core version
+    const rootPackageJson = JSON.parse(fs.readFileSync(rootPackageJsonPath, 'utf8'))
+    const oldRootVersion = rootPackageJson.version
+
+    rootPackageJson.version = coreVersion
+    fs.writeFileSync(rootPackageJsonPath, JSON.stringify(rootPackageJson, null, 2) + '\n', 'utf8')
+
+    console.log(`✓ Synced root package.json from ${oldRootVersion} to ${coreVersion}`)
 
     console.log('\n✅ Version sync complete!')
     console.log('\nNext steps:')

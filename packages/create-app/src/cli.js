@@ -340,8 +340,8 @@ async function createProject(answers, flags) {
       spinner.succeed('Initialized git repository')
     }
 
-    // 6. Run migrations
-    if (runMigrations && !skipInstall && resourcesCreated) {
+    // 6. Run migrations (always run locally, even if remote resources weren't created)
+    if (runMigrations && !skipInstall) {
       spinner.start('Running database migrations...')
       try {
         await runDatabaseMigrations(targetDir)
@@ -355,9 +355,6 @@ async function createProject(answers, flags) {
       }
     } else if (runMigrations && skipInstall) {
       spinner.info('Skipping migrations - run after npm install')
-      answers.migrationsRan = false
-    } else if (runMigrations && !resourcesCreated) {
-      spinner.info('Skipping migrations - database not created yet')
       answers.migrationsRan = false
     }
 
@@ -418,7 +415,7 @@ async function copyTemplate(templateName, targetDir, options) {
 
   // Add @sonicjs-cms/core dependency
   packageJson.dependencies = {
-    '@sonicjs-cms/core': '^2.3.2',
+    '@sonicjs-cms/core': '^2.3.6',
     ...packageJson.dependencies
   }
 
@@ -451,7 +448,7 @@ async function copyTemplate(templateName, targetDir, options) {
 async function createAdminSeedScript(targetDir, { email, password }) {
   const seedScriptContent = `import { createDb, users } from '@sonicjs-cms/core'
 import { eq } from 'drizzle-orm'
-import bcrypt from 'bcryptjs'
+import * as crypto from 'crypto'
 import { getPlatformProxy } from 'wrangler'
 
 /**
@@ -498,20 +495,26 @@ async function seed() {
       return
     }
 
-    // Hash password using bcrypt
-    const passwordHash = await bcrypt.hash('${password}', 10)
+    // Hash password using SHA-256 (same as SonicJS auth system)
+    const data = '${password}' + 'salt-change-in-production'
+    const passwordHash = crypto.createHash('sha256').update(data).digest('hex')
+    const now = Date.now()
+    const odid = \`admin-\${now}-\${Math.random().toString(36).substr(2, 9)}\`
 
     // Create admin user
     await db
       .insert(users)
       .values({
+        id: odid,
         email: '${email}',
         username: '${email.split('@')[0]}',
-        password: passwordHash,
+        firstName: 'Admin',
+        lastName: 'User',
+        passwordHash: passwordHash,
         role: 'admin',
-        isActive: 1,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        isActive: true,
+        createdAt: now,
+        updatedAt: now
       })
       .run()
 
