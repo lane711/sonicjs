@@ -340,8 +340,8 @@ async function createProject(answers, flags) {
       spinner.succeed('Initialized git repository')
     }
 
-    // 6. Run migrations
-    if (runMigrations && !skipInstall && resourcesCreated) {
+    // 6. Run migrations (always run locally, even if remote resources weren't created)
+    if (runMigrations && !skipInstall) {
       spinner.start('Running database migrations...')
       try {
         await runDatabaseMigrations(targetDir)
@@ -355,9 +355,6 @@ async function createProject(answers, flags) {
       }
     } else if (runMigrations && skipInstall) {
       spinner.info('Skipping migrations - run after npm install')
-      answers.migrationsRan = false
-    } else if (runMigrations && !resourcesCreated) {
-      spinner.info('Skipping migrations - database not created yet')
       answers.migrationsRan = false
     }
 
@@ -418,7 +415,7 @@ async function copyTemplate(templateName, targetDir, options) {
 
   // Add @sonicjs-cms/core dependency
   packageJson.dependencies = {
-    '@sonicjs-cms/core': '^2.3.4',
+    '@sonicjs-cms/core': '^2.3.6',
     ...packageJson.dependencies
   }
 
