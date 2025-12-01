@@ -1,0 +1,319 @@
+export const metadata = {
+  title: 'Contributing - SonicJS',
+  description:
+    'Learn how to contribute to SonicJS. Understand our contribution process and expectations before getting started.',
+}
+
+export const sections = [
+  { title: 'Before You Start', id: 'before-you-start' },
+  { title: 'Contribution Process', id: 'contribution-process' },
+  { title: 'Good First Contributions', id: 'good-first-contributions' },
+  { title: 'Working with Maintainers', id: 'working-with-maintainers' },
+  { title: 'Development Setup', id: 'development-setup' },
+  { title: 'Code Standards', id: 'code-standards' },
+]
+
+# Contributing to SonicJS
+
+Thank you for your interest in contributing to SonicJS! This guide will help you understand our contribution process and how to become an effective contributor. {{ className: 'lead' }}
+
+---
+
+## Before You Start
+
+We appreciate every developer who wants to contribute to SonicJS. To ensure the best experience for both contributors and maintainers, we've established a clear process for getting involved.
+
+<div className="not-prose mb-8 p-6 rounded-lg border-2 border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20">
+  <div className="flex items-start gap-4">
+    <div className="text-3xl">💡</div>
+    <div>
+      <h3 className="text-lg font-semibold mb-2 m-0 text-amber-900 dark:text-amber-100">Important: Start with Code, Not Meetings</h3>
+      <p className="text-amber-800 dark:text-amber-200 mb-0">We receive many requests from developers interested in contributing. While we value every potential contributor, we've found that the most effective way to get involved is to <strong>demonstrate your commitment through contributions first</strong>. Please submit at least one meaningful pull request before requesting a meeting or deeper integration into the project.</p>
+    </div>
+  </div>
+</div>
+
+### Why This Approach?
+
+Open source maintainers have limited time. By focusing on code contributions first:
+
+- **You demonstrate real interest** - Actions speak louder than words
+- **You learn the codebase** - Hands-on experience is the best teacher
+- **We can evaluate fit** - Your code shows us your skills and style
+- **It respects everyone's time** - Meetings are more productive after you're familiar with the project
+
+### What Counts as a Meaningful Contribution?
+
+<FeatureGrid
+  features={[
+    {
+      icon: '🐛',
+      title: 'Bug Fixes',
+      description: 'Fix a bug from the issue tracker with a well-tested solution',
+    },
+    {
+      icon: '✨',
+      title: 'New Features',
+      description: 'Implement a feature that has been discussed and approved',
+    },
+    {
+      icon: '📝',
+      title: 'Documentation',
+      description: 'Significantly improve or add documentation',
+    },
+    {
+      icon: '🧪',
+      title: 'Test Coverage',
+      description: 'Add meaningful tests for untested functionality',
+    },
+  ]}
+  columns={2}
+/>
+
+---
+
+## Contribution Process
+
+Here's how to become a successful contributor to SonicJS:
+
+### Step 1: Find Something to Work On
+
+<div className="not-prose mb-8">
+  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <a href="https://github.com/lane711/sonicjs/labels/good%20first%20issue" className="flex flex-col rounded-lg border border-zinc-200 dark:border-zinc-800 p-6 hover:border-zinc-300 dark:hover:border-zinc-700 transition">
+      <div className="text-2xl mb-3">🏷️</div>
+      <h3 className="text-lg font-semibold mb-2 m-0">Good First Issues</h3>
+      <p className="text-sm text-zinc-600 dark:text-zinc-400">Issues tagged for newcomers - great starting point</p>
+    </a>
+
+    <a href="https://github.com/lane711/sonicjs/labels/help%20wanted" className="flex flex-col rounded-lg border border-zinc-200 dark:border-zinc-800 p-6 hover:border-zinc-300 dark:hover:border-zinc-700 transition">
+      <div className="text-2xl mb-3">🙋</div>
+      <h3 className="text-lg font-semibold mb-2 m-0">Help Wanted</h3>
+      <p className="text-sm text-zinc-600 dark:text-zinc-400">Issues where we actively need community help</p>
+    </a>
+
+    <a href="https://github.com/lane711/sonicjs/issues" className="flex flex-col rounded-lg border border-zinc-200 dark:border-zinc-800 p-6 hover:border-zinc-300 dark:hover:border-zinc-700 transition">
+      <div className="text-2xl mb-3">🔍</div>
+      <h3 className="text-lg font-semibold mb-2 m-0">All Issues</h3>
+      <p className="text-sm text-zinc-600 dark:text-zinc-400">Browse all open issues and find one that interests you</p>
+    </a>
+
+    <a href="https://github.com/lane711/sonicjs/labels/documentation" className="flex flex-col rounded-lg border border-zinc-200 dark:border-zinc-800 p-6 hover:border-zinc-300 dark:hover:border-zinc-700 transition">
+      <div className="text-2xl mb-3">📚</div>
+      <h3 className="text-lg font-semibold mb-2 m-0">Documentation</h3>
+      <p className="text-sm text-zinc-600 dark:text-zinc-400">Help improve our docs - great for learning the project</p>
+    </a>
+  </div>
+</div>
+
+### Step 2: Claim the Issue
+
+Before starting work:
+
+1. **Comment on the issue** to indicate you're working on it
+2. **Wait for confirmation** from a maintainer (especially for larger features)
+3. **Ask questions** if anything is unclear about the requirements
+
+### Step 3: Submit Your Pull Request
+
+Once your work is ready:
+
+1. Ensure all tests pass
+2. Follow our code standards (see below)
+3. Write a clear PR description explaining your changes
+4. Reference the issue number in your PR
+5. Be responsive to feedback
+
+### Step 4: After Your First PR is Merged
+
+<div className="not-prose mb-8 p-6 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20">
+  <div className="flex items-start gap-4">
+    <div className="text-3xl">🎉</div>
+    <div>
+      <h3 className="text-lg font-semibold mb-2 m-0 text-emerald-900 dark:text-emerald-100">Congratulations!</h3>
+      <p className="text-emerald-800 dark:text-emerald-200 mb-4">After your first meaningful contribution is merged, you'll be:</p>
+      <ul className="text-emerald-800 dark:text-emerald-200 list-disc list-inside space-y-1 mb-0">
+        <li>Added to our contributors list</li>
+        <li>Eligible for deeper project discussions</li>
+        <li>Welcome to schedule a call with maintainers if desired</li>
+        <li>Considered for more significant responsibilities</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+---
+
+## Good First Contributions
+
+Not sure where to start? Here are some ideas:
+
+### Low-Hanging Fruit
+
+- **Fix typos** in documentation
+- **Improve error messages** to be more helpful
+- **Write tests** for existing untested code
+- **Update dependencies** (with proper testing)
+
+### Medium Complexity
+
+- **Fix bugs** from the issue tracker
+- **Improve documentation** with examples
+- **Add configuration options** to existing features
+- **Performance improvements** with benchmarks
+
+### Higher Complexity
+
+- **New features** (please discuss first in an issue)
+- **Major refactoring** (requires maintainer approval)
+- **New plugins** (see our plugin development guide)
+
+---
+
+## Working with Maintainers
+
+### Communication Guidelines
+
+**Do:**
+- Be patient - maintainers are often volunteers
+- Provide context and details in issues/PRs
+- Ask questions publicly so others can benefit
+- Accept feedback gracefully and iterate
+
+**Don't:**
+- Request meetings before contributing
+- Expect immediate responses
+- Take feedback personally
+- Submit large changes without discussion first
+
+### Response Times
+
+- **Issue responses**: Usually within 24 hours during M-F and non-US holidays
+- **PR reviews**: Within a few days at most
+- **Meeting requests**: Only after meaningful contribution
+
+### When to Request Deeper Involvement
+
+After you've:
+- Had at least one meaningful PR merged
+- Shown consistent quality in your contributions
+- Demonstrated understanding of the project's direction
+- Been active in discussions and helpful to others
+
+You can then reach out about:
+- Regular contributor status
+- Joining the core team
+- Taking ownership of specific areas
+- Other collaboration opportunities
+
+---
+
+## Development Setup
+
+<CodeGroup title="Getting Started">
+
+```bash {{ title: 'Clone & Install' }}
+# Fork the repository on GitHub first
+# Then clone your fork:
+git clone https://github.com/YOUR_USERNAME/sonicjs.git
+cd sonicjs
+
+# Add upstream remote
+git remote add upstream https://github.com/lane711/sonicjs.git
+
+# Install dependencies
+npm install
+```
+
+```bash {{ title: 'Development' }}
+# Start development server
+npm run dev
+
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Lint code
+npm run lint
+
+# Format code
+npm run format
+```
+
+```bash {{ title: 'Submit PR' }}
+# Create a feature branch
+git checkout -b feature/your-feature-name
+
+# Make your changes, then commit
+git add .
+git commit -m "feat: add your feature description"
+
+# Push to your fork
+git push origin feature/your-feature-name
+
+# Create PR on GitHub
+```
+
+</CodeGroup>
+
+---
+
+## Code Standards
+
+### General Guidelines
+
+- **TypeScript**: All code must be in TypeScript with proper types
+- **Testing**: New features must include tests
+- **Documentation**: Public APIs must be documented
+- **Formatting**: Use Prettier (runs automatically on commit)
+- **Linting**: ESLint rules must pass
+
+### Commit Messages
+
+We use AI to generate commit messages - make them as detailed as possible. Reference issue numbers when applicable.
+
+### Pull Request Checklist
+
+Before submitting a PR, ensure:
+
+- [ ] All tests pass (`npm test`)
+- [ ] Code is formatted (`npm run format`)
+- [ ] Linting passes (`npm run lint`)
+- [ ] Changes are documented if needed
+- [ ] PR description explains the changes
+- [ ] Related issue is referenced
+
+---
+
+## Ready to Contribute?
+
+<div className="not-prose mt-8">
+  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <Button href="https://github.com/lane711/sonicjs/issues" variant="primary">
+      <>Find an Issue to Work On</>
+    </Button>
+    <Button href="https://github.com/lane711/sonicjs" variant="secondary">
+      <>View Repository</>
+    </Button>
+  </div>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/community" variant="text" arrow="right">
+    <>Join the Community</>
+  </Button>
+</div>
+
+---
+
+## Questions?
+
+If you have questions about contributing:
+
+1. **Check existing issues** - your question may already be answered
+2. **Ask in GitHub Discussions** - for general questions
+3. **Comment on the issue** - for specific issue clarifications
+
+We look forward to your contributions!
