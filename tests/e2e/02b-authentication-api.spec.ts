@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { ADMIN_CREDENTIALS } from './utils/test-helpers';
 
-test.describe.skip('Authentication API', () => {
+test.describe('Authentication API', () => {
   const testUser = {
     email: 'test.api.user@example.com',
     password: 'TestPassword123!',
