@@ -153,6 +153,15 @@ export function renderSettingsPage(data: SettingsPageData): string {
       const currentTab = '${activeTab}';
 
       async function saveAllSettings() {
+        // Tabs with implemented save functionality
+        const saveableTabs = ['general'];
+
+        // Check if current tab supports saving
+        if (!saveableTabs.includes(currentTab)) {
+          showNotification('Saving is not yet available for this settings section. This feature is under development.', 'warning');
+          return;
+        }
+
         // Collect all form data
         const formData = new FormData();
 
