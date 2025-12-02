@@ -103,26 +103,6 @@ export function renderSettingsPage(data: SettingsPageData): string {
           <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">Settings</h1>
           <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Manage your application settings and preferences</p>
         </div>
-        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex space-x-3">
-          <button
-            onclick="resetSettings()"
-            class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
-          >
-            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-            </svg>
-            Reset to Defaults
-          </button>
-          <button
-            onclick="saveAllSettings()"
-            class="inline-flex items-center justify-center rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
-          >
-            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-            </svg>
-            Save All Changes
-          </button>
-        </div>
       </div>
 
       <!-- Settings Navigation Tabs -->
@@ -152,8 +132,8 @@ export function renderSettingsPage(data: SettingsPageData): string {
       // Initialize tab-specific features on page load
       const currentTab = '${activeTab}';
 
-      async function saveAllSettings() {
-        // Collect all form data
+      async function saveGeneralSettings() {
+        // Collect all form data from general settings
         const formData = new FormData();
 
         // Get all form inputs in the settings content area
@@ -166,20 +146,13 @@ export function renderSettingsPage(data: SettingsPageData): string {
         });
 
         // Show loading state
-        const saveBtn = document.querySelector('button[onclick="saveAllSettings()"]');
+        const saveBtn = document.querySelector('button[onclick="saveGeneralSettings()"]');
         const originalText = saveBtn.innerHTML;
         saveBtn.innerHTML = '<svg class="animate-spin -ml-0.5 mr-1.5 h-5 w-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>Saving...';
         saveBtn.disabled = true;
 
         try {
-          // Determine which endpoint to call based on current tab
-          let endpoint = '/admin/settings/general';
-          if (currentTab === 'general') {
-            endpoint = '/admin/settings/general';
-          }
-          // Add more endpoints for other tabs when implemented
-
-          const response = await fetch(endpoint, {
+          const response = await fetch('/admin/settings/general', {
             method: 'POST',
             body: formData
           });
@@ -199,18 +172,7 @@ export function renderSettingsPage(data: SettingsPageData): string {
           saveBtn.disabled = false;
         }
       }
-      
-      function resetSettings() {
-        showConfirmDialog('reset-settings-confirm');
-      }
 
-      function performResetSettings() {
-        showNotification('Settings reset to defaults', 'info');
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      }
-      
       // Migration functions
       window.refreshMigrationStatus = async function() {
         try {
@@ -492,17 +454,6 @@ export function renderSettingsPage(data: SettingsPageData): string {
 
     <!-- Confirmation Dialogs -->
     ${renderConfirmationDialog({
-      id: 'reset-settings-confirm',
-      title: 'Reset Settings',
-      message: 'Are you sure you want to reset all settings to their default values? This action cannot be undone.',
-      confirmText: 'Reset',
-      cancelText: 'Cancel',
-      iconColor: 'yellow',
-      confirmClass: 'bg-yellow-500 hover:bg-yellow-400',
-      onConfirm: 'performResetSettings()'
-    })}
-
-    ${renderConfirmationDialog({
       id: 'run-migrations-confirm',
       title: 'Run Migrations',
       message: 'Are you sure you want to run pending migrations? This action cannot be undone.',
@@ -665,6 +616,19 @@ function renderGeneralSettings(settings?: GeneralSettings): string {
           </div>
         </div>
       </div>
+
+      <!-- Save Button -->
+      <div class="mt-8 pt-6 border-t border-zinc-950/5 dark:border-white/10 flex justify-end">
+        <button
+          onclick="saveGeneralSettings()"
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
+        >
+          <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save Changes
+        </button>
+      </div>
     </div>
   `
 }
@@ -782,6 +746,19 @@ function renderAppearanceSettings(settings?: AppearanceSettings): string {
             >${settings?.customCSS || ''}</textarea>
           </div>
         </div>
+      </div>
+
+      <!-- Save Button (Disabled for WIP) -->
+      <div class="mt-8 pt-6 border-t border-zinc-950/5 dark:border-white/10 flex justify-end">
+        <button
+          disabled
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-950/50 dark:bg-white/50 px-3.5 py-2.5 text-sm font-semibold text-white/50 dark:text-zinc-950/50 cursor-not-allowed shadow-sm"
+        >
+          <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save Changes
+        </button>
       </div>
     </div>
   `
@@ -939,6 +916,19 @@ function renderSecuritySettings(settings?: SecuritySettings): string {
           </div>
         </div>
       </div>
+
+      <!-- Save Button (Disabled for WIP) -->
+      <div class="mt-8 pt-6 border-t border-zinc-950/5 dark:border-white/10 flex justify-end">
+        <button
+          disabled
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-950/50 dark:bg-white/50 px-3.5 py-2.5 text-sm font-semibold text-white/50 dark:text-zinc-950/50 cursor-not-allowed shadow-sm"
+        >
+          <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save Changes
+        </button>
+      </div>
     </div>
   `
 }
@@ -1086,6 +1076,19 @@ function renderNotificationSettings(settings?: NotificationSettings): string {
           </div>
         </div>
       </div>
+
+      <!-- Save Button (Disabled for WIP) -->
+      <div class="mt-8 pt-6 border-t border-zinc-950/5 dark:border-white/10 flex justify-end">
+        <button
+          disabled
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-950/50 dark:bg-white/50 px-3.5 py-2.5 text-sm font-semibold text-white/50 dark:text-zinc-950/50 cursor-not-allowed shadow-sm"
+        >
+          <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save Changes
+        </button>
+      </div>
     </div>
   `
 }
@@ -1189,6 +1192,19 @@ function renderStorageSettings(settings?: StorageSettings): string {
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Save Button (Disabled for WIP) -->
+      <div class="mt-8 pt-6 border-t border-zinc-950/5 dark:border-white/10 flex justify-end">
+        <button
+          disabled
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-950/50 dark:bg-white/50 px-3.5 py-2.5 text-sm font-semibold text-white/50 dark:text-zinc-950/50 cursor-not-allowed shadow-sm"
+        >
+          <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save Changes
+        </button>
       </div>
     </div>
   `
