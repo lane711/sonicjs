@@ -269,7 +269,7 @@ npx create-sonicjs my-app
 ## Related
 
 - [@sonicjs-cms/core](../core) - Core framework
-- [SonicJS Documentation](https://docs.sonicjs.com)
+- [SonicJS Documentation](https://sonicjs.com)
 - [Cloudflare Workers](https://workers.cloudflare.com)
 
 ## Contributing
@@ -282,9 +282,9 @@ MIT © SonicJS Team
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/sonicjs/sonicjs/issues)
-- **Discord**: [Join our community](https://discord.gg/sonicjs)
-- **Docs**: [docs.sonicjs.com](https://docs.sonicjs.com)
+- **Issues**: [GitHub Issues](https://github.com/lane711/sonicjs/issues)
+- **Discord**: [Join our community](https://discord.gg/8bMy6bv3sZ)
+- **Docs**: [sonicjs.com](https://sonicjs.com)
 
 ---
 
