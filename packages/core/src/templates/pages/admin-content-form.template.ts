@@ -697,17 +697,17 @@ export function renderContentFormPage(data: ContentFormData): string {
         form.addEventListener('change', scheduleAutoSave);
       });
 
-      ${data.tinymceEnabled ? `<script>${getTinyMCEInitScript({
+      ${data.tinymceEnabled ? getTinyMCEInitScript({
         skin: data.tinymceSettings?.skin,
         defaultHeight: data.tinymceSettings?.defaultHeight,
         defaultToolbar: data.tinymceSettings?.defaultToolbar
-      })}</script>` : ''}
+      }) : ''}
 
-      ${data.mdxeditorEnabled ? `<script>${getMDXEditorInitScript({
+      ${data.mdxeditorEnabled ? getMDXEditorInitScript({
         defaultHeight: data.mdxeditorSettings?.defaultHeight,
         toolbar: data.mdxeditorSettings?.toolbar,
         placeholder: data.mdxeditorSettings?.placeholder
-      })}</script>` : ''}
+      }) : ''}
     </script>
   `
 
