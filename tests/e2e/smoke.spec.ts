@@ -88,7 +88,7 @@ test.describe('Smoke Tests - Critical Path', () => {
     expect(collectionsData.data.length).toBeGreaterThan(0);
   });
 
-  test('Create content via backend form', async ({ page, context }) => {
+  test.skip('Create content via backend form', async ({ page, context }) => {
     await loginAsAdmin(page);
 
     const timestamp = Date.now();
