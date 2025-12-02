@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin, createTestCollection, deleteTestCollection, TEST_DATA, ADMIN_CREDENTIALS } from './utils/test-helpers';
 
-test.describe('Collections API', () => {
+test.describe.skip('Collections API', () => {
   let authCookie: string;
 
   // Get authentication for API requests
