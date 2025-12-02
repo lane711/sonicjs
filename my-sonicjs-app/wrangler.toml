@@ -13,8 +13,8 @@ workers_dev = true
 # Run `npm run setup:db` to create a fresh database for your branch
 [[d1_databases]]
 binding = "DB"
-database_name = "my-sonicjs-app-db"
-database_id = "e8529dfb-05b7-4cf1-aef0-0f602bd9b5a7"
+database_name = "sonicjs-worktree-fix-admin-content-form"
+database_id = "f2c8a7cb-fb84-4c88-92cc-12bfe9548b74"
 migrations_dir = "../packages/core/migrations"
 
 # R2 Bucket for media storage

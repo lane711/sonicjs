@@ -2,12 +2,12 @@ import { test, expect } from '@playwright/test';
 import { loginAsAdmin, navigateToAdminSection } from './utils/test-helpers';
 import corePackageJson from '../../packages/core/package.json';
 
-test.describe.skip('Admin Dashboard', () => {
+test.describe('Admin Dashboard', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
   });
 
-  test('should display correct version from package.json', async ({ page }) => {
+  test.skip('should display correct version from package.json', async ({ page }) => {
     // The version should be displayed in the layout (usually in the sidebar or footer)
     // Version comes from @sonicjs-cms/core package and is shown without 'v' prefix in badge
     const expectedVersion = corePackageJson.version;
@@ -102,7 +102,7 @@ test.describe.skip('Admin Dashboard', () => {
     await expect(systemStatusContainer.getByText('R2 Storage', { exact: false })).toBeVisible();
   });
 
-  test('should navigate to collections page', async ({ page }) => {
+  test.skip('should navigate to collections page', async ({ page }) => {
     await navigateToAdminSection(page, 'collections');
     
     await expect(page.locator('h1')).toContainText('Collections');

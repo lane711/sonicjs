@@ -1,9 +1,9 @@
 import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-Q52ZQFMB.js';
-import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-U2ILQXK6.js';
+import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-Z4RDOIHE.js';
 import { PluginService } from './chunk-7CXL5K7N.js';
-import { MigrationService } from './chunk-QJBYQRNX.js';
+import { MigrationService } from './chunk-Y6J7G3K5.js';
 import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-5RKQB2JG.js';
-import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-IDLIOJD2.js';
+import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-ZM6JGGRM.js';
 import { metricsTracker } from './chunk-FICTAGD4.js';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
@@ -1720,7 +1720,7 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
 });
 adminApiRoutes.get("/migrations/status", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-3JJADRMO.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-SG5KL6HB.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const status = await migrationService.getMigrationStatus();
@@ -1745,7 +1745,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const { MigrationService: MigrationService2 } = await import('./migrations-3JJADRMO.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-SG5KL6HB.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const result = await migrationService.runPendingMigrations();
@@ -1764,7 +1764,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
 });
 adminApiRoutes.get("/migrations/validate", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-3JJADRMO.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-SG5KL6HB.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const validation = await migrationService.validateSchema();
@@ -5066,17 +5066,17 @@ function renderContentFormPage(data) {
         form.addEventListener('change', scheduleAutoSave);
       });
 
-      ${data.tinymceEnabled ? `<script>${getTinyMCEInitScript({
+      ${data.tinymceEnabled ? getTinyMCEInitScript({
     skin: data.tinymceSettings?.skin,
     defaultHeight: data.tinymceSettings?.defaultHeight,
     defaultToolbar: data.tinymceSettings?.defaultToolbar
-  })}</script>` : ""}
+  }) : ""}
 
-      ${data.mdxeditorEnabled ? `<script>${getMDXEditorInitScript({
+      ${data.mdxeditorEnabled ? getMDXEditorInitScript({
     defaultHeight: data.mdxeditorSettings?.defaultHeight,
     toolbar: data.mdxeditorSettings?.toolbar,
     placeholder: data.mdxeditorSettings?.placeholder
-  })}</script>` : ""}
+  }) : ""}
     </script>
   `;
   const layoutData = {
@@ -16682,7 +16682,7 @@ function renderDashboardPage(data) {
         <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Welcome to your SonicJS AI admin dashboard</p>
       </div>
       <div class="mt-4 sm:mt-0 flex items-center gap-x-3">
-        <a href="/docs/getting-started" target="_blank" class="inline-flex items-center justify-center gap-x-1.5 rounded-lg bg-lime-600 dark:bg-lime-700 px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-lime-700 dark:hover:bg-lime-600 transition-colors shadow-sm">
+        <a href="https://sonicjs.com/installation" target="_blank" class="inline-flex items-center justify-center gap-x-1.5 rounded-lg bg-lime-600 dark:bg-lime-700 px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-lime-700 dark:hover:bg-lime-600 transition-colors shadow-sm">
           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"/>
           </svg>
@@ -19690,26 +19690,6 @@ function renderSettingsPage(data) {
           <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">Settings</h1>
           <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Manage your application settings and preferences</p>
         </div>
-        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex space-x-3">
-          <button
-            onclick="resetSettings()"
-            class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
-          >
-            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-            </svg>
-            Reset to Defaults
-          </button>
-          <button
-            onclick="saveAllSettings()"
-            class="inline-flex items-center justify-center rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
-          >
-            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-            </svg>
-            Save All Changes
-          </button>
-        </div>
       </div>
 
       <!-- Settings Navigation Tabs -->
@@ -19739,8 +19719,8 @@ function renderSettingsPage(data) {
       // Initialize tab-specific features on page load
       const currentTab = '${activeTab}';
 
-      async function saveAllSettings() {
-        // Collect all form data
+      async function saveGeneralSettings() {
+        // Collect all form data from general settings
         const formData = new FormData();
 
         // Get all form inputs in the settings content area
@@ -19753,20 +19733,13 @@ function renderSettingsPage(data) {
         });
 
         // Show loading state
-        const saveBtn = document.querySelector('button[onclick="saveAllSettings()"]');
+        const saveBtn = document.querySelector('button[onclick="saveGeneralSettings()"]');
         const originalText = saveBtn.innerHTML;
         saveBtn.innerHTML = '<svg class="animate-spin -ml-0.5 mr-1.5 h-5 w-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>Saving...';
         saveBtn.disabled = true;
 
         try {
-          // Determine which endpoint to call based on current tab
-          let endpoint = '/admin/settings/general';
-          if (currentTab === 'general') {
-            endpoint = '/admin/settings/general';
-          }
-          // Add more endpoints for other tabs when implemented
-
-          const response = await fetch(endpoint, {
+          const response = await fetch('/admin/settings/general', {
             method: 'POST',
             body: formData
           });
@@ -19786,18 +19759,7 @@ function renderSettingsPage(data) {
           saveBtn.disabled = false;
         }
       }
-      
-      function resetSettings() {
-        showConfirmDialog('reset-settings-confirm');
-      }
 
-      function performResetSettings() {
-        showNotification('Settings reset to defaults', 'info');
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      }
-      
       // Migration functions
       window.refreshMigrationStatus = async function() {
         try {
@@ -20079,17 +20041,6 @@ function renderSettingsPage(data) {
 
     <!-- Confirmation Dialogs -->
     ${renderConfirmationDialog2({
-    id: "reset-settings-confirm",
-    title: "Reset Settings",
-    message: "Are you sure you want to reset all settings to their default values? This action cannot be undone.",
-    confirmText: "Reset",
-    cancelText: "Cancel",
-    iconColor: "yellow",
-    confirmClass: "bg-yellow-500 hover:bg-yellow-400",
-    onConfirm: "performResetSettings()"
-  })}
-
-    ${renderConfirmationDialog2({
     id: "run-migrations-confirm",
     title: "Run Migrations",
     message: "Are you sure you want to run pending migrations? This action cannot be undone.",
@@ -20244,6 +20195,19 @@ function renderGeneralSettings(settings) {
           </div>
         </div>
       </div>
+
+      <!-- Save Button -->
+      <div class="mt-8 pt-6 border-t border-zinc-950/5 dark:border-white/10 flex justify-end">
+        <button
+          onclick="saveGeneralSettings()"
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
+        >
+          <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save Changes
+        </button>
+      </div>
     </div>
   `;
 }
@@ -20360,6 +20324,19 @@ function renderAppearanceSettings(settings) {
             >${settings?.customCSS || ""}</textarea>
           </div>
         </div>
+      </div>
+
+      <!-- Save Button (Disabled for WIP) -->
+      <div class="mt-8 pt-6 border-t border-zinc-950/5 dark:border-white/10 flex justify-end">
+        <button
+          disabled
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-950/50 dark:bg-white/50 px-3.5 py-2.5 text-sm font-semibold text-white/50 dark:text-zinc-950/50 cursor-not-allowed shadow-sm"
+        >
+          <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save Changes
+        </button>
       </div>
     </div>
   `;
@@ -20516,6 +20493,19 @@ function renderSecuritySettings(settings) {
           </div>
         </div>
       </div>
+
+      <!-- Save Button (Disabled for WIP) -->
+      <div class="mt-8 pt-6 border-t border-zinc-950/5 dark:border-white/10 flex justify-end">
+        <button
+          disabled
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-950/50 dark:bg-white/50 px-3.5 py-2.5 text-sm font-semibold text-white/50 dark:text-zinc-950/50 cursor-not-allowed shadow-sm"
+        >
+          <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save Changes
+        </button>
+      </div>
     </div>
   `;
 }
@@ -20662,6 +20652,19 @@ function renderNotificationSettings(settings) {
           </div>
         </div>
       </div>
+
+      <!-- Save Button (Disabled for WIP) -->
+      <div class="mt-8 pt-6 border-t border-zinc-950/5 dark:border-white/10 flex justify-end">
+        <button
+          disabled
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-950/50 dark:bg-white/50 px-3.5 py-2.5 text-sm font-semibold text-white/50 dark:text-zinc-950/50 cursor-not-allowed shadow-sm"
+        >
+          <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save Changes
+        </button>
+      </div>
     </div>
   `;
 }
@@ -20764,6 +20767,19 @@ function renderStorageSettings(settings) {
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Save Button (Disabled for WIP) -->
+      <div class="mt-8 pt-6 border-t border-zinc-950/5 dark:border-white/10 flex justify-end">
+        <button
+          disabled
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-950/50 dark:bg-white/50 px-3.5 py-2.5 text-sm font-semibold text-white/50 dark:text-zinc-950/50 cursor-not-allowed shadow-sm"
+        >
+          <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save Changes
+        </button>
       </div>
     </div>
   `;
@@ -21562,5 +21578,5 @@ var ROUTES_INFO = {
 };
 
 export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, test_cleanup_default, userRoutes };
-//# sourceMappingURL=chunk-4OE6ITVW.js.map
-//# sourceMappingURL=chunk-4OE6ITVW.js.map
+//# sourceMappingURL=chunk-I2JRG2FS.js.map
+//# sourceMappingURL=chunk-I2JRG2FS.js.map

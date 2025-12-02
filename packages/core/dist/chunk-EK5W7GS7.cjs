@@ -1,11 +1,11 @@
 'use strict';
 
 var chunkES3BRZQJ_cjs = require('./chunk-ES3BRZQJ.cjs');
-var chunk7Z5F225H_cjs = require('./chunk-7Z5F225H.cjs');
+var chunkNKNUJ7UA_cjs = require('./chunk-NKNUJ7UA.cjs');
 var chunkNAYD76QF_cjs = require('./chunk-NAYD76QF.cjs');
-var chunkCYGFFMUZ_cjs = require('./chunk-CYGFFMUZ.cjs');
+var chunkLJB5SPNC_cjs = require('./chunk-LJB5SPNC.cjs');
 var chunkYU6QFFI4_cjs = require('./chunk-YU6QFFI4.cjs');
-var chunk6IZ4RIHG_cjs = require('./chunk-6IZ4RIHG.cjs');
+var chunkHAEKMXWF_cjs = require('./chunk-HAEKMXWF.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 var hono = require('hono');
 var cors = require('hono/cors');
@@ -44,7 +44,7 @@ apiContentCrudRoutes.get("/:id", async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.post("/", chunk7Z5F225H_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.post("/", chunkNKNUJ7UA_cjs.requireAuth(), async (c) => {
   try {
     const db = c.env.DB;
     const user = c.get("user");
@@ -110,7 +110,7 @@ apiContentCrudRoutes.post("/", chunk7Z5F225H_cjs.requireAuth(), async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.put("/:id", chunk7Z5F225H_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.put("/:id", chunkNKNUJ7UA_cjs.requireAuth(), async (c) => {
   try {
     const id = c.req.param("id");
     const db = c.env.DB;
@@ -174,7 +174,7 @@ apiContentCrudRoutes.put("/:id", chunk7Z5F225H_cjs.requireAuth(), async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.delete("/:id", chunk7Z5F225H_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.delete("/:id", chunkNKNUJ7UA_cjs.requireAuth(), async (c) => {
   try {
     const id = c.req.param("id");
     const db = c.env.DB;
@@ -210,7 +210,7 @@ apiRoutes.use("*", async (c, next) => {
   c.header("X-Response-Time", `${totalTime}ms`);
 });
 apiRoutes.use("*", async (c, next) => {
-  const cacheEnabled = await chunk7Z5F225H_cjs.isPluginActive(c.env.DB, "core-cache");
+  const cacheEnabled = await chunkNKNUJ7UA_cjs.isPluginActive(c.env.DB, "core-cache");
   c.set("cacheEnabled", cacheEnabled);
   await next();
 });
@@ -335,12 +335,12 @@ apiRoutes.get("/content", async (c) => {
         });
       }
     }
-    const filter = chunk6IZ4RIHG_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunkHAEKMXWF_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.limit) {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder3 = new chunk6IZ4RIHG_cjs.QueryFilterBuilder();
+    const builder3 = new chunkHAEKMXWF_cjs.QueryFilterBuilder();
     const queryResult = builder3.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -427,7 +427,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
     if (!collectionResult) {
       return c.json({ error: "Collection not found" }, 404);
     }
-    const filter = chunk6IZ4RIHG_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunkHAEKMXWF_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.where) {
       filter.where = { and: [] };
     }
@@ -443,7 +443,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder3 = new chunk6IZ4RIHG_cjs.QueryFilterBuilder();
+    const builder3 = new chunkHAEKMXWF_cjs.QueryFilterBuilder();
     const queryResult = builder3.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -568,7 +568,7 @@ var fileValidationSchema = zod.z.object({
   // 50MB max
 });
 var apiMediaRoutes = new hono.Hono();
-apiMediaRoutes.use("*", chunk7Z5F225H_cjs.requireAuth());
+apiMediaRoutes.use("*", chunkNKNUJ7UA_cjs.requireAuth());
 apiMediaRoutes.post("/upload", async (c) => {
   try {
     const user = c.get("user");
@@ -1312,8 +1312,8 @@ apiSystemRoutes.get("/env", (c) => {
 });
 var api_system_default = apiSystemRoutes;
 var adminApiRoutes = new hono.Hono();
-adminApiRoutes.use("*", chunk7Z5F225H_cjs.requireAuth());
-adminApiRoutes.use("*", chunk7Z5F225H_cjs.requireRole(["admin", "editor"]));
+adminApiRoutes.use("*", chunkNKNUJ7UA_cjs.requireAuth());
+adminApiRoutes.use("*", chunkNKNUJ7UA_cjs.requireRole(["admin", "editor"]));
 adminApiRoutes.get("/stats", async (c) => {
   try {
     const db = c.env.DB;
@@ -1722,7 +1722,7 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
 });
 adminApiRoutes.get("/migrations/status", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-7K7IOKD6.cjs');
+    const { MigrationService: MigrationService2 } = await import('./migrations-YAJ4AYFY.cjs');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const status = await migrationService.getMigrationStatus();
@@ -1747,7 +1747,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const { MigrationService: MigrationService2 } = await import('./migrations-7K7IOKD6.cjs');
+    const { MigrationService: MigrationService2 } = await import('./migrations-YAJ4AYFY.cjs');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const result = await migrationService.runPendingMigrations();
@@ -1766,7 +1766,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
 });
 adminApiRoutes.get("/migrations/validate", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-7K7IOKD6.cjs');
+    const { MigrationService: MigrationService2 } = await import('./migrations-YAJ4AYFY.cjs');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const validation = await migrationService.validateSchema();
@@ -2212,7 +2212,7 @@ authRoutes.post(
       if (existingUser) {
         return c.json({ error: "User with this email or username already exists" }, 400);
       }
-      const passwordHash = await chunk7Z5F225H_cjs.AuthManager.hashPassword(password);
+      const passwordHash = await chunkNKNUJ7UA_cjs.AuthManager.hashPassword(password);
       const userId = crypto.randomUUID();
       const now = /* @__PURE__ */ new Date();
       await db.prepare(`
@@ -2232,7 +2232,7 @@ authRoutes.post(
         now.getTime(),
         now.getTime()
       ).run();
-      const token = await chunk7Z5F225H_cjs.AuthManager.generateToken(userId, normalizedEmail, "viewer");
+      const token = await chunkNKNUJ7UA_cjs.AuthManager.generateToken(userId, normalizedEmail, "viewer");
       cookie.setCookie(c, "auth_token", token, {
         httpOnly: true,
         secure: true,
@@ -2285,11 +2285,11 @@ authRoutes.post("/login", async (c) => {
     if (!user) {
       return c.json({ error: "Invalid email or password" }, 401);
     }
-    const isValidPassword = await chunk7Z5F225H_cjs.AuthManager.verifyPassword(password, user.password_hash);
+    const isValidPassword = await chunkNKNUJ7UA_cjs.AuthManager.verifyPassword(password, user.password_hash);
     if (!isValidPassword) {
       return c.json({ error: "Invalid email or password" }, 401);
     }
-    const token = await chunk7Z5F225H_cjs.AuthManager.generateToken(user.id, user.email, user.role);
+    const token = await chunkNKNUJ7UA_cjs.AuthManager.generateToken(user.id, user.email, user.role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: true,
@@ -2338,7 +2338,7 @@ authRoutes.get("/logout", (c) => {
   });
   return c.redirect("/auth/login?message=You have been logged out successfully");
 });
-authRoutes.get("/me", chunk7Z5F225H_cjs.requireAuth(), async (c) => {
+authRoutes.get("/me", chunkNKNUJ7UA_cjs.requireAuth(), async (c) => {
   try {
     const user = c.get("user");
     if (!user) {
@@ -2355,13 +2355,13 @@ authRoutes.get("/me", chunk7Z5F225H_cjs.requireAuth(), async (c) => {
     return c.json({ error: "Failed to get user" }, 500);
   }
 });
-authRoutes.post("/refresh", chunk7Z5F225H_cjs.requireAuth(), async (c) => {
+authRoutes.post("/refresh", chunkNKNUJ7UA_cjs.requireAuth(), async (c) => {
   try {
     const user = c.get("user");
     if (!user) {
       return c.json({ error: "Not authenticated" }, 401);
     }
-    const token = await chunk7Z5F225H_cjs.AuthManager.generateToken(user.userId, user.email, user.role);
+    const token = await chunkNKNUJ7UA_cjs.AuthManager.generateToken(user.userId, user.email, user.role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: true,
@@ -2410,7 +2410,7 @@ authRoutes.post("/register/form", async (c) => {
         </div>
       `);
     }
-    const passwordHash = await chunk7Z5F225H_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await chunkNKNUJ7UA_cjs.AuthManager.hashPassword(password);
     const userId = crypto.randomUUID();
     const now = /* @__PURE__ */ new Date();
     await db.prepare(`
@@ -2430,7 +2430,7 @@ authRoutes.post("/register/form", async (c) => {
       now.getTime(),
       now.getTime()
     ).run();
-    const token = await chunk7Z5F225H_cjs.AuthManager.generateToken(userId, normalizedEmail, "admin");
+    const token = await chunkNKNUJ7UA_cjs.AuthManager.generateToken(userId, normalizedEmail, "admin");
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: false,
@@ -2481,7 +2481,7 @@ authRoutes.post("/login/form", async (c) => {
         </div>
       `);
     }
-    const isValidPassword = await chunk7Z5F225H_cjs.AuthManager.verifyPassword(password, user.password_hash);
+    const isValidPassword = await chunkNKNUJ7UA_cjs.AuthManager.verifyPassword(password, user.password_hash);
     if (!isValidPassword) {
       return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -2489,7 +2489,7 @@ authRoutes.post("/login/form", async (c) => {
         </div>
       `);
     }
-    const token = await chunk7Z5F225H_cjs.AuthManager.generateToken(user.id, user.email, user.role);
+    const token = await chunkNKNUJ7UA_cjs.AuthManager.generateToken(user.id, user.email, user.role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: false,
@@ -2548,7 +2548,7 @@ authRoutes.post("/seed-admin", async (c) => {
     `).run();
     const existingAdmin = await db.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind("admin@sonicjs.com", "admin").first();
     if (existingAdmin) {
-      const passwordHash2 = await chunk7Z5F225H_cjs.AuthManager.hashPassword("sonicjs!");
+      const passwordHash2 = await chunkNKNUJ7UA_cjs.AuthManager.hashPassword("sonicjs!");
       await db.prepare("UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?").bind(passwordHash2, Date.now(), existingAdmin.id).run();
       return c.json({
         message: "Admin user already exists (password updated)",
@@ -2560,7 +2560,7 @@ authRoutes.post("/seed-admin", async (c) => {
         }
       });
     }
-    const passwordHash = await chunk7Z5F225H_cjs.AuthManager.hashPassword("sonicjs!");
+    const passwordHash = await chunkNKNUJ7UA_cjs.AuthManager.hashPassword("sonicjs!");
     const userId = "admin-user-id";
     const now = Date.now();
     const adminEmail = "admin@sonicjs.com".toLowerCase();
@@ -2780,7 +2780,7 @@ authRoutes.post("/accept-invitation", async (c) => {
     if (existingUsername) {
       return c.json({ error: "Username is already taken" }, 400);
     }
-    const passwordHash = await chunk7Z5F225H_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await chunkNKNUJ7UA_cjs.AuthManager.hashPassword(password);
     const updateStmt = db.prepare(`
       UPDATE users SET 
         username = ?,
@@ -2799,7 +2799,7 @@ authRoutes.post("/accept-invitation", async (c) => {
       Date.now(),
       invitedUser.id
     ).run();
-    const authToken = await chunk7Z5F225H_cjs.AuthManager.generateToken(invitedUser.id, invitedUser.email, invitedUser.role);
+    const authToken = await chunkNKNUJ7UA_cjs.AuthManager.generateToken(invitedUser.id, invitedUser.email, invitedUser.role);
     cookie.setCookie(c, "auth_token", authToken, {
       httpOnly: true,
       secure: true,
@@ -3029,7 +3029,7 @@ authRoutes.post("/reset-password", async (c) => {
     if (Date.now() > user.password_reset_expires) {
       return c.json({ error: "Reset token has expired" }, 400);
     }
-    const newPasswordHash = await chunk7Z5F225H_cjs.AuthManager.hashPassword(password);
+    const newPasswordHash = await chunkNKNUJ7UA_cjs.AuthManager.hashPassword(password);
     try {
       const historyStmt = db.prepare(`
         INSERT INTO password_history (id, user_id, password_hash, created_at)
@@ -5068,17 +5068,17 @@ function renderContentFormPage(data) {
         form.addEventListener('change', scheduleAutoSave);
       });
 
-      ${data.tinymceEnabled ? `<script>${getTinyMCEInitScript({
+      ${data.tinymceEnabled ? getTinyMCEInitScript({
     skin: data.tinymceSettings?.skin,
     defaultHeight: data.tinymceSettings?.defaultHeight,
     defaultToolbar: data.tinymceSettings?.defaultToolbar
-  })}</script>` : ""}
+  }) : ""}
 
-      ${data.mdxeditorEnabled ? `<script>${getMDXEditorInitScript({
+      ${data.mdxeditorEnabled ? getMDXEditorInitScript({
     defaultHeight: data.mdxeditorSettings?.defaultHeight,
     toolbar: data.mdxeditorSettings?.toolbar,
     placeholder: data.mdxeditorSettings?.placeholder
-  })}</script>` : ""}
+  }) : ""}
     </script>
   `;
   const layoutData = {
@@ -5924,7 +5924,7 @@ async function isPluginActive2(db, pluginId) {
 
 // src/routes/admin-content.ts
 var adminContentRoutes = new hono.Hono();
-adminContentRoutes.use("*", chunk7Z5F225H_cjs.requireAuth());
+adminContentRoutes.use("*", chunkNKNUJ7UA_cjs.requireAuth());
 async function getCollectionFields(db, collectionId) {
   const cache = chunkES3BRZQJ_cjs.getCacheService(chunkES3BRZQJ_cjs.CACHE_CONFIGS.collection);
   return cache.getOrSet(
@@ -7991,7 +7991,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="first_name"
-                      value="${chunk6IZ4RIHG_cjs.escapeHtml(data.userToEdit.firstName || "")}"
+                      value="${chunkHAEKMXWF_cjs.escapeHtml(data.userToEdit.firstName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -8002,7 +8002,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="last_name"
-                      value="${chunk6IZ4RIHG_cjs.escapeHtml(data.userToEdit.lastName || "")}"
+                      value="${chunkHAEKMXWF_cjs.escapeHtml(data.userToEdit.lastName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -8013,7 +8013,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="username"
-                      value="${chunk6IZ4RIHG_cjs.escapeHtml(data.userToEdit.username || "")}"
+                      value="${chunkHAEKMXWF_cjs.escapeHtml(data.userToEdit.username || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -8024,7 +8024,7 @@ function renderUserEditPage(data) {
                     <input
                       type="email"
                       name="email"
-                      value="${chunk6IZ4RIHG_cjs.escapeHtml(data.userToEdit.email || "")}"
+                      value="${chunkHAEKMXWF_cjs.escapeHtml(data.userToEdit.email || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -8035,7 +8035,7 @@ function renderUserEditPage(data) {
                     <input
                       type="tel"
                       name="phone"
-                      value="${chunk6IZ4RIHG_cjs.escapeHtml(data.userToEdit.phone || "")}"
+                      value="${chunkHAEKMXWF_cjs.escapeHtml(data.userToEdit.phone || "")}"
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
                   </div>
@@ -8049,7 +8049,7 @@ function renderUserEditPage(data) {
                         class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-zinc-500/30 dark:outline-zinc-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-500 dark:focus-visible:outline-zinc-400 sm:text-sm/6"
                       >
                         ${data.roles.map((role) => `
-                          <option value="${chunk6IZ4RIHG_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunk6IZ4RIHG_cjs.escapeHtml(role.label)}</option>
+                          <option value="${chunkHAEKMXWF_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunkHAEKMXWF_cjs.escapeHtml(role.label)}</option>
                         `).join("")}
                       </select>
                       <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-zinc-600 dark:text-zinc-400 sm:size-4">
@@ -8065,7 +8065,7 @@ function renderUserEditPage(data) {
                     name="bio"
                     rows="3"
                     class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-                  >${chunk6IZ4RIHG_cjs.escapeHtml(data.userToEdit.bio || "")}</textarea>
+                  >${chunkHAEKMXWF_cjs.escapeHtml(data.userToEdit.bio || "")}</textarea>
                 </div>
               </div>
 
@@ -8965,7 +8965,7 @@ function renderUsersListPage(data) {
 
 // src/routes/admin-users.ts
 var userRoutes = new hono.Hono();
-userRoutes.use("*", chunk7Z5F225H_cjs.requireAuth());
+userRoutes.use("*", chunkNKNUJ7UA_cjs.requireAuth());
 userRoutes.get("/", (c) => {
   return c.redirect("/admin/dashboard");
 });
@@ -9064,12 +9064,12 @@ userRoutes.put("/profile", async (c) => {
   const db = c.env.DB;
   try {
     const formData = await c.req.formData();
-    const firstName = chunk6IZ4RIHG_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunk6IZ4RIHG_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunk6IZ4RIHG_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkHAEKMXWF_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkHAEKMXWF_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkHAEKMXWF_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunk6IZ4RIHG_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunk6IZ4RIHG_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkHAEKMXWF_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkHAEKMXWF_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const timezone = formData.get("timezone")?.toString() || "UTC";
     const language = formData.get("language")?.toString() || "en";
     const emailNotifications = formData.get("email_notifications") === "1";
@@ -9120,7 +9120,7 @@ userRoutes.put("/profile", async (c) => {
       Date.now(),
       user.userId
     ).run();
-    await chunk7Z5F225H_cjs.logActivity(
+    await chunkNKNUJ7UA_cjs.logActivity(
       db,
       user.userId,
       "profile.update",
@@ -9183,7 +9183,7 @@ userRoutes.post("/profile/avatar", async (c) => {
       SELECT first_name, last_name FROM users WHERE id = ?
     `);
     const userData = await userStmt.bind(user.userId).first();
-    await chunk7Z5F225H_cjs.logActivity(
+    await chunkNKNUJ7UA_cjs.logActivity(
       db,
       user.userId,
       "profile.avatar_update",
@@ -9254,7 +9254,7 @@ userRoutes.post("/profile/password", async (c) => {
         dismissible: true
       }));
     }
-    const validPassword = await chunk7Z5F225H_cjs.AuthManager.verifyPassword(currentPassword, userData.password_hash);
+    const validPassword = await chunkNKNUJ7UA_cjs.AuthManager.verifyPassword(currentPassword, userData.password_hash);
     if (!validPassword) {
       return c.html(renderAlert2({
         type: "error",
@@ -9262,7 +9262,7 @@ userRoutes.post("/profile/password", async (c) => {
         dismissible: true
       }));
     }
-    const newPasswordHash = await chunk7Z5F225H_cjs.AuthManager.hashPassword(newPassword);
+    const newPasswordHash = await chunkNKNUJ7UA_cjs.AuthManager.hashPassword(newPassword);
     const historyStmt = db.prepare(`
       INSERT INTO password_history (id, user_id, password_hash, created_at)
       VALUES (?, ?, ?, ?)
@@ -9278,7 +9278,7 @@ userRoutes.post("/profile/password", async (c) => {
       WHERE id = ?
     `);
     await updateStmt.bind(newPasswordHash, Date.now(), user.userId).run();
-    await chunk7Z5F225H_cjs.logActivity(
+    await chunkNKNUJ7UA_cjs.logActivity(
       db,
       user.userId,
       "profile.password_change",
@@ -9345,7 +9345,7 @@ userRoutes.get("/users", async (c) => {
     `);
     const countResult = await countStmt.bind(...params).first();
     const totalUsers = countResult?.total || 0;
-    await chunk7Z5F225H_cjs.logActivity(
+    await chunkNKNUJ7UA_cjs.logActivity(
       db,
       user.userId,
       "users.list_view",
@@ -9447,12 +9447,12 @@ userRoutes.post("/users/new", async (c) => {
   const user = c.get("user");
   try {
     const formData = await c.req.formData();
-    const firstName = chunk6IZ4RIHG_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunk6IZ4RIHG_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunk6IZ4RIHG_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkHAEKMXWF_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkHAEKMXWF_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkHAEKMXWF_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunk6IZ4RIHG_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunk6IZ4RIHG_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkHAEKMXWF_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkHAEKMXWF_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const password = formData.get("password")?.toString() || "";
     const confirmPassword = formData.get("confirm_password")?.toString() || "";
@@ -9499,7 +9499,7 @@ userRoutes.post("/users/new", async (c) => {
         dismissible: true
       }));
     }
-    const passwordHash = await chunk7Z5F225H_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await chunkNKNUJ7UA_cjs.AuthManager.hashPassword(password);
     const userId = crypto.randomUUID();
     const createStmt = db.prepare(`
       INSERT INTO users (
@@ -9522,7 +9522,7 @@ userRoutes.post("/users/new", async (c) => {
       Date.now(),
       Date.now()
     ).run();
-    await chunk7Z5F225H_cjs.logActivity(
+    await chunkNKNUJ7UA_cjs.logActivity(
       db,
       user.userId,
       "user!.create",
@@ -9560,7 +9560,7 @@ userRoutes.get("/users/:id", async (c) => {
     if (!userRecord) {
       return c.json({ error: "User not found" }, 404);
     }
-    await chunk7Z5F225H_cjs.logActivity(
+    await chunkNKNUJ7UA_cjs.logActivity(
       db,
       user.userId,
       "user!.view",
@@ -9653,12 +9653,12 @@ userRoutes.put("/users/:id", async (c) => {
   const userId = c.req.param("id");
   try {
     const formData = await c.req.formData();
-    const firstName = chunk6IZ4RIHG_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunk6IZ4RIHG_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunk6IZ4RIHG_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkHAEKMXWF_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkHAEKMXWF_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkHAEKMXWF_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunk6IZ4RIHG_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunk6IZ4RIHG_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkHAEKMXWF_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkHAEKMXWF_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const isActive = formData.get("is_active") === "1";
     const emailVerified = formData.get("email_verified") === "1";
@@ -9709,7 +9709,7 @@ userRoutes.put("/users/:id", async (c) => {
       Date.now(),
       userId
     ).run();
-    await chunk7Z5F225H_cjs.logActivity(
+    await chunkNKNUJ7UA_cjs.logActivity(
       db,
       user.userId,
       "user!.update",
@@ -9754,7 +9754,7 @@ userRoutes.post("/users/:id/toggle", async (c) => {
       UPDATE users SET is_active = ?, updated_at = ? WHERE id = ?
     `);
     await toggleStmt.bind(active ? 1 : 0, Date.now(), userId).run();
-    await chunk7Z5F225H_cjs.logActivity(
+    await chunkNKNUJ7UA_cjs.logActivity(
       db,
       user.userId,
       active ? "user.activate" : "user.deactivate",
@@ -9795,7 +9795,7 @@ userRoutes.delete("/users/:id", async (c) => {
         DELETE FROM users WHERE id = ?
       `);
       await deleteStmt.bind(userId).run();
-      await chunk7Z5F225H_cjs.logActivity(
+      await chunkNKNUJ7UA_cjs.logActivity(
         db,
         user.userId,
         "user!.hard_delete",
@@ -9814,7 +9814,7 @@ userRoutes.delete("/users/:id", async (c) => {
         UPDATE users SET is_active = 0, updated_at = ? WHERE id = ?
       `);
       await deleteStmt.bind(Date.now(), userId).run();
-      await chunk7Z5F225H_cjs.logActivity(
+      await chunkNKNUJ7UA_cjs.logActivity(
         db,
         user.userId,
         "user!.soft_delete",
@@ -9841,8 +9841,8 @@ userRoutes.post("/invite-user", async (c) => {
     const formData = await c.req.formData();
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
     const role = formData.get("role")?.toString()?.trim() || "viewer";
-    const firstName = chunk6IZ4RIHG_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunk6IZ4RIHG_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const firstName = chunkHAEKMXWF_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkHAEKMXWF_cjs.sanitizeInput(formData.get("last_name")?.toString());
     if (!email || !firstName || !lastName) {
       return c.json({ error: "Email, first name, and last name are required" }, 400);
     }
@@ -9880,7 +9880,7 @@ userRoutes.post("/invite-user", async (c) => {
       Date.now(),
       Date.now()
     ).run();
-    await chunk7Z5F225H_cjs.logActivity(
+    await chunkNKNUJ7UA_cjs.logActivity(
       db,
       user.userId,
       "user!.invite_sent",
@@ -9937,7 +9937,7 @@ userRoutes.post("/resend-invitation/:id", async (c) => {
       Date.now(),
       userId
     ).run();
-    await chunk7Z5F225H_cjs.logActivity(
+    await chunkNKNUJ7UA_cjs.logActivity(
       db,
       user.userId,
       "user!.invitation_resent",
@@ -9973,7 +9973,7 @@ userRoutes.delete("/cancel-invitation/:id", async (c) => {
     }
     const deleteStmt = db.prepare(`DELETE FROM users WHERE id = ?`);
     await deleteStmt.bind(userId).run();
-    await chunk7Z5F225H_cjs.logActivity(
+    await chunkNKNUJ7UA_cjs.logActivity(
       db,
       user.userId,
       "user!.invitation_cancelled",
@@ -10056,7 +10056,7 @@ userRoutes.get("/activity-logs", async (c) => {
       ...log,
       details: log.details ? JSON.parse(log.details) : null
     }));
-    await chunk7Z5F225H_cjs.logActivity(
+    await chunkNKNUJ7UA_cjs.logActivity(
       db,
       user.userId,
       "activity.logs_viewed",
@@ -10163,7 +10163,7 @@ userRoutes.get("/activity-logs/export", async (c) => {
       csvRows.push(row.join(","));
     }
     const csvContent = csvRows.join("\n");
-    await chunk7Z5F225H_cjs.logActivity(
+    await chunkNKNUJ7UA_cjs.logActivity(
       db,
       user.userId,
       "activity.logs_exported",
@@ -11502,7 +11502,7 @@ var fileValidationSchema2 = zod.z.object({
   // 50MB max
 });
 var adminMediaRoutes = new hono.Hono();
-adminMediaRoutes.use("*", chunk7Z5F225H_cjs.requireAuth());
+adminMediaRoutes.use("*", chunkNKNUJ7UA_cjs.requireAuth());
 adminMediaRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -12088,7 +12088,7 @@ adminMediaRoutes.put("/:id", async (c) => {
     `);
   }
 });
-adminMediaRoutes.delete("/cleanup", chunk7Z5F225H_cjs.requireRole("admin"), async (c) => {
+adminMediaRoutes.delete("/cleanup", chunkNKNUJ7UA_cjs.requireRole("admin"), async (c) => {
   try {
     const db = c.env.DB;
     const allMediaStmt = db.prepare("SELECT id, r2_key, filename FROM media WHERE deleted_at IS NULL");
@@ -13693,7 +13693,7 @@ function formatTimestamp(timestamp) {
 
 // src/routes/admin-plugins.ts
 var adminPluginRoutes = new hono.Hono();
-adminPluginRoutes.use("*", chunk7Z5F225H_cjs.requireAuth());
+adminPluginRoutes.use("*", chunkNKNUJ7UA_cjs.requireAuth());
 var AVAILABLE_PLUGINS = [
   {
     id: "third-party-faq",
@@ -14984,7 +14984,7 @@ function renderLogConfigPage(data) {
 
 // src/routes/admin-logs.ts
 var adminLogsRoutes = new hono.Hono();
-adminLogsRoutes.use("*", chunk7Z5F225H_cjs.requireAuth());
+adminLogsRoutes.use("*", chunkNKNUJ7UA_cjs.requireAuth());
 adminLogsRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -16684,7 +16684,7 @@ function renderDashboardPage(data) {
         <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Welcome to your SonicJS AI admin dashboard</p>
       </div>
       <div class="mt-4 sm:mt-0 flex items-center gap-x-3">
-        <a href="/docs/getting-started" target="_blank" class="inline-flex items-center justify-center gap-x-1.5 rounded-lg bg-lime-600 dark:bg-lime-700 px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-lime-700 dark:hover:bg-lime-600 transition-colors shadow-sm">
+        <a href="https://sonicjs.com/installation" target="_blank" class="inline-flex items-center justify-center gap-x-1.5 rounded-lg bg-lime-600 dark:bg-lime-700 px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-lime-700 dark:hover:bg-lime-600 transition-colors shadow-sm">
           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"/>
           </svg>
@@ -17312,9 +17312,9 @@ function renderStorageUsage(databaseSizeBytes, mediaSizeBytes) {
 }
 
 // src/routes/admin-dashboard.ts
-var VERSION = chunk6IZ4RIHG_cjs.getCoreVersion();
+var VERSION = chunkHAEKMXWF_cjs.getCoreVersion();
 var router = new hono.Hono();
-router.use("*", chunk7Z5F225H_cjs.requireAuth());
+router.use("*", chunkNKNUJ7UA_cjs.requireAuth());
 router.get("/", async (c) => {
   const user = c.get("user");
   try {
@@ -19068,7 +19068,7 @@ function renderCollectionFormPage(data) {
 
 // src/routes/admin-collections.ts
 var adminCollectionsRoutes = new hono.Hono();
-adminCollectionsRoutes.use("*", chunk7Z5F225H_cjs.requireAuth());
+adminCollectionsRoutes.use("*", chunkNKNUJ7UA_cjs.requireAuth());
 adminCollectionsRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -19692,26 +19692,6 @@ function renderSettingsPage(data) {
           <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">Settings</h1>
           <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Manage your application settings and preferences</p>
         </div>
-        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex space-x-3">
-          <button
-            onclick="resetSettings()"
-            class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
-          >
-            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-            </svg>
-            Reset to Defaults
-          </button>
-          <button
-            onclick="saveAllSettings()"
-            class="inline-flex items-center justify-center rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
-          >
-            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-            </svg>
-            Save All Changes
-          </button>
-        </div>
       </div>
 
       <!-- Settings Navigation Tabs -->
@@ -19741,8 +19721,8 @@ function renderSettingsPage(data) {
       // Initialize tab-specific features on page load
       const currentTab = '${activeTab}';
 
-      async function saveAllSettings() {
-        // Collect all form data
+      async function saveGeneralSettings() {
+        // Collect all form data from general settings
         const formData = new FormData();
 
         // Get all form inputs in the settings content area
@@ -19755,20 +19735,13 @@ function renderSettingsPage(data) {
         });
 
         // Show loading state
-        const saveBtn = document.querySelector('button[onclick="saveAllSettings()"]');
+        const saveBtn = document.querySelector('button[onclick="saveGeneralSettings()"]');
         const originalText = saveBtn.innerHTML;
         saveBtn.innerHTML = '<svg class="animate-spin -ml-0.5 mr-1.5 h-5 w-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>Saving...';
         saveBtn.disabled = true;
 
         try {
-          // Determine which endpoint to call based on current tab
-          let endpoint = '/admin/settings/general';
-          if (currentTab === 'general') {
-            endpoint = '/admin/settings/general';
-          }
-          // Add more endpoints for other tabs when implemented
-
-          const response = await fetch(endpoint, {
+          const response = await fetch('/admin/settings/general', {
             method: 'POST',
             body: formData
           });
@@ -19788,18 +19761,7 @@ function renderSettingsPage(data) {
           saveBtn.disabled = false;
         }
       }
-      
-      function resetSettings() {
-        showConfirmDialog('reset-settings-confirm');
-      }
 
-      function performResetSettings() {
-        showNotification('Settings reset to defaults', 'info');
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      }
-      
       // Migration functions
       window.refreshMigrationStatus = async function() {
         try {
@@ -20081,17 +20043,6 @@ function renderSettingsPage(data) {
 
     <!-- Confirmation Dialogs -->
     ${renderConfirmationDialog2({
-    id: "reset-settings-confirm",
-    title: "Reset Settings",
-    message: "Are you sure you want to reset all settings to their default values? This action cannot be undone.",
-    confirmText: "Reset",
-    cancelText: "Cancel",
-    iconColor: "yellow",
-    confirmClass: "bg-yellow-500 hover:bg-yellow-400",
-    onConfirm: "performResetSettings()"
-  })}
-
-    ${renderConfirmationDialog2({
     id: "run-migrations-confirm",
     title: "Run Migrations",
     message: "Are you sure you want to run pending migrations? This action cannot be undone.",
@@ -20246,6 +20197,19 @@ function renderGeneralSettings(settings) {
           </div>
         </div>
       </div>
+
+      <!-- Save Button -->
+      <div class="mt-8 pt-6 border-t border-zinc-950/5 dark:border-white/10 flex justify-end">
+        <button
+          onclick="saveGeneralSettings()"
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
+        >
+          <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save Changes
+        </button>
+      </div>
     </div>
   `;
 }
@@ -20362,6 +20326,19 @@ function renderAppearanceSettings(settings) {
             >${settings?.customCSS || ""}</textarea>
           </div>
         </div>
+      </div>
+
+      <!-- Save Button (Disabled for WIP) -->
+      <div class="mt-8 pt-6 border-t border-zinc-950/5 dark:border-white/10 flex justify-end">
+        <button
+          disabled
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-950/50 dark:bg-white/50 px-3.5 py-2.5 text-sm font-semibold text-white/50 dark:text-zinc-950/50 cursor-not-allowed shadow-sm"
+        >
+          <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save Changes
+        </button>
       </div>
     </div>
   `;
@@ -20518,6 +20495,19 @@ function renderSecuritySettings(settings) {
           </div>
         </div>
       </div>
+
+      <!-- Save Button (Disabled for WIP) -->
+      <div class="mt-8 pt-6 border-t border-zinc-950/5 dark:border-white/10 flex justify-end">
+        <button
+          disabled
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-950/50 dark:bg-white/50 px-3.5 py-2.5 text-sm font-semibold text-white/50 dark:text-zinc-950/50 cursor-not-allowed shadow-sm"
+        >
+          <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save Changes
+        </button>
+      </div>
     </div>
   `;
 }
@@ -20664,6 +20654,19 @@ function renderNotificationSettings(settings) {
           </div>
         </div>
       </div>
+
+      <!-- Save Button (Disabled for WIP) -->
+      <div class="mt-8 pt-6 border-t border-zinc-950/5 dark:border-white/10 flex justify-end">
+        <button
+          disabled
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-950/50 dark:bg-white/50 px-3.5 py-2.5 text-sm font-semibold text-white/50 dark:text-zinc-950/50 cursor-not-allowed shadow-sm"
+        >
+          <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save Changes
+        </button>
+      </div>
     </div>
   `;
 }
@@ -20766,6 +20769,19 @@ function renderStorageSettings(settings) {
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Save Button (Disabled for WIP) -->
+      <div class="mt-8 pt-6 border-t border-zinc-950/5 dark:border-white/10 flex justify-end">
+        <button
+          disabled
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-950/50 dark:bg-white/50 px-3.5 py-2.5 text-sm font-semibold text-white/50 dark:text-zinc-950/50 cursor-not-allowed shadow-sm"
+        >
+          <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save Changes
+        </button>
       </div>
     </div>
   `;
@@ -21129,7 +21145,7 @@ function renderDatabaseToolsSettings(settings) {
 
 // src/routes/admin-settings.ts
 var adminSettingsRoutes = new hono.Hono();
-adminSettingsRoutes.use("*", chunk7Z5F225H_cjs.requireAuth());
+adminSettingsRoutes.use("*", chunkNKNUJ7UA_cjs.requireAuth());
 function getMockSettings(user) {
   return {
     general: {
@@ -21297,7 +21313,7 @@ adminSettingsRoutes.get("/database-tools", (c) => {
 adminSettingsRoutes.get("/api/migrations/status", async (c) => {
   try {
     const db = c.env.DB;
-    const migrationService = new chunkCYGFFMUZ_cjs.MigrationService(db);
+    const migrationService = new chunkLJB5SPNC_cjs.MigrationService(db);
     const status = await migrationService.getMigrationStatus();
     return c.json({
       success: true,
@@ -21321,7 +21337,7 @@ adminSettingsRoutes.post("/api/migrations/run", async (c) => {
       }, 403);
     }
     const db = c.env.DB;
-    const migrationService = new chunkCYGFFMUZ_cjs.MigrationService(db);
+    const migrationService = new chunkLJB5SPNC_cjs.MigrationService(db);
     const result = await migrationService.runPendingMigrations();
     return c.json({
       success: result.success,
@@ -21339,7 +21355,7 @@ adminSettingsRoutes.post("/api/migrations/run", async (c) => {
 adminSettingsRoutes.get("/api/migrations/validate", async (c) => {
   try {
     const db = c.env.DB;
-    const migrationService = new chunkCYGFFMUZ_cjs.MigrationService(db);
+    const migrationService = new chunkLJB5SPNC_cjs.MigrationService(db);
     const validation = await migrationService.validateSchema();
     return c.json({
       success: true,
@@ -21584,5 +21600,5 @@ exports.auth_default = auth_default;
 exports.router = router;
 exports.test_cleanup_default = test_cleanup_default;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-GW5UIEV7.cjs.map
-//# sourceMappingURL=chunk-GW5UIEV7.cjs.map
+//# sourceMappingURL=chunk-EK5W7GS7.cjs.map
+//# sourceMappingURL=chunk-EK5W7GS7.cjs.map

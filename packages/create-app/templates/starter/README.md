@@ -114,16 +114,16 @@ Your collections are automatically available via REST API:
 
 ## Documentation
 
-- [SonicJS Documentation](https://docs.sonicjs.com)
-- [Collection Configuration](https://docs.sonicjs.com/collections)
-- [Plugin Development](https://docs.sonicjs.com/plugins)
-- [API Reference](https://docs.sonicjs.com/api)
+- [SonicJS Documentation](https://sonicjs.com)
+- [Collection Configuration](https://sonicjs.com/collections)
+- [Plugin Development](https://sonicjs.com/plugins)
+- [API Reference](https://sonicjs.com/api)
 
 ## Support
 
-- [GitHub Issues](https://github.com/sonicjs/sonicjs/issues)
-- [Discord Community](https://discord.gg/sonicjs)
-- [Documentation](https://docs.sonicjs.com)
+- [GitHub Issues](https://github.com/lane711/sonicjs/issues)
+- [Discord Community](https://discord.gg/8bMy6bv3sZ)
+- [Documentation](https://sonicjs.com)
 
 ## License
 
