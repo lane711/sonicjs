@@ -428,11 +428,11 @@ npm run dev
 
 ## 📖 Documentation
 
-- [Getting Started](https://docs.sonicjs.com/getting-started)
-- [API Reference](https://docs.sonicjs.com/api)
-- [Collections Guide](https://docs.sonicjs.com/collections)
-- [Plugin Development](https://docs.sonicjs.com/plugins)
-- [Deployment](https://docs.sonicjs.com/deployment)
+- [Getting Started](https://sonicjs.com/installation)
+- [API Reference](https://sonicjs.com/api)
+- [Collections Guide](https://sonicjs.com/collections)
+- [Plugin Development](https://sonicjs.com/plugins)
+- [Deployment](https://sonicjs.com/deployment)
 
 ## 🤝 Contributing
 
@@ -444,9 +444,9 @@ MIT © SonicJS Team - See [LICENSE](./LICENSE) for details.
 
 ## 💬 Support & Community
 
-- **Issues**: [GitHub Issues](https://github.com/sonicjs/sonicjs/issues)
-- **Discord**: [Join our community](https://discord.gg/sonicjs)
-- **Docs**: [docs.sonicjs.com](https://docs.sonicjs.com)
+- **Issues**: [GitHub Issues](https://github.com/lane711/sonicjs/issues)
+- **Discord**: [Join our community](https://discord.gg/8bMy6bv3sZ)
+- **Docs**: [sonicjs.com](https://sonicjs.com)
 - **Twitter**: [@sonicjscms](https://twitter.com/sonicjscms)
 
 ## 🔖 Resources

@@ -825,7 +825,7 @@ function printSuccessMessage(answers) {
   console.log(kleur.cyan('  http://localhost:8787/admin'))
 
   console.log()
-  console.log(kleur.dim('Need help? Visit https://docs.sonicjs.com'))
+  console.log(kleur.dim('Need help? Visit https://sonicjs.com'))
   console.log()
 }
 
