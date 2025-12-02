@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin, navigateToAdminSection } from './utils/test-helpers';
 
-test.describe.skip('Media Management', () => {
+test.describe('Media Management', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
     await navigateToAdminSection(page, 'media');

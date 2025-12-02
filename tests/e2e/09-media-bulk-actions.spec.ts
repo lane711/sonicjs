@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin } from './utils/test-helpers';
 
-test.describe.skip('Media Bulk Actions', () => {
+test.describe('Media Bulk Actions', () => {
   let uploadedFileIds: string[] = [];
 
   test.beforeEach(async ({ page, context }) => {

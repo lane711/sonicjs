@@ -88,8 +88,7 @@ test.describe('Smoke Tests - Critical Path', () => {
     expect(collectionsData.data.length).toBeGreaterThan(0);
   });
 
-  // TODO: Re-enable when migration infrastructure is fixed (scheduled_publish_at column missing)
-  test.skip('Create content via backend form', async ({ page, context }) => {
+  test('Create content via backend form', async ({ page, context }) => {
     await loginAsAdmin(page);
 
     const timestamp = Date.now();
