@@ -200,10 +200,15 @@ async function main() {
     results.twitter = { skipped: true, reason: 'user_skip' }
   }
 
-  // Step 5: Update WWW repository
+  // Step 5: Update WWW folder (local)
   if (!options.skipWww) {
-    console.log('🌐 Updating WWW repository...')
-    results.www = await updateWww(content.www, releaseInfo, { dryRun: options.dryRun })
+    console.log('🌐 Updating WWW folder...')
+    // Pass discord highlights to WWW update
+    const wwwContent = {
+      ...content.www,
+      highlights: content.discord.highlights
+    }
+    results.www = await updateWww(wwwContent, releaseInfo, { dryRun: options.dryRun })
     console.log('')
   } else {
     console.log('⏭️  Skipping WWW update (--skip-www)\n')
@@ -225,7 +230,7 @@ async function main() {
 
   console.log(`${statusIcon(results.discord)} Discord: ${results.discord?.success ? 'Posted' : results.discord?.skipped ? 'Skipped' : results.discord?.dryRun ? 'Dry run' : 'Failed'}`)
   console.log(`${statusIcon(results.twitter)} Twitter: ${results.twitter?.success ? `Posted (${results.twitter.url})` : results.twitter?.skipped ? 'Skipped' : results.twitter?.dryRun ? 'Dry run' : 'Failed'}`)
-  console.log(`${statusIcon(results.www)} WWW: ${results.www?.success ? `PR created (#${results.www.prNumber})` : results.www?.skipped ? 'Skipped' : results.www?.dryRun ? 'Dry run' : 'Failed'}`)
+  console.log(`${statusIcon(results.www)} WWW: ${results.www?.success ? (results.www.local ? 'Updated locally' : `PR created (#${results.www.prNumber})`) : results.www?.skipped ? 'Skipped' : results.www?.dryRun ? 'Dry run' : 'Failed'}`)
 
   // Exit with error if any platform failed
   const hasError = Object.values(results).some(r => r?.error)

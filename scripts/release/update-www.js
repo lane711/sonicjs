@@ -3,13 +3,21 @@
 /**
  * WWW Website Update Script for Release Announcements
  *
- * Updates the SonicJS website with:
- * 1. Version badge (next to logo)
- * 2. Home page changelog section
- * 3. Full changelog page
+ * Updates the SonicJS website (in www/ folder) with:
+ * 1. Home page changelog section (Recent Updates)
+ * 2. Full changelog page
  *
- * Creates a PR on the WWW repository with the changes.
+ * Works with the local www/ folder in the monorepo.
  */
+
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const ROOT_DIR = path.join(__dirname, '../..')
+const WWW_DIR = path.join(ROOT_DIR, 'www')
 
 /**
  * @typedef {Object} WwwContent
@@ -25,228 +33,156 @@
  * @property {string} publishedAt - ISO date string
  */
 
-const GITHUB_API_URL = 'https://api.github.com'
-
-// Configuration - can be overridden via environment variables
-const WWW_REPO_OWNER = process.env.WWW_REPO_OWNER || 'lane711'
-const WWW_REPO_NAME = process.env.WWW_REPO_NAME || 'sonicjs-www'
-const WWW_DEFAULT_BRANCH = process.env.WWW_DEFAULT_BRANCH || 'main'
-
-// File paths in the WWW repo (adjust these based on actual structure)
-const VERSION_FILE_PATH = process.env.WWW_VERSION_PATH || 'src/config/version.json'
-const HOME_CHANGELOG_PATH = process.env.WWW_HOME_CHANGELOG_PATH || 'src/data/changelog-home.json'
-const FULL_CHANGELOG_PATH = process.env.WWW_FULL_CHANGELOG_PATH || 'src/content/changelog.md'
+// File paths in the WWW folder
+const HOME_PAGE_PATH = path.join(WWW_DIR, 'src/app/page.mdx')
+const CHANGELOG_PAGE_PATH = path.join(WWW_DIR, 'src/app/changelog/page.mdx')
 
 /**
- * Get GitHub token from environment
- * @returns {string|null}
- */
-function getGitHubToken() {
-  return process.env.WWW_REPO_TOKEN || process.env.GITHUB_TOKEN || null
-}
-
-/**
- * Make a GitHub API request
- * @param {string} endpoint - API endpoint
- * @param {Object} options - Fetch options
- * @returns {Promise<Object>}
- */
-async function githubRequest(endpoint, options = {}) {
-  const token = getGitHubToken()
-
-  if (!token) {
-    throw new Error('GitHub token not configured')
-  }
-
-  const url = endpoint.startsWith('http') ? endpoint : `${GITHUB_API_URL}${endpoint}`
-
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Accept': 'application/vnd.github.v3+json',
-      'Content-Type': 'application/json',
-      'X-GitHub-Api-Version': '2022-11-28',
-      ...options.headers
-    }
-  })
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}))
-    throw new Error(`GitHub API error: ${response.status} ${error.message || response.statusText}`)
-  }
-
-  return response.json()
-}
-
-/**
- * Get the SHA of a file in a repository
- * @param {string} path - File path
- * @param {string} branch - Branch name
- * @returns {Promise<{sha: string, content: string}|null>}
- */
-async function getFileSha(path, branch = WWW_DEFAULT_BRANCH) {
-  try {
-    const data = await githubRequest(
-      `/repos/${WWW_REPO_OWNER}/${WWW_REPO_NAME}/contents/${path}?ref=${branch}`
-    )
-    return {
-      sha: data.sha,
-      content: Buffer.from(data.content, 'base64').toString('utf8')
-    }
-  } catch (error) {
-    if (error.message.includes('404')) {
-      return null
-    }
-    throw error
-  }
-}
-
-/**
- * Create or update a file in the repository
- * @param {string} path - File path
- * @param {string} content - File content
- * @param {string} message - Commit message
- * @param {string} branch - Branch name
- * @param {string|null} sha - Existing file SHA (for updates)
- * @returns {Promise<Object>}
- */
-async function createOrUpdateFile(path, content, message, branch, sha = null) {
-  const body = {
-    message,
-    content: Buffer.from(content).toString('base64'),
-    branch
-  }
-
-  if (sha) {
-    body.sha = sha
-  }
-
-  return githubRequest(
-    `/repos/${WWW_REPO_OWNER}/${WWW_REPO_NAME}/contents/${path}`,
-    {
-      method: 'PUT',
-      body: JSON.stringify(body)
-    }
-  )
-}
-
-/**
- * Create a new branch from the default branch
- * @param {string} branchName - New branch name
- * @returns {Promise<Object>}
- */
-async function createBranch(branchName) {
-  // Get the SHA of the default branch
-  const refData = await githubRequest(
-    `/repos/${WWW_REPO_OWNER}/${WWW_REPO_NAME}/git/ref/heads/${WWW_DEFAULT_BRANCH}`
-  )
-
-  // Create new branch
-  return githubRequest(
-    `/repos/${WWW_REPO_OWNER}/${WWW_REPO_NAME}/git/refs`,
-    {
-      method: 'POST',
-      body: JSON.stringify({
-        ref: `refs/heads/${branchName}`,
-        sha: refData.object.sha
-      })
-    }
-  )
-}
-
-/**
- * Create a pull request
- * @param {string} title - PR title
- * @param {string} body - PR body
- * @param {string} head - Head branch
- * @param {string} base - Base branch
- * @returns {Promise<Object>}
- */
-async function createPullRequest(title, body, head, base = WWW_DEFAULT_BRANCH) {
-  return githubRequest(
-    `/repos/${WWW_REPO_OWNER}/${WWW_REPO_NAME}/pulls`,
-    {
-      method: 'POST',
-      body: JSON.stringify({
-        title,
-        body,
-        head,
-        base
-      })
-    }
-  )
-}
-
-/**
- * Generate version.json content
- * @param {string} version - Version number
- * @returns {string}
- */
-function generateVersionJson(version) {
-  return JSON.stringify({
-    version,
-    updatedAt: new Date().toISOString()
-  }, null, 2)
-}
-
-/**
- * Generate home changelog JSON entry
+ * Update the home page with new release info in the "Recent Updates" section
  * @param {string} version - Version number
  * @param {string} summary - Changelog summary
- * @param {string} existingContent - Existing JSON content
- * @returns {string}
+ * @param {string[]} highlights - Key highlights
+ * @returns {boolean} Success
  */
-function generateHomeChangelogJson(version, summary, existingContent) {
-  let entries = []
+function updateHomePage(version, summary, highlights) {
+  const content = fs.readFileSync(HOME_PAGE_PATH, 'utf8')
 
-  try {
-    entries = JSON.parse(existingContent || '[]')
-  } catch {
-    entries = []
+  const date = new Date().toISOString().split('T')[0]
+
+  // Find the "Recent Updates" section and the first version entry
+  // Look for the pattern: <div className="border-l-4 border-emerald-500
+  const firstVersionPattern = /<div className="border-l-4 border-emerald-500[^>]*>[\s\S]*?<\/div>\s*<\/div>/
+  const match = content.match(firstVersionPattern)
+
+  if (!match) {
+    console.warn('⚠️  Could not find Recent Updates section in home page')
+    return false
   }
 
-  // Add new entry at the beginning
-  entries.unshift({
-    version,
-    date: new Date().toISOString().split('T')[0],
-    summary
-  })
+  // Create new version entry (emerald for latest)
+  const highlightsHtml = highlights.map(h =>
+    `        <div className="flex items-start gap-2">
+          <span className="text-emerald-600 dark:text-emerald-400 mt-0.5">✓</span>
+          <span className="text-gray-700 dark:text-gray-300">${h}</span>
+        </div>`
+  ).join('\n')
 
-  // Keep only the last 5 entries for home page
-  entries = entries.slice(0, 5)
+  const newEntry = `<div className="border-l-4 border-emerald-500 dark:border-emerald-400 pl-4 py-1">
+      <div className="flex items-center gap-2 mb-2">
+        <span className="text-xs font-bold px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300">v${version}</span>
+        <span className="text-xs px-2 py-1 rounded bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 border border-orange-300 dark:border-orange-700 text-orange-800 dark:text-orange-300 font-bold">LATEST</span>
+        <span className="text-sm text-gray-500 dark:text-gray-400">${date}</span>
+      </div>
+      <div className="text-sm space-y-1">
+${highlightsHtml}
+      </div>
+    </div>`
 
-  return JSON.stringify(entries, null, 2)
+  // Replace the old "LATEST" badge with just the version
+  let updatedContent = content.replace(
+    /<span className="text-xs px-2 py-1 rounded bg-gradient-to-r from-orange-100 to-red-100[^>]*>LATEST<\/span>/g,
+    ''
+  )
+
+  // Change the first emerald entry to blue (demote it)
+  updatedContent = updatedContent.replace(
+    /<div className="border-l-4 border-emerald-500 dark:border-emerald-400/,
+    '<div className="border-l-4 border-blue-500 dark:border-blue-400'
+  )
+  updatedContent = updatedContent.replace(
+    /bg-emerald-100 dark:bg-emerald-900\/30 text-emerald-700 dark:text-emerald-300/,
+    'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+  )
+  updatedContent = updatedContent.replace(
+    /text-emerald-600 dark:text-emerald-400/g,
+    'text-blue-600 dark:text-blue-400'
+  )
+
+  // Insert new entry before the (now blue) first entry
+  const insertPoint = updatedContent.indexOf('<div className="border-l-4 border-blue-500')
+  if (insertPoint === -1) {
+    console.warn('⚠️  Could not find insertion point in home page')
+    return false
+  }
+
+  updatedContent = updatedContent.slice(0, insertPoint) + newEntry + '\n\n    ' + updatedContent.slice(insertPoint)
+
+  fs.writeFileSync(HOME_PAGE_PATH, updatedContent)
+  return true
 }
 
 /**
- * Prepend changelog entry to full changelog
+ * Update the changelog page with new release entry
  * @param {string} version - Version number
  * @param {string} fullChangelog - Full changelog markdown
- * @param {string} existingContent - Existing changelog content
- * @returns {string}
+ * @param {string[]} highlights - Key highlights for the card
+ * @returns {boolean} Success
  */
-function prependToChangelog(version, fullChangelog, existingContent) {
-  const date = new Date().toISOString().split('T')[0]
-  const header = existingContent ? '' : '# Changelog\n\nAll notable changes to SonicJS will be documented here.\n\n'
+function updateChangelogPage(version, fullChangelog, highlights) {
+  const content = fs.readFileSync(CHANGELOG_PAGE_PATH, 'utf8')
 
-  const newEntry = `## [${version}] - ${date}\n\n${fullChangelog}\n\n---\n\n`
+  const date = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
 
-  if (!existingContent) {
-    return header + newEntry
+  // Create new changelog entry in the same style as existing entries
+  const highlightsHtml = highlights.map(h =>
+    `          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span>${h}</li>`
+  ).join('\n')
+
+  const newEntry = `{/* Version ${version} */}
+<div className="relative pl-8 pb-8 border-l-2 border-emerald-200 dark:border-emerald-800">
+  <div className="absolute -left-3 top-0 w-6 h-6 rounded-full bg-emerald-500 border-4 border-white dark:border-gray-900 shadow-lg"></div>
+
+  <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-6 border border-emerald-200 dark:border-emerald-800 shadow-md hover:shadow-xl transition-shadow">
+    <div className="flex items-center gap-3 mb-4">
+      <span className="px-3 py-1 bg-emerald-500 text-white text-sm font-bold rounded-lg">v${version}</span>
+      <span className="text-sm text-gray-600 dark:text-gray-400">${date}</span>
+      <span className="px-2 py-1 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 border border-orange-300 dark:border-orange-700 text-orange-800 dark:text-orange-300 text-xs font-bold rounded uppercase">Latest</span>
+    </div>
+
+    <div className="space-y-3">
+      <div>
+        <h4 className="text-sm font-bold text-emerald-800 dark:text-emerald-300 mb-2 flex items-center gap-2">
+          <span>✨</span> Highlights
+        </h4>
+        <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
+${highlightsHtml}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+`
+
+  // Find the "Version 2.x" section and insert after the opening div
+  const version2xPattern = /## Version 2\.x\s*\n\s*<div className="not-prose space-y-6 my-8">\s*\n/
+  const match = content.match(version2xPattern)
+
+  if (!match) {
+    console.warn('⚠️  Could not find Version 2.x section in changelog page')
+    return false
   }
 
-  // Insert after the header (if exists) or at the beginning
-  const headerMatch = existingContent.match(/^#\s+Changelog[\s\S]*?\n\n/)
-  if (headerMatch) {
-    return existingContent.replace(headerMatch[0], headerMatch[0] + newEntry)
-  }
+  // Remove "Latest" badge from the previous latest entry
+  let updatedContent = content.replace(
+    /<span className="px-2 py-1 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900\/30 dark:to-red-900\/30 border border-orange-300 dark:border-orange-700 text-orange-800 dark:text-orange-300 text-xs font-bold rounded uppercase">Latest<\/span>/g,
+    ''
+  )
 
-  return newEntry + existingContent
+  // Insert new entry after the Version 2.x section header
+  const insertIndex = updatedContent.indexOf(match[0]) + match[0].length
+  updatedContent = updatedContent.slice(0, insertIndex) + '\n' + newEntry + updatedContent.slice(insertIndex)
+
+  fs.writeFileSync(CHANGELOG_PAGE_PATH, updatedContent)
+  return true
 }
 
 /**
- * Update WWW repository with release information
+ * Update WWW folder with release information
  * @param {WwwContent} content - Generated content
  * @param {ReleaseInfo} releaseInfo - Release information
  * @param {Object} options - Options
@@ -255,101 +191,63 @@ function prependToChangelog(version, fullChangelog, existingContent) {
  */
 export async function updateWww(content, releaseInfo, options = {}) {
   const { version } = releaseInfo
-  const branchName = `release/v${version}-changelog`
+
+  // Parse highlights from the content
+  const highlights = content.fullChangelog
+    .split('\n')
+    .filter(line => line.trim().startsWith('-') || line.trim().startsWith('*'))
+    .slice(0, 4)
+    .map(line => line.replace(/^[-*]\s*/, '').replace(/\*\*/g, '<strong>').replace(/\*\*/g, '</strong>').trim())
+
+  // Use discord highlights if available (they're better formatted)
+  const discordHighlights = Array.isArray(content.highlights) ? content.highlights : highlights
 
   if (options.dryRun) {
-    console.log('🔵 [DRY RUN] Would update WWW repository:')
-    console.log(`   Branch: ${branchName}`)
-    console.log(`   Version file: ${VERSION_FILE_PATH}`)
-    console.log(`   Home changelog: ${HOME_CHANGELOG_PATH}`)
-    console.log(`   Full changelog: ${FULL_CHANGELOG_PATH}`)
-    console.log('\n   Version JSON:')
-    console.log(generateVersionJson(version))
-    console.log('\n   Home changelog summary:')
-    console.log(content.homeChangelog)
-    console.log('\n   Full changelog entry:')
-    console.log(content.fullChangelog)
+    console.log('🔵 [DRY RUN] Would update WWW folder:')
+    console.log(`   Home page: ${HOME_PAGE_PATH}`)
+    console.log(`   Changelog: ${CHANGELOG_PAGE_PATH}`)
+    console.log(`   Version: ${version}`)
+    console.log(`   Highlights: ${discordHighlights.join(', ')}`)
     return { dryRun: true }
   }
 
-  const token = getGitHubToken()
-  if (!token) {
-    console.warn('⚠️  GitHub token not configured, skipping WWW update')
-    console.warn('   Required env var: WWW_REPO_TOKEN or GITHUB_TOKEN')
-    return { skipped: true, reason: 'token_missing' }
+  // Check if WWW folder exists
+  if (!fs.existsSync(WWW_DIR)) {
+    console.warn('⚠️  WWW folder not found at:', WWW_DIR)
+    return { skipped: true, reason: 'www_folder_missing' }
   }
 
   try {
-    console.log(`📝 Creating branch: ${branchName}`)
-    await createBranch(branchName)
+    console.log(`📝 Updating home page: ${HOME_PAGE_PATH}`)
+    const homeSuccess = updateHomePage(version, content.homeChangelog, discordHighlights)
 
-    // Get existing file contents
-    const [versionFile, homeChangelogFile, fullChangelogFile] = await Promise.all([
-      getFileSha(VERSION_FILE_PATH, branchName),
-      getFileSha(HOME_CHANGELOG_PATH, branchName),
-      getFileSha(FULL_CHANGELOG_PATH, branchName)
-    ])
+    console.log(`📝 Updating changelog page: ${CHANGELOG_PAGE_PATH}`)
+    const changelogSuccess = updateChangelogPage(version, content.fullChangelog, discordHighlights)
 
-    // Update version file
-    console.log(`📝 Updating ${VERSION_FILE_PATH}`)
-    await createOrUpdateFile(
-      VERSION_FILE_PATH,
-      generateVersionJson(version),
-      `chore: update version to ${version}`,
-      branchName,
-      versionFile?.sha
-    )
-
-    // Update home changelog
-    console.log(`📝 Updating ${HOME_CHANGELOG_PATH}`)
-    await createOrUpdateFile(
-      HOME_CHANGELOG_PATH,
-      generateHomeChangelogJson(version, content.homeChangelog, homeChangelogFile?.content),
-      `docs: add v${version} to home changelog`,
-      branchName,
-      homeChangelogFile?.sha
-    )
-
-    // Update full changelog
-    console.log(`📝 Updating ${FULL_CHANGELOG_PATH}`)
-    await createOrUpdateFile(
-      FULL_CHANGELOG_PATH,
-      prependToChangelog(version, content.fullChangelog, fullChangelogFile?.content),
-      `docs: add v${version} changelog entry`,
-      branchName,
-      fullChangelogFile?.sha
-    )
-
-    // Create pull request
-    console.log('📝 Creating pull request')
-    const pr = await createPullRequest(
-      `docs: Update changelog and version for v${version}`,
-      `## Summary\n\nAutomated update for SonicJS v${version} release.\n\n### Changes\n- Updated version badge to ${version}\n- Added changelog entry to home page\n- Added full changelog entry\n\n---\n\n🤖 Generated automatically by release-announce workflow`,
-      branchName
-    )
-
-    console.log(`✅ Pull request created: ${pr.html_url}`)
-    return { success: true, prUrl: pr.html_url, prNumber: pr.number }
+    if (homeSuccess && changelogSuccess) {
+      console.log('✅ WWW folder updated successfully')
+      console.log('   Note: Changes are local. Commit and push to deploy.')
+      return { success: true, local: true }
+    } else {
+      console.warn('⚠️  Some updates may have failed')
+      return {
+        success: false,
+        homeUpdated: homeSuccess,
+        changelogUpdated: changelogSuccess
+      }
+    }
   } catch (error) {
-    console.error('❌ Error updating WWW repository:', error.message)
+    console.error('❌ Error updating WWW folder:', error.message)
     return { error: true, message: error.message }
   }
 }
 
 /**
- * Check if WWW repo is accessible
+ * Check if WWW folder is accessible
  * @returns {Promise<boolean>}
  */
 export async function verifyWwwAccess() {
-  const token = getGitHubToken()
-  if (!token) {
-    return false
-  }
-
-  try {
-    await githubRequest(`/repos/${WWW_REPO_OWNER}/${WWW_REPO_NAME}`)
-    return true
-  } catch {
-    return false
-  }
+  return fs.existsSync(WWW_DIR) &&
+         fs.existsSync(HOME_PAGE_PATH) &&
+         fs.existsSync(CHANGELOG_PAGE_PATH)
 }
