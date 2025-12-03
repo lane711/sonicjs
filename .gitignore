@@ -60,6 +60,7 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+.release-content.json
 
 # Vitest
 coverage/
