@@ -1,10 +1,16 @@
 #!/usr/bin/env node
 
 /**
- * Discord release notification script
+ * Discord release notification script (Legacy)
  *
- * Posts a release notification to Discord when a new version is published.
+ * Posts a basic release notification to Discord when a new version is published.
  * Requires DISCORD_WEBHOOK_URL environment variable to be set.
+ *
+ * NOTE: This script is kept for backwards compatibility.
+ * For AI-enhanced announcements (Discord + Twitter + WWW), use:
+ *   npm run release:announce
+ *
+ * @deprecated Use `npm run release:announce` for full release announcements
  */
 
 import fs from 'fs'

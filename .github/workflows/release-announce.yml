@@ -1,0 +1,98 @@
+name: Release Announcements
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (no actual posts)'
+        required: false
+        default: 'false'
+        type: boolean
+      skip_discord:
+        description: 'Skip Discord posting'
+        required: false
+        default: false
+        type: boolean
+      skip_twitter:
+        description: 'Skip Twitter posting'
+        required: false
+        default: false
+        type: boolean
+      skip_www:
+        description: 'Skip WWW update'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  announce:
+    name: Announce Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Release Announcements
+        env:
+          # Discord
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+          # Twitter/X
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+
+          # WWW Repository
+          WWW_REPO_TOKEN: ${{ secrets.WWW_REPO_TOKEN }}
+          WWW_REPO_OWNER: lane711
+          WWW_REPO_NAME: sonicjs-www
+
+          # Release Information (from GitHub release event)
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_BODY: ${{ github.event.release.body }}
+          RELEASE_URL: ${{ github.event.release.html_url }}
+          RELEASE_PUBLISHED_AT: ${{ github.event.release.published_at }}
+
+          # Options
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+        run: |
+          ARGS=""
+          if [ "${{ inputs.skip_discord }}" = "true" ]; then
+            ARGS="$ARGS --skip-discord"
+          fi
+          if [ "${{ inputs.skip_twitter }}" = "true" ]; then
+            ARGS="$ARGS --skip-twitter"
+          fi
+          if [ "${{ inputs.skip_www }}" = "true" ]; then
+            ARGS="$ARGS --skip-www"
+          fi
+          node scripts/release/index.js $ARGS
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Release Announcement Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ github.event.release.tag_name || 'Manual trigger' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Platforms" >> $GITHUB_STEP_SUMMARY
+          echo "- Discord: ${{ inputs.skip_discord == 'true' && '⏭️ Skipped' || '✅ Attempted' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Twitter: ${{ inputs.skip_twitter == 'true' && '⏭️ Skipped' || '✅ Attempted' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- WWW: ${{ inputs.skip_www == 'true' && '⏭️ Skipped' || '✅ Attempted' }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **This was a dry run - no actual posts were made**" >> $GITHUB_STEP_SUMMARY
+          fi
