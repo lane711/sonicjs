@@ -8,6 +8,7 @@
     "my-sonicjs-app"
   ],
   "scripts": {
+    "predev": "test -d node_modules/@sonicjs-cms || npm install",
     "dev": "npm run dev --workspace=my-sonicjs-app",
     "dev:www": "npm run dev --workspace=www",
     "build": "npm run build:core && npm run build --workspace=my-sonicjs-app",
@@ -35,7 +36,9 @@
     "release:minor": "npm run version:minor && npm run publish:all && node scripts/notify-discord.js",
     "release:major": "npm run version:major && npm run publish:all && node scripts/notify-discord.js",
     "notify:discord": "node scripts/notify-discord.js",
-    "db:reset": "npm run setup:db --workspace=my-sonicjs-app"
+    "db:reset": "npm run setup:db --workspace=my-sonicjs-app",
+    "workspace": "npm install && npm run db:reset",
+    "kill": "pkill workerd && npm run dev --workspace=my-sonicjs-app"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
