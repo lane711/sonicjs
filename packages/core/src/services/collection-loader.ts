@@ -40,10 +40,20 @@ export function registerCollections(collections: CollectionConfig[]): void {
 export async function loadCollectionConfigs(): Promise<CollectionConfig[]> {
   const collections: CollectionConfig[] = [...registeredCollections]
 
+  // Log registered collections summary
+  if (registeredCollections.length > 0) {
+    console.log(`📦 Found ${registeredCollections.length} registered collection(s) from application`)
+  } else {
+    console.log(`⚠️  No collections registered. Make sure to call registerCollections() in your app's index.ts`)
+    console.log(`   Example: import myCollection from './collections/my-collection.collection'`)
+    console.log(`            registerCollections([myCollection])`)
+  }
+
   try {
     // Import all collection files dynamically from core package
     // In production, these will be bundled with the application
     const modules = (import.meta as any).glob?.('../collections/*.collection.ts', { eager: true }) || {}
+    let coreCollectionCount = 0
 
     for (const [path, module] of Object.entries(modules)) {
       try {
@@ -70,13 +80,14 @@ export async function loadCollectionConfigs(): Promise<CollectionConfig[]> {
         }
 
         collections.push(normalizedConfig)
-        console.log(`✓ Loaded collection config: ${config.name}`)
+        coreCollectionCount++
+        console.log(`✓ Loaded core collection: ${config.name}`)
       } catch (error) {
         console.error(`Error loading collection from ${path}:`, error)
       }
     }
 
-    console.log(`Loaded ${collections.length} total collection configuration(s) (${registeredCollections.length} registered, ${collections.length - registeredCollections.length} from core)`)
+    console.log(`📊 Collection summary: ${collections.length} total (${registeredCollections.length} from app, ${coreCollectionCount} from core)`)
     return collections
   } catch (error) {
     console.error('Error loading collection configurations:', error)
