@@ -87,8 +87,8 @@ function validateCollectionConfig(config) {
   const errors = [];
   if (!config.name) {
     errors.push("Collection name is required");
-  } else if (!/^[a-z0-9_]+$/.test(config.name)) {
-    errors.push("Collection name must contain only lowercase letters, numbers, and underscores");
+  } else if (!/^[a-z0-9_-]+$/.test(config.name)) {
+    errors.push("Collection name must contain only lowercase letters, numbers, underscores, and hyphens");
   }
   if (!config.displayName) {
     errors.push("Display name is required");
@@ -793,5 +793,5 @@ var PluginBootstrapService = class {
 };
 
 export { PluginBootstrapService, PluginService, cleanupRemovedCollections, fullCollectionSync, getAvailableCollectionNames, getManagedCollections, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, registerCollections, syncCollection, syncCollections, validateCollectionConfig };
-//# sourceMappingURL=chunk-6TOCXOFH.js.map
-//# sourceMappingURL=chunk-6TOCXOFH.js.map
+//# sourceMappingURL=chunk-SGAG6FD3.js.map
+//# sourceMappingURL=chunk-SGAG6FD3.js.map
