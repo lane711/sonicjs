@@ -3,7 +3,7 @@
 /**
  * Twitter/X Post Script for Release Announcements
  *
- * Uses Twitter API v2 to post release announcements.
+ * Uses Twitter API v2 to post release announcements as threads.
  * Requires OAuth 1.0a User Context authentication.
  */
 
@@ -21,8 +21,9 @@ const TWITTER_API_URL = 'https://api.twitter.com/2/tweets'
 
 /**
  * @typedef {Object} TwitterContent
- * @property {string} text - Tweet text
+ * @property {string} text - Main tweet text
  * @property {string[]} hashtags - Hashtags to append
+ * @property {string[]} [thread] - Additional tweets for thread
  */
 
 /**
@@ -99,42 +100,146 @@ function getCredentials() {
 }
 
 /**
- * Format tweet text with hashtags
- * @param {TwitterContent} content - Twitter content
+ * Format the main tweet with hashtags
+ * @param {string} text - Tweet text
+ * @param {string[]} hashtags - Hashtags to append
  * @param {string} releaseUrl - URL to the release
  * @returns {string} - Formatted tweet text
  */
-function formatTweet(content, releaseUrl) {
-  const hashtags = content.hashtags.map(tag => `#${tag.replace(/^#/, '')}`).join(' ')
-  const maxTextLength = 280 - hashtags.length - releaseUrl.length - 4 // 4 for spaces and newlines
-
-  let text = content.text
-  if (text.length > maxTextLength) {
-    text = text.substring(0, maxTextLength - 3) + '...'
-  }
-
-  return `${text}\n\n${releaseUrl}\n\n${hashtags}`
+function formatMainTweet(text, hashtags, releaseUrl) {
+  const hashtagStr = hashtags.map(tag => `#${tag.replace(/^#/, '')}`).join(' ')
+  return `${text}\n\n${releaseUrl}\n\n${hashtagStr}`
 }
 
 /**
- * Post a tweet to Twitter/X
+ * Build thread tweets from content
+ * @param {TwitterContent} content - Twitter content
+ * @param {string} releaseUrl - URL to the release
+ * @returns {string[]} - Array of tweet texts
+ */
+function buildThread(content, releaseUrl) {
+  const tweets = []
+
+  // Tweet 1: Main announcement with link and hashtags
+  const mainTweet = formatMainTweet(content.text, content.hashtags, releaseUrl)
+  tweets.push(mainTweet)
+
+  // Additional thread tweets if provided
+  if (content.thread && content.thread.length > 0) {
+    for (const threadTweet of content.thread) {
+      if (threadTweet.length <= 280) {
+        tweets.push(threadTweet)
+      } else {
+        // Split long tweets
+        const chunks = splitIntoTweets(threadTweet)
+        tweets.push(...chunks)
+      }
+    }
+  }
+
+  return tweets
+}
+
+/**
+ * Split long text into tweet-sized chunks
+ * @param {string} text - Text to split
+ * @param {number} maxLength - Max length per tweet (default 280)
+ * @returns {string[]} - Array of tweets
+ */
+function splitIntoTweets(text, maxLength = 275) {
+  const tweets = []
+  const sentences = text.split(/(?<=[.!?])\s+/)
+  let currentTweet = ''
+
+  for (const sentence of sentences) {
+    if ((currentTweet + ' ' + sentence).trim().length <= maxLength) {
+      currentTweet = (currentTweet + ' ' + sentence).trim()
+    } else {
+      if (currentTweet) {
+        tweets.push(currentTweet)
+      }
+      // If single sentence is too long, split by words
+      if (sentence.length > maxLength) {
+        const words = sentence.split(' ')
+        currentTweet = ''
+        for (const word of words) {
+          if ((currentTweet + ' ' + word).trim().length <= maxLength) {
+            currentTweet = (currentTweet + ' ' + word).trim()
+          } else {
+            if (currentTweet) {
+              tweets.push(currentTweet)
+            }
+            currentTweet = word
+          }
+        }
+      } else {
+        currentTweet = sentence
+      }
+    }
+  }
+
+  if (currentTweet) {
+    tweets.push(currentTweet)
+  }
+
+  return tweets
+}
+
+/**
+ * Post a single tweet
+ * @param {string} text - Tweet text
+ * @param {TwitterCredentials} credentials - Twitter credentials
+ * @param {string|null} replyToId - Tweet ID to reply to (for threads)
+ * @returns {Promise<Object>} - Twitter API response
+ */
+async function postSingleTweet(text, credentials, replyToId = null) {
+  const authHeader = generateOAuthHeader('POST', TWITTER_API_URL, credentials)
+
+  const body = { text }
+  if (replyToId) {
+    body.reply = { in_reply_to_tweet_id: replyToId }
+  }
+
+  const response = await fetch(TWITTER_API_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': authHeader,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  })
+
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(`Twitter API error: ${response.status} - ${JSON.stringify(data)}`)
+  }
+
+  return data
+}
+
+/**
+ * Post a thread to Twitter/X
  * @param {TwitterContent} content - Content to post
  * @param {string} releaseUrl - URL to the release
  * @param {Object} options - Options
  * @param {boolean} options.dryRun - If true, don't actually post
- * @returns {Promise<Object>} - Twitter API response
+ * @returns {Promise<Object>} - Result with tweet IDs
  */
 export async function postToTwitter(content, releaseUrl, options = {}) {
   const credentials = getCredentials()
+  const tweets = buildThread(content, releaseUrl)
 
   if (options.dryRun) {
-    const tweetText = formatTweet(content, releaseUrl)
-    console.log('🔵 [DRY RUN] Would post to Twitter:')
+    console.log('🔵 [DRY RUN] Would post Twitter thread:')
     console.log('---')
-    console.log(tweetText)
+    tweets.forEach((tweet, i) => {
+      console.log(`Tweet ${i + 1}/${tweets.length} (${tweet.length}/280 chars):`)
+      console.log(tweet)
+      console.log('')
+    })
     console.log('---')
-    console.log(`Character count: ${tweetText.length}/280`)
-    return { dryRun: true, text: tweetText }
+    return { dryRun: true, tweets, tweetCount: tweets.length }
   }
 
   if (!credentials) {
@@ -143,34 +248,48 @@ export async function postToTwitter(content, releaseUrl, options = {}) {
     return { skipped: true, reason: 'credentials_missing' }
   }
 
-  const tweetText = formatTweet(content, releaseUrl)
-
-  if (tweetText.length > 280) {
-    console.error(`❌ Tweet too long: ${tweetText.length}/280 characters`)
-    return { error: true, reason: 'tweet_too_long', length: tweetText.length }
+  // Validate all tweets before posting
+  for (let i = 0; i < tweets.length; i++) {
+    if (tweets[i].length > 280) {
+      console.error(`❌ Tweet ${i + 1} too long: ${tweets[i].length}/280 characters`)
+      return { error: true, reason: 'tweet_too_long', tweetIndex: i, length: tweets[i].length }
+    }
   }
 
   try {
-    const authHeader = generateOAuthHeader('POST', TWITTER_API_URL, credentials)
+    const postedTweets = []
+    let previousTweetId = null
 
-    const response = await fetch(TWITTER_API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': authHeader,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ text: tweetText })
-    })
+    for (let i = 0; i < tweets.length; i++) {
+      console.log(`   Posting tweet ${i + 1}/${tweets.length}...`)
 
-    const data = await response.json()
+      const result = await postSingleTweet(tweets[i], credentials, previousTweetId)
+      const tweetId = result.data.id
 
-    if (!response.ok) {
-      console.error('❌ Twitter API error:', data)
-      return { error: true, status: response.status, data }
+      postedTweets.push({
+        id: tweetId,
+        url: `https://twitter.com/i/status/${tweetId}`,
+        text: tweets[i]
+      })
+
+      previousTweetId = tweetId
+
+      // Small delay between tweets to avoid rate limiting
+      if (i < tweets.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+      }
     }
 
-    console.log(`✅ Tweet posted successfully: https://twitter.com/i/status/${data.data.id}`)
-    return { success: true, tweetId: data.data.id, url: `https://twitter.com/i/status/${data.data.id}` }
+    const mainTweetUrl = postedTweets[0].url
+    console.log(`✅ Thread posted successfully (${tweets.length} tweets): ${mainTweetUrl}`)
+
+    return {
+      success: true,
+      tweetId: postedTweets[0].id,
+      url: mainTweetUrl,
+      threadLength: tweets.length,
+      tweets: postedTweets
+    }
   } catch (error) {
     console.error('❌ Error posting to Twitter:', error.message)
     return { error: true, message: error.message }

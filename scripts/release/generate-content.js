@@ -23,8 +23,9 @@
  * @property {string} discord.description - Embed description
  * @property {string[]} discord.highlights - Key highlights as bullet points
  * @property {Object} twitter - Twitter-specific content
- * @property {string} twitter.text - Tweet text (max 280 chars)
- * @property {string[]} twitter.hashtags - Hashtags to append
+ * @property {string} twitter.text - Main tweet text (max 280 chars)
+ * @property {string[]} twitter.hashtags - Hashtags to append to main tweet
+ * @property {string[]} [twitter.thread] - Additional tweets for thread (each max 280 chars)
  * @property {Object} www - Website content
  * @property {string} www.homeChangelog - Summary for home page
  * @property {string} www.fullChangelog - Full changelog entry markdown
@@ -119,7 +120,15 @@ function getFallbackContent(releaseInfo) {
 
   // Extract first few lines for highlights
   const lines = body.split('\n').filter(line => line.trim().startsWith('-') || line.trim().startsWith('*'))
-  const highlights = lines.slice(0, 3).map(line => line.replace(/^[-*]\s*/, '').trim())
+  const highlights = lines.slice(0, 4).map(line => line.replace(/^[-*]\s*/, '').trim())
+
+  // Build thread tweets from highlights
+  const thread = []
+  if (highlights.length > 0) {
+    thread.push(`✨ What's new in v${version}:\n\n${highlights.map((h, i) => `${i + 1}. ${h}`).join('\n')}`)
+  }
+  thread.push(`📦 Get started:\nnpx create-sonicjs@latest my-app\n\nSonicJS is 6x faster than Node/Express and deploys globally on Cloudflare Workers in seconds.`)
+  thread.push(`⭐ If you find SonicJS useful, please star us on GitHub!\n\nhttps://github.com/lane711/sonicjs\n\nYour support helps us keep improving the project!`)
 
   return {
     discord: {
@@ -128,8 +137,9 @@ function getFallbackContent(releaseInfo) {
       highlights: highlights.length > 0 ? highlights : ['Various improvements and bug fixes']
     },
     twitter: {
-      text: `SonicJS v${version} is now available! The open-source headless CMS for Cloudflare Workers just got better.`,
-      hashtags: ['SonicJS', 'CloudflareWorkers', 'HeadlessCMS', 'OpenSource']
+      text: `🚀 SonicJS v${version} is now available! The open-source headless CMS for Cloudflare Workers just got better.`,
+      hashtags: ['SonicJS', 'CloudflareWorkers', 'HeadlessCMS', 'OpenSource'],
+      thread
     },
     www: {
       homeChangelog: `v${version} - ${new Date().toISOString().split('T')[0]}`,
