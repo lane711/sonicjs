@@ -1,5 +1,3 @@
-'use strict';
-
 // src/services/collection-loader.ts
 var registeredCollections = [];
 function registerCollections(collections) {
@@ -19,8 +17,16 @@ function registerCollections(collections) {
 }
 async function loadCollectionConfigs() {
   const collections = [...registeredCollections];
+  if (registeredCollections.length > 0) {
+    console.log(`\u{1F4E6} Found ${registeredCollections.length} registered collection(s) from application`);
+  } else {
+    console.log(`\u26A0\uFE0F  No collections registered. Make sure to call registerCollections() in your app's index.ts`);
+    console.log(`   Example: import myCollection from './collections/my-collection.collection'`);
+    console.log(`            registerCollections([myCollection])`);
+  }
   try {
-    const modules = undefined?.("../collections/*.collection.ts", { eager: true }) || {};
+    const modules = import.meta.glob?.("../collections/*.collection.ts", { eager: true }) || {};
+    let coreCollectionCount = 0;
     for (const [path, module] of Object.entries(modules)) {
       try {
         const configModule = module;
@@ -39,12 +45,13 @@ async function loadCollectionConfigs() {
           isActive: config.isActive !== void 0 ? config.isActive : true
         };
         collections.push(normalizedConfig);
-        console.log(`\u2713 Loaded collection config: ${config.name}`);
+        coreCollectionCount++;
+        console.log(`\u2713 Loaded core collection: ${config.name}`);
       } catch (error) {
         console.error(`Error loading collection from ${path}:`, error);
       }
     }
-    console.log(`Loaded ${collections.length} total collection configuration(s) (${registeredCollections.length} registered, ${collections.length - registeredCollections.length} from core)`);
+    console.log(`\u{1F4CA} Collection summary: ${collections.length} total (${registeredCollections.length} from app, ${coreCollectionCount} from core)`);
     return collections;
   } catch (error) {
     console.error("Error loading collection configurations:", error);
@@ -62,7 +69,7 @@ async function loadCollectionConfig(name) {
 }
 async function getAvailableCollectionNames() {
   try {
-    const modules = undefined?.("../collections/*.collection.ts") || {};
+    const modules = import.meta.glob?.("../collections/*.collection.ts") || {};
     const names = [];
     for (const path of Object.keys(modules)) {
       const match = path.match(/\/([^/]+)\.collection\.ts$/);
@@ -785,18 +792,6 @@ var PluginBootstrapService = class {
   }
 };
 
-exports.PluginBootstrapService = PluginBootstrapService;
-exports.PluginService = PluginService;
-exports.cleanupRemovedCollections = cleanupRemovedCollections;
-exports.fullCollectionSync = fullCollectionSync;
-exports.getAvailableCollectionNames = getAvailableCollectionNames;
-exports.getManagedCollections = getManagedCollections;
-exports.isCollectionManaged = isCollectionManaged;
-exports.loadCollectionConfig = loadCollectionConfig;
-exports.loadCollectionConfigs = loadCollectionConfigs;
-exports.registerCollections = registerCollections;
-exports.syncCollection = syncCollection;
-exports.syncCollections = syncCollections;
-exports.validateCollectionConfig = validateCollectionConfig;
-//# sourceMappingURL=chunk-NAYD76QF.cjs.map
-//# sourceMappingURL=chunk-NAYD76QF.cjs.map
+export { PluginBootstrapService, PluginService, cleanupRemovedCollections, fullCollectionSync, getAvailableCollectionNames, getManagedCollections, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, registerCollections, syncCollection, syncCollections, validateCollectionConfig };
+//# sourceMappingURL=chunk-6TOCXOFH.js.map
+//# sourceMappingURL=chunk-6TOCXOFH.js.map
