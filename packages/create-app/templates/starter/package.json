@@ -19,16 +19,16 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20251014.0",
-    "@types/node": "^24.9.2",
-    "drizzle-kit": "^0.30.3",
+    "@cloudflare/workers-types": "^4.20251202.0",
+    "@types/node": "^24.10.1",
+    "drizzle-kit": "^0.31.7",
     "drizzle-orm": "^0.44.7",
-    "hono": "^4.10.4",
-    "tsx": "^4.20.3",
+    "hono": "^4.10.7",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.5",
-    "wrangler": "^3.110.4",
-    "zod": "^4.1.12"
+    "vitest": "^4.0.15",
+    "wrangler": "^4.52.1",
+    "zod": "^4.1.13"
   },
   "engines": {
     "node": ">=18.0.0"
