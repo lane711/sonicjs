@@ -89,8 +89,8 @@ function validateCollectionConfig(config) {
   const errors = [];
   if (!config.name) {
     errors.push("Collection name is required");
-  } else if (!/^[a-z0-9_]+$/.test(config.name)) {
-    errors.push("Collection name must contain only lowercase letters, numbers, and underscores");
+  } else if (!/^[a-z0-9_-]+$/.test(config.name)) {
+    errors.push("Collection name must contain only lowercase letters, numbers, underscores, and hyphens");
   }
   if (!config.displayName) {
     errors.push("Display name is required");
@@ -807,5 +807,5 @@ exports.registerCollections = registerCollections;
 exports.syncCollection = syncCollection;
 exports.syncCollections = syncCollections;
 exports.validateCollectionConfig = validateCollectionConfig;
-//# sourceMappingURL=chunk-BE3UWQYQ.cjs.map
-//# sourceMappingURL=chunk-BE3UWQYQ.cjs.map
+//# sourceMappingURL=chunk-ILZ3DP4I.cjs.map
+//# sourceMappingURL=chunk-ILZ3DP4I.cjs.map

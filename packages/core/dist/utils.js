@@ -1,4 +1,4 @@
-export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer } from './chunk-ZM6JGGRM.js';
+export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer } from './chunk-KNSBZMAH.js';
 export { generateInstallationId, generateProjectId, getDefaultTelemetryConfig, getTelemetryConfig, isTelemetryEnabled, sanitizeErrorMessage, sanitizeRoute, shouldSkipEvent } from './chunk-RRKXFGIO.js';
 export { metricsTracker } from './chunk-FICTAGD4.js';
 import './chunk-V4OQ3NZ2.js';

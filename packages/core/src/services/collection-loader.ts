@@ -145,8 +145,8 @@ export function validateCollectionConfig(config: CollectionConfig): { valid: boo
   // Required fields
   if (!config.name) {
     errors.push('Collection name is required')
-  } else if (!/^[a-z0-9_]+$/.test(config.name)) {
-    errors.push('Collection name must contain only lowercase letters, numbers, and underscores')
+  } else if (!/^[a-z0-9_-]+$/.test(config.name)) {
+    errors.push('Collection name must contain only lowercase letters, numbers, underscores, and hyphens')
   }
 
   if (!config.displayName) {
