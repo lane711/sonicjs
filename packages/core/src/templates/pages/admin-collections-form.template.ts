@@ -383,7 +383,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
                   Add Field
                 </button>
               </div>
-              
+
               <!-- Fields List -->
               <div id="fields-list" class="space-y-3">
                 ${fieldsWithData.map(field => `
@@ -454,7 +454,9 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
                 ` : ''}
               </div>
             </div>
-          ` : `
+          ` : ''}
+
+          ${!isEdit ? `
             <div class="mt-6 rounded-lg bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-100 dark:border-cyan-900/30 p-4">
               <div class="flex items-start gap-x-3">
                 <svg class="h-5 w-5 text-cyan-600 dark:text-cyan-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -470,7 +472,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
                 </div>
               </div>
             </div>
-          `}
+          ` : ''}
           
           <!-- Action Buttons -->
           <div class="mt-6 pt-6 border-t border-zinc-950/5 dark:border-white/10 flex items-center justify-between">
