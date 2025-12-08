@@ -209,4 +209,59 @@ test.describe('Admin Dashboard', () => {
     // Should contain either activity list or empty state
     expect(containerContent).toMatch(/ul role="list"|No recent activity/);
   });
+
+  test('should open and close User Dropdown menu in desktop and mobile', async ({ page }) => {
+    // Test Desktop Version
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto('/admin');
+
+    // Find the user menu button (desktop version)
+    const desktopUserButton = page.locator('[data-user-menu]').first();
+    await expect(desktopUserButton).toBeVisible({ timeout: 5000 });
+
+    // Verify dropdown is initially hidden
+    const desktopDropdown = page.locator('.userDropdown:not(.is-mobile)').first();
+    await expect(desktopDropdown).toBeHidden();
+
+    // Click to open dropdown
+    await desktopUserButton.click();
+    await expect(desktopDropdown).toBeVisible({ timeout: 2000 });
+
+    // Verify dropdown contains user information
+    await expect(desktopDropdown.locator('a[href="/admin/profile"]')).toBeVisible();
+
+    // Click to close dropdown
+    await desktopUserButton.click();
+    await expect(desktopDropdown).toBeHidden();
+
+    // Test Mobile Version
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/admin');
+
+    // Open mobile sidebar first (mobile nav is hidden by default)
+    const mobileMenuButton = page.locator('button[aria-label="Open navigation"]');
+    if (await mobileMenuButton.isVisible()) {
+      await mobileMenuButton.click();
+      await page.waitForTimeout(500); // Wait for sidebar animation
+    }
+
+    // Find the user menu button (mobile version)
+    const mobileUserButton = page.locator('[data-user-menu]').last();
+    await expect(mobileUserButton).toBeVisible({ timeout: 5000 });
+
+    // Verify dropdown is initially hidden
+    const mobileDropdown = page.locator('.is-mobile .userDropdown').last();
+    await expect(mobileDropdown).toBeHidden();
+
+    // Click to open dropdown
+    await mobileUserButton.click();
+    await expect(mobileDropdown).toBeVisible({ timeout: 2000 });
+
+    // Verify dropdown contains user information
+    await expect(mobileDropdown.locator('a[href="/admin/profile"]')).toBeVisible();
+
+    // Click to close dropdown
+    await mobileUserButton.click();
+    await expect(mobileDropdown).toBeHidden();
+  });
 }); 
