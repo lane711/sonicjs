@@ -61,8 +61,7 @@ export interface TelemetryProperties {
 
 export interface TelemetryConfig {
   enabled: boolean
-  apiKey?: string
-  host?: string  // For self-hosted PostHog
+  host?: string  // Stats endpoint URL
   debug?: boolean
 }
 

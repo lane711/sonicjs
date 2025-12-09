@@ -28,8 +28,7 @@ function safeGetEnv(key: string): string | undefined {
 export function getDefaultTelemetryConfig(): TelemetryConfig {
   return {
     enabled: true,
-    apiKey: safeGetEnv('POSTHOG_API_KEY') || 'phc_VuhFUIJLXzwyGjlgQ67dbNeSh5x4cp9F8i15hZFIDhs',
-    host: safeGetEnv('POSTHOG_HOST') || 'https://us.i.posthog.com',
+    host: safeGetEnv('SONICJS_TELEMETRY_ENDPOINT') || 'https://stats.sonicjs.com',
     debug: safeGetEnv('NODE_ENV') === 'development'
   }
 }

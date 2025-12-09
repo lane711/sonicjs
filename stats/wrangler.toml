@@ -1,0 +1,29 @@
+name = "sonicjs-stats"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# Cloudflare Workers settings
+workers_dev = true
+
+# D1 Database
+# Run: wrangler d1 create sonicjs-stats-db
+# Then update database_id below
+[[d1_databases]]
+binding = "DB"
+database_name = "sonicjs-stats-db"
+database_id = "YOUR_DATABASE_ID_HERE"
+migrations_dir = "./migrations"
+
+# Environment variables
+[vars]
+ENVIRONMENT = "development"
+
+# Production environment
+[env.production]
+name = "sonicjs-stats-production"
+vars = { ENVIRONMENT = "production" }
+
+# Observability
+[observability]
+enabled = true

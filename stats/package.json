@@ -1,0 +1,30 @@
+{
+  "name": "sonicjs-stats",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SonicJS telemetry stats collector",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "echo 'Worker build is handled by wrangler during deployment'",
+    "deploy": "wrangler deploy",
+    "db:migrate": "wrangler d1 migrations apply DB",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sonicjs-cms/core": "^2.3.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250620.0",
+    "@types/node": "^20.19.1",
+    "drizzle-kit": "^0.30.0",
+    "drizzle-orm": "^0.44.2",
+    "hono": "^4.7.3",
+    "typescript": "^5.8.3",
+    "wrangler": "^4.45.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
