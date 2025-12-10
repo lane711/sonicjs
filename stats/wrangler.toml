@@ -12,7 +12,7 @@ workers_dev = true
 [[d1_databases]]
 binding = "DB"
 database_name = "sonicjs-stats-db"
-database_id = "YOUR_DATABASE_ID_HERE"
+database_id = "93150491-63c3-4b9a-ac9a-792ba416a240"
 migrations_dir = "./migrations"
 
 # Environment variables
