@@ -366,8 +366,10 @@ export function renderAdminLayoutCatalyst(
 
     // User dropdown toggle
     function toggleUserDropdown() {
-      const dropdown = document.getElementById('userDropdown');
-      dropdown.classList.toggle('hidden');
+      const dropDowns = document.querySelectorAll('.userDropdown');
+      dropDowns.forEach(dropdown => {
+        dropdown.classList.toggle('hidden');
+      });
     }
 
     // Close dropdown when clicking outside
@@ -550,7 +552,7 @@ function renderCatalystSidebar(
 
   return `
     <nav class="flex h-full min-h-0 flex-col bg-white shadow-sm ring-1 ring-zinc-950/5 dark:bg-zinc-900 dark:ring-white/10 ${
-      isMobile ? "rounded-lg p-2 m-2" : ""
+      isMobile ? "is-mobile rounded-lg p-2 m-2" : ""
     }">
       ${closeButton}
 
@@ -668,7 +670,7 @@ function renderCatalystSidebar(
             </button>
 
             <!-- User Dropdown -->
-            <div id="userDropdown" class="hidden absolute bottom-full mb-2 left-0 right-0 mx-2 rounded-xl bg-white shadow-lg ring-1 ring-zinc-950/10 dark:bg-zinc-800 dark:ring-white/10 z-50">
+            <div class="userDropdown hidden absolute bottom-full mb-2 left-0 right-0 mx-2 rounded-xl bg-white shadow-lg ring-1 ring-zinc-950/10 dark:bg-zinc-800 dark:ring-white/10 z-50">
               <div class="p-2">
                 <div class="px-3 py-2 border-b border-zinc-950/5 dark:border-white/5">
                   <p class="text-sm font-medium text-zinc-950 dark:text-white">${
