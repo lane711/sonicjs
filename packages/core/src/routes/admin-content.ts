@@ -137,8 +137,8 @@ adminContentRoutes.get('/', async (c) => {
     }
 
     if (search) {
-      conditions.push('(c.title LIKE ? OR c.slug LIKE ?)')
-      params.push(`%${search}%`, `%${search}%`)
+      conditions.push('(c.title LIKE ? OR c.slug LIKE ? OR c.data LIKE ?)')
+      params.push(`%${search}%`, `%${search}%`, `%${search}%`)
     }
 
     if (modelName !== 'all') {

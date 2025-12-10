@@ -68,5 +68,7 @@
     "**/node_modules/**": true,
     "**/dist/**": true,
     "**/.wrangler/**": true
-  }
+  },
+  "prettier.singleQuote": true,
+  "prettier.printWidth": 100
 }
