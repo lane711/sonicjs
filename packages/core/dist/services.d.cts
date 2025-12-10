@@ -1,5 +1,5 @@
 export { C as CorePlugin, p as LogCategory, q as LogEntry, t as LogFilter, o as LogLevel, L as Logger, m as Migration, M as MigrationService, n as MigrationStatus, k as PluginBootstrapService, P as PluginService, e as cleanupRemovedCollections, f as fullCollectionSync, g as getAvailableCollectionNames, h as getLogger, d as getManagedCollections, j as initLogger, i as isCollectionManaged, a as loadCollectionConfig, l as loadCollectionConfigs, r as registerCollections, c as syncCollection, b as syncCollections, v as validateCollectionConfig } from './plugin-bootstrap-C0E3jdz-.cjs';
-import { b as TelemetryConfig, c as TelemetryIdentity, T as TelemetryEvent, a as TelemetryProperties } from './telemetry-BFBIjBxK.cjs';
+import { b as TelemetryConfig, c as TelemetryIdentity, T as TelemetryEvent, a as TelemetryProperties } from './telemetry-UiD1i9GS.cjs';
 import './collection-config-FLlGtsh9.cjs';
 import '@cloudflare/workers-types';
 import 'drizzle-zod';
@@ -132,7 +132,7 @@ declare class SettingsService {
 /**
  * Telemetry Service
  *
- * Privacy-first telemetry service using PostHog
+ * Privacy-first telemetry service using custom SonicJS stats endpoint
  * - No PII collection
  * - Opt-out by default
  * - Silent failures (never blocks app)
@@ -146,7 +146,6 @@ declare class SettingsService {
 declare class TelemetryService {
     private config;
     private identity;
-    private client;
     private enabled;
     private eventQueue;
     private isInitialized;
@@ -204,7 +203,7 @@ declare class TelemetryService {
      */
     private getVersion;
     /**
-     * Shutdown the telemetry service
+     * Shutdown the telemetry service (no-op for fetch-based telemetry)
      */
     shutdown(): Promise<void>;
     /**
