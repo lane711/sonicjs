@@ -36,6 +36,7 @@
     "release:patch": "npm run version:patch && npm run publish:all && npm run release:announce",
     "release:minor": "npm run version:minor && npm run publish:all && npm run release:announce",
     "release:major": "npm run version:major && npm run publish:all && npm run release:announce",
+    "release:draft": "node scripts/release/generate-draft.js",
     "release:announce": "node scripts/release/index.js",
     "release:announce:dry": "node scripts/release/index.js --dry-run",
     "notify:discord": "node scripts/notify-discord.js",
