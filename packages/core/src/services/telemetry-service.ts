@@ -1,7 +1,7 @@
 /**
  * Telemetry Service
  *
- * Privacy-first telemetry service using PostHog
+ * Privacy-first telemetry service using custom SonicJS stats endpoint
  * - No PII collection
  * - Opt-out by default
  * - Silent failures (never blocks app)
@@ -19,7 +19,6 @@ import { generateInstallationId, generateProjectId, sanitizeErrorMessage, saniti
 export class TelemetryService {
   private config: TelemetryConfig
   private identity: TelemetryIdentity | null = null
-  private client: any = null
   private enabled: boolean = true
   private eventQueue: Array<{ event: TelemetryEvent; properties?: TelemetryProperties }> = []
   private isInitialized: boolean = false
@@ -46,22 +45,8 @@ export class TelemetryService {
     try {
       this.identity = identity
 
-      // Only initialize PostHog if we have an API key
-      if (this.config.apiKey) {
-        // Dynamic import to avoid bundling if not needed
-        const { PostHog } = await import('posthog-node')
-
-        this.client = new PostHog(this.config.apiKey, {
-          host: this.config.host,
-          flushAt: 20,  // Batch events
-          flushInterval: 10000  // Flush every 10 seconds
-        })
-
-        if (this.config.debug) {
-          console.log('[Telemetry] Initialized with installation ID:', identity.installationId)
-        }
-      } else if (this.config.debug) {
-        console.log('[Telemetry] No API key provided, tracking will be logged only')
+      if (this.config.debug) {
+        console.log('[Telemetry] Initialized with installation ID:', identity.installationId)
       }
 
       this.isInitialized = true
@@ -104,19 +89,29 @@ export class TelemetryService {
         return
       }
 
-      // Send to PostHog if client is available
-      if (this.client && this.identity) {
-        this.client.capture({
-          distinctId: this.identity.installationId,
-          event,
-          properties: enrichedProps
-        })
+      // Send to custom SonicJS stats endpoint
+      if (this.identity && this.config.host) {
+        const payload = {
+          data: {
+            installation_id: this.identity.installationId,
+            event_type: event,
+            properties: enrichedProps,
+            timestamp: enrichedProps.timestamp
+          }
+        }
+
+        // Fire and forget - don't block on response
+        fetch(`${this.config.host}/v1/events`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(() => {}) // Silent fail
 
         if (this.config.debug) {
           console.log('[Telemetry] Tracked event:', event, enrichedProps)
         }
       } else if (this.config.debug) {
-        console.log('[Telemetry] Event (no client):', event, enrichedProps)
+        console.log('[Telemetry] Event (no endpoint):', event, enrichedProps)
       }
 
     } catch (error) {
@@ -255,19 +250,10 @@ export class TelemetryService {
   }
 
   /**
-   * Shutdown the telemetry service
+   * Shutdown the telemetry service (no-op for fetch-based telemetry)
    */
   async shutdown(): Promise<void> {
-    try {
-      if (this.client) {
-        await this.client.shutdown()
-      }
-    } catch (error) {
-      // Silent fail
-      if (this.config.debug) {
-        console.error('[Telemetry] Shutdown failed:', error)
-      }
-    }
+    // No-op - fetch requests are fire and forget
   }
 
   /**

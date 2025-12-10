@@ -13,8 +13,7 @@ import fs from 'fs-extra'
 import path from 'path'
 
 const TELEMETRY_ENABLED = process.env.SONICJS_TELEMETRY !== 'false' && process.env.DO_NOT_TRACK !== '1'
-const TELEMETRY_API_KEY = process.env.POSTHOG_API_KEY || 'phc_VuhFUIJLXzwyGjlgQ67dbNeSh5x4cp9F8i15hZFIDhs'
-const TELEMETRY_HOST = process.env.POSTHOG_HOST || 'https://us.i.posthog.com'
+const TELEMETRY_ENDPOINT = process.env.SONICJS_TELEMETRY_ENDPOINT || 'https://stats.sonicjs.com'
 const DEBUG = process.env.DEBUG === 'true'
 
 /**
@@ -51,7 +50,6 @@ function getInstallationId() {
 /**
  * Initialize telemetry
  */
-let telemetryClient = null
 let installationId = null
 
 async function initTelemetry() {
@@ -65,23 +63,11 @@ async function initTelemetry() {
   try {
     installationId = getInstallationId()
 
-    // Initialize PostHog
-    if (TELEMETRY_API_KEY) {
-      const { PostHog } = await import('posthog-node')
-      telemetryClient = new PostHog(TELEMETRY_API_KEY, {
-        host: TELEMETRY_HOST,
-        flushAt: 1,  // Flush immediately for CLI
-        flushInterval: 1000
-      })
-
-      if (DEBUG) {
-        console.log('[Telemetry] Initialized with ID:', installationId)
-      }
-    } else if (DEBUG) {
-      console.log('[Telemetry] No API key, tracking will be logged only')
+    if (DEBUG) {
+      console.log('[Telemetry] Initialized with ID:', installationId)
     }
 
-    return { client: telemetryClient, installationId }
+    return { installationId }
   } catch (error) {
     if (DEBUG) {
       console.error('[Telemetry] Initialization failed:', error)
@@ -91,7 +77,7 @@ async function initTelemetry() {
 }
 
 /**
- * Track an event
+ * Track an event using custom SonicJS stats endpoint
  */
 async function track(event, properties = {}) {
   if (!TELEMETRY_ENABLED) return
@@ -101,25 +87,33 @@ async function track(event, properties = {}) {
       await initTelemetry()
     }
 
-    const enrichedProperties = {
-      ...properties,
-      timestamp: new Date().toISOString(),
-      os: os.platform(),
-      nodeVersion: process.version.split('.').slice(0, 2).join('.'), // e.g., "v18.0"
+    if (!installationId) return
+
+    const timestamp = new Date().toISOString()
+
+    // Use standard SonicJS collection API
+    const payload = {
+      data: {
+        installation_id: installationId,
+        event_type: event,
+        properties: {
+          ...properties,
+          os: os.platform(),
+          nodeVersion: process.version.split('.').slice(0, 2).join('.'), // e.g., "v18.0"
+        },
+        timestamp
+      }
     }
 
-    if (telemetryClient && installationId) {
-      telemetryClient.capture({
-        distinctId: installationId,
-        event,
-        properties: enrichedProperties
-      })
+    // Fire and forget - don't block on response
+    fetch(`${TELEMETRY_ENDPOINT}/v1/events`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(() => {}) // Silent fail
 
-      if (DEBUG) {
-        console.log('[Telemetry] Tracked:', event, enrichedProperties)
-      }
-    } else if (DEBUG) {
-      console.log('[Telemetry] Event (no client):', event, enrichedProperties)
+    if (DEBUG) {
+      console.log('[Telemetry] Tracked:', event, payload)
     }
   } catch (error) {
     // Silent fail - telemetry should never break the CLI
@@ -130,18 +124,10 @@ async function track(event, properties = {}) {
 }
 
 /**
- * Shutdown telemetry (flush pending events)
+ * Shutdown telemetry (no-op for fetch-based telemetry)
  */
 async function shutdown() {
-  if (telemetryClient) {
-    try {
-      await telemetryClient.shutdown()
-    } catch (error) {
-      if (DEBUG) {
-        console.error('[Telemetry] Shutdown failed:', error)
-      }
-    }
-  }
+  // No-op - fetch requests are fire and forget
 }
 
 /**

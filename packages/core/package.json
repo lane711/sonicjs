@@ -102,8 +102,7 @@
     "drizzle-zod": "^0.8.3",
     "marked": "^16.4.1",
     "highlight.js": "^11.11.1",
-    "semver": "^7.7.3",
-    "posthog-node": "^4.0.0"
+    "semver": "^7.7.3"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20251014.0",
