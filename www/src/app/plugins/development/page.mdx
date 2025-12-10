@@ -3,27 +3,672 @@ export const metadata = {
   description: 'Learn how to create custom plugins for SonicJS',
 }
 
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Getting Started', id: 'getting-started' },
+  { title: 'Plugin Structure', id: 'plugin-structure' },
+  { title: 'Creating a Plugin', id: 'creating-a-plugin' },
+  { title: 'Routes', id: 'routes' },
+  { title: 'Lifecycle Hooks', id: 'lifecycle-hooks' },
+  { title: 'Hook System', id: 'hook-system' },
+  { title: 'Services', id: 'services' },
+  { title: 'Database Models', id: 'database-models' },
+  { title: 'Admin Interface', id: 'admin-interface' },
+  { title: 'Plugin Context', id: 'plugin-context' },
+  { title: 'Best Practices', id: 'best-practices' },
+  { title: 'Testing', id: 'testing' },
+]
+
 # Plugin Development Guide
 
-## Coming Soon
+Create custom plugins to extend SonicJS with new features, routes, admin pages, and more. {{ className: 'lead' }}
 
-This page is currently under construction. We're working on a comprehensive guide for developing custom SonicJS plugins.
+---
 
-### What to Expect
+## Overview
 
-- **Creating plugins** - Step-by-step plugin creation guide
-- **Hook system** - Understanding and using plugin hooks
-- **Extension points** - Where to extend SonicJS functionality
-- **Best practices** - Plugin development guidelines
-- **Testing plugins** - How to test your custom plugins
-- **Publishing plugins** - Sharing your plugins with the community
+The SonicJS plugin system provides a powerful, modular architecture for extending functionality. Plugins can:
 
-### In the Meantime
+- Add custom API routes
+- Register middleware
+- Create admin pages and menu items
+- Define database models
+- Hook into system events
+- Provide reusable services
 
-Check out our other documentation sections:
+**Key Features:**
 
-- [Plugin System Overview](/plugins) - Understand the plugin architecture
-- [Core Plugins](/plugins/core) - Learn from built-in plugins
-- [Architecture](/architecture) - System design and patterns
+<FeatureGrid
+  features={[
+    {
+      icon: '🔌',
+      title: 'Modular Architecture',
+      description: 'Self-contained plugins with routes, services, and templates',
+    },
+    {
+      icon: '🪝',
+      title: 'Event-Driven',
+      description: 'Hook into content, auth, and system events',
+    },
+    {
+      icon: '⚡',
+      title: 'Hot-Swappable',
+      description: 'Enable or disable plugins without restarting',
+    },
+    {
+      icon: '🛡️',
+      title: 'Isolated',
+      description: 'Scoped hooks prevent cross-plugin interference',
+    },
+  ]}
+  columns={2}
+/>
 
-For immediate help, visit our [Community](/community) page or check the [FAQ](/faq).
+---
+
+## Getting Started
+
+### Prerequisites
+
+- TypeScript knowledge
+- Understanding of [Hono.js](https://hono.dev/) framework
+- Familiarity with SonicJS architecture
+- Node.js 18+ installed
+
+### Plugin Location
+
+Custom plugins live in your app's `src/plugins/` directory. When you create a SonicJS app, this folder is set up for you to add your own plugins.
+
+---
+
+## Plugin Structure
+
+A typical plugin has this structure:
+
+- `index.ts` - Main plugin file
+- `manifest.json` - Plugin metadata and configuration
+- `routes.ts` - API routes (optional)
+- `services/` - Business logic services (optional)
+- `migrations/` - Database migrations (optional)
+- `tests/` - Plugin tests (optional)
+
+---
+
+## Creating a Plugin
+
+Let's create a simple plugin step by step.
+
+### Step 1: Create the Plugin Directory
+
+```bash
+mkdir -p src/plugins/my-plugin
+```
+
+### Step 2: Create the Manifest
+
+Create `manifest.json` with your plugin metadata:
+
+```json
+{
+  "id": "my-plugin",
+  "name": "My Plugin",
+  "version": "1.0.0",
+  "description": "My first SonicJS plugin",
+  "author": "Your Name",
+  "license": "MIT",
+  "category": "utilities",
+  "permissions": {
+    "my-plugin:view": "View My Plugin page"
+  },
+  "adminMenu": {
+    "label": "My Plugin",
+    "icon": "puzzle-piece",
+    "path": "/admin/my-plugin",
+    "order": 100
+  }
+}
+```
+
+### Step 3: Create the Plugin Code
+
+Create `index.ts`:
+
+```typescript
+import { Hono } from 'hono'
+import { html } from 'hono/html'
+import { PluginBuilder } from '@sonicjs/core'
+import type { Plugin } from '@sonicjs/core'
+
+export function createMyPlugin(): Plugin {
+  const builder = PluginBuilder.create({
+    name: 'my-plugin',
+    version: '1.0.0',
+    description: 'My first SonicJS plugin'
+  })
+
+  builder.metadata({
+    author: { name: 'Your Name', email: 'you@example.com' },
+    license: 'MIT',
+    compatibility: '^2.0.0'
+  })
+
+  const routes = new Hono()
+
+  routes.get('/', async (c: any) => {
+    const user = c.get('user')
+    return c.html(html`<h1>Hello from My Plugin!</h1>`)
+  })
+
+  builder.addRoute('/admin/my-plugin', routes, {
+    description: 'My plugin admin page',
+    requiresAuth: true
+  })
+
+  builder.addMenuItem('My Plugin', '/admin/my-plugin', {
+    icon: 'puzzle-piece',
+    order: 100,
+    permissions: ['my-plugin:view']
+  })
+
+  builder.lifecycle({
+    activate: async () => console.info('My plugin activated!'),
+    deactivate: async () => console.info('My plugin deactivated!')
+  })
+
+  return builder.build() as Plugin
+}
+
+export const myPlugin = createMyPlugin()
+```
+
+### Step 4: Register the Plugin
+
+Add your plugin to your app's plugin index at `src/plugins/index.ts`:
+
+```typescript
+export { myPlugin } from './my-plugin'
+```
+
+Your plugin will be automatically loaded when the app starts.
+
+---
+
+## Routes
+
+Routes define API endpoints using [Hono.js](https://hono.dev/).
+
+### Basic Route Registration
+
+```typescript
+import { Hono } from 'hono'
+
+const routes = new Hono()
+
+routes.get('/items', async (c) => {
+  return c.json({ success: true, data: [] })
+})
+
+routes.post('/items', async (c) => {
+  const body = await c.req.json()
+  return c.json({ success: true, data: body }, 201)
+})
+
+builder.addRoute('/api/my-plugin', routes, {
+  description: 'My plugin API',
+  requiresAuth: true
+})
+```
+
+### Route Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `description` | `string` | Route description |
+| `requiresAuth` | `boolean` | Require authentication |
+| `roles` | `string[]` | Required user roles |
+| `priority` | `number` | Route priority (lower = earlier) |
+
+---
+
+## Lifecycle Hooks
+
+Plugins have five lifecycle stages:
+
+### 1. Install
+
+Called once when the plugin is first installed.
+
+```typescript
+builder.lifecycle({
+  install: async (context) => {
+    await context.db.exec(`
+      CREATE TABLE IF NOT EXISTS my_plugin_data (
+        id INTEGER PRIMARY KEY,
+        key TEXT NOT NULL,
+        value TEXT
+      )
+    `)
+  }
+})
+```
+
+### 2. Activate
+
+Called when the plugin is activated.
+
+```typescript
+builder.lifecycle({
+  activate: async (context) => {
+    context.hooks.register('content:save', async (data) => {
+      console.info('Content saved:', data.id)
+      return data
+    })
+  }
+})
+```
+
+### 3. Configure
+
+Called when plugin configuration changes.
+
+```typescript
+builder.lifecycle({
+  configure: async (config) => {
+    if (config.apiKey && config.apiKey.length < 10) {
+      throw new Error('Invalid API key')
+    }
+  }
+})
+```
+
+### 4. Deactivate
+
+Called when the plugin is deactivated.
+
+```typescript
+builder.lifecycle({
+  deactivate: async (context) => {
+    // Clean up resources
+  }
+})
+```
+
+### 5. Uninstall
+
+Called when the plugin is removed.
+
+```typescript
+builder.lifecycle({
+  uninstall: async (context) => {
+    await context.db.exec('DROP TABLE IF EXISTS my_plugin_data')
+  }
+})
+```
+
+---
+
+## Hook System
+
+The hook system provides event-driven extensibility.
+
+### Standard Hooks
+
+SonicJS provides these built-in hooks:
+
+**Application Lifecycle**
+- `app:init` - App initialization
+- `app:ready` - App ready to receive requests
+- `app:shutdown` - App shutting down
+
+**Request Lifecycle**
+- `request:start` - Request begins
+- `request:end` - Request completes
+- `request:error` - Request error occurs
+
+**Authentication**
+- `auth:login` - User logs in
+- `auth:logout` - User logs out
+- `auth:register` - User registers
+
+**Content Lifecycle**
+- `content:create` - Content created
+- `content:update` - Content updated
+- `content:delete` - Content deleted
+- `content:publish` - Content published
+
+**Media Lifecycle**
+- `media:upload` - File uploaded
+- `media:delete` - File deleted
+
+### Registering Hooks
+
+```typescript
+builder.addHook('content:save', async (data, context) => {
+  console.info('Content saved:', data.id)
+  data.processedAt = Date.now()
+  return data
+})
+
+// Hook with priority (lower = earlier)
+builder.addHook('content:save', async (data) => {
+  data.validated = true
+  return data
+}, { priority: 5 })
+```
+
+### Custom Hooks
+
+```typescript
+builder.addHook('my-plugin:data-processed', async (data) => {
+  console.info('Data processed:', data)
+  return data
+})
+```
+
+---
+
+## Services
+
+Services encapsulate business logic.
+
+### Creating a Service
+
+```typescript
+export class EmailService {
+  private apiKey: string
+
+  constructor(apiKey: string) {
+    this.apiKey = apiKey
+  }
+
+  async sendEmail(to: string, subject: string, body: string) {
+    // Email sending logic
+    return true
+  }
+}
+```
+
+### Registering Services
+
+```typescript
+const emailService = new EmailService('api-key-here')
+
+builder.addService('emailService', emailService, {
+  description: 'Email sending service',
+  singleton: true
+})
+```
+
+### Service Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `description` | `string` | Service description |
+| `dependencies` | `string[]` | Required services |
+| `singleton` | `boolean` | Single instance (default: true) |
+
+---
+
+## Database Models
+
+Define database structures using Zod schemas and migrations.
+
+### Creating a Model
+
+```typescript
+import { z } from 'zod'
+import { PluginHelpers } from '@sonicjs/core'
+
+const userSchema = z.object({
+  email: z.string().email(),
+  firstName: z.string(),
+  lastName: z.string(),
+  active: z.boolean().default(true)
+})
+
+const migration = PluginHelpers.createMigration('plugin_users', [
+  { name: 'id', type: 'INTEGER', primaryKey: true },
+  { name: 'email', type: 'TEXT', nullable: false, unique: true },
+  { name: 'first_name', type: 'TEXT', nullable: false },
+  { name: 'last_name', type: 'TEXT', nullable: false },
+  { name: 'active', type: 'INTEGER', nullable: false, defaultValue: '1' }
+])
+
+builder.addModel('PluginUser', {
+  tableName: 'plugin_users',
+  schema: userSchema,
+  migrations: [migration]
+})
+```
+
+---
+
+## Admin Interface
+
+Add pages and menu items to the admin interface.
+
+### Admin Pages
+
+```typescript
+builder.addAdminPage(
+  '/my-plugin',
+  'My Plugin',
+  'MyPluginView',
+  {
+    description: 'Manage my plugin',
+    permissions: ['my-plugin:view'],
+    icon: 'cog'
+  }
+)
+```
+
+### Menu Items
+
+```typescript
+builder.addMenuItem('My Plugin', '/admin/my-plugin', {
+  icon: 'puzzle-piece',
+  order: 50,
+  permissions: ['my-plugin:view']
+})
+
+// Sub-menu item
+builder.addMenuItem('Settings', '/admin/my-plugin/settings', {
+  icon: 'cog',
+  parent: 'My Plugin',
+  order: 1
+})
+```
+
+### Menu Item Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `icon` | `string` | Heroicon name |
+| `order` | `number` | Sort order (lower = earlier) |
+| `parent` | `string` | Parent menu label |
+| `permissions` | `string[]` | Required permissions |
+
+---
+
+## Plugin Context
+
+Plugins receive a context object with access to SonicJS APIs.
+
+### Context Interface
+
+```typescript
+interface PluginContext {
+  db: D1Database          // Cloudflare D1 database
+  kv: KVNamespace         // Cloudflare KV storage
+  r2?: R2Bucket           // Cloudflare R2 storage
+  config: PluginConfig    // Plugin configuration
+  services: {
+    auth: AuthService
+    content: ContentService
+    media: MediaService
+  }
+  hooks: HookSystem
+  logger: PluginLogger
+}
+```
+
+### Using the Database
+
+```typescript
+builder.lifecycle({
+  activate: async (context) => {
+    const result = await context.db.prepare(
+      'SELECT * FROM my_table WHERE active = ?'
+    ).bind(1).all()
+  }
+})
+```
+
+### Using KV Storage
+
+```typescript
+builder.lifecycle({
+  activate: async (context) => {
+    await context.kv.put('my-plugin:config', JSON.stringify(config))
+    const stored = await context.kv.get('my-plugin:config', 'json')
+  }
+})
+```
+
+### Using the Logger
+
+```typescript
+builder.lifecycle({
+  activate: async (context) => {
+    context.logger.debug('Debug message', { detail: 'value' })
+    context.logger.info('Plugin activated')
+    context.logger.warn('Warning message')
+    context.logger.error('Error occurred', new Error('Details'))
+  }
+})
+```
+
+---
+
+## Best Practices
+
+### 1. Plugin Naming
+
+Use lowercase with hyphens: `weather-forecast`, `user-analytics`
+
+### 2. Semantic Versioning
+
+Follow semver: `1.0.0` (initial), `1.1.0` (feature), `1.1.1` (fix), `2.0.0` (breaking)
+
+### 3. Provide Sensible Defaults
+
+```typescript
+builder.lifecycle({
+  configure: async (config) => {
+    const settings = {
+      enabled: true,
+      cacheEnabled: true,
+      cacheTTL: 3600,
+      ...config
+    }
+  }
+})
+```
+
+### 4. Validate Inputs
+
+```typescript
+import { z } from 'zod'
+
+const inputSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(1).max(100)
+})
+
+routes.post('/users', async (c) => {
+  const body = await c.req.json()
+  const validated = inputSchema.parse(body)
+  return c.json({ success: true, data: validated })
+})
+```
+
+### 5. Handle Errors Gracefully
+
+```typescript
+routes.get('/data', async (c) => {
+  try {
+    const data = await fetchData()
+    return c.json({ success: true, data })
+  } catch (error) {
+    console.error('Failed to fetch data:', error)
+    return c.json({ success: false, error: 'Failed to fetch data' }, 500)
+  }
+})
+```
+
+### 6. Clean Up Resources
+
+```typescript
+builder.lifecycle({
+  deactivate: async (context) => {
+    if (refreshInterval) clearInterval(refreshInterval)
+    cache.clear()
+  }
+})
+```
+
+---
+
+## Testing
+
+### Unit Testing
+
+```typescript
+import { describe, it, expect } from 'vitest'
+import { myPlugin } from '../index'
+
+describe('My Plugin', () => {
+  it('should have correct metadata', () => {
+    expect(myPlugin.name).toBe('my-plugin')
+    expect(myPlugin.version).toBe('1.0.0')
+  })
+
+  it('should register routes', () => {
+    expect(myPlugin.routes).toBeDefined()
+  })
+})
+```
+
+### Running Tests
+
+```bash
+npm run test
+```
+
+---
+
+## Next Steps
+
+<div className="not-prose">
+  <Button href="/plugins" variant="text" arrow="right">
+    <>Plugin System Overview</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/plugins/core" variant="text" arrow="right">
+    <>Core Plugins Reference</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/architecture" variant="text" arrow="right">
+    <>Understand SonicJS architecture</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/api" variant="text" arrow="right">
+    <>Explore the API reference</>
+  </Button>
+</div>
