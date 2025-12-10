@@ -1,7 +1,7 @@
-import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-3YNNVSMC.js';
-import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-EIE35JCC.js';
+import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-4PTABHLC.js';
+import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-TIU77QG6.js';
 import { PluginService } from './chunk-SGAG6FD3.js';
-import { MigrationService } from './chunk-NTXPL746.js';
+import { MigrationService } from './chunk-LGAUMBWN.js';
 import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-KQCYQKSV.js';
 import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-74RYBO6J.js';
 import { metricsTracker } from './chunk-FICTAGD4.js';
@@ -1720,7 +1720,7 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
 });
 adminApiRoutes.get("/migrations/status", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-YAFC5JVO.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-UJEQSCBA.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const status = await migrationService.getMigrationStatus();
@@ -1745,7 +1745,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const { MigrationService: MigrationService2 } = await import('./migrations-YAFC5JVO.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-UJEQSCBA.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const result = await migrationService.runPendingMigrations();
@@ -1764,7 +1764,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
 });
 adminApiRoutes.get("/migrations/validate", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-YAFC5JVO.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-UJEQSCBA.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const validation = await migrationService.validateSchema();
@@ -6455,10 +6455,9 @@ adminContentRoutes.post("/", async (c) => {
     const insertStmt = db.prepare(`
       INSERT INTO content (
         id, collection_id, slug, title, data, status,
-        scheduled_publish_at, scheduled_unpublish_at,
-        meta_title, meta_description, author_id, created_by, created_at, updated_at
+        author_id, created_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     await insertStmt.bind(
       contentId,
@@ -6467,11 +6466,6 @@ adminContentRoutes.post("/", async (c) => {
       data.title || "Untitled",
       JSON.stringify(data),
       status,
-      scheduledPublishAt ? new Date(scheduledPublishAt).getTime() : null,
-      scheduledUnpublishAt ? new Date(scheduledUnpublishAt).getTime() : null,
-      data.meta_title || null,
-      data.meta_description || null,
-      user?.userId || "unknown",
       user?.userId || "unknown",
       now,
       now
@@ -21580,5 +21574,5 @@ var ROUTES_INFO = {
 };
 
 export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, test_cleanup_default, userRoutes };
-//# sourceMappingURL=chunk-HDSRB23N.js.map
-//# sourceMappingURL=chunk-HDSRB23N.js.map
+//# sourceMappingURL=chunk-2AOJLDPQ.js.map
+//# sourceMappingURL=chunk-2AOJLDPQ.js.map
