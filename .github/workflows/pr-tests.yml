@@ -37,7 +37,9 @@ jobs:
       - name: Build core package
         run: npm run build:core
 
+      # Skip Cloudflare deployment and E2E tests for Dependabot PRs (no access to secrets)
       - name: Create fresh D1 database for PR
+        if: github.actor != 'dependabot[bot]'
         id: create-db
         run: |
           cd my-sonicjs-app
@@ -89,6 +91,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Run D1 migrations
+        if: github.actor != 'dependabot[bot]'
         run: |
           cd my-sonicjs-app
           echo "Applying migrations to database: ${{ steps.create-db.outputs.db_name }}"
@@ -98,6 +101,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Deploy to Cloudflare Workers Preview
+        if: github.actor != 'dependabot[bot]'
         id: deploy
         run: |
           cd my-sonicjs-app
@@ -140,6 +144,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Wait for preview deployment
+        if: github.actor != 'dependabot[bot]'
         run: |
           echo "Waiting for preview to be ready..."
           for i in {1..30}; do
@@ -154,16 +159,18 @@ jobs:
           exit 1
 
       - name: Install Playwright browsers
+        if: github.actor != 'dependabot[bot]'
         run: npx playwright install --with-deps chromium
 
       - name: Run E2E tests against preview
+        if: github.actor != 'dependabot[bot]'
         run: npm run e2e
         env:
           CI: true
           BASE_URL: ${{ steps.deploy.outputs.preview_url }}
 
       - name: Upload test results
-        if: always()
+        if: always() && github.actor != 'dependabot[bot]'
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
@@ -171,7 +178,7 @@ jobs:
           retention-days: 7
 
       - name: Upload test videos
-        if: failure()
+        if: failure() && github.actor != 'dependabot[bot]'
         uses: actions/upload-artifact@v4
         with:
           name: test-videos
