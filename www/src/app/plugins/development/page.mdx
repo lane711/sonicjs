@@ -77,7 +77,7 @@ The SonicJS plugin system provides a powerful, modular architecture for extendin
 
 ### Plugin Location
 
-Plugins live in the `packages/core/src/plugins/` directory with subdirectories for `core-plugins/`, `available/`, and `sdk/`.
+Custom plugins live in your app's `src/plugins/` directory. When you create a SonicJS app, this folder is set up for you to add your own plugins.
 
 ---
 
@@ -101,7 +101,7 @@ Let's create a simple plugin step by step.
 ### Step 1: Create the Plugin Directory
 
 ```bash
-mkdir -p packages/core/src/plugins/core-plugins/my-plugin
+mkdir -p src/plugins/my-plugin
 ```
 
 ### Step 2: Create the Manifest
@@ -136,8 +136,8 @@ Create `index.ts`:
 ```typescript
 import { Hono } from 'hono'
 import { html } from 'hono/html'
-import { PluginBuilder } from '../../sdk/plugin-builder'
-import type { Plugin } from '@sonicjs-cms/core'
+import { PluginBuilder } from '@sonicjs/core'
+import type { Plugin } from '@sonicjs/core'
 
 export function createMyPlugin(): Plugin {
   const builder = PluginBuilder.create({
@@ -183,11 +183,13 @@ export const myPlugin = createMyPlugin()
 
 ### Step 4: Register the Plugin
 
-Add your plugin to the core plugins index:
+Add your plugin to your app's plugin index at `src/plugins/index.ts`:
 
 ```typescript
 export { myPlugin } from './my-plugin'
 ```
+
+Your plugin will be automatically loaded when the app starts.
 
 ---
 
@@ -415,7 +417,7 @@ Define database structures using Zod schemas and migrations.
 
 ```typescript
 import { z } from 'zod'
-import { PluginHelpers } from '../../sdk/plugin-builder'
+import { PluginHelpers } from '@sonicjs/core'
 
 const userSchema = z.object({
   email: z.string().email(),
