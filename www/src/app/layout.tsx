@@ -1,4 +1,5 @@
 import { type Metadata } from 'next'
+import Script from 'next/script'
 
 import { Providers } from '@/app/providers'
 import { Layout } from '@/components/Layout'
@@ -25,6 +26,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full" suppressHydrationWarning>
+      <head>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-FWS35H2E1W"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FWS35H2E1W');
+          `}
+        </Script>
+      </head>
       <body className="flex min-h-full bg-white antialiased dark:bg-zinc-900">
         <Providers>
           <div className="w-full">
