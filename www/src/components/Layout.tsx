@@ -9,9 +9,7 @@ import { Header } from '@/components/Header'
 import { Logo } from '@/components/Logo'
 import { Navigation } from '@/components/Navigation'
 import { SectionProvider, type Section } from '@/components/SectionProvider'
-
-// Version from core package
-const version = '2.3.12'
+import { VERSION } from '@/lib/version'
 
 export function Layout({
   children,
@@ -35,7 +33,7 @@ export function Layout({
                 <Logo className="h-6" />
               </Link>
               <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-500/10 dark:text-blue-400 dark:ring-blue-500/20">
-                v{version}
+                v{VERSION}
               </span>
             </div>
             <Header />

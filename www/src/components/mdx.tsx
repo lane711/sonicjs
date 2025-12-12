@@ -13,6 +13,14 @@ export { Tabs } from '@/components/Tabs'
 export { ApiEndpoint } from '@/components/ApiEndpoint'
 export { CodeExample } from '@/components/CodeExample'
 export { FeatureGrid } from '@/components/FeatureGrid'
+export {
+  VersionBadge,
+  VersionText,
+  LastUpdatedInfo,
+  ActivelyMaintainedFooter,
+  LatestVersionEntry,
+  VERSION,
+} from '@/components/VersionInfo'
 
 export function wrapper({ children }: { children: React.ReactNode }) {
   return (

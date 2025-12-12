@@ -8,6 +8,7 @@
  * 2. Updates the version in packages/create-app/src/cli.js
  * 3. Syncs the create-sonicjs package version to match core version
  * 4. Syncs the root package.json version to match core version
+ * 5. Syncs the www documentation site version
  */
 
 import fs from 'fs'
@@ -22,6 +23,7 @@ const rootPackageJsonPath = path.join(rootDir, 'package.json')
 const corePackageJsonPath = path.join(rootDir, 'packages/core/package.json')
 const createAppCliPath = path.join(rootDir, 'packages/create-app/src/cli.js')
 const createAppPackageJsonPath = path.join(rootDir, 'packages/create-app/package.json')
+const wwwVersionPath = path.join(rootDir, 'www/src/lib/version.ts')
 
 async function syncVersions() {
   try {
@@ -61,6 +63,23 @@ async function syncVersions() {
     fs.writeFileSync(rootPackageJsonPath, JSON.stringify(rootPackageJson, null, 2) + '\n', 'utf8')
 
     console.log(`✓ Synced root package.json from ${oldRootVersion} to ${coreVersion}`)
+
+    // Sync www documentation site version
+    if (fs.existsSync(wwwVersionPath)) {
+      let wwwVersionContent = fs.readFileSync(wwwVersionPath, 'utf8')
+      const wwwVersionRegex = /export const VERSION = '[^']+'/
+      const newWwwVersionString = `export const VERSION = '${coreVersion}'`
+
+      if (wwwVersionRegex.test(wwwVersionContent)) {
+        wwwVersionContent = wwwVersionContent.replace(wwwVersionRegex, newWwwVersionString)
+        fs.writeFileSync(wwwVersionPath, wwwVersionContent, 'utf8')
+        console.log(`✓ Synced www documentation version to ${coreVersion}`)
+      } else {
+        console.warn('⚠ Could not find VERSION export in www/src/lib/version.ts')
+      }
+    } else {
+      console.warn('⚠ www/src/lib/version.ts not found, skipping www version sync')
+    }
 
     console.log('\n✅ Version sync complete!')
     console.log('\nNext steps:')
