@@ -274,9 +274,9 @@ test.describe('Collections API', () => {
       for (const name of malformedNames) {
         const response = await request.get(`/api/collections/${encodeURIComponent(name)}/content`);
 
-        // Should return 404 (not found) or handle gracefully - should not expose server errors
-        // Accept 404 (not found) or 200 with empty data as valid responses
-        expect([200, 404]).toContain(response.status());
+        // Should handle gracefully - should not expose server errors (500)
+        // Accept 400 (bad request), 404 (not found), or 200 with empty data as valid responses
+        expect([200, 400, 404]).toContain(response.status());
 
         const data = await response.json();
         // Should have valid JSON response structure
