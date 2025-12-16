@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
 
-test.describe.skip('Content API Collection Filtering', () => {
+test.describe('Content API Collection Filtering', () => {
   test('should filter content by collection parameter', async ({ request }) => {
     // First, get all collections to find actual collection names
-    const collectionsResponse = await request.get('http://localhost:8787/api/collections');
+    const collectionsResponse = await request.get('/api/collections');
     expect(collectionsResponse.ok()).toBeTruthy();
 
     const collectionsData = await collectionsResponse.json();
@@ -22,7 +22,7 @@ test.describe.skip('Content API Collection Filtering', () => {
     console.log(`Testing with collection: ${collectionName} (ID: ${collectionId})`);
 
     // Test 1: Get all content without filtering
-    const allContentResponse = await request.get('http://localhost:8787/api/content?limit=100');
+    const allContentResponse = await request.get('/api/content?limit=100');
     expect(allContentResponse.ok()).toBeTruthy();
 
     const allContentData = await allContentResponse.json();
@@ -30,7 +30,7 @@ test.describe.skip('Content API Collection Filtering', () => {
 
     // Test 2: Get content filtered by collection using query parameter
     const filteredResponse = await request.get(
-      `http://localhost:8787/api/content?limit=100&collection=${collectionName}`
+      `/api/content?limit=100&collection=${collectionName}`
     );
     expect(filteredResponse.ok()).toBeTruthy();
 
@@ -64,7 +64,7 @@ test.describe.skip('Content API Collection Filtering', () => {
 
   test('should filter content using status and collection together', async ({ request }) => {
     // Get collections
-    const collectionsResponse = await request.get('http://localhost:8787/api/collections');
+    const collectionsResponse = await request.get('/api/collections');
     const collectionsData = await collectionsResponse.json();
 
     if (collectionsData.data.length === 0) {
@@ -77,7 +77,7 @@ test.describe.skip('Content API Collection Filtering', () => {
 
     // Filter by both collection and status
     const response = await request.get(
-      `http://localhost:8787/api/content?limit=100&collection=${collectionName}&status=published`
+      `/api/content?limit=100&collection=${collectionName}&status=published`
     );
 
     expect(response.ok()).toBeTruthy();
@@ -96,7 +96,7 @@ test.describe.skip('Content API Collection Filtering', () => {
 
   test('should return empty array for non-existent collection', async ({ request }) => {
     const response = await request.get(
-      'http://localhost:8787/api/content?limit=100&collection=nonexistent_collection_xyz'
+      '/api/content?limit=100&collection=nonexistent_collection_xyz'
     );
 
     expect(response.ok()).toBeTruthy();
@@ -111,7 +111,7 @@ test.describe.skip('Content API Collection Filtering', () => {
 
   test('should work with sort and order parameters', async ({ request }) => {
     // Get collections
-    const collectionsResponse = await request.get('http://localhost:8787/api/collections');
+    const collectionsResponse = await request.get('/api/collections');
     const collectionsData = await collectionsResponse.json();
 
     if (collectionsData.data.length === 0) {
@@ -123,7 +123,7 @@ test.describe.skip('Content API Collection Filtering', () => {
 
     // Filter with collection and sort
     const response = await request.get(
-      `http://localhost:8787/api/content?limit=10&collection=${collectionName}&sort=${encodeURIComponent(JSON.stringify([{ field: 'created_at', order: 'desc' }]))}`
+      `/api/content?limit=10&collection=${collectionName}&sort=${encodeURIComponent(JSON.stringify([{ field: 'created_at', order: 'desc' }]))}`
     );
 
     expect(response.ok()).toBeTruthy();

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin, deleteTestCollection, TEST_DATA } from './utils/test-helpers';
 
-test.describe.skip('Admin Collections API', () => {
+test.describe('Admin Collections API', () => {
   let authHeaders: Record<string, string> = {};
 
   // Setup authentication for API requests
