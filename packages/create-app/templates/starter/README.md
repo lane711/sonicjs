@@ -80,7 +80,7 @@ export default {
   fields: {
     name: { type: 'text', required: true },
     price: { type: 'number', required: true },
-    description: { type: 'markdown' }
+    description: { type: 'quill' }
   }
 } satisfies CollectionConfig
 ```
