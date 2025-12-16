@@ -10,7 +10,7 @@ import allSections from './allSections.json'
 
 export const metadata: Metadata = {
   title: {
-    template: '%s - SonicJS Documentation',
+    template: '%s | SonicJS Docs',
     default: 'SonicJS - Modern Headless CMS for Cloudflare Workers',
   },
   description:
@@ -93,6 +93,67 @@ export default function RootLayout({
             gtag('config', 'G-FWS35H2E1W');
           `}
         </Script>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@graph': [
+                {
+                  '@type': 'Organization',
+                  '@id': 'https://sonicjs.com/#organization',
+                  name: 'SonicJS',
+                  url: 'https://sonicjs.com',
+                  logo: {
+                    '@type': 'ImageObject',
+                    url: 'https://sonicjs.com/sonicjs-favicon.png',
+                  },
+                  sameAs: [
+                    'https://github.com/lane711/sonicjs',
+                    'https://twitter.com/nicholasbarger',
+                    'https://discord.gg/SV4Mqsss8f',
+                  ],
+                },
+                {
+                  '@type': 'SoftwareApplication',
+                  '@id': 'https://sonicjs.com/#software',
+                  name: 'SonicJS',
+                  description:
+                    'A modern, blazingly fast headless CMS built with TypeScript, Hono, and Cloudflare Workers.',
+                  applicationCategory: 'DeveloperApplication',
+                  operatingSystem: 'Cross-platform',
+                  offers: {
+                    '@type': 'Offer',
+                    price: '0',
+                    priceCurrency: 'USD',
+                  },
+                  author: {
+                    '@id': 'https://sonicjs.com/#organization',
+                  },
+                  programmingLanguage: 'TypeScript',
+                  runtimePlatform: 'Cloudflare Workers',
+                },
+                {
+                  '@type': 'WebSite',
+                  '@id': 'https://sonicjs.com/#website',
+                  url: 'https://sonicjs.com',
+                  name: 'SonicJS Documentation',
+                  publisher: {
+                    '@id': 'https://sonicjs.com/#organization',
+                  },
+                  potentialAction: {
+                    '@type': 'SearchAction',
+                    target: {
+                      '@type': 'EntryPoint',
+                      urlTemplate: 'https://sonicjs.com/?q={search_term_string}',
+                    },
+                    'query-input': 'required name=search_term_string',
+                  },
+                },
+              ],
+            }),
+          }}
+        />
       </head>
       <body className="flex min-h-full bg-white antialiased dark:bg-zinc-900">
         <Providers>
