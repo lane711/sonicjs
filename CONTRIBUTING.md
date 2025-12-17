@@ -47,6 +47,7 @@ We appreciate every developer who wants to contribute. To ensure the best experi
 - **Documentation**: Public APIs must be documented
 - **Formatting**: Use Prettier (runs automatically on commit)
 - **Linting**: ESLint rules must pass
+- **Naming Conventions**: See our [Coding Standards Guide](https://sonicjs.com/coding-standards) for detailed naming conventions and code style guidelines
 
 ## Pull Request Checklist
 

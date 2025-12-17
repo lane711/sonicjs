@@ -8,6 +8,7 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
+    "predev": "node scripts/generate-sections.mjs",
     "dev": "next dev -p 3010",
     "prebuild": "node scripts/generate-sections.mjs",
     "build": "next build",
