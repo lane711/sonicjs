@@ -15,7 +15,7 @@ import { setupCacheInvalidation } from './services/cache-invalidation.js'
 import cacheRoutes from './routes.js'
 
 export class CachePlugin {
-  private ___context: PluginContext | null = null
+  private _context: PluginContext | null = null
 
   /**
    * Get plugin routes
@@ -28,7 +28,7 @@ export class CachePlugin {
    * Activate the cache plugin
    */
   async activate(context: PluginContext): Promise<void> {
-    this.___context = context
+    this._context = context
 
     const settings = context.config || {}
 
@@ -58,7 +58,7 @@ export class CachePlugin {
   async deactivate(): Promise<void> {
     console.log('❌ Cache plugin deactivated - clearing all caches')
     await clearAllCaches()
-    this.___context = null
+    this._context = null
   }
 
   /**

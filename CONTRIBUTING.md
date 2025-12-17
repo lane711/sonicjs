@@ -46,16 +46,25 @@ We appreciate every developer who wants to contribute. To ensure the best experi
 - **Testing**: New features must include tests
 - **Documentation**: Public APIs must be documented
 - **Formatting**: Use Prettier (runs automatically on commit)
-- **Linting**: ESLint rules must pass
+- **Linting**: ESLint rules must pass (runs automatically on commit)
 - **Naming Conventions**: See our [Coding Standards Guide](https://sonicjs.com/coding-standards) for detailed naming conventions and code style guidelines
+
+### Running Lint
+
+```bash
+# Lint the core package
+npm run lint --workspace=@sonicjs-cms/core
+
+# Auto-fix lint issues
+npm run lint:fix --workspace=@sonicjs-cms/core
+```
 
 ## Pull Request Checklist
 
 Before submitting a PR:
 
 - [ ] All tests pass (`npm test`)
-- [ ] Code is formatted (`npm run format`)
-- [ ] Linting passes (`npm run lint`)
+- [ ] Linting passes (`npm run lint --workspace=@sonicjs-cms/core`)
 - [ ] Changes are documented if needed
 - [ ] PR description explains the changes
 - [ ] Related issue is referenced

@@ -45,7 +45,7 @@ adminMediaRoutes.get('/', async (c) => {
     const type = searchParams.get('type') || 'all'
     const view = searchParams.get('view') || 'grid'
     const page = parseInt(searchParams.get('page') || '1')
-    const ____cacheBust = searchParams.get('t') // Cache-busting parameter
+    const _cacheBust = searchParams.get('t') // Cache-busting parameter
     const limit = 24
     const offset = (page - 1) * limit
 

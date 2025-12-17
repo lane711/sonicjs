@@ -346,7 +346,7 @@ adminApiRoutes.post('/collections', async (c) => {
       }
       const validatedData = validation.data
       const db = c.env.DB
-      const ____user = c.get('user')
+      const _user = c.get('user')
 
       // Handle both camelCase and snake_case for display_name
       const displayName = validatedData.displayName || validatedData.display_name || ''

@@ -34,7 +34,7 @@ export function createMediaPlugin(): Plugin {
   mediaAPI.get('/', async (c) => {
     const page = parseInt(c.req.query('page') || '1')
     const limit = parseInt(c.req.query('limit') || '20')
-    const ____type = c.req.query('type') // image, video, document, etc.
+    const _type = c.req.query('type') // image, video, document, etc.
 
     return c.json({
       message: 'Media list',
