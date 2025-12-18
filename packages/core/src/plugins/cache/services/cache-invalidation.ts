@@ -12,7 +12,7 @@ import { getEventBus, onEvent } from './event-bus.js'
  * Setup automatic cache invalidation based on events
  */
 export function setupCacheInvalidation(): void {
-  const _____eventBus = getEventBus()
+  const _eventBus = getEventBus()
 
   // Content cache invalidation
   setupContentInvalidation()

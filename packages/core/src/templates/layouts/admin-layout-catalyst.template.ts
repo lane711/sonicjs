@@ -55,7 +55,7 @@ export function renderCatalystCheckbox(props: CatalystCheckboxProps): string {
     red: { bg: "#dc2626", border: "#b91c1c", check: "#ffffff" },
   };
 
-  const ____config = colorConfig[color] || colorConfig["dark/zinc"];
+  const _config = colorConfig[color] || colorConfig["dark/zinc"];
 
   const colorClasses = {
     "dark/zinc":
