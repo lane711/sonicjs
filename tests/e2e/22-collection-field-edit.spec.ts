@@ -4,7 +4,7 @@ import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers';
 // Use environment variable for port or default to 8787
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8787';
 
-test.describe.skip('Collection Field Edit', () => {
+test.describe('Collection Field Edit', () => {
   test.beforeEach(async ({ page }) => {
     await ensureAdminUserExists(page);
     await loginAsAdmin(page);
@@ -35,7 +35,7 @@ test.describe.skip('Collection Field Edit', () => {
       await page.waitForSelector('#field-modal:not(.hidden)');
 
       // Fill in field details
-      await page.fill('#field-name', 'test_field');
+      await page.fill('#modal-field-name', 'test_field');
       await page.selectOption('#field-type', 'text');
       await page.fill('#field-label', 'Test Field');
 
@@ -63,13 +63,14 @@ test.describe.skip('Collection Field Edit', () => {
     await page.waitForSelector('#field-modal:not(.hidden)');
     await expect(page.locator('#modal-title')).toContainText('Edit Field');
 
-    // Check that the field name input is populated
-    const fieldNameInput = page.locator('#field-name');
-    const fieldNameValue = await fieldNameInput.inputValue();
+    // Wait for the field name input to be populated (JS uses setTimeout)
+    const fieldNameInput = page.locator('#modal-field-name');
+    await expect(fieldNameInput).not.toHaveValue('', { timeout: 5000 });
 
+    const fieldNameValue = await fieldNameInput.inputValue();
     console.log(`Field name input value: "${fieldNameValue}"`);
 
-    // Assert that field name is not empty
+    // Assert that field name matches the displayed field name
     expect(fieldNameValue).toBeTruthy();
     expect(fieldNameValue.length).toBeGreaterThan(0);
     expect(fieldNameValue).toBe(fieldNameText);
@@ -103,7 +104,7 @@ test.describe.skip('Collection Field Edit', () => {
     if (fieldCount === 0) {
       // Add a field
       await page.click('button:has-text("Add Field")');
-      await page.fill('#field-name', 'editable_test');
+      await page.fill('#modal-field-name', 'editable_test');
       await page.selectOption('#field-type', 'text');
       await page.fill('#field-label', 'Editable Test');
       await page.click('#field-modal button[type="submit"]');
@@ -117,9 +118,9 @@ test.describe.skip('Collection Field Edit', () => {
 
     await page.waitForSelector('#field-modal:not(.hidden)');
 
-    // Field name should be readonly (not disabled) when editing
-    const fieldNameInput = page.locator('#field-name');
-    await expect(fieldNameInput).toHaveAttribute('readonly');
+    // Field name should be disabled when editing
+    const fieldNameInput = page.locator('#modal-field-name');
+    await expect(fieldNameInput).toBeDisabled();
 
     // But label and type should be editable
     const fieldLabelInput = page.locator('#field-label');
@@ -136,7 +137,7 @@ test.describe.skip('Collection Field Edit', () => {
 
     // Close modal without saving (cancel)
     await page.click('button:has-text("Cancel")');
-    await page.waitForSelector('#field-modal.hidden');
+    await expect(page.locator('#field-modal')).toHaveClass(/hidden/);
   });
 
   test('should preserve all field properties when editing', async ({ page }) => {
@@ -151,13 +152,13 @@ test.describe.skip('Collection Field Edit', () => {
     await page.waitForSelector('#field-modal:not(.hidden)', { timeout: 10000 });
 
     // Wait for field name input to be visible and enabled (no readonly for new fields)
-    const fieldNameInput = page.locator('#field-name');
+    const fieldNameInput = page.locator('#modal-field-name');
     await fieldNameInput.waitFor({ state: 'visible', timeout: 10000 });
 
     // If readonly, wait for it to be removed or skip this test
     const isReadonly = await fieldNameInput.getAttribute('readonly');
     if (isReadonly === null) {
-      await page.fill('#field-name', 'complete_field');
+      await page.fill('#modal-field-name', 'complete_field');
     } else {
       // Skip filling if field is readonly (might be due to test pollution)
       console.log('Skipping fill - field is readonly');
@@ -169,19 +170,29 @@ test.describe.skip('Collection Field Edit', () => {
     await page.check('#field-required');
     await page.check('#field-searchable');
 
+    // Click submit and wait for the field to appear (page reloads after successful POST)
     await page.click('#field-modal button[type="submit"]');
-    await page.waitForLoadState('networkidle');
 
-    // Find and edit the field we just created
+    // Wait for the field to appear in the list (happens after page reload)
     const newField = page.locator('.field-item:has(code:has-text("complete_field"))');
-    await expect(newField).toBeVisible();
+    await expect(newField).toBeVisible({ timeout: 15000 });
+
+    // Close modal if it's still open (some browsers may show it during reload transition)
+    const modalVisible = await page.locator('#field-modal:not(.hidden)').isVisible().catch(() => false);
+    if (modalVisible) {
+      await page.click('button:has-text("Cancel")');
+      await expect(page.locator('#field-modal')).toHaveClass(/hidden/, { timeout: 5000 });
+    }
 
     const editBtn = newField.locator('button:has-text("Edit")');
     await editBtn.click();
     await page.waitForSelector('#field-modal:not(.hidden)');
 
+    // Wait for the field name input to be populated (JS uses setTimeout)
+    await expect(page.locator('#modal-field-name')).not.toHaveValue('', { timeout: 5000 });
+
     // Verify all properties are populated
-    expect(await page.locator('#field-name').inputValue()).toBe('complete_field');
+    expect(await page.locator('#modal-field-name').inputValue()).toBe('complete_field');
     expect(await page.locator('#field-label').inputValue()).toBe('Complete Field');
     expect(await page.locator('#field-type').inputValue()).toBe('text');
     expect(await page.locator('#field-required').isChecked()).toBe(true);
@@ -202,13 +213,13 @@ test.describe.skip('Collection Field Edit', () => {
     await page.waitForSelector('#field-modal:not(.hidden)', { timeout: 10000 });
 
     // Wait for field name input to be visible
-    const fieldNameInput = page.locator('#field-name');
+    const fieldNameInput = page.locator('#modal-field-name');
     await fieldNameInput.waitFor({ state: 'visible', timeout: 10000 });
 
     // If readonly, wait for it to be removed or skip
     const isReadonly = await fieldNameInput.getAttribute('readonly');
     if (isReadonly === null) {
-      await page.fill('#field-name', 'select_test');
+      await page.fill('#modal-field-name', 'select_test');
     } else {
       // Skip filling if field is readonly
       console.log('Skipping fill - field is readonly');
@@ -221,13 +232,25 @@ test.describe.skip('Collection Field Edit', () => {
     // Should show options container
     await expect(page.locator('#field-options-container')).not.toHaveClass(/hidden/);
 
+    // Click submit and wait for the field to appear (page reloads after successful POST)
     await page.click('#field-modal button[type="submit"]');
-    await page.waitForLoadState('networkidle');
 
-    // Edit the select field
+    // Wait for the field to appear in the list (happens after page reload)
     const selectField = page.locator('.field-item:has(code:has-text("select_test"))');
+    await expect(selectField).toBeVisible({ timeout: 15000 });
+
+    // Close modal if it's still open (some browsers may show it during reload transition)
+    const modalVisible = await page.locator('#field-modal:not(.hidden)').isVisible().catch(() => false);
+    if (modalVisible) {
+      await page.click('button:has-text("Cancel")');
+      await expect(page.locator('#field-modal')).toHaveClass(/hidden/, { timeout: 5000 });
+    }
+
     await selectField.locator('button:has-text("Edit")').click();
     await page.waitForSelector('#field-modal:not(.hidden)');
+
+    // Wait for the field type to be populated (JS uses setTimeout)
+    await expect(page.locator('#field-type')).not.toHaveValue('', { timeout: 5000 });
 
     // Verify field type and options are populated
     expect(await page.locator('#field-type').inputValue()).toBe('select');

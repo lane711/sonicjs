@@ -992,6 +992,8 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         })
         .then(data => {
           if (data.success) {
+            // Close modal before reloading
+            closeFieldModal();
             location.reload();
           } else {
             alert('Error saving field: ' + (data.error || 'Unknown error'));

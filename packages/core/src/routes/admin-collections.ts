@@ -619,7 +619,22 @@ adminCollectionsRoutes.post('/:id/fields', async (c) => {
 
     const db = c.env.DB
 
-    // Check if field already exists
+    // Get current collection to check its schema
+    const getCollectionStmt = db.prepare('SELECT * FROM collections WHERE id = ?')
+    const collection = await getCollectionStmt.bind(collectionId).first() as any
+
+    if (!collection) {
+      return c.json({ success: false, error: 'Collection not found.' })
+    }
+
+    // Check if field already exists in schema
+    let schema = collection.schema ? (typeof collection.schema === 'string' ? JSON.parse(collection.schema) : collection.schema) : null
+
+    if (schema && schema.properties && schema.properties[fieldName]) {
+      return c.json({ success: false, error: 'A field with this name already exists.' })
+    }
+
+    // Also check content_fields table for legacy support
     const existingStmt = db.prepare('SELECT id FROM content_fields WHERE collection_id = ? AND field_name = ?')
     const existing = await existingStmt.bind(collectionId, fieldName).first()
 
@@ -627,12 +642,74 @@ adminCollectionsRoutes.post('/:id/fields', async (c) => {
       return c.json({ success: false, error: 'A field with this name already exists.' })
     }
 
+    // Parse field options
+    let parsedOptions = {}
+    try {
+      parsedOptions = fieldOptions ? JSON.parse(fieldOptions) : {}
+    } catch (e) {
+      console.error('Error parsing field options:', e)
+    }
+
+    // Add field to schema (primary storage method)
+    if (schema) {
+      if (!schema.properties) {
+        schema.properties = {}
+      }
+      if (!schema.required) {
+        schema.required = []
+      }
+
+      // Build field config based on type
+      const fieldConfig: any = {
+        type: fieldType === 'number' ? 'number' : fieldType === 'boolean' ? 'boolean' : 'string',
+        title: fieldLabel,
+        searchable: isSearchable,
+        ...parsedOptions
+      }
+
+      // Handle special field types
+      if (fieldType === 'richtext') {
+        fieldConfig.format = 'richtext'
+      } else if (fieldType === 'date') {
+        fieldConfig.format = 'date-time'
+      } else if (fieldType === 'select') {
+        fieldConfig.enum = (parsedOptions as any).options || []
+      } else if (fieldType === 'media') {
+        fieldConfig.format = 'media'
+      } else if (fieldType === 'quill') {
+        fieldConfig.type = 'quill'
+      } else if (fieldType === 'mdxeditor') {
+        fieldConfig.type = 'mdxeditor'
+      }
+
+      schema.properties[fieldName] = fieldConfig
+
+      // Add to required array if needed
+      if (isRequired && !schema.required.includes(fieldName)) {
+        schema.required.push(fieldName)
+      }
+
+      // Update collection schema in database
+      const updateSchemaStmt = db.prepare(`
+        UPDATE collections
+        SET schema = ?, updated_at = ?
+        WHERE id = ?
+      `)
+
+      await updateSchemaStmt.bind(JSON.stringify(schema), Date.now(), collectionId).run()
+
+      console.log('[Add Field] Added field to schema:', fieldName, fieldConfig)
+
+      return c.json({ success: true, fieldId: `schema-${fieldName}` })
+    }
+
+    // Fallback: If no schema exists, use content_fields table
     // Get next field order
     const orderStmt = db.prepare('SELECT MAX(field_order) as max_order FROM content_fields WHERE collection_id = ?')
     const orderResult = await orderStmt.bind(collectionId).first() as any
     const nextOrder = (orderResult?.max_order || 0) + 1
 
-    // Create field
+    // Create field in content_fields table
     const fieldId = crypto.randomUUID()
     const now = Date.now()
 
@@ -818,8 +895,57 @@ adminCollectionsRoutes.put('/:collectionId/fields/:fieldId', async (c) => {
 adminCollectionsRoutes.delete('/:collectionId/fields/:fieldId', async (c) => {
   try {
     const fieldId = c.req.param('fieldId')
+    const collectionId = c.req.param('collectionId')
     const db = c.env.DB
 
+    // Check if this is a schema field (starts with "schema-")
+    if (fieldId.startsWith('schema-')) {
+      const fieldName = fieldId.replace('schema-', '')
+
+      // Get the current collection
+      const getCollectionStmt = db.prepare('SELECT * FROM collections WHERE id = ?')
+      const collection = await getCollectionStmt.bind(collectionId).first() as any
+
+      if (!collection) {
+        return c.json({ success: false, error: 'Collection not found.' })
+      }
+
+      // Parse the current schema
+      let schema = typeof collection.schema === 'string' ? JSON.parse(collection.schema) : collection.schema
+      if (!schema || !schema.properties) {
+        return c.json({ success: false, error: 'Field not found in schema.' })
+      }
+
+      // Remove field from schema
+      if (schema.properties[fieldName]) {
+        delete schema.properties[fieldName]
+
+        // Also remove from required array if present
+        if (schema.required && Array.isArray(schema.required)) {
+          const requiredIndex = schema.required.indexOf(fieldName)
+          if (requiredIndex !== -1) {
+            schema.required.splice(requiredIndex, 1)
+          }
+        }
+
+        // Update the collection in the database
+        const updateCollectionStmt = db.prepare(`
+          UPDATE collections
+          SET schema = ?, updated_at = ?
+          WHERE id = ?
+        `)
+
+        await updateCollectionStmt.bind(JSON.stringify(schema), Date.now(), collectionId).run()
+
+        console.log('[Delete Field] Removed field from schema:', fieldName)
+
+        return c.json({ success: true })
+      } else {
+        return c.json({ success: false, error: 'Field not found in schema.' })
+      }
+    }
+
+    // For regular database fields
     const deleteStmt = db.prepare('DELETE FROM content_fields WHERE id = ?')
     await deleteStmt.bind(fieldId).run()
 
