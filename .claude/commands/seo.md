@@ -33,6 +33,15 @@ export const metadata = {
 
 # [H1 TITLE - Include Primary Keyword]
 
+<TLDRBox>
+**TL;DR** — [2-3 sentence summary answering the main question]
+
+**Key Stats:**
+- [Stat 1 with number - e.g., "50ms average response time globally"]
+- [Stat 2 with number - e.g., "Zero cold starts with V8 isolates"]
+- [Stat 3 with number - e.g., "300+ edge locations worldwide"]
+</TLDRBox>
+
 [Opening paragraph - hook the reader, state the problem/opportunity]
 
 ## [H2 Section - Include Secondary Keyword]
@@ -49,6 +58,31 @@ export const metadata = {
 
 [Call to action - try SonicJS, read docs, join Discord]
 ```
+
+### TL;DR Box Best Practices (Featured Snippet Optimization)
+
+Adding a TL;DR summary box at the top of blog posts significantly improves SEO:
+
+**Why TL;DR Boxes Matter:**
+- **Featured Snippets**: Google extracts concise answers for "Position Zero" - TL;DR sections are perfect for this
+- **AI Overviews**: Google SGE and Perplexity AI prioritize structured, concise summaries
+- **Voice Search**: Short answers (2-3 sentences) fit voice assistant response formats
+- **User Experience**: Respects reader time, reduces bounce rates, increases dwell time
+- **35% increase in AI visibility** reported by agencies implementing TL;DR sections
+
+**TL;DR Format Guidelines:**
+- Place at the TOP of the article, immediately after the H1
+- Keep to 80-100 words or 3-5 bullet points maximum
+- Include 1-2 focus keywords naturally
+- Use bold formatting for scanability
+- Include specific numbers/stats when possible (e.g., "50ms latency" not "fast")
+- Start definitions with "[Keyword] is..." format for featured snippet optimization
+
+**Key Stats Section:**
+- Include 3-5 compelling statistics or metrics
+- Use specific numbers (quantifiable data performs better)
+- Highlight SonicJS differentiators with data
+- Format as bullet points for easy extraction by search engines
 
 **Content Types to Create**:
 1. **Tutorials**: Step-by-step guides (e.g., "How to Build a Blog with SonicJS and Cloudflare Workers")

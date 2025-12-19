@@ -1,11 +1,13 @@
 import { MetadataRoute } from 'next'
+import { getAllPosts } from '@/lib/blog'
+import { BLOG_CATEGORIES } from '@/types/blog'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://sonicjs.com'
   const currentDate = new Date().toISOString()
 
   // Main documentation pages with their priorities
-  const pages = [
+  const docPages = [
     // Homepage - highest priority
     { url: '', priority: 1.0, changeFrequency: 'weekly' as const },
 
@@ -57,10 +59,58 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: '/roadmap', priority: 0.6, changeFrequency: 'monthly' as const },
   ]
 
-  return pages.map((page) => ({
-    url: `${baseUrl}${page.url}`,
-    lastModified: currentDate,
-    changeFrequency: page.changeFrequency,
-    priority: page.priority,
+  // Blog index page - high priority
+  const blogIndex = {
+    url: '/blog',
+    priority: 0.9,
+    changeFrequency: 'daily' as const,
+  }
+
+  // Get all blog posts
+  const posts = await getAllPosts()
+
+  // Individual blog posts
+  const blogPosts = posts.map((post) => ({
+    url: `/blog/${post.slug}`,
+    lastModified: post.updatedAt || post.publishedAt,
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
   }))
+
+  // Blog category pages
+  const categoryPages = BLOG_CATEGORIES.map((category) => ({
+    url: `/blog/category/${category.value}`,
+    priority: 0.7,
+    changeFrequency: 'weekly' as const,
+  }))
+
+  // Combine all pages
+  const allPages = [
+    ...docPages.map((page) => ({
+      url: `${baseUrl}${page.url}`,
+      lastModified: currentDate,
+      changeFrequency: page.changeFrequency,
+      priority: page.priority,
+    })),
+    {
+      url: `${baseUrl}${blogIndex.url}`,
+      lastModified: currentDate,
+      changeFrequency: blogIndex.changeFrequency,
+      priority: blogIndex.priority,
+    },
+    ...blogPosts.map((page) => ({
+      url: `${baseUrl}${page.url}`,
+      lastModified: page.lastModified,
+      changeFrequency: page.changeFrequency,
+      priority: page.priority,
+    })),
+    ...categoryPages.map((page) => ({
+      url: `${baseUrl}${page.url}`,
+      lastModified: currentDate,
+      changeFrequency: page.changeFrequency,
+      priority: page.priority,
+    })),
+  ]
+
+  return allPages
 }
