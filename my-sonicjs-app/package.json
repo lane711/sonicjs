@@ -5,36 +5,34 @@
   "description": "A SonicJS headless CMS application",
   "type": "module",
   "scripts": {
-    "dev": "npm run dev:build && npm run dev:watch",
-    "dev:build": "cd ../packages/core && npm run build",
-    "dev:watch": "npm run dev:core & wrangler dev 2>&1 | grep -v '\\[wrangler:inf\\]'",
-    "dev:core": "cd ../packages/core && npm run dev",
-    "build": "echo 'Worker build is handled by wrangler during deployment'",
+    "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "db:migrate": "wrangler d1 migrations apply DB",
     "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "db:reset": "sonicjs-db-reset",
     "db:studio": "drizzle-kit studio",
     "type-check": "tsc --noEmit",
     "test": "vitest --run",
     "test:watch": "vitest",
     "update": "npm install @sonicjs-cms/core@latest --save",
     "update:beta": "npm install @sonicjs-cms/core@beta --save",
-    "seed": "tsx scripts/seed-admin.ts",
-    "setup:db": "bash scripts/setup-worktree-db.sh"
+    "seed": "tsx scripts/seed-admin.ts"
   },
   "dependencies": {
     "@sonicjs-cms/core": "file:../packages/core"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250620.0",
-    "@types/node": "^20.19.1",
-    "drizzle-kit": "^0.30.0",
-    "drizzle-orm": "^0.44.2",
-    "hono": "^4.7.3",
-    "typescript": "^5.8.3",
-    "vitest": "^2.1.8",
-    "wrangler": "^4.45.4",
-    "zod": "^3.25.67"
+    "@cloudflare/workers-types": "^4.20251202.0",
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^24.10.1",
+    "drizzle-kit": "^0.31.7",
+    "drizzle-orm": "^0.44.7",
+    "hono": "^4.10.7",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15",
+    "wrangler": "^4.52.1",
+    "zod": "^4.1.13"
   },
   "engines": {
     "node": ">=18.0.0"

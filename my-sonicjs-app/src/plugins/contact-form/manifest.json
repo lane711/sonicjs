@@ -1,0 +1,19 @@
+{
+  "id": "contact-form",
+  "name": "Contact Form",
+  "version": "1.0.0",
+  "description": "Contact form with Google Maps support",
+  "author": "My Company",
+  "license": "MIT",
+  "category": "communication",
+  "adminMenu": {
+    "label": "Contact Form",
+    "icon": "envelope",
+    "path": "/admin/plugins/contact-form/settings",
+    "order": 90
+  },
+  "permissions": [
+    "contact_form.manage",
+    "contact_form.read"
+  ]
+}
