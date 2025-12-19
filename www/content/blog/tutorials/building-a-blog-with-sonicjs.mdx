@@ -1,0 +1,461 @@
+---
+title: "How to Build a Blog with SonicJS and Cloudflare Workers"
+description: "Step-by-step tutorial on building a blazingly fast blog using SonicJS headless CMS deployed on Cloudflare Workers with D1 database and R2 storage."
+keywords:
+  - "sonicjs blog tutorial"
+  - "cloudflare workers blog"
+  - "edge cms blog"
+  - "headless cms tutorial"
+  - "build blog with cms"
+category: "tutorials"
+tags:
+  - "blog"
+  - "tutorial"
+  - "cloudflare"
+  - "d1"
+publishedAt: "2025-12-12"
+author:
+  name: "SonicJS Team"
+  twitter: "sonicjs"
+  github: "lane711/sonicjs"
+---
+
+# How to Build a Blog with SonicJS and Cloudflare Workers
+
+<TLDRBox>
+**TL;DR** — Build a complete blog backend with SonicJS in under 30 minutes. Define Authors, Categories, and Posts collections, configure caching for performance, and deploy to Cloudflare Workers for global edge delivery.
+
+**Key Stats:**
+- Sub-50ms response times worldwide
+- 3 content collections: Authors, Categories, Posts
+- Built-in relationships and media handling
+- 1 command to deploy: `npm run deploy`
+</TLDRBox>
+
+Building a blog has never been faster. In this tutorial, we'll create a complete blog backend using SonicJS, leveraging Cloudflare Workers for global edge deployment. Your blog will have sub-50ms response times worldwide.
+
+## What We're Building
+
+By the end of this tutorial, you'll have:
+
+- A complete blog content API
+- Author management with relationships
+- Category and tag support
+- Media uploads for featured images
+- Full-text search capability
+
+## Prerequisites
+
+- Node.js 20+
+- Cloudflare account
+- Wrangler CLI installed
+
+## Step 1: Project Setup
+
+Create a new SonicJS project:
+
+```bash
+npm create sonicjs-app my-blog
+cd my-blog
+```
+
+## Step 2: Define Content Collections
+
+### Authors Collection
+
+Create `src/collections/authors.ts`:
+
+```typescript
+import { defineCollection } from '@sonicjs-cms/core'
+
+export const authorsCollection = defineCollection({
+  name: 'authors',
+  slug: 'authors',
+  fields: {
+    name: {
+      type: 'string',
+      required: true,
+      maxLength: 100,
+    },
+    email: {
+      type: 'email',
+      required: true,
+      unique: true,
+    },
+    bio: {
+      type: 'text',
+      maxLength: 500,
+    },
+    avatar: {
+      type: 'media',
+    },
+    twitter: {
+      type: 'string',
+      maxLength: 50,
+    },
+    github: {
+      type: 'string',
+      maxLength: 50,
+    },
+  },
+})
+```
+
+### Categories Collection
+
+Create `src/collections/categories.ts`:
+
+```typescript
+import { defineCollection } from '@sonicjs-cms/core'
+
+export const categoriesCollection = defineCollection({
+  name: 'categories',
+  slug: 'categories',
+  fields: {
+    name: {
+      type: 'string',
+      required: true,
+      maxLength: 50,
+    },
+    slug: {
+      type: 'string',
+      required: true,
+      unique: true,
+    },
+    description: {
+      type: 'text',
+      maxLength: 200,
+    },
+  },
+})
+```
+
+### Posts Collection
+
+Create `src/collections/posts.ts`:
+
+```typescript
+import { defineCollection } from '@sonicjs-cms/core'
+
+export const postsCollection = defineCollection({
+  name: 'posts',
+  slug: 'posts',
+  fields: {
+    title: {
+      type: 'string',
+      required: true,
+      maxLength: 200,
+    },
+    slug: {
+      type: 'string',
+      required: true,
+      unique: true,
+    },
+    excerpt: {
+      type: 'text',
+      maxLength: 300,
+    },
+    content: {
+      type: 'richtext',
+      required: true,
+    },
+    featuredImage: {
+      type: 'media',
+    },
+    author: {
+      type: 'relation',
+      collection: 'authors',
+      required: true,
+    },
+    category: {
+      type: 'relation',
+      collection: 'categories',
+    },
+    tags: {
+      type: 'array',
+      of: 'string',
+    },
+    status: {
+      type: 'select',
+      options: ['draft', 'published', 'archived'],
+      default: 'draft',
+    },
+    publishedAt: {
+      type: 'datetime',
+    },
+    seo: {
+      type: 'object',
+      fields: {
+        metaTitle: { type: 'string', maxLength: 60 },
+        metaDescription: { type: 'string', maxLength: 160 },
+        ogImage: { type: 'media' },
+      },
+    },
+  },
+})
+```
+
+## Step 3: Configure the CMS
+
+Update `src/index.ts`:
+
+```typescript
+import { Hono } from 'hono'
+import { createSonicJS } from '@sonicjs-cms/core'
+import { authPlugin, mediaPlugin, cachePlugin } from '@sonicjs-cms/core/plugins'
+import { authorsCollection } from './collections/authors'
+import { categoriesCollection } from './collections/categories'
+import { postsCollection } from './collections/posts'
+
+type Env = {
+  DB: D1Database
+  CACHE: KVNamespace
+  STORAGE: R2Bucket
+}
+
+const app = new Hono<{ Bindings: Env }>()
+
+app.use('*', async (c, next) => {
+  const cms = createSonicJS({
+    database: c.env.DB,
+    cache: c.env.CACHE,
+    storage: c.env.STORAGE,
+    collections: [
+      authorsCollection,
+      categoriesCollection,
+      postsCollection,
+    ],
+    plugins: [
+      authPlugin(),
+      mediaPlugin(),
+      cachePlugin({
+        defaultTTL: 3600,
+        patterns: {
+          '/api/content/posts': { ttl: 300 },
+          '/api/content/posts/*': { ttl: 600 },
+        },
+      }),
+    ],
+  })
+
+  c.set('cms', cms)
+  return next()
+})
+
+export default app
+```
+
+## Step 4: Set Up Database
+
+Create and configure D1:
+
+```bash
+# Create database
+wrangler d1 create my-blog-db
+
+# Create KV namespace for caching
+wrangler kv:namespace create CACHE
+
+# Create R2 bucket for media
+wrangler r2 bucket create my-blog-storage
+```
+
+Update `wrangler.toml` with your resource IDs:
+
+```toml
+name = "my-blog"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "my-blog-db"
+database_id = "your-database-id"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "your-kv-id"
+
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "my-blog-storage"
+```
+
+Run migrations:
+
+```bash
+npm run db:generate
+npm run db:migrate:local
+```
+
+## Step 5: Test Your API
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+### Create an Author
+
+```bash
+curl -X POST http://localhost:8787/api/content/authors \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "bio": "Technical writer and developer advocate.",
+    "twitter": "janedoe"
+  }'
+```
+
+### Create a Category
+
+```bash
+curl -X POST http://localhost:8787/api/content/categories \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "name": "Tutorials",
+    "slug": "tutorials",
+    "description": "Step-by-step guides and how-tos"
+  }'
+```
+
+### Create a Post
+
+```bash
+curl -X POST http://localhost:8787/api/content/posts \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "title": "Hello World",
+    "slug": "hello-world",
+    "excerpt": "My first blog post with SonicJS",
+    "content": "<p>Welcome to my new blog!</p>",
+    "author": "author-id-here",
+    "category": "category-id-here",
+    "tags": ["introduction", "hello"],
+    "status": "published",
+    "publishedAt": "2025-12-12T00:00:00Z"
+  }'
+```
+
+### Query Published Posts
+
+```bash
+# Get all published posts with author data
+curl "http://localhost:8787/api/content/posts?status=published&include=author,category"
+
+# Search posts
+curl "http://localhost:8787/api/content/posts?search=hello"
+
+# Filter by category
+curl "http://localhost:8787/api/content/posts?category=category-id"
+```
+
+## Step 6: Deploy to Production
+
+Deploy your blog to Cloudflare's global network:
+
+```bash
+# Apply production migrations
+npm run db:migrate:prod
+
+# Deploy
+npm run deploy
+```
+
+Your blog API is now live at `https://my-blog.your-subdomain.workers.dev`!
+
+## Step 7: Connect Your Frontend
+
+Use any frontend framework to consume your blog API:
+
+### React/Next.js Example
+
+```typescript
+// lib/api.ts
+const API_URL = process.env.NEXT_PUBLIC_CMS_URL
+
+export async function getPosts() {
+  const res = await fetch(`${API_URL}/api/content/posts?status=published&include=author`)
+  return res.json()
+}
+
+export async function getPost(slug: string) {
+  const res = await fetch(`${API_URL}/api/content/posts?slug=${slug}&include=author,category`)
+  const data = await res.json()
+  return data.data[0]
+}
+```
+
+```tsx
+// app/blog/page.tsx
+import { getPosts } from '@/lib/api'
+
+export default async function BlogPage() {
+  const { data: posts } = await getPosts()
+
+  return (
+    <div>
+      {posts.map((post) => (
+        <article key={post.id}>
+          <h2>{post.title}</h2>
+          <p>{post.excerpt}</p>
+          <span>By {post.author.name}</span>
+        </article>
+      ))}
+    </div>
+  )
+}
+```
+
+## Performance Tips
+
+### Enable Aggressive Caching
+
+```typescript
+cachePlugin({
+  defaultTTL: 3600,
+  patterns: {
+    '/api/content/posts': { ttl: 60 },      // List updates quickly
+    '/api/content/posts/*': { ttl: 3600 },  // Individual posts cache longer
+  },
+})
+```
+
+### Use ISR in Next.js
+
+```typescript
+export const revalidate = 60 // Revalidate every 60 seconds
+```
+
+### Optimize Images
+
+SonicJS integrates with Cloudflare Images for automatic optimization:
+
+```typescript
+mediaPlugin({
+  imageOptimization: true,
+  variants: ['thumbnail', 'medium', 'large'],
+})
+```
+
+## Key Takeaways
+
+- SonicJS makes building a blog API straightforward
+- Collections define your content structure with TypeScript
+- Relationships connect authors, categories, and posts
+- D1 and KV provide edge-first data storage
+- Deploy globally with a single command
+
+## Next Steps
+
+- Add comments using a custom collection
+- Implement newsletter subscriptions
+- Set up webhooks for build triggers
+- Add full-text search with Cloudflare Workers AI
+
+Happy blogging with SonicJS!

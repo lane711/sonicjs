@@ -238,7 +238,6 @@ export const navigation: Array<NavGroup> = [
     links: [
       { title: 'Introduction', href: '/' },
       { title: 'Quickstart', href: '/quickstart' },
-      { title: 'Installation', href: '/installation' },
     ],
   },
   {
@@ -277,12 +276,14 @@ export const navigation: Array<NavGroup> = [
   {
     title: 'Resources',
     links: [
+      { title: 'Blog', href: '/blog' },
       { title: 'Roadmap', href: '/roadmap' },
       { title: 'Examples', href: '/examples' },
       { title: 'FAQ', href: '/faq' },
       { title: 'Changelog', href: '/changelog' },
       { title: 'Community', href: '/community' },
       { title: 'Contributing', href: '/contributing' },
+      { title: 'Coding Standards', href: '/coding-standards' },
       { title: 'Telemetry', href: '/telemetry' },
     ],
   },

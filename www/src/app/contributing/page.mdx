@@ -1,21 +1,22 @@
 export const metadata = {
   title: 'Contributing - SonicJS',
   description:
-    'Learn how to contribute to SonicJS. Understand our contribution process and expectations before getting started.',
+    'Learn how to contribute to SonicJS. Set up the monorepo for core development, understand the project structure, and submit your first pull request.',
 }
 
 export const sections = [
   { title: 'Before You Start', id: 'before-you-start' },
+  { title: 'Monorepo Setup', id: 'monorepo-setup' },
+  { title: 'Project Structure', id: 'project-structure' },
+  { title: 'Available Scripts', id: 'available-scripts' },
   { title: 'Contribution Process', id: 'contribution-process' },
-  { title: 'Good First Contributions', id: 'good-first-contributions' },
-  { title: 'Working with Maintainers', id: 'working-with-maintainers' },
-  { title: 'Development Setup', id: 'development-setup' },
   { title: 'Code Standards', id: 'code-standards' },
+  { title: 'Troubleshooting', id: 'troubleshooting' },
 ]
 
 # Contributing to SonicJS
 
-Thank you for your interest in contributing to SonicJS! This guide will help you understand our contribution process and how to become an effective contributor. {{ className: 'lead' }}
+This guide is for developers who want to contribute to the SonicJS platform itself. If you're building an application with SonicJS, see the [Installation](/installation) guide instead. {{ className: 'lead' }}
 
 ---
 
@@ -32,15 +33,6 @@ We appreciate every developer who wants to contribute to SonicJS. To ensure the 
     </div>
   </div>
 </div>
-
-### Why This Approach?
-
-Open source maintainers have limited time. By focusing on code contributions first:
-
-- **You demonstrate real interest** - Actions speak louder than words
-- **You learn the codebase** - Hands-on experience is the best teacher
-- **We can evaluate fit** - Your code shows us your skills and style
-- **It respects everyone's time** - Meetings are more productive after you're familiar with the project
 
 ### What Counts as a Meaningful Contribution?
 
@@ -66,17 +58,176 @@ Open source maintainers have limited time. By focusing on code contributions fir
       title: 'Test Coverage',
       description: 'Add meaningful tests for untested functionality',
     },
+    {
+      icon: '🎬',
+      title: 'Video Content',
+      description: 'Create tutorials, walkthroughs, or feature demos for YouTube',
+    },
   ]}
   columns={2}
 />
+
+### Create Video Content
+
+We're looking for contributors to create video content for our [YouTube channel](https://www.youtube.com/@sonicjs). Video tutorials help developers learn SonicJS faster and reach a wider audience.
+
+**Video ideas:**
+- Getting started tutorials
+- Feature walkthroughs and demos
+- Building real-world projects with SonicJS
+- Plugin development guides
+- Tips and tricks
+
+Reach out via [GitHub Discussions](https://github.com/lane711/sonicjs/discussions) if you're interested in creating video content.
+
+---
+
+## Monorepo Setup
+
+SonicJS uses a **monorepo** structure managed by npm workspaces. This allows us to develop the core framework, CLI tools, and documentation in a single repository.
+
+### Clone the Repository
+
+```bash {{ title: 'Clone & Install' }}
+# Fork the repository on GitHub first
+# Then clone your fork:
+git clone https://github.com/YOUR_USERNAME/sonicjs.git
+cd sonicjs
+
+# Add upstream remote
+git remote add upstream https://github.com/lane711/sonicjs.git
+
+# Install all dependencies (installs for all workspaces)
+npm install
+```
+
+### Start Development Server
+
+```bash {{ title: 'Start Development' }}
+# Start the development application
+npm run dev
+
+# Or start the documentation site
+npm run dev:www
+```
+
+The development server runs at **http://localhost:8787**
+
+---
+
+## Project Structure
+
+The SonicJS monorepo is organized as follows:
+
+```
+sonicjs/
+├── packages/
+│   ├── core/                    # @sonicjs-cms/core - The main framework
+│   │   ├── src/
+│   │   │   ├── index.ts        # Package entry point
+│   │   │   ├── middleware/     # Request middleware
+│   │   │   ├── routes/         # HTTP route handlers
+│   │   │   ├── services/       # Business logic
+│   │   │   ├── templates/      # HTML templates
+│   │   │   ├── plugins/        # Plugin system
+│   │   │   │   ├── core/       # Plugin architecture
+│   │   │   │   ├── core-plugins/  # Built-in plugins
+│   │   │   │   └── available/  # Optional plugins
+│   │   │   ├── collections/    # Collection definitions
+│   │   │   └── types/          # TypeScript types
+│   │   ├── migrations/         # Database migrations
+│   │   └── package.json
+│   │
+│   └── create-app/             # create-sonicjs CLI tool
+│       ├── src/
+│       │   └── cli.js          # CLI entry point
+│       ├── templates/
+│       │   └── starter/        # Starter project template
+│       └── package.json
+│
+├── www/                        # Documentation website (Next.js)
+│   ├── src/
+│   │   └── app/               # MDX documentation pages
+│   └── package.json
+│
+├── my-sonicjs-app/            # Development/test application
+│   ├── src/
+│   │   └── index.ts           # App entry point
+│   ├── wrangler.toml          # Cloudflare config
+│   └── package.json
+│
+├── tests/                      # E2E tests
+│   ├── e2e/                   # Playwright tests
+│   └── playwright.config.ts
+│
+├── docs/                       # Internal documentation
+├── package.json               # Root package.json (workspaces)
+└── README.md
+```
+
+### Key Directories
+
+| Directory | Description |
+|-----------|-------------|
+| `packages/core` | The core SonicJS framework published as `@sonicjs-cms/core` |
+| `packages/create-app` | The `create-sonicjs` CLI tool for scaffolding new projects |
+| `www` | Documentation website built with Next.js |
+| `my-sonicjs-app` | Development application for testing changes |
+| `tests` | End-to-end tests using Playwright |
+
+---
+
+## Available Scripts
+
+### Root Level Scripts
+
+Run these from the repository root:
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server (my-sonicjs-app) |
+| `npm run dev:www` | Start documentation site |
+| `npm run build` | Build core package and development app |
+| `npm run build:core` | Build only the core package |
+| `npm run build:www` | Build documentation site |
+| `npm test` | Run core package unit tests |
+| `npm run test:e2e` | Run Playwright end-to-end tests |
+| `npm run deploy` | Deploy development app to Cloudflare |
+| `npm run deploy:www` | Deploy documentation site |
+
+### Database Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run db:generate` | Generate migration files from schema changes |
+| `npm run db:migrate` | Apply migrations to local D1 database |
+| `npm run db:migrate:prod` | Apply migrations to production database |
+| `npm run db:studio` | Open Drizzle Studio (database GUI) |
+
+### Testing Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm test` | Run Vitest unit tests |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:cov` | Run tests with coverage report |
+| `npm run test:e2e` | Run Playwright E2E tests |
+| `npm run test:e2e:ui` | Run E2E tests with UI mode |
+
+### Plugin Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run plugins:generate` | Regenerate plugin registry from manifests |
+| `npm run plugins:watch` | Watch plugin manifests and auto-regenerate |
 
 ---
 
 ## Contribution Process
 
-Here's how to become a successful contributor to SonicJS:
-
 ### Step 1: Find Something to Work On
+
+Browse our [GitHub Issues](https://github.com/lane711/sonicjs/issues) to find something to work on:
 
 <div className="not-prose mb-8">
   <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -106,25 +257,41 @@ Here's how to become a successful contributor to SonicJS:
   </div>
 </div>
 
-### Step 2: Claim the Issue
+### Step 2: Create a Feature Branch
 
-Before starting work:
+```bash
+# Sync with upstream
+git fetch upstream
+git checkout main
+git merge upstream/main
 
-1. **Comment on the issue** to indicate you're working on it
-2. **Wait for confirmation** from a maintainer (especially for larger features)
-3. **Ask questions** if anything is unclear about the requirements
+# Create a feature branch
+git checkout -b feature/your-feature-name
+```
 
-### Step 3: Submit Your Pull Request
+### Step 3: Make Your Changes
 
-Once your work is ready:
+1. Make your changes in the appropriate package
+2. Write tests for new functionality
+3. Run tests to ensure everything passes
+4. Update documentation if needed
 
-1. Ensure all tests pass
-2. Follow our code standards (see below)
-3. Write a clear PR description explaining your changes
-4. Reference the issue number in your PR
-5. Be responsive to feedback
+Have questions? Ask in our [Discord server](https://discord.gg/SJArGfJgPJ) - we're happy to help!
 
-### Step 4: After Your First PR is Merged
+### Step 4: Submit Your Pull Request
+
+```bash
+# Commit your changes
+git add .
+git commit -m "feat: add your feature description"
+
+# Push to your fork
+git push origin feature/your-feature-name
+```
+
+Then create a Pull Request on GitHub.
+
+### Step 5: After Your First PR is Merged
 
 <div className="not-prose mb-8 p-6 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20">
   <div className="flex items-start gap-4">
@@ -144,122 +311,6 @@ Once your work is ready:
 
 ---
 
-## Good First Contributions
-
-Not sure where to start? Here are some ideas:
-
-### Low-Hanging Fruit
-
-- **Fix typos** in documentation
-- **Improve error messages** to be more helpful
-- **Write tests** for existing untested code
-- **Update dependencies** (with proper testing)
-
-### Medium Complexity
-
-- **Fix bugs** from the issue tracker
-- **Improve documentation** with examples
-- **Add configuration options** to existing features
-- **Performance improvements** with benchmarks
-
-### Higher Complexity
-
-- **New features** (please discuss first in an issue)
-- **Major refactoring** (requires maintainer approval)
-- **New plugins** (see our plugin development guide)
-
----
-
-## Working with Maintainers
-
-### Communication Guidelines
-
-**Do:**
-- Be patient - maintainers are often volunteers
-- Provide context and details in issues/PRs
-- Ask questions publicly so others can benefit
-- Accept feedback gracefully and iterate
-
-**Don't:**
-- Request meetings before contributing
-- Expect immediate responses
-- Take feedback personally
-- Submit large changes without discussion first
-
-### Response Times
-
-- **Issue responses**: Usually within 24 hours during M-F and non-US holidays
-- **PR reviews**: Within a few days at most
-- **Meeting requests**: Only after meaningful contribution
-
-### When to Request Deeper Involvement
-
-After you've:
-- Had at least one meaningful PR merged
-- Shown consistent quality in your contributions
-- Demonstrated understanding of the project's direction
-- Been active in discussions and helpful to others
-
-You can then reach out about:
-- Regular contributor status
-- Joining the core team
-- Taking ownership of specific areas
-- Other collaboration opportunities
-
----
-
-## Development Setup
-
-<CodeGroup title="Getting Started">
-
-```bash {{ title: 'Clone & Install' }}
-# Fork the repository on GitHub first
-# Then clone your fork:
-git clone https://github.com/YOUR_USERNAME/sonicjs.git
-cd sonicjs
-
-# Add upstream remote
-git remote add upstream https://github.com/lane711/sonicjs.git
-
-# Install dependencies
-npm install
-```
-
-```bash {{ title: 'Development' }}
-# Start development server
-npm run dev
-
-# Run tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Lint code
-npm run lint
-
-# Format code
-npm run format
-```
-
-```bash {{ title: 'Submit PR' }}
-# Create a feature branch
-git checkout -b feature/your-feature-name
-
-# Make your changes, then commit
-git add .
-git commit -m "feat: add your feature description"
-
-# Push to your fork
-git push origin feature/your-feature-name
-
-# Create PR on GitHub
-```
-
-</CodeGroup>
-
----
-
 ## Code Standards
 
 ### General Guidelines
@@ -272,18 +323,99 @@ git push origin feature/your-feature-name
 
 ### Commit Messages
 
-We use AI to generate commit messages - make them as detailed as possible. Reference issue numbers when applicable.
+We use conventional commit messages. Reference issue numbers when applicable.
+
+```bash
+feat: add new caching strategy
+fix: resolve authentication bug (#123)
+docs: update installation guide
+test: add tests for plugin loader
+```
 
 ### Pull Request Checklist
 
 Before submitting a PR, ensure:
 
 - [ ] All tests pass (`npm test`)
+- [ ] E2E tests pass (`npm run test:e2e`)
 - [ ] Code is formatted (`npm run format`)
 - [ ] Linting passes (`npm run lint`)
 - [ ] Changes are documented if needed
 - [ ] PR description explains the changes
 - [ ] Related issue is referenced
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+#### Database Connection Errors
+
+**Error:** `Error: no such table: users`
+
+**Solution:**
+
+```bash
+# Run migrations
+npm run db:migrate
+
+# Verify migration status
+wrangler d1 migrations list DB --local
+```
+
+---
+
+#### Port Already in Use
+
+**Error:** `Error: listen EADDRINUSE: address already in use :::8787`
+
+**Solution:**
+
+```bash
+# Find and kill the process using port 8787
+lsof -ti:8787 | xargs kill -9
+```
+
+---
+
+#### Module Not Found / Import Errors
+
+**Error:** `Cannot find module 'hono'`
+
+**Solution:**
+
+```bash
+# Clear and reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
+
+# Clear TypeScript build cache
+rm -rf .wrangler
+```
+
+---
+
+#### Build Failures
+
+**Error:** Build fails when running `npm run build:core`
+
+**Solution:**
+
+1. Ensure you're using Node.js 18+
+2. Clear build artifacts: `rm -rf packages/core/dist`
+3. Reinstall dependencies: `npm install`
+4. Try building again: `npm run build:core`
+
+---
+
+### Getting Help
+
+**Resources:**
+
+- 📚 [Full Documentation](https://sonicjs.com)
+- 🐛 [GitHub Issues](https://github.com/lane711/sonicjs/issues)
+- 💬 [Discord](https://discord.gg/SJArGfJgPJ)
 
 ---
 
@@ -313,7 +445,7 @@ Before submitting a PR, ensure:
 If you have questions about contributing:
 
 1. **Check existing issues** - your question may already be answered
-2. **Ask in GitHub Discussions** - for general questions
+2. **Ask in [Discord](https://discord.gg/SJArGfJgPJ)** - for general questions
 3. **Comment on the issue** - for specific issue clarifications
 
 We look forward to your contributions!

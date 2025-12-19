@@ -1,0 +1,502 @@
+export const metadata = {
+  title: 'Coding Standards - SonicJS',
+  description: 'Coding standards and naming conventions for contributing to SonicJS',
+}
+
+export const sections = [
+  { title: 'Naming Conventions', id: 'naming-conventions' },
+  { title: 'Collection Names', id: 'collection-names' },
+  { title: 'Schema Field Names', id: 'schema-field-names' },
+  { title: 'Database Columns', id: 'database-columns' },
+  { title: 'API Responses', id: 'api-responses' },
+  { title: 'TypeScript Conventions', id: 'typescript-conventions' },
+  { title: 'File Names', id: 'file-names' },
+  { title: 'Code Style', id: 'code-style' },
+  { title: 'Project Patterns', id: 'project-patterns' },
+  { title: 'Testing Standards', id: 'testing-standards' },
+]
+
+# Coding Standards
+
+Consistent coding standards ensure a maintainable codebase and make it easier for everyone to contribute. {{ className: 'lead' }}
+
+<FeatureGrid
+  features={[
+    {
+      icon: '📝',
+      title: 'Naming Conventions',
+      description: 'Clear rules for naming collections, fields, variables, and files',
+    },
+    {
+      icon: '🔄',
+      title: 'Consistency',
+      description: 'camelCase for JavaScript, snake_case for database/collections',
+    },
+    {
+      icon: '✨',
+      title: 'TypeScript First',
+      description: 'All code must be properly typed with TypeScript',
+    },
+    {
+      icon: '🧪',
+      title: 'Test Coverage',
+      description: 'New features must include comprehensive tests',
+    },
+  ]}
+  columns={2}
+/>
+
+---
+
+## Naming Conventions
+
+SonicJS follows industry-standard naming conventions with clear boundaries between JavaScript/TypeScript code and database layers.
+
+### Quick Reference
+
+| Element | Convention | Example |
+|---------|------------|---------|
+| Collection names | snake_case | `blog_posts`, `user_profiles` |
+| Schema field names | camelCase | `firstName`, `createdAt` |
+| Database columns | snake_case | `first_name`, `created_at` |
+| API responses | camelCase | `userId`, `createdAt` |
+| TypeScript variables | camelCase | `userData`, `isActive` |
+| TypeScript functions | camelCase | `getUserById`, `validateInput` |
+| Classes & Types | PascalCase | `UserService`, `BlogPost` |
+| Constants | SCREAMING_SNAKE_CASE | `MAX_RETRIES`, `API_BASE_URL` |
+| File names | kebab-case | `user-service.ts` |
+
+---
+
+## Collection Names
+
+Collection names **must** be lowercase with underscores (snake_case). This is enforced by validation.
+
+<CodeGroup title="Collection Names">
+
+```typescript {{title: 'Correct'}}
+// All lowercase with underscores
+name: 'blog_posts'
+name: 'user_profiles'
+name: 'order_items'
+```
+
+```typescript {{title: 'Incorrect'}}
+// These will fail validation
+name: 'blogPosts'      // No camelCase
+name: 'Blog_Posts'     // No uppercase
+name: 'blog-posts'     // No hyphens
+```
+
+</CodeGroup>
+
+<Note>
+Collection names are validated with the regex `/^[a-z0-9_]+$/`. Only lowercase letters, numbers, and underscores are allowed.
+</Note>
+
+---
+
+## Schema Field Names
+
+Schema field names should use **camelCase** in the TypeScript definition:
+
+<CodeGroup title="Schema Fields">
+
+```typescript {{title: 'Correct'}}
+export const blogPostsCollection: CollectionConfig = {
+  name: 'blog_posts',
+  schema: {
+    type: 'object',
+    properties: {
+      title: { type: 'string' },
+      featuredImage: { type: 'string', format: 'media' },
+      publishedAt: { type: 'string', format: 'date-time' },
+      metaDescription: { type: 'string' },
+    },
+  },
+}
+```
+
+```typescript {{title: 'Incorrect'}}
+// Don't use snake_case for schema properties
+properties: {
+  featured_image: { type: 'string' },  // Wrong
+  published_at: { type: 'string' },    // Wrong
+  meta_description: { type: 'string' } // Wrong
+}
+```
+
+</CodeGroup>
+
+---
+
+## Database Columns
+
+Database column names use **snake_case** (SQL convention). Drizzle ORM maps camelCase TypeScript properties to snake_case columns:
+
+```typescript
+// TypeScript property -> SQL column
+firstName: text('first_name').notNull(),
+lastName: text('last_name').notNull(),
+createdAt: integer('created_at'),
+updatedAt: integer('updated_at'),
+isActive: integer('is_active', { mode: 'boolean' }),
+```
+
+---
+
+## API Responses
+
+API responses should use **camelCase** (JavaScript convention). Transform database results at the API boundary:
+
+<CodeGroup title="API Responses">
+
+```json {{title: 'Correct'}}
+{
+  "id": "123",
+  "userId": "user_456",
+  "createdAt": "2024-01-15T10:30:00Z",
+  "updatedAt": "2024-01-15T10:30:00Z",
+  "firstName": "John",
+  "lastName": "Doe"
+}
+```
+
+```json {{title: 'Incorrect'}}
+{
+  "user_id": "user_456",
+  "created_at": "2024-01-15T10:30:00Z",
+  "first_name": "John",
+  "last_name": "Doe"
+}
+```
+
+</CodeGroup>
+
+---
+
+## TypeScript Conventions
+
+### Variables and Functions
+
+Use **camelCase** for variables and functions:
+
+```typescript
+// Correct
+const userData = await getUserById(userId)
+const isValidEmail = validateEmail(email)
+let itemCount = 0
+
+// Incorrect
+const user_data = await get_user_by_id(user_id)  // Wrong
+const IsValidEmail = validateEmail(email)         // Wrong
+```
+
+### Classes, Types, and Interfaces
+
+Use **PascalCase** for classes, types, and interfaces:
+
+```typescript
+// Correct
+class UserService { }
+type BlogPost = { title: string; content: string }
+interface ApiResponse<T> { data: T; status: number }
+
+// Incorrect
+class userService { }        // Wrong
+type blogPost = { }          // Wrong
+```
+
+### Constants
+
+Use **SCREAMING_SNAKE_CASE** for constants:
+
+```typescript
+// Correct
+const MAX_RETRY_ATTEMPTS = 3
+const API_BASE_URL = 'https://api.example.com'
+const DEFAULT_PAGE_SIZE = 20
+
+// Incorrect
+const maxRetryAttempts = 3   // Looks like a variable
+```
+
+---
+
+## File Names
+
+Use **kebab-case** for file names:
+
+```
+// Correct
+user-service.ts
+blog-posts.collection.ts
+api-response.types.ts
+auth.middleware.ts
+
+// Incorrect
+userService.ts              // camelCase
+BlogPosts.collection.ts     // PascalCase
+user_service.ts             // snake_case
+```
+
+---
+
+## Code Style
+
+### TypeScript Requirements
+
+- **Always use TypeScript** with proper type annotations
+- Avoid `any` type - use `unknown` if the type is truly unknown
+- Prefer interfaces over type aliases for object shapes
+
+```typescript
+// Correct
+function getUser(id: string): Promise<User | null> {
+  // ...
+}
+
+// Incorrect
+function getUser(id): any {  // Missing types
+  // ...
+}
+```
+
+### Async/Await
+
+Prefer `async/await` over `.then()` chains:
+
+<CodeGroup title="Async Patterns">
+
+```typescript {{title: 'Preferred'}}
+async function fetchData() {
+  try {
+    const result = await api.getData()
+    return result
+  } catch (error) {
+    logger.error('Failed to fetch data', error)
+    throw error
+  }
+}
+```
+
+```typescript {{title: 'Avoid'}}
+function fetchData() {
+  return api.getData()
+    .then(result => result)
+    .catch(error => {
+      logger.error(error)
+      throw error
+    })
+}
+```
+
+</CodeGroup>
+
+### Import Organization
+
+Organize imports in this order:
+
+1. Node.js built-in modules
+2. External dependencies
+3. Internal modules (absolute paths)
+4. Relative imports
+
+```typescript
+// 1. Built-in modules
+import { readFile } from 'fs/promises'
+
+// 2. External dependencies
+import { Hono } from 'hono'
+import { drizzle } from 'drizzle-orm/d1'
+
+// 3. Internal modules
+import { UserService } from '@/services/user-service'
+import { validateInput } from '@/utils/validation'
+
+// 4. Relative imports
+import { localHelper } from './helpers'
+import type { LocalType } from './types'
+```
+
+---
+
+## Project Patterns
+
+### Collection Definitions
+
+<CodeGroup title="Collection Pattern">
+
+```typescript
+import { CollectionConfig } from '@sonicjs/core'
+
+export const blogPostsCollection: CollectionConfig = {
+  name: 'blog_posts',  // snake_case
+  schema: {
+    type: 'object',
+    properties: {
+      title: {
+        type: 'string',
+        title: 'Title',
+        required: true,
+      },
+      content: {
+        type: 'string',
+        title: 'Content',
+        format: 'richtext',
+      },
+      featuredImage: {  // camelCase
+        type: 'string',
+        title: 'Featured Image',
+        format: 'media',
+      },
+      publishedAt: {  // camelCase
+        type: 'string',
+        title: 'Published At',
+        format: 'date-time',
+      },
+    },
+  },
+  access: {
+    read: () => true,
+    create: ({ user }) => !!user,
+    update: ({ user }) => !!user,
+    delete: ({ user }) => user?.role === 'admin',
+  },
+}
+```
+
+</CodeGroup>
+
+### Route Handlers
+
+<CodeGroup title="Route Handler Pattern">
+
+```typescript
+import { Hono } from 'hono'
+import type { Context } from 'hono'
+
+const app = new Hono()
+
+app.get('/users/:id', async (c: Context) => {
+  const { id } = c.req.param()
+
+  try {
+    const user = await userService.getById(id)
+
+    if (!user) {
+      return c.json({ error: 'User not found' }, 404)
+    }
+
+    return c.json({ data: user })  // camelCase in response
+  } catch (error) {
+    logger.error('Failed to get user', { id, error })
+    return c.json({ error: 'Internal server error' }, 500)
+  }
+})
+```
+
+</CodeGroup>
+
+### Middleware
+
+<CodeGroup title="Middleware Pattern">
+
+```typescript
+import type { MiddlewareHandler } from 'hono'
+
+export const authMiddleware: MiddlewareHandler = async (c, next) => {
+  const token = c.req.header('Authorization')?.replace('Bearer ', '')
+
+  if (!token) {
+    return c.json({ error: 'Unauthorized' }, 401)
+  }
+
+  try {
+    const user = await verifyToken(token)
+    c.set('user', user)
+    await next()
+  } catch (error) {
+    return c.json({ error: 'Invalid token' }, 401)
+  }
+}
+```
+
+</CodeGroup>
+
+---
+
+## Testing Standards
+
+### Test File Location
+
+Place test files next to the code they test:
+
+```
+src/
+  services/
+    user-service.ts
+    user-service.test.ts
+  routes/
+    api.ts
+    api.test.ts
+```
+
+### Test Naming
+
+Use descriptive test names:
+
+```typescript
+describe('UserService', () => {
+  describe('getById', () => {
+    it('returns user when found', async () => {
+      // ...
+    })
+
+    it('returns null when user does not exist', async () => {
+      // ...
+    })
+
+    it('throws error when database connection fails', async () => {
+      // ...
+    })
+  })
+})
+```
+
+---
+
+## Formatting and Linting
+
+### Automatic Formatting
+
+Prettier runs automatically on commit with this configuration:
+
+```json
+{
+  "semi": false,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "es5"
+}
+```
+
+### Before Committing
+
+Run these commands before submitting a PR:
+
+```bash
+npm run lint      # ESLint rules must pass
+npm run format    # Format with Prettier
+npm test          # All tests must pass
+```
+
+---
+
+## Questions?
+
+If you have questions about these standards:
+
+- Check [existing issues](https://github.com/lane711/sonicjs/issues)
+- Ask in [GitHub Discussions](https://github.com/lane711/sonicjs/discussions)
+- Join our [Discord](https://discord.gg/8bMy6bv3sZ)

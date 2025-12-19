@@ -1,6 +1,6 @@
 {
   "name": "@sonicjs-cms/core",
-  "version": "2.3.12",
+  "version": "2.3.13",
   "description": "Core framework for SonicJS headless CMS - Edge-first, TypeScript-native CMS built for Cloudflare Workers",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -65,6 +65,8 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "type-check": "tsc --noEmit",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
     "test": "vitest --run",
     "test:watch": "vitest",
     "prepublishOnly": "npm run build"
@@ -94,20 +96,23 @@
   "homepage": "https://sonicjs.com",
   "peerDependencies": {
     "@cloudflare/workers-types": "^4.0.0",
-    "hono": "^4.0.0",
     "drizzle-orm": "^0.44.0",
+    "hono": "^4.0.0",
     "zod": "^3.0.0 || ^4.0.0"
   },
   "dependencies": {
     "drizzle-zod": "^0.8.3",
-    "marked": "^16.4.1",
     "highlight.js": "^11.11.1",
+    "marked": "^16.4.1",
     "semver": "^7.7.3"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20251014.0",
     "@types/node": "^24.9.2",
+    "@typescript-eslint/eslint-plugin": "^8.50.0",
+    "@typescript-eslint/parser": "^8.50.0",
     "drizzle-orm": "^0.44.7",
+    "eslint": "^9.39.2",
     "hono": "^4.10.4",
     "tsup": "^8.5.0",
     "typescript": "^5.9.3",

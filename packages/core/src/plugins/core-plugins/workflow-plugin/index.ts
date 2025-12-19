@@ -193,7 +193,7 @@ export function createWorkflowPlugin(): Plugin {
     },
     activate: async (context) => {
       // Initialize default workflow if needed
-      const ___workflowService = new WorkflowService(context.db)
+      const _workflowService = new WorkflowService(context.db)
       // For now, we'll just log that the plugin is activated
       // Default workflow initialization can be added later
       console.log('Workflow plugin activated')

@@ -33,7 +33,7 @@ export function createAnalyticsPlugin(): Plugin {
   // GET /analytics/stats - Get analytics overview
   analyticsAPI.get('/stats', async (c) => {
     const timeRange = c.req.query('range') || '7d' // 1d, 7d, 30d, 90d
-    const _____metric = c.req.query('metric') || 'all' // pageviews, sessions, users, etc.
+    const _metric = c.req.query('metric') || 'all' // pageviews, sessions, users, etc.
 
     return c.json({
       message: 'Analytics stats',
