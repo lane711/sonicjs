@@ -72,6 +72,28 @@ git commit -m "chore(deps): update dependencies
 
 When asked to publish a release, follow these steps:
 
+### Step 0: Check Current Published Version
+
+**IMPORTANT: Before starting any release, check the currently published version on npm to ensure you're incrementing correctly.**
+
+Use WebFetch to check the current version:
+- URL: `https://www.npmjs.com/package/@sonicjs-cms/core?activeTab=versions`
+- This shows all published versions and helps verify:
+  - The latest published version
+  - Whether the version you're about to publish already exists
+  - The version history
+
+Also run these commands to verify:
+```bash
+# Check latest published version
+npm view @sonicjs-cms/core version
+
+# Check local version
+grep '"version"' packages/core/package.json
+```
+
+Compare the npm published version with the local version to determine if a release is needed and what the next version should be.
+
 ### Step 1: Pre-Release Checks
 
 ```bash
