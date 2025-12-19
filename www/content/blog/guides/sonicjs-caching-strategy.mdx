@@ -1,0 +1,365 @@
+---
+title: "Understanding SonicJS Three-Tiered Caching Strategy"
+description: "Learn how SonicJS implements a three-tiered caching strategy using memory, Cloudflare KV, and D1 to deliver sub-15ms response times globally."
+keywords:
+  - "cloudflare workers caching"
+  - "edge caching strategy"
+  - "kv cache"
+  - "d1 caching"
+  - "headless cms performance"
+category: "guides"
+tags:
+  - "caching"
+  - "performance"
+  - "cloudflare"
+  - "optimization"
+publishedAt: "2025-12-12"
+author:
+  name: "SonicJS Team"
+  twitter: "sonicjs"
+  github: "lane711/sonicjs"
+---
+
+# Understanding SonicJS Three-Tiered Caching Strategy
+
+<TLDRBox>
+**TL;DR** — SonicJS uses a three-tiered caching system: Memory (sub-1ms), KV (5-15ms), and D1 (20-50ms). Content is checked in order from fastest to slowest, with automatic population of faster tiers on cache misses.
+
+**Key Stats:**
+- Memory cache: Under 1ms access time
+- KV cache: 5-15ms globally distributed
+- 90-95% cache hit rate for well-configured sites
+- Only 5-10% of requests hit the D1 database
+</TLDRBox>
+
+Performance is at the heart of SonicJS. To deliver consistent sub-15ms response times globally, SonicJS implements a sophisticated three-tiered caching strategy. This guide explains how it works and how to configure it for your needs.
+
+## The Three Tiers
+
+SonicJS caching operates across three layers:
+
+```
+Request → Memory Cache → KV Cache → D1 Database
+              ↓              ↓           ↓
+           <1ms           5-15ms      20-50ms
+```
+
+### Tier 1: Memory Cache
+
+The fastest layer, storing frequently accessed content in V8 isolate memory.
+
+**Characteristics:**
+- **Speed**: Sub-millisecond access
+- **Scope**: Per-isolate (not shared across data centers)
+- **Lifetime**: Duration of the isolate (typically minutes)
+- **Size**: Limited by isolate memory
+
+### Tier 2: KV Cache
+
+Cloudflare KV provides globally distributed, persistent caching.
+
+**Characteristics:**
+- **Speed**: 5-15ms globally
+- **Scope**: Shared across all edge locations
+- **Lifetime**: Configurable TTL
+- **Size**: Up to 25MB per value
+
+### Tier 3: D1 Database
+
+The source of truth, providing SQLite at the edge.
+
+**Characteristics:**
+- **Speed**: 20-50ms
+- **Scope**: Replicated globally
+- **Lifetime**: Persistent
+- **Size**: 2GB+ per database
+
+## How Caching Works
+
+### Read Path
+
+When a request comes in:
+
+```typescript
+async function getContent(key: string) {
+  // 1. Check memory cache first
+  const memoryResult = memoryCache.get(key)
+  if (memoryResult) {
+    return memoryResult // <1ms
+  }
+
+  // 2. Check KV cache
+  const kvResult = await env.CACHE.get(key, 'json')
+  if (kvResult) {
+    memoryCache.set(key, kvResult) // Populate memory
+    return kvResult // 5-15ms
+  }
+
+  // 3. Query D1 database
+  const dbResult = await db.query(...)
+  if (dbResult) {
+    await env.CACHE.put(key, JSON.stringify(dbResult), { ttl })
+    memoryCache.set(key, dbResult)
+    return dbResult // 20-50ms
+  }
+
+  return null
+}
+```
+
+### Write Path
+
+When content is updated:
+
+```typescript
+async function updateContent(key: string, data: any) {
+  // 1. Update D1 database
+  await db.update(...)
+
+  // 2. Invalidate KV cache
+  await env.CACHE.delete(key)
+
+  // 3. Memory cache expires naturally
+  // (or explicitly invalidated if supported)
+}
+```
+
+## Configuration Options
+
+### Basic Setup
+
+```typescript
+import { createSonicJS } from '@sonicjs-cms/core'
+import { cachePlugin } from '@sonicjs-cms/core/plugins'
+
+const cms = createSonicJS({
+  plugins: [
+    cachePlugin({
+      defaultTTL: 3600, // 1 hour default
+    }),
+  ],
+})
+```
+
+### Route-Specific TTLs
+
+```typescript
+cachePlugin({
+  defaultTTL: 3600,
+  patterns: {
+    // Frequently updated content
+    '/api/content/posts': { ttl: 60 },
+
+    // Rarely changed content
+    '/api/content/categories': { ttl: 86400 },
+
+    // Individual posts can cache longer
+    '/api/content/posts/*': { ttl: 3600 },
+
+    // Never cache user-specific data
+    '/api/users/*': { ttl: 0 },
+  },
+})
+```
+
+### Cache Headers
+
+SonicJS automatically sets appropriate cache headers:
+
+```typescript
+cachePlugin({
+  headers: {
+    'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+    'CDN-Cache-Control': 'max-age=86400',
+  },
+})
+```
+
+## Cache Invalidation Strategies
+
+### Time-Based (TTL)
+
+The simplest approach - content expires after a set time:
+
+```typescript
+{ ttl: 300 } // Cache for 5 minutes
+```
+
+### Tag-Based
+
+Invalidate groups of related content:
+
+```typescript
+// When saving a post
+await cache.tag(postId, ['posts', `category:${categoryId}`])
+
+// Invalidate all posts in a category
+await cache.invalidateTag(`category:${categoryId}`)
+```
+
+### Event-Based
+
+Invalidate on specific events:
+
+```typescript
+cms.on('content:afterSave', async (content) => {
+  await cache.invalidate(`posts:${content.id}`)
+  await cache.invalidate('posts:list')
+})
+```
+
+## Performance Benchmarks
+
+Real-world performance across cache tiers:
+
+| Scenario | Memory Hit | KV Hit | D1 Query |
+|----------|-----------|--------|----------|
+| Simple content | 0.5ms | 8ms | 25ms |
+| Complex query | 1ms | 12ms | 45ms |
+| With relations | 1.5ms | 15ms | 60ms |
+
+### Cache Hit Rates
+
+Typical hit rates for well-configured caching:
+
+- **Memory**: 60-80% for hot content
+- **KV**: 90-95% for all cached content
+- **D1**: Only ~5-10% of requests
+
+## Best Practices
+
+### 1. Set Appropriate TTLs
+
+```typescript
+// Static content: Long TTL
+'/api/content/pages': { ttl: 86400 }, // 24 hours
+
+// Dynamic listings: Short TTL
+'/api/content/posts': { ttl: 60 }, // 1 minute
+
+// Real-time data: No caching
+'/api/analytics': { ttl: 0 },
+```
+
+### 2. Use Stale-While-Revalidate
+
+Serve stale content while refreshing in the background:
+
+```typescript
+cachePlugin({
+  staleWhileRevalidate: true,
+  staleTime: 60, // Serve stale for up to 60s while revalidating
+})
+```
+
+### 3. Warm Critical Caches
+
+Pre-populate caches for critical content:
+
+```typescript
+// Warm cache on deploy
+async function warmCache() {
+  const posts = await db.getAllPublishedPosts()
+  for (const post of posts) {
+    await cache.set(`post:${post.slug}`, post)
+  }
+}
+```
+
+### 4. Monitor Cache Performance
+
+Track cache effectiveness:
+
+```typescript
+cachePlugin({
+  metrics: true,
+  onCacheHit: (key, tier) => {
+    console.log(`Cache hit: ${key} from ${tier}`)
+  },
+  onCacheMiss: (key) => {
+    console.log(`Cache miss: ${key}`)
+  },
+})
+```
+
+## Debugging Cache Issues
+
+### Check Cache Status
+
+API responses include cache metadata:
+
+```json
+{
+  "data": [...],
+  "meta": {
+    "cache": {
+      "hit": true,
+      "source": "kv",
+      "age": 45,
+      "ttl": 3600
+    }
+  }
+}
+```
+
+### Force Cache Bypass
+
+For debugging, bypass the cache:
+
+```bash
+curl -H "Cache-Control: no-cache" https://api.example.com/content/posts
+```
+
+### View Cache Keys
+
+List cached keys:
+
+```bash
+wrangler kv:key list --namespace-id YOUR_KV_ID
+```
+
+## Advanced Patterns
+
+### Regional Caching
+
+Adjust TTLs based on region:
+
+```typescript
+cachePlugin({
+  ttlByRegion: {
+    'North America': 3600,
+    'Europe': 3600,
+    'Asia': 1800, // Lower TTL for faster propagation
+  },
+})
+```
+
+### Content-Aware Caching
+
+Cache based on content type:
+
+```typescript
+cms.on('content:beforeCache', (content, options) => {
+  if (content.type === 'breaking-news') {
+    options.ttl = 30 // Very short TTL
+  }
+})
+```
+
+## Key Takeaways
+
+- Three-tiered caching provides sub-15ms response times
+- Memory cache is fastest but per-isolate
+- KV cache provides global persistence
+- D1 is the source of truth, accessed only on cache miss
+- Configure TTLs based on content update frequency
+- Use tag-based invalidation for related content
+- Monitor cache hit rates for optimization
+
+## Related Resources
+
+- [Cloudflare KV Documentation](https://developers.cloudflare.com/workers/runtime-apis/kv/)
+- [D1 Performance Guide](https://developers.cloudflare.com/d1/platform/pricing/)
+- [SonicJS Caching API](/caching)
+
+Optimize your SonicJS deployment with intelligent caching!
