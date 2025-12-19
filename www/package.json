@@ -16,7 +16,8 @@
     "type-check": "tsc --noEmit",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload"
+    "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
+    "generate:blog-image": "node scripts/generate-blog-image.mjs"
   },
   "repository": {
     "type": "git",
