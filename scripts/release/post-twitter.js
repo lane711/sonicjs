@@ -5,9 +5,32 @@
  *
  * Uses Twitter API v2 to post release announcements as threads.
  * Requires OAuth 1.0a User Context authentication.
+ *
+ * Environment (loaded from ~/Dropbox/Data/.env):
+ *   TWITTER_API_KEY - Twitter API Key (Consumer Key)
+ *   TWITTER_API_SECRET - Twitter API Secret (Consumer Secret)
+ *   TWITTER_ACCESS_TOKEN - User Access Token
+ *   TWITTER_ACCESS_TOKEN_SECRET - User Access Token Secret
  */
 
 import crypto from 'crypto'
+import { existsSync, readFileSync } from 'fs'
+import { homedir } from 'os'
+
+// Load environment variables from shared .env file
+const envPath = `${homedir()}/Dropbox/Data/.env`
+if (existsSync(envPath)) {
+  const envContent = readFileSync(envPath, 'utf8')
+  for (const line of envContent.split('\n')) {
+    const trimmed = line.trim()
+    if (trimmed && !trimmed.startsWith('#')) {
+      const [key, ...valueParts] = trimmed.split('=')
+      if (key && valueParts.length > 0) {
+        process.env[key] = valueParts.join('=')
+      }
+    }
+  }
+}
 
 const TWITTER_API_URL = 'https://api.twitter.com/2/tweets'
 
@@ -90,7 +113,7 @@ function getCredentials() {
   const apiKey = process.env.TWITTER_API_KEY
   const apiSecret = process.env.TWITTER_API_SECRET
   const accessToken = process.env.TWITTER_ACCESS_TOKEN
-  const accessSecret = process.env.TWITTER_ACCESS_SECRET
+  const accessSecret = process.env.TWITTER_ACCESS_TOKEN_SECRET
 
   if (!apiKey || !apiSecret || !accessToken || !accessSecret) {
     return null
