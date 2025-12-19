@@ -40,6 +40,9 @@
     "release:announce": "node scripts/release/index.js",
     "release:announce:dry": "node scripts/release/index.js --dry-run",
     "notify:discord": "node scripts/notify-discord.js",
+    "social:discord": "node scripts/social/post-discord.js",
+    "social:twitter": "node scripts/social/post-twitter.js",
+    "social:post": "node scripts/social/post-both.js",
     "db:reset": "npm run setup:db --workspace=my-sonicjs-app",
     "workspace": "npm install && npm run db:reset",
     "kill": "pkill workerd && npm run dev --workspace=my-sonicjs-app"
