@@ -22,7 +22,7 @@ const nextConfig = {
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'mdx'],
   outputFileTracingRoot: path.join(__dirname, '..'),
   outputFileTracingIncludes: {
-    '/**/*': ['./src/app/**/*.mdx'],
+    '/**/*': ['./src/app/**/*.mdx', './content/blog/**/*.mdx'],
   },
 }
 
