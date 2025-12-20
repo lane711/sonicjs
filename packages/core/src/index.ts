@@ -297,7 +297,9 @@ export type {
 } from './db'
 
 // Plugins - Week 2
-// export { PluginBuilder, HookSystem } from './plugins/sdk'
+// FIX: Pointing directly to the file found via grep
+export { PluginBuilder } from './plugins/sdk/plugin-builder'
+// export { HookSystem } from './plugins/sdk' // <-- Commented out until we find the file for this
 
 // ============================================================================
 // Version
