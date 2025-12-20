@@ -9,6 +9,9 @@ import { RelatedPosts } from '../components/RelatedPosts'
 import { BlogPostSchema, BreadcrumbSchema } from '../components/StructuredData'
 import { TLDRBox } from '../components/TLDRBox'
 
+// Force static generation - required for Cloudflare Workers deployment
+export const dynamic = 'force-static'
+
 interface PageProps {
   params: Promise<{ slug: string }>
 }

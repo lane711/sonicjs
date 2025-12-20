@@ -4,6 +4,9 @@ import { BlogCard } from './components/BlogCard'
 import { CategoryFilter } from './components/CategoryFilter'
 import { BlogListSchema } from './components/StructuredData'
 
+// Force static generation - required for Cloudflare Workers deployment
+export const dynamic = 'force-static'
+
 export const metadata: Metadata = {
   title: 'Blog | SonicJS',
   description:
