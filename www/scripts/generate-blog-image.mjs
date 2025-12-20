@@ -13,13 +13,29 @@
  *   --output <path>   Custom output directory
  *
  * Environment:
- *   OPENAI_API_KEY    Required: Your OpenAI API key
+ *   OPENAI_API_KEY    Required: Your OpenAI API key (loaded from ~/Dropbox/Data/.env)
  *
  * Example:
- *   OPENAI_API_KEY=sk-xxx node scripts/generate-blog-image.mjs "Building REST APIs with SonicJS" --slug rest-api-guide
+ *   node scripts/generate-blog-image.mjs "Building REST APIs with SonicJS" --slug rest-api-guide
  */
 
-import { writeFileSync, mkdirSync, existsSync } from 'fs'
+import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'fs'
+import { homedir } from 'os'
+
+// Load environment variables from shared .env file
+const envPath = `${homedir()}/Dropbox/Data/.env`
+if (existsSync(envPath)) {
+  const envContent = readFileSync(envPath, 'utf8')
+  for (const line of envContent.split('\n')) {
+    const trimmed = line.trim()
+    if (trimmed && !trimmed.startsWith('#')) {
+      const [key, ...valueParts] = trimmed.split('=')
+      if (key && valueParts.length > 0) {
+        process.env[key] = valueParts.join('=')
+      }
+    }
+  }
+}
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 

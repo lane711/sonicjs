@@ -12,12 +12,29 @@
  *   node scripts/social/post-both.js --discord-only "Discord only message"
  *   node scripts/social/post-both.js --twitter-only "Twitter only message"
  *
- * Environment:
- *   DISCORD_WEBHOOK_URL - Discord webhook URL (optional)
+ * Environment (loaded from ~/Dropbox/Data/.env):
+ *   DISCORD_WEBHOOK_URL - Discord webhook URL
  *   TWITTER_API_KEY, TWITTER_API_SECRET, etc. - Twitter credentials
  */
 
 import { spawn } from 'child_process'
+import { existsSync, readFileSync } from 'fs'
+import { homedir } from 'os'
+
+// Load environment variables from shared .env file
+const envPath = `${homedir()}/Dropbox/Data/.env`
+if (existsSync(envPath)) {
+  const envContent = readFileSync(envPath, 'utf8')
+  for (const line of envContent.split('\n')) {
+    const trimmed = line.trim()
+    if (trimmed && !trimmed.startsWith('#')) {
+      const [key, ...valueParts] = trimmed.split('=')
+      if (key && valueParts.length > 0) {
+        process.env[key] = valueParts.join('=')
+      }
+    }
+  }
+}
 import { fileURLToPath } from 'url'
 import path from 'path'
 

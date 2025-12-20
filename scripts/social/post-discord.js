@@ -10,11 +10,27 @@
  *   node scripts/social/post-discord.js --title "Title" --message "Message"
  *   node scripts/social/post-discord.js --dry-run "Test message"
  *
- * Environment:
- *   DISCORD_WEBHOOK_URL - Discord webhook URL (optional, uses default if not set)
+ * Environment (loaded from ~/Dropbox/Data/.env):
+ *   DISCORD_WEBHOOK_URL - Discord webhook URL
  */
 
-const DEFAULT_WEBHOOK = 'https://discord.com/api/webhooks/1443339433318285442/lnxdw64Wze72PjY8EhxPYF6bLGjqBwOi8EqwOnZxUFPo82E37o6myjQ1aO-8dzvsaStN'
+import { existsSync, readFileSync } from 'fs'
+import { homedir } from 'os'
+
+// Load environment variables from shared .env file
+const envPath = `${homedir()}/Dropbox/Data/.env`
+if (existsSync(envPath)) {
+  const envContent = readFileSync(envPath, 'utf8')
+  for (const line of envContent.split('\n')) {
+    const trimmed = line.trim()
+    if (trimmed && !trimmed.startsWith('#')) {
+      const [key, ...valueParts] = trimmed.split('=')
+      if (key && valueParts.length > 0) {
+        process.env[key] = valueParts.join('=')
+      }
+    }
+  }
+}
 
 /**
  * Parse command line arguments
@@ -54,7 +70,13 @@ function parseArgs() {
  * Post message to Discord
  */
 async function postToDiscord(options) {
-  const webhookUrl = process.env.DISCORD_WEBHOOK_URL || DEFAULT_WEBHOOK
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL
+
+  if (!webhookUrl) {
+    console.error('❌ Error: DISCORD_WEBHOOK_URL not configured')
+    console.error('Set DISCORD_WEBHOOK_URL in ~/Dropbox/Data/.env')
+    process.exit(1)
+  }
 
   if (!options.message) {
     console.error('❌ Error: No message provided')

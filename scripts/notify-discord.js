@@ -4,16 +4,35 @@
  * Discord release notification script (Legacy)
  *
  * Posts a basic release notification to Discord when a new version is published.
- * Requires DISCORD_WEBHOOK_URL environment variable to be set.
  *
  * NOTE: This script is kept for backwards compatibility.
  * For AI-enhanced announcements (Discord + Twitter + WWW), use:
  *   npm run release:announce
  *
+ * Environment (loaded from ~/Dropbox/Data/.env):
+ *   DISCORD_WEBHOOK_URL - Discord webhook URL
+ *
  * @deprecated Use `npm run release:announce` for full release announcements
  */
 
 import fs from 'fs'
+import { existsSync, readFileSync } from 'fs'
+import { homedir } from 'os'
+
+// Load environment variables from shared .env file
+const envPath = `${homedir()}/Dropbox/Data/.env`
+if (existsSync(envPath)) {
+  const envContent = readFileSync(envPath, 'utf8')
+  for (const line of envContent.split('\n')) {
+    const trimmed = line.trim()
+    if (trimmed && !trimmed.startsWith('#')) {
+      const [key, ...valueParts] = trimmed.split('=')
+      if (key && valueParts.length > 0) {
+        process.env[key] = valueParts.join('=')
+      }
+    }
+  }
+}
 import path from 'path'
 import { fileURLToPath } from 'url'
 
