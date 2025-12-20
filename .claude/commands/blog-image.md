@@ -10,9 +10,9 @@ This agent generates high-quality, on-brand images for SonicJS blog posts using 
 
 Based on the blog topic provided, determine:
 - **Image Type**: Hero image, diagram, illustration, or screenshot mockup
-- **Style**: Modern tech aesthetic, clean lines, professional
-- **Color Palette**: SonicJS brand colors (blue gradients, dark backgrounds, white accents)
-- **Dimensions**: 1200x630px (OpenGraph standard) or 1600x900px (hero image)
+- **Style**: 3D isometric visualization with depth and dimension
+- **Color Palette**: Dark slate background (nearly black), electric blue (#3B82F6) glowing elements
+- **Dimensions**: 1792x1024px (hero image)
 
 ### 2. Prompt Engineering
 
@@ -24,15 +24,16 @@ Create an optimized DALL-E prompt following these guidelines:
 ```
 
 **Example Prompts**:
-- "Modern minimalist tech illustration of cloud computing with edge servers, blue gradient background, geometric shapes, professional business style, clean vector art"
-- "Abstract digital art showing data flowing through a global network, dark background with glowing blue nodes, futuristic tech aesthetic, 3D render"
-- "Isometric illustration of a developer workspace with code on screens showing CMS dashboard, soft lighting, modern flat design style"
+- "3D isometric visualization of edge computing network, floating platforms with global server nodes connected by glowing circuits, dark slate background nearly black, electric blue (#3B82F6) glowing connections, sophisticated futuristic tech aesthetic, clean geometric shapes, no text, professional enterprise visualization with depth"
+- "3D isometric visualization of three-tiered caching architecture, horizontal layers showing memory cache, KV storage, and database with glowing data packets flowing upward, dark slate background nearly black, electric blue accents, futuristic tech aesthetic"
+- "3D isometric visualization of content management system, floating content cards connected to central glowing database cylinder with data streams to cloud icons, dark slate background nearly black, electric blue glowing elements"
 
 **Brand Guidelines for SonicJS Images**:
-- Primary colors: #3B82F6 (blue), #1E293B (dark slate), #F8FAFC (light)
-- Style: Modern, minimalist, tech-forward
-- Avoid: Cartoonish elements, stock photo clichés, cluttered compositions
-- Include: Clean typography space, professional atmosphere, development/cloud themes
+- Background: Dark slate, nearly black (#1E293B or darker)
+- Accent color: Electric blue (#3B82F6) for glowing elements and connections
+- Style: 3D isometric with depth and dimension, futuristic tech aesthetic
+- Avoid: Flat 2D designs, cartoonish elements, light backgrounds, text in images
+- Include: Floating platforms, glowing connections, circuit-like patterns, geometric shapes, professional enterprise feel
 
 ### 3. API Integration
 
@@ -92,22 +93,22 @@ After generating the image, provide:
 
 **Tutorial Posts**:
 ```
-Modern illustration showing [specific technology/concept], step-by-step visual guide aesthetic, clean flat design, blue and white color scheme, developer-friendly, educational infographic style
+3D isometric visualization of [specific technology/concept], floating pathway of connected platforms showing progression, ascending steps with glowing checkpoints, dark slate background nearly black, electric blue (#3B82F6) glowing connections and path markers, sophisticated futuristic tech aesthetic, clean geometric shapes, no text, professional enterprise visualization with depth
 ```
 
 **Comparison Posts**:
 ```
-Split-screen tech comparison visualization, [Product A] vs [Product B] concept, balanced composition, professional analysis theme, modern gradient background, corporate presentation style
+3D isometric visualization comparing [Product A] vs [Product B] architectures side by side, left platform showing [concept A], right platform showing [concept B], floating platforms with glowing blue circuit connections, dark slate background nearly black, electric blue (#3B82F6) glowing elements, sophisticated futuristic tech aesthetic, clean geometric shapes, no text, professional enterprise visualization with depth
 ```
 
 **Technical Deep Dives**:
 ```
-Abstract representation of [technical concept], architectural diagram style, interconnected nodes and data flow, dark theme with glowing accents, sophisticated tech aesthetic
+3D isometric visualization of [technical concept], layered architecture with glowing data packets flowing between tiers, interconnected nodes and data flow patterns, dark slate background nearly black, electric blue (#3B82F6) glowing connections, sophisticated futuristic tech aesthetic, clean geometric shapes, no text, professional enterprise visualization with depth
 ```
 
 **Use Case/Case Study**:
 ```
-Professional business scenario illustration showing [use case], modern office/tech environment, success-oriented imagery, warm professional lighting, corporate but approachable
+3D isometric visualization of [use case scenario], floating content elements connected to central system, data streams flowing to cloud deployment, dark slate background nearly black, electric blue (#3B82F6) glowing elements and connections, sophisticated futuristic tech aesthetic, clean geometric shapes, no text, professional enterprise visualization with depth
 ```
 
 ### 7. Quality Checklist
@@ -135,12 +136,12 @@ If DALL-E generation fails or produces unsuitable results:
 ```
 
 **Generated Prompt**:
-"Modern minimalist illustration of REST API architecture, interconnected endpoints and data nodes, blueprint-style technical diagram, blue gradient on dark background, clean vector art style, professional developer documentation aesthetic"
+"3D isometric visualization of REST API architecture, floating endpoint nodes connected by glowing data pathways, request and response flows between client and server platforms, dark slate background nearly black, electric blue (#3B82F6) glowing connections and data packets, sophisticated futuristic tech aesthetic, clean geometric shapes, no text, professional enterprise visualization with depth"
 
 **Output**:
 - Image URL: [temporary URL]
-- Filename: `rest-api-hero.webp`
-- Alt text: "Illustration of REST API architecture showing interconnected endpoints and data flow patterns"
+- Filename: `hero.png`
+- Alt text: "3D isometric visualization of REST API architecture with connected endpoint nodes and data pathways"
 
 ## Environment Setup
 
