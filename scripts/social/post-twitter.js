@@ -10,14 +10,31 @@
  *   node scripts/social/post-twitter.js --text "Tweet" --hashtags "SonicJS,CMS"
  *   node scripts/social/post-twitter.js --dry-run "Test tweet"
  *
- * Environment:
+ * Environment (loaded from ~/Dropbox/Data/.env):
  *   TWITTER_API_KEY - Twitter API Key (Consumer Key)
  *   TWITTER_API_SECRET - Twitter API Secret (Consumer Secret)
  *   TWITTER_ACCESS_TOKEN - User Access Token
- *   TWITTER_ACCESS_SECRET - User Access Token Secret
+ *   TWITTER_ACCESS_TOKEN_SECRET - User Access Token Secret
  */
 
 import crypto from 'crypto'
+import { existsSync, readFileSync } from 'fs'
+import { homedir } from 'os'
+
+// Load environment variables from shared .env file
+const envPath = `${homedir()}/Dropbox/Data/.env`
+if (existsSync(envPath)) {
+  const envContent = readFileSync(envPath, 'utf8')
+  for (const line of envContent.split('\n')) {
+    const trimmed = line.trim()
+    if (trimmed && !trimmed.startsWith('#')) {
+      const [key, ...valueParts] = trimmed.split('=')
+      if (key && valueParts.length > 0) {
+        process.env[key] = valueParts.join('=')
+      }
+    }
+  }
+}
 
 const TWITTER_API_URL = 'https://api.twitter.com/2/tweets'
 const DEFAULT_HASHTAGS = ['SonicJS', 'CloudflareCMS', 'OpenSource', 'Webdev']
@@ -65,7 +82,7 @@ function getCredentials() {
   const apiKey = process.env.TWITTER_API_KEY
   const apiSecret = process.env.TWITTER_API_SECRET
   const accessToken = process.env.TWITTER_ACCESS_TOKEN
-  const accessSecret = process.env.TWITTER_ACCESS_SECRET
+  const accessSecret = process.env.TWITTER_ACCESS_TOKEN_SECRET
 
   if (!apiKey || !apiSecret || !accessToken || !accessSecret) {
     return null
@@ -175,7 +192,7 @@ async function postToTwitter(options) {
     console.error('  TWITTER_API_KEY')
     console.error('  TWITTER_API_SECRET')
     console.error('  TWITTER_ACCESS_TOKEN')
-    console.error('  TWITTER_ACCESS_SECRET')
+    console.error('  TWITTER_ACCESS_TOKEN_SECRET')
     process.exit(1)
   }
 

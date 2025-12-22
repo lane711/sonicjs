@@ -4,6 +4,9 @@ import { BlogCard } from './components/BlogCard'
 import { CategoryFilter } from './components/CategoryFilter'
 import { BlogListSchema } from './components/StructuredData'
 
+// Force static generation - required for Cloudflare Workers deployment
+export const dynamic = 'force-static'
+
 export const metadata: Metadata = {
   title: 'Blog | SonicJS',
   description:
@@ -65,14 +68,12 @@ export default async function BlogPage() {
           </p>
         </div>
 
-        {/* Featured Posts */}
+        {/* Featured Post */}
         {featuredPosts.length > 0 && (
           <section className="mb-16">
             <h2 className="mb-8 text-2xl font-semibold text-zinc-900 dark:text-white">Featured</h2>
-            <div className="grid gap-8 md:grid-cols-2">
-              {featuredPosts.map((post) => (
-                <BlogCard key={post.slug} post={post} featured />
-              ))}
+            <div className="max-w-4xl mx-auto">
+              <BlogCard key={featuredPosts[0].slug} post={featuredPosts[0]} featured />
             </div>
           </section>
         )}

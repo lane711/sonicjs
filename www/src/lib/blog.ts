@@ -109,7 +109,7 @@ export async function getPost(slug: string): Promise<BlogPost | null> {
 
 export async function getFeaturedPosts(): Promise<BlogPostMeta[]> {
   const posts = await getAllPosts()
-  return posts.filter((post) => post.featured).slice(0, 2)
+  return posts.filter((post) => post.featured).slice(0, 1)
 }
 
 export async function getPostsByCategory(category: BlogCategory): Promise<BlogPostMeta[]> {

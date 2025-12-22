@@ -78,7 +78,7 @@ export function Breadcrumbs() {
       <nav aria-label="Breadcrumb" className="mt-4 mb-4">
         <ol className="flex items-center space-x-2 text-sm text-zinc-500 dark:text-zinc-400">
           {breadcrumbs.map((item, index) => (
-            <li key={item.href} className="flex items-center">
+            <li key={`${item.href}-${index}`} className="flex items-center">
               {index > 0 && (
                 <svg
                   className="mx-2 h-4 w-4 flex-shrink-0"

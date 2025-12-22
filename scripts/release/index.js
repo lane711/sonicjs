@@ -19,7 +19,29 @@
  *   --skip-www        Skip WWW repository update
  *   --version <ver>   Override version number
  *   --notes <text>    Override release notes
+ *
+ * Environment (loaded from ~/Dropbox/Data/.env):
+ *   DISCORD_WEBHOOK_URL - Discord webhook URL
+ *   TWITTER_API_KEY, TWITTER_API_SECRET, etc. - Twitter credentials
  */
+
+import { existsSync, readFileSync } from 'fs'
+import { homedir } from 'os'
+
+// Load environment variables from shared .env file
+const envPath = `${homedir()}/Dropbox/Data/.env`
+if (existsSync(envPath)) {
+  const envContent = readFileSync(envPath, 'utf8')
+  for (const line of envContent.split('\n')) {
+    const trimmed = line.trim()
+    if (trimmed && !trimmed.startsWith('#')) {
+      const [key, ...valueParts] = trimmed.split('=')
+      if (key && valueParts.length > 0) {
+        process.env[key] = valueParts.join('=')
+      }
+    }
+  }
+}
 
 import { generateContent, getReleaseInfo } from './generate-content.js'
 import { postToTwitter } from './post-twitter.js'

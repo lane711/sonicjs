@@ -5,6 +5,9 @@ import { BlogCard } from '../../components/BlogCard'
 import { CategoryFilter } from '../../components/CategoryFilter'
 import { BLOG_CATEGORIES, BlogCategory } from '@/types/blog'
 
+// Force static generation - required for Cloudflare Workers deployment
+export const dynamic = 'force-static'
+
 interface PageProps {
   params: Promise<{ category: string }>
 }
