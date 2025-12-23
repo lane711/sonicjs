@@ -5,6 +5,7 @@ export const metadata = {
 
 export const sections = [
   { title: 'Introduction', id: 'introduction' },
+  { title: 'CORS', id: 'cors' },
   { title: 'Authentication', id: 'authentication' },
   { title: 'Collections', id: 'collections' },
   { title: 'Content Management', id: 'content-management' },
@@ -47,6 +48,112 @@ Get the complete OpenAPI 3.0 specification:
 
 ```bash
 curl -X GET "http://localhost:8787/api/"
+```
+
+---
+
+## CORS {{ id: 'cors' }}
+
+SonicJS includes built-in CORS (Cross-Origin Resource Sharing) support, allowing you to call the API from frontend applications running on different domains—such as a Next.js, React, or Vue app on `localhost:3000`.
+
+### Default Configuration
+
+CORS is enabled by default with a permissive configuration:
+
+| Setting | Value |
+|---------|-------|
+| **Allowed Origins** | `*` (all origins) |
+| **Allowed Methods** | GET, POST, PUT, DELETE, OPTIONS |
+| **Allowed Headers** | Content-Type, Authorization |
+
+This means your frontend application can immediately start making API requests without any additional configuration.
+
+### How It Works
+
+SonicJS uses [Hono's CORS middleware](https://hono.dev/middleware/builtin/cors) applied to all API routes:
+
+```typescript
+import { cors } from 'hono/cors'
+
+apiRoutes.use('*', cors({
+  origin: '*',
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization']
+}))
+```
+
+### Preflight Requests
+
+For requests that require preflight checks (e.g., POST with JSON body), the browser sends an OPTIONS request first. SonicJS automatically handles these and returns a `204 No Content` response with the appropriate CORS headers.
+
+### Example: Fetching from Next.js
+
+<CodeGroup title="Next.js API Call">
+
+```js {{ title: 'Client Component' }}
+// app/components/Posts.tsx
+'use client'
+
+import { useEffect, useState } from 'react'
+
+export default function Posts() {
+  const [posts, setPosts] = useState([])
+
+  useEffect(() => {
+    fetch('http://localhost:8787/api/collections/blog-posts/content')
+      .then(res => res.json())
+      .then(data => setPosts(data.data))
+  }, [])
+
+  return (
+    <ul>
+      {posts.map(post => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+```js {{ title: 'Server Action' }}
+// app/actions.ts
+'use server'
+
+export async function getPosts() {
+  const response = await fetch(
+    'http://localhost:8787/api/collections/blog-posts/content',
+    { cache: 'no-store' }
+  )
+  return response.json()
+}
+```
+
+</CodeGroup>
+
+### Media Files
+
+Static files served from R2 storage (`/files/*`) also include CORS headers:
+
+| Setting | Value |
+|---------|-------|
+| **Allowed Origins** | `*` (all origins) |
+| **Allowed Methods** | GET, HEAD, OPTIONS |
+| **Allowed Headers** | Content-Type |
+
+This allows you to load images and other media directly in your frontend application.
+
+### Custom CORS Configuration
+
+The default CORS configuration is hardcoded for maximum accessibility. If you need to restrict origins for production, you can modify the CORS middleware in `packages/core/src/routes/api.ts`:
+
+```typescript
+// Example: Restrict to specific origins
+apiRoutes.use('*', cors({
+  origin: ['https://your-app.com', 'https://admin.your-app.com'],
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+  credentials: true  // Enable if using cookies
+}))
 ```
 
 ---
