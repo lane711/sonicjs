@@ -1,0 +1,1013 @@
+---
+title: "How to Use SonicJS with Astro: Complete Integration Guide"
+description: "Learn how to integrate SonicJS headless CMS with Astro for blazing-fast static and server-rendered websites. Step-by-step guide covering setup, content fetching, dynamic routing, and deployment."
+keywords:
+  - "sonicjs astro integration"
+  - "astro headless cms"
+  - "sonicjs tutorial"
+  - "astro content api"
+  - "edge cms astro"
+category: "guides"
+tags:
+  - "astro"
+  - "integration"
+  - "frontend"
+  - "tutorial"
+publishedAt: "2025-12-23"
+author:
+  name: "SonicJS Team"
+  twitter: "sonicjs"
+  github: "lane711/sonicjs"
+featuredImage:
+  url: "/images/blog/using-sonicjs-with-astro/hero.png"
+  alt: "Astro spaceship connected to SonicJS cloud representing the integration between Astro frontend and SonicJS CMS backend"
+  width: 1792
+  height: 1024
+---
+
+# How to Use SonicJS with Astro: Complete Integration Guide
+
+<TLDRBox>
+**TL;DR** — Connect your Astro site to SonicJS for a powerful edge-first CMS experience. Fetch content via REST API, create dynamic routes for blog posts, and deploy to Cloudflare Pages for global performance.
+
+**Key Stats:**
+- Sub-50ms API response times from edge
+- Works with Astro SSG, SSR, and hybrid modes
+- Zero config CORS — start fetching immediately
+- Deploy both to Cloudflare for optimal performance
+</TLDRBox>
+
+Astro and SonicJS make a perfect pair: Astro's content-focused architecture meets SonicJS's edge-first performance. In this guide, you'll learn how to build a complete content-driven website using SonicJS as your headless CMS backend and Astro as your frontend framework.
+
+## Why Astro + SonicJS?
+
+| Feature | Benefit |
+|---------|---------|
+| **Edge-first architecture** | Both run on Cloudflare's global network |
+| **Content-focused** | Astro is built for content sites; SonicJS manages content |
+| **Zero JS by default** | Astro ships minimal JavaScript; SonicJS delivers pure JSON |
+| **TypeScript support** | Full type safety across your entire stack |
+| **Flexible rendering** | SSG, SSR, or hybrid — SonicJS supports all modes |
+
+## Prerequisites
+
+Before we begin, make sure you have:
+
+- **Node.js 20+** — Required for both Astro and SonicJS
+- **A running SonicJS instance** — Either local or deployed to Cloudflare Workers
+- **Basic familiarity with Astro** — Component syntax and routing
+
+```bash
+# Check your Node.js version
+node --version  # Should be v20.0.0 or higher
+```
+
+## Part 1: Setting Up SonicJS Backend
+
+If you don't already have a SonicJS instance running, let's set one up quickly.
+
+### Create a SonicJS Project
+
+```bash
+# Create a new SonicJS application
+npx create-sonicjs my-cms
+
+# Navigate to your project
+cd my-cms
+
+# Start the development server
+npm run dev
+
+# Your CMS is now running at http://localhost:8787
+```
+
+The `create-sonicjs` command automatically:
+- Creates a new project directory
+- Installs all dependencies
+- Sets up the database schema
+- Configures Cloudflare Workers
+- Creates the admin user
+- Runs initial migrations
+
+Your SonicJS API is now running at `http://localhost:8787`.
+
+### Create a Blog Posts Collection
+
+In the SonicJS admin panel (`http://localhost:8787/admin`), create a "Blog Posts" collection with these fields:
+
+| Field | Type | Required |
+|-------|------|----------|
+| title | Text | Yes |
+| slug | Text | Yes |
+| excerpt | Text | No |
+| content | Rich Text | Yes |
+| featuredImage | Media | No |
+| publishedAt | DateTime | No |
+
+Or define it programmatically in `src/collections/posts.ts`:
+
+```typescript
+import { defineCollection } from '@sonicjs-cms/core'
+
+export const postsCollection = defineCollection({
+  name: 'blog-posts',
+  slug: 'blog-posts',
+  fields: {
+    title: {
+      type: 'string',
+      required: true,
+      maxLength: 200,
+    },
+    slug: {
+      type: 'string',
+      required: true,
+      unique: true,
+    },
+    excerpt: {
+      type: 'text',
+      maxLength: 300,
+    },
+    content: {
+      type: 'richtext',
+      required: true,
+    },
+    featuredImage: {
+      type: 'media',
+    },
+    publishedAt: {
+      type: 'datetime',
+    },
+  },
+})
+```
+
+### Add Sample Content
+
+Create a few blog posts through the admin panel or via the API:
+
+```bash
+curl -X POST "http://localhost:8787/api/content" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "collectionId": "blog-posts-collection-id",
+    "title": "Getting Started with Astro",
+    "slug": "getting-started-with-astro",
+    "status": "published",
+    "data": {
+      "title": "Getting Started with Astro",
+      "slug": "getting-started-with-astro",
+      "excerpt": "Learn how to build fast websites with Astro",
+      "content": "<p>Astro is a modern web framework...</p>",
+      "publishedAt": "2025-12-23T00:00:00Z"
+    }
+  }'
+```
+
+---
+
+## Part 2: Setting Up Astro Frontend
+
+Now let's create your Astro project and connect it to SonicJS.
+
+### Create an Astro Project
+
+```bash
+# Create a new Astro project
+npm create astro@latest my-astro-site
+
+# Navigate to the project
+cd my-astro-site
+
+# Install dependencies
+npm install
+```
+
+When prompted, choose your preferences. For this guide, we recommend:
+- Template: **Empty**
+- TypeScript: **Yes**
+- Strict TypeScript: **Yes**
+
+### Configure Environment Variables
+
+Create a `.env` file in your Astro project root:
+
+```bash
+# .env
+SONICJS_API_URL=http://localhost:8787
+SONICJS_API_TOKEN=your-api-token-here
+```
+
+Update `astro.config.mjs` to load environment variables:
+
+```javascript
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+
+export default defineConfig({
+  // Your Astro config
+});
+```
+
+### Create a SonicJS API Client
+
+Create a utility file to handle all SonicJS API calls:
+
+```typescript
+// src/lib/sonicjs.ts
+
+const API_URL = import.meta.env.SONICJS_API_URL || 'http://localhost:8787';
+const API_TOKEN = import.meta.env.SONICJS_API_TOKEN;
+
+interface SonicJSResponse<T> {
+  data: T;
+  meta: {
+    count: number;
+    timestamp: string;
+    cache: {
+      hit: boolean;
+      source: string;
+    };
+  };
+}
+
+interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  status: string;
+  data: {
+    title: string;
+    slug: string;
+    excerpt?: string;
+    content: string;
+    featuredImage?: string;
+    publishedAt?: string;
+  };
+  created_at: number;
+  updated_at: number;
+}
+
+// Fetch all blog posts
+export async function getBlogPosts(): Promise<BlogPost[]> {
+  const response = await fetch(
+    `${API_URL}/api/collections/blog-posts/content?filter[status][equals]=published&sort=-created_at`
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch posts: ${response.statusText}`);
+  }
+
+  const result: SonicJSResponse<BlogPost[]> = await response.json();
+  return result.data;
+}
+
+// Fetch a single blog post by slug
+export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+  const response = await fetch(
+    `${API_URL}/api/collections/blog-posts/content?filter[data.slug][equals]=${slug}&filter[status][equals]=published`
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch post: ${response.statusText}`);
+  }
+
+  const result: SonicJSResponse<BlogPost[]> = await response.json();
+  return result.data[0] || null;
+}
+
+// Fetch all collections
+export async function getCollections() {
+  const response = await fetch(`${API_URL}/api/collections`);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch collections: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+// Generic content fetcher
+export async function getContent<T>(
+  collection: string,
+  options?: {
+    limit?: number;
+    offset?: number;
+    sort?: string;
+    filters?: Record<string, string>;
+  }
+): Promise<SonicJSResponse<T[]>> {
+  const params = new URLSearchParams();
+
+  if (options?.limit) params.set('limit', options.limit.toString());
+  if (options?.offset) params.set('offset', options.offset.toString());
+  if (options?.sort) params.set('sort', options.sort);
+  if (options?.filters) {
+    Object.entries(options.filters).forEach(([key, value]) => {
+      params.set(`filter[${key}]`, value);
+    });
+  }
+
+  const url = `${API_URL}/api/collections/${collection}/content?${params}`;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch content: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+```
+
+---
+
+## Part 3: Building Pages with SonicJS Content
+
+### Blog Listing Page
+
+Create a page that displays all blog posts:
+
+```astro
+---
+// src/pages/blog/index.astro
+import { getBlogPosts } from '../../lib/sonicjs';
+import Layout from '../../layouts/Layout.astro';
+
+const posts = await getBlogPosts();
+---
+
+<Layout title="Blog">
+  <main>
+    <h1>Blog</h1>
+
+    <div class="posts-grid">
+      {posts.map((post) => (
+        <article class="post-card">
+          {post.data.featuredImage && (
+            <img
+              src={post.data.featuredImage}
+              alt={post.data.title}
+              loading="lazy"
+            />
+          )}
+          <h2>
+            <a href={`/blog/${post.data.slug}`}>
+              {post.data.title}
+            </a>
+          </h2>
+          {post.data.excerpt && (
+            <p>{post.data.excerpt}</p>
+          )}
+          {post.data.publishedAt && (
+            <time datetime={post.data.publishedAt}>
+              {new Date(post.data.publishedAt).toLocaleDateString()}
+            </time>
+          )}
+        </article>
+      ))}
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .post-card {
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .post-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+
+  .post-card h2, .post-card p, .post-card time {
+    padding: 0 1rem;
+  }
+
+  .post-card a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .post-card a:hover {
+    text-decoration: underline;
+  }
+</style>
+```
+
+### Dynamic Blog Post Page
+
+Create a dynamic route for individual blog posts:
+
+```astro
+---
+// src/pages/blog/[slug].astro
+import { getBlogPosts, getBlogPostBySlug } from '../../lib/sonicjs';
+import Layout from '../../layouts/Layout.astro';
+
+// For static site generation, define all possible paths
+export async function getStaticPaths() {
+  const posts = await getBlogPosts();
+
+  return posts.map((post) => ({
+    params: { slug: post.data.slug },
+    props: { post },
+  }));
+}
+
+// Get the post from props (SSG) or fetch it (SSR)
+const { slug } = Astro.params;
+const { post: propPost } = Astro.props;
+
+const post = propPost || await getBlogPostBySlug(slug!);
+
+if (!post) {
+  return Astro.redirect('/404');
+}
+---
+
+<Layout title={post.data.title}>
+  <article>
+    <header>
+      <h1>{post.data.title}</h1>
+      {post.data.publishedAt && (
+        <time datetime={post.data.publishedAt}>
+          Published on {new Date(post.data.publishedAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })}
+        </time>
+      )}
+    </header>
+
+    {post.data.featuredImage && (
+      <img
+        src={post.data.featuredImage}
+        alt={post.data.title}
+        class="featured-image"
+      />
+    )}
+
+    <div class="content" set:html={post.data.content} />
+
+    <footer>
+      <a href="/blog">← Back to Blog</a>
+    </footer>
+  </article>
+</Layout>
+
+<style>
+  article {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  header {
+    margin-bottom: 2rem;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  time {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .featured-image {
+    width: 100%;
+    max-height: 500px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+  }
+
+  .content {
+    line-height: 1.8;
+    font-size: 1.1rem;
+  }
+
+  .content :global(h2) {
+    margin-top: 2rem;
+  }
+
+  .content :global(pre) {
+    background: #1e1e1e;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+
+  .content :global(code) {
+    font-family: 'Fira Code', monospace;
+  }
+
+  footer {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e5e5;
+  }
+</style>
+```
+
+### Base Layout
+
+Create a simple layout component:
+
+```astro
+---
+// src/layouts/Layout.astro
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'My Astro site powered by SonicJS' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/blog">Blog</a>
+    </nav>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  nav {
+    padding: 1rem 2rem;
+    background: #f5f5f5;
+    display: flex;
+    gap: 1rem;
+  }
+
+  nav a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  nav a:hover {
+    text-decoration: underline;
+  }
+</style>
+```
+
+---
+
+## Part 4: Advanced Patterns
+
+### Server-Side Rendering (SSR)
+
+For dynamic content that changes frequently, use Astro's SSR mode:
+
+```javascript
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import cloudflare from '@astrojs/cloudflare';
+
+export default defineConfig({
+  output: 'server',
+  adapter: cloudflare(),
+});
+```
+
+Then update your dynamic route to fetch on each request:
+
+```astro
+---
+// src/pages/blog/[slug].astro (SSR version)
+import { getBlogPostBySlug } from '../../lib/sonicjs';
+import Layout from '../../layouts/Layout.astro';
+
+const { slug } = Astro.params;
+const post = await getBlogPostBySlug(slug!);
+
+if (!post) {
+  return new Response(null, {
+    status: 404,
+    statusText: 'Not Found',
+  });
+}
+---
+
+<!-- Rest of the template remains the same -->
+```
+
+### Hybrid Rendering
+
+Use Astro's hybrid mode to mix static and dynamic pages:
+
+```javascript
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import cloudflare from '@astrojs/cloudflare';
+
+export default defineConfig({
+  output: 'hybrid',
+  adapter: cloudflare(),
+});
+```
+
+Mark specific pages as server-rendered:
+
+```astro
+---
+// src/pages/blog/[slug].astro
+export const prerender = false; // This page is server-rendered
+---
+```
+
+### Pagination
+
+Handle large content sets with pagination:
+
+```astro
+---
+// src/pages/blog/page/[page].astro
+import { getContent } from '../../../lib/sonicjs';
+import Layout from '../../../layouts/Layout.astro';
+
+const POSTS_PER_PAGE = 10;
+
+export async function getStaticPaths() {
+  const response = await getContent('blog-posts', {
+    filters: { 'status[equals]': 'published' }
+  });
+
+  const totalPosts = response.meta.count;
+  const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
+
+  return Array.from({ length: totalPages }, (_, i) => ({
+    params: { page: (i + 1).toString() },
+  }));
+}
+
+const { page } = Astro.params;
+const currentPage = parseInt(page!);
+const offset = (currentPage - 1) * POSTS_PER_PAGE;
+
+const response = await getContent('blog-posts', {
+  limit: POSTS_PER_PAGE,
+  offset,
+  sort: '-created_at',
+  filters: { 'status[equals]': 'published' }
+});
+
+const posts = response.data;
+const totalPages = Math.ceil(response.meta.count / POSTS_PER_PAGE);
+---
+
+<Layout title={`Blog - Page ${currentPage}`}>
+  <main>
+    <h1>Blog</h1>
+
+    <div class="posts">
+      {posts.map((post) => (
+        <article>
+          <h2><a href={`/blog/${post.data.slug}`}>{post.data.title}</a></h2>
+          <p>{post.data.excerpt}</p>
+        </article>
+      ))}
+    </div>
+
+    <nav class="pagination">
+      {currentPage > 1 && (
+        <a href={`/blog/page/${currentPage - 1}`}>← Previous</a>
+      )}
+
+      <span>Page {currentPage} of {totalPages}</span>
+
+      {currentPage < totalPages && (
+        <a href={`/blog/page/${currentPage + 1}`}>Next →</a>
+      )}
+    </nav>
+  </main>
+</Layout>
+```
+
+### Category Filtering
+
+Create category pages to filter content:
+
+```astro
+---
+// src/pages/blog/category/[category].astro
+import { getContent } from '../../../lib/sonicjs';
+import Layout from '../../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const response = await getContent('categories');
+
+  return response.data.map((category) => ({
+    params: { category: category.data.slug },
+    props: { categoryName: category.data.name },
+  }));
+}
+
+const { category } = Astro.params;
+const { categoryName } = Astro.props;
+
+const response = await getContent('blog-posts', {
+  filters: {
+    'status[equals]': 'published',
+    'data.category[equals]': category,
+  },
+  sort: '-created_at',
+});
+
+const posts = response.data;
+---
+
+<Layout title={`${categoryName} Posts`}>
+  <main>
+    <h1>{categoryName}</h1>
+    <p>{posts.length} posts in this category</p>
+
+    <div class="posts">
+      {posts.map((post) => (
+        <article>
+          <h2><a href={`/blog/${post.data.slug}`}>{post.data.title}</a></h2>
+          <p>{post.data.excerpt}</p>
+        </article>
+      ))}
+    </div>
+  </main>
+</Layout>
+```
+
+### Image Optimization
+
+Use Astro's built-in image optimization with SonicJS media:
+
+```astro
+---
+// src/components/OptimizedImage.astro
+import { Image } from 'astro:assets';
+
+interface Props {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+}
+
+const { src, alt, width = 800, height = 600 } = Astro.props;
+---
+
+<Image
+  src={src}
+  alt={alt}
+  width={width}
+  height={height}
+  format="webp"
+  quality={80}
+/>
+```
+
+For remote images from SonicJS R2 storage, configure Astro:
+
+```javascript
+// astro.config.mjs
+export default defineConfig({
+  image: {
+    domains: ['pub-sonicjs-media-dev.r2.dev'],
+    remotePatterns: [{ protocol: 'https' }],
+  },
+});
+```
+
+---
+
+## Part 5: Caching Strategies
+
+### Leverage SonicJS Caching
+
+SonicJS includes a three-tiered caching system. For SSG sites, content is fetched at build time and cached statically. For SSR, you can leverage Cloudflare's edge caching:
+
+```typescript
+// src/lib/sonicjs.ts - Add cache headers
+export async function getBlogPosts(): Promise<BlogPost[]> {
+  const response = await fetch(
+    `${API_URL}/api/collections/blog-posts/content?filter[status][equals]=published`,
+    {
+      headers: {
+        'Cache-Control': 'max-age=300', // Cache for 5 minutes
+      },
+    }
+  );
+
+  // Log cache status from SonicJS
+  const cacheStatus = response.headers.get('X-Cache-Status');
+  const cacheSource = response.headers.get('X-Cache-Source');
+  console.log(`Cache: ${cacheStatus} from ${cacheSource}`);
+
+  const result = await response.json();
+  return result.data;
+}
+```
+
+### Incremental Static Regeneration Pattern
+
+For Astro SSR with on-demand revalidation:
+
+```astro
+---
+// src/pages/blog/[slug].astro
+export const prerender = false;
+
+// Set cache headers for CDN caching
+Astro.response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400');
+---
+```
+
+---
+
+## Part 6: Deployment
+
+### Deploy SonicJS to Cloudflare Workers
+
+```bash
+# In your SonicJS project
+npm run deploy
+```
+
+Note your production URL: `https://my-cms.your-subdomain.workers.dev`
+
+### Deploy Astro to Cloudflare Pages
+
+Install the Cloudflare adapter:
+
+```bash
+npm install @astrojs/cloudflare
+```
+
+Update your Astro config:
+
+```javascript
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import cloudflare from '@astrojs/cloudflare';
+
+export default defineConfig({
+  output: 'hybrid', // or 'server' for full SSR
+  adapter: cloudflare(),
+});
+```
+
+Update your production environment variables:
+
+```bash
+# .env.production
+SONICJS_API_URL=https://my-cms.your-subdomain.workers.dev
+```
+
+Deploy to Cloudflare Pages:
+
+```bash
+# Build the site
+npm run build
+
+# Deploy via Wrangler
+npx wrangler pages deploy ./dist
+```
+
+Or connect your Git repository to Cloudflare Pages for automatic deployments.
+
+### Environment Variables in Cloudflare Pages
+
+Set your environment variables in the Cloudflare Pages dashboard:
+
+1. Go to your Pages project settings
+2. Navigate to **Environment variables**
+3. Add `SONICJS_API_URL` with your production SonicJS URL
+
+---
+
+## Troubleshooting
+
+### CORS Issues
+
+SonicJS has CORS enabled by default for all origins. If you encounter CORS issues:
+
+1. Verify your SonicJS instance is running
+2. Check the browser console for specific error messages
+3. Ensure you're using the correct API URL
+
+### Content Not Updating
+
+For SSG sites, content is fetched at build time. To update:
+
+```bash
+# Rebuild and redeploy
+npm run build
+npx wrangler pages deploy ./dist
+```
+
+For SSR sites, check the cache headers and consider reducing TTL:
+
+```typescript
+// In your fetch calls
+const response = await fetch(url, {
+  headers: { 'Cache-Control': 'no-cache' }
+});
+```
+
+### 404 on Dynamic Routes
+
+Ensure your `getStaticPaths` function returns all possible paths:
+
+```astro
+---
+export async function getStaticPaths() {
+  const posts = await getBlogPosts();
+  console.log(`Found ${posts.length} posts for static paths`);
+  return posts.map((post) => ({
+    params: { slug: post.data.slug },
+  }));
+}
+---
+```
+
+### TypeScript Errors
+
+Add proper types for your SonicJS responses:
+
+```typescript
+// src/types/sonicjs.ts
+export interface SonicJSContent<T> {
+  id: string;
+  title: string;
+  slug: string;
+  status: string;
+  data: T;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface BlogPostData {
+  title: string;
+  slug: string;
+  excerpt?: string;
+  content: string;
+  featuredImage?: string;
+  publishedAt?: string;
+}
+
+export type BlogPost = SonicJSContent<BlogPostData>;
+```
+
+---
+
+## Key Takeaways
+
+- **SonicJS + Astro** provides a powerful, edge-first content stack
+- Use the **API client pattern** for clean, reusable data fetching
+- **getStaticPaths** enables static generation for dynamic routes
+- Choose **SSG, SSR, or hybrid** based on your content update frequency
+- Deploy both to **Cloudflare** for optimal performance and co-location
+- SonicJS **caching** provides sub-50ms response times out of the box
+
+## Next Steps
+
+- [Authentication](/authentication) — Add user authentication to your Astro site
+- [Media Management](/media) — Learn about image optimization and R2 storage
+- [Filtering & Querying](/api#filtering) — Master advanced content queries
+- [Caching](/caching) — Understand SonicJS's three-tiered caching system
+
+Have questions? Join our [Discord community](https://discord.gg/sonicjs) or open an issue on [GitHub](https://github.com/lane711/sonicjs).
+
+Happy building with Astro and SonicJS!
