@@ -67,6 +67,19 @@ const AVAILABLE_PLUGINS = [
     is_core: false
   },
   {
+    id: 'contact-form',
+    name: 'contact-form',
+    display_name: 'Contact Form',
+    description: 'Professional contact form with Google Maps integration, message storage, and configurable company information',
+    version: '1.0.0',
+    author: 'SonicJS Community',
+    category: 'communication',
+    icon: '📧',
+    permissions: ['admin', 'contact_form.manage'],
+    dependencies: [],
+    is_core: false
+  },
+  {
     id: 'quill-editor',
     name: 'quill-editor',
     display_name: 'Quill Rich Text Editor',
@@ -352,6 +365,34 @@ adminPluginRoutes.post('/install', async (c) => {
       })
 
       return c.json({ success: true, plugin: faqPlugin })
+    }
+
+    // Handle Contact Form plugin installation
+    if (body.name === 'contact-form') {
+      const contactPlugin = await pluginService.installPlugin({
+        id: 'contact-form',
+        name: 'contact-form',
+        display_name: 'Contact Form',
+        description: 'Professional contact form with Google Maps integration, message storage, and configurable company information',
+        version: '1.0.0',
+        author: 'SonicJS Community',
+        category: 'communication',
+        icon: '📧',
+        permissions: ['admin', 'contact_form.manage'],
+        dependencies: [],
+        settings: {
+          companyName: 'My Company',
+          phoneNumber: '555-0199',
+          description: '',
+          address: '123 Web Dev Lane',
+          city: '',
+          state: '',
+          showMap: false,
+          mapApiKey: ''
+        }
+      })
+
+      return c.json({ success: true, plugin: contactPlugin })
     }
 
     // Handle Demo Login plugin installation
