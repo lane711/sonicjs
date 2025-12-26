@@ -73,6 +73,8 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.2.3",
     "playwright": "^1.53.1",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
     "tsx": "^4.20.3",
     "typescript": "^5.9.3",
     "vitest": "^4.0.5",

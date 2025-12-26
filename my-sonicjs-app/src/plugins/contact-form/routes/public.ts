@@ -1,14 +1,30 @@
 import { Hono } from 'hono'
 import { html } from 'hono/html'
+import type { Context } from 'hono'
 import { ContactService } from '../services/contact'
 
 const publicRoutes = new Hono()
 
+/**
+ * GET /contact
+ * Display the public contact form
+ */
 publicRoutes.get('/contact', async (c: any) => {
-  const service = new ContactService(c.env.DB)
-  const { status, data: settings } = await service.getSettings()
+  try {
+    // Get DB from context
+    const db = c.get('db') || c.env?.DB
+    if (!db) {
+      return c.html('<h1>Service temporarily unavailable</h1>', 503)
+    }
 
-  if (status !== 'active') return c.text('Contact form is currently disabled.', 503)
+    const service = new ContactService(db)
+    const { status, data: settings } = await service.getSettings()
+
+    // For testing: Allow form to work even if not activated
+    // TODO: Remove this after proper plugin activation
+    // if (status !== 'active') {
+    //   return c.text('Contact form is currently disabled.', 503)
+    // }
 
   const company = settings.companyName || 'My Company'
   const street = settings.address || '123 Web Dev Lane'
@@ -53,16 +69,52 @@ publicRoutes.get('/contact', async (c: any) => {
             <a href="/" class="btn btn-link mt-3">← Back Home</a>
           </div>
         </div>
-        <script>document.getElementById('cf').addEventListener('submit',async(e)=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const r=await fetch('/api/contact',{method:'POST',body:JSON.stringify(d)});if((await r.json()).success){document.getElementById('success-alert').classList.remove('d-none');e.target.reset()}});</script>
+        <script>document.getElementById('cf').addEventListener('submit',async(e)=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});const res=await r.json();if(res.success){document.getElementById('success-alert').classList.remove('d-none');e.target.reset();setTimeout(()=>document.getElementById('success-alert').classList.add('d-none'),5000)}else{alert('Error sending message. Please try again.')}});</script>
       </body>
     </html>
   `)
+  } catch (error) {
+    console.error('Error rendering contact page:', error)
+    return c.html('<h1>Error loading contact form</h1>', 500)
+  }
 })
 
+/**
+ * POST /api/contact
+ * Submit a contact form message
+ */
 publicRoutes.post('/api/contact', async (c: any) => {
-  const service = new ContactService(c.env.DB)
-  await service.saveMessage(await c.req.json())
-  return c.json({ success: true })
+  try {
+    // Get DB from context
+    const db = c.get('db') || c.env?.DB
+    if (!db) {
+      return c.json({ success: false, error: 'Service unavailable' }, 503)
+    }
+
+    const service = new ContactService(db)
+    const data = await c.req.json()
+    
+    // Basic validation
+    if (!data.name || !data.email || !data.msg) {
+      return c.json({ 
+        success: false, 
+        error: 'All fields are required' 
+      }, 400)
+    }
+
+    await service.saveMessage(data)
+    
+    return c.json({ 
+      success: true, 
+      message: 'Message sent successfully' 
+    })
+  } catch (error) {
+    console.error('Error saving contact message:', error)
+    return c.json({ 
+      success: false, 
+      error: 'Failed to send message' 
+    }, 500)
+  }
 })
 
 export default publicRoutes

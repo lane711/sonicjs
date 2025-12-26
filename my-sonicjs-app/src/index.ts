@@ -3,10 +3,12 @@ import { createSonicJSApp, registerCollections } from '@sonicjs-cms/core'
 
 // 1. IMPORT COLLECTIONS
 import blogPostsCollection from './collections/blog-posts.collection'
-import servicesCollection from './collections/services.collection'
+import contactMessagesCollection from './collections/contact-messages.collection'
+// import servicesCollection from './collections/services.collection' // TODO: Create this collection
 
-// 2. IMPORT WEBSITE & YOUR PLUGIN
-import website from './routes/website'
+// 2. USER PLUGINS 
+// NOTE: Full plugin auto-loading isn't implemented yet in SonicJS
+// For now, manually import and mount plugin routes
 import contactFormPlugin from './plugins/contact-form/index' 
 
 console.log("🔥 DEBUG: src/index.ts is running! 🔥")
@@ -18,81 +20,37 @@ const coreApp = createSonicJSApp()
 console.log("➡️ Step 2: Registering Collections...")
 registerCollections([
   blogPostsCollection,
-  servicesCollection
+  contactMessagesCollection
+  // servicesCollection // TODO: Add when created
 ])
 
 // --- 2. MAIN APP & PLUGIN LOADER ---
 const app = new Hono()
 
-// ROBUST PLUGIN LOADER
-// Checks multiple locations for 'setup' and 'routes' to ensure compatibility
-async function registerLocalPlugin(mainApp: Hono, plugin: any) {
-  console.log("➡️ Step 3: Inside registerLocalPlugin function...")
+// Mount user plugin routes
+function mountPluginRoutes(app: Hono, plugin: any) {
+  if (!plugin || !plugin.routes) return
   
-  if (!plugin) {
-    console.error("❌ ERROR: Plugin object is UNDEFINED. Check import!")
-    return
-  }
-  
-  console.log(`🔌 Loading Plugin: ${plugin.name}`)
-
-  // A. FIND SETUP FUNCTION (The Fix!)
-  // Builder might put it on the root OR inside lifecycle
-  const setupFn = plugin.setup || (plugin.lifecycle && plugin.lifecycle.setup)
-
-  if (setupFn) {
-    try {
-      console.log(`   └─ Running Setup (DB Registration)...`)
-      await setupFn(mainApp)
-    } catch (err) {
-      console.error(`   ❌ Setup failed:`, err)
+  plugin.routes.forEach((routeDef: any) => {
+    if (routeDef.path && routeDef.handler) {
+      console.log(`   └─ Mounting plugin route: ${routeDef.path}`)
+      app.route(routeDef.path, routeDef.handler)
     }
-  } else {
-    console.log("   ⚠️ No setup function found! (Plugin will NOT appear in Admin List)")
-    console.log("   🔍 Available keys:", Object.keys(plugin))
-  }
-
-  // B. MOUNT ROUTES
-  const routes = plugin.routes
-  if (Array.isArray(routes)) {
-    // Standard Builder Format (Array)
-    routes.forEach((routeDef: any) => {
-      const routeApp = routeDef.app || routeDef.handler || routeDef.route
-      const path = routeDef.path
-      
-      if (path && routeApp) {
-         console.log(`   └─ Mounting Route: ${path}`)
-         mainApp.route(path, routeApp)
-      }
-    })
-  } else if (routes instanceof Map) {
-    // Legacy Format (Map)
-    routes.forEach((routeApp: Hono, path: string) => {
-      console.log(`   └─ Mounting Route (Map): ${path}`)
-      mainApp.route(path, routeApp)
-    })
-  } else if (routes) {
-    console.log("   ⚠️ Routes found but format unreadable:", typeof routes)
-  }
+  })
 }
 
 // --- 3. EXECUTION ---
 
-// 1. Global Middleware
-app.use('*', async (c, next) => {
-  await next()
-})
+// 1. Mount user plugin routes
+console.log("➡️ Step 4: Mounting Contact Form Plugin Routes...")
+mountPluginRoutes(app, contactFormPlugin)
 
-// 2. Register Plugin (Execute Loader)
-console.log("➡️ Step 4: Calling registerLocalPlugin...")
-registerLocalPlugin(app, contactFormPlugin)
-
-// 3. Mount Website (Custom Homepage)
-console.log("➡️ Step 5: Mounting Apps...")
-app.route('/', website)
-
-// 4. Mount Core (Admin, API, etc.)
+// 2. Mount Core (Admin, API, etc.)
+console.log("➡️ Step 5: Mounting Core App...")
 app.route('/', coreApp)
+
+// 4. Mount Website (Custom Homepage) - TODO: Create website routes
+// app.route('/', website)
 
 console.log("✅ DEBUG: Initialization Complete. Starting Server...")
 

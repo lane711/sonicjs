@@ -1,9 +1,9 @@
 import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-3YNNVSMC.js';
-import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-VE3ARDK3.js';
+import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-R7G4JXQP.js';
 import { PluginService } from './chunk-SGAG6FD3.js';
-import { MigrationService } from './chunk-XON2HCAN.js';
+import { MigrationService } from './chunk-IFH4Z2YR.js';
 import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-DN45O5XV.js';
-import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-B2TCQ54E.js';
+import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-FHCN7KR2.js';
 import { metricsTracker } from './chunk-FICTAGD4.js';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
@@ -1720,7 +1720,7 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
 });
 adminApiRoutes.get("/migrations/status", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-XCLII3T5.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-AL3CG7BI.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const status = await migrationService.getMigrationStatus();
@@ -1745,7 +1745,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const { MigrationService: MigrationService2 } = await import('./migrations-XCLII3T5.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-AL3CG7BI.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const result = await migrationService.runPendingMigrations();
@@ -1764,7 +1764,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
 });
 adminApiRoutes.get("/migrations/validate", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-XCLII3T5.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-AL3CG7BI.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const validation = await migrationService.validateSchema();
@@ -13740,6 +13740,19 @@ var AVAILABLE_PLUGINS = [
     is_core: false
   },
   {
+    id: "contact-form",
+    name: "contact-form",
+    display_name: "Contact Form",
+    description: "Professional contact form with Google Maps integration, message storage, and configurable company information",
+    version: "1.0.0",
+    author: "SonicJS Community",
+    category: "communication",
+    icon: "\u{1F4E7}",
+    permissions: ["admin", "contact_form.manage"],
+    dependencies: [],
+    is_core: false
+  },
+  {
     id: "quill-editor",
     name: "quill-editor",
     display_name: "Quill Rich Text Editor",
@@ -13966,6 +13979,31 @@ adminPluginRoutes.post("/install", async (c) => {
         }
       });
       return c.json({ success: true, plugin: faqPlugin });
+    }
+    if (body.name === "contact-form") {
+      const contactPlugin = await pluginService.installPlugin({
+        id: "contact-form",
+        name: "contact-form",
+        display_name: "Contact Form",
+        description: "Professional contact form with Google Maps integration, message storage, and configurable company information",
+        version: "1.0.0",
+        author: "SonicJS Community",
+        category: "communication",
+        icon: "\u{1F4E7}",
+        permissions: ["admin", "contact_form.manage"],
+        dependencies: [],
+        settings: {
+          companyName: "My Company",
+          phoneNumber: "555-0199",
+          description: "",
+          address: "123 Web Dev Lane",
+          city: "",
+          state: "",
+          showMap: false,
+          mapApiKey: ""
+        }
+      });
+      return c.json({ success: true, plugin: contactPlugin });
     }
     if (body.name === "demo-login-plugin") {
       const demoPlugin = await pluginService.installPlugin({
@@ -21662,5 +21700,5 @@ var ROUTES_INFO = {
 };
 
 export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, test_cleanup_default, userRoutes };
-//# sourceMappingURL=chunk-XITMVMGN.js.map
-//# sourceMappingURL=chunk-XITMVMGN.js.map
+//# sourceMappingURL=chunk-FOEYH7EC.js.map
+//# sourceMappingURL=chunk-FOEYH7EC.js.map
