@@ -72,7 +72,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
     case 'text':
       let patternHelp = ''
       let autoSlugScript = ''
-      
+
       if (opts.pattern) {
         if (opts.pattern === '^[a-z0-9-]+$' || opts.pattern === '^[a-zA-Z0-9_-]+$') {
           patternHelp = '<p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Use letters, numbers, underscores, and hyphens only</p>'
@@ -115,7 +115,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
           patternHelp = '<p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Must match required format</p>'
         }
       }
-      
+
       fieldHTML = `
         <input 
           type="text" 
@@ -245,7 +245,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         >
       `
       break
-      
+
     case 'boolean':
       const checked = value === true || value === 'true' || value === '1' ? 'checked' : ''
       fieldHTML = `
@@ -266,7 +266,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         <input type="hidden" name="${fieldName}_submitted" value="1">
       `
       break
-      
+
     case 'date':
       fieldHTML = `
         <input
@@ -371,7 +371,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
       const options = opts.options || []
       const multiple = opts.multiple ? 'multiple' : ''
       const selectedValues = Array.isArray(value) ? value : [value]
-      
+
       fieldHTML = `
         <select 
           id="${fieldId}"
@@ -383,11 +383,11 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         >
           ${!required && !opts.multiple ? '<option value="">Choose an option...</option>' : ''}
           ${options.map((option: any) => {
-            const optionValue = typeof option === 'string' ? option : option.value
-            const optionLabel = typeof option === 'string' ? option : option.label
-            const selected = selectedValues.includes(optionValue) ? 'selected' : ''
-            return `<option value="${escapeHtml(optionValue)}" ${selected}>${escapeHtml(optionLabel)}</option>`
-          }).join('')}
+        const optionValue = typeof option === 'string' ? option : option.value
+        const optionLabel = typeof option === 'string' ? option : option.label
+        const selected = selectedValues.includes(optionValue) ? 'selected' : ''
+        return `<option value="${escapeHtml(optionValue)}" ${selected}>${escapeHtml(optionLabel)}</option>`
+      }).join('')}
         </select>
         ${opts.allowCustom ? `
           <div class="mt-2">
@@ -401,34 +401,75 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         ` : ''}
       `
       break
-      
+
     case 'media':
+      // Check if multiple selection is enabled
+      const isMultiple = opts.multiple === true;
+      const values = isMultiple && value ? (Array.isArray(value) ? value : value.split(',').filter(Boolean)) : [];
+      const singleValue = !isMultiple ? value : '';
+
+      // Helper to detect if URL is a video
+      const isVideoUrl = (url: string) => {
+        const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
+        return videoExtensions.some(ext => url.toLowerCase().endsWith(ext));
+      };
+
+      // Helper to render media element
+      const renderMediaPreview = (url: string, alt: string, classes: string) => {
+        if (isVideoUrl(url)) {
+          return `<video src="${url}" class="${classes}" muted></video>`;
+        }
+        return `<img src="${url}" alt="${alt}" class="${classes}">`;
+      };
+
       fieldHTML = `
         <div class="media-field-container">
-          <input type="hidden" id="${fieldId}" name="${fieldName}" value="${value}">
-          <div class="media-preview ${value ? '' : 'hidden'}" id="${fieldId}-preview">
-            ${value ? `<img src="${value}" alt="Selected media" class="w-32 h-32 object-cover rounded-lg border border-white/20">` : ''}
-          </div>
+          <input type="hidden" id="${fieldId}" name="${fieldName}" value="${isMultiple ? values.join(',') : singleValue}" data-multiple="${isMultiple}">
+          
+          ${isMultiple ? `
+            <div class="media-preview-grid grid grid-cols-4 gap-2 mb-2 ${values.length === 0 ? 'hidden' : ''}" id="${fieldId}-preview">
+              ${values.map((url: string, idx: number) => `
+                <div class="relative media-preview-item" data-url="${url}">
+                  ${renderMediaPreview(url, `Media ${idx + 1}`, 'w-full h-24 object-cover rounded-lg border border-white/20')}
+                  <button
+                    type="button"
+                    onclick="removeMediaFromMultiple('${fieldId}', '${url}')"
+                    class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 hover:bg-red-700"
+                    ${disabled ? 'disabled' : ''}
+                  >
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                </div>
+              `).join('')}
+            </div>
+          ` : `
+            <div class="media-preview ${singleValue ? '' : 'hidden'}" id="${fieldId}-preview">
+              ${singleValue ? renderMediaPreview(singleValue, 'Selected media', 'w-32 h-32 object-cover rounded-lg border border-white/20') : ''}
+            </div>
+          `}
+          
           <div class="media-actions mt-2 space-x-2">
             <button
               type="button"
-              onclick="openMediaSelector('${fieldId}')"
+              onclick="openMediaSelector('${fieldId}', ${isMultiple})"
               class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all"
               ${disabled ? 'disabled' : ''}
             >
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
-              Select Media
+              ${isMultiple ? 'Select Media (Multiple)' : 'Select Media'}
             </button>
-            ${value ? `
+            ${(isMultiple ? values.length > 0 : singleValue) ? `
               <button
                 type="button"
                 onclick="clearMediaField('${fieldId}')"
                 class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all"
                 ${disabled ? 'disabled' : ''}
               >
-                Remove
+                ${isMultiple ? 'Clear All' : 'Remove'}
               </button>
             ` : ''}
           </div>
@@ -449,7 +490,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         >
       `
   }
-  
+
   return `
     <div class="form-group">
       <label for="${fieldId}" class="block text-sm/6 font-medium text-zinc-950 dark:text-white mb-2">

@@ -1,10 +1,10 @@
-import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
-import { renderAlert } from '../alert.template'
-import { renderDynamicField, renderFieldGroup, FieldDefinition } from '../components/dynamic-field.template'
-import { renderConfirmationDialog, getConfirmationDialogScript } from '../confirmation-dialog.template'
-import { getTinyMCEScript, getTinyMCEInitScript } from '../../plugins/available/tinymce-plugin'
+import { getMDXEditorInitScript, getMDXEditorScripts } from '../../plugins/available/easy-mdx'
+import { getTinyMCEInitScript, getTinyMCEScript } from '../../plugins/available/tinymce-plugin'
 import { getQuillCDN, getQuillInitScript } from '../../plugins/core-plugins/quill-editor'
-import { getMDXEditorScripts, getMDXEditorInitScript } from '../../plugins/available/easy-mdx'
+import { renderAlert } from '../alert.template'
+import { FieldDefinition, renderDynamicField, renderFieldGroup } from '../components/dynamic-field.template'
+import { getConfirmationDialogScript, renderConfirmationDialog } from '../confirmation-dialog.template'
+import { AdminLayoutCatalystData, renderAdminLayoutCatalyst } from '../layouts/admin-layout-catalyst.template'
 
 export interface Collection {
   id: string
@@ -75,7 +75,7 @@ export function renderContentFormPage(data: ContentFormData): string {
   const coreFields = data.fields.filter(f => ['title', 'slug', 'content'].includes(f.field_name))
   const contentFields = data.fields.filter(f => !['title', 'slug', 'content'].includes(f.field_name) && !f.field_name.startsWith('meta_'))
   const metaFields = data.fields.filter(f => f.field_name.startsWith('meta_'))
-  
+
   // Helper function to get field value - title and slug are stored as columns, others in data JSON
   const getFieldValue = (fieldName: string) => {
     if (fieldName === 'title') return data.title || data.data?.[fieldName] || ''
@@ -392,26 +392,26 @@ export function renderContentFormPage(data: ContentFormData): string {
 
     <!-- Confirmation Dialogs -->
     ${renderConfirmationDialog({
-      id: 'duplicate-content-confirm',
-      title: 'Duplicate Content',
-      message: 'Create a copy of this content?',
-      confirmText: 'Duplicate',
-      cancelText: 'Cancel',
-      iconColor: 'blue',
-      confirmClass: 'bg-blue-500 hover:bg-blue-400',
-      onConfirm: 'performDuplicateContent()'
-    })}
+    id: 'duplicate-content-confirm',
+    title: 'Duplicate Content',
+    message: 'Create a copy of this content?',
+    confirmText: 'Duplicate',
+    cancelText: 'Cancel',
+    iconColor: 'blue',
+    confirmClass: 'bg-blue-500 hover:bg-blue-400',
+    onConfirm: 'performDuplicateContent()'
+  })}
 
     ${renderConfirmationDialog({
-      id: 'delete-content-confirm',
-      title: 'Delete Content',
-      message: 'Are you sure you want to delete this content? This action cannot be undone.',
-      confirmText: 'Delete',
-      cancelText: 'Cancel',
-      iconColor: 'red',
-      confirmClass: 'bg-red-500 hover:bg-red-400',
-      onConfirm: `performDeleteContent('${data.id}')`
-    })}
+    id: 'delete-content-confirm',
+    title: 'Delete Content',
+    message: 'Are you sure you want to delete this content? This action cannot be undone.',
+    confirmText: 'Delete',
+    cancelText: 'Cancel',
+    iconColor: 'red',
+    confirmClass: 'bg-red-500 hover:bg-red-400',
+    onConfirm: `performDeleteContent('${data.id}')`
+  })}
 
     ${getConfirmationDialogScript()}
 
@@ -441,11 +441,18 @@ export function renderContentFormPage(data: ContentFormData): string {
 
       // Media field functions
       let currentMediaFieldId = null;
+      let currentMediaFieldMultiple = false;
+      let originalFieldValue = '';
+      let originalPreviewHTML = '';
 
-      function openMediaSelector(fieldId) {
+      function openMediaSelector(fieldId, isMultiple = false) {
         currentMediaFieldId = fieldId;
-        // Store the original value in case user cancels
+        currentMediaFieldMultiple = isMultiple;
+        // Store the original value and preview in case user cancels
         const originalValue = document.getElementById(fieldId)?.value || '';
+        originalFieldValue = originalValue;
+        const preview = document.getElementById(fieldId + '-preview');
+        originalPreviewHTML = preview ? preview.innerHTML : '';
 
         // Open media library modal
         const modal = document.createElement('div');
@@ -453,7 +460,49 @@ export function renderContentFormPage(data: ContentFormData): string {
         modal.id = 'media-selector-modal';
         modal.innerHTML = \`
           <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <h3 class="text-lg font-semibold text-zinc-950 dark:text-white mb-4">Select Media</h3>
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-semibold text-zinc-950 dark:text-white">Select Media\${isMultiple ? ' (Multiple)' : ''}</h3>
+              <button
+                onclick="toggleUploadInSelector()"
+                class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors">
+                Upload New
+              </button>
+            </div>
+            
+            <!-- Upload Form (hidden by default) -->
+            <div id="media-selector-upload" class="hidden mb-4">
+              <form
+                id="selector-upload-form"
+                hx-post="/admin/media/upload"
+                hx-encoding="multipart/form-data"
+                hx-target="#selector-upload-results"
+                hx-on::after-request="if(event.detail.successful) { setTimeout(() => { const container = document.getElementById('media-grid-container'); if(container) { htmx.ajax('GET', '/admin/media/selector', {target: container, swap: 'innerHTML'}); } setTimeout(() => { document.getElementById('selector-upload-results').innerHTML = ''; document.getElementById('selector-file-input').value = ''; }, 1000); }, 500); }"
+                class="space-y-4 p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg"
+              >
+                <div
+                  class="border-2 border-dashed border-zinc-950/10 dark:border-white/20 rounded-xl p-6 text-center cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                  onclick="document.getElementById('selector-file-input').click()"
+                >
+                  <svg class="mx-auto h-10 w-10 text-zinc-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <p class="mt-2 text-sm text-zinc-950 dark:text-white">Drop files or click to upload</p>
+                  <p class="text-xs text-zinc-500 dark:text-zinc-400">Images, Videos, PDF, TXT</p>
+                </div>
+                <input 
+                  type="file" 
+                  id="selector-file-input" 
+                  name="files" 
+                  multiple 
+                  accept="image/*,video/*,application/pdf,text/plain"
+                  class="hidden"
+                  onchange="if(this.files.length > 0) { document.getElementById('selector-upload-form').dispatchEvent(new Event('submit', {bubbles: true, cancelable: true})); }"
+                >
+                <input type="hidden" name="folder" value="uploads">
+                <div id="selector-upload-results" class="text-sm"></div>
+              </form>
+            </div>
+            
             <div id="media-grid-container" hx-get="/admin/media/selector" hx-trigger="load"></div>
             <div class="mt-4 flex justify-end space-x-2">
               <button
@@ -473,6 +522,41 @@ export function renderContentFormPage(data: ContentFormData): string {
         // Trigger HTMX for the modal content
         if (window.htmx) {
           htmx.process(modal);
+          // After HTMX loads the grid, update button texts based on selection state
+          const gridContainer = document.getElementById('media-grid-container');
+          if (gridContainer) {
+            htmx.on(gridContainer, 'htmx:afterSettle', () => {
+              updateMediaSelectorButtonTexts();
+            });
+          }
+        }
+      }
+
+      // Update button texts in media selector based on selection state
+      function updateMediaSelectorButtonTexts() {
+        if (!currentMediaFieldId) return;
+        
+        const hiddenInput = document.getElementById(currentMediaFieldId);
+        if (!hiddenInput) return;
+        
+        const selectedUrls = hiddenInput.value ? hiddenInput.value.split(',').filter(Boolean) : [];
+        
+        // Update all buttons in the selector grid
+        const gridItems = document.querySelectorAll('#media-selector-grid [data-media-url]');
+        gridItems.forEach(item => {
+          const mediaUrl = item.getAttribute('data-media-url');
+          const button = item.querySelector('.media-select-btn');
+          if (button && mediaUrl) {
+            const isSelected = selectedUrls.includes(mediaUrl);
+            button.textContent = isSelected ? 'Deselect' : 'Select';
+          }
+        });
+      }
+
+      function toggleUploadInSelector() {
+        const uploadDiv = document.getElementById('media-selector-upload');
+        if (uploadDiv) {
+          uploadDiv.classList.toggle('hidden');
         }
       }
 
@@ -488,13 +572,17 @@ export function renderContentFormPage(data: ContentFormData): string {
         // Restore original value
         const hiddenInput = document.getElementById(fieldId);
         if (hiddenInput) {
-          hiddenInput.value = originalValue;
+          hiddenInput.value = originalFieldValue;
         }
 
-        // If original value was empty, hide the preview and show select button
-        if (!originalValue) {
-          const preview = document.getElementById(fieldId + '-preview');
-          if (preview) {
+        // Restore original preview HTML
+        const preview = document.getElementById(fieldId + '-preview');
+        if (preview) {
+          preview.innerHTML = originalPreviewHTML;
+          // Show/hide based on whether there was content
+          if (originalFieldValue) {
+            preview.classList.remove('hidden');
+          } else {
             preview.classList.add('hidden');
           }
         }
@@ -504,8 +592,20 @@ export function renderContentFormPage(data: ContentFormData): string {
       }
 
       function clearMediaField(fieldId) {
-        document.getElementById(fieldId).value = '';
-        document.getElementById(fieldId + '-preview').classList.add('hidden');
+        const hiddenInput = document.getElementById(fieldId);
+        const preview = document.getElementById(fieldId + '-preview');
+        
+        if (hiddenInput) {
+          hiddenInput.value = '';
+        }
+        
+        if (preview) {
+          // Clear all children if it's a grid, or hide it
+          if (preview.classList.contains('media-preview-grid')) {
+            preview.innerHTML = '';
+          }
+          preview.classList.add('hidden');
+        }
       }
 
       // Global function called by media selector buttons
@@ -516,42 +616,150 @@ export function renderContentFormPage(data: ContentFormData): string {
         }
 
         const fieldId = currentMediaFieldId;
-
-        // Set the hidden input value to the media URL (not ID)
         const hiddenInput = document.getElementById(fieldId);
-        if (hiddenInput) {
-          hiddenInput.value = mediaUrl;
-        }
+        
+        // Helper to detect if file is video
+        const isVideo = (url) => {
+          const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
+          return videoExtensions.some(ext => url.toLowerCase().endsWith(ext));
+        };
+        
+        // Helper to render media element (image or video)
+        const renderMediaElement = (url, alt) => {
+          if (isVideo(url)) {
+            return \`<video src="\${url}" class="w-full h-24 object-cover rounded-lg border border-white/20" muted></video>\`;
+          }
+          return \`<img src="\${url}" alt="\${alt}" class="w-full h-24 object-cover rounded-lg border border-white/20">\`;
+        };
+        
+        if (currentMediaFieldMultiple) {
+          // Multiple selection mode with toggle behavior
+          const currentValue = hiddenInput?.value || '';
+          const values = currentValue ? currentValue.split(',').filter(Boolean) : [];
+          
+          // Toggle: if already selected, remove it; otherwise add it
+          const index = values.indexOf(mediaUrl);
+          if (index > -1) {
+            // Deselect: remove from array
+            values.splice(index, 1);
+            if (hiddenInput) {
+              hiddenInput.value = values.join(',');
+            }
+            
+            // Remove preview item from the modal preview area
+            const preview = document.getElementById(fieldId + '-preview');
+            if (preview) {
+              const previewItem = preview.querySelector('[data-url="' + mediaUrl + '"]');
+              if (previewItem) {
+                previewItem.remove();
+              }
+              // Hide preview if no items left
+              if (values.length === 0) {
+                preview.classList.add('hidden');
+              }
+            }
+            
+            // Remove highlight from selector grid
+            const selectedEl = document.querySelector('#media-selector-grid [data-media-url="' + mediaUrl + '"]');
+            if (selectedEl) {
+              selectedEl.classList.remove('ring-2', 'ring-lime-500', 'dark:ring-lime-400');
+            }
+          } else {
+            // Select: add to array
+            values.push(mediaUrl);
+            if (hiddenInput) {
+              hiddenInput.value = values.join(',');
+            }
+            
+            // Add preview item
+            const preview = document.getElementById(fieldId + '-preview');
+            if (preview) {
+              preview.classList.remove('hidden');
+              const newItem = document.createElement('div');
+              newItem.className = 'relative media-preview-item';
+              newItem.dataset.url = mediaUrl;
+              newItem.innerHTML = \`
+                \${renderMediaElement(mediaUrl, filename)}
+                <button
+                  type="button"
+                  onclick="removeMediaFromMultiple('\${fieldId}', '\${mediaUrl}')"
+                  class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 hover:bg-red-700"
+                >
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              \`;
+              preview.appendChild(newItem);
+            }
+            
+            // Add highlight to selector grid
+            const selectedEl = document.querySelector('#media-selector-grid [data-media-url="' + mediaUrl + '"]');
+            if (selectedEl) {
+              selectedEl.classList.add('ring-2', 'ring-lime-500', 'dark:ring-lime-400');
+            }
+          }
+        } else {
+          // Single selection mode (existing behavior)
+          if (hiddenInput) {
+            hiddenInput.value = mediaUrl;
+          }
 
-        // Update the preview
-        const preview = document.getElementById(fieldId + '-preview');
-        if (preview) {
-          preview.innerHTML = \`<img src="\${mediaUrl}" alt="\${filename}" class="w-32 h-32 object-cover rounded-lg border border-white/20">\`;
-          preview.classList.remove('hidden');
-        }
+          // Update the preview
+          const preview = document.getElementById(fieldId + '-preview');
+          if (preview) {
+            preview.innerHTML = renderMediaElement(mediaUrl, filename);
+            preview.classList.remove('hidden');
+          }
 
-        // Show the remove button by finding the media actions container and updating it
-        const mediaField = hiddenInput?.closest('.media-field-container');
-        if (mediaField) {
-          const actionsDiv = mediaField.querySelector('.media-actions');
-          if (actionsDiv && !actionsDiv.querySelector('button:has-text("Remove")')) {
-            const removeBtn = document.createElement('button');
-            removeBtn.type = 'button';
-            removeBtn.onclick = () => clearMediaField(fieldId);
-            removeBtn.className = 'inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all';
-            removeBtn.textContent = 'Remove';
-            actionsDiv.appendChild(removeBtn);
+          // Show the remove button by finding the media actions container and updating it
+          const mediaField = hiddenInput?.closest('.media-field-container');
+          if (mediaField) {
+            const actionsDiv = mediaField.querySelector('.media-actions');
+            if (actionsDiv && !actionsDiv.querySelector('button:has-text("Remove")')) {
+              const removeBtn = document.createElement('button');
+              removeBtn.type = 'button';
+              removeBtn.onclick = () => clearMediaField(fieldId);
+              removeBtn.className = 'inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all';
+              removeBtn.textContent = 'Remove';
+              actionsDiv.appendChild(removeBtn);
+            }
           }
         }
 
-        // DON'T close the modal - let user click OK button
-        // Visual feedback: highlight the selected item
-        document.querySelectorAll('#media-selector-grid [data-media-id]').forEach(el => {
-          el.classList.remove('ring-2', 'ring-lime-500', 'dark:ring-lime-400');
-        });
-        const selectedItem = document.querySelector(\`#media-selector-grid [data-media-id="\${mediaId}"]\`);
-        if (selectedItem) {
-          selectedItem.classList.add('ring-2', 'ring-lime-500', 'dark:ring-lime-400');
+        // Visual feedback: highlight the selected item (only for single mode, multiple is handled above)
+        if (!currentMediaFieldMultiple) {
+          // In single mode, only highlight the latest selected item
+          document.querySelectorAll('#media-selector-grid [data-media-id]').forEach(el => {
+            el.classList.remove('ring-2', 'ring-lime-500', 'dark:ring-lime-400');
+          });
+          const selectedEl = document.querySelector('#media-selector-grid [data-media-id="' + mediaId + '"]');
+          if (selectedEl) {
+            selectedEl.classList.add('ring-2', 'ring-lime-500', 'dark:ring-lime-400');
+          }
+        }
+      };
+      
+      // Add function to remove individual items from multiple selection
+      window.removeMediaFromMultiple = function(fieldId, urlToRemove) {
+        const hiddenInput = document.getElementById(fieldId);
+        if (!hiddenInput) return;
+        
+        const values = hiddenInput.value.split(',').filter(url => url !== urlToRemove);
+        hiddenInput.value = values.join(',');
+        
+        // Remove preview item
+        const previewItem = document.querySelector(\`[data-url="\${urlToRemove}"]\`);
+        if (previewItem) {
+          previewItem.remove();
+        }
+        
+        // Hide preview grid if empty
+        if (values.length === 0) {
+          const preview = document.getElementById(fieldId + '-preview');
+          if (preview) {
+            preview.classList.add('hidden');
+          }
         }
       };
 
@@ -698,16 +906,16 @@ export function renderContentFormPage(data: ContentFormData): string {
       });
 
       ${data.tinymceEnabled ? getTinyMCEInitScript({
-        skin: data.tinymceSettings?.skin,
-        defaultHeight: data.tinymceSettings?.defaultHeight,
-        defaultToolbar: data.tinymceSettings?.defaultToolbar
-      }) : ''}
+    skin: data.tinymceSettings?.skin,
+    defaultHeight: data.tinymceSettings?.defaultHeight,
+    defaultToolbar: data.tinymceSettings?.defaultToolbar
+  }) : ''}
 
       ${data.mdxeditorEnabled ? getMDXEditorInitScript({
-        defaultHeight: data.mdxeditorSettings?.defaultHeight,
-        toolbar: data.mdxeditorSettings?.toolbar,
-        placeholder: data.mdxeditorSettings?.placeholder
-      }) : ''}
+    defaultHeight: data.mdxeditorSettings?.defaultHeight,
+    toolbar: data.mdxeditorSettings?.toolbar,
+    placeholder: data.mdxeditorSettings?.placeholder
+  }) : ''}
     </script>
   `
 

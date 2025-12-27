@@ -1,5 +1,1 @@
-export { renderFilterBar } from './chunk-F56JKQTA.js';
-export { getConfirmationDialogScript, renderAdminLayout, renderAdminLayoutCatalyst, renderAlert, renderCheckboxPage, renderCodeExamplesList, renderConfirmationDialog, renderDesignPage, renderForm, renderFormField, renderLogo, renderPagination, renderTable, renderTestimonialsList } from './chunk-DN45O5XV.js';
-import './chunk-V4OQ3NZ2.js';
-//# sourceMappingURL=templates.js.map
-//# sourceMappingURL=templates.js.map
+export * from '../src/templates/index.ts'

@@ -1,12 +1,11 @@
 import { Hono } from 'hono'
 import { html, raw } from 'hono/html'
 import { z } from 'zod'
-import type { D1Database, KVNamespace, R2Bucket } from '@cloudflare/workers-types'
-import { requireAuth, requireRole } from '../middleware'
-import { renderMediaLibraryPage, MediaLibraryPageData, FolderStats, TypeStats } from '../templates/pages/admin-media-library.template'
-import { renderMediaFileDetails, MediaFileDetailsData } from '../templates/components/media-file-details.template'
-import { MediaFile, renderMediaFileCard } from '../templates/components/media-grid.template'
 import type { Bindings, Variables } from '../app'
+import { requireAuth, requireRole } from '../middleware'
+import { MediaFileDetailsData, renderMediaFileDetails } from '../templates/components/media-file-details.template'
+import { MediaFile, renderMediaFileCard } from '../templates/components/media-grid.template'
+import { FolderStats, MediaLibraryPageData, renderMediaLibraryPage, TypeStats } from '../templates/pages/admin-media-library.template'
 
 // File validation schema
 const fileValidationSchema = z.object({
@@ -17,7 +16,7 @@ const fileValidationSchema = z.object({
         // Images
         'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
         // Documents
-        'application/pdf', 'text/plain', 'application/msword', 
+        'application/pdf', 'text/plain', 'application/msword',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         // Videos
         'video/mp4', 'video/webm', 'video/ogg', 'video/avi', 'video/mov',
@@ -57,12 +56,12 @@ adminMediaRoutes.get('/', async (c) => {
     let query = 'SELECT * FROM media'
     const params: any[] = []
     const conditions: string[] = ['deleted_at IS NULL']
-    
+
     if (folder !== 'all') {
       conditions.push('folder = ?')
       params.push(folder)
     }
-    
+
     if (type !== 'all') {
       switch (type) {
         case 'images':
@@ -79,16 +78,16 @@ adminMediaRoutes.get('/', async (c) => {
           break
       }
     }
-    
+
     if (conditions.length > 0) {
       query += ` WHERE ${conditions.join(' AND ')}`
     }
-    
+
     query += ` ORDER BY uploaded_at DESC LIMIT ${limit} OFFSET ${offset}`
-    
+
     const stmt = db.prepare(query)
     const { results } = await stmt.bind(...params).all()
-    
+
     // Get folder statistics
     const foldersStmt = db.prepare(`
       SELECT folder, COUNT(*) as count, SUM(size) as totalSize
@@ -98,7 +97,7 @@ adminMediaRoutes.get('/', async (c) => {
       ORDER BY folder
     `)
     const { results: folders } = await foldersStmt.all()
-    
+
     // Get type statistics
     const typesStmt = db.prepare(`
       SELECT
@@ -114,7 +113,7 @@ adminMediaRoutes.get('/', async (c) => {
       GROUP BY type
     `)
     const { results: types } = await typesStmt.all()
-    
+
     // Process media files with local serving URLs
     const mediaFiles: MediaFile[] = results.map((row: any) => ({
       id: row.id,
@@ -134,7 +133,7 @@ adminMediaRoutes.get('/', async (c) => {
       isVideo: row.mime_type.startsWith('video/'),
       isDocument: !row.mime_type.startsWith('image/') && !row.mime_type.startsWith('video/')
     }))
-    
+
     const pageData: MediaLibraryPageData = {
       files: mediaFiles,
       folders: folders.map((f: any) => ({
@@ -224,11 +223,12 @@ adminMediaRoutes.get('/selector', async (c) => {
         >
       </div>
 
-      <div id="media-selector-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
+      <div id="media-selector-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-96 overflow-y-auto p-1">
         ${raw(mediaFiles.map(file => `
           <div
             class="relative group cursor-pointer rounded-lg overflow-hidden bg-zinc-50 dark:bg-zinc-800 shadow-sm hover:shadow-md transition-shadow"
             data-media-id="${file.id}"
+            data-media-url="${file.public_url}"
           >
             <div class="aspect-square relative">
               ${file.isImage ? `
@@ -258,8 +258,8 @@ adminMediaRoutes.get('/selector', async (c) => {
               <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <button
                   type="button"
-                  onclick="selectMediaFile('${file.id}', '${file.public_url.replace(/'/g, "\\'")}', '${file.filename.replace(/'/g, "\\'")}')"
-                  class="px-4 py-2 bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white rounded-lg font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                  onclick="selectMediaFile('${file.id}', '${file.public_url.replace(/'/g, "\\'")}', '${file.filename.replace(/'/g, "\\'")}'); setTimeout(() => { const el = this.closest('[data-media-url]'); this.textContent = el && el.classList.contains('ring-2') ? 'Deselect' : 'Select'; }, 50);"
+                  class="media-select-btn px-4 py-2 bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white rounded-lg font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                 >
                   Select
                 </button>
@@ -301,23 +301,23 @@ adminMediaRoutes.get('/search', async (c) => {
     const folder = searchParams.get('folder') || 'all'
     const type = searchParams.get('type') || 'all'
     const db = c.env.DB
-    
+
     // Build search query
     let query = 'SELECT * FROM media'
     const params: any[] = []
     const conditions: string[] = []
-    
+
     if (search.trim()) {
       conditions.push('(filename LIKE ? OR original_name LIKE ? OR alt LIKE ?)')
       const searchTerm = `%${search}%`
       params.push(searchTerm, searchTerm, searchTerm)
     }
-    
+
     if (folder !== 'all') {
       conditions.push('folder = ?')
       params.push(folder)
     }
-    
+
     if (type !== 'all') {
       switch (type) {
         case 'images':
@@ -334,16 +334,16 @@ adminMediaRoutes.get('/search', async (c) => {
           break
       }
     }
-    
+
     if (conditions.length > 0) {
       query += ` WHERE ${conditions.join(' AND ')}`
     }
-    
+
     query += ` ORDER BY uploaded_at DESC LIMIT 24`
-    
+
     const stmt = db.prepare(query)
     const { results } = await stmt.bind(...params).all()
-    
+
     const mediaFiles = results.map((row: any) => ({
       ...row,
       public_url: `/files/${row.r2_key}`,
@@ -355,9 +355,9 @@ adminMediaRoutes.get('/search', async (c) => {
       isVideo: row.mime_type.startsWith('video/'),
       isDocument: !row.mime_type.startsWith('image/') && !row.mime_type.startsWith('video/')
     }))
-    
+
     const gridHTML = mediaFiles.map(file => generateMediaItemHTML(file)).join('')
-    
+
     return c.html(raw(gridHTML))
   } catch (error) {
     console.error('Error searching media:', error)
@@ -370,14 +370,14 @@ adminMediaRoutes.get('/:id/details', async (c) => {
   try {
     const id = c.req.param('id')
     const db = c.env.DB
-    
+
     const stmt = db.prepare('SELECT * FROM media WHERE id = ?')
     const result = await stmt.bind(id).first() as any
-    
+
     if (!result) {
       return c.html('<div class="text-red-500">File not found</div>')
     }
-    
+
     const file: MediaFile & { width?: number; height?: number; folder: string; uploadedAt: string } = {
       id: result.id,
       filename: result.filename,
@@ -399,9 +399,9 @@ adminMediaRoutes.get('/:id/details', async (c) => {
       height: result.height,
       folder: result.folder
     }
-    
+
     const detailsData: MediaFileDetailsData = { file }
-    
+
     return c.html(renderMediaFileDetails(detailsData))
   } catch (error) {
     console.error('Error fetching file details:', error)
@@ -422,7 +422,7 @@ adminMediaRoutes.post('/upload', async (c) => {
         files.push(entry)
       }
     }
-    
+
     if (!files || files.length === 0) {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -496,9 +496,9 @@ adminMediaRoutes.post('/upload', async (c) => {
         }
 
         // Extract image dimensions if it's an image
-        let width: number | undefined
-        let height: number | undefined
-        
+        let width: number | null = null
+        let height: number | null = null
+
         if (file.type.startsWith('image/') && !file.type.includes('svg')) {
           try {
             const dimensions = await getImageDimensions(arrayBuffer)
@@ -511,7 +511,7 @@ adminMediaRoutes.post('/upload', async (c) => {
 
         // Generate URLs - use public serving route
         const publicUrl = `/files/${r2Key}`
-        const thumbnailUrl = file.type.startsWith('image/') ? publicUrl : undefined
+        const thumbnailUrl = file.type.startsWith('image/') ? publicUrl : null
 
         // Save to database
         const stmt = c.env.DB.prepare(`
@@ -520,7 +520,7 @@ adminMediaRoutes.post('/upload', async (c) => {
             folder, r2_key, public_url, thumbnail_url, uploaded_by, uploaded_at
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `)
-        
+
         await stmt.bind(
           fileId,
           filename,
@@ -631,14 +631,14 @@ adminMediaRoutes.post('/upload', async (c) => {
 adminMediaRoutes.get('/file/*', async (c) => {
   try {
     const r2Key = c.req.path.replace('/admin/media/file/', '')
-    
+
     if (!r2Key) {
       return c.notFound()
     }
 
     // Get file from R2
     const object = await c.env.MEDIA_BUCKET.get(r2Key)
-    
+
     if (!object) {
       return c.notFound()
     }
@@ -648,7 +648,7 @@ adminMediaRoutes.get('/file/*', async (c) => {
     object.httpMetadata?.contentType && headers.set('Content-Type', object.httpMetadata.contentType)
     object.httpMetadata?.contentDisposition && headers.set('Content-Disposition', object.httpMetadata.contentDisposition)
     headers.set('Cache-Control', 'public, max-age=31536000') // 1 year cache
-    
+
     return new Response(object.body as any, {
       headers
     })
@@ -664,11 +664,11 @@ adminMediaRoutes.put('/:id', async (c) => {
     const user = c.get('user')
     const fileId = c.req.param('id')
     const formData = await c.req.formData()
-    
+
     // Get file record
     const stmt = c.env.DB.prepare('SELECT * FROM media WHERE id = ? AND deleted_at IS NULL')
     const fileRecord = await stmt.bind(fileId).first() as any
-    
+
     if (!fileRecord) {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -899,17 +899,17 @@ adminMediaRoutes.delete('/:id', async (c) => {
 // Helper function to extract image dimensions
 async function getImageDimensions(arrayBuffer: ArrayBuffer): Promise<{ width: number; height: number }> {
   const uint8Array = new Uint8Array(arrayBuffer)
-  
+
   // Check for JPEG
   if (uint8Array[0] === 0xFF && uint8Array[1] === 0xD8) {
     return getJPEGDimensions(uint8Array)
   }
-  
+
   // Check for PNG
   if (uint8Array[0] === 0x89 && uint8Array[1] === 0x50 && uint8Array[2] === 0x4E && uint8Array[3] === 0x47) {
     return getPNGDimensions(uint8Array)
   }
-  
+
   // Default fallback
   return { width: 0, height: 0 }
 }
@@ -943,7 +943,7 @@ function getPNGDimensions(uint8Array: Uint8Array): { width: number; height: numb
 function generateMediaItemHTML(file: any): string {
   const isImage = file.isImage
   const isVideo = file.isVideo
-  
+
   return `
     <div 
       class="media-item bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer" 
