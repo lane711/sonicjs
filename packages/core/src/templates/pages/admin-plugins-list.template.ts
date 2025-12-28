@@ -40,6 +40,7 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
   const categories = [
     { value: 'content', label: 'Content Management' },
     { value: 'media', label: 'Media' },
+    { value: 'editor', label: 'Editors' },
     { value: 'seo', label: 'SEO & Analytics' },
     { value: 'security', label: 'Security' },
     { value: 'utilities', label: 'Utilities' },
@@ -54,6 +55,23 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
     { value: 'uninstalled', label: 'Available to Install' },
     { value: 'error', label: 'Error' }
   ];
+
+  // Calculate counts
+  const categoryCounts: Record<string, number> = {};
+  categories.forEach(cat => {
+    categoryCounts[cat.value] = data.plugins.filter(p => p.category === cat.value).length;
+  });
+
+  // Sort categories by count (descending)
+  categories.sort((a, b) => (categoryCounts[b.value] || 0) - (categoryCounts[a.value] || 0));
+
+  const statusCounts: Record<string, number> = {};
+  statuses.forEach(status => {
+    statusCounts[status.value] = data.plugins.filter(p => p.status === status.value).length;
+  });
+
+  // Sort statuses by count (descending)
+  statuses.sort((a, b) => (statusCounts[b.value] || 0) - (statusCounts[a.value] || 0));
 
   const pageContent = `
     <div>
@@ -89,26 +107,30 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
 
       <div class="flex flex-col lg:flex-row gap-8">
         <!-- Sidebar Filters -->
-        <aside class="w-full lg:w-48 flex-shrink-0 space-y-8 sticky top-6 self-start">
+        <aside class="w-full lg:w-48 flex-shrink-0 space-y-8 lg:sticky lg:top-6 lg:self-start">
           <!-- Categories Filter -->
           <div>
             <h3 class="text-sm font-semibold text-zinc-950 dark:text-white mb-4">Categories</h3>
             <div class="space-y-3">
-              ${categories.map(cat => `
-                <div class="flex items-center">
+              ${categories.map(cat => {
+                const count = categoryCounts[cat.value] || 0;
+                const isDisabled = count === 0;
+                return `
+                <div class="flex items-center ${isDisabled ? 'opacity-50' : ''}">
                   <input
                     id="category-${cat.value}"
                     name="category"
                     value="${cat.value}"
                     type="checkbox"
                     onchange="filterAndSortPlugins()"
-                    class="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-600 dark:bg-zinc-900"
+                    class="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-600 dark:bg-zinc-900 disabled:cursor-not-allowed"
+                    ${isDisabled ? 'disabled' : ''}
                   >
-                  <label for="category-${cat.value}" class="ml-3 text-sm text-zinc-600 dark:text-zinc-400 select-none">
-                    ${cat.label}
+                  <label for="category-${cat.value}" class="ml-3 text-sm text-zinc-600 dark:text-zinc-400 select-none ${isDisabled ? 'cursor-not-allowed' : ''}">
+                    ${cat.label} <span class="text-zinc-400 dark:text-zinc-500">(${count})</span>
                   </label>
                 </div>
-              `).join('')}
+              `}).join('')}
             </div>
           </div>
 
@@ -119,6 +141,8 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
             <h3 class="text-sm font-semibold text-zinc-950 dark:text-white mb-4">Status</h3>
             <div class="space-y-3">
               ${statuses.map(status => {
+                const count = statusCounts[status.value] || 0;
+                const isDisabled = count === 0;
                 let colorClass = '';
                 let ringClass = '';
                 let dotClass = '';
@@ -151,20 +175,22 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
                 }
 
                 return `
-                <div class="flex items-center">
+                <div class="flex items-center ${isDisabled ? 'opacity-50' : ''}">
                   <input
                     id="status-${status.value}"
                     name="status"
                     value="${status.value}"
                     type="checkbox"
                     onchange="filterAndSortPlugins()"
-                    class="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-600 dark:bg-zinc-900"
+                    class="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-600 dark:bg-zinc-900 disabled:cursor-not-allowed"
+                    ${isDisabled ? 'disabled' : ''}
                   >
-                  <label for="status-${status.value}" class="ml-3 cursor-pointer select-none flex items-center">
+                  <label for="status-${status.value}" class="ml-3 cursor-pointer select-none flex items-center ${isDisabled ? 'cursor-not-allowed' : ''}">
                     <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${colorClass} ${ringClass}">
                       <span class="mr-1.5 h-1.5 w-1.5 rounded-full ${dotClass}"></span>
                       ${status.label}
                     </span>
+                    <span class="ml-2 text-xs text-zinc-500 dark:text-zinc-400">(${count})</span>
                   </label>
                 </div>
               `}).join('')}
@@ -207,12 +233,12 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
                 type="text"
                 placeholder="Search plugins..."
                 oninput="filterAndSortPlugins()"
-                class="block w-full rounded-md border-0 py-1.5 pl-10 text-zinc-900 ring-1 ring-inset ring-zinc-300 placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-zinc-600 dark:bg-zinc-900 dark:text-white dark:ring-zinc-700 dark:focus:ring-zinc-500 sm:text-sm sm:leading-6"
+                class="block w-full h-9 rounded-md border-0 py-1.5 pl-10 text-zinc-900 ring-1 ring-inset ring-zinc-300 placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-zinc-600 dark:bg-zinc-900 dark:text-white dark:ring-zinc-700 dark:focus:ring-zinc-500 sm:text-sm sm:leading-6"
               >
             </div>
 
             <div class="flex items-center gap-3 w-full sm:w-auto">
-              <select id="sort-filter" onchange="filterAndSortPlugins()" class="block w-full sm:w-auto rounded-md border-0 py-1.5 pl-3 pr-8 text-zinc-900 ring-1 ring-inset ring-zinc-300 focus:ring-2 focus:ring-inset focus:ring-zinc-600 dark:bg-zinc-900 dark:text-white dark:ring-zinc-700 dark:focus:ring-zinc-500 sm:text-sm sm:leading-6">
+              <select id="sort-filter" onchange="filterAndSortPlugins()" class="block w-full sm:w-auto h-9 rounded-md border-0 py-1.5 pl-3 pr-8 text-zinc-900 ring-1 ring-inset ring-zinc-300 focus:ring-2 focus:ring-inset focus:ring-zinc-600 dark:bg-zinc-900 dark:text-white dark:ring-zinc-700 dark:focus:ring-zinc-500 sm:text-sm sm:leading-6">
                 <option value="name-asc">Name (A-Z)</option>
                 <option value="name-desc">Name (Z-A)</option>
                 <option value="newest">Newest Installed</option>
@@ -223,7 +249,7 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
 
               <button
                 onclick="location.reload()"
-                class="inline-flex items-center gap-x-1.5 rounded-md bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm font-semibold text-zinc-900 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-300 dark:ring-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                class="inline-flex items-center gap-x-1.5 rounded-md bg-white dark:bg-zinc-900 px-3 py-1.5 h-9 text-sm font-semibold text-zinc-900 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-300 dark:ring-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
               >
                 <svg class="h-4 w-4 text-zinc-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
