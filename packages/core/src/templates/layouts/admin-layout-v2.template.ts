@@ -169,6 +169,8 @@ export function adminLayoutV2(data: AdminLayoutData): string {
     
     /* Notification styles */
     .notification {
+      -webkit-backdrop-filter: blur(15px);
+      backdrop-filter: blur(15px);
       animation: slideInRight 0.3s ease-out;
     }
     
