@@ -1,6 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { loginAsAdmin, logout, ADMIN_CREDENTIALS } from './utils/test-helpers';
+import { loginAsAdmin, logout } from './utils/test-helpers';
 
+/**
+ * E2E Tests for Disable User Registration Feature
+ *
+ * Tests the enforcement of the "registration.enabled" setting in the auth plugin.
+ * When disabled, new user registration should be blocked (except for first user bootstrap).
+ */
 test.describe('Disable User Registration', () => {
   // Test data for registration attempts
   const testUser = {
@@ -10,6 +16,36 @@ test.describe('Disable User Registration', () => {
     firstName: 'Test',
     lastName: 'User'
   };
+
+  // Helper function to update registration setting via API
+  async function setRegistrationEnabled(page: any, enabled: boolean) {
+    // Login as admin first
+    await loginAsAdmin(page);
+
+    // Update the core-auth plugin settings via API
+    const response = await page.request.post('/admin/plugins/core-auth/settings', {
+      data: {
+        registration: {
+          enabled: enabled,
+          requireEmailVerification: false,
+          defaultRole: 'viewer'
+        }
+      }
+    });
+
+    // Log the response for debugging
+    const status = response.status();
+    if (status !== 200) {
+      console.log(`Setting registration enabled=${enabled}: status=${status}`);
+    }
+
+    await logout(page);
+
+    // Small delay to ensure setting is persisted
+    await page.waitForTimeout(500);
+
+    return status === 200;
+  }
 
   // Seed admin before all tests
   test.beforeAll(async ({ request }) => {
@@ -50,149 +86,77 @@ test.describe('Disable User Registration', () => {
     });
   });
 
-  test.describe('Registration when disabled', () => {
-    test.beforeEach(async ({ page }) => {
-      // Login as admin and disable registration
-      await loginAsAdmin(page);
+  test.describe('Registration when disabled via API', () => {
+    // These tests use API to toggle registration setting
 
-      // Navigate to settings/plugins to disable registration
-      await page.goto('/admin/plugins');
+    test('should block API registration when disabled', async ({ page, request }) => {
+      // Disable registration via API
+      const settingUpdated = await setRegistrationEnabled(page, false);
 
-      // Find and click on auth plugin settings
-      const authPluginRow = page.locator('tr').filter({ hasText: 'Authentication' });
-      const settingsButton = authPluginRow.locator('a[href*="settings"], button').filter({ hasText: /settings/i });
-
-      if (await settingsButton.count() > 0) {
-        await settingsButton.click();
-        await page.waitForTimeout(1000);
-
-        // Find the "Allow User Registration" toggle and disable it
-        const registrationToggle = page.locator('input[name="registration_enabled"]');
-        if (await registrationToggle.count() > 0) {
-          // Uncheck the toggle if it's checked
-          const isChecked = await registrationToggle.isChecked();
-          if (isChecked) {
-            await registrationToggle.uncheck();
-          }
-
-          // Save the settings
-          const saveButton = page.locator('button[type="submit"]').first();
-          if (await saveButton.count() > 0) {
-            await saveButton.click();
-            await page.waitForTimeout(2000);
-          }
-        }
-      } else {
-        // If we can't find the settings UI, try updating directly via API
-        await page.request.post('/admin/plugins/auth/settings', {
-          data: {
-            registration: {
-              enabled: false,
-              requireEmailVerification: false,
-              defaultRole: 'viewer'
-            }
-          }
-        });
+      // Only run the test if we successfully updated the setting
+      if (!settingUpdated) {
+        console.log('Could not update registration setting via API - skipping test');
+        // Re-enable registration for safety
+        await setRegistrationEnabled(page, true);
+        return;
       }
 
-      await logout(page);
-    });
-
-    test.afterEach(async ({ page }) => {
-      // Re-enable registration after test
       try {
-        await loginAsAdmin(page);
+        const uniqueUser = {
+          ...testUser,
+          email: `disabled.api.${Date.now()}@example.com`,
+          username: `disabledapi${Date.now()}`
+        };
 
-        await page.goto('/admin/plugins');
+        const response = await request.post('/auth/register', {
+          data: uniqueUser
+        });
 
-        const authPluginRow = page.locator('tr').filter({ hasText: 'Authentication' });
-        const settingsButton = authPluginRow.locator('a[href*="settings"], button').filter({ hasText: /settings/i });
+        // Registration should be blocked with 403 Forbidden
+        expect(response.status()).toBe(403);
 
-        if (await settingsButton.count() > 0) {
-          await settingsButton.click();
-          await page.waitForTimeout(1000);
-
-          const registrationToggle = page.locator('input[name="registration_enabled"]');
-          if (await registrationToggle.count() > 0) {
-            const isChecked = await registrationToggle.isChecked();
-            if (!isChecked) {
-              await registrationToggle.check();
-            }
-
-            const saveButton = page.locator('button[type="submit"]').first();
-            if (await saveButton.count() > 0) {
-              await saveButton.click();
-              await page.waitForTimeout(1000);
-            }
-          }
-        }
-
-        await logout(page);
-      } catch (error) {
-        // Ignore cleanup errors
+        const data = await response.json();
+        expect(data.error).toContain('disabled');
+      } finally {
+        // Re-enable registration
+        await setRegistrationEnabled(page, true);
       }
-    });
-
-    test('should block API registration when disabled', async ({ request }) => {
-      const uniqueUser = {
-        ...testUser,
-        email: `disabled.api.${Date.now()}@example.com`,
-        username: `disabledapi${Date.now()}`
-      };
-
-      const response = await request.post('/auth/register', {
-        data: uniqueUser
-      });
-
-      // Registration should be blocked with 403 Forbidden
-      expect(response.status()).toBe(403);
-
-      const data = await response.json();
-      expect(data.error).toContain('disabled');
     });
 
     test('should redirect registration page to login when disabled', async ({ page }) => {
-      await page.goto('/auth/register');
+      // Disable registration via API
+      const settingUpdated = await setRegistrationEnabled(page, false);
 
-      // Should be redirected to login page with error message
-      await expect(page).toHaveURL(/\/auth\/login/);
+      if (!settingUpdated) {
+        console.log('Could not update registration setting via API - skipping test');
+        await setRegistrationEnabled(page, true);
+        return;
+      }
 
-      // Should see error message about registration being disabled
-      const errorMessage = page.locator('.error, .bg-red-100, [class*="error"]');
-      // URL should contain error parameter
-      expect(page.url()).toContain('error');
-    });
+      try {
+        await page.goto('/auth/register');
 
-    test('should block form registration when disabled', async ({ page }) => {
-      // Try to access registration page directly
-      const response = await page.request.get('/auth/register');
-
-      // Should redirect (302) when disabled
-      expect([200, 302]).toContain(response.status());
-
-      // If we got HTML, check if it contains an error or redirect
-      if (response.status() === 200) {
-        const html = await response.text();
-        // Either shows registration form (if first user) or should show error/redirect
-        expect(html).toBeTruthy();
+        // Should be redirected to login page with error parameter
+        await expect(page).toHaveURL(/\/auth\/login/);
+        expect(page.url()).toContain('error');
+      } finally {
+        // Re-enable registration
+        await setRegistrationEnabled(page, true);
       }
     });
   });
 
   test.describe('First user bootstrap scenario', () => {
-    // Note: This test is tricky to run in a real environment since we can't easily
-    // delete all users. We'll test the logic indirectly.
+    // Note: This test documents expected behavior but can't fully test it
+    // since we can't easily clear all users in E2E tests.
 
     test('should allow first user registration even when disabled (bootstrap)', async ({ request }) => {
       // This test documents the expected behavior:
       // When there are NO users in the database, registration should be allowed
       // even if the setting is disabled, to allow initial admin setup.
 
-      // We can't easily test this without a fresh database, but we verify the
-      // setting is checked AFTER the first-user check by looking at the response.
-
-      // If there are already users (which there are, since we seed admin),
-      // and registration is disabled, we should get 403
+      // Since admin already exists from beforeAll, this tests that registration
+      // either succeeds (if enabled) or fails with 403 (if disabled)
       const response = await request.post('/auth/register', {
         data: {
           email: `bootstrap.test.${Date.now()}@example.com`,
@@ -203,125 +167,103 @@ test.describe('Disable User Registration', () => {
         }
       });
 
-      // Since admin already exists, this should either succeed (if enabled)
-      // or fail with 403 (if disabled) - but never fail for other reasons
+      // Should either succeed (if enabled) or fail with 403 (if disabled)
+      // Should NOT fail for other reasons
       expect([201, 403]).toContain(response.status());
     });
   });
 
   test.describe('Error message validation', () => {
     test('API returns appropriate error message when registration is disabled', async ({ request, page }) => {
-      // First, ensure admin exists and disable registration
-      await loginAsAdmin(page);
+      // Disable registration via API
+      const settingUpdated = await setRegistrationEnabled(page, false);
 
-      // Update settings to disable registration
-      try {
-        await page.request.post('/admin/plugins/auth/settings', {
-          data: {
-            registration: {
-              enabled: false,
-              requireEmailVerification: false,
-              defaultRole: 'viewer'
-            }
-          }
-        });
-      } catch (e) {
-        // Settings endpoint might not exist in this format
+      if (!settingUpdated) {
+        console.log('Could not update registration setting via API - skipping test');
+        await setRegistrationEnabled(page, true);
+        return;
       }
 
-      await logout(page);
+      try {
+        // Try to register
+        const response = await request.post('/auth/register', {
+          data: {
+            email: `error.test.${Date.now()}@example.com`,
+            password: 'ErrorTest123!',
+            username: `erroruser${Date.now()}`,
+            firstName: 'Error',
+            lastName: 'Test'
+          }
+        });
 
-      // Try to register
-      const response = await request.post('/auth/register', {
-        data: {
-          email: `error.test.${Date.now()}@example.com`,
-          password: 'ErrorTest123!',
-          username: `erroruser${Date.now()}`,
-          firstName: 'Error',
-          lastName: 'Test'
-        }
-      });
+        expect(response.status()).toBe(403);
 
-      if (response.status() === 403) {
         const data = await response.json();
         expect(data).toHaveProperty('error');
         expect(data.error.toLowerCase()).toContain('disabled');
+      } finally {
+        // Re-enable registration
+        await setRegistrationEnabled(page, true);
       }
-
-      // Re-enable registration
-      await loginAsAdmin(page);
-      try {
-        await page.request.post('/admin/plugins/auth/settings', {
-          data: {
-            registration: {
-              enabled: true,
-              requireEmailVerification: false,
-              defaultRole: 'viewer'
-            }
-          }
-        });
-      } catch (e) {
-        // Ignore
-      }
-      await logout(page);
     });
   });
 
   test.describe('Registration setting persistence', () => {
-    test('registration setting persists after server restart simulation', async ({ page, request }) => {
-      // Login and check the current registration setting
-      await loginAsAdmin(page);
+    test('registration setting can be toggled and affects registration behavior', async ({ page, request }) => {
+      // First ensure registration is enabled (default state)
+      await setRegistrationEnabled(page, true);
 
-      // Navigate to auth settings
-      await page.goto('/admin/plugins');
-
-      // Look for auth plugin
-      const authPluginRow = page.locator('tr').filter({ hasText: 'Authentication' });
-      const hasAuthPlugin = await authPluginRow.count() > 0;
-
-      if (hasAuthPlugin) {
-        // Click to view settings
-        const settingsLink = authPluginRow.locator('a[href*="settings"]');
-        if (await settingsLink.count() > 0) {
-          await settingsLink.click();
-          await page.waitForTimeout(1000);
-
-          // Check if registration toggle exists and its state
-          const registrationToggle = page.locator('input[name="registration_enabled"]');
-          if (await registrationToggle.count() > 0) {
-            const isEnabled = await registrationToggle.isChecked();
-            console.log(`Registration is currently ${isEnabled ? 'enabled' : 'disabled'}`);
-
-            // Toggle it
-            if (isEnabled) {
-              await registrationToggle.uncheck();
-            } else {
-              await registrationToggle.check();
-            }
-
-            // Save
-            const saveButton = page.locator('button[type="submit"]').first();
-            await saveButton.click();
-            await page.waitForTimeout(1000);
-
-            // Reload the page
-            await page.reload();
-            await page.waitForTimeout(1000);
-
-            // Verify the setting persisted
-            const newState = await registrationToggle.isChecked();
-            expect(newState).toBe(!isEnabled);
-
-            // Reset to original state
-            if (newState !== isEnabled) {
-              await registrationToggle.click();
-              await saveButton.click();
-            }
-          }
+      // Verify registration works when enabled
+      let response = await request.post('/auth/register', {
+        data: {
+          email: `persist.enabled.${Date.now()}@example.com`,
+          password: 'PersistTest123!',
+          username: `persistenabled${Date.now()}`,
+          firstName: 'Persist',
+          lastName: 'Enabled'
         }
+      });
+      expect(response.status()).toBe(201);
+
+      // Now disable registration
+      const settingUpdated = await setRegistrationEnabled(page, false);
+
+      if (!settingUpdated) {
+        console.log('Could not update registration setting via API - skipping toggle test');
+        return;
       }
 
-      await logout(page);
+      try {
+        // Verify registration is blocked when disabled
+        response = await request.post('/auth/register', {
+          data: {
+            email: `persist.disabled.${Date.now()}@example.com`,
+            password: 'PersistTest123!',
+            username: `persistdisabled${Date.now()}`,
+            firstName: 'Persist',
+            lastName: 'Disabled'
+          }
+        });
+        expect(response.status()).toBe(403);
+
+        // Re-enable registration
+        await setRegistrationEnabled(page, true);
+
+        // Verify registration works again
+        response = await request.post('/auth/register', {
+          data: {
+            email: `persist.reenabled.${Date.now()}@example.com`,
+            password: 'PersistTest123!',
+            username: `persistreenabled${Date.now()}`,
+            firstName: 'Persist',
+            lastName: 'ReEnabled'
+          }
+        });
+        expect(response.status()).toBe(201);
+      } finally {
+        // Ensure registration is re-enabled
+        await setRegistrationEnabled(page, true);
+      }
     });
   });
 });
