@@ -145,12 +145,13 @@ If DALL-E generation fails or produces unsuitable results:
 
 ## Environment Setup
 
-Ensure the following environment variable is configured:
+**IMPORTANT**: Source the environment file before making API calls:
 
 ```bash
-# Add to your environment or .env file
-OPENAI_API_KEY=sk-your-api-key-here
+source /Users/lane/Dropbox/Data/.env
 ```
+
+This file contains the OPENAI_API_KEY and other credentials needed for image generation.
 
 For Cloudflare Workers deployment, add to `wrangler.toml`:
 ```toml
