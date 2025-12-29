@@ -2,6 +2,8 @@
 
 A modern, TypeScript-first headless CMS built for Cloudflare's edge platform with Hono.js.
 
+**[sonicjs.com](https://sonicjs.com)**
+
 > **📦 Get Started:** `npx create-sonicjs@latest my-app`
 >
 > **⚠️ Note:** This repository is for **developing the SonicJS core package**. To build an application with SonicJS, use the command above to create a new project.
