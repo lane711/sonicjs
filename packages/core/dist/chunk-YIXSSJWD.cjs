@@ -1,6 +1,6 @@
 'use strict';
 
-var chunkMF7DWI5P_cjs = require('./chunk-MF7DWI5P.cjs');
+var chunkAZLU3ROK_cjs = require('./chunk-AZLU3ROK.cjs');
 
 // src/templates/filter-bar.template.ts
 function renderFilterBar(data) {
@@ -68,9 +68,9 @@ function renderFilterBar(data) {
 }
 
 // src/templates/index.ts
-chunkMF7DWI5P_cjs.init_admin_layout_catalyst_template();
-chunkMF7DWI5P_cjs.init_logo_template();
+chunkAZLU3ROK_cjs.init_admin_layout_catalyst_template();
+chunkAZLU3ROK_cjs.init_logo_template();
 
 exports.renderFilterBar = renderFilterBar;
-//# sourceMappingURL=chunk-XR6XACXJ.cjs.map
-//# sourceMappingURL=chunk-XR6XACXJ.cjs.map
+//# sourceMappingURL=chunk-YIXSSJWD.cjs.map
+//# sourceMappingURL=chunk-YIXSSJWD.cjs.map

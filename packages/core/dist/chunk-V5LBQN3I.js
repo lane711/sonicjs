@@ -1281,6 +1281,8 @@ function adminLayoutV2(data) {
     
     /* Notification styles */
     .notification {
+      -webkit-backdrop-filter: blur(15px);
+      backdrop-filter: blur(15px);
       animation: slideInRight 0.3s ease-out;
     }
     
@@ -3527,5 +3529,5 @@ function renderFormField(field) {
 }
 
 export { adminLayoutV2, getConfirmationDialogScript, init_admin_layout_catalyst_template, init_logo_template, renderAdminLayout, renderAdminLayoutCatalyst, renderAlert, renderCheckboxPage, renderCodeExamplesList, renderConfirmationDialog, renderDesignPage, renderForm, renderFormField, renderLogo, renderPagination, renderTable, renderTestimonialsList };
-//# sourceMappingURL=chunk-DN45O5XV.js.map
-//# sourceMappingURL=chunk-DN45O5XV.js.map
+//# sourceMappingURL=chunk-V5LBQN3I.js.map
+//# sourceMappingURL=chunk-V5LBQN3I.js.map

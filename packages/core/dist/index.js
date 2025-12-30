@@ -1,23 +1,24 @@
-import { PluginBuilder, api_default, api_media_default, api_system_default, admin_api_default, router, adminCollectionsRoutes, adminSettingsRoutes, admin_content_default, adminMediaRoutes, adminPluginRoutes, adminLogsRoutes, userRoutes, auth_default, test_cleanup_default } from './chunk-XITMVMGN.js';
-export { ROUTES_INFO, admin_api_default as adminApiRoutes, adminCheckboxRoutes, admin_code_examples_default as adminCodeExamplesRoutes, adminCollectionsRoutes, admin_content_default as adminContentRoutes, router as adminDashboardRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_testimonials_default as adminTestimonialsRoutes, userRoutes as adminUsersRoutes, api_content_crud_default as apiContentCrudRoutes, api_media_default as apiMediaRoutes, api_default as apiRoutes, api_system_default as apiSystemRoutes, auth_default as authRoutes } from './chunk-XITMVMGN.js';
+import { PluginBuilder, api_default, api_media_default, api_system_default, admin_api_default, router, adminCollectionsRoutes, adminSettingsRoutes, admin_content_default, adminMediaRoutes, adminPluginRoutes, adminLogsRoutes, userRoutes, auth_default, test_cleanup_default } from './chunk-A3EAM5Z4.js';
+export { ROUTES_INFO, admin_api_default as adminApiRoutes, adminCheckboxRoutes, admin_code_examples_default as adminCodeExamplesRoutes, adminCollectionsRoutes, admin_content_default as adminContentRoutes, router as adminDashboardRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_testimonials_default as adminTestimonialsRoutes, userRoutes as adminUsersRoutes, api_content_crud_default as apiContentCrudRoutes, api_media_default as apiMediaRoutes, api_default as apiRoutes, api_system_default as apiSystemRoutes, auth_default as authRoutes } from './chunk-A3EAM5Z4.js';
 import { schema_exports } from './chunk-3YNNVSMC.js';
 export { Logger, apiTokens, collections, content, contentVersions, getLogger, initLogger, insertCollectionSchema, insertContentSchema, insertLogConfigSchema, insertMediaSchema, insertPluginActivityLogSchema, insertPluginAssetSchema, insertPluginHookSchema, insertPluginRouteSchema, insertPluginSchema, insertSystemLogSchema, insertUserSchema, insertWorkflowHistorySchema, logConfig, media, pluginActivityLog, pluginAssets, pluginHooks, pluginRoutes, plugins, selectCollectionSchema, selectContentSchema, selectLogConfigSchema, selectMediaSchema, selectPluginActivityLogSchema, selectPluginAssetSchema, selectPluginHookSchema, selectPluginRouteSchema, selectPluginSchema, selectSystemLogSchema, selectUserSchema, selectWorkflowHistorySchema, systemLogs, users, workflowHistory } from './chunk-3YNNVSMC.js';
-import { metricsMiddleware, bootstrapMiddleware, requireAuth } from './chunk-VE3ARDK3.js';
-export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware } from './chunk-VE3ARDK3.js';
+import { AuthManager, metricsMiddleware, bootstrapMiddleware, requireAuth } from './chunk-IGE5NGAV.js';
+export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware } from './chunk-IGE5NGAV.js';
 export { PluginBootstrapService, PluginService as PluginServiceClass, cleanupRemovedCollections, fullCollectionSync, getAvailableCollectionNames, getManagedCollections, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, registerCollections, syncCollection, syncCollections, validateCollectionConfig } from './chunk-SGAG6FD3.js';
-export { MigrationService } from './chunk-XON2HCAN.js';
-export { renderFilterBar } from './chunk-F56JKQTA.js';
-import { init_admin_layout_catalyst_template, renderAdminLayout, renderAdminLayoutCatalyst } from './chunk-DN45O5XV.js';
-export { getConfirmationDialogScript, renderAlert, renderConfirmationDialog, renderForm, renderFormField, renderPagination, renderTable } from './chunk-DN45O5XV.js';
+export { MigrationService } from './chunk-MKVBI7NF.js';
+export { renderFilterBar } from './chunk-AVPUX57O.js';
+import { init_admin_layout_catalyst_template, renderAdminLayout, adminLayoutV2, renderAdminLayoutCatalyst } from './chunk-V5LBQN3I.js';
+export { getConfirmationDialogScript, renderAlert, renderConfirmationDialog, renderForm, renderFormField, renderPagination, renderTable } from './chunk-V5LBQN3I.js';
 export { HookSystemImpl, HookUtils, PluginManager as PluginManagerClass, PluginRegistryImpl, PluginValidator as PluginValidatorClass, ScopedHookSystem as ScopedHookSystemClass } from './chunk-CPXAVWCU.js';
-import { package_default, getCoreVersion } from './chunk-B2TCQ54E.js';
-export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer } from './chunk-B2TCQ54E.js';
+import { package_default, getCoreVersion } from './chunk-FHCN7KR2.js';
+export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer } from './chunk-FHCN7KR2.js';
 import './chunk-X7ZAEI5S.js';
 export { metricsTracker } from './chunk-FICTAGD4.js';
 export { HOOKS } from './chunk-LOUJRBXV.js';
 import './chunk-V4OQ3NZ2.js';
 import { Hono } from 'hono';
 import { html } from 'hono/html';
+import { z } from 'zod';
 import { drizzle } from 'drizzle-orm/d1';
 
 // src/plugins/core-plugins/database-tools-plugin/services/database-service.ts
@@ -1113,6 +1114,987 @@ function createEmailPlugin() {
 }
 var emailPlugin = createEmailPlugin();
 
+// src/plugins/core-plugins/otp-login-plugin/otp-service.ts
+var OTPService = class {
+  constructor(db) {
+    this.db = db;
+  }
+  /**
+   * Generate a secure random OTP code
+   */
+  generateCode(length = 6) {
+    const digits = "0123456789";
+    let code = "";
+    for (let i = 0; i < length; i++) {
+      const randomValues = new Uint8Array(1);
+      crypto.getRandomValues(randomValues);
+      const randomValue = randomValues[0] ?? 0;
+      code += digits[randomValue % digits.length];
+    }
+    return code;
+  }
+  /**
+   * Create and store a new OTP code
+   */
+  async createOTPCode(email, settings, ipAddress, userAgent) {
+    const code = this.generateCode(settings.codeLength);
+    const id = crypto.randomUUID();
+    const now = Date.now();
+    const expiresAt = now + settings.codeExpiryMinutes * 60 * 1e3;
+    const otpCode = {
+      id,
+      user_email: email.toLowerCase(),
+      code,
+      expires_at: expiresAt,
+      used: 0,
+      used_at: null,
+      ip_address: ipAddress || null,
+      user_agent: userAgent || null,
+      attempts: 0,
+      created_at: now
+    };
+    await this.db.prepare(`
+      INSERT INTO otp_codes (
+        id, user_email, code, expires_at, used, used_at,
+        ip_address, user_agent, attempts, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      otpCode.id,
+      otpCode.user_email,
+      otpCode.code,
+      otpCode.expires_at,
+      otpCode.used,
+      otpCode.used_at,
+      otpCode.ip_address,
+      otpCode.user_agent,
+      otpCode.attempts,
+      otpCode.created_at
+    ).run();
+    return otpCode;
+  }
+  /**
+   * Verify an OTP code
+   */
+  async verifyCode(email, code, settings) {
+    const normalizedEmail = email.toLowerCase();
+    const now = Date.now();
+    const otpCode = await this.db.prepare(`
+      SELECT * FROM otp_codes
+      WHERE user_email = ? AND code = ? AND used = 0
+      ORDER BY created_at DESC
+      LIMIT 1
+    `).bind(normalizedEmail, code).first();
+    if (!otpCode) {
+      return { valid: false, error: "Invalid or expired code" };
+    }
+    if (now > otpCode.expires_at) {
+      return { valid: false, error: "Code has expired" };
+    }
+    if (otpCode.attempts >= settings.maxAttempts) {
+      return { valid: false, error: "Maximum attempts exceeded" };
+    }
+    await this.db.prepare(`
+      UPDATE otp_codes
+      SET used = 1, used_at = ?, attempts = attempts + 1
+      WHERE id = ?
+    `).bind(now, otpCode.id).run();
+    return { valid: true };
+  }
+  /**
+   * Increment failed attempt count
+   */
+  async incrementAttempts(email, code) {
+    const normalizedEmail = email.toLowerCase();
+    const result = await this.db.prepare(`
+      UPDATE otp_codes
+      SET attempts = attempts + 1
+      WHERE user_email = ? AND code = ? AND used = 0
+      RETURNING attempts
+    `).bind(normalizedEmail, code).first();
+    return result?.attempts || 0;
+  }
+  /**
+   * Check rate limiting
+   */
+  async checkRateLimit(email, settings) {
+    const normalizedEmail = email.toLowerCase();
+    const oneHourAgo = Date.now() - 60 * 60 * 1e3;
+    const result = await this.db.prepare(`
+      SELECT COUNT(*) as count
+      FROM otp_codes
+      WHERE user_email = ? AND created_at > ?
+    `).bind(normalizedEmail, oneHourAgo).first();
+    const count = result?.count || 0;
+    return count < settings.rateLimitPerHour;
+  }
+  /**
+   * Get recent OTP requests for activity log
+   */
+  async getRecentRequests(limit = 50) {
+    const result = await this.db.prepare(`
+      SELECT * FROM otp_codes
+      ORDER BY created_at DESC
+      LIMIT ?
+    `).bind(limit).all();
+    const rows = result.results || [];
+    return rows.map((row) => this.mapRowToOTP(row));
+  }
+  /**
+   * Clean up expired codes (for maintenance)
+   */
+  async cleanupExpiredCodes() {
+    const now = Date.now();
+    const result = await this.db.prepare(`
+      DELETE FROM otp_codes
+      WHERE expires_at < ? OR (used = 1 AND used_at < ?)
+    `).bind(now, now - 30 * 24 * 60 * 60 * 1e3).run();
+    return result.meta.changes || 0;
+  }
+  mapRowToOTP(row) {
+    return {
+      id: String(row.id),
+      user_email: String(row.user_email),
+      code: String(row.code),
+      expires_at: Number(row.expires_at ?? Date.now()),
+      used: Number(row.used ?? 0),
+      used_at: row.used_at === null || row.used_at === void 0 ? null : Number(row.used_at),
+      ip_address: typeof row.ip_address === "string" ? row.ip_address : null,
+      user_agent: typeof row.user_agent === "string" ? row.user_agent : null,
+      attempts: Number(row.attempts ?? 0),
+      created_at: Number(row.created_at ?? Date.now())
+    };
+  }
+  /**
+   * Get OTP statistics
+   */
+  async getStats(days = 7) {
+    const since = Date.now() - days * 24 * 60 * 60 * 1e3;
+    const stats = await this.db.prepare(`
+      SELECT
+        COUNT(*) as total,
+        SUM(CASE WHEN used = 1 THEN 1 ELSE 0 END) as successful,
+        SUM(CASE WHEN attempts >= 3 AND used = 0 THEN 1 ELSE 0 END) as failed,
+        SUM(CASE WHEN expires_at < ? AND used = 0 THEN 1 ELSE 0 END) as expired
+      FROM otp_codes
+      WHERE created_at > ?
+    `).bind(Date.now(), since).first();
+    return {
+      total: stats?.total || 0,
+      successful: stats?.successful || 0,
+      failed: stats?.failed || 0,
+      expired: stats?.expired || 0
+    };
+  }
+};
+
+// src/plugins/core-plugins/otp-login-plugin/email-templates.ts
+function renderOTPEmailHTML(data) {
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Login Code</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
+
+  <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+    ${data.logoUrl ? `
+    <div style="text-align: center; padding: 30px 20px 20px;">
+      <img src="${data.logoUrl}" alt="Logo" style="max-width: 150px; height: auto;">
+    </div>
+    ` : ""}
+
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 30px; text-align: center;">
+      <h1 style="margin: 0 0 10px 0; font-size: 32px; font-weight: 600;">Your Login Code</h1>
+      <p style="margin: 0; opacity: 0.95; font-size: 16px;">Enter this code to sign in to ${data.appName}</p>
+    </div>
+
+    <div style="padding: 40px 30px;">
+      <div style="background: #f8f9fa; border: 2px dashed #667eea; border-radius: 12px; padding: 30px; text-align: center; margin: 0 0 30px 0;">
+        <div style="font-size: 56px; font-weight: bold; letter-spacing: 12px; color: #667eea; font-family: 'Courier New', Courier, monospace; line-height: 1;">
+          ${data.code}
+        </div>
+      </div>
+
+      <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 16px 20px; margin: 0 0 30px 0; border-radius: 6px;">
+        <p style="margin: 0; font-size: 14px; color: #856404;">
+          <strong>\u26A0\uFE0F This code expires in ${data.expiryMinutes} minutes</strong>
+        </p>
+      </div>
+
+      <div style="margin: 0 0 30px 0;">
+        <h3 style="color: #333; margin: 0 0 15px 0; font-size: 18px;">Quick Tips:</h3>
+        <ul style="color: #666; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
+          <li>Enter the code exactly as shown (${data.codeLength} digits)</li>
+          <li>The code can only be used once</li>
+          <li>You have ${data.maxAttempts} attempts to enter the correct code</li>
+          <li>Request a new code if this one expires</li>
+        </ul>
+      </div>
+
+      <div style="background: #e8f4ff; border-radius: 8px; padding: 20px; margin: 0 0 30px 0;">
+        <p style="margin: 0 0 10px 0; font-size: 14px; color: #0066cc; font-weight: 600;">
+          \u{1F512} Security Notice
+        </p>
+        <p style="margin: 0; font-size: 13px; color: #004080; line-height: 1.6;">
+          Never share this code with anyone. ${data.appName} will never ask you for this code via phone, email, or social media.
+        </p>
+      </div>
+    </div>
+
+    <div style="border-top: 1px solid #eee; padding: 30px; background: #f8f9fa;">
+      <p style="margin: 0 0 15px 0; font-size: 14px; color: #666; text-align: center;">
+        <strong>Didn't request this code?</strong><br>
+        Someone may have entered your email by mistake. You can safely ignore this email.
+      </p>
+
+      <div style="text-align: center; color: #999; font-size: 12px; line-height: 1.6;">
+        <p style="margin: 5px 0;">This email was sent to ${data.email}</p>
+        ${data.ipAddress ? `<p style="margin: 5px 0;">IP Address: ${data.ipAddress}</p>` : ""}
+        <p style="margin: 5px 0;">Time: ${data.timestamp}</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
+    <p style="margin: 0;">&copy; ${(/* @__PURE__ */ new Date()).getFullYear()} ${data.appName}. All rights reserved.</p>
+  </div>
+
+</body>
+</html>`;
+}
+function renderOTPEmailText(data) {
+  return `Your Login Code for ${data.appName}
+
+Your one-time verification code is:
+
+${data.code}
+
+This code expires in ${data.expiryMinutes} minutes.
+
+Quick Tips:
+\u2022 Enter the code exactly as shown (${data.codeLength} digits)
+\u2022 The code can only be used once
+\u2022 You have ${data.maxAttempts} attempts to enter the correct code
+\u2022 Request a new code if this one expires
+
+Security Notice:
+Never share this code with anyone. ${data.appName} will never ask you for this code via phone, email, or social media.
+
+Didn't request this code?
+Someone may have entered your email by mistake. You can safely ignore this email.
+
+---
+This email was sent to ${data.email}
+${data.ipAddress ? `IP Address: ${data.ipAddress}` : ""}
+Time: ${data.timestamp}
+
+\xA9 ${(/* @__PURE__ */ new Date()).getFullYear()} ${data.appName}. All rights reserved.`;
+}
+function renderOTPEmail(data) {
+  return {
+    html: renderOTPEmailHTML(data),
+    text: renderOTPEmailText(data)
+  };
+}
+
+// src/plugins/core-plugins/otp-login-plugin/index.ts
+var otpRequestSchema = z.object({
+  email: z.string().email("Valid email is required")
+});
+var otpVerifySchema = z.object({
+  email: z.string().email("Valid email is required"),
+  code: z.string().min(4).max(8)
+});
+var DEFAULT_SETTINGS = {
+  codeLength: 6,
+  codeExpiryMinutes: 10,
+  maxAttempts: 3,
+  rateLimitPerHour: 5,
+  allowNewUserRegistration: false,
+  appName: "SonicJS"
+};
+function createOTPLoginPlugin() {
+  const builder = PluginBuilder.create({
+    name: "otp-login",
+    version: "1.0.0-beta.1",
+    description: "Passwordless authentication via email one-time codes"
+  });
+  builder.metadata({
+    author: {
+      name: "SonicJS Team",
+      email: "team@sonicjs.com"
+    },
+    license: "MIT",
+    compatibility: "^2.0.0"
+  });
+  const otpAPI = new Hono();
+  otpAPI.post("/request", async (c) => {
+    try {
+      const body = await c.req.json();
+      const validation = otpRequestSchema.safeParse(body);
+      if (!validation.success) {
+        return c.json({
+          error: "Validation failed",
+          details: validation.error.issues
+        }, 400);
+      }
+      const { email } = validation.data;
+      const normalizedEmail = email.toLowerCase();
+      const db = c.env.DB;
+      const otpService = new OTPService(db);
+      const settings = { ...DEFAULT_SETTINGS };
+      const canRequest = await otpService.checkRateLimit(normalizedEmail, settings);
+      if (!canRequest) {
+        return c.json({
+          error: "Too many requests. Please try again in an hour."
+        }, 429);
+      }
+      const user = await db.prepare(`
+        SELECT id, email, role, is_active
+        FROM users
+        WHERE email = ?
+      `).bind(normalizedEmail).first();
+      if (!user && !settings.allowNewUserRegistration) {
+        return c.json({
+          message: "If an account exists for this email, you will receive a verification code shortly.",
+          expiresIn: settings.codeExpiryMinutes * 60
+        });
+      }
+      if (user && !user.is_active) {
+        return c.json({
+          error: "This account has been deactivated."
+        }, 403);
+      }
+      const ipAddress = c.req.header("cf-connecting-ip") || c.req.header("x-forwarded-for") || "unknown";
+      const userAgent = c.req.header("user-agent") || "unknown";
+      const otpCode = await otpService.createOTPCode(
+        normalizedEmail,
+        settings,
+        ipAddress,
+        userAgent
+      );
+      try {
+        const isDevMode = c.env.ENVIRONMENT === "development";
+        if (isDevMode) {
+          console.log(`[DEV] OTP Code for ${normalizedEmail}: ${otpCode.code}`);
+        }
+        const emailContent = renderOTPEmail({
+          code: otpCode.code,
+          expiryMinutes: settings.codeExpiryMinutes,
+          codeLength: settings.codeLength,
+          maxAttempts: settings.maxAttempts,
+          email: normalizedEmail,
+          ipAddress,
+          timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+          appName: settings.appName
+        });
+        const response = {
+          message: "If an account exists for this email, you will receive a verification code shortly.",
+          expiresIn: settings.codeExpiryMinutes * 60
+        };
+        if (isDevMode) {
+          response.dev_code = otpCode.code;
+        }
+        return c.json(response);
+      } catch (emailError) {
+        console.error("Error sending OTP email:", emailError);
+        return c.json({
+          error: "Failed to send verification code. Please try again."
+        }, 500);
+      }
+    } catch (error) {
+      console.error("OTP request error:", error);
+      return c.json({
+        error: "An error occurred. Please try again."
+      }, 500);
+    }
+  });
+  otpAPI.post("/verify", async (c) => {
+    try {
+      const body = await c.req.json();
+      const validation = otpVerifySchema.safeParse(body);
+      if (!validation.success) {
+        return c.json({
+          error: "Validation failed",
+          details: validation.error.issues
+        }, 400);
+      }
+      const { email, code } = validation.data;
+      const normalizedEmail = email.toLowerCase();
+      const db = c.env.DB;
+      const otpService = new OTPService(db);
+      const settings = { ...DEFAULT_SETTINGS };
+      const verification = await otpService.verifyCode(normalizedEmail, code, settings);
+      if (!verification.valid) {
+        await otpService.incrementAttempts(normalizedEmail, code);
+        return c.json({
+          error: verification.error || "Invalid code",
+          attemptsRemaining: verification.attemptsRemaining
+        }, 401);
+      }
+      const user = await db.prepare(`
+        SELECT id, email, role, is_active
+        FROM users
+        WHERE email = ?
+      `).bind(normalizedEmail).first();
+      if (!user) {
+        return c.json({
+          error: "User not found"
+        }, 404);
+      }
+      if (!user.is_active) {
+        return c.json({
+          error: "Account is deactivated"
+        }, 403);
+      }
+      return c.json({
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role
+        },
+        message: "Authentication successful"
+      });
+    } catch (error) {
+      console.error("OTP verify error:", error);
+      return c.json({
+        error: "An error occurred. Please try again."
+      }, 500);
+    }
+  });
+  otpAPI.post("/resend", async (c) => {
+    try {
+      const body = await c.req.json();
+      const validation = otpRequestSchema.safeParse(body);
+      if (!validation.success) {
+        return c.json({
+          error: "Validation failed",
+          details: validation.error.issues
+        }, 400);
+      }
+      return otpAPI.fetch(
+        new Request(c.req.url.replace("/resend", "/request"), {
+          method: "POST",
+          headers: c.req.raw.headers,
+          body: JSON.stringify({ email: validation.data.email })
+        }),
+        c.env
+      );
+    } catch (error) {
+      console.error("OTP resend error:", error);
+      return c.json({
+        error: "An error occurred. Please try again."
+      }, 500);
+    }
+  });
+  builder.addRoute("/auth/otp", otpAPI, {
+    description: "OTP authentication endpoints",
+    requiresAuth: false,
+    priority: 100
+  });
+  const adminRoutes = new Hono();
+  adminRoutes.get("/settings", async (c) => {
+    const user = c.get("user");
+    const contentHTML = await html`
+      <div class="p-8">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold mb-2">OTP Login Settings</h1>
+          <p class="text-zinc-600 dark:text-zinc-400">Configure passwordless authentication via email codes</p>
+        </div>
+
+        <div class="max-w-3xl">
+          <div class="backdrop-blur-md bg-black/20 border border-white/10 shadow-xl rounded-xl p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Code Settings</h2>
+
+            <form id="otpSettingsForm" class="space-y-6">
+              <div>
+                <label for="codeLength" class="block text-sm font-medium mb-2">
+                  Code Length
+                </label>
+                <input
+                  type="number"
+                  id="codeLength"
+                  name="codeLength"
+                  min="4"
+                  max="8"
+                  value="6"
+                  class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
+                />
+                <p class="text-xs text-zinc-500 mt-1">Number of digits in OTP code (4-8)</p>
+              </div>
+
+              <div>
+                <label for="codeExpiryMinutes" class="block text-sm font-medium mb-2">
+                  Code Expiry (minutes)
+                </label>
+                <input
+                  type="number"
+                  id="codeExpiryMinutes"
+                  name="codeExpiryMinutes"
+                  min="5"
+                  max="60"
+                  value="10"
+                  class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
+                />
+                <p class="text-xs text-zinc-500 mt-1">How long codes remain valid (5-60 minutes)</p>
+              </div>
+
+              <div>
+                <label for="maxAttempts" class="block text-sm font-medium mb-2">
+                  Maximum Attempts
+                </label>
+                <input
+                  type="number"
+                  id="maxAttempts"
+                  name="maxAttempts"
+                  min="3"
+                  max="10"
+                  value="3"
+                  class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
+                />
+                <p class="text-xs text-zinc-500 mt-1">Max verification attempts before invalidation</p>
+              </div>
+
+              <div>
+                <label for="rateLimitPerHour" class="block text-sm font-medium mb-2">
+                  Rate Limit (per hour)
+                </label>
+                <input
+                  type="number"
+                  id="rateLimitPerHour"
+                  name="rateLimitPerHour"
+                  min="3"
+                  max="20"
+                  value="5"
+                  class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
+                />
+                <p class="text-xs text-zinc-500 mt-1">Max code requests per email per hour</p>
+              </div>
+
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="allowNewUserRegistration"
+                  name="allowNewUserRegistration"
+                  class="w-4 h-4 rounded border-white/10"
+                />
+                <label for="allowNewUserRegistration" class="ml-2 text-sm">
+                  Allow new user registration via OTP
+                </label>
+              </div>
+
+              <div class="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  class="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all"
+                >
+                  Save Settings
+                </button>
+                <button
+                  type="button"
+                  id="testOTPBtn"
+                  class="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-all"
+                >
+                  Send Test Code
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div id="statusMessage" class="hidden backdrop-blur-md bg-black/20 border border-white/10 rounded-xl p-4 mb-6"></div>
+
+          <div class="backdrop-blur-md bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
+            <h3 class="font-semibold text-blue-400 mb-3">
+              🔢 Features
+            </h3>
+            <ul class="text-sm text-blue-200 space-y-2">
+              <li>✓ Passwordless authentication</li>
+              <li>✓ Secure random code generation</li>
+              <li>✓ Rate limiting protection</li>
+              <li>✓ Brute force prevention</li>
+              <li>✓ Mobile-friendly UX</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        document.getElementById('otpSettingsForm').addEventListener('submit', async (e) => {
+          e.preventDefault()
+          const statusEl = document.getElementById('statusMessage')
+          statusEl.className = 'backdrop-blur-md bg-green-500/20 border border-green-500/30 rounded-xl p-4 mb-6'
+          statusEl.innerHTML = '✅ Settings saved successfully!'
+          statusEl.classList.remove('hidden')
+          setTimeout(() => statusEl.classList.add('hidden'), 3000)
+        })
+
+        document.getElementById('testOTPBtn').addEventListener('click', async () => {
+          const email = prompt('Enter email address for test:')
+          if (!email) return
+
+          const statusEl = document.getElementById('statusMessage')
+          statusEl.className = 'backdrop-blur-md bg-blue-500/20 border border-blue-500/30 rounded-xl p-4 mb-6'
+          statusEl.innerHTML = '📧 Sending test code...'
+          statusEl.classList.remove('hidden')
+
+          try {
+            const response = await fetch('/auth/otp/request', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email })
+            })
+
+            const data = await response.json()
+
+            if (response.ok) {
+              statusEl.className = 'backdrop-blur-md bg-green-500/20 border border-green-500/30 rounded-xl p-4 mb-6'
+              statusEl.innerHTML = '✅ Test code sent!' + (data.dev_code ? \` Code: <strong>\${data.dev_code}</strong>\` : '')
+            } else {
+              throw new Error(data.error || 'Failed')
+            }
+          } catch (error) {
+            statusEl.className = 'backdrop-blur-md bg-red-500/20 border border-red-500/30 rounded-xl p-4 mb-6'
+            statusEl.innerHTML = '❌ Failed to send test code'
+          }
+        })
+      </script>
+    `;
+    const templateUser = user ? {
+      name: user.name ?? user.email ?? "Admin",
+      email: user.email ?? "admin@sonicjs.com",
+      role: user.role ?? "admin"
+    } : void 0;
+    return c.html(
+      adminLayoutV2({
+        title: "OTP Login Settings",
+        content: contentHTML,
+        user: templateUser,
+        currentPath: "/admin/plugins/otp-login/settings"
+      })
+    );
+  });
+  builder.addRoute("/admin/plugins/otp-login", adminRoutes, {
+    description: "OTP login admin interface",
+    requiresAuth: true,
+    priority: 85
+  });
+  builder.addMenuItem("OTP Login", "/admin/plugins/otp-login/settings", {
+    icon: "key",
+    order: 85,
+    permissions: ["otp:manage"]
+  });
+  builder.lifecycle({
+    activate: async () => {
+      console.info("\u2705 OTP Login plugin activated");
+    },
+    deactivate: async () => {
+      console.info("\u274C OTP Login plugin deactivated");
+    }
+  });
+  return builder.build();
+}
+var otpLoginPlugin = createOTPLoginPlugin();
+var magicLinkRequestSchema = z.object({
+  email: z.string().email("Valid email is required")
+});
+function createMagicLinkAuthPlugin() {
+  const magicLinkRoutes = new Hono();
+  magicLinkRoutes.post("/request", async (c) => {
+    try {
+      const body = await c.req.json();
+      const validation = magicLinkRequestSchema.safeParse(body);
+      if (!validation.success) {
+        return c.json({
+          error: "Validation failed",
+          details: validation.error.issues
+        }, 400);
+      }
+      const { email } = validation.data;
+      const normalizedEmail = email.toLowerCase();
+      const db = c.env.DB;
+      const oneHourAgo = Date.now() - 60 * 60 * 1e3;
+      const recentLinks = await db.prepare(`
+        SELECT COUNT(*) as count
+        FROM magic_links
+        WHERE user_email = ? AND created_at > ?
+      `).bind(normalizedEmail, oneHourAgo).first();
+      const rateLimitPerHour = 5;
+      if (recentLinks && recentLinks.count >= rateLimitPerHour) {
+        return c.json({
+          error: "Too many requests. Please try again later."
+        }, 429);
+      }
+      const user = await db.prepare(`
+        SELECT id, email, role, is_active
+        FROM users
+        WHERE email = ?
+      `).bind(normalizedEmail).first();
+      const allowNewUsers = false;
+      if (!user && !allowNewUsers) {
+        return c.json({
+          message: "If an account exists for this email, you will receive a magic link shortly."
+        });
+      }
+      if (user && !user.is_active) {
+        return c.json({
+          error: "This account has been deactivated."
+        }, 403);
+      }
+      const token = crypto.randomUUID() + "-" + crypto.randomUUID();
+      const tokenId = crypto.randomUUID();
+      const linkExpiryMinutes = 15;
+      const expiresAt = Date.now() + linkExpiryMinutes * 60 * 1e3;
+      await db.prepare(`
+        INSERT INTO magic_links (
+          id, user_email, token, expires_at, used, created_at, ip_address, user_agent
+        ) VALUES (?, ?, ?, ?, 0, ?, ?, ?)
+      `).bind(
+        tokenId,
+        normalizedEmail,
+        token,
+        expiresAt,
+        Date.now(),
+        c.req.header("cf-connecting-ip") || c.req.header("x-forwarded-for") || "unknown",
+        c.req.header("user-agent") || "unknown"
+      ).run();
+      const baseUrl = new URL(c.req.url).origin;
+      const magicLink = `${baseUrl}/auth/magic-link/verify?token=${token}`;
+      try {
+        const emailPlugin2 = c.env.plugins?.get("email");
+        if (emailPlugin2 && emailPlugin2.sendEmail) {
+          await emailPlugin2.sendEmail({
+            to: normalizedEmail,
+            subject: "Your Magic Link to Sign In",
+            html: renderMagicLinkEmail(magicLink, linkExpiryMinutes)
+          });
+        } else {
+          console.error("Email plugin not available");
+          console.log(`Magic link for ${normalizedEmail}: ${magicLink}`);
+        }
+      } catch (error) {
+        console.error("Failed to send magic link email:", error);
+        return c.json({
+          error: "Failed to send email. Please try again later."
+        }, 500);
+      }
+      return c.json({
+        message: "If an account exists for this email, you will receive a magic link shortly.",
+        // For development only - remove in production
+        ...c.env.ENVIRONMENT === "development" && { dev_link: magicLink }
+      });
+    } catch (error) {
+      console.error("Magic link request error:", error);
+      return c.json({ error: "Failed to process request" }, 500);
+    }
+  });
+  magicLinkRoutes.get("/verify", async (c) => {
+    try {
+      const token = c.req.query("token");
+      if (!token) {
+        return c.redirect("/auth/login?error=Invalid magic link");
+      }
+      const db = c.env.DB;
+      const magicLink = await db.prepare(`
+        SELECT * FROM magic_links
+        WHERE token = ? AND used = 0
+      `).bind(token).first();
+      if (!magicLink) {
+        return c.redirect("/auth/login?error=Invalid or expired magic link");
+      }
+      if (magicLink.expires_at < Date.now()) {
+        return c.redirect("/auth/login?error=This magic link has expired");
+      }
+      let user = await db.prepare(`
+        SELECT * FROM users WHERE email = ? AND is_active = 1
+      `).bind(magicLink.user_email).first();
+      const allowNewUsers = false;
+      if (!user && allowNewUsers) {
+        const userId = crypto.randomUUID();
+        const username = magicLink.user_email.split("@")[0];
+        const now = Date.now();
+        await db.prepare(`
+          INSERT INTO users (
+            id, email, username, first_name, last_name,
+            password_hash, role, is_active, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, NULL, 'viewer', 1, ?, ?)
+        `).bind(
+          userId,
+          magicLink.user_email,
+          username,
+          username,
+          "",
+          now,
+          now
+        ).run();
+        user = {
+          id: userId,
+          email: magicLink.user_email,
+          username,
+          role: "viewer"
+        };
+      } else if (!user) {
+        return c.redirect("/auth/login?error=No account found for this email");
+      }
+      await db.prepare(`
+        UPDATE magic_links
+        SET used = 1, used_at = ?
+        WHERE id = ?
+      `).bind(Date.now(), magicLink.id).run();
+      const jwtToken = await AuthManager.generateToken(
+        user.id,
+        user.email,
+        user.role
+      );
+      AuthManager.setAuthCookie(c, jwtToken);
+      await db.prepare(`
+        UPDATE users SET last_login_at = ? WHERE id = ?
+      `).bind(Date.now(), user.id).run();
+      return c.redirect("/admin/dashboard?message=Successfully signed in");
+    } catch (error) {
+      console.error("Magic link verification error:", error);
+      return c.redirect("/auth/login?error=Authentication failed");
+    }
+  });
+  return {
+    name: "magic-link-auth",
+    version: "1.0.0",
+    description: "Passwordless authentication via email magic links",
+    author: {
+      name: "SonicJS Team",
+      email: "team@sonicjs.com"
+    },
+    dependencies: ["email"],
+    routes: [{
+      path: "/auth/magic-link",
+      handler: magicLinkRoutes,
+      description: "Magic link authentication endpoints",
+      requiresAuth: false
+    }],
+    async install(context) {
+      console.log("Installing magic-link-auth plugin...");
+    },
+    async activate(context) {
+      console.log("Magic link authentication activated");
+      console.log("Users can now sign in via /auth/magic-link/request");
+    },
+    async deactivate(context) {
+      console.log("Magic link authentication deactivated");
+    },
+    async uninstall(context) {
+      console.log("Uninstalling magic-link-auth plugin...");
+    }
+  };
+}
+function renderMagicLinkEmail(magicLink, expiryMinutes) {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Your Magic Link</title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .container {
+          background: #ffffff;
+          border-radius: 8px;
+          padding: 40px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+          text-align: center;
+          margin-bottom: 30px;
+        }
+        .header h1 {
+          color: #0ea5e9;
+          margin: 0;
+          font-size: 24px;
+        }
+        .content {
+          margin-bottom: 30px;
+        }
+        .button {
+          display: inline-block;
+          padding: 14px 32px;
+          background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+          color: #ffffff !important;
+          text-decoration: none;
+          border-radius: 6px;
+          font-weight: 600;
+          text-align: center;
+          margin: 20px 0;
+        }
+        .button:hover {
+          opacity: 0.9;
+        }
+        .expiry {
+          color: #ef4444;
+          font-size: 14px;
+          margin-top: 20px;
+        }
+        .footer {
+          margin-top: 40px;
+          padding-top: 20px;
+          border-top: 1px solid #e5e7eb;
+          font-size: 12px;
+          color: #6b7280;
+          text-align: center;
+        }
+        .security-note {
+          background: #fef3c7;
+          border-left: 4px solid #f59e0b;
+          padding: 12px 16px;
+          margin-top: 20px;
+          border-radius: 4px;
+          font-size: 14px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>\u{1F517} Your Magic Link</h1>
+        </div>
+
+        <div class="content">
+          <p>Hello!</p>
+          <p>You requested a magic link to sign in to your account. Click the button below to continue:</p>
+
+          <div style="text-align: center;">
+            <a href="${magicLink}" class="button">Sign In</a>
+          </div>
+
+          <p class="expiry">\u23F0 This link expires in ${expiryMinutes} minutes</p>
+
+          <div class="security-note">
+            <strong>Security Notice:</strong> If you didn't request this link, you can safely ignore this email.
+            Someone may have entered your email address by mistake.
+          </div>
+        </div>
+
+        <div class="footer">
+          <p>This is an automated email from SonicJS.</p>
+          <p>For security, this link can only be used once.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+createMagicLinkAuthPlugin();
+
 // src/app.ts
 function createSonicJSApp(config = {}) {
   const app = new Hono();
@@ -1157,6 +2139,17 @@ function createSonicJSApp(config = {}) {
   app.route("/", test_cleanup_default);
   if (emailPlugin.routes && emailPlugin.routes.length > 0) {
     for (const route of emailPlugin.routes) {
+      app.route(route.path, route.handler);
+    }
+  }
+  if (otpLoginPlugin.routes && otpLoginPlugin.routes.length > 0) {
+    for (const route of otpLoginPlugin.routes) {
+      app.route(route.path, route.handler);
+    }
+  }
+  const magicLinkPlugin = createMagicLinkAuthPlugin();
+  if (magicLinkPlugin.routes && magicLinkPlugin.routes.length > 0) {
+    for (const route of magicLinkPlugin.routes) {
       app.route(route.path, route.handler);
     }
   }

@@ -1283,6 +1283,8 @@ function adminLayoutV2(data) {
     
     /* Notification styles */
     .notification {
+      -webkit-backdrop-filter: blur(15px);
+      backdrop-filter: blur(15px);
       animation: slideInRight 0.3s ease-out;
     }
     
@@ -3545,5 +3547,5 @@ exports.renderLogo = renderLogo;
 exports.renderPagination = renderPagination;
 exports.renderTable = renderTable;
 exports.renderTestimonialsList = renderTestimonialsList;
-//# sourceMappingURL=chunk-MF7DWI5P.cjs.map
-//# sourceMappingURL=chunk-MF7DWI5P.cjs.map
+//# sourceMappingURL=chunk-AZLU3ROK.cjs.map
+//# sourceMappingURL=chunk-AZLU3ROK.cjs.map

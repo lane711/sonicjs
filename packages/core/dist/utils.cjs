@@ -1,6 +1,6 @@
 'use strict';
 
-var chunkKHJJTHWY_cjs = require('./chunk-KHJJTHWY.cjs');
+var chunkW2IAEG4W_cjs = require('./chunk-W2IAEG4W.cjs');
 var chunkP3XDZL6Q_cjs = require('./chunk-P3XDZL6Q.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 require('./chunk-IGJUBJBW.cjs');
@@ -9,43 +9,43 @@ require('./chunk-IGJUBJBW.cjs');
 
 Object.defineProperty(exports, "QueryFilterBuilder", {
   enumerable: true,
-  get: function () { return chunkKHJJTHWY_cjs.QueryFilterBuilder; }
+  get: function () { return chunkW2IAEG4W_cjs.QueryFilterBuilder; }
 });
 Object.defineProperty(exports, "SONICJS_VERSION", {
   enumerable: true,
-  get: function () { return chunkKHJJTHWY_cjs.SONICJS_VERSION; }
+  get: function () { return chunkW2IAEG4W_cjs.SONICJS_VERSION; }
 });
 Object.defineProperty(exports, "TemplateRenderer", {
   enumerable: true,
-  get: function () { return chunkKHJJTHWY_cjs.TemplateRenderer; }
+  get: function () { return chunkW2IAEG4W_cjs.TemplateRenderer; }
 });
 Object.defineProperty(exports, "buildQuery", {
   enumerable: true,
-  get: function () { return chunkKHJJTHWY_cjs.buildQuery; }
+  get: function () { return chunkW2IAEG4W_cjs.buildQuery; }
 });
 Object.defineProperty(exports, "escapeHtml", {
   enumerable: true,
-  get: function () { return chunkKHJJTHWY_cjs.escapeHtml; }
+  get: function () { return chunkW2IAEG4W_cjs.escapeHtml; }
 });
 Object.defineProperty(exports, "getCoreVersion", {
   enumerable: true,
-  get: function () { return chunkKHJJTHWY_cjs.getCoreVersion; }
+  get: function () { return chunkW2IAEG4W_cjs.getCoreVersion; }
 });
 Object.defineProperty(exports, "renderTemplate", {
   enumerable: true,
-  get: function () { return chunkKHJJTHWY_cjs.renderTemplate; }
+  get: function () { return chunkW2IAEG4W_cjs.renderTemplate; }
 });
 Object.defineProperty(exports, "sanitizeInput", {
   enumerable: true,
-  get: function () { return chunkKHJJTHWY_cjs.sanitizeInput; }
+  get: function () { return chunkW2IAEG4W_cjs.sanitizeInput; }
 });
 Object.defineProperty(exports, "sanitizeObject", {
   enumerable: true,
-  get: function () { return chunkKHJJTHWY_cjs.sanitizeObject; }
+  get: function () { return chunkW2IAEG4W_cjs.sanitizeObject; }
 });
 Object.defineProperty(exports, "templateRenderer", {
   enumerable: true,
-  get: function () { return chunkKHJJTHWY_cjs.templateRenderer; }
+  get: function () { return chunkW2IAEG4W_cjs.templateRenderer; }
 });
 Object.defineProperty(exports, "generateInstallationId", {
   enumerable: true,
