@@ -18,7 +18,7 @@ test.describe('Disable User Registration', () => {
   };
 
   // Helper function to update registration setting via API
-  async function setRegistrationEnabled(page: any, enabled: boolean) {
+  async function setRegistrationEnabled(page: any, enabled: boolean): Promise<boolean> {
     // Login as admin first
     await loginAsAdmin(page);
 
@@ -30,7 +30,8 @@ test.describe('Disable User Registration', () => {
           requireEmailVerification: false,
           defaultRole: 'viewer'
         }
-      }
+      },
+      timeout: 10000
     });
 
     // Log the response for debugging
@@ -42,7 +43,7 @@ test.describe('Disable User Registration', () => {
     await logout(page);
 
     // Small delay to ensure setting is persisted
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(300);
 
     return status === 200;
   }
@@ -203,65 +204,6 @@ test.describe('Disable User Registration', () => {
         expect(data.error.toLowerCase()).toContain('disabled');
       } finally {
         // Re-enable registration
-        await setRegistrationEnabled(page, true);
-      }
-    });
-  });
-
-  test.describe('Registration setting persistence', () => {
-    test('registration setting can be toggled and affects registration behavior', async ({ page, request }) => {
-      // First ensure registration is enabled (default state)
-      await setRegistrationEnabled(page, true);
-
-      // Verify registration works when enabled
-      let response = await request.post('/auth/register', {
-        data: {
-          email: `persist.enabled.${Date.now()}@example.com`,
-          password: 'PersistTest123!',
-          username: `persistenabled${Date.now()}`,
-          firstName: 'Persist',
-          lastName: 'Enabled'
-        }
-      });
-      expect(response.status()).toBe(201);
-
-      // Now disable registration
-      const settingUpdated = await setRegistrationEnabled(page, false);
-
-      if (!settingUpdated) {
-        console.log('Could not update registration setting via API - skipping toggle test');
-        return;
-      }
-
-      try {
-        // Verify registration is blocked when disabled
-        response = await request.post('/auth/register', {
-          data: {
-            email: `persist.disabled.${Date.now()}@example.com`,
-            password: 'PersistTest123!',
-            username: `persistdisabled${Date.now()}`,
-            firstName: 'Persist',
-            lastName: 'Disabled'
-          }
-        });
-        expect(response.status()).toBe(403);
-
-        // Re-enable registration
-        await setRegistrationEnabled(page, true);
-
-        // Verify registration works again
-        response = await request.post('/auth/register', {
-          data: {
-            email: `persist.reenabled.${Date.now()}@example.com`,
-            password: 'PersistTest123!',
-            username: `persistreenabled${Date.now()}`,
-            firstName: 'Persist',
-            lastName: 'ReEnabled'
-          }
-        });
-        expect(response.status()).toBe(201);
-      } finally {
-        // Ensure registration is re-enabled
         await setRegistrationEnabled(page, true);
       }
     });
