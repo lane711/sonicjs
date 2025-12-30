@@ -195,7 +195,57 @@ npm install @sonicjs-cms/core@<VERSION>
 \`\`\`"
 ```
 
-### Step 9: Announce Release
+### Step 9: Update Documentation Website Changelog
+
+After publishing, update the changelog on the docs website at `www/src/app/changelog/page.mdx`:
+
+1. **Add the new version entry** after the "Unreleased" section and before the previous latest version
+2. **Use the established format** - each version has a styled card with:
+   - Version badge with date
+   - "Latest" tag (remove from previous version)
+   - Highlights section with key changes
+3. **Follow the color scheme**:
+   - Latest versions use emerald colors
+   - Use the timeline format with left border and dot indicators
+
+Example entry format:
+```jsx
+{/* Version X.X.X */}
+<div className="relative pl-8 pb-8 border-l-2 border-emerald-200 dark:border-emerald-800">
+  <div className="absolute -left-3 top-0 w-6 h-6 rounded-full bg-emerald-500 border-4 border-white dark:border-gray-900 shadow-lg"></div>
+
+  <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-6 border border-emerald-200 dark:border-emerald-800 shadow-md hover:shadow-xl transition-shadow">
+    <div className="flex items-center gap-3 mb-4">
+      <span className="px-3 py-1 bg-emerald-500 text-white text-sm font-bold rounded-lg">vX.X.X</span>
+      <span className="text-sm text-gray-600 dark:text-gray-400">Month DD, YYYY</span>
+      <span className="px-2 py-1 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 border border-orange-300 dark:border-orange-700 text-orange-800 dark:text-orange-300 text-xs font-bold rounded uppercase">Latest</span>
+    </div>
+
+    <div className="space-y-3">
+      <div>
+        <h4 className="text-sm font-bold text-emerald-800 dark:text-emerald-300 mb-2 flex items-center gap-2">
+          <span>✨</span> Highlights
+        </h4>
+        <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span>Feature 1</li>
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span>Feature 2</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+4. **Commit the changelog update**:
+```bash
+git add www/src/app/changelog/page.mdx
+git commit -m "docs(www): add v<VERSION> to changelog
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)"
+git push origin main
+```
+
+### Step 10: Announce Release
 
 **IMPORTANT: Always ask the user if they want to announce the release before proceeding.**
 
@@ -209,6 +259,24 @@ npm run release:announce
 This posts to Discord and Twitter.
 
 If the user declines, skip this step and proceed to post-release verification.
+
+### Step 11: Post-Release Verification
+
+After completing all steps, verify:
+
+1. **npm packages are live**:
+   - https://www.npmjs.com/package/@sonicjs-cms/core
+   - https://www.npmjs.com/package/create-sonicjs
+
+2. **CLI works**:
+   ```bash
+   npm create sonicjs@latest test-app -- --skip-install
+   rm -rf test-app
+   ```
+
+3. **GitHub release exists**: Check releases page
+
+4. **Changelog updated**: Verify the docs website changelog includes the new version
 
 ## Workflow 3: Pre-release Versions (Alpha/Beta/RC)
 
@@ -302,18 +370,3 @@ npm dist-tag ls create-sonicjs
 - If tests fail, abort the release and fix issues first
 - If push fails, check branch protections and permissions
 
-## Post-Release Verification
-
-After publishing, verify:
-
-1. **npm packages are live**:
-   - https://www.npmjs.com/package/@sonicjs-cms/core
-   - https://www.npmjs.com/package/create-sonicjs
-
-2. **CLI works**:
-   ```bash
-   npm create sonicjs@latest test-app -- --skip-install
-   rm -rf test-app
-   ```
-
-3. **GitHub release exists**: Check releases page
