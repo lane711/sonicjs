@@ -195,18 +195,24 @@ npm install @sonicjs-cms/core@<VERSION>
 \`\`\`"
 ```
 
-### Step 9: Update Documentation Website Changelog
+### Step 9: Update Documentation Website
 
-After publishing, update the changelog on the docs website at `www/src/app/changelog/page.mdx`:
+After publishing, update the docs website in three places:
+
+#### 9a. Version Badge (Automatic)
+
+The version badge next to the SonicJS logo is **automatically updated** when you run `npm run version:patch/minor/major` because it reads from `www/src/lib/version.ts` which is synced by `scripts/sync-versions.js`.
+
+No manual action needed for the version badge.
+
+#### 9b. Changelog Page (`www/src/app/changelog/page.mdx`)
 
 1. **Add the new version entry** after the "Unreleased" section and before the previous latest version
-2. **Use the established format** - each version has a styled card with:
+2. **Remove the "Latest" tag** from the previous version entry
+3. **Use the established format** - each version has a styled card with:
    - Version badge with date
-   - "Latest" tag (remove from previous version)
+   - "Latest" tag (only on newest version)
    - Highlights section with key changes
-3. **Follow the color scheme**:
-   - Latest versions use emerald colors
-   - Use the timeline format with left border and dot indicators
 
 Example entry format:
 ```jsx
@@ -236,10 +242,33 @@ Example entry format:
 </div>
 ```
 
-4. **Commit the changelog update**:
+#### 9c. Homepage Changelog Section (`www/src/app/page.mdx`)
+
+Update the "Recent Updates" section on the homepage (around line 255):
+
+1. **Update the `LatestVersionEntry` component** with the new release date and highlights:
+```jsx
+<LatestVersionEntry date="YYYY-MM-DD">
+  <div className="flex items-start gap-2">
+    <span className="text-emerald-600 dark:text-emerald-400 mt-0.5">✓</span>
+    <span className="text-gray-700 dark:text-gray-300">Key feature or fix 1</span>
+  </div>
+  <div className="flex items-start gap-2">
+    <span className="text-emerald-600 dark:text-emerald-400 mt-0.5">✓</span>
+    <span className="text-gray-700 dark:text-gray-300">Key feature or fix 2</span>
+  </div>
+</LatestVersionEntry>
+```
+
+2. **Shift older entries down** - the previous "latest" becomes a regular entry with blue styling
+3. **Remove the oldest entry** if there are more than 4-5 entries to keep the section concise
+
+Note: The `LatestVersionEntry` component automatically displays the current VERSION from `www/src/lib/version.ts`.
+
+#### 9d. Commit all docs website updates:
 ```bash
-git add www/src/app/changelog/page.mdx
-git commit -m "docs(www): add v<VERSION> to changelog
+git add www/src/app/changelog/page.mdx www/src/app/page.mdx
+git commit -m "docs(www): add v<VERSION> to changelog and homepage
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)"
 git push origin main
