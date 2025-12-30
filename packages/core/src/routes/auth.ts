@@ -7,7 +7,7 @@ import { AuthManager, requireAuth } from '../middleware'
 import { renderLoginPage, LoginPageData } from '../templates/pages/auth-login.template'
 import { renderRegisterPage, RegisterPageData } from '../templates/pages/auth-register.template'
 import { getCacheService, CACHE_CONFIGS } from '../services'
-import { authValidationService } from '../services/auth-validation'
+import { authValidationService, isRegistrationEnabled, isFirstUserRegistration } from '../services/auth-validation'
 import type { RegistrationData } from '../services/auth-validation'
 import type { Bindings, Variables } from '../app'
 
@@ -40,13 +40,26 @@ authRoutes.get('/login', async (c) => {
 })
 
 // Registration page (HTML form)
-authRoutes.get('/register', (c) => {
+authRoutes.get('/register', async (c) => {
+  const db = c.env.DB
+
+  // Check if this is the first user (bootstrap scenario) - always allow
+  const isFirstUser = await isFirstUserRegistration(db)
+
+  // If not first user, check if registration is enabled
+  if (!isFirstUser) {
+    const registrationEnabled = await isRegistrationEnabled(db)
+    if (!registrationEnabled) {
+      return c.redirect('/auth/login?error=Registration is currently disabled')
+    }
+  }
+
   const error = c.req.query('error')
-  
+
   const pageData: RegisterPageData = {
     error: error || undefined
   }
-  
+
   return c.html(renderRegisterPage(pageData))
 })
 
@@ -61,6 +74,17 @@ authRoutes.post('/register',
   async (c) => {
     try {
       const db = c.env.DB
+
+      // Check if this is the first user (bootstrap scenario) - always allow
+      const isFirstUser = await isFirstUserRegistration(db)
+
+      // If not first user, check if registration is enabled
+      if (!isFirstUser) {
+        const registrationEnabled = await isRegistrationEnabled(db)
+        if (!registrationEnabled) {
+          return c.json({ error: 'Registration is currently disabled' }, 403)
+        }
+      }
 
       // Parse JSON with error handling
       let requestData
@@ -320,6 +344,22 @@ authRoutes.post('/refresh', requireAuth(), async (c) => {
 authRoutes.post('/register/form', async (c) => {
   try {
     const db = c.env.DB
+
+    // Check if this is the first user (bootstrap scenario) - always allow
+    const isFirstUser = await isFirstUserRegistration(db)
+
+    // If not first user, check if registration is enabled
+    if (!isFirstUser) {
+      const registrationEnabled = await isRegistrationEnabled(db)
+      if (!registrationEnabled) {
+        return c.html(html`
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            Registration is currently disabled. Please contact an administrator.
+          </div>
+        `)
+      }
+    }
+
     const formData = await c.req.formData()
 
     // Extract form data
@@ -336,8 +376,8 @@ authRoutes.post('/register/form', async (c) => {
     requestData.email = normalizedEmail
 
     // Build and validate using dynamic schema
-      const validationSchema = await authValidationService.buildRegistrationSchema(db)
-      const validation = await validationSchema.safeParseAsync(requestData)
+    const validationSchema = await authValidationService.buildRegistrationSchema(db)
+    const validation = await validationSchema.safeParseAsync(requestData)
 
     if (!validation.success) {
       return c.html(html`
@@ -371,11 +411,14 @@ authRoutes.post('/register/form', async (c) => {
     
     // Hash password
     const passwordHash = await AuthManager.hashPassword(password)
-    
+
+    // Determine role: first user gets admin, others get viewer
+    const role = isFirstUser ? 'admin' : 'viewer'
+
     // Create user
     const userId = crypto.randomUUID()
     const now = new Date()
-    
+
     await db.prepare(`
       INSERT INTO users (id, email, username, first_name, last_name, password_hash, role, is_active, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -386,15 +429,15 @@ authRoutes.post('/register/form', async (c) => {
       firstName,
       lastName,
       passwordHash,
-      'admin', // First user gets admin role
+      role,
       1, // is_active
       now.getTime(),
       now.getTime()
     ).run()
-    
+
     // Generate JWT token
-    const token = await AuthManager.generateToken(userId, normalizedEmail, 'admin')
-    
+    const token = await AuthManager.generateToken(userId, normalizedEmail, role)
+
     // Set HTTP-only cookie
     setCookie(c, 'auth_token', token, {
       httpOnly: true,
@@ -402,13 +445,16 @@ authRoutes.post('/register/form', async (c) => {
       sameSite: 'Strict',
       maxAge: 60 * 60 * 24 // 24 hours
     })
-    
+
+    // Redirect based on role
+    const redirectUrl = role === 'admin' ? '/admin/dashboard' : '/admin/dashboard'
+
     return c.html(html`
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-        Account created successfully! Redirecting to admin dashboard...
+        Account created successfully! Redirecting...
         <script>
           setTimeout(() => {
-            window.location.href = '/admin/dashboard';
+            window.location.href = '${redirectUrl}';
           }, 2000);
         </script>
       </div>
