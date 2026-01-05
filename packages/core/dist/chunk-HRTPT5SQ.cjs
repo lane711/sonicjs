@@ -1,10 +1,13 @@
-import { HOOKS } from './chunk-LOUJRBXV.js';
-import { __commonJS, __toESM } from './chunk-V4OQ3NZ2.js';
-import { z } from 'zod';
-import { Hono } from 'hono';
+'use strict';
+
+var chunkQBKCBF7C_cjs = require('./chunk-QBKCBF7C.cjs');
+var chunkKYGRJCZM_cjs = require('./chunk-KYGRJCZM.cjs');
+var chunkIGJUBJBW_cjs = require('./chunk-IGJUBJBW.cjs');
+var zod = require('zod');
+var hono = require('hono');
 
 // ../../node_modules/semver/internal/constants.js
-var require_constants = __commonJS({
+var require_constants = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/internal/constants.js"(exports, module) {
     var SEMVER_SPEC_VERSION = "2.0.0";
     var MAX_LENGTH = 256;
@@ -35,7 +38,7 @@ var require_constants = __commonJS({
 });
 
 // ../../node_modules/semver/internal/debug.js
-var require_debug = __commonJS({
+var require_debug = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/internal/debug.js"(exports, module) {
     var debug = typeof process === "object" && process.env && process.env.NODE_DEBUG && /\bsemver\b/i.test(process.env.NODE_DEBUG) ? (...args) => console.error("SEMVER", ...args) : () => {
     };
@@ -44,7 +47,7 @@ var require_debug = __commonJS({
 });
 
 // ../../node_modules/semver/internal/re.js
-var require_re = __commonJS({
+var require_re = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/internal/re.js"(exports, module) {
     var {
       MAX_SAFE_COMPONENT_LENGTH,
@@ -131,7 +134,7 @@ var require_re = __commonJS({
 });
 
 // ../../node_modules/semver/internal/parse-options.js
-var require_parse_options = __commonJS({
+var require_parse_options = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/internal/parse-options.js"(exports, module) {
     var looseOption = Object.freeze({ loose: true });
     var emptyOpts = Object.freeze({});
@@ -149,7 +152,7 @@ var require_parse_options = __commonJS({
 });
 
 // ../../node_modules/semver/internal/identifiers.js
-var require_identifiers = __commonJS({
+var require_identifiers = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/internal/identifiers.js"(exports, module) {
     var numeric = /^[0-9]+$/;
     var compareIdentifiers = (a, b) => {
@@ -173,7 +176,7 @@ var require_identifiers = __commonJS({
 });
 
 // ../../node_modules/semver/classes/semver.js
-var require_semver = __commonJS({
+var require_semver = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/classes/semver.js"(exports, module) {
     var debug = require_debug();
     var { MAX_LENGTH, MAX_SAFE_INTEGER } = require_constants();
@@ -451,7 +454,7 @@ var require_semver = __commonJS({
 });
 
 // ../../node_modules/semver/functions/parse.js
-var require_parse = __commonJS({
+var require_parse = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/parse.js"(exports, module) {
     var SemVer = require_semver();
     var parse = (version, options, throwErrors = false) => {
@@ -472,7 +475,7 @@ var require_parse = __commonJS({
 });
 
 // ../../node_modules/semver/functions/valid.js
-var require_valid = __commonJS({
+var require_valid = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/valid.js"(exports, module) {
     var parse = require_parse();
     var valid = (version, options) => {
@@ -484,7 +487,7 @@ var require_valid = __commonJS({
 });
 
 // ../../node_modules/semver/functions/clean.js
-var require_clean = __commonJS({
+var require_clean = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/clean.js"(exports, module) {
     var parse = require_parse();
     var clean = (version, options) => {
@@ -496,7 +499,7 @@ var require_clean = __commonJS({
 });
 
 // ../../node_modules/semver/functions/inc.js
-var require_inc = __commonJS({
+var require_inc = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/inc.js"(exports, module) {
     var SemVer = require_semver();
     var inc = (version, release, options, identifier, identifierBase) => {
@@ -519,7 +522,7 @@ var require_inc = __commonJS({
 });
 
 // ../../node_modules/semver/functions/diff.js
-var require_diff = __commonJS({
+var require_diff = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/diff.js"(exports, module) {
     var parse = require_parse();
     var diff = (version1, version2) => {
@@ -562,7 +565,7 @@ var require_diff = __commonJS({
 });
 
 // ../../node_modules/semver/functions/major.js
-var require_major = __commonJS({
+var require_major = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/major.js"(exports, module) {
     var SemVer = require_semver();
     var major = (a, loose) => new SemVer(a, loose).major;
@@ -571,7 +574,7 @@ var require_major = __commonJS({
 });
 
 // ../../node_modules/semver/functions/minor.js
-var require_minor = __commonJS({
+var require_minor = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/minor.js"(exports, module) {
     var SemVer = require_semver();
     var minor = (a, loose) => new SemVer(a, loose).minor;
@@ -580,7 +583,7 @@ var require_minor = __commonJS({
 });
 
 // ../../node_modules/semver/functions/patch.js
-var require_patch = __commonJS({
+var require_patch = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/patch.js"(exports, module) {
     var SemVer = require_semver();
     var patch = (a, loose) => new SemVer(a, loose).patch;
@@ -589,7 +592,7 @@ var require_patch = __commonJS({
 });
 
 // ../../node_modules/semver/functions/prerelease.js
-var require_prerelease = __commonJS({
+var require_prerelease = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/prerelease.js"(exports, module) {
     var parse = require_parse();
     var prerelease = (version, options) => {
@@ -601,7 +604,7 @@ var require_prerelease = __commonJS({
 });
 
 // ../../node_modules/semver/functions/compare.js
-var require_compare = __commonJS({
+var require_compare = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/compare.js"(exports, module) {
     var SemVer = require_semver();
     var compare = (a, b, loose) => new SemVer(a, loose).compare(new SemVer(b, loose));
@@ -610,7 +613,7 @@ var require_compare = __commonJS({
 });
 
 // ../../node_modules/semver/functions/rcompare.js
-var require_rcompare = __commonJS({
+var require_rcompare = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/rcompare.js"(exports, module) {
     var compare = require_compare();
     var rcompare = (a, b, loose) => compare(b, a, loose);
@@ -619,7 +622,7 @@ var require_rcompare = __commonJS({
 });
 
 // ../../node_modules/semver/functions/compare-loose.js
-var require_compare_loose = __commonJS({
+var require_compare_loose = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/compare-loose.js"(exports, module) {
     var compare = require_compare();
     var compareLoose = (a, b) => compare(a, b, true);
@@ -628,7 +631,7 @@ var require_compare_loose = __commonJS({
 });
 
 // ../../node_modules/semver/functions/compare-build.js
-var require_compare_build = __commonJS({
+var require_compare_build = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/compare-build.js"(exports, module) {
     var SemVer = require_semver();
     var compareBuild = (a, b, loose) => {
@@ -641,7 +644,7 @@ var require_compare_build = __commonJS({
 });
 
 // ../../node_modules/semver/functions/sort.js
-var require_sort = __commonJS({
+var require_sort = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/sort.js"(exports, module) {
     var compareBuild = require_compare_build();
     var sort = (list, loose) => list.sort((a, b) => compareBuild(a, b, loose));
@@ -650,7 +653,7 @@ var require_sort = __commonJS({
 });
 
 // ../../node_modules/semver/functions/rsort.js
-var require_rsort = __commonJS({
+var require_rsort = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/rsort.js"(exports, module) {
     var compareBuild = require_compare_build();
     var rsort = (list, loose) => list.sort((a, b) => compareBuild(b, a, loose));
@@ -659,7 +662,7 @@ var require_rsort = __commonJS({
 });
 
 // ../../node_modules/semver/functions/gt.js
-var require_gt = __commonJS({
+var require_gt = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/gt.js"(exports, module) {
     var compare = require_compare();
     var gt = (a, b, loose) => compare(a, b, loose) > 0;
@@ -668,7 +671,7 @@ var require_gt = __commonJS({
 });
 
 // ../../node_modules/semver/functions/lt.js
-var require_lt = __commonJS({
+var require_lt = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/lt.js"(exports, module) {
     var compare = require_compare();
     var lt = (a, b, loose) => compare(a, b, loose) < 0;
@@ -677,7 +680,7 @@ var require_lt = __commonJS({
 });
 
 // ../../node_modules/semver/functions/eq.js
-var require_eq = __commonJS({
+var require_eq = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/eq.js"(exports, module) {
     var compare = require_compare();
     var eq = (a, b, loose) => compare(a, b, loose) === 0;
@@ -686,7 +689,7 @@ var require_eq = __commonJS({
 });
 
 // ../../node_modules/semver/functions/neq.js
-var require_neq = __commonJS({
+var require_neq = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/neq.js"(exports, module) {
     var compare = require_compare();
     var neq = (a, b, loose) => compare(a, b, loose) !== 0;
@@ -695,7 +698,7 @@ var require_neq = __commonJS({
 });
 
 // ../../node_modules/semver/functions/gte.js
-var require_gte = __commonJS({
+var require_gte = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/gte.js"(exports, module) {
     var compare = require_compare();
     var gte = (a, b, loose) => compare(a, b, loose) >= 0;
@@ -704,7 +707,7 @@ var require_gte = __commonJS({
 });
 
 // ../../node_modules/semver/functions/lte.js
-var require_lte = __commonJS({
+var require_lte = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/lte.js"(exports, module) {
     var compare = require_compare();
     var lte = (a, b, loose) => compare(a, b, loose) <= 0;
@@ -713,7 +716,7 @@ var require_lte = __commonJS({
 });
 
 // ../../node_modules/semver/functions/cmp.js
-var require_cmp = __commonJS({
+var require_cmp = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/cmp.js"(exports, module) {
     var eq = require_eq();
     var neq = require_neq();
@@ -762,7 +765,7 @@ var require_cmp = __commonJS({
 });
 
 // ../../node_modules/semver/functions/coerce.js
-var require_coerce = __commonJS({
+var require_coerce = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/coerce.js"(exports, module) {
     var SemVer = require_semver();
     var parse = require_parse();
@@ -807,7 +810,7 @@ var require_coerce = __commonJS({
 });
 
 // ../../node_modules/semver/internal/lrucache.js
-var require_lrucache = __commonJS({
+var require_lrucache = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/internal/lrucache.js"(exports, module) {
     var LRUCache = class {
       constructor() {
@@ -844,7 +847,7 @@ var require_lrucache = __commonJS({
 });
 
 // ../../node_modules/semver/classes/range.js
-var require_range = __commonJS({
+var require_range = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/classes/range.js"(exports, module) {
     var SPACE_CHARACTERS = /\s+/g;
     var Range = class _Range {
@@ -1220,7 +1223,7 @@ var require_range = __commonJS({
 });
 
 // ../../node_modules/semver/classes/comparator.js
-var require_comparator = __commonJS({
+var require_comparator = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/classes/comparator.js"(exports, module) {
     var ANY = Symbol("SemVer ANY");
     var Comparator = class _Comparator {
@@ -1332,7 +1335,7 @@ var require_comparator = __commonJS({
 });
 
 // ../../node_modules/semver/functions/satisfies.js
-var require_satisfies = __commonJS({
+var require_satisfies = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/functions/satisfies.js"(exports, module) {
     var Range = require_range();
     var satisfies = (version, range, options) => {
@@ -1348,7 +1351,7 @@ var require_satisfies = __commonJS({
 });
 
 // ../../node_modules/semver/ranges/to-comparators.js
-var require_to_comparators = __commonJS({
+var require_to_comparators = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/ranges/to-comparators.js"(exports, module) {
     var Range = require_range();
     var toComparators = (range, options) => new Range(range, options).set.map((comp) => comp.map((c) => c.value).join(" ").trim().split(" "));
@@ -1357,7 +1360,7 @@ var require_to_comparators = __commonJS({
 });
 
 // ../../node_modules/semver/ranges/max-satisfying.js
-var require_max_satisfying = __commonJS({
+var require_max_satisfying = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/ranges/max-satisfying.js"(exports, module) {
     var SemVer = require_semver();
     var Range = require_range();
@@ -1385,7 +1388,7 @@ var require_max_satisfying = __commonJS({
 });
 
 // ../../node_modules/semver/ranges/min-satisfying.js
-var require_min_satisfying = __commonJS({
+var require_min_satisfying = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/ranges/min-satisfying.js"(exports, module) {
     var SemVer = require_semver();
     var Range = require_range();
@@ -1413,7 +1416,7 @@ var require_min_satisfying = __commonJS({
 });
 
 // ../../node_modules/semver/ranges/min-version.js
-var require_min_version = __commonJS({
+var require_min_version = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/ranges/min-version.js"(exports, module) {
     var SemVer = require_semver();
     var Range = require_range();
@@ -1471,7 +1474,7 @@ var require_min_version = __commonJS({
 });
 
 // ../../node_modules/semver/ranges/valid.js
-var require_valid2 = __commonJS({
+var require_valid2 = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/ranges/valid.js"(exports, module) {
     var Range = require_range();
     var validRange = (range, options) => {
@@ -1486,7 +1489,7 @@ var require_valid2 = __commonJS({
 });
 
 // ../../node_modules/semver/ranges/outside.js
-var require_outside = __commonJS({
+var require_outside = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/ranges/outside.js"(exports, module) {
     var SemVer = require_semver();
     var Comparator = require_comparator();
@@ -1554,7 +1557,7 @@ var require_outside = __commonJS({
 });
 
 // ../../node_modules/semver/ranges/gtr.js
-var require_gtr = __commonJS({
+var require_gtr = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/ranges/gtr.js"(exports, module) {
     var outside = require_outside();
     var gtr = (version, range, options) => outside(version, range, ">", options);
@@ -1563,7 +1566,7 @@ var require_gtr = __commonJS({
 });
 
 // ../../node_modules/semver/ranges/ltr.js
-var require_ltr = __commonJS({
+var require_ltr = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/ranges/ltr.js"(exports, module) {
     var outside = require_outside();
     var ltr = (version, range, options) => outside(version, range, "<", options);
@@ -1572,7 +1575,7 @@ var require_ltr = __commonJS({
 });
 
 // ../../node_modules/semver/ranges/intersects.js
-var require_intersects = __commonJS({
+var require_intersects = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/ranges/intersects.js"(exports, module) {
     var Range = require_range();
     var intersects = (r1, r2, options) => {
@@ -1585,7 +1588,7 @@ var require_intersects = __commonJS({
 });
 
 // ../../node_modules/semver/ranges/simplify.js
-var require_simplify = __commonJS({
+var require_simplify = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/ranges/simplify.js"(exports, module) {
     var satisfies = require_satisfies();
     var compare = require_compare();
@@ -1634,7 +1637,7 @@ var require_simplify = __commonJS({
 });
 
 // ../../node_modules/semver/ranges/subset.js
-var require_subset = __commonJS({
+var require_subset = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/ranges/subset.js"(exports, module) {
     var Range = require_range();
     var Comparator = require_comparator();
@@ -1795,7 +1798,7 @@ var require_subset = __commonJS({
 });
 
 // ../../node_modules/semver/index.js
-var require_semver2 = __commonJS({
+var require_semver2 = chunkIGJUBJBW_cjs.__commonJS({
   "../../node_modules/semver/index.js"(exports, module) {
     var internalRe = require_re();
     var constants = require_constants();
@@ -2124,111 +2127,111 @@ var HookUtils = class {
 };
 
 // src/plugins/plugin-validator.ts
-var import_semver = __toESM(require_semver2(), 1);
-var PluginAuthorSchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email().optional(),
-  url: z.string().url().optional()
+var import_semver = chunkIGJUBJBW_cjs.__toESM(require_semver2(), 1);
+var PluginAuthorSchema = zod.z.object({
+  name: zod.z.string().min(1),
+  email: zod.z.string().email().optional(),
+  url: zod.z.string().url().optional()
 });
-var PluginRoutesSchema = z.object({
-  path: z.string().min(1),
-  handler: z.any(),
+var PluginRoutesSchema = zod.z.object({
+  path: zod.z.string().min(1),
+  handler: zod.z.any(),
   // Hono instance
-  description: z.string().optional(),
-  requiresAuth: z.boolean().optional(),
-  roles: z.array(z.string()).optional(),
-  priority: z.number().optional()
+  description: zod.z.string().optional(),
+  requiresAuth: zod.z.boolean().optional(),
+  roles: zod.z.array(zod.z.string()).optional(),
+  priority: zod.z.number().optional()
 });
-var PluginMiddlewareSchema = z.object({
-  name: z.string().min(1),
-  handler: z.function(),
-  description: z.string().optional(),
-  priority: z.number().optional(),
-  routes: z.array(z.string()).optional(),
-  global: z.boolean().optional()
+var PluginMiddlewareSchema = zod.z.object({
+  name: zod.z.string().min(1),
+  handler: zod.z.function(),
+  description: zod.z.string().optional(),
+  priority: zod.z.number().optional(),
+  routes: zod.z.array(zod.z.string()).optional(),
+  global: zod.z.boolean().optional()
 });
-var PluginModelSchema = z.object({
-  name: z.string().min(1),
-  tableName: z.string().min(1),
-  schema: z.any(),
+var PluginModelSchema = zod.z.object({
+  name: zod.z.string().min(1),
+  tableName: zod.z.string().min(1),
+  schema: zod.z.any(),
   // Zod schema
-  migrations: z.array(z.string()),
-  relationships: z.array(z.object({
-    type: z.enum(["oneToOne", "oneToMany", "manyToMany"]),
-    target: z.string(),
-    foreignKey: z.string().optional(),
-    joinTable: z.string().optional()
+  migrations: zod.z.array(zod.z.string()),
+  relationships: zod.z.array(zod.z.object({
+    type: zod.z.enum(["oneToOne", "oneToMany", "manyToMany"]),
+    target: zod.z.string(),
+    foreignKey: zod.z.string().optional(),
+    joinTable: zod.z.string().optional()
   })).optional(),
-  extendsContent: z.boolean().optional()
+  extendsContent: zod.z.boolean().optional()
 });
-var PluginServiceSchema = z.object({
-  name: z.string().min(1),
-  implementation: z.any(),
-  description: z.string().optional(),
-  dependencies: z.array(z.string()).optional(),
-  singleton: z.boolean().optional()
+var PluginServiceSchema = zod.z.object({
+  name: zod.z.string().min(1),
+  implementation: zod.z.any(),
+  description: zod.z.string().optional(),
+  dependencies: zod.z.array(zod.z.string()).optional(),
+  singleton: zod.z.boolean().optional()
 });
-var PluginAdminPageSchema = z.object({
-  path: z.string().min(1),
-  title: z.string().min(1),
-  component: z.string().min(1),
-  description: z.string().optional(),
-  permissions: z.array(z.string()).optional(),
-  menuItem: z.object({
-    label: z.string(),
-    path: z.string(),
-    icon: z.string().optional(),
-    order: z.number().optional(),
-    parent: z.string().optional(),
-    permissions: z.array(z.string()).optional(),
-    active: z.boolean().optional()
+var PluginAdminPageSchema = zod.z.object({
+  path: zod.z.string().min(1),
+  title: zod.z.string().min(1),
+  component: zod.z.string().min(1),
+  description: zod.z.string().optional(),
+  permissions: zod.z.array(zod.z.string()).optional(),
+  menuItem: zod.z.object({
+    label: zod.z.string(),
+    path: zod.z.string(),
+    icon: zod.z.string().optional(),
+    order: zod.z.number().optional(),
+    parent: zod.z.string().optional(),
+    permissions: zod.z.array(zod.z.string()).optional(),
+    active: zod.z.boolean().optional()
   }).optional(),
-  icon: z.string().optional()
+  icon: zod.z.string().optional()
 });
-var PluginComponentSchema = z.object({
-  name: z.string().min(1),
-  template: z.function(),
-  description: z.string().optional(),
-  propsSchema: z.any().optional()
+var PluginComponentSchema = zod.z.object({
+  name: zod.z.string().min(1),
+  template: zod.z.function(),
+  description: zod.z.string().optional(),
+  propsSchema: zod.z.any().optional()
   // Zod schema
 });
-var PluginHookSchema = z.object({
-  name: z.string().min(1),
-  handler: z.function(),
-  priority: z.number().optional(),
-  description: z.string().optional()
+var PluginHookSchema = zod.z.object({
+  name: zod.z.string().min(1),
+  handler: zod.z.function(),
+  priority: zod.z.number().optional(),
+  description: zod.z.string().optional()
 });
-var PluginSchema = z.object({
-  name: z.string().min(1).regex(/^[a-z0-9-]+$/, "Plugin name must be lowercase with hyphens"),
-  version: z.string().refine((v) => import_semver.default.valid(v), "Version must be valid semver"),
-  description: z.string().optional(),
+var PluginSchema = zod.z.object({
+  name: zod.z.string().min(1).regex(/^[a-z0-9-]+$/, "Plugin name must be lowercase with hyphens"),
+  version: zod.z.string().refine((v) => import_semver.default.valid(v), "Version must be valid semver"),
+  description: zod.z.string().optional(),
   author: PluginAuthorSchema.optional(),
-  dependencies: z.array(z.string()).optional(),
-  compatibility: z.string().optional(),
-  license: z.string().optional(),
+  dependencies: zod.z.array(zod.z.string()).optional(),
+  compatibility: zod.z.string().optional(),
+  license: zod.z.string().optional(),
   // Extension points
-  routes: z.array(PluginRoutesSchema).optional(),
-  middleware: z.array(PluginMiddlewareSchema).optional(),
-  models: z.array(PluginModelSchema).optional(),
-  services: z.array(PluginServiceSchema).optional(),
-  adminPages: z.array(PluginAdminPageSchema).optional(),
-  adminComponents: z.array(PluginComponentSchema).optional(),
-  menuItems: z.array(z.object({
-    label: z.string(),
-    path: z.string(),
-    icon: z.string().optional(),
-    order: z.number().optional(),
-    parent: z.string().optional(),
-    permissions: z.array(z.string()).optional(),
-    active: z.boolean().optional()
+  routes: zod.z.array(PluginRoutesSchema).optional(),
+  middleware: zod.z.array(PluginMiddlewareSchema).optional(),
+  models: zod.z.array(PluginModelSchema).optional(),
+  services: zod.z.array(PluginServiceSchema).optional(),
+  adminPages: zod.z.array(PluginAdminPageSchema).optional(),
+  adminComponents: zod.z.array(PluginComponentSchema).optional(),
+  menuItems: zod.z.array(zod.z.object({
+    label: zod.z.string(),
+    path: zod.z.string(),
+    icon: zod.z.string().optional(),
+    order: zod.z.number().optional(),
+    parent: zod.z.string().optional(),
+    permissions: zod.z.array(zod.z.string()).optional(),
+    active: zod.z.boolean().optional()
   })).optional(),
-  hooks: z.array(PluginHookSchema).optional(),
+  hooks: zod.z.array(PluginHookSchema).optional(),
   // Lifecycle hooks
-  install: z.function().optional(),
-  uninstall: z.function().optional(),
-  activate: z.function().optional(),
-  deactivate: z.function().optional(),
-  configure: z.function().optional()
+  install: zod.z.function().optional(),
+  uninstall: zod.z.function().optional(),
+  activate: zod.z.function().optional(),
+  deactivate: zod.z.function().optional(),
+  configure: zod.z.function().optional()
 });
 var PluginValidator = class _PluginValidator {
   static RESERVED_NAMES = [
@@ -2792,7 +2795,7 @@ var PluginManager = class {
   async initialize(context) {
     console.info("Initializing plugin system...");
     this.context = context;
-    await this.hooks.execute(HOOKS.APP_INIT, {
+    await this.hooks.execute(chunkKYGRJCZM_cjs.HOOKS.APP_INIT, {
       pluginManager: this,
       context
     });
@@ -2864,7 +2867,7 @@ var PluginManager = class {
       if (plugin.install) {
         await plugin.install(pluginContext);
       }
-      await this.hooks.execute(HOOKS.PLUGIN_INSTALL, {
+      await this.hooks.execute(chunkKYGRJCZM_cjs.HOOKS.PLUGIN_INSTALL, {
         plugin: plugin.name,
         version: plugin.version,
         context: pluginContext
@@ -2918,7 +2921,7 @@ var PluginManager = class {
       }
       this.scopedHooks.delete(name);
       this.pluginRoutes.delete(name);
-      await this.hooks.execute(HOOKS.PLUGIN_UNINSTALL, {
+      await this.hooks.execute(chunkKYGRJCZM_cjs.HOOKS.PLUGIN_UNINSTALL, {
         plugin: name,
         context: pluginContext
       });
@@ -2957,7 +2960,7 @@ var PluginManager = class {
    */
   async registerPluginExtensions(plugin, _context) {
     if (plugin.routes) {
-      const pluginApp = new Hono();
+      const pluginApp = new hono.Hono();
       for (const route of plugin.routes) {
         console.debug(`Registering plugin route: ${route.path}`);
         pluginApp.route(route.path, route.handler);
@@ -3055,7 +3058,7 @@ var PluginManager = class {
    */
   async shutdown() {
     console.info("Shutting down plugin system...");
-    await this.hooks.execute(HOOKS.APP_SHUTDOWN, {
+    await this.hooks.execute(chunkKYGRJCZM_cjs.HOOKS.APP_SHUTDOWN, {
       pluginManager: this
     });
     const activePlugins = this.registry.getActive();
@@ -3081,6 +3084,287 @@ var PluginManager = class {
   }
 };
 
-export { HookSystemImpl, HookUtils, PluginManager, PluginRegistryImpl, PluginValidator, ScopedHookSystem };
-//# sourceMappingURL=chunk-CPXAVWCU.js.map
-//# sourceMappingURL=chunk-CPXAVWCU.js.map
+// src/plugins/core-plugins/turnstile-plugin/manifest.json
+var manifest_default = {
+  id: "turnstile",
+  name: "Cloudflare Turnstile",
+  description: "CAPTCHA-free bot protection using Cloudflare Turnstile. Provides reusable verification for any form.",
+  version: "1.0.0",
+  author: "SonicJS",
+  category: "security",
+  icon: "shield-check",
+  homepage: "https://developers.cloudflare.com/turnstile/",
+  repository: "https://github.com/sonicjs/sonicjs",
+  license: "MIT",
+  permissions: ["settings:write", "admin:access"],
+  dependencies: [],
+  configSchema: {
+    siteKey: {
+      type: "string",
+      label: "Site Key",
+      description: "Your Cloudflare Turnstile site key (public)",
+      required: true
+    },
+    secretKey: {
+      type: "string",
+      label: "Secret Key",
+      description: "Your Cloudflare Turnstile secret key (private)",
+      required: true,
+      sensitive: true
+    },
+    theme: {
+      type: "select",
+      label: "Widget Theme",
+      description: "Visual theme for the Turnstile widget",
+      default: "auto",
+      options: [
+        { value: "light", label: "Light" },
+        { value: "dark", label: "Dark" },
+        { value: "auto", label: "Auto" }
+      ]
+    },
+    size: {
+      type: "select",
+      label: "Widget Size",
+      description: "Size of the Turnstile widget",
+      default: "normal",
+      options: [
+        { value: "normal", label: "Normal" },
+        { value: "compact", label: "Compact" }
+      ]
+    },
+    mode: {
+      type: "select",
+      label: "Widget Mode",
+      description: "Managed: Adaptive challenge. Non-Interactive: Always visible, minimal friction. Invisible: No visible widget",
+      default: "managed",
+      options: [
+        { value: "managed", label: "Managed (Recommended)" },
+        { value: "non-interactive", label: "Non-Interactive" },
+        { value: "invisible", label: "Invisible" }
+      ]
+    },
+    appearance: {
+      type: "select",
+      label: "Appearance",
+      description: "When the Turnstile challenge is executed. Always: Verifies immediately. Execute: Challenge on form submit. Interaction Only: Only after user interaction",
+      default: "always",
+      options: [
+        { value: "always", label: "Always" },
+        { value: "execute", label: "Execute" },
+        { value: "interaction-only", label: "Interaction Only" }
+      ]
+    },
+    preClearance: {
+      type: "boolean",
+      label: "Enable Pre-clearance",
+      description: "Issue a clearance cookie that bypasses Cloudflare Firewall Rules (as if the user passed a challenge on your proxied site)",
+      default: false
+    },
+    preClearanceLevel: {
+      type: "select",
+      label: "Pre-clearance Level",
+      description: "Controls which Cloudflare Firewall Rules the clearance cookie bypasses. Only applies if Pre-clearance is enabled",
+      default: "managed",
+      options: [
+        { value: "interactive", label: "Interactive - Bypasses Interactive, Managed & JS Challenge Rules" },
+        { value: "managed", label: "Managed - Bypasses Managed & JS Challenge Rules" },
+        { value: "non-interactive", label: "Non-interactive - Bypasses JS Challenge Rules only" }
+      ]
+    },
+    enabled: {
+      type: "boolean",
+      label: "Enable Turnstile",
+      description: "Enable or disable Turnstile verification globally",
+      default: true
+    }
+  },
+  adminMenu: {
+    label: "Turnstile",
+    icon: "shield-check",
+    href: "/admin/plugins/turnstile/settings",
+    parentId: "plugins",
+    order: 100
+  }
+};
+
+// src/plugins/core-plugins/turnstile-plugin/services/turnstile.ts
+var TurnstileService = class {
+  db;
+  VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+  constructor(db) {
+    this.db = db;
+  }
+  /**
+   * Get Turnstile settings from database
+   */
+  async getSettings() {
+    try {
+      const plugin = await this.db.prepare(`SELECT settings FROM plugins WHERE id = ? LIMIT 1`).bind(manifest_default.id).first();
+      if (!plugin || !plugin.settings) {
+        return null;
+      }
+      return JSON.parse(plugin.settings);
+    } catch (error) {
+      console.error("Error getting Turnstile settings:", error);
+      return null;
+    }
+  }
+  /**
+   * Verify a Turnstile token with Cloudflare
+   */
+  async verifyToken(token, remoteIp) {
+    try {
+      const settings = await this.getSettings();
+      if (!settings) {
+        return { success: false, error: "Turnstile not configured" };
+      }
+      if (!settings.enabled) {
+        return { success: true };
+      }
+      if (!settings.secretKey) {
+        return { success: false, error: "Turnstile secret key not configured" };
+      }
+      const formData = new FormData();
+      formData.append("secret", settings.secretKey);
+      formData.append("response", token);
+      if (remoteIp) {
+        formData.append("remoteip", remoteIp);
+      }
+      const response = await fetch(this.VERIFY_URL, {
+        method: "POST",
+        body: formData
+      });
+      if (!response.ok) {
+        return { success: false, error: "Turnstile verification request failed" };
+      }
+      const result = await response.json();
+      if (!result.success) {
+        const errorCode = result["error-codes"]?.[0] || "unknown-error";
+        return { success: false, error: `Turnstile verification failed: ${errorCode}` };
+      }
+      return { success: true };
+    } catch (error) {
+      console.error("Error verifying Turnstile token:", error);
+      return { success: false, error: "Turnstile verification error" };
+    }
+  }
+  /**
+   * Save Turnstile settings to database
+   */
+  async saveSettings(settings) {
+    try {
+      await this.db.prepare(`UPDATE plugins SET settings = ?, updated_at = ? WHERE id = ?`).bind(JSON.stringify(settings), Date.now(), manifest_default.id).run();
+      console.log("Turnstile settings saved successfully");
+    } catch (error) {
+      console.error("Error saving Turnstile settings:", error);
+      throw new Error("Failed to save Turnstile settings");
+    }
+  }
+  /**
+   * Check if Turnstile is enabled
+   */
+  async isEnabled() {
+    const settings = await this.getSettings();
+    return settings?.enabled === true && !!settings.siteKey && !!settings.secretKey;
+  }
+};
+
+// src/plugins/core-plugins/turnstile-plugin/middleware/verify.ts
+async function verifyTurnstile(c, next) {
+  const db = c.get("db") || c.env?.DB;
+  if (!db) {
+    console.error("Turnstile middleware: Database not available");
+    return c.json({ error: "Database not available" }, 500);
+  }
+  const turnstileService = new TurnstileService(db);
+  const isEnabled = await turnstileService.isEnabled();
+  if (!isEnabled) {
+    return next();
+  }
+  let token;
+  let body;
+  if (c.req.method === "POST") {
+    const contentType = c.req.header("content-type") || "";
+    if (contentType.includes("application/json")) {
+      body = await c.req.json();
+      token = body["cf-turnstile-response"] || body["turnstile-token"];
+      c.set("requestBody", body);
+    } else if (contentType.includes("application/x-www-form-urlencoded") || contentType.includes("multipart/form-data")) {
+      const formData = await c.req.formData();
+      token = formData.get("cf-turnstile-response")?.toString() || formData.get("turnstile-token")?.toString();
+    }
+  }
+  if (!token) {
+    return c.json({
+      error: "Turnstile token missing",
+      message: "Please complete the verification challenge"
+    }, 400);
+  }
+  const remoteIp = c.req.header("cf-connecting-ip") || c.req.header("x-forwarded-for");
+  const result = await turnstileService.verifyToken(token, remoteIp);
+  if (!result.success) {
+    return c.json({
+      error: "Turnstile verification failed",
+      message: result.error || "Verification failed. Please try again."
+    }, 403);
+  }
+  return next();
+}
+function createTurnstileMiddleware(options) {
+  return async (c, next) => {
+    const db = c.get("db") || c.env?.DB;
+    if (!db) {
+      return options?.onError?.(c, "Database not available") || c.json({ error: "Database not available" }, 500);
+    }
+    const turnstileService = new TurnstileService(db);
+    const isEnabled = await turnstileService.isEnabled();
+    if (!isEnabled) {
+      return next();
+    }
+    let token;
+    const contentType = c.req.header("content-type") || "";
+    if (contentType.includes("application/json")) {
+      const body = await c.req.json();
+      token = body["cf-turnstile-response"] || body["turnstile-token"];
+    } else if (contentType.includes("application/x-www-form-urlencoded") || contentType.includes("multipart/form-data")) {
+      const formData = await c.req.formData();
+      token = formData.get("cf-turnstile-response")?.toString() || formData.get("turnstile-token")?.toString();
+    }
+    if (!token) {
+      return options?.onMissing?.(c) || c.json({ error: "Turnstile token missing" }, 400);
+    }
+    const remoteIp = c.req.header("cf-connecting-ip") || c.req.header("x-forwarded-for");
+    const result = await turnstileService.verifyToken(token, remoteIp);
+    if (!result.success) {
+      return options?.onError?.(c, result.error || "Verification failed") || c.json({ error: "Turnstile verification failed", message: result.error }, 403);
+    }
+    return next();
+  };
+}
+
+// src/plugins/core-plugins/turnstile-plugin/index.ts
+new chunkQBKCBF7C_cjs.PluginBuilder({
+  name: manifest_default.name,
+  version: manifest_default.version,
+  description: manifest_default.description,
+  author: { name: manifest_default.author }
+}).metadata({
+  description: manifest_default.description,
+  author: { name: manifest_default.author }
+}).addService("turnstile", TurnstileService).addSingleMiddleware("verifyTurnstile", verifyTurnstile, {
+  description: "Verify Cloudflare Turnstile token",
+  global: false
+}).build();
+
+exports.HookSystemImpl = HookSystemImpl;
+exports.HookUtils = HookUtils;
+exports.PluginManager = PluginManager;
+exports.PluginRegistryImpl = PluginRegistryImpl;
+exports.PluginValidator = PluginValidator;
+exports.ScopedHookSystem = ScopedHookSystem;
+exports.TurnstileService = TurnstileService;
+exports.createTurnstileMiddleware = createTurnstileMiddleware;
+exports.verifyTurnstile = verifyTurnstile;
+//# sourceMappingURL=chunk-HRTPT5SQ.cjs.map
+//# sourceMappingURL=chunk-HRTPT5SQ.cjs.map
