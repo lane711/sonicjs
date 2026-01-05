@@ -47,8 +47,7 @@ export class ContactService {
       city: '',
       state: '',
       showMap: false,
-      mapApiKey: '',
-      useTurnstile: false
+      mapApiKey: ''
     }
   }
 

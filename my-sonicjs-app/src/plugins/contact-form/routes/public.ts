@@ -2,7 +2,6 @@ import { Hono } from 'hono'
 import { html } from 'hono/html'
 import type { Context } from 'hono'
 import { ContactService } from '../services/contact'
-import { TurnstileService } from '@sonicjs-cms/core/plugins'
 
 const publicRoutes = new Hono()
 
@@ -42,39 +41,12 @@ publicRoutes.get('/contact', async (c: any) => {
   const mapQuery = `${street} ${city} ${state}`
   const mapSrc = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodeURIComponent(mapQuery)}`
 
-  // Get Turnstile settings - only show if BOTH global Turnstile is enabled AND contact form has it enabled
-  let turnstileSiteKey = ''
-  let turnstileEnabled = false
-  let turnstileTheme = 'light'
-  let turnstileSize = 'normal'
-  let turnstileMode = 'managed'
-  let turnstileAppearance = 'always'
-  const contactUseTurnstile = settings.useTurnstile === true || settings.useTurnstile === 1 || settings.useTurnstile === 'true' || settings.useTurnstile === 'on'
-  
-  if (contactUseTurnstile) {
-    try {
-      const turnstileResult = await db.prepare('SELECT settings FROM plugins WHERE id = ?').bind('turnstile').first()
-      if (turnstileResult?.settings) {
-        const turnstileSettings = JSON.parse(turnstileResult.settings)
-        turnstileSiteKey = turnstileSettings.siteKey || ''
-        turnstileEnabled = turnstileSettings.enabled === true
-        turnstileTheme = turnstileSettings.theme || 'light'
-        turnstileSize = turnstileSettings.size || 'normal'
-        turnstileMode = turnstileSettings.mode || 'managed'
-        turnstileAppearance = turnstileSettings.appearance || 'always'
-      }
-    } catch (e) {
-      console.log('Turnstile plugin not found or not configured')
-    }
-  }
-
   return c.html(html`
     <!DOCTYPE html>
     <html>
       <head>
         <title>Contact ${company}</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        ${turnstileEnabled && turnstileSiteKey ? html`<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>` : ''}
       </head>
       <body class="container py-5">
         <div class="row justify-content-center">
@@ -92,19 +64,6 @@ publicRoutes.get('/contact', async (c: any) => {
                <div class="mb-3"><label class="form-label">Name</label><input type="text" name="name" class="form-control" required></div>
                <div class="mb-3"><label class="form-label">Email</label><input type="email" name="email" class="form-control" required></div>
                <div class="mb-3"><label class="form-label">Message</label><textarea name="msg" class="form-control" rows="5" required></textarea></div>
-               ${turnstileEnabled && turnstileSiteKey ? html`
-               <div class="mb-3">
-                 <div 
-                   class="cf-turnstile" 
-                   data-sitekey="${turnstileSiteKey}" 
-                   data-theme="${turnstileTheme}"
-                   data-size="${turnstileSize}"
-                   data-action="submit"
-                   data-appearance="${turnstileAppearance}"
-                   ${turnstileMode !== 'managed' ? `data-execution="${turnstileMode}"` : ''}
-                 ></div>
-               </div>
-               ` : ''}
                <button class="btn btn-primary">Send Message</button>
             </form>
             <a href="/" class="btn btn-link mt-3">← Back Home</a>
@@ -116,34 +75,6 @@ publicRoutes.get('/contact', async (c: any) => {
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
             
-            // Get Turnstile token if widget is present
-            const turnstileWidget = e.target.querySelector('.cf-turnstile');
-            if (turnstileWidget) {
-              console.log('Turnstile widget found');
-              
-              // Turnstile automatically creates a hidden input with the token
-              const tokenInput = e.target.querySelector('input[name="cf-turnstile-response"]');
-              
-              if (tokenInput && tokenInput.value) {
-                console.log('Token found in hidden input');
-                data['cf-turnstile-response'] = tokenInput.value;
-              } else if (typeof turnstile !== 'undefined') {
-                console.log('Attempting to get token via API');
-                const token = turnstile.getResponse();
-                if (!token) {
-                  alert('Please complete the security check');
-                  return;
-                }
-                data['cf-turnstile-response'] = token;
-              } else {
-                console.error('No Turnstile token found');
-                alert('Please complete the security check');
-                return;
-              }
-            }
-            
-            console.log('Submitting form data:', { ...data, 'cf-turnstile-response': data['cf-turnstile-response'] ? '***token***' : 'missing' });
-            
             const r = await fetch('/api/contact', {
               method: 'POST',
               headers: {'Content-Type': 'application/json'},
@@ -151,18 +82,12 @@ publicRoutes.get('/contact', async (c: any) => {
             });
             
             const res = await r.json();
-            console.log('Response:', res);
             
             if (res.success) {
               document.getElementById('success-alert').classList.remove('d-none');
               e.target.reset();
-              // Reset Turnstile widget if present
-              if (turnstileWidget && typeof turnstile !== 'undefined') {
-                turnstile.reset();
-              }
               setTimeout(() => document.getElementById('success-alert').classList.add('d-none'), 5000);
             } else {
-              console.error('Submission error:', res);
               alert('Error sending message: ' + (res.message || res.error || 'Please try again.'));
             }
           });
@@ -179,7 +104,6 @@ publicRoutes.get('/contact', async (c: any) => {
 /**
  * POST /api/contact
  * Submit a contact form message
- * Protected by Turnstile if enabled in contact form settings
  */
 publicRoutes.post('/api/contact', async (c: any) => {
   try {
@@ -190,10 +114,6 @@ publicRoutes.post('/api/contact', async (c: any) => {
     }
 
     const service = new ContactService(db)
-    
-    // Check if contact form has Turnstile enabled
-    const { data: settings } = await service.getSettings()
-    const useTurnstile = settings.useTurnstile === true || settings.useTurnstile === 1 || settings.useTurnstile === 'true' || settings.useTurnstile === 'on'
     
     // Get request data
     let data: any = {}
@@ -206,44 +126,6 @@ publicRoutes.post('/api/contact', async (c: any) => {
       formData.forEach((value, key) => {
         data[key] = value;
       });
-    }
-    
-    // If Turnstile is enabled for this form, verify it
-    if (useTurnstile) {
-      console.log('[Contact Form] Turnstile verification enabled for this form')
-      const turnstileService = new TurnstileService(db)
-      const isTurnstileEnabled = await turnstileService.isEnabled()
-      console.log('[Contact Form] Turnstile plugin enabled:', isTurnstileEnabled)
-      
-      if (isTurnstileEnabled) {
-        const token = data['cf-turnstile-response'] || data['turnstile-token']
-        console.log('[Contact Form] Token present:', !!token)
-        
-        if (!token) {
-          console.error('[Contact Form] No Turnstile token provided')
-          return c.json({
-            success: false,
-            error: 'Turnstile verification required',
-            message: 'Please complete the security check'
-          }, 400)
-        }
-        
-        const remoteIp = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for')
-        console.log('[Contact Form] Verifying token with IP:', remoteIp)
-        const result = await turnstileService.verifyToken(token, remoteIp)
-        console.log('[Contact Form] Verification result:', result)
-        
-        if (!result.success) {
-          console.error('[Contact Form] Turnstile verification failed:', result.error)
-          return c.json({
-            success: false,
-            error: 'Turnstile verification failed',
-            message: result.error || 'Security verification failed. Please try again.'
-          }, 403)
-        }
-        
-        console.log('[Contact Form] Turnstile verification successful')
-      }
     }
     
     // Basic validation

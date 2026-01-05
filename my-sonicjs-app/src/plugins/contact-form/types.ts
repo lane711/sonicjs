@@ -24,8 +24,6 @@ export interface ContactSettings {
   showMap: boolean | number | string
   /** Google Maps API key */
   mapApiKey?: string
-  /** Whether to use Cloudflare Turnstile for bot protection */
-  useTurnstile?: boolean | number | string
 }
 
 /**
