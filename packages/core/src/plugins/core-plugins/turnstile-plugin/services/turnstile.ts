@@ -15,7 +15,8 @@ export interface TurnstileSettings {
 
 export interface TurnstileVerificationResponse {
   success: boolean
-  'error-codes'?: string[]
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  'error-codes'?: string[] // Cloudflare API uses kebab-case for this field
   challenge_ts?: string
   hostname?: string
 }
