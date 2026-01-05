@@ -1,7 +1,7 @@
 name: PR Tests
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - main
   push:
@@ -9,13 +9,32 @@ on:
       - main
 
 jobs:
+  # Authorization job - gates fork PRs behind environment approval
+  authorize:
+    runs-on: ubuntu-latest
+    # Use 'external' environment (requires approval) for fork PRs, 'internal' for same-repo PRs
+    environment:
+      name: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name != github.repository && 'external' || 'internal' }}
+    steps:
+      - name: Authorize
+        run: |
+          echo "✅ Workflow authorized"
+          echo "Event: ${{ github.event_name }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "PR Head Repo: ${{ github.event.pull_request.head.repo.full_name || 'N/A' }}"
+          echo "Is Fork: ${{ github.event.pull_request.head.repo.full_name != github.repository }}"
+
   test:
+    needs: authorize
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          # For pull_request_target, we need to checkout the PR head
+          ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

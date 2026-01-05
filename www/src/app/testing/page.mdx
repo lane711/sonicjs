@@ -1,13 +1,14 @@
 export const metadata = {
   title: 'Testing Guide - SonicJS',
   description:
-    'Comprehensive testing guide for SonicJS covering unit tests with Vitest and end-to-end testing with Playwright, including examples and best practices.',
+    'Comprehensive testing guide for SonicJS covering unit tests with Vitest, end-to-end testing with Playwright, and manual API testing with Postman.',
 }
 
 export const sections = [
   { title: 'Overview', id: 'overview' },
   { title: 'Testing Stack', id: 'testing-stack' },
   { title: 'Setup and Installation', id: 'setup-and-installation' },
+  { title: 'Manual API Testing with Postman', id: 'manual-api-testing-with-postman' },
   { title: 'Unit Testing with Vitest', id: 'unit-testing-with-vitest' },
   { title: 'End-to-End Testing with Playwright', id: 'end-to-end-testing-with-playwright' },
   { title: 'Running Tests', id: 'running-tests' },
@@ -100,8 +101,13 @@ As of the latest test run:
       title: '@vitest/coverage-v8',
       description: "Fast, accurate code coverage using V8's built-in coverage",
     },
+    {
+      icon: '📬',
+      title: 'Postman Collection',
+      description: 'Manual API testing with auto-auth and full endpoint coverage',
+    },
   ]}
-  columns={3}
+  columns={4}
 />
 
 ### Why These Tools?
@@ -109,6 +115,7 @@ As of the latest test run:
 - **Vitest** - Fast, Vite-native test runner with excellent TypeScript support
 - **Playwright** - Reliable cross-browser testing with powerful debugging capabilities
 - **Coverage-v8** - Fast, accurate code coverage using V8's built-in coverage
+- **Postman** - Interactive API testing for development, debugging, and exploration
 
 ---
 
@@ -135,6 +142,110 @@ The project includes pre-configured test setups:
 - `vitest.config.ts` - Vitest configuration
 - `playwright.config.ts` - Playwright configuration
 - `tests/e2e/utils/test-helpers.ts` - Shared test utilities
+
+---
+
+## Manual API Testing with Postman
+
+SonicJS includes a comprehensive Postman collection for manually testing all API endpoints. This is useful for exploring the API, debugging issues, and testing new features during development.
+
+### Quick Start
+
+<CodeGroup title="Import the Collection">
+
+```bash
+# Collection and environment files are located at:
+tests/postman/SonicJS-API.postman_collection.json
+tests/postman/SonicJS-API.postman_environment.json
+```
+
+</CodeGroup>
+
+1. **Import into Postman**: Open Postman and import both files
+2. **Start the server**: Run `npm run dev`
+3. **Seed admin user**: Run the "Seed Admin User" request first
+4. **Start testing**: Authentication is handled automatically
+
+### Features
+
+<FeatureGrid
+  features={[
+    {
+      icon: '🔐',
+      title: 'Auto-Authentication',
+      description: 'Automatically logs in and refreshes tokens when needed',
+    },
+    {
+      icon: '📦',
+      title: 'Full API Coverage',
+      description: 'All endpoints including auth, content, media, users, and plugins',
+    },
+    {
+      icon: '🔑',
+      title: 'OTP Testing',
+      description: 'Test passwordless authentication with one-time codes',
+    },
+    {
+      icon: '⚡',
+      title: 'Collection Variables',
+      description: 'IDs and tokens are auto-saved for subsequent requests',
+    },
+  ]}
+  columns={4}
+/>
+
+### Endpoint Categories
+
+The collection includes these endpoint groups:
+
+| Category | Description |
+|----------|-------------|
+| **Public API** | Health checks, content listing, collection info |
+| **System API** | Health, stats, ping, environment info |
+| **Authentication** | Login, register, logout, password reset |
+| **OTP Authentication** | Request, verify, and resend one-time codes |
+| **Admin - Users** | CRUD operations, invitations, status toggle |
+| **Admin - Profile** | Profile management, password change, avatar |
+| **Admin - Content** | CRUD, versions, bulk actions, duplicate |
+| **Admin - Media** | Upload, folders, bulk operations, metadata |
+| **Admin - Plugins** | List, activate, deactivate, configure |
+| **Admin - Settings** | Migrations, database tools, general settings |
+| **Admin - Activity Logs** | View and export activity logs |
+
+### OTP Testing
+
+The collection includes endpoints for testing passwordless (OTP) authentication:
+
+<CodeGroup title="OTP Flow">
+
+```bash
+# 1. Request OTP code
+POST /auth/otp/request
+{ "email": "user@example.com" }
+
+# In development mode, the code is returned in the response
+# and auto-saved to the otpCode collection variable
+
+# 2. Verify OTP code
+POST /auth/otp/verify
+{ "email": "user@example.com", "code": "123456" }
+
+# On success, the auth token is saved automatically
+```
+
+</CodeGroup>
+
+<Callout type="tip" title="Development Mode">
+In development mode, the OTP code is returned directly in the API response (`dev_code` field) and automatically saved to the collection variable for easy testing.
+</Callout>
+
+### Default Credentials
+
+| Variable | Value | Description |
+|----------|-------|-------------|
+| `baseUrl` | `http://localhost:8787` | Local development server |
+| `testUserEmail` | `admin@sonicjs.com` | Default admin email |
+| `testUserPassword` | `sonicjs!` | Default admin password |
 
 ---
 

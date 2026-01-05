@@ -3,7 +3,7 @@
     "name": "SonicJS API Testing",
     "description": "Comprehensive API testing collection for SonicJS with automated authentication",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "auth": {
     "type": "bearer",
@@ -28,7 +28,7 @@
           "",
           "// Skip auth for auth endpoints themselves",
           "const requestUrl = pm.request.url.toString();",
-          "if (requestUrl.includes('/auth/login') || requestUrl.includes('/auth/register') || requestUrl.includes('/auth/seed-admin') || requestUrl.includes('/api/health')) {",
+          "if (requestUrl.includes('/auth/login') || requestUrl.includes('/auth/register') || requestUrl.includes('/auth/seed-admin') || requestUrl.includes('/auth/otp/') || requestUrl.includes('/api/health') || requestUrl.includes('/api/system/')) {",
           "  return;",
           "}",
           "",
@@ -45,8 +45,8 @@
           "    body: {",
           "      mode: 'raw',",
           "      raw: JSON.stringify({",
-          "        email: pm.environment.get('testUserEmail') || 'admin@test.com',",
-          "        password: pm.environment.get('testUserPassword') || 'Admin123!'",
+          "        email: pm.environment.get('testUserEmail') || 'admin@sonicjs.com',",
+          "        password: pm.environment.get('testUserPassword') || 'sonicjs!'",
           "      })",
           "    }",
           "  };",
@@ -117,6 +117,21 @@
       "key": "testPluginId",
       "value": "database-tools",
       "type": "string"
+    },
+    {
+      "key": "testUserId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "otpEmail",
+      "value": "test@example.com",
+      "type": "string"
+    },
+    {
+      "key": "otpCode",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
@@ -124,7 +139,22 @@
       "name": "Public API",
       "item": [
         {
-          "name": "Health Check",
+          "name": "Health Check (Root)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "API Health Check",
           "request": {
             "auth": {
               "type": "noauth"
@@ -139,7 +169,7 @@
           }
         },
         {
-          "name": "Get OpenAPI Spec",
+          "name": "Get API Info",
           "request": {
             "auth": {
               "type": "noauth"
@@ -212,6 +242,21 @@
           }
         },
         {
+          "name": "Get Content by ID",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/content/{{testContentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "content", "{{testContentId}}"]
+            }
+          }
+        },
+        {
           "name": "Get Collection Content",
           "request": {
             "auth": {
@@ -223,6 +268,86 @@
               "raw": "{{baseUrl}}/api/collections/pages/content",
               "host": ["{{baseUrl}}"],
               "path": ["api", "collections", "pages", "content"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "System API",
+      "item": [
+        {
+          "name": "System Health Check",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/system/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "system", "health"]
+            }
+          }
+        },
+        {
+          "name": "System Info",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/system/info",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "system", "info"]
+            }
+          }
+        },
+        {
+          "name": "System Stats",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/system/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "system", "stats"]
+            }
+          }
+        },
+        {
+          "name": "System Ping",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/system/ping",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "system", "ping"]
+            }
+          }
+        },
+        {
+          "name": "System Environment",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/system/env",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "system", "env"]
             }
           }
         }
@@ -259,7 +384,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@test.com\",\n  \"password\": \"Admin123!\",\n  \"name\": \"Test Admin\"\n}"
+              "raw": "{\n  \"email\": \"admin@sonicjs.com\",\n  \"password\": \"sonicjs!\",\n  \"name\": \"Admin User\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/seed-admin",
@@ -275,7 +400,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (pm.response.code === 200) {",
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
                   "  const jsonData = pm.response.json();",
                   "  pm.collectionVariables.set('authToken', jsonData.token);",
                   "  pm.collectionVariables.set('userId', jsonData.user.id);",
@@ -345,7 +470,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@test.com\",\n  \"password\": \"Admin123!\"\n}"
+              "raw": "{\n  \"email\": \"admin@sonicjs.com\",\n  \"password\": \"sonicjs!\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
@@ -428,12 +553,18 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json"
+                "value": "application/x-www-form-urlencoded"
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@test.com\"\n}"
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "admin@sonicjs.com",
+                  "type": "text"
+                }
+              ]
             },
             "url": {
               "raw": "{{baseUrl}}/auth/request-password-reset",
@@ -452,17 +583,594 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json"
+                "value": "application/x-www-form-urlencoded"
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"token\": \"reset-token-here\",\n  \"password\": \"NewPassword123!\"\n}"
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "token",
+                  "value": "reset-token-here",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "NewPassword123!",
+                  "type": "text"
+                },
+                {
+                  "key": "confirm_password",
+                  "value": "NewPassword123!",
+                  "type": "text"
+                }
+              ]
             },
             "url": {
               "raw": "{{baseUrl}}/auth/reset-password",
               "host": ["{{baseUrl}}"],
               "path": ["auth", "reset-password"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "OTP Authentication",
+      "description": "Passwordless authentication via email one-time codes. The OTP plugin must be active for these endpoints to work.",
+      "item": [
+        {
+          "name": "Request OTP Code",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  console.log('OTP Response:', jsonData);",
+                  "  ",
+                  "  // In development mode, the code is returned in the response",
+                  "  if (jsonData.dev_code) {",
+                  "    pm.collectionVariables.set('otpCode', jsonData.dev_code);",
+                  "    console.log('Development OTP Code saved:', jsonData.dev_code);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{otpEmail}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/otp/request",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "otp", "request"]
+            }
+          }
+        },
+        {
+          "name": "Verify OTP Code",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  console.log('OTP Verification Response:', jsonData);",
+                  "  ",
+                  "  if (jsonData.success) {",
+                  "    console.log('OTP verification successful!');",
+                  "    // If a token is returned, save it",
+                  "    if (jsonData.token) {",
+                  "      pm.collectionVariables.set('authToken', jsonData.token);",
+                  "      const expiryTime = Date.now() + (60 * 60 * 1000);",
+                  "      pm.collectionVariables.set('tokenExpiry', expiryTime);",
+                  "    }",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{otpEmail}}\",\n  \"code\": \"{{otpCode}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/otp/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "otp", "verify"]
+            }
+          }
+        },
+        {
+          "name": "Resend OTP Code",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonData = pm.response.json();",
+                  "  console.log('OTP Resend Response:', jsonData);",
+                  "  ",
+                  "  // In development mode, the new code is returned in the response",
+                  "  if (jsonData.dev_code) {",
+                  "    pm.collectionVariables.set('otpCode', jsonData.dev_code);",
+                  "    console.log('New Development OTP Code saved:', jsonData.dev_code);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{otpEmail}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/otp/resend",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "otp", "resend"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?page=1&limit=20&status=active",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "active"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "role",
+                  "value": "admin",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{testUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{testUserId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Check for redirect (successful creation redirects)",
+                  "if (pm.response.code === 302 || pm.response.code === 200) {",
+                  "  console.log('User created successfully');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "newuser@example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "username",
+                  "value": "newuser",
+                  "type": "text"
+                },
+                {
+                  "key": "first_name",
+                  "value": "New",
+                  "type": "text"
+                },
+                {
+                  "key": "last_name",
+                  "value": "User",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "Password123!",
+                  "type": "text"
+                },
+                {
+                  "key": "confirm_password",
+                  "value": "Password123!",
+                  "type": "text"
+                },
+                {
+                  "key": "role",
+                  "value": "viewer",
+                  "type": "text"
+                },
+                {
+                  "key": "is_active",
+                  "value": "1",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/new",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "new"]
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "updated@example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "username",
+                  "value": "updateduser",
+                  "type": "text"
+                },
+                {
+                  "key": "first_name",
+                  "value": "Updated",
+                  "type": "text"
+                },
+                {
+                  "key": "last_name",
+                  "value": "User",
+                  "type": "text"
+                },
+                {
+                  "key": "role",
+                  "value": "editor",
+                  "type": "text"
+                },
+                {
+                  "key": "is_active",
+                  "value": "1",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{testUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{testUserId}}"]
+            }
+          }
+        },
+        {
+          "name": "Toggle User Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"active\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{testUserId}}/toggle",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{testUserId}}", "toggle"]
+            }
+          }
+        },
+        {
+          "name": "Delete User (Soft)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hardDelete\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{testUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{testUserId}}"]
+            }
+          }
+        },
+        {
+          "name": "Invite User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "invited@example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "first_name",
+                  "value": "Invited",
+                  "type": "text"
+                },
+                {
+                  "key": "last_name",
+                  "value": "User",
+                  "type": "text"
+                },
+                {
+                  "key": "role",
+                  "value": "editor",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/invite-user",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "invite-user"]
+            }
+          }
+        },
+        {
+          "name": "Resend Invitation",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/resend-invitation/{{testUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "resend-invitation", "{{testUserId}}"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Invitation",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/cancel-invitation/{{testUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "cancel-invitation", "{{testUserId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Profile",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "first_name",
+                  "value": "Updated",
+                  "type": "text"
+                },
+                {
+                  "key": "last_name",
+                  "value": "Name",
+                  "type": "text"
+                },
+                {
+                  "key": "username",
+                  "value": "updatedadmin",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "admin@sonicjs.com",
+                  "type": "text"
+                },
+                {
+                  "key": "timezone",
+                  "value": "America/New_York",
+                  "type": "text"
+                },
+                {
+                  "key": "language",
+                  "value": "en",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "current_password",
+                  "value": "sonicjs!",
+                  "type": "text"
+                },
+                {
+                  "key": "new_password",
+                  "value": "NewPassword123!",
+                  "type": "text"
+                },
+                {
+                  "key": "confirm_password",
+                  "value": "NewPassword123!",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/profile/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "profile", "password"]
+            }
+          }
+        },
+        {
+          "name": "Upload Avatar",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "avatar",
+                  "type": "file",
+                  "src": [],
+                  "description": "Select an image file (JPEG, PNG, GIF, or WebP)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/profile/avatar",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "profile", "avatar"]
             }
           }
         }
@@ -511,7 +1219,6 @@
               "script": {
                 "exec": [
                   "if (pm.response.code === 200 || pm.response.code === 201) {",
-                  "  // Try to extract ID from response",
                   "  try {",
                   "    const jsonData = pm.response.json();",
                   "    if (jsonData.id) {",
@@ -667,9 +1374,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/media/?page=1&limit=20",
+              "raw": "{{baseUrl}}/admin/media/?page=1&limit=20",
               "host": ["{{baseUrl}}"],
-              "path": ["media", ""],
+              "path": ["admin", "media", ""],
               "query": [
                 {
                   "key": "page",
@@ -694,7 +1401,7 @@
           }
         },
         {
-          "name": "Upload Media",
+          "name": "Upload Media (Single)",
           "event": [
             {
               "listen": "test",
@@ -703,9 +1410,9 @@
                   "if (pm.response.code === 200 || pm.response.code === 201) {",
                   "  try {",
                   "    const jsonData = pm.response.json();",
-                  "    if (jsonData.id) {",
-                  "      pm.collectionVariables.set('testMediaId', jsonData.id);",
-                  "      console.log('Media uploaded with ID:', jsonData.id);",
+                  "    if (jsonData.file && jsonData.file.id) {",
+                  "      pm.collectionVariables.set('testMediaId', jsonData.file.id);",
+                  "      console.log('Media uploaded with ID:', jsonData.file.id);",
                   "    }",
                   "  } catch (e) {",
                   "    console.log('Response processing error');",
@@ -722,58 +1429,57 @@
               "mode": "formdata",
               "formdata": [
                 {
-                  "key": "files",
+                  "key": "file",
                   "type": "file",
                   "src": [],
-                  "description": "Select one or more files to upload"
+                  "description": "Select a file to upload"
                 },
                 {
                   "key": "folder",
                   "value": "uploads",
                   "type": "text"
-                },
-                {
-                  "key": "alt",
-                  "value": "Test image uploaded via Postman",
-                  "type": "text"
-                },
-                {
-                  "key": "caption",
-                  "value": "Test caption",
-                  "type": "text",
-                  "disabled": true
-                },
-                {
-                  "key": "tags",
-                  "value": "test,postman",
-                  "type": "text",
-                  "disabled": true
                 }
               ]
             },
             "url": {
-              "raw": "{{baseUrl}}/media/upload",
+              "raw": "{{baseUrl}}/api/media/upload",
               "host": ["{{baseUrl}}"],
-              "path": ["media", "upload"]
+              "path": ["api", "media", "upload"]
             }
           }
         },
         {
-          "name": "Get Media by ID",
+          "name": "Upload Media (Multiple)",
           "request": {
-            "method": "GET",
+            "method": "POST",
             "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": [],
+                  "description": "Select multiple files to upload"
+                },
+                {
+                  "key": "folder",
+                  "value": "uploads",
+                  "type": "text"
+                }
+              ]
+            },
             "url": {
-              "raw": "{{baseUrl}}/media/{{testMediaId}}",
+              "raw": "{{baseUrl}}/api/media/upload-multiple",
               "host": ["{{baseUrl}}"],
-              "path": ["media", "{{testMediaId}}"]
+              "path": ["api", "media", "upload-multiple"]
             }
           }
         },
         {
           "name": "Update Media Metadata",
           "request": {
-            "method": "PUT",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Content-Type",
@@ -785,38 +1491,14 @@
               "raw": "{\n  \"alt\": \"Updated alt text\",\n  \"caption\": \"Updated caption via Postman\",\n  \"tags\": [\"updated\", \"postman\"],\n  \"folder\": \"updated-folder\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/media/{{testMediaId}}",
+              "raw": "{{baseUrl}}/api/media/{{testMediaId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["media", "{{testMediaId}}"]
+              "path": ["api", "media", "{{testMediaId}}"]
             }
           }
         },
         {
-          "name": "Get Media Stats",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/media/stats/overview",
-              "host": ["{{baseUrl}}"],
-              "path": ["media", "stats", "overview"]
-            }
-          }
-        },
-        {
-          "name": "List Media Folders",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/media/folders",
-              "host": ["{{baseUrl}}"],
-              "path": ["media", "folders"]
-            }
-          }
-        },
-        {
-          "name": "Bulk Media Actions",
+          "name": "Create Folder",
           "request": {
             "method": "POST",
             "header": [
@@ -827,12 +1509,54 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"action\": \"move\",\n  \"mediaIds\": [\"{{testMediaId}}\"],\n  \"folder\": \"archived\"\n}"
+              "raw": "{\n  \"folderName\": \"new-folder\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/media/bulk",
+              "raw": "{{baseUrl}}/api/media/create-folder",
               "host": ["{{baseUrl}}"],
-              "path": ["media", "bulk"]
+              "path": ["api", "media", "create-folder"]
+            }
+          }
+        },
+        {
+          "name": "Bulk Move Files",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileIds\": [\"{{testMediaId}}\"],\n  \"folder\": \"archived\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/media/bulk-move",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "media", "bulk-move"]
+            }
+          }
+        },
+        {
+          "name": "Bulk Delete Files",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileIds\": [\"{{testMediaId}}\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/media/bulk-delete",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "media", "bulk-delete"]
             }
           }
         },
@@ -842,9 +1566,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/media/{{testMediaId}}",
+              "raw": "{{baseUrl}}/api/media/{{testMediaId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["media", "{{testMediaId}}"]
+              "path": ["api", "media", "{{testMediaId}}"]
             }
           }
         },
@@ -857,9 +1581,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/media/serve/example-file-key",
+              "raw": "{{baseUrl}}/files/uploads/example-file.jpg",
               "host": ["{{baseUrl}}"],
-              "path": ["media", "serve", "example-file-key"]
+              "path": ["files", "uploads", "example-file.jpg"]
             }
           }
         }
@@ -981,9 +1705,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/admin/api/migrations/status",
+              "raw": "{{baseUrl}}/admin/settings/api/migrations/status",
               "host": ["{{baseUrl}}"],
-              "path": ["admin", "api", "migrations", "status"]
+              "path": ["admin", "settings", "api", "migrations", "status"]
             }
           }
         },
@@ -993,9 +1717,9 @@
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/admin/api/migrations/run",
+              "raw": "{{baseUrl}}/admin/settings/api/migrations/run",
               "host": ["{{baseUrl}}"],
-              "path": ["admin", "api", "migrations", "run"]
+              "path": ["admin", "settings", "api", "migrations", "run"]
             }
           }
         },
@@ -1005,26 +1729,50 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/admin/api/migrations/validate",
+              "raw": "{{baseUrl}}/admin/settings/api/migrations/validate",
               "host": ["{{baseUrl}}"],
-              "path": ["admin", "api", "migrations", "validate"]
+              "path": ["admin", "settings", "api", "migrations", "validate"]
             }
           }
         },
         {
-          "name": "Get All Settings",
+          "name": "Get Database Stats",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/admin/settings",
+              "raw": "{{baseUrl}}/admin/settings/api/database-tools/stats",
               "host": ["{{baseUrl}}"],
-              "path": ["admin", "settings"]
+              "path": ["admin", "settings", "api", "database-tools", "stats"]
             }
           }
         },
         {
-          "name": "Update Settings",
+          "name": "Validate Database",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/settings/api/database-tools/validate",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "settings", "api", "database-tools", "validate"]
+            }
+          }
+        },
+        {
+          "name": "Backup Database",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/settings/api/database-tools/backup",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "settings", "api", "database-tools", "backup"]
+            }
+          }
+        },
+        {
+          "name": "Truncate Tables",
           "request": {
             "method": "POST",
             "header": [
@@ -1035,12 +1783,159 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"tab\": \"general\",\n  \"settings\": {\n    \"siteName\": \"My SonicJS Site\",\n    \"siteDescription\": \"A headless CMS\"\n  }\n}"
+              "raw": "{\n  \"tables\": [\"content\"],\n  \"confirm\": true\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/admin/settings",
+              "raw": "{{baseUrl}}/admin/settings/api/database-tools/truncate",
               "host": ["{{baseUrl}}"],
-              "path": ["admin", "settings"]
+              "path": ["admin", "settings", "api", "database-tools", "truncate"]
+            }
+          }
+        },
+        {
+          "name": "Update General Settings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "siteName",
+                  "value": "My SonicJS Site",
+                  "type": "text"
+                },
+                {
+                  "key": "siteDescription",
+                  "value": "A headless CMS powered by SonicJS",
+                  "type": "text"
+                },
+                {
+                  "key": "adminEmail",
+                  "value": "admin@sonicjs.com",
+                  "type": "text"
+                },
+                {
+                  "key": "timezone",
+                  "value": "UTC",
+                  "type": "text"
+                },
+                {
+                  "key": "language",
+                  "value": "en",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/settings/general",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "settings", "general"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Activity Logs",
+      "item": [
+        {
+          "name": "View Activity Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/activity-logs?page=1&limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "activity-logs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "action",
+                  "value": "user.login",
+                  "disabled": true
+                },
+                {
+                  "key": "resource_type",
+                  "value": "users",
+                  "disabled": true
+                },
+                {
+                  "key": "date_from",
+                  "value": "2024-01-01",
+                  "disabled": true
+                },
+                {
+                  "key": "date_to",
+                  "value": "2024-12-31",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Export Activity Logs (CSV)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/activity-logs/export",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "activity-logs", "export"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Dashboard API",
+      "item": [
+        {
+          "name": "Get Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/api/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "api", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Get Storage Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/api/storage",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "api", "storage"]
+            }
+          }
+        },
+        {
+          "name": "Get Recent Activity",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/api/activity",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "api", "activity"]
             }
           }
         }

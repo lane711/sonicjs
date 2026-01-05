@@ -252,17 +252,45 @@ Join thousands of developers building the future of web APIs
   </div>
 
   <div className="space-y-6">
-    <LatestVersionEntry date="2025-12-10">
+    <LatestVersionEntry date="2025-12-30">
       <div className="flex items-start gap-2">
         <span className="text-emerald-600 dark:text-emerald-400 mt-0.5">✓</span>
-        <span className="text-gray-700 dark:text-gray-300">Various improvements and bug fixes</span>
+        <span className="text-gray-700 dark:text-gray-300"><strong>OTP & Magic Link Routes</strong> - Authentication plugins fully wired up</span>
+      </div>
+      <div className="flex items-start gap-2">
+        <span className="text-emerald-600 dark:text-emerald-400 mt-0.5">✓</span>
+        <span className="text-gray-700 dark:text-gray-300"><strong>EasyMDE Fix</strong> - Content sync issue causing save failures resolved</span>
+      </div>
+      <div className="flex items-start gap-2">
+        <span className="text-emerald-600 dark:text-emerald-400 mt-0.5">✓</span>
+        <span className="text-gray-700 dark:text-gray-300"><strong>Astro Integration Guide</strong> - Comprehensive docs for using SonicJS with Astro</span>
       </div>
     </LatestVersionEntry>
 
     <div className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 py-1">
       <div className="flex items-center gap-2 mb-2">
+        <span className="text-xs font-bold px-2 py-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">v2.3.13</span>
+        <span className="text-sm text-gray-500 dark:text-gray-400">2025-12-18</span>
+      </div>
+      <div className="text-sm space-y-1">
+        <div className="flex items-start gap-2">
+          <span className="text-blue-600 dark:text-blue-400 mt-0.5">✓</span>
+          <span className="text-gray-700 dark:text-gray-300"><strong>Release Engineer Agent</strong> - Automated npm publishing workflow</span>
+        </div>
+        <div className="flex items-start gap-2">
+          <span className="text-blue-600 dark:text-blue-400 mt-0.5">✓</span>
+          <span className="text-gray-700 dark:text-gray-300">Fixed field add/edit issues on collection forms</span>
+        </div>
+        <div className="flex items-start gap-2">
+          <span className="text-blue-600 dark:text-blue-400 mt-0.5">✓</span>
+          <span className="text-gray-700 dark:text-gray-300">EasyMDE markdown editor plugin with database migration</span>
+        </div>
+      </div>
+    </div>
+
+    <div className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 py-1">
+      <div className="flex items-center gap-2 mb-2">
         <span className="text-xs font-bold px-2 py-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">v2.3.8</span>
-        
         <span className="text-sm text-gray-500 dark:text-gray-400">2025-12-03</span>
       </div>
       <div className="text-sm space-y-1">
@@ -278,17 +306,12 @@ Join thousands of developers building the future of web APIs
           <span className="text-blue-600 dark:text-blue-400 mt-0.5">✓</span>
           <span className="text-gray-700 dark:text-gray-300">Fixed settings save button functionality</span>
         </div>
-        <div className="flex items-start gap-2">
-          <span className="text-blue-600 dark:text-blue-400 mt-0.5">✓</span>
-          <span className="text-gray-700 dark:text-gray-300">Enhanced smoke test reliability</span>
-        </div>
       </div>
     </div>
 
     <div className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 py-1">
       <div className="flex items-center gap-2 mb-2">
         <span className="text-xs font-bold px-2 py-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">v2.3.2</span>
-        
         <span className="text-sm text-gray-500 dark:text-gray-400">2025-11-26</span>
       </div>
       <div className="text-sm space-y-1">
@@ -307,27 +330,6 @@ Join thousands of developers building the future of web APIs
       </div>
     </div>
 
-    <div className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 py-1">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-xs font-bold px-2 py-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">v2.2.1</span>
-        <span className="text-sm text-gray-500 dark:text-gray-400">2025-11-22</span>
-      </div>
-      <div className="text-sm space-y-1">
-        <div className="flex items-start gap-2">
-          <span className="text-blue-600 dark:text-blue-400 mt-0.5">✓</span>
-          <span className="text-gray-700 dark:text-gray-300">Fixed "process is not defined" error in Cloudflare Workers</span>
-        </div>
-        <div className="flex items-start gap-2">
-          <span className="text-blue-600 dark:text-blue-400 mt-0.5">✓</span>
-          <span className="text-gray-700 dark:text-gray-300">Enabled proper TypeScript declaration generation</span>
-        </div>
-        <div className="flex items-start gap-2">
-          <span className="text-blue-600 dark:text-blue-400 mt-0.5">✓</span>
-          <span className="text-gray-700 dark:text-gray-300">Restored type-check pass</span>
-        </div>
-      </div>
-    </div>
-
     <div className="border-l-4 border-purple-500 dark:border-purple-400 pl-4 py-1">
       <div className="flex items-center gap-2 mb-2">
         <span className="text-xs font-bold px-2 py-1 rounded bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">v2.0.10</span>
@@ -337,10 +339,6 @@ Join thousands of developers building the future of web APIs
         <div className="flex items-start gap-2">
           <span className="text-purple-600 dark:text-purple-400 mt-0.5">✓</span>
           <span className="text-gray-700 dark:text-gray-300"><strong>PostHog Telemetry</strong> - Privacy-first anonymous tracking</span>
-        </div>
-        <div className="flex items-start gap-2">
-          <span className="text-purple-600 dark:text-purple-400 mt-0.5">✓</span>
-          <span className="text-gray-700 dark:text-gray-300"><strong>OTP & Magic Link Auth</strong> - New authentication plugins</span>
         </div>
         <div className="flex items-start gap-2">
           <span className="text-purple-600 dark:text-purple-400 mt-0.5">✓</span>

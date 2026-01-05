@@ -28,6 +28,8 @@ import { bootstrapMiddleware } from './middleware/bootstrap'
 import { metricsMiddleware } from './middleware/metrics'
 import { createDatabaseToolsAdminRoutes } from './plugins/core-plugins/database-tools-plugin/admin-routes'
 import { emailPlugin } from './plugins/core-plugins/email-plugin'
+import { otpLoginPlugin } from './plugins/core-plugins/otp-login-plugin'
+import { createMagicLinkAuthPlugin } from './plugins/available/magic-link-auth'
 
 // ============================================================================
 // Type Definitions
@@ -187,9 +189,24 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   // Test cleanup routes (only for development/test environments)
   app.route('/', testCleanupRoutes)
 
-  // Plugin routes
+  // Plugin routes - Email
   if (emailPlugin.routes && emailPlugin.routes.length > 0) {
     for (const route of emailPlugin.routes) {
+      app.route(route.path, route.handler)
+    }
+  }
+
+  // Plugin routes - OTP Login (passwordless authentication via email codes)
+  if (otpLoginPlugin.routes && otpLoginPlugin.routes.length > 0) {
+    for (const route of otpLoginPlugin.routes) {
+      app.route(route.path, route.handler)
+    }
+  }
+
+  // Plugin routes - Magic Link Auth (passwordless authentication via email links)
+  const magicLinkPlugin = createMagicLinkAuthPlugin()
+  if (magicLinkPlugin.routes && magicLinkPlugin.routes.length > 0) {
+    for (const route of magicLinkPlugin.routes) {
       app.route(route.path, route.handler)
     }
   }

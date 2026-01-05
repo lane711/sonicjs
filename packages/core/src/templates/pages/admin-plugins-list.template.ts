@@ -37,10 +37,46 @@ export interface PluginsListPageData {
 }
 
 export function renderPluginsListPage(data: PluginsListPageData): string {
+  const categories = [
+    { value: 'content', label: 'Content Management' },
+    { value: 'media', label: 'Media' },
+    { value: 'editor', label: 'Editors' },
+    { value: 'seo', label: 'SEO & Analytics' },
+    { value: 'security', label: 'Security' },
+    { value: 'utilities', label: 'Utilities' },
+    { value: 'system', label: 'System' },
+    { value: 'development', label: 'Development' },
+    { value: 'demo', label: 'Demo' }
+  ];
+
+  const statuses = [
+    { value: 'active', label: 'Active' },
+    { value: 'inactive', label: 'Inactive' },
+    { value: 'uninstalled', label: 'Available to Install' },
+    { value: 'error', label: 'Error' }
+  ];
+
+  // Calculate counts
+  const categoryCounts: Record<string, number> = {};
+  categories.forEach(cat => {
+    categoryCounts[cat.value] = data.plugins.filter(p => p.category === cat.value).length;
+  });
+
+  // Sort categories by count (descending)
+  categories.sort((a, b) => (categoryCounts[b.value] || 0) - (categoryCounts[a.value] || 0));
+
+  const statusCounts: Record<string, number> = {};
+  statuses.forEach(status => {
+    statusCounts[status.value] = data.plugins.filter(p => p.status === status.value).length;
+  });
+
+  // Sort statuses by count (descending)
+  statuses.sort((a, b) => (statusCounts[b.value] || 0) - (statusCounts[a.value] || 0));
+
   const pageContent = `
     <div>
       <!-- Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
         <div>
           <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">Plugins</h1>
           <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Manage and extend functionality with plugins</p>
@@ -48,7 +84,7 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
       </div>
 
       <!-- Experimental Notice -->
-      <div class="mb-6 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 p-4">
+      <div class="mb-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 p-4">
         <div class="flex items-start">
           <div class="flex-shrink-0">
             <svg class="h-5 w-5 text-amber-600 dark:text-amber-400" viewBox="0 0 20 20" fill="currentColor">
@@ -69,176 +105,174 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
         </div>
       </div>
 
-      <!-- Stats -->
-      <div class="mb-6">
-        <h3 class="text-base font-semibold text-zinc-950 dark:text-white">Plugin Statistics</h3>
-        <dl class="mt-5 grid grid-cols-1 divide-zinc-950/5 dark:divide-white/10 overflow-hidden rounded-lg bg-zinc-800/75 dark:bg-zinc-800/75 ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 md:grid-cols-5 md:divide-x md:divide-y-0">
-          <div class="px-4 py-5 sm:p-6">
-            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Total Plugins</dt>
-            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
-              <div class="flex items-baseline text-2xl font-semibold text-cyan-400">
-                ${data.stats?.total || 0}
-              </div>
-              <div class="inline-flex items-baseline rounded-full bg-lime-400/10 text-lime-600 dark:text-lime-400 px-2.5 py-0.5 text-sm font-medium md:mt-2 lg:mt-0">
-                <svg viewBox="0 0 20 20" fill="currentColor" class="-ml-1 mr-0.5 size-5 shrink-0 self-center">
-                  <path d="M10 17a.75.75 0 0 1-.75-.75V5.612L5.29 9.77a.75.75 0 0 1-1.08-1.04l5.25-5.5a.75.75 0 0 1 1.08 0l5.25 5.5a.75.75 0 1 1-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0 1 10 17Z" clip-rule="evenodd" fill-rule="evenodd" />
-                </svg>
-                <span class="sr-only">Increased by</span>
-                8.5%
-              </div>
-            </dd>
-          </div>
-          <div class="px-4 py-5 sm:p-6">
-            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Active Plugins</dt>
-            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
-              <div class="flex items-baseline text-2xl font-semibold text-lime-400">
-                ${data.stats?.active || 0}
-              </div>
-              <div class="inline-flex items-baseline rounded-full bg-lime-400/10 text-lime-600 dark:text-lime-400 px-2.5 py-0.5 text-sm font-medium md:mt-2 lg:mt-0">
-                <svg viewBox="0 0 20 20" fill="currentColor" class="-ml-1 mr-0.5 size-5 shrink-0 self-center">
-                  <path d="M10 17a.75.75 0 0 1-.75-.75V5.612L5.29 9.77a.75.75 0 0 1-1.08-1.04l5.25-5.5a.75.75 0 0 1 1.08 0l5.25 5.5a.75.75 0 1 1-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0 1 10 17Z" clip-rule="evenodd" fill-rule="evenodd" />
-                </svg>
-                <span class="sr-only">Increased by</span>
-                12.3%
-              </div>
-            </dd>
-          </div>
-          <div class="px-4 py-5 sm:p-6">
-            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Inactive Plugins</dt>
-            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
-              <div class="flex items-baseline text-2xl font-semibold text-purple-400">
-                ${data.stats?.inactive || 0}
-              </div>
-              <div class="inline-flex items-baseline rounded-full bg-pink-400/10 text-pink-600 dark:text-pink-400 px-2.5 py-0.5 text-sm font-medium md:mt-2 lg:mt-0">
-                <svg viewBox="0 0 20 20" fill="currentColor" class="-ml-1 mr-0.5 size-5 shrink-0 self-center">
-                  <path d="M10 3a.75.75 0 0 1 .75.75v10.638l3.96-4.158a.75.75 0 1 1 1.08 1.04l-5.25 5.5a.75.75 0 0 1-1.08 0l-5.25-5.5a.75.75 0 1 1 1.08-1.04l3.96 4.158V3.75A.75.75 0 0 1 10 3Z" clip-rule="evenodd" fill-rule="evenodd" />
-                </svg>
-                <span class="sr-only">Decreased by</span>
-                3.2%
-              </div>
-            </dd>
-          </div>
-          <div class="px-4 py-5 sm:p-6">
-            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Plugin Errors</dt>
-            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
-              <div class="flex items-baseline text-2xl font-semibold text-pink-400">
-                ${data.stats?.errors || 0}
-              </div>
-              <div class="inline-flex items-baseline rounded-full bg-pink-400/10 text-pink-600 dark:text-pink-400 px-2.5 py-0.5 text-sm font-medium md:mt-2 lg:mt-0">
-                <svg viewBox="0 0 20 20" fill="currentColor" class="-ml-1 mr-0.5 size-5 shrink-0 self-center">
-                  <path d="M10 3a.75.75 0 0 1 .75.75v10.638l3.96-4.158a.75.75 0 1 1 1.08 1.04l-5.25 5.5a.75.75 0 0 1-1.08 0l-5.25-5.5a.75.75 0 1 1 1.08-1.04l3.96 4.158V3.75A.75.75 0 0 1 10 3Z" clip-rule="evenodd" fill-rule="evenodd" />
-                </svg>
-                <span class="sr-only">Decreased by</span>
-                1.5%
-              </div>
-            </dd>
-          </div>
-          <div class="px-4 py-5 sm:p-6">
-            <dt class="text-base font-normal text-zinc-700 dark:text-zinc-100">Available to Install</dt>
-            <dd class="mt-1 flex items-baseline justify-between md:block lg:flex">
-              <div class="flex items-baseline text-2xl font-semibold text-zinc-400">
-                ${data.stats?.uninstalled || 0}
-              </div>
-              <div class="inline-flex items-baseline rounded-full bg-zinc-400/10 text-zinc-600 dark:text-zinc-400 px-2.5 py-0.5 text-sm font-medium md:mt-2 lg:mt-0">
-                <svg viewBox="0 0 20 20" fill="currentColor" class="-ml-1 mr-0.5 size-5 shrink-0 self-center">
-                  <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
-                </svg>
-                <span class="sr-only">Available</span>
-                Ready
-              </div>
-            </dd>
-          </div>
-        </dl>
-      </div>
-
-      <!-- Filters -->
-      <div class="relative rounded-xl overflow-hidden mb-6">
-        <!-- Gradient Background -->
-        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 dark:from-cyan-400/20 dark:via-blue-400/20 dark:to-purple-400/20"></div>
-
-        <div class="relative bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10">
-          <div class="px-6 py-5">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-4 flex-1">
-                <div>
-                  <label class="block text-sm/6 font-medium text-zinc-950 dark:text-white">Category</label>
-                  <div class="mt-2 grid grid-cols-1">
-                    <select id="category-filter" onchange="filterPlugins()" class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-cyan-500/30 dark:outline-cyan-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-500 dark:focus-visible:outline-cyan-400 sm:text-sm/6 min-w-48">
-                      <option value="">All Categories</option>
-                      <option value="content">Content Management</option>
-                      <option value="media">Media</option>
-                      <option value="seo">SEO & Analytics</option>
-                      <option value="security">Security</option>
-                      <option value="utilities">Utilities</option>
-                      <option value="system">System</option>
-                      <option value="development">Development</option>
-                      <option value="demo">Demo</option>
-                    </select>
-                    <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-cyan-600 dark:text-cyan-400 sm:size-4">
-                      <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
-                    </svg>
-                  </div>
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Sidebar Filters -->
+        <aside class="w-full lg:w-48 flex-shrink-0 space-y-8 lg:sticky lg:top-6 lg:self-start">
+          <!-- Categories Filter -->
+          <div>
+            <h3 class="text-sm font-semibold text-zinc-950 dark:text-white mb-4">Categories</h3>
+            <div class="space-y-3">
+              ${categories.map(cat => {
+                const count = categoryCounts[cat.value] || 0;
+                const isDisabled = count === 0;
+                return `
+                <div class="flex items-center ${isDisabled ? 'opacity-50' : ''}">
+                  <input
+                    id="category-${cat.value}"
+                    name="category"
+                    value="${cat.value}"
+                    type="checkbox"
+                    onchange="filterAndSortPlugins()"
+                    class="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-600 dark:bg-zinc-900 disabled:cursor-not-allowed"
+                    ${isDisabled ? 'disabled' : ''}
+                  >
+                  <label for="category-${cat.value}" class="ml-3 text-sm text-zinc-600 dark:text-zinc-400 select-none ${isDisabled ? 'cursor-not-allowed' : ''}">
+                    ${cat.label} <span class="text-zinc-400 dark:text-zinc-500">(${count})</span>
+                  </label>
                 </div>
-                <div>
-                  <label class="block text-sm/6 font-medium text-zinc-950 dark:text-white">Status</label>
-                  <div class="mt-2 grid grid-cols-1">
-                    <select id="status-filter" onchange="filterPlugins()" class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-cyan-500/30 dark:outline-cyan-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-500 dark:focus-visible:outline-cyan-400 sm:text-sm/6 min-w-48">
-                      <option value="">All Status</option>
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                      <option value="uninstalled">Available to Install</option>
-                      <option value="error">Error</option>
-                    </select>
-                    <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-cyan-600 dark:text-cyan-400 sm:size-4">
-                      <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
-                    </svg>
-                  </div>
-                </div>
-                <div class="flex-1 max-w-md">
-                  <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Search</label>
-                  <div class="relative group">
-                    <div class="absolute left-3.5 top-2.5 flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 dark:from-cyan-300 dark:to-blue-400 opacity-90 group-focus-within:opacity-100 transition-opacity">
-                      <svg class="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                      </svg>
-                    </div>
-                    <input
-                      id="search-input"
-                      type="text"
-                      placeholder="Search plugins..."
-                      oninput="filterPlugins()"
-                      class="w-full rounded-full bg-transparent px-11 py-2 text-sm text-zinc-950 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 border-2 border-cyan-200/50 dark:border-cyan-700/50 focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:shadow-lg focus:shadow-cyan-500/20 dark:focus:shadow-cyan-400/20 transition-all duration-300"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div class="flex items-center gap-x-3 ml-4">
-                <button
-                  onclick="location.reload()"
-                  class="inline-flex items-center gap-x-1.5 px-3 py-1.5 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm text-zinc-950 dark:text-white text-sm font-medium rounded-full ring-1 ring-inset ring-cyan-200/50 dark:ring-cyan-700/50 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 dark:hover:from-cyan-900/30 dark:hover:to-blue-900/30 hover:ring-cyan-300 dark:hover:ring-cyan-600 transition-all duration-200"
-                >
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                  </svg>
-                  Refresh
-                </button>
-              </div>
+              `}).join('')}
             </div>
+          </div>
+
+          <div class="h-px bg-zinc-200 dark:bg-zinc-800 lg:hidden"></div>
+
+          <!-- Status Filter -->
+          <div>
+            <h3 class="text-sm font-semibold text-zinc-950 dark:text-white mb-4">Status</h3>
+            <div class="space-y-3">
+              ${statuses.map(status => {
+                const count = statusCounts[status.value] || 0;
+                const isDisabled = count === 0;
+                let colorClass = '';
+                let ringClass = '';
+                let dotClass = '';
+                
+                switch(status.value) {
+                  case 'active':
+                    colorClass = 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10';
+                    ringClass = 'ring-emerald-600/20';
+                    dotClass = 'bg-emerald-500 dark:bg-emerald-400';
+                    break;
+                  case 'inactive':
+                    colorClass = 'text-zinc-700 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-500/10';
+                    ringClass = 'ring-zinc-600/20';
+                    dotClass = 'bg-zinc-500 dark:bg-zinc-400';
+                    break;
+                  case 'error':
+                    colorClass = 'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10';
+                    ringClass = 'ring-red-600/20';
+                    dotClass = 'bg-red-500 dark:bg-red-400';
+                    break;
+                  case 'uninstalled':
+                    colorClass = 'text-yellow-700 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-500/10';
+                    ringClass = 'ring-yellow-600/20';
+                    dotClass = 'bg-yellow-500 dark:bg-yellow-400';
+                    break;
+                  default:
+                     colorClass = 'text-zinc-700 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-500/10';
+                     ringClass = 'ring-zinc-600/20';
+                     dotClass = 'bg-zinc-500 dark:bg-zinc-400';
+                }
+
+                return `
+                <div class="flex items-center ${isDisabled ? 'opacity-50' : ''}">
+                  <input
+                    id="status-${status.value}"
+                    name="status"
+                    value="${status.value}"
+                    type="checkbox"
+                    onchange="filterAndSortPlugins()"
+                    class="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-600 dark:bg-zinc-900 disabled:cursor-not-allowed"
+                    ${isDisabled ? 'disabled' : ''}
+                  >
+                  <label for="status-${status.value}" class="ml-3 cursor-pointer select-none flex items-center ${isDisabled ? 'cursor-not-allowed' : ''}">
+                    <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${colorClass} ${ringClass}">
+                      <span class="mr-1.5 h-1.5 w-1.5 rounded-full ${dotClass}"></span>
+                      ${status.label}
+                    </span>
+                    <span class="ml-2 text-xs text-zinc-500 dark:text-zinc-400">(${count})</span>
+                  </label>
+                </div>
+              `}).join('')}
+            </div>
+          </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 min-w-0">
+          <!-- Stats Row (Compact) -->
+          <div class="flex flex-wrap gap-4 mb-6">
+            <div class="min-w-[140px] rounded-lg bg-zinc-50 dark:bg-zinc-800/50 p-3 ring-1 ring-inset ring-zinc-950/5 dark:ring-white/5">
+              <div class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Total</div>
+              <div class="mt-1 text-lg font-semibold text-zinc-900 dark:text-white">${data.stats?.total || 0}</div>
+            </div>
+            <div class="min-w-[140px] rounded-lg bg-zinc-50 dark:bg-zinc-800/50 p-3 ring-1 ring-inset ring-zinc-950/5 dark:ring-white/5">
+              <div class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Active</div>
+              <div class="mt-1 text-lg font-semibold text-emerald-600 dark:text-emerald-400">${data.stats?.active || 0}</div>
+            </div>
+            <div class="min-w-[140px] rounded-lg bg-zinc-50 dark:bg-zinc-800/50 p-3 ring-1 ring-inset ring-zinc-950/5 dark:ring-white/5">
+              <div class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Available</div>
+              <div class="mt-1 text-lg font-semibold text-zinc-600 dark:text-zinc-400">${data.stats?.uninstalled || 0}</div>
+            </div>
+            <div class="min-w-[140px] rounded-lg bg-zinc-50 dark:bg-zinc-800/50 p-3 ring-1 ring-inset ring-zinc-950/5 dark:ring-white/5">
+              <div class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Errors</div>
+              <div class="mt-1 text-lg font-semibold text-red-600 dark:text-red-400">${data.stats?.errors || 0}</div>
+            </div>
+          </div>
+
+          <!-- Toolbar -->
+          <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-6">
+            <div class="relative flex-1 w-full">
+              <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <svg class="h-4 w-4 text-zinc-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <input
+                id="search-input"
+                type="text"
+                placeholder="Search plugins..."
+                oninput="filterAndSortPlugins()"
+                class="block w-full h-9 rounded-md border-0 py-1.5 pl-10 text-zinc-900 ring-1 ring-inset ring-zinc-300 placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-zinc-600 dark:bg-zinc-900 dark:text-white dark:ring-zinc-700 dark:focus:ring-zinc-500 sm:text-sm sm:leading-6"
+              >
+            </div>
+
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+              <select id="sort-filter" onchange="filterAndSortPlugins()" class="block w-full sm:w-auto h-9 rounded-md border-0 py-1.5 pl-3 pr-8 text-zinc-900 ring-1 ring-inset ring-zinc-300 focus:ring-2 focus:ring-inset focus:ring-zinc-600 dark:bg-zinc-900 dark:text-white dark:ring-zinc-700 dark:focus:ring-zinc-500 sm:text-sm sm:leading-6">
+                <option value="name-asc">Name (A-Z)</option>
+                <option value="name-desc">Name (Z-A)</option>
+                <option value="newest">Newest Installed</option>
+                <option value="updated">Recently Updated</option>
+                <option value="popular">Popularity</option>
+                <option value="rating">Highest Rated</option>
+              </select>
+
+              <button
+                onclick="location.reload()"
+                class="inline-flex items-center gap-x-1.5 rounded-md bg-white dark:bg-zinc-900 px-3 py-1.5 h-9 text-sm font-semibold text-zinc-900 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-300 dark:ring-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+              >
+                <svg class="h-4 w-4 text-zinc-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Plugins Grid -->
+          <div id="plugins-grid" class="grid gap-6" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));">
+            ${data.plugins.map(plugin => renderPluginCard(plugin)).join('')}
           </div>
         </div>
       </div>
-
-    <!-- Plugins Grid -->
-    <div id="plugins-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-      ${data.plugins.map(plugin => renderPluginCard(plugin)).join('')}
     </div>
 
     <script>
-      async function togglePlugin(pluginId, action) {
-        const button = event.target;
-        const originalText = button.textContent;
+      async function togglePlugin(pluginId, action, event) {
+        const button = event.target.closest('button');
+        if (!button) return;
+
         button.disabled = true;
-        button.textContent = action === 'activate' ? 'Activating...' : 'Deactivating...';
+        button.classList.add('opacity-50', 'cursor-wait');
         
         try {
           const response = await fetch(\`/admin/plugins/\${pluginId}/\${action}\`, {
@@ -254,27 +288,36 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
             // Update UI
             const card = button.closest('.plugin-card');
             const statusBadge = card.querySelector('.status-badge');
+            const knob = button.querySelector('.toggle-knob');
 
             if (action === 'activate') {
               // Update status badge
-              statusBadge.className = 'status-badge inline-flex items-center rounded-md px-2.5 py-1 text-sm font-medium ring-1 ring-inset bg-lime-50 dark:bg-lime-500/10 text-lime-700 dark:text-lime-300 ring-lime-700/10 dark:ring-lime-400/20';
-              statusBadge.innerHTML = '<div class="w-2 h-2 bg-lime-500 dark:bg-lime-400 rounded-full mr-2"></div>Active';
-              // Update card border to green
-              card.className = 'plugin-card rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-[3px] ring-lime-500 dark:ring-lime-400 p-6 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all';
-              // Update button
-              button.textContent = 'Deactivate';
-              button.onclick = () => togglePlugin(pluginId, 'deactivate');
-              button.className = 'bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors';
+              statusBadge.className = 'status-badge inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ring-1 ring-inset bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 ring-emerald-600/20';
+              statusBadge.innerHTML = '<div class="w-1.5 h-1.5 bg-emerald-500 dark:bg-emerald-400 rounded-full mr-1.5"></div>Active';
+              
+              // Update button state to Active
+              button.className = 'bg-emerald-600 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 toggle-button';
+              button.setAttribute('aria-checked', 'true');
+              button.onclick = (event) => togglePlugin(pluginId, 'deactivate', event);
+              
+              // Update knob position
+              if (knob) {
+                knob.className = 'translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out toggle-knob';
+              }
             } else {
               // Update status badge
-              statusBadge.className = 'status-badge inline-flex items-center rounded-md px-2.5 py-1 text-sm font-medium ring-1 ring-inset bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700 dark:text-zinc-400 ring-zinc-700/10 dark:ring-zinc-400/20';
-              statusBadge.innerHTML = '<div class="w-2 h-2 bg-zinc-500 dark:bg-zinc-400 rounded-full mr-2"></div>Inactive';
-              // Update card border to pink
-              card.className = 'plugin-card rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-[3px] ring-pink-500 dark:ring-pink-400 p-6 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all';
-              // Update button
-              button.textContent = 'Activate';
-              button.onclick = () => togglePlugin(pluginId, 'activate');
-              button.className = 'bg-lime-600 dark:bg-lime-700 hover:bg-lime-700 dark:hover:bg-lime-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors';
+              statusBadge.className = 'status-badge inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ring-1 ring-inset bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700 dark:text-zinc-400 ring-zinc-600/20';
+              statusBadge.innerHTML = '<div class="w-1.5 h-1.5 bg-zinc-500 dark:bg-zinc-400 rounded-full mr-1.5"></div>Inactive';
+              
+              // Update button state to Inactive
+              button.className = 'bg-zinc-200 dark:bg-zinc-700 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 toggle-button';
+              button.setAttribute('aria-checked', 'false');
+              button.onclick = (event) => togglePlugin(pluginId, 'activate', event);
+              
+              // Update knob position
+              if (knob) {
+                knob.className = 'translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out toggle-knob';
+              }
             }
 
             showNotification(\`Plugin \${action}d successfully\`, 'success');
@@ -283,9 +326,9 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
           }
         } catch (error) {
           showNotification(error.message, 'error');
-          button.textContent = originalText;
         } finally {
           button.disabled = false;
+          button.classList.remove('opacity-50', 'cursor-wait');
         }
       }
       
@@ -369,81 +412,92 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
         showNotification('Plugin details coming soon!', 'info');
       }
       
-      function showNotification(message, type) {
-        const notification = document.createElement('div');
-        const bgColor = type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600';
-        notification.className = \`fixed top-4 right-4 px-4 py-2 rounded-lg text-white z-50 \${bgColor}\`;
-        notification.textContent = message;
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-          notification.remove();
-        }, 3000);
-      }
-
-      function filterPlugins() {
-        const categoryFilter = document.getElementById('category-filter').value.toLowerCase();
-        const statusFilter = document.getElementById('status-filter').value.toLowerCase();
+      function filterAndSortPlugins() {
+        // Get checked categories
+        const checkedCategories = Array.from(document.querySelectorAll('input[name="category"]:checked'))
+          .map(cb => cb.value.toLowerCase());
+          
+        // Get checked statuses
+        const checkedStatuses = Array.from(document.querySelectorAll('input[name="status"]:checked'))
+          .map(cb => cb.value.toLowerCase());
+          
         const searchInput = document.getElementById('search-input').value.toLowerCase();
+        const sortValue = document.getElementById('sort-filter').value;
 
-        const pluginCards = document.querySelectorAll('.plugin-card');
-        let visibleCount = 0;
-
-        pluginCards.forEach(card => {
-          // Get plugin data from card attributes
+        const pluginsGrid = document.getElementById('plugins-grid');
+        const pluginCards = Array.from(pluginsGrid.querySelectorAll('.plugin-card'));
+        
+        // Filter
+        const visibleCards = pluginCards.filter(card => {
           const category = card.getAttribute('data-category')?.toLowerCase() || '';
           const status = card.getAttribute('data-status')?.toLowerCase() || '';
           const name = card.getAttribute('data-name')?.toLowerCase() || '';
           const description = card.getAttribute('data-description')?.toLowerCase() || '';
 
-          // Check if plugin matches all filters
-          let matches = true;
+          // Category filter: if any selected, must match one of them
+          if (checkedCategories.length > 0 && !checkedCategories.includes(category)) return false;
+          
+          // Status filter: if any selected, must match one of them
+          if (checkedStatuses.length > 0 && !checkedStatuses.includes(status)) return false;
+          
+          // Search filter
+          if (searchInput && !name.includes(searchInput) && !description.includes(searchInput)) return false;
+          
+          return true;
+        });
 
-          // Category filter
-          if (categoryFilter && category !== categoryFilter) {
-            matches = false;
-          }
+        // Sort
+        visibleCards.sort((a, b) => {
+          const aName = a.getAttribute('data-name') || '';
+          const bName = b.getAttribute('data-name') || '';
+          const aInstalled = parseInt(a.getAttribute('data-installed') || '0');
+          const bInstalled = parseInt(b.getAttribute('data-installed') || '0');
+          const aUpdated = parseInt(a.getAttribute('data-updated') || '0');
+          const bUpdated = parseInt(b.getAttribute('data-updated') || '0');
+          const aDownloads = parseInt(a.getAttribute('data-downloads') || '0');
+          const bDownloads = parseInt(b.getAttribute('data-downloads') || '0');
+          const aRating = parseFloat(a.getAttribute('data-rating') || '0');
+          const bRating = parseFloat(b.getAttribute('data-rating') || '0');
 
-          // Status filter
-          if (statusFilter && status !== statusFilter) {
-            matches = false;
-          }
-
-          // Search filter - check if search term is in name or description
-          if (searchInput && !name.includes(searchInput) && !description.includes(searchInput)) {
-            matches = false;
-          }
-
-          // Show/hide card
-          if (matches) {
-            card.style.display = '';
-            visibleCount++;
-          } else {
-            card.style.display = 'none';
+          switch (sortValue) {
+            case 'name-desc': return bName.localeCompare(aName);
+            case 'newest': return bInstalled - aInstalled;
+            case 'updated': return bUpdated - aUpdated;
+            case 'popular': return bDownloads - aDownloads;
+            case 'rating': return bRating - aRating;
+            case 'name-asc':
+            default: return aName.localeCompare(bName);
           }
         });
 
-        // Show/hide "no results" message
+        // Re-append
+        pluginCards.forEach(card => card.style.display = 'none'); // Hide all first
+        
+        // If no results
         let noResultsMsg = document.getElementById('no-results-message');
-        if (visibleCount === 0) {
+        if (visibleCards.length === 0) {
           if (!noResultsMsg) {
             noResultsMsg = document.createElement('div');
             noResultsMsg.id = 'no-results-message';
-            noResultsMsg.className = 'col-span-full text-center py-12';
+            noResultsMsg.className = 'col-span-full text-center py-12 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700';
             noResultsMsg.innerHTML = \`
               <div class="flex flex-col items-center">
-                <svg class="w-16 h-16 text-zinc-400 dark:text-zinc-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-12 h-12 text-zinc-400 dark:text-zinc-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <h3 class="text-lg font-semibold text-zinc-950 dark:text-white mb-2">No plugins found</h3>
+                <h3 class="text-base font-semibold text-zinc-950 dark:text-white mb-1">No plugins found</h3>
                 <p class="text-sm text-zinc-500 dark:text-zinc-400">Try adjusting your filters or search terms</p>
               </div>
             \`;
-            document.getElementById('plugins-grid').appendChild(noResultsMsg);
+            pluginsGrid.appendChild(noResultsMsg);
           }
           noResultsMsg.style.display = '';
-        } else if (noResultsMsg) {
-          noResultsMsg.style.display = 'none';
+        } else {
+          if (noResultsMsg) noResultsMsg.style.display = 'none';
+          visibleCards.forEach(card => {
+            card.style.display = '';
+            pluginsGrid.appendChild(card); // Re-appending moves it to the end, effectively sorting
+          });
         }
       }
     </script>
@@ -477,25 +531,17 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
 
 function renderPluginCard(plugin: Plugin): string {
   const statusColors = {
-    active: 'bg-lime-50 dark:bg-lime-500/10 text-lime-700 dark:text-lime-300 ring-lime-700/10 dark:ring-lime-400/20',
-    inactive: 'bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700 dark:text-zinc-400 ring-zinc-700/10 dark:ring-zinc-400/20',
-    error: 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-red-700/10 dark:ring-red-400/20',
-    uninstalled: 'bg-zinc-100 dark:bg-zinc-600/10 text-zinc-600 dark:text-zinc-500 ring-zinc-600/10 dark:ring-zinc-500/20'
+    active: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 ring-emerald-600/20',
+    inactive: 'bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700 dark:text-zinc-400 ring-zinc-600/20',
+    error: 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-red-600/20',
+    uninstalled: 'bg-zinc-50 dark:bg-zinc-500/10 text-zinc-600 dark:text-zinc-500 ring-zinc-600/20'
   }
 
   const statusIcons = {
-    active: '<div class="w-2 h-2 bg-lime-500 dark:bg-lime-400 rounded-full mr-2"></div>',
-    inactive: '<div class="w-2 h-2 bg-zinc-500 dark:bg-zinc-400 rounded-full mr-2"></div>',
-    error: '<div class="w-2 h-2 bg-red-500 dark:bg-red-400 rounded-full mr-2"></div>',
-    uninstalled: '<div class="w-2 h-2 bg-zinc-400 dark:bg-zinc-600 rounded-full mr-2"></div>'
-  }
-
-  // Border colors based on status
-  const borderColors = {
-    active: 'ring-[3px] ring-lime-500 dark:ring-lime-400',
-    inactive: 'ring-[3px] ring-pink-500 dark:ring-pink-400',
-    error: 'ring-[3px] ring-red-500 dark:ring-red-400',
-    uninstalled: 'ring-[3px] ring-zinc-400 dark:ring-zinc-600'
+    active: '<div class="w-1.5 h-1.5 bg-emerald-500 dark:bg-emerald-400 rounded-full mr-1.5"></div>',
+    inactive: '<div class="w-1.5 h-1.5 bg-zinc-500 dark:bg-zinc-400 rounded-full mr-1.5"></div>',
+    error: '<div class="w-1.5 h-1.5 bg-red-500 dark:bg-red-400 rounded-full mr-1.5"></div>',
+    uninstalled: '<div class="w-1.5 h-1.5 bg-zinc-400 dark:bg-zinc-600 rounded-full mr-1.5"></div>'
   }
 
   // Core system plugins that cannot be deactivated
@@ -504,86 +550,58 @@ function renderPluginCard(plugin: Plugin): string {
 
   let actionButton = ''
   if (plugin.status === 'uninstalled') {
-    actionButton = `<button onclick="installPlugin('${plugin.name}')" class="bg-cyan-600 dark:bg-cyan-700 hover:bg-cyan-700 dark:hover:bg-cyan-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">Install</button>`
-  } else if (plugin.status === 'active') {
-    actionButton = `<button onclick="togglePlugin('${plugin.id}', 'deactivate')" class="bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">Deactivate</button>`
+    actionButton = `<button onclick="installPlugin('${plugin.name}')" class="w-full sm:w-auto bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 px-3 py-1.5 rounded-md text-xs font-medium transition-colors shadow-sm">Install</button>`
   } else {
-    actionButton = `<button onclick="togglePlugin('${plugin.id}', 'activate')" class="bg-lime-600 dark:bg-lime-700 hover:bg-lime-700 dark:hover:bg-lime-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">Activate</button>`
+    const isActive = plugin.status === 'active';
+    const action = isActive ? 'deactivate' : 'activate';
+    // Use bg-emerald-600 for active, bg-zinc-200 (light) / bg-zinc-700 (dark) for inactive
+    const bgClass = isActive ? 'bg-emerald-600' : 'bg-zinc-200 dark:bg-zinc-700';
+    const translateClass = isActive ? 'translate-x-5' : 'translate-x-0';
+     
+    if (canToggle) {
+      actionButton = `
+      <button onclick="togglePlugin('${plugin.id}', '${action}', event)" type="button" class="${bgClass} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 toggle-button" role="switch" aria-checked="${isActive}">
+        <span class="sr-only">Toggle plugin</span>
+        <span aria-hidden="true" class="${translateClass} pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out toggle-knob"></span>
+      </button>
+      `
+    } else {
+      // Critical core plugins cannot be toggled
+      actionButton = `
+      <div class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-not-allowed rounded-full border-2 border-transparent bg-emerald-600/50 opacity-50" title="Core plugin cannot be disabled">
+        <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0"></span>
+      </div>
+      `
+    }
   }
 
   return `
-    <div class="plugin-card rounded-xl bg-white dark:bg-zinc-900 shadow-sm ${borderColors[plugin.status]} p-6 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all" data-category="${plugin.category}" data-status="${plugin.status}" data-name="${plugin.displayName}" data-description="${plugin.description}">
+    <div class="plugin-card flex flex-col h-full rounded-md bg-white dark:bg-zinc-900 ring-1 ring-zinc-950/10 dark:ring-white/10 p-5 transition-all hover:shadow-md" 
+      data-category="${plugin.category}" 
+      data-status="${plugin.status}" 
+      data-name="${plugin.displayName}" 
+      data-description="${plugin.description}"
+      data-downloads="${plugin.downloadCount || 0}"
+      data-rating="${plugin.rating || 0}">
       <div class="flex items-start justify-between mb-4">
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-lg flex items-center justify-center ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 bg-zinc-50 dark:bg-zinc-800">
+          <div class="w-10 h-10 rounded-md flex items-center justify-center bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 ring-1 ring-inset ring-zinc-200 dark:ring-zinc-700/50">
             ${plugin.icon || getDefaultPluginIcon(plugin.category)}
           </div>
           <div>
-            <h3 class="text-lg font-semibold text-zinc-950 dark:text-white">${plugin.displayName}</h3>
-            <p class="text-sm text-zinc-500 dark:text-zinc-400">v${plugin.version} by ${plugin.author}</p>
+            <div class="flex items-center gap-2">
+              <h3 class="text-sm font-semibold text-zinc-900 dark:text-white">${plugin.displayName}</h3>
+              <span class="status-badge inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ring-1 ring-inset ${statusColors[plugin.status]}">
+                ${statusIcons[plugin.status]}${plugin.status.charAt(0).toUpperCase() + plugin.status.slice(1)}
+              </span>
+            </div>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400">v${plugin.version} • ${plugin.author}</p>
           </div>
         </div>
-        <div class="flex flex-col items-end gap-2">
-          <span class="status-badge inline-flex items-center rounded-md px-2.5 py-1 text-sm font-medium ring-1 ring-inset ${statusColors[plugin.status]}">
-            ${statusIcons[plugin.status]}${plugin.status.charAt(0).toUpperCase() + plugin.status.slice(1)}
-          </span>
-          ${plugin.isCore ? '<span class="inline-flex items-center rounded-md px-2.5 py-1 text-sm font-medium bg-cyan-50 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 ring-1 ring-inset ring-cyan-700/10 dark:ring-cyan-400/20">Core</span>' : ''}
-        </div>
-      </div>
-
-      <p class="text-zinc-600 dark:text-zinc-300 text-sm mb-4 line-clamp-3">${plugin.description}</p>
-
-      <div class="flex items-center gap-4 mb-4 text-xs text-zinc-500 dark:text-zinc-400">
-        <span class="flex items-center gap-1">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-          </svg>
-          ${plugin.category}
-        </span>
-
-        ${plugin.downloadCount ? `
-        <span class="flex items-center gap-1">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-          </svg>
-          ${plugin.downloadCount.toLocaleString()}
-        </span>
-        ` : ''}
-
-        ${plugin.rating ? `
-        <span class="flex items-center gap-1">
-          <svg class="w-4 h-4 text-yellow-500 dark:text-yellow-400 fill-current" viewBox="0 0 24 24">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-          </svg>
-          ${plugin.rating}
-        </span>
-        ` : ''}
-
-        <span>${plugin.lastUpdated}</span>
-      </div>
-
-      ${plugin.dependencies && plugin.dependencies.length > 0 ? `
-      <div class="mb-4">
-        <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-2">Dependencies:</p>
-        <div class="flex flex-wrap gap-1">
-          ${plugin.dependencies.map(dep => `<span class="inline-block bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs px-2 py-1 rounded">${dep}</span>`).join('')}
-        </div>
-      </div>
-      ` : ''}
-
-      <div class="flex items-center justify-between">
-        <div class="flex gap-2">
-          ${plugin.status === 'uninstalled' ? actionButton : (canToggle ? actionButton : '')}
+        
+        <div class="flex items-center gap-1">
           ${plugin.status !== 'uninstalled' ? `
-          <button onclick="openPluginSettings('${plugin.id}')" class="bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">
-            Settings
-          </button>
-          ` : ''}
-        </div>
-
-        <div class="flex items-center gap-2">
-          ${plugin.status !== 'uninstalled' ? `
-          <button onclick="showPluginDetails('${plugin.id}')" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Plugin Details">
+          <button onclick="showPluginDetails('${plugin.id}')" class="text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Plugin Details">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
@@ -591,9 +609,41 @@ function renderPluginCard(plugin: Plugin): string {
           ` : ''}
 
           ${!plugin.isCore && plugin.status !== 'uninstalled' ? `
-          <button onclick="uninstallPlugin('${plugin.id}')" class="text-zinc-500 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Uninstall Plugin">
+          <button onclick="uninstallPlugin('${plugin.id}')" class="text-zinc-400 hover:text-red-600 dark:text-zinc-500 dark:hover:text-red-400 p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Uninstall Plugin">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+          </button>
+          ` : ''}
+        </div>
+      </div>
+
+      <p class="text-zinc-600 dark:text-zinc-400 text-sm mb-4 line-clamp-2 flex-grow">${plugin.description}</p>
+
+      <div class="flex flex-wrap items-center gap-2 mb-5">
+        <span class="inline-flex items-center rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">
+          ${plugin.category}
+        </span>
+        ${plugin.isCore ? '<span class="inline-flex items-center rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">Core</span>' : ''}
+        
+        ${plugin.dependencies && plugin.dependencies.map(dep => `
+          <span class="inline-flex items-center rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">
+            ${dep}
+          </span>
+        `).join('') || ''}
+      </div>
+
+      <div class="flex items-center justify-between pt-4 border-t border-zinc-100 dark:border-zinc-800 mt-auto">
+        <div class="flex gap-2">
+          ${actionButton}
+        </div>
+
+        <div class="flex items-center gap-2">
+          ${plugin.status !== 'uninstalled' ? `
+          <button onclick="openPluginSettings('${plugin.id}')" class="text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Settings">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
           </button>
           ` : ''}

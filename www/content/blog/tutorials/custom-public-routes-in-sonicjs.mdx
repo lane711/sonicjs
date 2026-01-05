@@ -1,0 +1,266 @@
+---
+title: "How to Serve Custom Public Routes in SonicJS"
+description: "Learn how to override the default login redirect and serve your own public pages on the root path or any custom route in SonicJS."
+keywords:
+  - "sonicjs routing"
+  - "sonicjs public routes"
+  - "cloudflare workers routing"
+  - "hono custom routes"
+  - "headless cms homepage"
+category: "tutorials"
+tags:
+  - "routing"
+  - "customization"
+  - "tutorial"
+  - "hono"
+publishedAt: "2025-12-29"
+author:
+  name: "SonicJS Team"
+  twitter: "sonicjs"
+  github: "lane711/sonicjs"
+featured: false
+featuredImage:
+  url: "/images/blog/custom-public-routes-in-sonicjs/hero.png"
+  alt: "Illustration showing web traffic routing from root path to custom pages"
+  width: 1792
+  height: 1024
+---
+
+# How to Serve Custom Public Routes in SonicJS
+
+<TLDRBox>
+**TL;DR** — By default, SonicJS redirects the root path "/" to the login page. Override this by adding custom routes in your app configuration using the `routes` option. Custom routes take precedence over the default redirect.
+
+**Key Points:**
+- Use `config.routes` to register custom public routes
+- Routes are registered before the default "/" redirect
+- Use `optionalAuth()` middleware if you need user context on public pages
+- Works with any path, not just the root
+</TLDRBox>
+
+When you first set up SonicJS, you might notice that visiting the root path "/" redirects you to `/auth/login`. This is by design—SonicJS is built as an admin-first CMS. But what if you want to serve a public homepage or landing page?
+
+This guide shows you how to override the default behavior and serve custom content on any route.
+
+## Understanding the Default Behavior
+
+SonicJS includes a default route handler that redirects all requests to "/" to the login page:
+
+```typescript
+// This is in the core - you don't need to change it
+app.get('/', (c) => {
+  return c.redirect('/auth/login')
+})
+```
+
+This makes sense for admin-only applications, but many projects need public-facing pages.
+
+## Solution: Add Custom Routes in Config
+
+The simplest way to serve custom content is to add routes to your app configuration. Custom routes are registered **before** the default redirect, so they take precedence.
+
+### Basic Example
+
+Update your `src/index.ts`:
+
+```typescript
+import { createSonicJSApp, registerCollections } from '@sonicjs-cms/core'
+import type { SonicJSConfig } from '@sonicjs-cms/core'
+import { Hono } from 'hono'
+
+// Create your public routes
+const publicRoutes = new Hono()
+
+publicRoutes.get('/', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Welcome to My Site</title>
+      </head>
+      <body>
+        <h1>Welcome!</h1>
+        <p>This is my public homepage.</p>
+        <a href="/admin">Admin Dashboard</a>
+      </body>
+    </html>
+  `)
+})
+
+// Add routes to config
+const config: SonicJSConfig = {
+  routes: [
+    { path: '/', handler: publicRoutes }
+  ]
+}
+
+export default createSonicJSApp(config)
+```
+
+Now visiting "/" shows your custom page instead of redirecting to login.
+
+## Adding Multiple Public Routes
+
+You can define multiple routes in the same handler:
+
+```typescript
+const publicRoutes = new Hono()
+
+publicRoutes.get('/', (c) => {
+  return c.html(`<h1>Homepage</h1>`)
+})
+
+publicRoutes.get('/about', (c) => {
+  return c.html(`<h1>About Us</h1>`)
+})
+
+publicRoutes.get('/contact', (c) => {
+  return c.html(`<h1>Contact</h1>`)
+})
+
+const config: SonicJSConfig = {
+  routes: [
+    { path: '/', handler: publicRoutes }
+  ]
+}
+```
+
+## Using Optional Authentication
+
+Sometimes you want a public page that shows different content for logged-in users. Use the `optionalAuth()` middleware:
+
+```typescript
+import { createSonicJSApp, optionalAuth } from '@sonicjs-cms/core'
+import { Hono } from 'hono'
+
+const publicRoutes = new Hono()
+
+// Apply optional auth - doesn't block, but sets user if logged in
+publicRoutes.use('*', optionalAuth())
+
+publicRoutes.get('/', (c) => {
+  const user = c.get('user')
+
+  if (user) {
+    return c.html(`
+      <h1>Welcome back, ${user.email}!</h1>
+      <a href="/admin">Go to Dashboard</a>
+    `)
+  }
+
+  return c.html(`
+    <h1>Welcome to My Site</h1>
+    <a href="/auth/login">Login</a>
+  `)
+})
+```
+
+With `optionalAuth()`:
+- Unauthenticated users can access the page normally
+- Authenticated users have their info available via `c.get('user')`
+- No redirects happen—the page always renders
+
+## Serving Template Files
+
+For more complex pages, you might want to serve template files. Here's how to integrate with a template renderer:
+
+```typescript
+import { Hono } from 'hono'
+import { renderTemplate } from '@sonicjs-cms/templates'
+
+const publicRoutes = new Hono()
+
+publicRoutes.get('/', async (c) => {
+  const html = await renderTemplate(c, 'homepage', {
+    title: 'Welcome',
+    features: ['Fast', 'Secure', 'Scalable']
+  })
+  return c.html(html)
+})
+```
+
+## Route Priority
+
+Understanding route priority helps avoid conflicts:
+
+1. **Your custom routes** (via `config.routes`) - highest priority
+2. **Core routes** (`/api`, `/auth`, `/admin`, etc.)
+3. **Default root redirect** (`/` → `/auth/login`)
+4. **404 handler** - lowest priority
+
+This means your custom routes always win over the default redirect.
+
+## Practical Example: Marketing Site with CMS Backend
+
+Here's a complete example combining a public marketing site with the SonicJS admin:
+
+```typescript
+import { createSonicJSApp, registerCollections, optionalAuth } from '@sonicjs-cms/core'
+import type { SonicJSConfig } from '@sonicjs-cms/core'
+import { Hono } from 'hono'
+
+// Public marketing pages
+const marketingRoutes = new Hono()
+marketingRoutes.use('*', optionalAuth())
+
+marketingRoutes.get('/', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Acme Corp</title>
+        <style>
+          body { font-family: system-ui; max-width: 1200px; margin: 0 auto; padding: 2rem; }
+          .hero { text-align: center; padding: 4rem 0; }
+          .cta { background: #0066cc; color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; }
+        </style>
+      </head>
+      <body>
+        <nav>
+          <a href="/">Home</a>
+          <a href="/features">Features</a>
+          <a href="/pricing">Pricing</a>
+          <a href="/admin">Admin</a>
+        </nav>
+        <div class="hero">
+          <h1>Welcome to Acme Corp</h1>
+          <p>The best solution for your business needs.</p>
+          <a href="/auth/register" class="cta">Get Started</a>
+        </div>
+      </body>
+    </html>
+  `)
+})
+
+marketingRoutes.get('/features', (c) => {
+  return c.html(`<h1>Features</h1><p>Coming soon...</p>`)
+})
+
+marketingRoutes.get('/pricing', (c) => {
+  return c.html(`<h1>Pricing</h1><p>Contact us for pricing.</p>`)
+})
+
+const config: SonicJSConfig = {
+  routes: [
+    { path: '/', handler: marketingRoutes }
+  ]
+}
+
+export default createSonicJSApp(config)
+```
+
+## Key Takeaways
+
+- Use `config.routes` to add public routes that override the default redirect
+- Custom routes are registered before core routes, giving them priority
+- Use `optionalAuth()` for pages that should be public but user-aware
+- You can serve HTML directly or integrate with template systems
+- The admin panel and API remain fully functional alongside your public routes
+
+## Next Steps
+
+- Learn about [SonicJS templates](/templates) for more powerful page rendering
+- Explore [authentication options](/authentication) for user management
+- Read about [middleware](/middleware) for custom request handling
+
+Have questions? Join our [Discord community](https://discord.gg/sonicjs) or check the [GitHub repo](https://github.com/lane711/sonicjs).

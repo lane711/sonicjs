@@ -209,6 +209,13 @@ export function getMDXEditorInitScript(config?: {
           // Store reference to editor instance
           textarea.easyMDEInstance = easyMDE;
 
+          // Sync changes back to textarea
+          easyMDE.codemirror.on("change", () => {
+            textarea.value = easyMDE.value();
+            textarea.dispatchEvent(new Event("input", { bubbles: true }));
+            textarea.dispatchEvent(new Event("change", { bubbles: true }));
+          });
+
           console.log('EasyMDE initialized for field:', textarea.id || textarea.name);
         } catch (error) {
           console.error('Error initializing EasyMDE:', error);
