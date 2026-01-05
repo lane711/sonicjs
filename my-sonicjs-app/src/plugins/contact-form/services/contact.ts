@@ -88,9 +88,9 @@ export class ContactService {
         throw new Error('Contact messages collection not found')
       }
       
-      // Get the admin user ID (could be 'admin-user-id' from migration or dynamic from seed)
+      // Get any active admin user ID (finds the first active admin, regardless of email)
       const adminUser = await this.db
-        .prepare(`SELECT id FROM users WHERE role = 'admin' AND email = 'admin@sonicjs.com' LIMIT 1`)
+        .prepare(`SELECT id FROM users WHERE role = 'admin' AND is_active = 1 ORDER BY created_at LIMIT 1`)
         .first()
       
       if (!adminUser || !adminUser.id) {
