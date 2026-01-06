@@ -27,6 +27,7 @@ import { getCoreVersion } from './utils/version'
 import { bootstrapMiddleware } from './middleware/bootstrap'
 import { metricsMiddleware } from './middleware/metrics'
 import { createDatabaseToolsAdminRoutes } from './plugins/core-plugins/database-tools-plugin/admin-routes'
+import { createSeedDataAdminRoutes } from './plugins/core-plugins/seed-data-plugin/admin-routes'
 import { emailPlugin } from './plugins/core-plugins/email-plugin'
 import { otpLoginPlugin } from './plugins/core-plugins/otp-login-plugin'
 import { createMagicLinkAuthPlugin } from './plugins/available/magic-link-auth'
@@ -179,6 +180,7 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   app.route('/admin/collections', adminCollectionsRoutes)
   app.route('/admin/settings', adminSettingsRoutes)
   app.route('/admin/database-tools', createDatabaseToolsAdminRoutes())
+  app.route('/admin/seed-data', createSeedDataAdminRoutes())
   app.route('/admin/content', adminContentRoutes)
   app.route('/admin/media', adminMediaRoutes)
   app.route('/admin/plugins', adminPluginRoutes)
