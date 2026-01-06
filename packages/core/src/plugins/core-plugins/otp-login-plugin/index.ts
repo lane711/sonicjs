@@ -114,10 +114,8 @@ export function createOTPLoginPlugin(): Plugin {
         userAgent
       )
 
-      // Send email (if email plugin is available)
+      // Send email via Email plugin
       try {
-        // TODO: Integrate with email plugin
-        // For now, we'll just log the code in development
         const isDevMode = c.env.ENVIRONMENT === 'development'
 
         if (isDevMode) {
@@ -136,13 +134,43 @@ export function createOTPLoginPlugin(): Plugin {
           appName: settings.appName
         })
 
-        // TODO: Actually send email via email plugin
-        // await emailService.send({
-        //   to: normalizedEmail,
-        //   subject: `Your login code for ${settings.appName}`,
-        //   html: emailContent.html,
-        //   text: emailContent.text
-        // })
+        // Load email plugin settings from database
+        const emailPlugin = await db.prepare(`
+          SELECT settings FROM plugins WHERE id = 'email' AND status = 'active'
+        `).first() as { settings: string | null } | null
+
+        if (emailPlugin?.settings) {
+          const emailSettings = JSON.parse(emailPlugin.settings)
+
+          if (emailSettings.apiKey && emailSettings.fromEmail && emailSettings.fromName) {
+            // Send email via Resend API
+            const emailResponse = await fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${emailSettings.apiKey}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                from: `${emailSettings.fromName} <${emailSettings.fromEmail}>`,
+                to: [normalizedEmail],
+                subject: `Your login code for ${settings.appName}`,
+                html: emailContent.html,
+                text: emailContent.text,
+                reply_to: emailSettings.replyTo || emailSettings.fromEmail
+              })
+            })
+
+            if (!emailResponse.ok) {
+              const errorData = await emailResponse.json() as { message?: string }
+              console.error('Failed to send OTP email via Resend:', errorData)
+              // Don't expose error to user for security - just log it
+            }
+          } else {
+            console.warn('Email plugin is not fully configured (missing apiKey, fromEmail, or fromName)')
+          }
+        } else {
+          console.warn('Email plugin is not active or has no settings configured')
+        }
 
         const response: any = {
           message: 'If an account exists for this email, you will receive a verification code shortly.',
