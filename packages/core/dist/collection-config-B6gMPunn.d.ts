@@ -5,6 +5,12 @@
  * Collections can be defined in TypeScript/JSON files and synced to the database.
  */
 type FieldType = 'string' | 'number' | 'boolean' | 'date' | 'datetime' | 'email' | 'url' | 'richtext' | 'markdown' | 'json' | 'array' | 'object' | 'reference' | 'media' | 'select' | 'multiselect' | 'checkbox' | 'radio' | 'textarea' | 'slug' | 'color' | 'file';
+interface BlockDefinition {
+    label?: string;
+    description?: string;
+    properties: Record<string, FieldConfig>;
+}
+type BlockDefinitions = Record<string, BlockDefinition>;
 interface FieldConfig {
     type: FieldType;
     title?: string;
@@ -23,6 +29,8 @@ interface FieldConfig {
     collection?: string;
     items?: FieldConfig;
     properties?: Record<string, FieldConfig>;
+    blocks?: BlockDefinitions;
+    discriminator?: string;
     format?: string;
     widget?: string;
     dependsOn?: string;
@@ -104,4 +112,4 @@ interface CollectionSyncResult {
     error?: string;
 }
 
-export type { CollectionSchema as C, FieldType as F, FieldConfig as a, CollectionConfig as b, CollectionConfigModule as c, CollectionSyncResult as d };
+export type { BlockDefinition as B, CollectionSchema as C, FieldType as F, FieldConfig as a, BlockDefinitions as b, CollectionConfig as c, CollectionConfigModule as d, CollectionSyncResult as e };

@@ -9,6 +9,7 @@ import { isPluginActive } from '../middleware/plugin-middleware'
 import { getCacheService, CACHE_CONFIGS } from '../services/cache'
 import type { Bindings, Variables } from '../app'
 import { PluginService } from '../services/plugin-service'
+import { getBlocksFieldConfig, parseBlocksValue } from '../utils/blocks'
 
 const adminContentRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
@@ -586,6 +587,19 @@ adminContentRoutes.post('/', async (c) => {
     
     for (const field of fields) {
       const value = formData.get(field.field_name)
+      const blocksConfig = getBlocksFieldConfig(field.field_options)
+
+      if (blocksConfig) {
+        const parsed = parseBlocksValue(value, blocksConfig)
+        if (field.is_required && parsed.value.length === 0) {
+          parsed.errors.push(`${field.field_label} is required`)
+        }
+        if (parsed.errors.length > 0) {
+          errors[field.field_name] = parsed.errors
+        }
+        data[field.field_name] = parsed.value
+        continue
+      }
 
       // Validation
       if (field.is_required && (!value || value.toString().trim() === '')) {
@@ -783,7 +797,20 @@ adminContentRoutes.put('/:id', async (c) => {
     
     for (const field of fields) {
       const value = formData.get(field.field_name)
-      
+      const blocksConfig = getBlocksFieldConfig(field.field_options)
+
+      if (blocksConfig) {
+        const parsed = parseBlocksValue(value, blocksConfig)
+        if (field.is_required && parsed.value.length === 0) {
+          parsed.errors.push(`${field.field_label} is required`)
+        }
+        if (parsed.errors.length > 0) {
+          errors[field.field_name] = parsed.errors
+        }
+        data[field.field_name] = parsed.value
+        continue
+      }
+
       if (field.is_required && (!value || value.toString().trim() === '')) {
         errors[field.field_name] = [`${field.field_label} is required`]
         continue
@@ -970,7 +997,14 @@ adminContentRoutes.post('/preview', async (c) => {
     const data: any = {}
     for (const field of fields) {
       const value = formData.get(field.field_name)
-      
+      const blocksConfig = getBlocksFieldConfig(field.field_options)
+
+      if (blocksConfig) {
+        const parsed = parseBlocksValue(value, blocksConfig)
+        data[field.field_name] = parsed.value
+        continue
+      }
+
       switch (field.field_type) {
         case 'number':
           data[field.field_name] = value ? Number(value) : null

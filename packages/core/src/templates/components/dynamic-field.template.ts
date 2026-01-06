@@ -367,11 +367,11 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
       `
       break
 
-    case 'select':
-      const options = opts.options || []
+    case 'select': {
+      const selectOptions = opts.options || []
       const multiple = opts.multiple ? 'multiple' : ''
       const selectedValues = Array.isArray(value) ? value : [value]
-      
+
       fieldHTML = `
         <select 
           id="${fieldId}"
@@ -382,7 +382,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
           ${disabled ? 'disabled' : ''}
         >
           ${!required && !opts.multiple ? '<option value="">Choose an option...</option>' : ''}
-          ${options.map((option: any) => {
+          ${selectOptions.map((option: any) => {
             const optionValue = typeof option === 'string' ? option : option.value
             const optionLabel = typeof option === 'string' ? option : option.label
             const selected = selectedValues.includes(optionValue) ? 'selected' : ''
@@ -401,6 +401,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         ` : ''}
       `
       break
+    }
       
     case 'media':
       fieldHTML = `
@@ -434,6 +435,23 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
           </div>
         </div>
       `
+      break
+    case 'array':
+      if (opts.items && typeof opts.items === 'object' && opts.items.blocks) {
+        fieldHTML = renderBlocksField(field, options, baseClasses, errorClasses)
+      } else {
+        fieldHTML = `
+          <textarea
+            id="${fieldId}"
+            name="${fieldName}"
+            rows="${opts.rows || 6}"
+            placeholder="${opts.placeholder || 'Enter JSON array...'}"
+            class="${baseClasses} ${errorClasses} resize-y font-mono text-xs"
+            ${required}
+            ${disabled ? 'disabled' : ''}
+          >${escapeHtml(typeof value === 'string' ? value : JSON.stringify(value || []))}</textarea>
+        `
+      }
       break
 
     default:
@@ -490,6 +508,445 @@ export function renderFieldGroup(title: string, fields: string[], collapsible: b
         ${fields.join('')}
       </div>
     </div>
+  `
+}
+
+function renderBlocksField(
+  field: FieldDefinition,
+  options: FieldRenderOptions,
+  baseClasses: string,
+  errorClasses: string
+): string {
+  const { value = [], pluginStatuses = {} } = options
+  const opts = field.field_options || {}
+  const itemsConfig = opts.items && typeof opts.items === 'object' ? opts.items : {}
+  const blocks = normalizeBlockDefinitions(itemsConfig.blocks)
+  const discriminator = typeof itemsConfig.discriminator === 'string' && itemsConfig.discriminator
+    ? itemsConfig.discriminator
+    : 'blockType'
+  const blockValues = normalizeBlocksValue(value, discriminator)
+  const fieldId = `field-${field.field_name}`
+  const fieldName = field.field_name
+  const emptyState = blockValues.length === 0 ? `
+    <div class="rounded-lg border border-dashed border-zinc-200 dark:border-white/10 px-4 py-6 text-center text-sm text-zinc-500 dark:text-zinc-400" data-blocks-empty>
+      No blocks yet. Add your first block to get started.
+    </div>
+  ` : ''
+
+  const blockOptions = blocks.map((block) => (
+    `<option value="${escapeHtml(block.name)}">${escapeHtml(block.label)}</option>`
+  )).join('')
+
+  const blockItems = blockValues.map((blockValue, index) => (
+    renderBlockItem(field, blockValue, blocks, discriminator, index, pluginStatuses)
+  )).join('')
+
+  const templates = blocks.map((block) => (
+    renderBlockTemplate(field, block, discriminator, pluginStatuses)
+  )).join('')
+
+  return `
+    <div
+      class="blocks-field space-y-4"
+      data-blocks='${escapeHtml(JSON.stringify(blocks))}'
+      data-blocks-discriminator="${escapeHtml(discriminator)}"
+      data-field-name="${escapeHtml(fieldName)}"
+    >
+      <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml(JSON.stringify(blockValues))}">
+
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex-1">
+          <select
+            class="${baseClasses} ${errorClasses}"
+            data-role="block-type-select"
+          >
+            <option value="">Choose a block...</option>
+            ${blockOptions}
+          </select>
+        </div>
+        <button
+          type="button"
+          data-action="add-block"
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-white/10 dark:hover:bg-white/20"
+        >
+          Add Block
+        </button>
+      </div>
+
+      <div class="space-y-4" data-blocks-list>
+        ${blockItems || emptyState}
+      </div>
+
+      ${templates}
+    </div>
+    ${getBlocksFieldScript()}
+  `
+}
+
+function normalizeBlockDefinitions(rawBlocks: any): Array<{ name: string; label: string; description?: string; properties: Record<string, any> }> {
+  if (!rawBlocks || typeof rawBlocks !== 'object') return []
+
+  return Object.entries(rawBlocks)
+    .filter(([name, block]) => typeof name === 'string' && block && typeof block === 'object')
+    .map(([name, block]: [string, any]) => ({
+      name,
+      label: block.label || name,
+      description: block.description,
+      properties: block.properties && typeof block.properties === 'object' ? block.properties : {}
+    }))
+}
+
+function normalizeBlocksValue(value: any, discriminator: string): any[] {
+  const normalizeItem = (item: any) => {
+    if (!item || typeof item !== 'object') return null
+    if (item[discriminator]) return item
+    if (item.blockType && item.data && typeof item.data === 'object') {
+      return { [discriminator]: item.blockType, ...item.data }
+    }
+    return item
+  }
+
+  const fromArray = (items: any[]) => items
+    .map(normalizeItem)
+    .filter((item) => item && typeof item === 'object')
+
+  if (Array.isArray(value)) return fromArray(value)
+  if (typeof value === 'string' && value.trim()) {
+    try {
+      const parsed = JSON.parse(value)
+      return Array.isArray(parsed) ? fromArray(parsed) : []
+    } catch {
+      return []
+    }
+  }
+  return []
+}
+
+function renderBlockTemplate(
+  field: FieldDefinition,
+  block: { name: string; label: string; description?: string; properties: Record<string, any> },
+  discriminator: string,
+  pluginStatuses: FieldRenderOptions['pluginStatuses']
+): string {
+  return `
+    <template data-block-template="${escapeHtml(block.name)}">
+      ${renderBlockCard(field, block, discriminator, '__INDEX__', {}, pluginStatuses)}
+    </template>
+  `
+}
+
+function renderBlockItem(
+  field: FieldDefinition,
+  blockValue: any,
+  blocks: Array<{ name: string; label: string; description?: string; properties: Record<string, any> }>,
+  discriminator: string,
+  index: number,
+  pluginStatuses: FieldRenderOptions['pluginStatuses']
+): string {
+  const blockType = blockValue?.[discriminator] || blockValue?.blockType
+  const blockDefinition = blocks.find((block) => block.name === blockType)
+
+  if (!blockDefinition) {
+    return `
+      <div class="rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3 text-sm text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200" data-block-raw="${escapeHtml(JSON.stringify(blockValue || {}))}">
+        Unknown block type: <strong>${escapeHtml(String(blockType || 'unknown'))}</strong>. This block will be preserved as-is.
+      </div>
+    `
+  }
+
+  const data = blockValue && typeof blockValue === 'object'
+    ? Object.fromEntries(Object.entries(blockValue).filter(([key]) => key !== discriminator))
+    : {}
+
+  return renderBlockCard(field, blockDefinition, discriminator, String(index), data, pluginStatuses)
+}
+
+function renderBlockCard(
+  field: FieldDefinition,
+  block: { name: string; label: string; description?: string; properties: Record<string, any> },
+  discriminator: string,
+  index: string,
+  data: Record<string, any>,
+  pluginStatuses: FieldRenderOptions['pluginStatuses']
+): string {
+  const blockFields = Object.entries(block.properties).map(([fieldName, fieldConfig]) => {
+    if (fieldConfig?.type === 'array' && fieldConfig?.items?.blocks) {
+      return `
+        <div class="rounded-lg border border-dashed border-amber-200 bg-amber-50/50 px-4 py-3 text-xs text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+          Nested blocks are not supported yet for "${escapeHtml(fieldName)}".
+        </div>
+      `
+    }
+
+    const normalizedField = normalizeBlockField(fieldConfig, fieldName)
+    const fieldValue = data?.[fieldName] ?? normalizedField.defaultValue ?? ''
+    const fieldDefinition: FieldDefinition = {
+      id: `block-${field.field_name}-${index}-${fieldName}`,
+      field_name: `block-${field.field_name}-${index}-${fieldName}`,
+      field_type: normalizedField.type,
+      field_label: normalizedField.label,
+      field_options: normalizedField.options,
+      field_order: 0,
+      is_required: normalizedField.required,
+      is_searchable: false
+    }
+
+    return `
+      <div class="blocks-subfield" data-block-field="${escapeHtml(fieldName)}" data-field-type="${escapeHtml(normalizedField.type)}">
+        ${renderDynamicField(fieldDefinition, { value: fieldValue, pluginStatuses })}
+      </div>
+    `
+  }).join('')
+
+  return `
+    <div class="blocks-item rounded-lg border border-zinc-200 dark:border-white/10 bg-white/60 dark:bg-white/5 p-4 shadow-sm" data-block-type="${escapeHtml(block.name)}" data-block-discriminator="${escapeHtml(discriminator)}">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div class="text-sm font-semibold text-zinc-900 dark:text-white">
+            ${escapeHtml(block.label)}
+            <span class="ml-2 text-xs font-normal text-zinc-500 dark:text-zinc-400" data-block-order-label></span>
+          </div>
+          ${block.description ? `<p class="text-xs text-zinc-500 dark:text-zinc-400">${escapeHtml(block.description)}</p>` : ''}
+        </div>
+        <div class="flex flex-wrap gap-2 text-xs">
+          <button type="button" data-action="move-up" class="rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10">
+            Move Up
+          </button>
+          <button type="button" data-action="move-down" class="rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10">
+            Move Down
+          </button>
+          <button type="button" data-action="remove-block" class="rounded-md border border-rose-200 px-2 py-1 text-rose-600 hover:bg-rose-50 dark:border-rose-500/30 dark:text-rose-300 dark:hover:bg-rose-500/10">
+            Remove
+          </button>
+        </div>
+      </div>
+      <div class="mt-4 space-y-4">
+        ${blockFields}
+      </div>
+    </div>
+  `
+}
+
+function normalizeBlockField(fieldConfig: any, fieldName: string) {
+  const type = fieldConfig?.type || 'text'
+  const label = fieldConfig?.title || fieldName
+  const required = fieldConfig?.required === true
+  const options = { ...fieldConfig }
+
+  if (type === 'select' && Array.isArray(fieldConfig?.enum)) {
+    options.options = fieldConfig.enum.map((value: string, index: number) => ({
+      value,
+      label: fieldConfig.enumLabels?.[index] || value
+    }))
+  }
+
+  return {
+    type,
+    label,
+    required,
+    defaultValue: fieldConfig?.default,
+    options
+  }
+}
+
+function getBlocksFieldScript(): string {
+  return `
+    <script>
+      if (!window.__sonicBlocksFieldInit) {
+        window.__sonicBlocksFieldInit = true;
+
+        function initializeBlocksFields() {
+          document.querySelectorAll('.blocks-field').forEach((container) => {
+            if (container.dataset.blocksInitialized === 'true') {
+              return;
+            }
+
+            container.dataset.blocksInitialized = 'true';
+            const list = container.querySelector('[data-blocks-list]');
+            const hiddenInput = container.querySelector('input[type="hidden"]');
+            const typeSelect = container.querySelector('[data-role="block-type-select"]');
+            const discriminator = container.dataset.blocksDiscriminator || 'blockType';
+
+            const updateOrderLabels = () => {
+              const items = Array.from(container.querySelectorAll('.blocks-item'));
+              items.forEach((item, index) => {
+                const label = item.querySelector('[data-block-order-label]');
+                if (label) {
+                  label.textContent = '#'+ (index + 1);
+                }
+              });
+            };
+
+            const readFieldValue = (fieldWrapper) => {
+              const fieldType = fieldWrapper.dataset.fieldType;
+              const select = fieldWrapper.querySelector('select');
+              const textarea = fieldWrapper.querySelector('textarea');
+              const inputs = Array.from(fieldWrapper.querySelectorAll('input'));
+              const checkbox = inputs.find((input) => input.type === 'checkbox');
+              const nonHiddenInput = inputs.find((input) => input.type !== 'hidden' && input.type !== 'checkbox');
+              const hiddenInput = inputs.find((input) => input.type === 'hidden');
+
+              if (fieldType === 'boolean' && checkbox) {
+                return checkbox.checked;
+              }
+
+              if (select) {
+                if (select.multiple) {
+                  return Array.from(select.selectedOptions).map((option) => option.value);
+                }
+                return select.value;
+              }
+
+              if (fieldType === 'quill' || fieldType === 'media') {
+                return hiddenInput ? hiddenInput.value : '';
+              }
+
+              const textSource = textarea || nonHiddenInput || hiddenInput;
+              if (!textSource) {
+                return '';
+              }
+
+              if (fieldType === 'number') {
+                return textSource.value === '' ? null : Number(textSource.value);
+              }
+
+              return textSource.value;
+            };
+
+            const readBlockItem = (item) => {
+              if (item.dataset.blockRaw) {
+                try {
+                  return JSON.parse(item.dataset.blockRaw);
+                } catch (error) {
+                  return {};
+                }
+              }
+
+              const blockType = item.dataset.blockType;
+              const data = {};
+
+              item.querySelectorAll('.blocks-subfield').forEach((fieldWrapper) => {
+                const fieldName = fieldWrapper.dataset.blockField;
+                if (!fieldName) {
+                  return;
+                }
+                data[fieldName] = readFieldValue(fieldWrapper);
+              });
+
+              return { [discriminator]: blockType, ...data };
+            };
+
+            const updateHiddenInput = () => {
+              if (!hiddenInput || !list) return;
+              const items = Array.from(list.querySelectorAll('.blocks-item, [data-block-raw]'));
+              const blocksData = items.map((item) => readBlockItem(item));
+              hiddenInput.value = JSON.stringify(blocksData);
+
+              const emptyState = list.querySelector('[data-blocks-empty]');
+              if (emptyState) {
+                emptyState.style.display = blocksData.length === 0 ? 'block' : 'none';
+              }
+              updateOrderLabels();
+            };
+
+            const initializeEditors = () => {
+              if (typeof initializeTinyMCE === 'function') {
+                initializeTinyMCE();
+              }
+              if (typeof window.initializeQuillEditors === 'function') {
+                window.initializeQuillEditors();
+              }
+              if (typeof initializeMDXEditor === 'function') {
+                initializeMDXEditor();
+              }
+            };
+
+            container.addEventListener('click', (event) => {
+              const target = event.target;
+              if (!(target instanceof Element)) return;
+              const actionButton = target.closest('[data-action]');
+              if (!actionButton) return;
+
+              const action = actionButton.getAttribute('data-action');
+              if (action === 'add-block') {
+                const blockType = typeSelect ? typeSelect.value : '';
+                if (!blockType || !list) return;
+                const template = container.querySelector('template[data-block-template="' + blockType + '"]');
+                if (!template) return;
+
+                const nextIndex = list.querySelectorAll('.blocks-item').length;
+                const html = template.innerHTML.replace(/__INDEX__/g, String(nextIndex));
+                list.insertAdjacentHTML('beforeend', html);
+                if (typeSelect) {
+                  typeSelect.value = '';
+                }
+                initializeEditors();
+                updateHiddenInput();
+                return;
+              }
+
+              const item = actionButton.closest('.blocks-item');
+              if (!item || !list) return;
+
+              if (action === 'remove-block') {
+                item.remove();
+                updateHiddenInput();
+                return;
+              }
+
+              if (action === 'move-up') {
+                const previous = item.previousElementSibling;
+                if (previous) {
+                  list.insertBefore(item, previous);
+                  updateHiddenInput();
+                }
+                return;
+              }
+
+              if (action === 'move-down') {
+                const next = item.nextElementSibling;
+                if (next) {
+                  list.insertBefore(next, item);
+                  updateHiddenInput();
+                }
+              }
+            });
+
+            container.addEventListener('input', (event) => {
+              const target = event.target;
+              if (!(target instanceof Element)) return;
+              if (target.closest('[data-blocks-list]')) {
+                updateHiddenInput();
+              }
+            });
+
+            container.addEventListener('change', (event) => {
+              const target = event.target;
+              if (!(target instanceof Element)) return;
+              if (target.closest('[data-blocks-list]')) {
+                updateHiddenInput();
+              }
+            });
+
+            updateHiddenInput();
+          });
+        }
+
+        window.initializeBlocksFields = initializeBlocksFields;
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initializeBlocksFields);
+        } else {
+          initializeBlocksFields();
+        }
+
+        document.addEventListener('htmx:afterSwap', function() {
+          setTimeout(initializeBlocksFields, 50);
+        });
+      } else if (typeof window.initializeBlocksFields === 'function') {
+        window.initializeBlocksFields();
+      }
+    </script>
   `
 }
 

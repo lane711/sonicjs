@@ -9,10 +9,12 @@ import type { SonicJSConfig } from '@sonicjs-cms/core'
 
 // Import custom collections
 import blogPostsCollection from './collections/blog-posts.collection'
+import pageBlocksCollection from './collections/page-blocks.collection'
 
 // Register all custom collections
 registerCollections([
-  blogPostsCollection
+  blogPostsCollection,
+  pageBlocksCollection
 ])
 
 // Application configuration

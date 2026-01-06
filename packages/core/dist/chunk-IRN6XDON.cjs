@@ -1,3 +1,5 @@
+'use strict';
+
 // src/utils/sanitize.ts
 function escapeHtml(text) {
   if (typeof text !== "string") {
@@ -413,7 +415,7 @@ function buildQuery(table, filter) {
 // package.json
 var package_default = {
   name: "@sonicjs-cms/core",
-  version: "2.3.13",
+  version: "2.3.14",
   description: "Core framework for SonicJS headless CMS - Edge-first, TypeScript-native CMS built for Cloudflare Workers",
   type: "module",
   main: "./dist/index.cjs",
@@ -547,6 +549,63 @@ function getCoreVersion() {
   return SONICJS_VERSION;
 }
 
-export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, package_default, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer };
-//# sourceMappingURL=chunk-FHCN7KR2.js.map
-//# sourceMappingURL=chunk-FHCN7KR2.js.map
+// src/utils/blocks.ts
+function getBlocksFieldConfig(fieldOptions) {
+  if (!fieldOptions || typeof fieldOptions !== "object") return null;
+  const itemsConfig = fieldOptions.items && typeof fieldOptions.items === "object" ? fieldOptions.items : null;
+  if (!itemsConfig || !itemsConfig.blocks || typeof itemsConfig.blocks !== "object") {
+    return null;
+  }
+  const discriminator = typeof itemsConfig.discriminator === "string" && itemsConfig.discriminator ? itemsConfig.discriminator : "blockType";
+  return {
+    blocks: itemsConfig.blocks,
+    discriminator
+  };
+}
+function parseBlocksValue(value, config) {
+  const errors = [];
+  let rawValue = value;
+  if (rawValue === null || rawValue === void 0 || rawValue === "") {
+    return { value: [], errors };
+  }
+  if (typeof rawValue === "string") {
+    try {
+      rawValue = JSON.parse(rawValue);
+    } catch {
+      return { value: [], errors: ["Blocks value must be valid JSON"] };
+    }
+  }
+  if (!Array.isArray(rawValue)) {
+    return { value: [], errors: ["Blocks value must be an array"] };
+  }
+  const normalized = rawValue.map((item, index) => {
+    if (!item || typeof item !== "object") {
+      errors.push(`Block #${index + 1} must be an object`);
+      return null;
+    }
+    if (item.blockType && item.data && typeof item.data === "object") {
+      return { [config.discriminator]: item.blockType, ...item.data };
+    }
+    if (!(config.discriminator in item)) {
+      errors.push(`Block #${index + 1} is missing "${config.discriminator}"`);
+    }
+    return item;
+  }).filter((item) => item !== null);
+  return { value: normalized, errors };
+}
+
+exports.QueryFilterBuilder = QueryFilterBuilder;
+exports.SONICJS_VERSION = SONICJS_VERSION;
+exports.TemplateRenderer = TemplateRenderer;
+exports.buildQuery = buildQuery;
+exports.escapeHtml = escapeHtml;
+exports.getBlocksFieldConfig = getBlocksFieldConfig;
+exports.getCoreVersion = getCoreVersion;
+exports.package_default = package_default;
+exports.parseBlocksValue = parseBlocksValue;
+exports.renderTemplate = renderTemplate;
+exports.sanitizeInput = sanitizeInput;
+exports.sanitizeObject = sanitizeObject;
+exports.templateRenderer = templateRenderer;
+//# sourceMappingURL=chunk-IRN6XDON.cjs.map
+//# sourceMappingURL=chunk-IRN6XDON.cjs.map

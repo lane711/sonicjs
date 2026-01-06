@@ -1,11 +1,11 @@
 'use strict';
 
 var chunk7FOAMNTI_cjs = require('./chunk-7FOAMNTI.cjs');
-var chunkM336PWCK_cjs = require('./chunk-M336PWCK.cjs');
+var chunkIDQGNQY3_cjs = require('./chunk-IDQGNQY3.cjs');
 var chunkILZ3DP4I_cjs = require('./chunk-ILZ3DP4I.cjs');
-var chunkL5VY4H7C_cjs = require('./chunk-L5VY4H7C.cjs');
+var chunkG66PHIDW_cjs = require('./chunk-G66PHIDW.cjs');
 var chunkAZLU3ROK_cjs = require('./chunk-AZLU3ROK.cjs');
-var chunkW2IAEG4W_cjs = require('./chunk-W2IAEG4W.cjs');
+var chunkIRN6XDON_cjs = require('./chunk-IRN6XDON.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 var hono = require('hono');
 var cors = require('hono/cors');
@@ -44,7 +44,7 @@ apiContentCrudRoutes.get("/:id", async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.post("/", chunkM336PWCK_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.post("/", chunkIDQGNQY3_cjs.requireAuth(), async (c) => {
   try {
     const db = c.env.DB;
     const user = c.get("user");
@@ -110,7 +110,7 @@ apiContentCrudRoutes.post("/", chunkM336PWCK_cjs.requireAuth(), async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.put("/:id", chunkM336PWCK_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.put("/:id", chunkIDQGNQY3_cjs.requireAuth(), async (c) => {
   try {
     const id = c.req.param("id");
     const db = c.env.DB;
@@ -174,7 +174,7 @@ apiContentCrudRoutes.put("/:id", chunkM336PWCK_cjs.requireAuth(), async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.delete("/:id", chunkM336PWCK_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.delete("/:id", chunkIDQGNQY3_cjs.requireAuth(), async (c) => {
   try {
     const id = c.req.param("id");
     const db = c.env.DB;
@@ -210,7 +210,7 @@ apiRoutes.use("*", async (c, next) => {
   c.header("X-Response-Time", `${totalTime}ms`);
 });
 apiRoutes.use("*", async (c, next) => {
-  const cacheEnabled = await chunkM336PWCK_cjs.isPluginActive(c.env.DB, "core-cache");
+  const cacheEnabled = await chunkIDQGNQY3_cjs.isPluginActive(c.env.DB, "core-cache");
   c.set("cacheEnabled", cacheEnabled);
   await next();
 });
@@ -335,12 +335,12 @@ apiRoutes.get("/content", async (c) => {
         });
       }
     }
-    const filter = chunkW2IAEG4W_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunkIRN6XDON_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.limit) {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder3 = new chunkW2IAEG4W_cjs.QueryFilterBuilder();
+    const builder3 = new chunkIRN6XDON_cjs.QueryFilterBuilder();
     const queryResult = builder3.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -427,7 +427,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
     if (!collectionResult) {
       return c.json({ error: "Collection not found" }, 404);
     }
-    const filter = chunkW2IAEG4W_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunkIRN6XDON_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.where) {
       filter.where = { and: [] };
     }
@@ -443,7 +443,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder3 = new chunkW2IAEG4W_cjs.QueryFilterBuilder();
+    const builder3 = new chunkIRN6XDON_cjs.QueryFilterBuilder();
     const queryResult = builder3.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -568,7 +568,7 @@ var fileValidationSchema = zod.z.object({
   // 50MB max
 });
 var apiMediaRoutes = new hono.Hono();
-apiMediaRoutes.use("*", chunkM336PWCK_cjs.requireAuth());
+apiMediaRoutes.use("*", chunkIDQGNQY3_cjs.requireAuth());
 apiMediaRoutes.post("/upload", async (c) => {
   try {
     const user = c.get("user");
@@ -1312,8 +1312,8 @@ apiSystemRoutes.get("/env", (c) => {
 });
 var api_system_default = apiSystemRoutes;
 var adminApiRoutes = new hono.Hono();
-adminApiRoutes.use("*", chunkM336PWCK_cjs.requireAuth());
-adminApiRoutes.use("*", chunkM336PWCK_cjs.requireRole(["admin", "editor"]));
+adminApiRoutes.use("*", chunkIDQGNQY3_cjs.requireAuth());
+adminApiRoutes.use("*", chunkIDQGNQY3_cjs.requireRole(["admin", "editor"]));
 adminApiRoutes.get("/stats", async (c) => {
   try {
     const db = c.env.DB;
@@ -1722,7 +1722,7 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
 });
 adminApiRoutes.get("/migrations/status", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-7K6KMGVF.cjs');
+    const { MigrationService: MigrationService2 } = await import('./migrations-CTOAFORH.cjs');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const status = await migrationService.getMigrationStatus();
@@ -1747,7 +1747,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const { MigrationService: MigrationService2 } = await import('./migrations-7K6KMGVF.cjs');
+    const { MigrationService: MigrationService2 } = await import('./migrations-CTOAFORH.cjs');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const result = await migrationService.runPendingMigrations();
@@ -1766,7 +1766,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
 });
 adminApiRoutes.get("/migrations/validate", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-7K6KMGVF.cjs');
+    const { MigrationService: MigrationService2 } = await import('./migrations-CTOAFORH.cjs');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const validation = await migrationService.validateSchema();
@@ -2248,7 +2248,7 @@ authRoutes.post(
       if (existingUser) {
         return c.json({ error: "User with this email or username already exists" }, 400);
       }
-      const passwordHash = await chunkM336PWCK_cjs.AuthManager.hashPassword(password);
+      const passwordHash = await chunkIDQGNQY3_cjs.AuthManager.hashPassword(password);
       const userId = crypto.randomUUID();
       const now = /* @__PURE__ */ new Date();
       await db.prepare(`
@@ -2268,7 +2268,7 @@ authRoutes.post(
         now.getTime(),
         now.getTime()
       ).run();
-      const token = await chunkM336PWCK_cjs.AuthManager.generateToken(userId, normalizedEmail, "viewer");
+      const token = await chunkIDQGNQY3_cjs.AuthManager.generateToken(userId, normalizedEmail, "viewer");
       cookie.setCookie(c, "auth_token", token, {
         httpOnly: true,
         secure: true,
@@ -2321,11 +2321,11 @@ authRoutes.post("/login", async (c) => {
     if (!user) {
       return c.json({ error: "Invalid email or password" }, 401);
     }
-    const isValidPassword = await chunkM336PWCK_cjs.AuthManager.verifyPassword(password, user.password_hash);
+    const isValidPassword = await chunkIDQGNQY3_cjs.AuthManager.verifyPassword(password, user.password_hash);
     if (!isValidPassword) {
       return c.json({ error: "Invalid email or password" }, 401);
     }
-    const token = await chunkM336PWCK_cjs.AuthManager.generateToken(user.id, user.email, user.role);
+    const token = await chunkIDQGNQY3_cjs.AuthManager.generateToken(user.id, user.email, user.role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: true,
@@ -2374,7 +2374,7 @@ authRoutes.get("/logout", (c) => {
   });
   return c.redirect("/auth/login?message=You have been logged out successfully");
 });
-authRoutes.get("/me", chunkM336PWCK_cjs.requireAuth(), async (c) => {
+authRoutes.get("/me", chunkIDQGNQY3_cjs.requireAuth(), async (c) => {
   try {
     const user = c.get("user");
     if (!user) {
@@ -2391,13 +2391,13 @@ authRoutes.get("/me", chunkM336PWCK_cjs.requireAuth(), async (c) => {
     return c.json({ error: "Failed to get user" }, 500);
   }
 });
-authRoutes.post("/refresh", chunkM336PWCK_cjs.requireAuth(), async (c) => {
+authRoutes.post("/refresh", chunkIDQGNQY3_cjs.requireAuth(), async (c) => {
   try {
     const user = c.get("user");
     if (!user) {
       return c.json({ error: "Not authenticated" }, 401);
     }
-    const token = await chunkM336PWCK_cjs.AuthManager.generateToken(user.userId, user.email, user.role);
+    const token = await chunkIDQGNQY3_cjs.AuthManager.generateToken(user.userId, user.email, user.role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: true,
@@ -2457,7 +2457,7 @@ authRoutes.post("/register/form", async (c) => {
         </div>
       `);
     }
-    const passwordHash = await chunkM336PWCK_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await chunkIDQGNQY3_cjs.AuthManager.hashPassword(password);
     const role = isFirstUser ? "admin" : "viewer";
     const userId = crypto.randomUUID();
     const now = /* @__PURE__ */ new Date();
@@ -2477,7 +2477,7 @@ authRoutes.post("/register/form", async (c) => {
       now.getTime(),
       now.getTime()
     ).run();
-    const token = await chunkM336PWCK_cjs.AuthManager.generateToken(userId, normalizedEmail, role);
+    const token = await chunkIDQGNQY3_cjs.AuthManager.generateToken(userId, normalizedEmail, role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: false,
@@ -2529,7 +2529,7 @@ authRoutes.post("/login/form", async (c) => {
         </div>
       `);
     }
-    const isValidPassword = await chunkM336PWCK_cjs.AuthManager.verifyPassword(password, user.password_hash);
+    const isValidPassword = await chunkIDQGNQY3_cjs.AuthManager.verifyPassword(password, user.password_hash);
     if (!isValidPassword) {
       return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -2537,7 +2537,7 @@ authRoutes.post("/login/form", async (c) => {
         </div>
       `);
     }
-    const token = await chunkM336PWCK_cjs.AuthManager.generateToken(user.id, user.email, user.role);
+    const token = await chunkIDQGNQY3_cjs.AuthManager.generateToken(user.id, user.email, user.role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: false,
@@ -2596,7 +2596,7 @@ authRoutes.post("/seed-admin", async (c) => {
     `).run();
     const existingAdmin = await db.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind("admin@sonicjs.com", "admin").first();
     if (existingAdmin) {
-      const passwordHash2 = await chunkM336PWCK_cjs.AuthManager.hashPassword("sonicjs!");
+      const passwordHash2 = await chunkIDQGNQY3_cjs.AuthManager.hashPassword("sonicjs!");
       await db.prepare("UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?").bind(passwordHash2, Date.now(), existingAdmin.id).run();
       return c.json({
         message: "Admin user already exists (password updated)",
@@ -2608,7 +2608,7 @@ authRoutes.post("/seed-admin", async (c) => {
         }
       });
     }
-    const passwordHash = await chunkM336PWCK_cjs.AuthManager.hashPassword("sonicjs!");
+    const passwordHash = await chunkIDQGNQY3_cjs.AuthManager.hashPassword("sonicjs!");
     const userId = "admin-user-id";
     const now = Date.now();
     const adminEmail = "admin@sonicjs.com".toLowerCase();
@@ -2828,7 +2828,7 @@ authRoutes.post("/accept-invitation", async (c) => {
     if (existingUsername) {
       return c.json({ error: "Username is already taken" }, 400);
     }
-    const passwordHash = await chunkM336PWCK_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await chunkIDQGNQY3_cjs.AuthManager.hashPassword(password);
     const updateStmt = db.prepare(`
       UPDATE users SET 
         username = ?,
@@ -2847,7 +2847,7 @@ authRoutes.post("/accept-invitation", async (c) => {
       Date.now(),
       invitedUser.id
     ).run();
-    const authToken = await chunkM336PWCK_cjs.AuthManager.generateToken(invitedUser.id, invitedUser.email, invitedUser.role);
+    const authToken = await chunkIDQGNQY3_cjs.AuthManager.generateToken(invitedUser.id, invitedUser.email, invitedUser.role);
     cookie.setCookie(c, "auth_token", authToken, {
       httpOnly: true,
       secure: true,
@@ -3077,7 +3077,7 @@ authRoutes.post("/reset-password", async (c) => {
     if (Date.now() > user.password_reset_expires) {
       return c.json({ error: "Reset token has expired" }, 400);
     }
-    const newPasswordHash = await chunkM336PWCK_cjs.AuthManager.hashPassword(password);
+    const newPasswordHash = await chunkIDQGNQY3_cjs.AuthManager.hashPassword(password);
     try {
       const historyStmt = db.prepare(`
         INSERT INTO password_history (id, user_id, password_hash, created_at)
@@ -3656,8 +3656,8 @@ function renderDynamicField(field, options = {}) {
         </script>
       `;
       break;
-    case "select":
-      const options2 = opts.options || [];
+    case "select": {
+      const selectOptions = opts.options || [];
       const multiple = opts.multiple ? "multiple" : "";
       const selectedValues = Array.isArray(value) ? value : [value];
       fieldHTML = `
@@ -3670,7 +3670,7 @@ function renderDynamicField(field, options = {}) {
           ${disabled ? "disabled" : ""}
         >
           ${!required && !opts.multiple ? '<option value="">Choose an option...</option>' : ""}
-          ${options2.map((option) => {
+          ${selectOptions.map((option) => {
         const optionValue = typeof option === "string" ? option : option.value;
         const optionLabel = typeof option === "string" ? option : option.label;
         const selected = selectedValues.includes(optionValue) ? "selected" : "";
@@ -3689,6 +3689,7 @@ function renderDynamicField(field, options = {}) {
         ` : ""}
       `;
       break;
+    }
     case "media":
       fieldHTML = `
         <div class="media-field-container">
@@ -3721,6 +3722,23 @@ function renderDynamicField(field, options = {}) {
           </div>
         </div>
       `;
+      break;
+    case "array":
+      if (opts.items && typeof opts.items === "object" && opts.items.blocks) {
+        fieldHTML = renderBlocksField(field, options, baseClasses, errorClasses);
+      } else {
+        fieldHTML = `
+          <textarea
+            id="${fieldId}"
+            name="${fieldName}"
+            rows="${opts.rows || 6}"
+            placeholder="${opts.placeholder || "Enter JSON array..."}"
+            class="${baseClasses} ${errorClasses} resize-y font-mono text-xs"
+            ${required}
+            ${disabled ? "disabled" : ""}
+          >${escapeHtml2(typeof value === "string" ? value : JSON.stringify(value || []))}</textarea>
+        `;
+      }
       break;
     default:
       fieldHTML = `
@@ -3773,6 +3791,381 @@ function renderFieldGroup(title, fields, collapsible = false) {
         ${fields.join("")}
       </div>
     </div>
+  `;
+}
+function renderBlocksField(field, options, baseClasses, errorClasses) {
+  const { value = [], pluginStatuses = {} } = options;
+  const opts = field.field_options || {};
+  const itemsConfig = opts.items && typeof opts.items === "object" ? opts.items : {};
+  const blocks = normalizeBlockDefinitions(itemsConfig.blocks);
+  const discriminator = typeof itemsConfig.discriminator === "string" && itemsConfig.discriminator ? itemsConfig.discriminator : "blockType";
+  const blockValues = normalizeBlocksValue(value, discriminator);
+  const fieldId = `field-${field.field_name}`;
+  const fieldName = field.field_name;
+  const emptyState = blockValues.length === 0 ? `
+    <div class="rounded-lg border border-dashed border-zinc-200 dark:border-white/10 px-4 py-6 text-center text-sm text-zinc-500 dark:text-zinc-400" data-blocks-empty>
+      No blocks yet. Add your first block to get started.
+    </div>
+  ` : "";
+  const blockOptions = blocks.map((block) => `<option value="${escapeHtml2(block.name)}">${escapeHtml2(block.label)}</option>`).join("");
+  const blockItems = blockValues.map((blockValue, index) => renderBlockItem(field, blockValue, blocks, discriminator, index, pluginStatuses)).join("");
+  const templates = blocks.map((block) => renderBlockTemplate(field, block, discriminator, pluginStatuses)).join("");
+  return `
+    <div
+      class="blocks-field space-y-4"
+      data-blocks='${escapeHtml2(JSON.stringify(blocks))}'
+      data-blocks-discriminator="${escapeHtml2(discriminator)}"
+      data-field-name="${escapeHtml2(fieldName)}"
+    >
+      <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml2(JSON.stringify(blockValues))}">
+
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex-1">
+          <select
+            class="${baseClasses} ${errorClasses}"
+            data-role="block-type-select"
+          >
+            <option value="">Choose a block...</option>
+            ${blockOptions}
+          </select>
+        </div>
+        <button
+          type="button"
+          data-action="add-block"
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-white/10 dark:hover:bg-white/20"
+        >
+          Add Block
+        </button>
+      </div>
+
+      <div class="space-y-4" data-blocks-list>
+        ${blockItems || emptyState}
+      </div>
+
+      ${templates}
+    </div>
+    ${getBlocksFieldScript()}
+  `;
+}
+function normalizeBlockDefinitions(rawBlocks) {
+  if (!rawBlocks || typeof rawBlocks !== "object") return [];
+  return Object.entries(rawBlocks).filter(([name, block]) => typeof name === "string" && block && typeof block === "object").map(([name, block]) => ({
+    name,
+    label: block.label || name,
+    description: block.description,
+    properties: block.properties && typeof block.properties === "object" ? block.properties : {}
+  }));
+}
+function normalizeBlocksValue(value, discriminator) {
+  const normalizeItem = (item) => {
+    if (!item || typeof item !== "object") return null;
+    if (item[discriminator]) return item;
+    if (item.blockType && item.data && typeof item.data === "object") {
+      return { [discriminator]: item.blockType, ...item.data };
+    }
+    return item;
+  };
+  const fromArray = (items) => items.map(normalizeItem).filter((item) => item && typeof item === "object");
+  if (Array.isArray(value)) return fromArray(value);
+  if (typeof value === "string" && value.trim()) {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? fromArray(parsed) : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+function renderBlockTemplate(field, block, discriminator, pluginStatuses) {
+  return `
+    <template data-block-template="${escapeHtml2(block.name)}">
+      ${renderBlockCard(field, block, discriminator, "__INDEX__", {}, pluginStatuses)}
+    </template>
+  `;
+}
+function renderBlockItem(field, blockValue, blocks, discriminator, index, pluginStatuses) {
+  const blockType = blockValue?.[discriminator] || blockValue?.blockType;
+  const blockDefinition = blocks.find((block) => block.name === blockType);
+  if (!blockDefinition) {
+    return `
+      <div class="rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3 text-sm text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200" data-block-raw="${escapeHtml2(JSON.stringify(blockValue || {}))}">
+        Unknown block type: <strong>${escapeHtml2(String(blockType || "unknown"))}</strong>. This block will be preserved as-is.
+      </div>
+    `;
+  }
+  const data = blockValue && typeof blockValue === "object" ? Object.fromEntries(Object.entries(blockValue).filter(([key]) => key !== discriminator)) : {};
+  return renderBlockCard(field, blockDefinition, discriminator, String(index), data, pluginStatuses);
+}
+function renderBlockCard(field, block, discriminator, index, data, pluginStatuses) {
+  const blockFields = Object.entries(block.properties).map(([fieldName, fieldConfig]) => {
+    if (fieldConfig?.type === "array" && fieldConfig?.items?.blocks) {
+      return `
+        <div class="rounded-lg border border-dashed border-amber-200 bg-amber-50/50 px-4 py-3 text-xs text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+          Nested blocks are not supported yet for "${escapeHtml2(fieldName)}".
+        </div>
+      `;
+    }
+    const normalizedField = normalizeBlockField(fieldConfig, fieldName);
+    const fieldValue = data?.[fieldName] ?? normalizedField.defaultValue ?? "";
+    const fieldDefinition = {
+      id: `block-${field.field_name}-${index}-${fieldName}`,
+      field_name: `block-${field.field_name}-${index}-${fieldName}`,
+      field_type: normalizedField.type,
+      field_label: normalizedField.label,
+      field_options: normalizedField.options,
+      is_required: normalizedField.required};
+    return `
+      <div class="blocks-subfield" data-block-field="${escapeHtml2(fieldName)}" data-field-type="${escapeHtml2(normalizedField.type)}">
+        ${renderDynamicField(fieldDefinition, { value: fieldValue, pluginStatuses })}
+      </div>
+    `;
+  }).join("");
+  return `
+    <div class="blocks-item rounded-lg border border-zinc-200 dark:border-white/10 bg-white/60 dark:bg-white/5 p-4 shadow-sm" data-block-type="${escapeHtml2(block.name)}" data-block-discriminator="${escapeHtml2(discriminator)}">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div class="text-sm font-semibold text-zinc-900 dark:text-white">
+            ${escapeHtml2(block.label)}
+            <span class="ml-2 text-xs font-normal text-zinc-500 dark:text-zinc-400" data-block-order-label></span>
+          </div>
+          ${block.description ? `<p class="text-xs text-zinc-500 dark:text-zinc-400">${escapeHtml2(block.description)}</p>` : ""}
+        </div>
+        <div class="flex flex-wrap gap-2 text-xs">
+          <button type="button" data-action="move-up" class="rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10">
+            Move Up
+          </button>
+          <button type="button" data-action="move-down" class="rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10">
+            Move Down
+          </button>
+          <button type="button" data-action="remove-block" class="rounded-md border border-rose-200 px-2 py-1 text-rose-600 hover:bg-rose-50 dark:border-rose-500/30 dark:text-rose-300 dark:hover:bg-rose-500/10">
+            Remove
+          </button>
+        </div>
+      </div>
+      <div class="mt-4 space-y-4">
+        ${blockFields}
+      </div>
+    </div>
+  `;
+}
+function normalizeBlockField(fieldConfig, fieldName) {
+  const type = fieldConfig?.type || "text";
+  const label = fieldConfig?.title || fieldName;
+  const required = fieldConfig?.required === true;
+  const options = { ...fieldConfig };
+  if (type === "select" && Array.isArray(fieldConfig?.enum)) {
+    options.options = fieldConfig.enum.map((value, index) => ({
+      value,
+      label: fieldConfig.enumLabels?.[index] || value
+    }));
+  }
+  return {
+    type,
+    label,
+    required,
+    defaultValue: fieldConfig?.default,
+    options
+  };
+}
+function getBlocksFieldScript() {
+  return `
+    <script>
+      if (!window.__sonicBlocksFieldInit) {
+        window.__sonicBlocksFieldInit = true;
+
+        function initializeBlocksFields() {
+          document.querySelectorAll('.blocks-field').forEach((container) => {
+            if (container.dataset.blocksInitialized === 'true') {
+              return;
+            }
+
+            container.dataset.blocksInitialized = 'true';
+            const list = container.querySelector('[data-blocks-list]');
+            const hiddenInput = container.querySelector('input[type="hidden"]');
+            const typeSelect = container.querySelector('[data-role="block-type-select"]');
+            const discriminator = container.dataset.blocksDiscriminator || 'blockType';
+
+            const updateOrderLabels = () => {
+              const items = Array.from(container.querySelectorAll('.blocks-item'));
+              items.forEach((item, index) => {
+                const label = item.querySelector('[data-block-order-label]');
+                if (label) {
+                  label.textContent = '#'+ (index + 1);
+                }
+              });
+            };
+
+            const readFieldValue = (fieldWrapper) => {
+              const fieldType = fieldWrapper.dataset.fieldType;
+              const select = fieldWrapper.querySelector('select');
+              const textarea = fieldWrapper.querySelector('textarea');
+              const inputs = Array.from(fieldWrapper.querySelectorAll('input'));
+              const checkbox = inputs.find((input) => input.type === 'checkbox');
+              const nonHiddenInput = inputs.find((input) => input.type !== 'hidden' && input.type !== 'checkbox');
+              const hiddenInput = inputs.find((input) => input.type === 'hidden');
+
+              if (fieldType === 'boolean' && checkbox) {
+                return checkbox.checked;
+              }
+
+              if (select) {
+                if (select.multiple) {
+                  return Array.from(select.selectedOptions).map((option) => option.value);
+                }
+                return select.value;
+              }
+
+              if (fieldType === 'quill' || fieldType === 'media') {
+                return hiddenInput ? hiddenInput.value : '';
+              }
+
+              const textSource = textarea || nonHiddenInput || hiddenInput;
+              if (!textSource) {
+                return '';
+              }
+
+              if (fieldType === 'number') {
+                return textSource.value === '' ? null : Number(textSource.value);
+              }
+
+              return textSource.value;
+            };
+
+            const readBlockItem = (item) => {
+              if (item.dataset.blockRaw) {
+                try {
+                  return JSON.parse(item.dataset.blockRaw);
+                } catch (error) {
+                  return {};
+                }
+              }
+
+              const blockType = item.dataset.blockType;
+              const data = {};
+
+              item.querySelectorAll('.blocks-subfield').forEach((fieldWrapper) => {
+                const fieldName = fieldWrapper.dataset.blockField;
+                if (!fieldName) {
+                  return;
+                }
+                data[fieldName] = readFieldValue(fieldWrapper);
+              });
+
+              return { [discriminator]: blockType, ...data };
+            };
+
+            const updateHiddenInput = () => {
+              if (!hiddenInput || !list) return;
+              const items = Array.from(list.querySelectorAll('.blocks-item, [data-block-raw]'));
+              const blocksData = items.map((item) => readBlockItem(item));
+              hiddenInput.value = JSON.stringify(blocksData);
+
+              const emptyState = list.querySelector('[data-blocks-empty]');
+              if (emptyState) {
+                emptyState.style.display = blocksData.length === 0 ? 'block' : 'none';
+              }
+              updateOrderLabels();
+            };
+
+            const initializeEditors = () => {
+              if (typeof initializeTinyMCE === 'function') {
+                initializeTinyMCE();
+              }
+              if (typeof window.initializeQuillEditors === 'function') {
+                window.initializeQuillEditors();
+              }
+              if (typeof initializeMDXEditor === 'function') {
+                initializeMDXEditor();
+              }
+            };
+
+            container.addEventListener('click', (event) => {
+              const target = event.target;
+              if (!(target instanceof Element)) return;
+              const actionButton = target.closest('[data-action]');
+              if (!actionButton) return;
+
+              const action = actionButton.getAttribute('data-action');
+              if (action === 'add-block') {
+                const blockType = typeSelect ? typeSelect.value : '';
+                if (!blockType || !list) return;
+                const template = container.querySelector('template[data-block-template="' + blockType + '"]');
+                if (!template) return;
+
+                const nextIndex = list.querySelectorAll('.blocks-item').length;
+                const html = template.innerHTML.replace(/__INDEX__/g, String(nextIndex));
+                list.insertAdjacentHTML('beforeend', html);
+                if (typeSelect) {
+                  typeSelect.value = '';
+                }
+                initializeEditors();
+                updateHiddenInput();
+                return;
+              }
+
+              const item = actionButton.closest('.blocks-item');
+              if (!item || !list) return;
+
+              if (action === 'remove-block') {
+                item.remove();
+                updateHiddenInput();
+                return;
+              }
+
+              if (action === 'move-up') {
+                const previous = item.previousElementSibling;
+                if (previous) {
+                  list.insertBefore(item, previous);
+                  updateHiddenInput();
+                }
+                return;
+              }
+
+              if (action === 'move-down') {
+                const next = item.nextElementSibling;
+                if (next) {
+                  list.insertBefore(next, item);
+                  updateHiddenInput();
+                }
+              }
+            });
+
+            container.addEventListener('input', (event) => {
+              const target = event.target;
+              if (!(target instanceof Element)) return;
+              if (target.closest('[data-blocks-list]')) {
+                updateHiddenInput();
+              }
+            });
+
+            container.addEventListener('change', (event) => {
+              const target = event.target;
+              if (!(target instanceof Element)) return;
+              if (target.closest('[data-blocks-list]')) {
+                updateHiddenInput();
+              }
+            });
+
+            updateHiddenInput();
+          });
+        }
+
+        window.initializeBlocksFields = initializeBlocksFields;
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initializeBlocksFields);
+        } else {
+          initializeBlocksFields();
+        }
+
+        document.addEventListener('htmx:afterSwap', function() {
+          setTimeout(initializeBlocksFields, 50);
+        });
+      } else if (typeof window.initializeBlocksFields === 'function') {
+        window.initializeBlocksFields();
+      }
+    </script>
   `;
 }
 function escapeHtml2(text) {
@@ -5979,7 +6372,7 @@ async function isPluginActive2(db, pluginId) {
 
 // src/routes/admin-content.ts
 var adminContentRoutes = new hono.Hono();
-adminContentRoutes.use("*", chunkM336PWCK_cjs.requireAuth());
+adminContentRoutes.use("*", chunkIDQGNQY3_cjs.requireAuth());
 async function getCollectionFields(db, collectionId) {
   const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.collection);
   return cache.getOrSet(
@@ -6456,6 +6849,18 @@ adminContentRoutes.post("/", async (c) => {
     const errors = {};
     for (const field of fields) {
       const value = formData.get(field.field_name);
+      const blocksConfig = chunkIRN6XDON_cjs.getBlocksFieldConfig(field.field_options);
+      if (blocksConfig) {
+        const parsed = chunkIRN6XDON_cjs.parseBlocksValue(value, blocksConfig);
+        if (field.is_required && parsed.value.length === 0) {
+          parsed.errors.push(`${field.field_label} is required`);
+        }
+        if (parsed.errors.length > 0) {
+          errors[field.field_name] = parsed.errors;
+        }
+        data[field.field_name] = parsed.value;
+        continue;
+      }
       if (field.is_required && (!value || value.toString().trim() === "")) {
         errors[field.field_name] = [`${field.field_label} is required`];
         continue;
@@ -6602,6 +7007,18 @@ adminContentRoutes.put("/:id", async (c) => {
     const errors = {};
     for (const field of fields) {
       const value = formData.get(field.field_name);
+      const blocksConfig = chunkIRN6XDON_cjs.getBlocksFieldConfig(field.field_options);
+      if (blocksConfig) {
+        const parsed = chunkIRN6XDON_cjs.parseBlocksValue(value, blocksConfig);
+        if (field.is_required && parsed.value.length === 0) {
+          parsed.errors.push(`${field.field_label} is required`);
+        }
+        if (parsed.errors.length > 0) {
+          errors[field.field_name] = parsed.errors;
+        }
+        data[field.field_name] = parsed.value;
+        continue;
+      }
       if (field.is_required && (!value || value.toString().trim() === "")) {
         errors[field.field_name] = [`${field.field_label} is required`];
         continue;
@@ -6743,6 +7160,12 @@ adminContentRoutes.post("/preview", async (c) => {
     const data = {};
     for (const field of fields) {
       const value = formData.get(field.field_name);
+      const blocksConfig = chunkIRN6XDON_cjs.getBlocksFieldConfig(field.field_options);
+      if (blocksConfig) {
+        const parsed = chunkIRN6XDON_cjs.parseBlocksValue(value, blocksConfig);
+        data[field.field_name] = parsed.value;
+        continue;
+      }
       switch (field.field_type) {
         case "number":
           data[field.field_name] = value ? Number(value) : null;
@@ -8040,7 +8463,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="first_name"
-                      value="${chunkW2IAEG4W_cjs.escapeHtml(data.userToEdit.firstName || "")}"
+                      value="${chunkIRN6XDON_cjs.escapeHtml(data.userToEdit.firstName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -8051,7 +8474,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="last_name"
-                      value="${chunkW2IAEG4W_cjs.escapeHtml(data.userToEdit.lastName || "")}"
+                      value="${chunkIRN6XDON_cjs.escapeHtml(data.userToEdit.lastName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -8062,7 +8485,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="username"
-                      value="${chunkW2IAEG4W_cjs.escapeHtml(data.userToEdit.username || "")}"
+                      value="${chunkIRN6XDON_cjs.escapeHtml(data.userToEdit.username || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -8073,7 +8496,7 @@ function renderUserEditPage(data) {
                     <input
                       type="email"
                       name="email"
-                      value="${chunkW2IAEG4W_cjs.escapeHtml(data.userToEdit.email || "")}"
+                      value="${chunkIRN6XDON_cjs.escapeHtml(data.userToEdit.email || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -8084,7 +8507,7 @@ function renderUserEditPage(data) {
                     <input
                       type="tel"
                       name="phone"
-                      value="${chunkW2IAEG4W_cjs.escapeHtml(data.userToEdit.phone || "")}"
+                      value="${chunkIRN6XDON_cjs.escapeHtml(data.userToEdit.phone || "")}"
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
                   </div>
@@ -8098,7 +8521,7 @@ function renderUserEditPage(data) {
                         class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-zinc-500/30 dark:outline-zinc-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-500 dark:focus-visible:outline-zinc-400 sm:text-sm/6"
                       >
                         ${data.roles.map((role) => `
-                          <option value="${chunkW2IAEG4W_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunkW2IAEG4W_cjs.escapeHtml(role.label)}</option>
+                          <option value="${chunkIRN6XDON_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunkIRN6XDON_cjs.escapeHtml(role.label)}</option>
                         `).join("")}
                       </select>
                       <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-zinc-600 dark:text-zinc-400 sm:size-4">
@@ -8114,7 +8537,7 @@ function renderUserEditPage(data) {
                     name="bio"
                     rows="3"
                     class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-                  >${chunkW2IAEG4W_cjs.escapeHtml(data.userToEdit.bio || "")}</textarea>
+                  >${chunkIRN6XDON_cjs.escapeHtml(data.userToEdit.bio || "")}</textarea>
                 </div>
               </div>
 
@@ -9014,7 +9437,7 @@ function renderUsersListPage(data) {
 
 // src/routes/admin-users.ts
 var userRoutes = new hono.Hono();
-userRoutes.use("*", chunkM336PWCK_cjs.requireAuth());
+userRoutes.use("*", chunkIDQGNQY3_cjs.requireAuth());
 userRoutes.get("/", (c) => {
   return c.redirect("/admin/dashboard");
 });
@@ -9113,12 +9536,12 @@ userRoutes.put("/profile", async (c) => {
   const db = c.env.DB;
   try {
     const formData = await c.req.formData();
-    const firstName = chunkW2IAEG4W_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkW2IAEG4W_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkW2IAEG4W_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkIRN6XDON_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkIRN6XDON_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkIRN6XDON_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkW2IAEG4W_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkW2IAEG4W_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkIRN6XDON_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkIRN6XDON_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const timezone = formData.get("timezone")?.toString() || "UTC";
     const language = formData.get("language")?.toString() || "en";
     const emailNotifications = formData.get("email_notifications") === "1";
@@ -9169,7 +9592,7 @@ userRoutes.put("/profile", async (c) => {
       Date.now(),
       user.userId
     ).run();
-    await chunkM336PWCK_cjs.logActivity(
+    await chunkIDQGNQY3_cjs.logActivity(
       db,
       user.userId,
       "profile.update",
@@ -9232,7 +9655,7 @@ userRoutes.post("/profile/avatar", async (c) => {
       SELECT first_name, last_name FROM users WHERE id = ?
     `);
     const userData = await userStmt.bind(user.userId).first();
-    await chunkM336PWCK_cjs.logActivity(
+    await chunkIDQGNQY3_cjs.logActivity(
       db,
       user.userId,
       "profile.avatar_update",
@@ -9303,7 +9726,7 @@ userRoutes.post("/profile/password", async (c) => {
         dismissible: true
       }));
     }
-    const validPassword = await chunkM336PWCK_cjs.AuthManager.verifyPassword(currentPassword, userData.password_hash);
+    const validPassword = await chunkIDQGNQY3_cjs.AuthManager.verifyPassword(currentPassword, userData.password_hash);
     if (!validPassword) {
       return c.html(renderAlert2({
         type: "error",
@@ -9311,7 +9734,7 @@ userRoutes.post("/profile/password", async (c) => {
         dismissible: true
       }));
     }
-    const newPasswordHash = await chunkM336PWCK_cjs.AuthManager.hashPassword(newPassword);
+    const newPasswordHash = await chunkIDQGNQY3_cjs.AuthManager.hashPassword(newPassword);
     const historyStmt = db.prepare(`
       INSERT INTO password_history (id, user_id, password_hash, created_at)
       VALUES (?, ?, ?, ?)
@@ -9327,7 +9750,7 @@ userRoutes.post("/profile/password", async (c) => {
       WHERE id = ?
     `);
     await updateStmt.bind(newPasswordHash, Date.now(), user.userId).run();
-    await chunkM336PWCK_cjs.logActivity(
+    await chunkIDQGNQY3_cjs.logActivity(
       db,
       user.userId,
       "profile.password_change",
@@ -9394,7 +9817,7 @@ userRoutes.get("/users", async (c) => {
     `);
     const countResult = await countStmt.bind(...params).first();
     const totalUsers = countResult?.total || 0;
-    await chunkM336PWCK_cjs.logActivity(
+    await chunkIDQGNQY3_cjs.logActivity(
       db,
       user.userId,
       "users.list_view",
@@ -9496,12 +9919,12 @@ userRoutes.post("/users/new", async (c) => {
   const user = c.get("user");
   try {
     const formData = await c.req.formData();
-    const firstName = chunkW2IAEG4W_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkW2IAEG4W_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkW2IAEG4W_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkIRN6XDON_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkIRN6XDON_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkIRN6XDON_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkW2IAEG4W_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkW2IAEG4W_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkIRN6XDON_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkIRN6XDON_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const password = formData.get("password")?.toString() || "";
     const confirmPassword = formData.get("confirm_password")?.toString() || "";
@@ -9548,7 +9971,7 @@ userRoutes.post("/users/new", async (c) => {
         dismissible: true
       }));
     }
-    const passwordHash = await chunkM336PWCK_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await chunkIDQGNQY3_cjs.AuthManager.hashPassword(password);
     const userId = crypto.randomUUID();
     const createStmt = db.prepare(`
       INSERT INTO users (
@@ -9571,7 +9994,7 @@ userRoutes.post("/users/new", async (c) => {
       Date.now(),
       Date.now()
     ).run();
-    await chunkM336PWCK_cjs.logActivity(
+    await chunkIDQGNQY3_cjs.logActivity(
       db,
       user.userId,
       "user!.create",
@@ -9609,7 +10032,7 @@ userRoutes.get("/users/:id", async (c) => {
     if (!userRecord) {
       return c.json({ error: "User not found" }, 404);
     }
-    await chunkM336PWCK_cjs.logActivity(
+    await chunkIDQGNQY3_cjs.logActivity(
       db,
       user.userId,
       "user!.view",
@@ -9702,12 +10125,12 @@ userRoutes.put("/users/:id", async (c) => {
   const userId = c.req.param("id");
   try {
     const formData = await c.req.formData();
-    const firstName = chunkW2IAEG4W_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkW2IAEG4W_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkW2IAEG4W_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkIRN6XDON_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkIRN6XDON_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkIRN6XDON_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkW2IAEG4W_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkW2IAEG4W_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkIRN6XDON_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkIRN6XDON_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const isActive = formData.get("is_active") === "1";
     const emailVerified = formData.get("email_verified") === "1";
@@ -9758,7 +10181,7 @@ userRoutes.put("/users/:id", async (c) => {
       Date.now(),
       userId
     ).run();
-    await chunkM336PWCK_cjs.logActivity(
+    await chunkIDQGNQY3_cjs.logActivity(
       db,
       user.userId,
       "user!.update",
@@ -9803,7 +10226,7 @@ userRoutes.post("/users/:id/toggle", async (c) => {
       UPDATE users SET is_active = ?, updated_at = ? WHERE id = ?
     `);
     await toggleStmt.bind(active ? 1 : 0, Date.now(), userId).run();
-    await chunkM336PWCK_cjs.logActivity(
+    await chunkIDQGNQY3_cjs.logActivity(
       db,
       user.userId,
       active ? "user.activate" : "user.deactivate",
@@ -9844,7 +10267,7 @@ userRoutes.delete("/users/:id", async (c) => {
         DELETE FROM users WHERE id = ?
       `);
       await deleteStmt.bind(userId).run();
-      await chunkM336PWCK_cjs.logActivity(
+      await chunkIDQGNQY3_cjs.logActivity(
         db,
         user.userId,
         "user!.hard_delete",
@@ -9863,7 +10286,7 @@ userRoutes.delete("/users/:id", async (c) => {
         UPDATE users SET is_active = 0, updated_at = ? WHERE id = ?
       `);
       await deleteStmt.bind(Date.now(), userId).run();
-      await chunkM336PWCK_cjs.logActivity(
+      await chunkIDQGNQY3_cjs.logActivity(
         db,
         user.userId,
         "user!.soft_delete",
@@ -9890,8 +10313,8 @@ userRoutes.post("/invite-user", async (c) => {
     const formData = await c.req.formData();
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
     const role = formData.get("role")?.toString()?.trim() || "viewer";
-    const firstName = chunkW2IAEG4W_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkW2IAEG4W_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const firstName = chunkIRN6XDON_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkIRN6XDON_cjs.sanitizeInput(formData.get("last_name")?.toString());
     if (!email || !firstName || !lastName) {
       return c.json({ error: "Email, first name, and last name are required" }, 400);
     }
@@ -9929,7 +10352,7 @@ userRoutes.post("/invite-user", async (c) => {
       Date.now(),
       Date.now()
     ).run();
-    await chunkM336PWCK_cjs.logActivity(
+    await chunkIDQGNQY3_cjs.logActivity(
       db,
       user.userId,
       "user!.invite_sent",
@@ -9986,7 +10409,7 @@ userRoutes.post("/resend-invitation/:id", async (c) => {
       Date.now(),
       userId
     ).run();
-    await chunkM336PWCK_cjs.logActivity(
+    await chunkIDQGNQY3_cjs.logActivity(
       db,
       user.userId,
       "user!.invitation_resent",
@@ -10022,7 +10445,7 @@ userRoutes.delete("/cancel-invitation/:id", async (c) => {
     }
     const deleteStmt = db.prepare(`DELETE FROM users WHERE id = ?`);
     await deleteStmt.bind(userId).run();
-    await chunkM336PWCK_cjs.logActivity(
+    await chunkIDQGNQY3_cjs.logActivity(
       db,
       user.userId,
       "user!.invitation_cancelled",
@@ -10105,7 +10528,7 @@ userRoutes.get("/activity-logs", async (c) => {
       ...log,
       details: log.details ? JSON.parse(log.details) : null
     }));
-    await chunkM336PWCK_cjs.logActivity(
+    await chunkIDQGNQY3_cjs.logActivity(
       db,
       user.userId,
       "activity.logs_viewed",
@@ -10212,7 +10635,7 @@ userRoutes.get("/activity-logs/export", async (c) => {
       csvRows.push(row.join(","));
     }
     const csvContent = csvRows.join("\n");
-    await chunkM336PWCK_cjs.logActivity(
+    await chunkIDQGNQY3_cjs.logActivity(
       db,
       user.userId,
       "activity.logs_exported",
@@ -11551,7 +11974,7 @@ var fileValidationSchema2 = zod.z.object({
   // 50MB max
 });
 var adminMediaRoutes = new hono.Hono();
-adminMediaRoutes.use("*", chunkM336PWCK_cjs.requireAuth());
+adminMediaRoutes.use("*", chunkIDQGNQY3_cjs.requireAuth());
 adminMediaRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -12137,7 +12560,7 @@ adminMediaRoutes.put("/:id", async (c) => {
     `);
   }
 });
-adminMediaRoutes.delete("/cleanup", chunkM336PWCK_cjs.requireRole("admin"), async (c) => {
+adminMediaRoutes.delete("/cleanup", chunkIDQGNQY3_cjs.requireRole("admin"), async (c) => {
   try {
     const db = c.env.DB;
     const allMediaStmt = db.prepare("SELECT id, r2_key, filename FROM media WHERE deleted_at IS NULL");
@@ -13782,7 +14205,7 @@ function formatTimestamp(timestamp) {
 
 // src/routes/admin-plugins.ts
 var adminPluginRoutes = new hono.Hono();
-adminPluginRoutes.use("*", chunkM336PWCK_cjs.requireAuth());
+adminPluginRoutes.use("*", chunkIDQGNQY3_cjs.requireAuth());
 var AVAILABLE_PLUGINS = [
   {
     id: "third-party-faq",
@@ -15073,7 +15496,7 @@ function renderLogConfigPage(data) {
 
 // src/routes/admin-logs.ts
 var adminLogsRoutes = new hono.Hono();
-adminLogsRoutes.use("*", chunkM336PWCK_cjs.requireAuth());
+adminLogsRoutes.use("*", chunkIDQGNQY3_cjs.requireAuth());
 adminLogsRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -17401,9 +17824,9 @@ function renderStorageUsage(databaseSizeBytes, mediaSizeBytes) {
 }
 
 // src/routes/admin-dashboard.ts
-var VERSION = chunkW2IAEG4W_cjs.getCoreVersion();
+var VERSION = chunkIRN6XDON_cjs.getCoreVersion();
 var router = new hono.Hono();
-router.use("*", chunkM336PWCK_cjs.requireAuth());
+router.use("*", chunkIDQGNQY3_cjs.requireAuth());
 router.get("/", async (c) => {
   const user = c.get("user");
   try {
@@ -19161,7 +19584,7 @@ function renderCollectionFormPage(data) {
 
 // src/routes/admin-collections.ts
 var adminCollectionsRoutes = new hono.Hono();
-adminCollectionsRoutes.use("*", chunkM336PWCK_cjs.requireAuth());
+adminCollectionsRoutes.use("*", chunkIDQGNQY3_cjs.requireAuth());
 adminCollectionsRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -21324,7 +21747,7 @@ function renderDatabaseToolsSettings(settings) {
 
 // src/routes/admin-settings.ts
 var adminSettingsRoutes = new hono.Hono();
-adminSettingsRoutes.use("*", chunkM336PWCK_cjs.requireAuth());
+adminSettingsRoutes.use("*", chunkIDQGNQY3_cjs.requireAuth());
 function getMockSettings(user) {
   return {
     general: {
@@ -21492,7 +21915,7 @@ adminSettingsRoutes.get("/database-tools", (c) => {
 adminSettingsRoutes.get("/api/migrations/status", async (c) => {
   try {
     const db = c.env.DB;
-    const migrationService = new chunkL5VY4H7C_cjs.MigrationService(db);
+    const migrationService = new chunkG66PHIDW_cjs.MigrationService(db);
     const status = await migrationService.getMigrationStatus();
     return c.json({
       success: true,
@@ -21516,7 +21939,7 @@ adminSettingsRoutes.post("/api/migrations/run", async (c) => {
       }, 403);
     }
     const db = c.env.DB;
-    const migrationService = new chunkL5VY4H7C_cjs.MigrationService(db);
+    const migrationService = new chunkG66PHIDW_cjs.MigrationService(db);
     const result = await migrationService.runPendingMigrations();
     return c.json({
       success: result.success,
@@ -21534,7 +21957,7 @@ adminSettingsRoutes.post("/api/migrations/run", async (c) => {
 adminSettingsRoutes.get("/api/migrations/validate", async (c) => {
   try {
     const db = c.env.DB;
-    const migrationService = new chunkL5VY4H7C_cjs.MigrationService(db);
+    const migrationService = new chunkG66PHIDW_cjs.MigrationService(db);
     const validation = await migrationService.validateSchema();
     return c.json({
       success: true,
@@ -21779,5 +22202,5 @@ exports.auth_default = auth_default;
 exports.router = router;
 exports.test_cleanup_default = test_cleanup_default;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-SNVF4HTD.cjs.map
-//# sourceMappingURL=chunk-SNVF4HTD.cjs.map
+//# sourceMappingURL=chunk-Q6MLLEWJ.cjs.map
+//# sourceMappingURL=chunk-Q6MLLEWJ.cjs.map
