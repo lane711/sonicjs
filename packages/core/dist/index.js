@@ -1,23 +1,24 @@
-import { PluginBuilder, api_default, api_media_default, api_system_default, admin_api_default, router, adminCollectionsRoutes, adminSettingsRoutes, admin_content_default, adminMediaRoutes, adminPluginRoutes, adminLogsRoutes, userRoutes, auth_default, test_cleanup_default } from './chunk-AKEOTWJC.js';
-export { PluginBuilder, ROUTES_INFO, admin_api_default as adminApiRoutes, adminCheckboxRoutes, admin_code_examples_default as adminCodeExamplesRoutes, adminCollectionsRoutes, admin_content_default as adminContentRoutes, router as adminDashboardRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_testimonials_default as adminTestimonialsRoutes, userRoutes as adminUsersRoutes, api_content_crud_default as apiContentCrudRoutes, api_media_default as apiMediaRoutes, api_default as apiRoutes, api_system_default as apiSystemRoutes, auth_default as authRoutes } from './chunk-AKEOTWJC.js';
+import { PluginBuilder, api_default, api_media_default, api_system_default, admin_api_default, router, adminCollectionsRoutes, adminSettingsRoutes, admin_content_default, adminMediaRoutes, adminPluginRoutes, adminLogsRoutes, userRoutes, auth_default, test_cleanup_default } from './chunk-LF5FMYEK.js';
+export { PluginBuilder, ROUTES_INFO, admin_api_default as adminApiRoutes, adminCheckboxRoutes, admin_code_examples_default as adminCodeExamplesRoutes, adminCollectionsRoutes, admin_content_default as adminContentRoutes, router as adminDashboardRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_testimonials_default as adminTestimonialsRoutes, userRoutes as adminUsersRoutes, api_content_crud_default as apiContentCrudRoutes, api_media_default as apiMediaRoutes, api_default as apiRoutes, api_system_default as apiSystemRoutes, auth_default as authRoutes } from './chunk-LF5FMYEK.js';
 import { schema_exports } from './chunk-3YNNVSMC.js';
 export { Logger, apiTokens, collections, content, contentVersions, getLogger, initLogger, insertCollectionSchema, insertContentSchema, insertLogConfigSchema, insertMediaSchema, insertPluginActivityLogSchema, insertPluginAssetSchema, insertPluginHookSchema, insertPluginRouteSchema, insertPluginSchema, insertSystemLogSchema, insertUserSchema, insertWorkflowHistorySchema, logConfig, media, pluginActivityLog, pluginAssets, pluginHooks, pluginRoutes, plugins, selectCollectionSchema, selectContentSchema, selectLogConfigSchema, selectMediaSchema, selectPluginActivityLogSchema, selectPluginAssetSchema, selectPluginHookSchema, selectPluginRouteSchema, selectPluginSchema, selectSystemLogSchema, selectUserSchema, selectWorkflowHistorySchema, systemLogs, users, workflowHistory } from './chunk-3YNNVSMC.js';
-import { AuthManager, metricsMiddleware, bootstrapMiddleware, requireAuth } from './chunk-XJ7XY6JM.js';
-export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware } from './chunk-XJ7XY6JM.js';
+import { AuthManager, metricsMiddleware, bootstrapMiddleware, requireAuth } from './chunk-JDH6MRM4.js';
+export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware } from './chunk-JDH6MRM4.js';
 export { PluginBootstrapService, PluginService as PluginServiceClass, cleanupRemovedCollections, fullCollectionSync, getAvailableCollectionNames, getManagedCollections, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, registerCollections, syncCollection, syncCollections, validateCollectionConfig } from './chunk-SGAG6FD3.js';
-export { MigrationService } from './chunk-DH77X56G.js';
+export { MigrationService } from './chunk-ZUS3M6LR.js';
 export { renderFilterBar } from './chunk-AVPUX57O.js';
 import { init_admin_layout_catalyst_template, renderAdminLayout, adminLayoutV2, renderAdminLayoutCatalyst } from './chunk-V5LBQN3I.js';
 export { getConfirmationDialogScript, renderAlert, renderConfirmationDialog, renderForm, renderFormField, renderPagination, renderTable } from './chunk-V5LBQN3I.js';
 export { HookSystemImpl, HookUtils, PluginManager as PluginManagerClass, PluginRegistryImpl, PluginValidator as PluginValidatorClass, ScopedHookSystem as ScopedHookSystemClass } from './chunk-CPXAVWCU.js';
-import { package_default, getCoreVersion } from './chunk-SKPETEM5.js';
-export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer } from './chunk-SKPETEM5.js';
+import { package_default, getCoreVersion } from './chunk-LRFDZHLM.js';
+export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer } from './chunk-LRFDZHLM.js';
 import './chunk-X7ZAEI5S.js';
 export { metricsTracker } from './chunk-FICTAGD4.js';
 export { HOOKS } from './chunk-LOUJRBXV.js';
 import './chunk-V4OQ3NZ2.js';
 import { Hono } from 'hono';
 import { html } from 'hono/html';
+import { setCookie } from 'hono/cookie';
 import { z } from 'zod';
 import { drizzle } from 'drizzle-orm/d1';
 
@@ -1492,6 +1493,37 @@ function createOTPLoginPlugin() {
           timestamp: (/* @__PURE__ */ new Date()).toISOString(),
           appName: settings.appName
         });
+        const emailPlugin2 = await db.prepare(`
+          SELECT settings FROM plugins WHERE id = 'email'
+        `).first();
+        if (emailPlugin2?.settings) {
+          const emailSettings = JSON.parse(emailPlugin2.settings);
+          if (emailSettings.apiKey && emailSettings.fromEmail && emailSettings.fromName) {
+            const emailResponse = await fetch("https://api.resend.com/emails", {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${emailSettings.apiKey}`,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                from: `${emailSettings.fromName} <${emailSettings.fromEmail}>`,
+                to: [normalizedEmail],
+                subject: `Your login code for ${settings.appName}`,
+                html: emailContent.html,
+                text: emailContent.text,
+                reply_to: emailSettings.replyTo || emailSettings.fromEmail
+              })
+            });
+            if (!emailResponse.ok) {
+              const errorData = await emailResponse.json();
+              console.error("Failed to send OTP email via Resend:", errorData);
+            }
+          } else {
+            console.warn("Email plugin is not fully configured (missing apiKey, fromEmail, or fromName)");
+          }
+        } else {
+          console.warn("Email plugin is not active or has no settings configured");
+        }
         const response = {
           message: "If an account exists for this email, you will receive a verification code shortly.",
           expiresIn: settings.codeExpiryMinutes * 60
@@ -1551,6 +1583,14 @@ function createOTPLoginPlugin() {
           error: "Account is deactivated"
         }, 403);
       }
+      const token = await AuthManager.generateToken(user.id, user.email, user.role);
+      setCookie(c, "auth_token", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "Strict",
+        maxAge: 60 * 60 * 24
+        // 24 hours
+      });
       return c.json({
         success: true,
         user: {
@@ -1558,6 +1598,7 @@ function createOTPLoginPlugin() {
           email: user.email,
           role: user.role
         },
+        token,
         message: "Authentication successful"
       });
     } catch (error) {

@@ -3,7 +3,7 @@
  *
  * Defines the structure for plugin manifest.json files
  */
-interface PluginManifest {
+interface PluginManifest<Settings extends Record<string, unknown> = Record<string, unknown>> {
     id: string;
     name: string;
     version: string;
@@ -15,7 +15,7 @@ interface PluginManifest {
     category: string;
     tags?: string[];
     dependencies?: string[];
-    settings?: Record<string, any>;
+    settings?: Settings;
     hooks?: Record<string, string>;
     routes?: Array<{
         path: string;

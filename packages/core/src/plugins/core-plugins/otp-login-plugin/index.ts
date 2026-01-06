@@ -7,12 +7,14 @@
 
 import { Hono } from 'hono'
 import { html } from 'hono/html'
+import { setCookie } from 'hono/cookie'
 import { z } from 'zod'
 import { PluginBuilder } from '../../sdk/plugin-builder'
 import type { Plugin } from '@sonicjs-cms/core'
 import { OTPService, type OTPSettings } from './otp-service'
 import { renderOTPEmail } from './email-templates'
 import { adminLayoutV2 } from '../../../templates/layouts/admin-layout-v2.template'
+import { AuthManager } from '../../../middleware'
 
 // Validation schemas
 const otpRequestSchema = z.object({
@@ -114,10 +116,8 @@ export function createOTPLoginPlugin(): Plugin {
         userAgent
       )
 
-      // Send email (if email plugin is available)
+      // Send email via Email plugin
       try {
-        // TODO: Integrate with email plugin
-        // For now, we'll just log the code in development
         const isDevMode = c.env.ENVIRONMENT === 'development'
 
         if (isDevMode) {
@@ -136,13 +136,45 @@ export function createOTPLoginPlugin(): Plugin {
           appName: settings.appName
         })
 
-        // TODO: Actually send email via email plugin
-        // await emailService.send({
-        //   to: normalizedEmail,
-        //   subject: `Your login code for ${settings.appName}`,
-        //   html: emailContent.html,
-        //   text: emailContent.text
-        // })
+        // Load email plugin settings from database
+        // Note: We don't check status='active' because the email plugin's
+        // settings UI works regardless of status, so we follow the same pattern
+        const emailPlugin = await db.prepare(`
+          SELECT settings FROM plugins WHERE id = 'email'
+        `).first() as { settings: string | null } | null
+
+        if (emailPlugin?.settings) {
+          const emailSettings = JSON.parse(emailPlugin.settings)
+
+          if (emailSettings.apiKey && emailSettings.fromEmail && emailSettings.fromName) {
+            // Send email via Resend API
+            const emailResponse = await fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${emailSettings.apiKey}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                from: `${emailSettings.fromName} <${emailSettings.fromEmail}>`,
+                to: [normalizedEmail],
+                subject: `Your login code for ${settings.appName}`,
+                html: emailContent.html,
+                text: emailContent.text,
+                reply_to: emailSettings.replyTo || emailSettings.fromEmail
+              })
+            })
+
+            if (!emailResponse.ok) {
+              const errorData = await emailResponse.json() as { message?: string }
+              console.error('Failed to send OTP email via Resend:', errorData)
+              // Don't expose error to user for security - just log it
+            }
+          } else {
+            console.warn('Email plugin is not fully configured (missing apiKey, fromEmail, or fromName)')
+          }
+        } else {
+          console.warn('Email plugin is not active or has no settings configured')
+        }
 
         const response: any = {
           message: 'If an account exists for this email, you will receive a verification code shortly.',
@@ -220,8 +252,17 @@ export function createOTPLoginPlugin(): Plugin {
         }, 403)
       }
 
-      // TODO: Generate JWT token
-      // For now, return success with user data
+      // Generate JWT token
+      const token = await AuthManager.generateToken(user.id, user.email, user.role)
+
+      // Set HTTP-only cookie
+      setCookie(c, 'auth_token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'Strict',
+        maxAge: 60 * 60 * 24 // 24 hours
+      })
+
       return c.json({
         success: true,
         user: {
@@ -229,6 +270,7 @@ export function createOTPLoginPlugin(): Plugin {
           email: user.email,
           role: user.role
         },
+        token,
         message: 'Authentication successful'
       })
     } catch (error) {
