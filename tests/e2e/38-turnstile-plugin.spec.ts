@@ -7,35 +7,88 @@ test.describe('Turnstile Plugin', () => {
     await loginAsAdmin(page)
   })
 
+  // Install and activate the Turnstile plugin before running tests
+  test.beforeAll(async ({ browser }) => {
+    const context = await browser.newContext()
+    const page = await context.newPage()
+    
+    try {
+      // Login as admin
+      await loginAsAdmin(page)
+      
+      // Install Turnstile plugin via API
+      const installResponse = await page.request.post('/admin/plugins/install', {
+        data: { name: 'turnstile-plugin' },
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      if (installResponse.ok()) {
+        console.log('Turnstile plugin installed successfully')
+      } else {
+        // Plugin might already be installed due to UNIQUE constraint - that's okay
+        const errorText = await installResponse.text()
+        if (errorText.includes('UNIQUE constraint')) {
+          console.log('Turnstile plugin already installed, proceeding to activate')
+        } else {
+          console.log('Turnstile plugin install failed:', installResponse.status(), errorText)
+        }
+      }
+      
+      // Activate the plugin (whether just installed or already existed)
+      const activateResponse = await page.request.post('/admin/plugins/turnstile/activate', {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      if (activateResponse.ok()) {
+        console.log('Turnstile plugin activated successfully')
+      } else {
+        console.log('Turnstile plugin activation response:', activateResponse.status(), await activateResponse.text())
+      }
+    } catch (error) {
+      console.log('Error setting up Turnstile plugin:', error)
+    } finally {
+      await context.close()
+    }
+  })
+
   test('should display Turnstile plugin in plugins list', async ({ page }) => {
     await page.goto('/admin/plugins')
     
-    // Check if Turnstile plugin card is visible
-    const turnstileCard = page.locator('text=Cloudflare Turnstile')
-    await expect(turnstileCard).toBeVisible()
+    // Check if Turnstile plugin heading is visible (more specific than text match)
+    const turnstileHeading = page.getByRole('heading', { name: 'Cloudflare Turnstile' })
+    await expect(turnstileHeading).toBeVisible()
     
-    // Check for shield icon
-    const shieldIcon = page.locator('[class*="shield"]').first()
-    await expect(shieldIcon).toBeVisible()
+    // Check for security category or description text
+    const turnstileDescription = page.getByText('CAPTCHA-free bot protection')
+    await expect(turnstileDescription).toBeVisible()
   })
 
   test('should show Turnstile settings page', async ({ page }) => {
-    await page.goto('/admin/plugins')
+    // Navigate directly to the Turnstile plugin settings page
+    await page.goto('/admin/plugins/turnstile')
     
-    // Click on Turnstile plugin
-    await page.click('text=Cloudflare Turnstile')
+    // Should show settings page with Plugin Settings main heading
+    await expect(page.getByRole('heading', { name: 'Plugin Settings' })).toBeVisible()
     
-    // Should show settings page with fields
-    await expect(page.locator('text=Cloudflare Turnstile Settings')).toBeVisible()
+    // Should show Cloudflare Turnstile Settings subheading
+    await expect(page.getByRole('heading', { name: 'Cloudflare Turnstile Settings' })).toBeVisible()
+    
+    // Check for all settings fields
     await expect(page.locator('input[name="setting_siteKey"]')).toBeVisible()
     await expect(page.locator('input[name="setting_secretKey"]')).toBeVisible()
     await expect(page.locator('select[name="setting_theme"]')).toBeVisible()
     await expect(page.locator('select[name="setting_size"]')).toBeVisible()
+    await expect(page.locator('select[name="setting_mode"]')).toBeVisible()
+    await expect(page.locator('select[name="setting_appearance"]')).toBeVisible()
   })
 
   test('should save Turnstile settings', async ({ page }) => {
-    await page.goto('/admin/plugins')
-    await page.click('text=Cloudflare Turnstile')
+    // Navigate directly to settings page
+    await page.goto('/admin/plugins/turnstile')
     
     // Fill in test keys (these are dummy keys for testing UI only)
     await page.fill('input[name="setting_siteKey"]', '1x00000000000000000000AA')
@@ -45,17 +98,20 @@ test.describe('Turnstile Plugin', () => {
     await page.selectOption('select[name="setting_theme"]', 'dark')
     await page.selectOption('select[name="setting_size"]', 'compact')
     
-    // Enable Turnstile
+    // Enable Turnstile - use force click since the checkbox is visually hidden
     const enableToggle = page.locator('input[name="setting_enabled"]')
     if (!(await enableToggle.isChecked())) {
-      await enableToggle.click()
+      await enableToggle.click({ force: true })
     }
     
     // Save settings
     await page.click('button:has-text("Save Settings")')
     
-    // Should show success message or stay on page
-    await expect(page).toHaveURL(/\/admin\/plugins/)
+    // Wait for save to complete
+    await page.waitForTimeout(1000)
+    
+    // Should stay on plugin settings page
+    await expect(page).toHaveURL(/\/admin\/plugins\/turnstile/)
   })
 
   // NOTE: The following tests require the Contact Form plugin from feature/contact-plugin-v1
