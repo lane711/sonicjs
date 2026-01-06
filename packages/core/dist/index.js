@@ -1,7 +1,7 @@
-import { PluginBuilder, api_default, api_media_default, api_system_default, admin_api_default, router, adminCollectionsRoutes, adminSettingsRoutes, admin_content_default, adminMediaRoutes, adminPluginRoutes, adminLogsRoutes, userRoutes, auth_default, test_cleanup_default } from './chunk-XVOFR5GW.js';
-export { ROUTES_INFO, admin_api_default as adminApiRoutes, adminCheckboxRoutes, admin_code_examples_default as adminCodeExamplesRoutes, adminCollectionsRoutes, admin_content_default as adminContentRoutes, router as adminDashboardRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_testimonials_default as adminTestimonialsRoutes, userRoutes as adminUsersRoutes, api_content_crud_default as apiContentCrudRoutes, api_media_default as apiMediaRoutes, api_default as apiRoutes, api_system_default as apiSystemRoutes, auth_default as authRoutes } from './chunk-XVOFR5GW.js';
-import { schema_exports } from './chunk-4PTABHLC.js';
-export { Logger, apiTokens, collections, content, contentVersions, getLogger, initLogger, insertCollectionSchema, insertContentSchema, insertLogConfigSchema, insertMediaSchema, insertPluginActivityLogSchema, insertPluginAssetSchema, insertPluginHookSchema, insertPluginRouteSchema, insertPluginSchema, insertSystemLogSchema, insertUserSchema, insertWorkflowHistorySchema, logConfig, media, pluginActivityLog, pluginAssets, pluginHooks, pluginRoutes, plugins, selectCollectionSchema, selectContentSchema, selectLogConfigSchema, selectMediaSchema, selectPluginActivityLogSchema, selectPluginAssetSchema, selectPluginHookSchema, selectPluginRouteSchema, selectPluginSchema, selectSystemLogSchema, selectUserSchema, selectWorkflowHistorySchema, systemLogs, users, workflowHistory } from './chunk-4PTABHLC.js';
+import { PluginBuilder, api_default, api_media_default, api_system_default, admin_api_default, router, adminCollectionsRoutes, adminSettingsRoutes, admin_content_default, adminMediaRoutes, adminPluginRoutes, adminLogsRoutes, userRoutes, auth_default, test_cleanup_default } from './chunk-3T2NKFDT.js';
+export { ROUTES_INFO, admin_api_default as adminApiRoutes, adminCheckboxRoutes, admin_code_examples_default as adminCodeExamplesRoutes, adminCollectionsRoutes, admin_content_default as adminContentRoutes, router as adminDashboardRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_testimonials_default as adminTestimonialsRoutes, userRoutes as adminUsersRoutes, api_content_crud_default as apiContentCrudRoutes, api_media_default as apiMediaRoutes, api_default as apiRoutes, api_system_default as apiSystemRoutes, auth_default as authRoutes } from './chunk-3T2NKFDT.js';
+import { schema_exports } from './chunk-3YNNVSMC.js';
+export { Logger, apiTokens, collections, content, contentVersions, getLogger, initLogger, insertCollectionSchema, insertContentSchema, insertLogConfigSchema, insertMediaSchema, insertPluginActivityLogSchema, insertPluginAssetSchema, insertPluginHookSchema, insertPluginRouteSchema, insertPluginSchema, insertSystemLogSchema, insertUserSchema, insertWorkflowHistorySchema, logConfig, media, pluginActivityLog, pluginAssets, pluginHooks, pluginRoutes, plugins, selectCollectionSchema, selectContentSchema, selectLogConfigSchema, selectMediaSchema, selectPluginActivityLogSchema, selectPluginAssetSchema, selectPluginHookSchema, selectPluginRouteSchema, selectPluginSchema, selectSystemLogSchema, selectUserSchema, selectWorkflowHistorySchema, systemLogs, users, workflowHistory } from './chunk-3YNNVSMC.js';
 import { AuthManager, metricsMiddleware, bootstrapMiddleware, requireAuth } from './chunk-DN2RXGUC.js';
 export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware } from './chunk-DN2RXGUC.js';
 export { PluginBootstrapService, PluginService as PluginServiceClass, cleanupRemovedCollections, fullCollectionSync, getAvailableCollectionNames, getManagedCollections, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, registerCollections, syncCollection, syncCollections, validateCollectionConfig } from './chunk-SGAG6FD3.js';
@@ -9,9 +9,9 @@ export { MigrationService } from './chunk-BISFOKO4.js';
 export { renderFilterBar } from './chunk-AVPUX57O.js';
 import { init_admin_layout_catalyst_template, renderAdminLayout, adminLayoutV2, renderAdminLayoutCatalyst } from './chunk-V5LBQN3I.js';
 export { getConfirmationDialogScript, renderAlert, renderConfirmationDialog, renderForm, renderFormField, renderPagination, renderTable } from './chunk-V5LBQN3I.js';
-export { HookSystemImpl, HookUtils, PluginManager as PluginManagerClass, PluginRegistryImpl, PluginValidator as PluginValidatorClass, ScopedHookSystem as ScopedHookSystemClass } from './chunk-7HBEA7JK.js';
-import { package_default, getCoreVersion } from './chunk-67SKO5RQ.js';
-export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer } from './chunk-67SKO5RQ.js';
+export { HookSystemImpl, HookUtils, PluginManager as PluginManagerClass, PluginRegistryImpl, PluginValidator as PluginValidatorClass, ScopedHookSystem as ScopedHookSystemClass } from './chunk-CPXAVWCU.js';
+import { package_default, getCoreVersion } from './chunk-TMQOLXLY.js';
+export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer } from './chunk-TMQOLXLY.js';
 import './chunk-X7ZAEI5S.js';
 export { metricsTracker } from './chunk-FICTAGD4.js';
 export { HOOKS } from './chunk-LOUJRBXV.js';
@@ -740,6 +740,573 @@ function createDatabaseToolsAdminRoutes() {
     }
   });
   return router2;
+}
+
+// src/plugins/core-plugins/seed-data-plugin/services/seed-data-service.ts
+var SeedDataService = class {
+  constructor(db) {
+    this.db = db;
+  }
+  // First names for generating realistic users
+  firstNames = [
+    "Emma",
+    "Liam",
+    "Olivia",
+    "Noah",
+    "Ava",
+    "Ethan",
+    "Sophia",
+    "Mason",
+    "Isabella",
+    "William",
+    "Mia",
+    "James",
+    "Charlotte",
+    "Benjamin",
+    "Amelia",
+    "Lucas",
+    "Harper",
+    "Henry",
+    "Evelyn",
+    "Alexander"
+  ];
+  // Last names for generating realistic users
+  lastNames = [
+    "Smith",
+    "Johnson",
+    "Williams",
+    "Brown",
+    "Jones",
+    "Garcia",
+    "Miller",
+    "Davis",
+    "Rodriguez",
+    "Martinez",
+    "Hernandez",
+    "Lopez",
+    "Gonzalez",
+    "Wilson",
+    "Anderson",
+    "Thomas",
+    "Taylor",
+    "Moore",
+    "Jackson",
+    "Martin"
+  ];
+  // Content titles for blog posts
+  blogTitles = [
+    "Getting Started with Modern Web Development",
+    "The Future of JavaScript Frameworks",
+    "Building Scalable Applications with Microservices",
+    "Understanding TypeScript: A Complete Guide",
+    "Best Practices for API Design",
+    "Introduction to Cloud Computing",
+    "Mastering Git and Version Control",
+    "The Art of Code Review",
+    "Performance Optimization Techniques",
+    "Security Best Practices for Web Apps",
+    "Exploring Serverless Architecture",
+    "Database Design Fundamentals",
+    "Testing Strategies for Modern Apps",
+    "CI/CD Pipeline Implementation",
+    "Mobile-First Development Approach"
+  ];
+  // Content titles for pages
+  pageTitles = [
+    "About Us",
+    "Contact",
+    "Privacy Policy",
+    "Terms of Service",
+    "FAQ",
+    "Our Team",
+    "Careers",
+    "Press Kit",
+    "Support",
+    "Documentation",
+    "Pricing",
+    "Features"
+  ];
+  // Content titles for products
+  productTitles = [
+    "Premium Wireless Headphones",
+    "Smart Watch Pro",
+    "Laptop Stand Adjustable",
+    "Mechanical Keyboard RGB",
+    "HD Webcam 4K",
+    "USB-C Hub 7-in-1",
+    "Portable SSD 1TB",
+    "Wireless Mouse Ergonomic",
+    'Monitor 27" 4K',
+    "Desk Lamp LED",
+    "Phone Case Premium",
+    "Tablet Stand Aluminum",
+    "Cable Management Kit",
+    "Power Bank 20000mAh",
+    "Bluetooth Speaker Portable"
+  ];
+  // Content for generating blog posts
+  blogContent = [
+    "This comprehensive guide covers everything you need to know about modern development practices and tools.",
+    "Learn the fundamentals and advanced concepts that will help you build better applications.",
+    "Discover the latest trends and best practices used by industry professionals.",
+    "A deep dive into the technologies and methodologies shaping the future of software development.",
+    "Practical tips and real-world examples to improve your development workflow.",
+    "Explore cutting-edge techniques and proven strategies for building robust applications.",
+    "Master the essential skills needed to excel in modern software development.",
+    "An in-depth look at the tools and frameworks that power today's web applications.",
+    "Step-by-step instructions and expert insights for developers of all levels.",
+    "Understanding the core principles that drive successful software projects."
+  ];
+  // Generate a random ID
+  generateId() {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+  // Generate a slug from a title
+  generateSlug(title) {
+    return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  }
+  // Generate random date within the last year
+  randomDate() {
+    const now = /* @__PURE__ */ new Date();
+    const yearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+    const randomTime = yearAgo.getTime() + Math.random() * (now.getTime() - yearAgo.getTime());
+    return new Date(randomTime);
+  }
+  // Create 20 example users
+  async createUsers() {
+    const roles = ["admin", "editor", "author", "viewer"];
+    const hashedPassword = "password123";
+    let count = 0;
+    for (let i = 0; i < 20; i++) {
+      const firstName = this.firstNames[Math.floor(Math.random() * this.firstNames.length)] || "John";
+      const lastName = this.lastNames[Math.floor(Math.random() * this.lastNames.length)] || "Doe";
+      const username = `${firstName.toLowerCase()}${lastName.toLowerCase()}${i}`;
+      const email = `${username}@example.com`;
+      const createdAt = this.randomDate();
+      const createdAtTimestamp = Math.floor(createdAt.getTime() / 1e3);
+      const stmt = this.db.prepare(`
+        INSERT INTO users (id, email, username, first_name, last_name, password_hash, role, is_active, last_login_at, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+      await stmt.bind(
+        this.generateId(),
+        email,
+        username,
+        firstName,
+        lastName,
+        hashedPassword,
+        roles[Math.floor(Math.random() * roles.length)],
+        Math.random() > 0.1 ? 1 : 0,
+        // 90% active
+        Math.random() > 0.3 ? createdAtTimestamp : null,
+        createdAtTimestamp,
+        createdAtTimestamp
+      ).run();
+      count++;
+    }
+    return count;
+  }
+  // Create 200 content items across different types
+  async createContent() {
+    const usersStmt = this.db.prepare("SELECT * FROM users");
+    const { results: allUsers } = await usersStmt.all();
+    const collectionsStmt = this.db.prepare("SELECT * FROM collections");
+    const { results: allCollections } = await collectionsStmt.all();
+    if (!allUsers || allUsers.length === 0) {
+      throw new Error("No users found. Please create users first.");
+    }
+    if (!allCollections || allCollections.length === 0) {
+      throw new Error("No collections found. Please create collections first.");
+    }
+    const statuses = ["draft", "published", "archived"];
+    let count = 0;
+    for (let i = 0; i < 200; i++) {
+      const collection = allCollections[Math.floor(Math.random() * allCollections.length)];
+      const author = allUsers[Math.floor(Math.random() * allUsers.length)];
+      const status = statuses[Math.floor(Math.random() * statuses.length)];
+      let title;
+      let contentData;
+      if (collection.name === "blog_posts" || collection.name.includes("blog")) {
+        title = this.blogTitles[Math.floor(Math.random() * this.blogTitles.length)] || "Untitled Blog Post";
+        contentData = {
+          body: this.blogContent[Math.floor(Math.random() * this.blogContent.length)] || "Blog content here",
+          excerpt: "A brief introduction to this article that provides an overview of the main topics covered.",
+          tags: this.generateTags(),
+          featured: Math.random() > 0.7
+        };
+      } else if (collection.name === "pages" || collection.name.includes("page")) {
+        title = this.pageTitles[Math.floor(Math.random() * this.pageTitles.length)] || "Untitled Page";
+        contentData = {
+          body: "This is a standard page with important information about our services and policies.",
+          template: "default",
+          showInMenu: Math.random() > 0.5
+        };
+      } else if (collection.name === "products" || collection.name.includes("product")) {
+        title = this.productTitles[Math.floor(Math.random() * this.productTitles.length)] || "Untitled Product";
+        contentData = {
+          description: "High-quality product with excellent features and great value for money.",
+          price: (Math.random() * 500 + 10).toFixed(2),
+          sku: `SKU-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+          inStock: Math.random() > 0.2,
+          rating: (Math.random() * 2 + 3).toFixed(1)
+          // 3.0 - 5.0
+        };
+      } else {
+        title = `${collection.display_name || collection.name} Item ${i + 1}`;
+        contentData = {
+          description: "This is a sample content item with generic data.",
+          value: Math.floor(Math.random() * 1e3)
+        };
+      }
+      const slug = `${this.generateSlug(title)}-${i}`;
+      const createdAt = this.randomDate();
+      const createdAtTimestamp = Math.floor(createdAt.getTime() / 1e3);
+      const publishedAtTimestamp = status === "published" ? createdAtTimestamp : null;
+      const stmt = this.db.prepare(`
+        INSERT INTO content (id, collection_id, slug, title, data, status, published_at, author_id, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+      await stmt.bind(
+        this.generateId(),
+        collection.id,
+        slug,
+        `${title} ${i}`,
+        JSON.stringify(contentData),
+        status,
+        publishedAtTimestamp,
+        author.id,
+        createdAtTimestamp,
+        createdAtTimestamp
+      ).run();
+      count++;
+    }
+    return count;
+  }
+  // Generate random tags for blog posts
+  generateTags() {
+    const allTags = [
+      "tutorial",
+      "guide",
+      "javascript",
+      "typescript",
+      "web-dev",
+      "backend",
+      "frontend",
+      "best-practices",
+      "security",
+      "performance",
+      "testing",
+      "deployment",
+      "cloud",
+      "database",
+      "api"
+    ];
+    const numTags = Math.floor(Math.random() * 4) + 1;
+    const shuffled = allTags.sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, numTags);
+  }
+  // Seed all data
+  async seedAll() {
+    const userCount = await this.createUsers();
+    const contentCount = await this.createContent();
+    return {
+      users: userCount,
+      content: contentCount
+    };
+  }
+  // Clear all seed data (optional cleanup method)
+  async clearSeedData() {
+    const deleteContentStmt = this.db.prepare("DELETE FROM content");
+    await deleteContentStmt.run();
+    const deleteUsersStmt = this.db.prepare(
+      "DELETE FROM users WHERE role != 'admin'"
+    );
+    await deleteUsersStmt.run();
+  }
+};
+
+// src/plugins/core-plugins/seed-data-plugin/admin-routes.ts
+function createSeedDataAdminRoutes() {
+  const routes = new Hono();
+  routes.get("/", async (c) => {
+    const html3 = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Seed Data - SonicJS Admin</title>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              background: #f5f5f5;
+              padding: 2rem;
+            }
+            .container {
+              max-width: 800px;
+              margin: 0 auto;
+              background: white;
+              border-radius: 8px;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+              padding: 2rem;
+            }
+            h1 {
+              color: #333;
+              margin-bottom: 1rem;
+              font-size: 2rem;
+            }
+            .description {
+              color: #666;
+              margin-bottom: 2rem;
+              line-height: 1.6;
+            }
+            .card {
+              background: #f9f9f9;
+              border-radius: 6px;
+              padding: 1.5rem;
+              margin-bottom: 1.5rem;
+            }
+            .card h2 {
+              color: #333;
+              font-size: 1.25rem;
+              margin-bottom: 0.75rem;
+            }
+            .card p {
+              color: #666;
+              line-height: 1.6;
+              margin-bottom: 1rem;
+            }
+            .card ul {
+              color: #666;
+              margin-left: 1.5rem;
+              margin-bottom: 1rem;
+            }
+            .card li {
+              margin-bottom: 0.5rem;
+            }
+            button {
+              background: #3b82f6;
+              color: white;
+              border: none;
+              padding: 0.75rem 1.5rem;
+              border-radius: 6px;
+              font-size: 1rem;
+              cursor: pointer;
+              transition: background 0.2s;
+            }
+            button:hover {
+              background: #2563eb;
+            }
+            button:disabled {
+              background: #94a3b8;
+              cursor: not-allowed;
+            }
+            .danger {
+              background: #ef4444;
+            }
+            .danger:hover {
+              background: #dc2626;
+            }
+            .warning {
+              background: #f59e0b;
+              color: #fff;
+              padding: 1rem;
+              border-radius: 6px;
+              margin-bottom: 1.5rem;
+            }
+            .success {
+              background: #10b981;
+              color: #fff;
+              padding: 1rem;
+              border-radius: 6px;
+              margin-bottom: 1.5rem;
+              display: none;
+            }
+            .error {
+              background: #ef4444;
+              color: #fff;
+              padding: 1rem;
+              border-radius: 6px;
+              margin-bottom: 1.5rem;
+              display: none;
+            }
+            .loading {
+              display: none;
+              margin-left: 1rem;
+            }
+            .back-link {
+              display: inline-block;
+              margin-bottom: 1rem;
+              color: #3b82f6;
+              text-decoration: none;
+              font-size: 0.9rem;
+            }
+            .back-link:hover {
+              text-decoration: underline;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <a href="/admin/plugins/seed-data" class="back-link">\u2190 Back to Plugin Settings</a>
+            <h1>\u{1F331} Seed Data Generator</h1>
+            <p class="description">
+              Generate realistic example data for testing and development. This will create 20 users and 200 content items with realistic data.
+            </p>
+
+            <div class="warning">
+              <strong>\u26A0\uFE0F Warning:</strong> This will create new data in your database. Make sure you're not running this in production!
+            </div>
+
+            <div class="success" id="successMessage"></div>
+            <div class="error" id="errorMessage"></div>
+
+            <div class="card">
+              <h2>What will be created?</h2>
+              <ul>
+                <li><strong>20 Users:</strong> With realistic names, emails, and various roles (admin, editor, author, viewer)</li>
+                <li><strong>200 Content Items:</strong> Including blog posts, pages, and products with realistic titles and data</li>
+                <li><strong>All passwords:</strong> Set to "password123" for testing</li>
+                <li><strong>Random dates:</strong> Created within the last year</li>
+                <li><strong>Various statuses:</strong> Draft, published, and archived content</li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <h2>Generate Seed Data</h2>
+              <p>Click the button below to generate example data. This may take a few moments.</p>
+              <button id="seedButton" onclick="generateSeedData()">
+                Generate Data
+                <span class="loading" id="loading">...</span>
+              </button>
+            </div>
+
+            <div class="card">
+              <h2>Clear Seed Data</h2>
+              <p>Remove all users and content from the database (except admin users).</p>
+              <button class="danger" id="clearButton" onclick="clearSeedData()">
+                Clear All Data
+                <span class="loading" id="clearLoading">...</span>
+              </button>
+            </div>
+          </div>
+
+          <script>
+            async function generateSeedData() {
+              const button = document.getElementById('seedButton');
+              const loading = document.getElementById('loading');
+              const success = document.getElementById('successMessage');
+              const error = document.getElementById('errorMessage');
+
+              button.disabled = true;
+              loading.style.display = 'inline';
+              success.style.display = 'none';
+              error.style.display = 'none';
+
+              try {
+                const response = await fetch('/admin/seed-data/generate', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                  success.textContent = \`\u2705 Successfully created \${data.users} users and \${data.content} content items!\`;
+                  success.style.display = 'block';
+                } else {
+                  throw new Error(data.error || 'Failed to generate seed data');
+                }
+              } catch (err) {
+                error.textContent = \`\u274C Error: \${err.message}\`;
+                error.style.display = 'block';
+              } finally {
+                button.disabled = false;
+                loading.style.display = 'none';
+              }
+            }
+
+            async function clearSeedData() {
+              if (!confirm('Are you sure you want to clear all data? This cannot be undone!')) {
+                return;
+              }
+
+              const button = document.getElementById('clearButton');
+              const loading = document.getElementById('clearLoading');
+              const success = document.getElementById('successMessage');
+              const error = document.getElementById('errorMessage');
+
+              button.disabled = true;
+              loading.style.display = 'inline';
+              success.style.display = 'none';
+              error.style.display = 'none';
+
+              try {
+                const response = await fetch('/admin/seed-data/clear', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                  success.textContent = '\u2705 Successfully cleared all seed data!';
+                  success.style.display = 'block';
+                } else {
+                  throw new Error(data.error || 'Failed to clear seed data');
+                }
+              } catch (err) {
+                error.textContent = \`\u274C Error: \${err.message}\`;
+                error.style.display = 'block';
+              } finally {
+                button.disabled = false;
+                loading.style.display = 'none';
+              }
+            }
+          </script>
+        </body>
+      </html>
+    `;
+    return c.html(html3);
+  });
+  routes.post("/generate", async (c) => {
+    try {
+      const db = c.env.DB;
+      const seedService = new SeedDataService(db);
+      const result = await seedService.seedAll();
+      return c.json({
+        success: true,
+        users: result.users,
+        content: result.content
+      });
+    } catch (error) {
+      return c.json({
+        success: false,
+        error: error.message
+      }, 500);
+    }
+  });
+  routes.post("/clear", async (c) => {
+    try {
+      const db = c.env.DB;
+      const seedService = new SeedDataService(db);
+      await seedService.clearSeedData();
+      return c.json({
+        success: true
+      });
+    } catch (error) {
+      return c.json({
+        success: false,
+        error: error.message
+      }, 500);
+    }
+  });
+  return routes;
 }
 function createEmailPlugin() {
   const builder = PluginBuilder.create({
@@ -2171,6 +2738,7 @@ function createSonicJSApp(config = {}) {
   app.route("/admin/collections", adminCollectionsRoutes);
   app.route("/admin/settings", adminSettingsRoutes);
   app.route("/admin/database-tools", createDatabaseToolsAdminRoutes());
+  app.route("/admin/seed-data", createSeedDataAdminRoutes());
   app.route("/admin/content", admin_content_default);
   app.route("/admin/media", adminMediaRoutes);
   app.route("/admin/plugins", adminPluginRoutes);
