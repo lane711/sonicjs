@@ -7,12 +7,14 @@
 
 import { Hono } from 'hono'
 import { html } from 'hono/html'
+import { setCookie } from 'hono/cookie'
 import { z } from 'zod'
 import { PluginBuilder } from '../../sdk/plugin-builder'
 import type { Plugin } from '@sonicjs-cms/core'
 import { OTPService, type OTPSettings } from './otp-service'
 import { renderOTPEmail } from './email-templates'
 import { adminLayoutV2 } from '../../../templates/layouts/admin-layout-v2.template'
+import { AuthManager } from '../../../middleware'
 
 // Validation schemas
 const otpRequestSchema = z.object({
@@ -135,8 +137,10 @@ export function createOTPLoginPlugin(): Plugin {
         })
 
         // Load email plugin settings from database
+        // Note: We don't check status='active' because the email plugin's
+        // settings UI works regardless of status, so we follow the same pattern
         const emailPlugin = await db.prepare(`
-          SELECT settings FROM plugins WHERE id = 'email' AND status = 'active'
+          SELECT settings FROM plugins WHERE id = 'email'
         `).first() as { settings: string | null } | null
 
         if (emailPlugin?.settings) {
@@ -248,8 +252,17 @@ export function createOTPLoginPlugin(): Plugin {
         }, 403)
       }
 
-      // TODO: Generate JWT token
-      // For now, return success with user data
+      // Generate JWT token
+      const token = await AuthManager.generateToken(user.id, user.email, user.role)
+
+      // Set HTTP-only cookie
+      setCookie(c, 'auth_token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'Strict',
+        maxAge: 60 * 60 * 24 // 24 hours
+      })
+
       return c.json({
         success: true,
         user: {
@@ -257,6 +270,7 @@ export function createOTPLoginPlugin(): Plugin {
           email: user.email,
           role: user.role
         },
+        token,
         message: 'Authentication successful'
       })
     } catch (error) {
