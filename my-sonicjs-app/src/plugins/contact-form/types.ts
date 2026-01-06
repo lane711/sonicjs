@@ -24,6 +24,8 @@ export interface ContactSettings {
   showMap: boolean | number | string
   /** Google Maps API key */
   mapApiKey?: string
+  /** Whether to enable Turnstile bot protection (optional, requires Turnstile plugin) */
+  useTurnstile?: boolean | number | string
 }
 
 /**

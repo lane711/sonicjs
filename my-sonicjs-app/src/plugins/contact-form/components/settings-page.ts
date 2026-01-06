@@ -1,8 +1,9 @@
 import { html } from 'hono/html'
 import type { ContactSettings } from '../types'
 
-export function renderSettingsPage(settings: ContactSettings) {
+export function renderSettingsPage(settings: ContactSettings, turnstileAvailable: boolean = false) {
   const showMap = settings.showMap === 1 || settings.showMap === true || settings.showMap === 'true' || settings.showMap === 'on'
+  const useTurnstile = settings.useTurnstile === 1 || settings.useTurnstile === true || settings.useTurnstile === 'true' || settings.useTurnstile === 'on'
 
   const content = html`
     <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
@@ -74,6 +75,18 @@ export function renderSettingsPage(settings: ContactSettings) {
             <input type="password" name="mapApiKey" value="${settings.mapApiKey || ''}" class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10">
           </div>
 
+          ${turnstileAvailable ? html`
+          <hr class="border-zinc-200 dark:border-zinc-800">
+          
+          <div class="flex items-center gap-3 p-4 border border-blue-200 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <input type="checkbox" id="useTurnstile" name="useTurnstile" ${useTurnstile ? 'checked' : ''} style="width: 20px; height: 20px; accent-color: #3b82f6; cursor: pointer;">
+            <div>
+              <label for="useTurnstile" class="text-base font-semibold text-zinc-900 dark:text-white select-none cursor-pointer block">🛡️ Enable Cloudflare Turnstile Protection</label>
+              <p class="text-sm text-zinc-600 dark:text-zinc-400 mt-1">Add CAPTCHA-free bot protection to your contact form (requires Turnstile plugin)</p>
+            </div>
+          </div>
+          ` : ''}
+
           <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800">
             <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-indigo-600 text-white px-6 py-2.5 text-sm font-semibold hover:bg-indigo-500 shadow-sm">Save Settings</button>
           </div>
@@ -90,6 +103,10 @@ export function renderSettingsPage(settings: ContactSettings) {
         btn.innerText = 'Saving...'; btn.disabled = true;
         const data = Object.fromEntries(new FormData(e.target));
         data.showMap = document.getElementById('showMap').checked;
+        const turnstileCheckbox = document.getElementById('useTurnstile');
+        if (turnstileCheckbox) {
+          data.useTurnstile = turnstileCheckbox.checked;
+        }
         const res = await fetch('/admin/plugins/contact-form/settings', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
         if (res.ok) { document.getElementById('msg').classList.remove('hidden'); setTimeout(() => document.getElementById('msg').classList.add('hidden'), 3000); }
         btn.innerText = 'Save Settings'; btn.disabled = false;

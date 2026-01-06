@@ -41,12 +41,43 @@ publicRoutes.get('/contact', async (c: any) => {
   const mapQuery = `${street} ${city} ${state}`
   const mapSrc = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodeURIComponent(mapQuery)}`
 
+  // Check if Turnstile is enabled and available
+  const useTurnstile = settings.useTurnstile === 1 || settings.useTurnstile === true || settings.useTurnstile === 'true' || settings.useTurnstile === 'on'
+  let turnstileSiteKey = ''
+  let turnstileEnabled = false
+  let turnstileTheme = 'auto'
+  let turnstileSize = 'normal'
+  let turnstileMode = 'managed'
+  let turnstileAppearance = 'always'
+  
+  if (useTurnstile) {
+    try {
+      const turnstilePlugin = await db
+        .prepare(`SELECT settings, status FROM plugins WHERE id = ? AND status = 'active'`)
+        .bind('turnstile')
+        .first()
+      
+      if (turnstilePlugin && turnstilePlugin.settings) {
+        const turnstileSettings = JSON.parse(turnstilePlugin.settings as string)
+        turnstileSiteKey = turnstileSettings.siteKey || ''
+        turnstileEnabled = turnstileSettings.enabled && turnstileSiteKey.length > 0
+        turnstileTheme = turnstileSettings.theme || 'auto'
+        turnstileSize = turnstileSettings.size || 'normal'
+        turnstileMode = turnstileSettings.mode || 'managed'
+        turnstileAppearance = turnstileSettings.appearance || 'always'
+      }
+    } catch (error) {
+      console.log('Turnstile plugin not available:', error)
+    }
+  }
+
   return c.html(html`
     <!DOCTYPE html>
     <html>
       <head>
         <title>Contact ${company}</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        ${turnstileEnabled ? html`<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>` : ''}
       </head>
       <body class="container py-5">
         <div class="row justify-content-center">
@@ -64,16 +95,38 @@ publicRoutes.get('/contact', async (c: any) => {
                <div class="mb-3"><label class="form-label">Name</label><input type="text" name="name" class="form-control" required></div>
                <div class="mb-3"><label class="form-label">Email</label><input type="email" name="email" class="form-control" required></div>
                <div class="mb-3"><label class="form-label">Message</label><textarea name="msg" class="form-control" rows="5" required></textarea></div>
+               ${turnstileEnabled ? html`
+               <div class="cf-turnstile mb-3" 
+                    data-sitekey="${turnstileSiteKey}"
+                    data-theme="${turnstileTheme}"
+                    data-size="${turnstileSize}"
+                    data-appearance="${turnstileAppearance}"
+                    data-execution="${turnstileMode}"></div>
+               ` : ''}
                <button class="btn btn-primary">Send Message</button>
             </form>
             <a href="/" class="btn btn-link mt-3">← Back Home</a>
           </div>
         </div>
         <script>
+          const turnstileEnabled = ${turnstileEnabled};
           document.getElementById('cf').addEventListener('submit', async(e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
+            
+            // Add Turnstile token if enabled
+            if (turnstileEnabled) {
+              const turnstileWidget = document.querySelector('.cf-turnstile');
+              if (turnstileWidget) {
+                const turnstileResponse = turnstile.getResponse(turnstileWidget);
+                if (!turnstileResponse) {
+                  alert('Please complete the security check');
+                  return;
+                }
+                data['cf-turnstile-response'] = turnstileResponse;
+              }
+            }
             
             const r = await fetch('/api/contact', {
               method: 'POST',
@@ -86,6 +139,9 @@ publicRoutes.get('/contact', async (c: any) => {
             if (res.success) {
               document.getElementById('success-alert').classList.remove('d-none');
               e.target.reset();
+              if (turnstileEnabled && window.turnstile) {
+                turnstile.reset();
+              }
               setTimeout(() => document.getElementById('success-alert').classList.add('d-none'), 5000);
             } else {
               alert('Error sending message: ' + (res.message || res.error || 'Please try again.'));
@@ -135,6 +191,82 @@ publicRoutes.post('/api/contact', async (c: any) => {
         error: 'All fields are required' 
       }, 400)
     }
+
+    // Check if Turnstile is enabled for this form
+    const { data: settings } = await service.getSettings()
+    const useTurnstile = settings.useTurnstile === 1 || settings.useTurnstile === true || settings.useTurnstile === 'true' || settings.useTurnstile === 'on'
+    
+    if (useTurnstile) {
+      // Verify Turnstile token if enabled
+      const token = data['cf-turnstile-response']
+      
+      if (!token) {
+        return c.json({
+          success: false,
+          error: 'Security verification required'
+        }, 400)
+      }
+      
+      try {
+        // Get Turnstile plugin settings
+        const turnstilePlugin = await db
+          .prepare(`SELECT settings FROM plugins WHERE id = ? AND status = 'active'`)
+          .bind('turnstile')
+          .first()
+        
+        if (!turnstilePlugin || !turnstilePlugin.settings) {
+          console.error('Turnstile plugin not available or not configured')
+          return c.json({
+            success: false,
+            error: 'Security verification unavailable'
+          }, 500)
+        }
+        
+        const turnstileSettings = JSON.parse(turnstilePlugin.settings as string)
+        const secretKey = turnstileSettings.secretKey
+        
+        if (!secretKey) {
+          console.error('Turnstile secret key not configured')
+          return c.json({
+            success: false,
+            error: 'Security verification unavailable'
+          }, 500)
+        }
+        
+        // Verify the token with Cloudflare
+        const verifyResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            secret: secretKey,
+            response: token
+          })
+        })
+        
+        const verifyResult = await verifyResponse.json() as any
+        
+        if (!verifyResult.success) {
+          console.error('Turnstile verification failed:', verifyResult['error-codes'])
+          return c.json({
+            success: false,
+            error: 'Security verification failed. Please try again.'
+          }, 400)
+        }
+        
+        console.log('Turnstile verification successful')
+      } catch (error) {
+        console.error('Error verifying Turnstile token:', error)
+        return c.json({
+          success: false,
+          error: 'Security verification error'
+        }, 500)
+      }
+    }
+
+    // Remove Turnstile token from data before saving
+    delete data['cf-turnstile-response']
 
     await service.saveMessage(data)
     

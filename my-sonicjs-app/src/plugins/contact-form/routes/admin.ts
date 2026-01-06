@@ -26,7 +26,21 @@ admin.get('/settings', async (c: any) => {
 
     const service = new ContactService(db)
     const { data } = await service.getSettings()
-    return c.html(renderSettingsPage(data))
+    
+    // Check if Turnstile plugin is available and active
+    let turnstileAvailable = false
+    try {
+      const turnstilePlugin = await db
+        .prepare(`SELECT status FROM plugins WHERE id = ? AND status = 'active'`)
+        .bind('turnstile')
+        .first()
+      turnstileAvailable = !!turnstilePlugin
+    } catch (error) {
+      // Turnstile plugin not found, that's okay - it's optional
+      console.log('Turnstile plugin not available (optional integration)')
+    }
+    
+    return c.html(renderSettingsPage(data, turnstileAvailable))
   } catch (error) {
     console.error('Error loading settings page:', error)
     return c.html('<h1>Error loading settings</h1>', 500)
