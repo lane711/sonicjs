@@ -101,7 +101,7 @@ publicRoutes.get('/contact', async (c: any) => {
                     data-theme="${turnstileTheme}"
                     data-size="${turnstileSize}"
                     data-appearance="${turnstileAppearance}"
-                    data-execution="${turnstileMode}"></div>
+                    data-execution="render"></div>
                ` : ''}
                <button class="btn btn-primary">Send Message</button>
             </form>
@@ -109,7 +109,7 @@ publicRoutes.get('/contact', async (c: any) => {
           </div>
         </div>
         <script>
-          const turnstileEnabled = ${turnstileEnabled};
+          const turnstileEnabled = ${turnstileEnabled ? 'true' : 'false'};
           document.getElementById('cf').addEventListener('submit', async(e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -128,23 +128,40 @@ publicRoutes.get('/contact', async (c: any) => {
               }
             }
             
-            const r = await fetch('/api/contact', {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json'},
-              body: JSON.stringify(data)
-            });
-            
-            const res = await r.json();
-            
-            if (res.success) {
-              document.getElementById('success-alert').classList.remove('d-none');
-              e.target.reset();
-              if (turnstileEnabled && window.turnstile) {
-                turnstile.reset();
+            try {
+              const r = await fetch('/api/contact', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+              });
+              
+              console.log('Response status:', r.status);
+              const res = await r.json();
+              console.log('Response data:', res);
+              
+              if (res.success) {
+                console.log('Showing success message');
+                const successAlert = document.getElementById('success-alert');
+                if (successAlert) {
+                  successAlert.classList.remove('d-none');
+                  console.log('Success alert classes:', successAlert.className);
+                }
+                e.target.reset();
+                if (turnstileEnabled && window.turnstile) {
+                  turnstile.reset();
+                }
+                setTimeout(() => {
+                  if (successAlert) {
+                    successAlert.classList.add('d-none');
+                  }
+                }, 5000);
+              } else {
+                console.error('Error response:', res);
+                alert('Error sending message: ' + (res.message || res.error || 'Please try again.'));
               }
-              setTimeout(() => document.getElementById('success-alert').classList.add('d-none'), 5000);
-            } else {
-              alert('Error sending message: ' + (res.message || res.error || 'Please try again.'));
+            } catch (error) {
+              console.error('Fetch error:', error);
+              alert('Error sending message. Please try again.');
             }
           });
         </script>
