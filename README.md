@@ -363,15 +363,11 @@ We welcome contributions! Please see our contributing guidelines for more detail
 
 ## ❤️ Sponsor
 
-SonicJS is 100% open source and free forever. If you find it useful, please consider sponsoring to support continued development:
+SonicJS is 100% open source and free forever. If you find it useful, please consider sponsoring:
 
 [![Sponsor on GitHub](https://img.shields.io/badge/Sponsor_on_GitHub-%E2%9D%A4-pink?style=for-the-badge&logo=github-sponsors)](https://github.com/sponsors/lane711)
 
-Your sponsorship helps fund:
-- 🚀 New features and improvements
-- 📚 Documentation and tutorials
-- 🐛 Bug fixes and maintenance
-- 💬 Community support
+**100% of sponsorship funds go to marketing** - spreading the word about SonicJS to help grow our community. The more developers who know about us, the stronger we become!
 
 ## 📞 Support
 
