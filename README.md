@@ -4,11 +4,16 @@ A modern, TypeScript-first headless CMS built for Cloudflare's edge platform wit
 
 **[sonicjs.com](https://sonicjs.com)**
 
+## 📦 Get Started
+
+```bash
+npx create-sonicjs@latest my-app
+```
+
 [![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink?style=for-the-badge&logo=github-sponsors)](https://github.com/sponsors/lane711)
+
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/lane711/sonicjs-deploy-now)
 
-> **📦 Get Started:** `npx create-sonicjs@latest my-app`
->
 > **⚠️ Note:** This repository is for **developing the SonicJS core package**. To build an application with SonicJS, use the command above to create a new project.
 
 ## 🚀 Features
@@ -360,7 +365,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our contributing guidelines for more details.
+We welcome contributions! Please see our [contributing guidelines](https://sonicjs.com/contributing) for more details.
 
 ## ❤️ Sponsor
 
