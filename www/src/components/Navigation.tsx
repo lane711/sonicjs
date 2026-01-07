@@ -282,6 +282,7 @@ export const navigation: Array<NavGroup> = [
       { title: 'FAQ', href: '/faq' },
       { title: 'Changelog', href: '/changelog' },
       { title: 'Community', href: '/community' },
+      { title: 'Sponsor', href: '/sponsor' },
       { title: 'Contributing', href: '/contributing' },
       { title: 'Coding Standards', href: '/coding-standards' },
       { title: 'Telemetry', href: '/telemetry' },

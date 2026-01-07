@@ -1,7 +1,17 @@
 import { createDb, users } from '@sonicjs-cms/core'
 import { eq } from 'drizzle-orm'
-import * as crypto from 'crypto'
 import { getPlatformProxy } from 'wrangler'
+
+/**
+ * Hash password using Web Crypto API (same as SonicJS AuthManager)
+ */
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(password + 'salt-change-in-production')
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
 
 /**
  * Seed script to create initial admin user
@@ -48,9 +58,8 @@ async function seed() {
       return
     }
 
-    // Hash password using SHA-256 (same as SonicJS auth system)
-    const data = 'sonicjs!' + 'salt-change-in-production'
-    const passwordHash = crypto.createHash('sha256').update(data).digest('hex')
+    // Hash password using Web Crypto API (same as SonicJS AuthManager)
+    const passwordHash = await hashPassword('sonicjs!')
     const now = Date.now()
     const odid = `admin-${now}-${Math.random().toString(36).substr(2, 9)}`
 
