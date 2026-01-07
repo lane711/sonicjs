@@ -370,6 +370,10 @@ SonicJS is 100% open source and free forever. If you find it useful, please cons
 
 **100% of sponsorship funds go to marketing** - spreading the word about SonicJS to help grow our community. The more developers who know about us, the stronger we become!
 
+### Thank You to Our Sponsors
+
+<a href="https://github.com/mmcintosh"><img src="https://github.com/mmcintosh.png" width="60" alt="@mmcintosh" /></a>
+
 ## 📞 Support
 
 - [GitHub Issues](https://github.com/lane711/sonicjs-ai/issues)
