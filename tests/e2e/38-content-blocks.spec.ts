@@ -35,7 +35,9 @@ test.describe('Content Blocks (Code-Based Collections)', () => {
     await secondBlock.locator('[data-block-field="buttonLabel"] input').fill('Sign up')
     await secondBlock.locator('[data-block-field="buttonUrl"] input').fill('https://example.com')
 
-    await secondBlock.locator('[data-action="move-up"]').click()
+    const dragHandle = secondBlock.locator('[data-action="drag-handle"]')
+    await dragHandle.dispatchEvent('pointerdown')
+    await secondBlock.dragTo(firstBlock)
 
     const hiddenValue = await blocksField.locator('input[type="hidden"][name="body"]').inputValue()
     const parsed = JSON.parse(hiddenValue)
