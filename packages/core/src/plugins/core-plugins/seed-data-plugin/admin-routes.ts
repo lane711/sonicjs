@@ -116,10 +116,21 @@ export function createSeedDataAdminRoutes() {
               display: none;
               margin-left: 1rem;
             }
+            .back-link {
+              display: inline-block;
+              margin-bottom: 1rem;
+              color: #3b82f6;
+              text-decoration: none;
+              font-size: 0.9rem;
+            }
+            .back-link:hover {
+              text-decoration: underline;
+            }
           </style>
         </head>
         <body>
           <div class="container">
+            <a href="/admin/plugins/seed-data" class="back-link">← Back to Plugin Settings</a>
             <h1>🌱 Seed Data Generator</h1>
             <p class="description">
               Generate realistic example data for testing and development. This will create 20 users and 200 content items with realistic data.
