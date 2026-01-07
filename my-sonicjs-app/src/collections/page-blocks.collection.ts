@@ -13,12 +13,12 @@ const pageBlocksCollection: CollectionConfig = {
         type: 'string',
         title: 'Title',
         required: true,
-        minLength: 3
+        minLength: 3,
       },
       slug: {
         type: 'slug',
         title: 'Slug',
-        required: true
+        required: true,
       },
       body: {
         type: 'array',
@@ -30,23 +30,37 @@ const pageBlocksCollection: CollectionConfig = {
             text: {
               label: 'Text',
               properties: {
-                heading: { type: 'string', required: true },
-                body: { type: 'textarea', required: true }
-              }
+                heading: { type: 'string', title: 'Heading', required: true },
+                body: { type: 'textarea', title: 'Body text', required: true },
+              },
+            },
+            longText: {
+              label: 'Long Text',
+              properties: {
+                body: { type: 'textarea', required: true },
+              },
+            },
+            imageText: {
+              label: 'Image + Text',
+              properties: {
+                title: { type: 'string', title: 'Title', required: true },
+                body: { type: 'textarea', title: 'Body text', required: true },
+                image: { type: 'media', title: 'Image', required: true },
+              },
             },
             callToAction: {
               label: 'Call To Action',
               properties: {
-                title: { type: 'string', required: true },
-                buttonLabel: { type: 'string', required: true },
-                buttonUrl: { type: 'url', required: true }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+                title: { type: 'string', title: 'Heading', required: true },
+                buttonLabel: { type: 'string', title: 'Button label', required: true },
+                buttonUrl: { type: 'url', title: 'Button URL', required: true },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 }
 
 export default pageBlocksCollection

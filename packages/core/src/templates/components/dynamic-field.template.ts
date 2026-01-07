@@ -775,12 +775,12 @@ function renderBlockCard(
           </div>
         </div>
         <div class="flex flex-wrap gap-2 text-xs">
-          <button type="button" data-action="move-up" class="inline-flex items-center justify-center rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10" aria-label="Move block up" title="Move up">
+          <button type="button" data-action="move-up" class="inline-flex items-center justify-center rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent dark:disabled:hover:bg-transparent" aria-label="Move block up" title="Move up">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="4">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6l-4 4m4-4l4 4m-4-4v12"/>
             </svg>
           </button>
-          <button type="button" data-action="move-down" class="inline-flex items-center justify-center rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10" aria-label="Move block down" title="Move down">
+          <button type="button" data-action="move-down" class="inline-flex items-center justify-center rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent dark:disabled:hover:bg-transparent" aria-label="Move block down" title="Move down">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="4">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 18l4-4m-4 4l-4-4m4 4V6"/>
             </svg>
@@ -846,6 +846,16 @@ function getBlocksFieldScript(): string {
                 const label = item.querySelector('[data-block-order-label]');
                 if (label) {
                   label.textContent = '#'+ (index + 1);
+                }
+
+                const moveUpButton = item.querySelector('[data-action="move-up"]');
+                if (moveUpButton instanceof HTMLButtonElement) {
+                  moveUpButton.disabled = index === 0;
+                }
+
+                const moveDownButton = item.querySelector('[data-action="move-down"]');
+                if (moveDownButton instanceof HTMLButtonElement) {
+                  moveDownButton.disabled = index === items.length - 1;
                 }
               });
             };
@@ -947,6 +957,10 @@ function getBlocksFieldScript(): string {
               if (!(target instanceof Element)) return;
               const actionButton = target.closest('[data-action]');
               if (!actionButton) return;
+
+              if (actionButton.hasAttribute('disabled')) {
+                return;
+              }
 
               const action = actionButton.getAttribute('data-action');
               if (action === 'add-block') {

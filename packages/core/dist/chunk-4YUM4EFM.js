@@ -1,7 +1,7 @@
 import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-3YNNVSMC.js';
-import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-4UQMEEAC.js';
+import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-CR3DU4E2.js';
 import { PluginService } from './chunk-SGAG6FD3.js';
-import { MigrationService } from './chunk-7MCNSNZV.js';
+import { MigrationService } from './chunk-AAPDRGBZ.js';
 import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-V5LBQN3I.js';
 import { QueryFilterBuilder, getBlocksFieldConfig, parseBlocksValue, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-QBPPY2OD.js';
 import { metricsTracker } from './chunk-FICTAGD4.js';
@@ -1720,7 +1720,7 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
 });
 adminApiRoutes.get("/migrations/status", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-OCMYWPPQ.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-MW2AE4KW.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const status = await migrationService.getMigrationStatus();
@@ -1745,7 +1745,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const { MigrationService: MigrationService2 } = await import('./migrations-OCMYWPPQ.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-MW2AE4KW.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const result = await migrationService.runPendingMigrations();
@@ -1764,7 +1764,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
 });
 adminApiRoutes.get("/migrations/validate", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-OCMYWPPQ.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-MW2AE4KW.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const validation = await migrationService.validateSchema();
@@ -4037,12 +4037,12 @@ function renderBlockCard(field, block, discriminator, index, data, pluginStatuse
           </div>
         </div>
         <div class="flex flex-wrap gap-2 text-xs">
-          <button type="button" data-action="move-up" class="inline-flex items-center justify-center rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10" aria-label="Move block up" title="Move up">
+          <button type="button" data-action="move-up" class="inline-flex items-center justify-center rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent dark:disabled:hover:bg-transparent" aria-label="Move block up" title="Move up">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="4">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6l-4 4m4-4l4 4m-4-4v12"/>
             </svg>
           </button>
-          <button type="button" data-action="move-down" class="inline-flex items-center justify-center rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10" aria-label="Move block down" title="Move down">
+          <button type="button" data-action="move-down" class="inline-flex items-center justify-center rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent dark:disabled:hover:bg-transparent" aria-label="Move block down" title="Move down">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="4">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 18l4-4m-4 4l-4-4m4 4V6"/>
             </svg>
@@ -4104,6 +4104,16 @@ function getBlocksFieldScript() {
                 const label = item.querySelector('[data-block-order-label]');
                 if (label) {
                   label.textContent = '#'+ (index + 1);
+                }
+
+                const moveUpButton = item.querySelector('[data-action="move-up"]');
+                if (moveUpButton instanceof HTMLButtonElement) {
+                  moveUpButton.disabled = index === 0;
+                }
+
+                const moveDownButton = item.querySelector('[data-action="move-down"]');
+                if (moveDownButton instanceof HTMLButtonElement) {
+                  moveDownButton.disabled = index === items.length - 1;
                 }
               });
             };
@@ -4205,6 +4215,10 @@ function getBlocksFieldScript() {
               if (!(target instanceof Element)) return;
               const actionButton = target.closest('[data-action]');
               if (!actionButton) return;
+
+              if (actionButton.hasAttribute('disabled')) {
+                return;
+              }
 
               const action = actionButton.getAttribute('data-action');
               if (action === 'add-block') {
@@ -22305,5 +22319,5 @@ var ROUTES_INFO = {
 };
 
 export { PluginBuilder, ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, router, test_cleanup_default, userRoutes };
-//# sourceMappingURL=chunk-HUWVC76N.js.map
-//# sourceMappingURL=chunk-HUWVC76N.js.map
+//# sourceMappingURL=chunk-4YUM4EFM.js.map
+//# sourceMappingURL=chunk-4YUM4EFM.js.map
