@@ -5,6 +5,7 @@ A modern, TypeScript-first headless CMS built for Cloudflare's edge platform wit
 **[sonicjs.com](https://sonicjs.com)**
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink?style=for-the-badge&logo=github-sponsors)](https://github.com/sponsors/lane711)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/lane711/sonicjs-deploy-now)
 
 > **📦 Get Started:** `npx create-sonicjs@latest my-app`
 >
