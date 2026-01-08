@@ -91,6 +91,7 @@ export const sections = [
 
 <div className="not-prose space-y-6 my-8">
 
+
 {/* Version 2.4.0 */}
 <div className="relative pl-8 pb-8 border-l-2 border-emerald-200 dark:border-emerald-800">
   <div className="absolute -left-3 top-0 w-6 h-6 rounded-full bg-emerald-500 border-4 border-white dark:border-gray-900 shadow-lg"></div>
@@ -108,10 +109,10 @@ export const sections = [
           <span>✨</span> Highlights
         </h4>
         <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
-          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Auto-redirect to Registration</strong> - Fresh installs now redirect to registration page when no admin exists</li>
-          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>First-time Setup Experience</strong> - New setup banner and welcome message for initial admin creation</li>
-          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Lazy Admin Check</strong> - In-memory caching minimizes DB queries (one query per worker lifetime)</li>
-          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>SonicJS Logo on Registration</strong> - Registration page now matches login page branding</li>
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span>Auto-redirect to registration when no admin exists on fresh install</li>
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span>New first-time setup experience with welcome banner</li>
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span>Lazy admin existence check - only one DB query per worker lifetime</li>
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span>SonicJS branding on registration page matching login design</li>
         </ul>
       </div>
     </div>
