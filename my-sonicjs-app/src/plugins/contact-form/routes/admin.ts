@@ -1,22 +1,19 @@
 import { Hono } from 'hono'
 import type { Context } from 'hono'
+import { requireAuth } from '@sonicjs-cms/core'
 import { ContactService } from '../services/contact'
 import { renderSettingsPage } from '../components/settings-page'
 
 const admin = new Hono()
 
-/**
- * Redirect root to settings page
- */
-admin.get('/', (c: Context) => {
-  return c.redirect('/admin/plugins/contact-form/settings')
-})
+// Apply authentication middleware to all admin routes
+admin.use('*', requireAuth())
 
 /**
- * GET /api/contact-form/settings
+ * GET /admin/plugins/contact-form
  * Display the contact form settings page
  */
-admin.get('/settings', async (c: any) => {
+admin.get('/', async (c: any) => {
   try {
     // Get DB from context (set by SonicJS middleware)
     const db = c.get('db') || c.env?.DB
@@ -48,10 +45,10 @@ admin.get('/settings', async (c: any) => {
 })
 
 /**
- * POST /api/contact-form/settings
+ * POST /admin/plugins/contact-form
  * Save contact form settings
  */
-admin.post('/settings', async (c: any) => {
+admin.post('/', async (c: any) => {
   try {
     const body = await c.req.json()
     
