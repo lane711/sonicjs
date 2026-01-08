@@ -1,5 +1,6 @@
 import { Plugin } from '../../../types/plugin'
 import { PluginBuilder } from '../../sdk/plugin-builder'
+import type { PluginService } from '../../../services/plugin-service'
 
 /**
  * TinyMCE Rich Text Editor Plugin
@@ -119,10 +120,10 @@ export function getTinyMCEInitScript(config?: {
  * @param pluginService - Plugin service instance
  * @returns Promise<boolean>
  */
-export async function isTinyMCEActive(pluginService: any): Promise<boolean> {
+export async function isTinyMCEActive(pluginService: PluginService): Promise<boolean> {
   try {
-    const status = await pluginService.getPluginStatus('tinymce-plugin')
-    return status?.is_active === true
+    const plugin = await pluginService.getPlugin('tinymce-plugin')
+    return plugin?.status === 'active'
   } catch (error) {
     console.error('Error checking TinyMCE plugin status:', error)
     return false
