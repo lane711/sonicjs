@@ -15,7 +15,7 @@ workers_dev = true
 binding = "DB"
 database_name = "sonicjs-worktree-fix-admin-content-form"
 database_id = "f2c8a7cb-fb84-4c88-92cc-12bfe9548b74"
-migrations_dir = "../packages/core/migrations"
+migrations_dir = "./migrations"
 
 # R2 Bucket for media storage
 [[r2_buckets]]
