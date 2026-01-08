@@ -20,7 +20,7 @@ declare function sanitizeInput(input: string | null | undefined): string;
  * @param fields - Array of field names to sanitize
  * @returns New object with sanitized fields
  */
-declare function sanitizeObject<T extends Record<string, any>>(obj: T, fields: (keyof T)[]): T;
+declare function sanitizeObject<T extends Record<string, unknown>>(obj: T, fields: (keyof T)[]): T;
 
 interface TemplateData {
     [key: string]: any;

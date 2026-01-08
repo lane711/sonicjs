@@ -42,7 +42,7 @@ export function sanitizeInput(input: string | null | undefined): string {
  * @param fields - Array of field names to sanitize
  * @returns New object with sanitized fields
  */
-export function sanitizeObject<T extends Record<string, any>>(
+export function sanitizeObject<T extends Record<string, unknown>>(
   obj: T,
   fields: (keyof T)[]
 ): T {
@@ -50,7 +50,7 @@ export function sanitizeObject<T extends Record<string, any>>(
 
   for (const field of fields) {
     if (typeof obj[field] === 'string') {
-      sanitized[field] = sanitizeInput(obj[field]) as T[keyof T]
+      sanitized[field] = sanitizeInput(obj[field] as string) as T[keyof T]
     }
   }
 

@@ -548,5 +548,5 @@ function getCoreVersion() {
 }
 
 export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, package_default, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer };
-//# sourceMappingURL=chunk-TMQOLXLY.js.map
-//# sourceMappingURL=chunk-TMQOLXLY.js.map
+//# sourceMappingURL=chunk-NLYJ6AEO.js.map
+//# sourceMappingURL=chunk-NLYJ6AEO.js.map
