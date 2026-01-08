@@ -243,7 +243,7 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
       headers.set('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS')
       headers.set('Access-Control-Allow-Headers', 'Content-Type')
 
-      return new Response(object.body as any, {
+      return new Response(object.body, {
         headers
       })
     } catch (error) {
