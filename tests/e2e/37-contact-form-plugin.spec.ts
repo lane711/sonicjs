@@ -28,14 +28,14 @@ test.describe('Contact Form Plugin', () => {
   // TEST 2: Admin Settings & Map Toggle
   test('should allow admin to enable the Google Map', async ({ page }) => {
     // --- LOGIN LOGIC START ---
-    await page.goto('/admin/plugins/contact-form/settings');
+    await page.goto('/admin/plugins/contact-form');
 
     // If redirected to login, fill it out
     if (page.url().includes('/auth/login')) {
       await page.fill('input[name="email"]', 'admin@sonicjs.com'); 
       await page.fill('input[name="password"]', 'sonicjs!');       
       await page.click('button[type="submit"]');
-      await page.waitForURL('**/admin/plugins/contact-form/settings');
+      await page.waitForURL('**/admin/plugins/contact-form');
     }
     // --- LOGIN LOGIC END ---
 
@@ -53,9 +53,6 @@ test.describe('Contact Form Plugin', () => {
     // FIX: We find this button by text too, just to be consistent
     await page.getByRole('button', { name: 'Save Settings' }).click();
     await expect(page.locator('#msg')).toBeVisible(); 
-
-    // 3b. Wait for D1 eventual consistency - give the database time to commit the write
-    await page.waitForTimeout(1000);
 
     // 4. Verify on Public Page
     await page.goto('/contact');
