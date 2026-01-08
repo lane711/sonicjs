@@ -52,8 +52,9 @@ const pageBlocksCollection: CollectionConfig = {
               label: 'Call To Action',
               properties: {
                 title: { type: 'string', title: 'Heading', required: true },
+                body: { type: 'textarea', title: 'Body text', required: true },
                 buttonLabel: { type: 'string', title: 'Button label', required: true },
-                buttonUrl: { type: 'url', title: 'Button URL', required: true },
+                buttonUrl: { type: 'url', title: 'Button link', required: true },
               },
             },
           },
