@@ -20,13 +20,13 @@ migrations_dir = "./migrations"
 # R2 Bucket for media storage
 [[r2_buckets]]
 binding = "MEDIA_BUCKET"
-bucket_name = "my-sonicjs-app-media"
+bucket_name = "sonicjs-ci-media"
 
 # KV Cache
 [[kv_namespaces]]
 binding = "CACHE_KV"
-id = "a16f8246fc294d809c90b0fb2df6d363"
-preview_id = "25360861fb2745fab3b1ef2f0f13ffc8"
+id = "f0814f19589a484da200cc3c3ba4d717"
+preview_id = "f0814f19589a484da200cc3c3ba4d717"
 
 # Environment variables
 [vars]
