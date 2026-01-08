@@ -5,6 +5,7 @@
  */
 
 import type { D1Database } from '@cloudflare/workers-types'
+import type { Plugin } from '../db/schema'
 
 /**
  * Check if a plugin is active
@@ -56,16 +57,16 @@ export async function requireActivePlugins(db: D1Database, pluginIds: string[]):
 /**
  * Get all active plugins
  * @param db - The D1 database instance
- * @returns Promise<any[]> - Array of active plugin records
+ * @returns Promise<Plugin[]> - Array of active plugin records
  */
-export async function getActivePlugins(db: D1Database): Promise<any[]> {
+export async function getActivePlugins(db: D1Database): Promise<Plugin[]> {
   try {
     const { results } = await db
       .prepare('SELECT * FROM plugins WHERE status = ?')
       .bind('active')
       .all()
 
-    return results || []
+    return (results || []) as Plugin[]
   } catch (error) {
     console.error('[getActivePlugins] Error fetching active plugins:', error)
     return []
