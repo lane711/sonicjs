@@ -109,7 +109,12 @@ export function renderSettingsPage(settings: ContactSettings, turnstileAvailable
         }
         try {
           console.log('[Contact Form] Saving settings to /admin/plugins/contact-form');
-          const res = await fetch('/admin/plugins/contact-form', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+          const res = await fetch('/admin/plugins/contact-form', { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify(data),
+            credentials: 'same-origin' // Include cookies for authentication
+          });
           console.log('[Contact Form] Response status:', res.status, res.ok);
           if (res.ok) { 
             console.log('[Contact Form] Settings saved successfully, showing message');
