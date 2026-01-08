@@ -107,7 +107,7 @@ export function renderSettingsPage(settings: ContactSettings, turnstileAvailable
         if (turnstileCheckbox) {
           data.useTurnstile = turnstileCheckbox.checked;
         }
-        const res = await fetch('/admin/plugins/contact-form/settings', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+        const res = await fetch('/admin/plugins/contact-form', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
         if (res.ok) { document.getElementById('msg').classList.remove('hidden'); setTimeout(() => document.getElementById('msg').classList.add('hidden'), 3000); }
         btn.innerText = 'Save Settings'; btn.disabled = false;
       });

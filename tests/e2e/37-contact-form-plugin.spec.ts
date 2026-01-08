@@ -54,6 +54,9 @@ test.describe('Contact Form Plugin', () => {
     await page.getByRole('button', { name: 'Save Settings' }).click();
     await expect(page.locator('#msg')).toBeVisible(); 
 
+    // 3b. Wait for D1 eventual consistency - give the database time to commit the write
+    await page.waitForTimeout(1000);
+
     // 4. Verify on Public Page
     await page.goto('/contact');
     

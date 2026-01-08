@@ -20,6 +20,12 @@ publicRoutes.get('/contact', async (c: any) => {
     const service = new ContactService(db)
     const { status, data: settings } = await service.getSettings()
 
+    // DEBUG: Log what settings we got
+    console.log('[Contact Form Public] Plugin status:', status)
+    console.log('[Contact Form Public] Settings:', JSON.stringify(settings))
+    console.log('[Contact Form Public] showMap:', settings.showMap)
+    console.log('[Contact Form Public] mapApiKey:', settings.mapApiKey)
+
     // For testing: Allow form to work even if not activated
     // TODO: Remove this after proper plugin activation
     // if (status !== 'active') {
