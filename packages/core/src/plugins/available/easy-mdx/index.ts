@@ -1,5 +1,6 @@
 import { Plugin } from '../../../types/plugin'
 import { PluginBuilder } from '../../sdk/plugin-builder'
+import { PluginService } from '../../../services/plugin-service'
 
 /**
  * EasyMDE Markdown Editor Plugin
@@ -246,10 +247,10 @@ export function getMDXEditorInitScript(config?: {
  * @param pluginService - Plugin service instance
  * @returns Promise<boolean>
  */
-export async function isEasyMdxActive(pluginService: any): Promise<boolean> {
+export async function isEasyMdxActive(pluginService: PluginService): Promise<boolean> {
   try {
-    const status = await pluginService.getPluginStatus('easy-mdx')
-    return status?.is_active === true
+    const plugin = await pluginService.getPluginByName('easy-mdx')
+    return plugin?.status === 'active'
   } catch (error) {
     console.error('Error checking EasyMDE editor plugin status:', error)
     return false
