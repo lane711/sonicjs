@@ -1,5 +1,5 @@
 import { syncCollections, PluginBootstrapService } from './chunk-SGAG6FD3.js';
-import { MigrationService } from './chunk-ITTJ5WTA.js';
+import { MigrationService } from './chunk-3AQK333E.js';
 import { metricsTracker } from './chunk-FICTAGD4.js';
 import { sign, verify } from 'hono/jwt';
 import { setCookie, getCookie } from 'hono/cookie';
@@ -217,5 +217,5 @@ var getActivePlugins = () => [];
 var isPluginActive = () => false;
 
 export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, metricsMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware };
-//# sourceMappingURL=chunk-7MNM45I7.js.map
-//# sourceMappingURL=chunk-7MNM45I7.js.map
+//# sourceMappingURL=chunk-SRBQJJER.js.map
+//# sourceMappingURL=chunk-SRBQJJER.js.map
