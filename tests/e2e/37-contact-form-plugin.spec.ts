@@ -30,17 +30,12 @@ test.describe('Contact Form Plugin', () => {
     // Listen for console logs to debug
     page.on('console', msg => console.log(`[Browser Console] ${msg.type()}: ${msg.text()}`));
     
-    // --- LOGIN LOGIC START ---
+    // Login first (will redirect to dashboard)
+    await loginAsAdmin(page);
+    
+    // Then navigate to Contact Form settings
     await page.goto('/admin/plugins/contact-form');
-
-    // If redirected to login, fill it out
-    if (page.url().includes('/auth/login')) {
-      await page.fill('input[name="email"]', 'admin@sonicjs.com'); 
-      await page.fill('input[name="password"]', 'sonicjs!');       
-      await page.click('button[type="submit"]');
-      await page.waitForURL('**/admin/plugins/contact-form');
-    }
-    // --- LOGIN LOGIC END ---
+    await page.waitForLoadState('networkidle');
 
     // 1. Check the "Enable Map" box
     const checkbox = page.locator('#showMap');
