@@ -602,6 +602,9 @@ authRoutes.post('/seed-admin', async (c) => {
         .bind(passwordHash, Date.now(), existingAdmin.id)
         .run()
 
+      // Update the admin exists cache so middleware doesn't redirect to setup
+      setAdminExists()
+
       return c.json({
         message: 'Admin user already exists (password updated)',
         user: {
@@ -636,7 +639,10 @@ authRoutes.post('/seed-admin', async (c) => {
       now,
       now
     ).run()
-    
+
+    // Update the admin exists cache so middleware doesn't redirect to setup
+    setAdminExists()
+
     return c.json({ 
       message: 'Admin user created successfully',
       user: {
