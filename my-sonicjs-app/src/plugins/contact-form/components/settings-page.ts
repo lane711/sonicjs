@@ -107,8 +107,21 @@ export function renderSettingsPage(settings: ContactSettings, turnstileAvailable
         if (turnstileCheckbox) {
           data.useTurnstile = turnstileCheckbox.checked;
         }
-        const res = await fetch('/admin/plugins/contact-form', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
-        if (res.ok) { document.getElementById('msg').classList.remove('hidden'); setTimeout(() => document.getElementById('msg').classList.add('hidden'), 3000); }
+        try {
+          console.log('[Contact Form] Saving settings to /admin/plugins/contact-form');
+          const res = await fetch('/admin/plugins/contact-form', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+          console.log('[Contact Form] Response status:', res.status, res.ok);
+          if (res.ok) { 
+            console.log('[Contact Form] Settings saved successfully, showing message');
+            document.getElementById('msg').classList.remove('hidden'); 
+            setTimeout(() => document.getElementById('msg').classList.add('hidden'), 3000); 
+          } else {
+            const errorText = await res.text();
+            console.error('[Contact Form] Save failed:', res.status, errorText);
+          }
+        } catch (error) {
+          console.error('[Contact Form] Fetch error:', error);
+        }
         btn.innerText = 'Save Settings'; btn.disabled = false;
       });
     </script>
