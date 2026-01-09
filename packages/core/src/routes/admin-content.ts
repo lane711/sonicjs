@@ -626,6 +626,67 @@ adminContentRoutes.post('/', async (c) => {
             data[field.field_name] = value
           }
           break
+        case 'array': {
+          if (!value || value.toString().trim() === '') {
+            data[field.field_name] = []
+            if (field.is_required) {
+              errors[field.field_name] = [`${field.field_label} is required`]
+            }
+            break
+          }
+          try {
+            const parsed = JSON.parse(value.toString())
+            if (!Array.isArray(parsed)) {
+              errors[field.field_name] = [`${field.field_label} must be a JSON array`]
+            } else {
+              if (field.is_required && parsed.length === 0) {
+                errors[field.field_name] = [`${field.field_label} is required`]
+              }
+              data[field.field_name] = parsed
+            }
+          } catch {
+            errors[field.field_name] = [`${field.field_label} must be valid JSON`]
+          }
+          break
+        }
+        case 'object': {
+          if (!value || value.toString().trim() === '') {
+            data[field.field_name] = {}
+            if (field.is_required) {
+              errors[field.field_name] = [`${field.field_label} is required`]
+            }
+            break
+          }
+          try {
+            const parsed = JSON.parse(value.toString())
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+              errors[field.field_name] = [`${field.field_label} must be a JSON object`]
+            } else {
+              if (field.is_required && Object.keys(parsed).length === 0) {
+                errors[field.field_name] = [`${field.field_label} is required`]
+              }
+              data[field.field_name] = parsed
+            }
+          } catch {
+            errors[field.field_name] = [`${field.field_label} must be valid JSON`]
+          }
+          break
+        }
+        case 'json': {
+          if (!value || value.toString().trim() === '') {
+            data[field.field_name] = null
+            if (field.is_required) {
+              errors[field.field_name] = [`${field.field_label} is required`]
+            }
+            break
+          }
+          try {
+            data[field.field_name] = JSON.parse(value.toString())
+          } catch {
+            errors[field.field_name] = [`${field.field_label} must be valid JSON`]
+          }
+          break
+        }
         default:
           data[field.field_name] = value
       }
@@ -834,6 +895,67 @@ adminContentRoutes.put('/:id', async (c) => {
             data[field.field_name] = value
           }
           break
+        case 'array': {
+          if (!value || value.toString().trim() === '') {
+            data[field.field_name] = []
+            if (field.is_required) {
+              errors[field.field_name] = [`${field.field_label} is required`]
+            }
+            break
+          }
+          try {
+            const parsed = JSON.parse(value.toString())
+            if (!Array.isArray(parsed)) {
+              errors[field.field_name] = [`${field.field_label} must be a JSON array`]
+            } else {
+              if (field.is_required && parsed.length === 0) {
+                errors[field.field_name] = [`${field.field_label} is required`]
+              }
+              data[field.field_name] = parsed
+            }
+          } catch {
+            errors[field.field_name] = [`${field.field_label} must be valid JSON`]
+          }
+          break
+        }
+        case 'object': {
+          if (!value || value.toString().trim() === '') {
+            data[field.field_name] = {}
+            if (field.is_required) {
+              errors[field.field_name] = [`${field.field_label} is required`]
+            }
+            break
+          }
+          try {
+            const parsed = JSON.parse(value.toString())
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+              errors[field.field_name] = [`${field.field_label} must be a JSON object`]
+            } else {
+              if (field.is_required && Object.keys(parsed).length === 0) {
+                errors[field.field_name] = [`${field.field_label} is required`]
+              }
+              data[field.field_name] = parsed
+            }
+          } catch {
+            errors[field.field_name] = [`${field.field_label} must be valid JSON`]
+          }
+          break
+        }
+        case 'json': {
+          if (!value || value.toString().trim() === '') {
+            data[field.field_name] = null
+            if (field.is_required) {
+              errors[field.field_name] = [`${field.field_label} is required`]
+            }
+            break
+          }
+          try {
+            data[field.field_name] = JSON.parse(value.toString())
+          } catch {
+            errors[field.field_name] = [`${field.field_label} must be valid JSON`]
+          }
+          break
+        }
         default:
           data[field.field_name] = value
       }

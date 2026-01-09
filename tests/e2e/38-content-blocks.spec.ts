@@ -17,6 +17,11 @@ test.describe('Content Blocks (Code-Based Collections)', () => {
     await page.fill('input[name="title"]', 'Blocks Page')
     await page.fill('input[name="slug"]', 'blocks-page')
 
+    const seoField = page.locator('[data-field-name="seo"]')
+    await expect(seoField).toBeVisible()
+    await seoField.locator('input[name="seo__title"]').fill('SEO Title')
+    await seoField.locator('textarea[name="seo__description"]').fill('SEO description text')
+
     const blocksField = page.locator('[data-field-name="body"]')
     await expect(blocksField).toBeVisible()
 
@@ -32,6 +37,7 @@ test.describe('Content Blocks (Code-Based Collections)', () => {
 
     const secondBlock = blocksField.locator('.blocks-item').nth(1)
     await secondBlock.locator('[data-block-field="title"] input').fill('Get started')
+    await secondBlock.locator('[data-block-field="body"] textarea').fill('CTA copy')
     await secondBlock.locator('[data-block-field="buttonLabel"] input').fill('Sign up')
     await secondBlock.locator('[data-block-field="buttonUrl"] input').fill('https://example.com')
 
@@ -39,10 +45,22 @@ test.describe('Content Blocks (Code-Based Collections)', () => {
     await dragHandle.dispatchEvent('pointerdown')
     await secondBlock.dragTo(firstBlock)
 
-    const hiddenValue = await blocksField.locator('input[type="hidden"][name="body"]').inputValue()
-    const parsed = JSON.parse(hiddenValue)
+    let hiddenValue = await blocksField.locator('input[type="hidden"][name="body"]').inputValue()
+    let parsed = JSON.parse(hiddenValue)
+
+    if (parsed[0]?.blockType !== 'callToAction') {
+      await secondBlock.locator('[data-action="move-up"]').click()
+      hiddenValue = await blocksField.locator('input[type="hidden"][name="body"]').inputValue()
+      parsed = JSON.parse(hiddenValue)
+    }
+
     expect(parsed[0].blockType).toBe('callToAction')
     expect(parsed[1].blockType).toBe('text')
+
+    const seoHiddenValue = await seoField.locator('input[type="hidden"][name="seo"]').inputValue()
+    const seoParsed = JSON.parse(seoHiddenValue)
+    expect(seoParsed.title).toBe('SEO Title')
+    expect(seoParsed.description).toBe('SEO description text')
 
     await page.click('button[type="submit"][value="save"]')
     await page.waitForURL(/\/admin\/content\?collection=/)

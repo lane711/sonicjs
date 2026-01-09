@@ -20,6 +20,34 @@ const pageBlocksCollection: CollectionConfig = {
         title: 'Slug',
         required: true,
       },
+      seo: {
+        type: 'object',
+        title: 'SEO',
+        properties: {
+          title: { type: 'string', title: 'SEO title' },
+          description: { type: 'textarea', title: 'SEO description' },
+        },
+      },
+      team: {
+        type: 'object',
+        title: 'Team',
+        properties: {
+          heading: { type: 'string', title: 'Heading' },
+          members: {
+            type: 'array',
+            title: 'Members',
+            items: {
+              type: 'object',
+              properties: {
+                name: { type: 'string', title: 'Name', required: true },
+                role: { type: 'string', title: 'Role' },
+                photo: { type: 'media', title: 'Photo' },
+              },
+            },
+          },
+        },
+      },
+
       body: {
         type: 'array',
         title: 'Content Blocks',
