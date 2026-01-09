@@ -57,6 +57,8 @@ test.describe('Turnstile Plugin', () => {
 
   test('should display Turnstile plugin in plugins list', async ({ page }) => {
     await page.goto('/admin/plugins')
+    await page.waitForLoadState('networkidle', { timeout: 15000 })
+    await page.waitForSelector('h2', { timeout: 10000 })
     
     // Check if Turnstile plugin heading is visible (more specific than text match)
     const turnstileHeading = page.getByRole('heading', { name: 'Cloudflare Turnstile' })
@@ -70,6 +72,8 @@ test.describe('Turnstile Plugin', () => {
   test('should show Turnstile settings page', async ({ page }) => {
     // Navigate directly to the Turnstile plugin settings page
     await page.goto('/admin/plugins/turnstile')
+    await page.waitForLoadState('networkidle', { timeout: 15000 })
+    await page.waitForSelector('h2', { timeout: 10000 })
     
     // Should show settings page with Plugin Settings main heading
     await expect(page.getByRole('heading', { name: 'Plugin Settings' })).toBeVisible()
@@ -89,6 +93,8 @@ test.describe('Turnstile Plugin', () => {
   test('should save Turnstile settings', async ({ page }) => {
     // Navigate directly to settings page
     await page.goto('/admin/plugins/turnstile')
+    await page.waitForLoadState('networkidle', { timeout: 15000 })
+    await page.waitForSelector('input[name="setting_siteKey"]', { timeout: 10000 })
     
     // Fill in test keys (these are dummy keys for testing UI only)
     await page.fill('input[name="setting_siteKey"]', '1x00000000000000000000AA')
