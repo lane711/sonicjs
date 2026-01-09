@@ -26,17 +26,8 @@ const tokenCache = new Map<string, CacheEntry>()
 const CACHE_CLEANUP_INTERVAL = 5 * 60 * 1000
 const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 
-// Cleanup expired cache entries periodically
-if (typeof setInterval !== 'undefined') {
-  setInterval(() => {
-    const now = Date.now()
-    for (const [key, entry] of tokenCache.entries()) {
-      if (entry.expires < now) {
-        tokenCache.delete(key)
-      }
-    }
-  }, CACHE_CLEANUP_INTERVAL)
-}
+// Note: setInterval cannot be used in Workers global scope
+// Instead, we'll do lazy cleanup when accessing the cache
 
 export class AuthManager {
   static async generateToken(userId: string, email: string, role: string): Promise<string> {
@@ -127,9 +118,19 @@ export const requireAuth = () => {
       const cacheKey = `auth:${token.substring(0, 20)}` // Use token prefix as key
       let payload: JWTPayload | null = null
 
+      // Lazy cleanup of expired entries (since we can't use setInterval in Workers)
+      const now = Date.now()
+      if (tokenCache.size > 1000) { // Cleanup when cache gets large
+        for (const [key, entry] of tokenCache.entries()) {
+          if (entry.expires < now) {
+            tokenCache.delete(key)
+          }
+        }
+      }
+
       // 1. Check in-memory cache first (fastest)
       const memCached = tokenCache.get(cacheKey)
-      if (memCached && memCached.expires > Date.now()) {
+      if (memCached && memCached.expires > now) {
         payload = memCached.payload
       }
 

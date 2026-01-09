@@ -1,7 +1,7 @@
 'use strict';
 
 var chunkILZ3DP4I_cjs = require('./chunk-ILZ3DP4I.cjs');
-var chunkH6TKO6XR_cjs = require('./chunk-H6TKO6XR.cjs');
+var chunkQXGBXR7L_cjs = require('./chunk-QXGBXR7L.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 var jwt = require('hono/jwt');
 var cookie = require('hono/cookie');
@@ -20,7 +20,7 @@ function bootstrapMiddleware(config = {}) {
     try {
       console.log("[Bootstrap] Starting system initialization...");
       console.log("[Bootstrap] Running database migrations...");
-      const migrationService = new chunkH6TKO6XR_cjs.MigrationService(c.env.DB);
+      const migrationService = new chunkQXGBXR7L_cjs.MigrationService(c.env.DB);
       await migrationService.runPendingMigrations();
       console.log("[Bootstrap] Syncing collection configurations...");
       try {
@@ -48,18 +48,7 @@ function bootstrapMiddleware(config = {}) {
 }
 var JWT_SECRET = "your-super-secret-jwt-key-change-in-production";
 var tokenCache = /* @__PURE__ */ new Map();
-var CACHE_CLEANUP_INTERVAL = 5 * 60 * 1e3;
 var CACHE_TTL = 5 * 60 * 1e3;
-if (typeof setInterval !== "undefined") {
-  setInterval(() => {
-    const now = Date.now();
-    for (const [key, entry] of tokenCache.entries()) {
-      if (entry.expires < now) {
-        tokenCache.delete(key);
-      }
-    }
-  }, CACHE_CLEANUP_INTERVAL);
-}
 var AuthManager = class {
   static async generateToken(userId, email, role) {
     const payload = {
@@ -127,8 +116,16 @@ var requireAuth = () => {
       }
       const cacheKey = `auth:${token.substring(0, 20)}`;
       let payload = null;
+      const now = Date.now();
+      if (tokenCache.size > 1e3) {
+        for (const [key, entry] of tokenCache.entries()) {
+          if (entry.expires < now) {
+            tokenCache.delete(key);
+          }
+        }
+      }
       const memCached = tokenCache.get(cacheKey);
-      if (memCached && memCached.expires > Date.now()) {
+      if (memCached && memCached.expires > now) {
         payload = memCached.payload;
       }
       if (!payload) {
@@ -314,5 +311,5 @@ exports.requireRole = requireRole;
 exports.securityHeaders = securityHeaders;
 exports.securityLoggingMiddleware = securityLoggingMiddleware;
 exports.withTimeout = withTimeout;
-//# sourceMappingURL=chunk-HT5DQSP7.cjs.map
-//# sourceMappingURL=chunk-HT5DQSP7.cjs.map
+//# sourceMappingURL=chunk-XGDP7IAC.cjs.map
+//# sourceMappingURL=chunk-XGDP7IAC.cjs.map

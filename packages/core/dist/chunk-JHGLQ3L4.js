@@ -1,5 +1,5 @@
 import { syncCollections, PluginBootstrapService } from './chunk-SGAG6FD3.js';
-import { MigrationService } from './chunk-MYFE4XTE.js';
+import { MigrationService } from './chunk-POCZQL2J.js';
 import { metricsTracker } from './chunk-FICTAGD4.js';
 import { sign, verify } from 'hono/jwt';
 import { setCookie, getCookie } from 'hono/cookie';
@@ -46,18 +46,7 @@ function bootstrapMiddleware(config = {}) {
 }
 var JWT_SECRET = "your-super-secret-jwt-key-change-in-production";
 var tokenCache = /* @__PURE__ */ new Map();
-var CACHE_CLEANUP_INTERVAL = 5 * 60 * 1e3;
 var CACHE_TTL = 5 * 60 * 1e3;
-if (typeof setInterval !== "undefined") {
-  setInterval(() => {
-    const now = Date.now();
-    for (const [key, entry] of tokenCache.entries()) {
-      if (entry.expires < now) {
-        tokenCache.delete(key);
-      }
-    }
-  }, CACHE_CLEANUP_INTERVAL);
-}
 var AuthManager = class {
   static async generateToken(userId, email, role) {
     const payload = {
@@ -125,8 +114,16 @@ var requireAuth = () => {
       }
       const cacheKey = `auth:${token.substring(0, 20)}`;
       let payload = null;
+      const now = Date.now();
+      if (tokenCache.size > 1e3) {
+        for (const [key, entry] of tokenCache.entries()) {
+          if (entry.expires < now) {
+            tokenCache.delete(key);
+          }
+        }
+      }
       const memCached = tokenCache.get(cacheKey);
-      if (memCached && memCached.expires > Date.now()) {
+      if (memCached && memCached.expires > now) {
         payload = memCached.payload;
       }
       if (!payload) {
@@ -290,5 +287,5 @@ var getActivePlugins = () => [];
 var isPluginActive = () => false;
 
 export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, metricsMiddleware, optionalAuth, performanceLoggingMiddleware, requestTimeout, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware, withTimeout };
-//# sourceMappingURL=chunk-IZ676AT6.js.map
-//# sourceMappingURL=chunk-IZ676AT6.js.map
+//# sourceMappingURL=chunk-JHGLQ3L4.js.map
+//# sourceMappingURL=chunk-JHGLQ3L4.js.map
