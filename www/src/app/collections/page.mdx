@@ -463,7 +463,19 @@ SonicJS supports 30+ field types for building rich content schemas:
   </Property>
 </Properties>
 
-### Content Blocks (Repeater)
+---
+
+## Content Blocks & Repeatable Fields
+There are three main patterns to model structured content in a page: blocks for mixed layouts, arrays for repeatable items, and objects for grouped fields.
+
+### When to use each:
+- **Blocks** - Mixed layouts in a single list (page builder sections).
+- **Arrays** - Repeatable items with the same shape (team members, FAQs, links).
+- **Objects** - Grouped fields that belong together (SEO, settings).
+
+<Callout type="info" >Blocks can include nested arrays/objects for repeatable sub-fields inside a block.</Callout>
+
+### Content Blocks
 
 Use an array field with `items.blocks` to define reusable content blocks (hero, text + image, testimonials, CTAs) with add/remove/reorder controls.
 
@@ -500,10 +512,48 @@ body: {
 
 </CodeGroup>
 
-<Callout type="info" title="Availability">
-  Blocks are currently supported for code-based collections only. The Admin UI
-  collection builder does not yet expose block definitions.
-</Callout>
+### Repeatable Lists (Arrays)
+
+Use arrays for repeatable items that share the same structure.
+
+<CodeGroup title="Team Members List">
+
+```typescript
+teamMembers: {
+  type: 'array',
+  title: 'Team Members',
+  items: {
+    type: 'object',
+    properties: {
+      name: { type: 'string', title: 'Name', required: true },
+      role: { type: 'string', title: 'Role' },
+      bio: { type: 'textarea', title: 'Bio' },
+      photo: { type: 'media', title: 'Photo' },
+    },
+  },
+},
+```
+
+</CodeGroup>
+
+### Grouped Fields (Objects)
+
+Use objects to group related fields under a single heading.
+
+<CodeGroup title="Grouped SEO Fields">
+
+```typescript
+seo: {
+  type: 'object',
+  title: 'SEO',
+  properties: {
+    title: { type: 'string', title: 'SEO title' },
+    description: { type: 'textarea', title: 'SEO description' },
+  },
+},
+```
+
+</CodeGroup>
 
 ---
 
