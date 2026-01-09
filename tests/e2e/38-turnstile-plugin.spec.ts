@@ -16,40 +16,30 @@ test.describe('Turnstile Plugin', () => {
       // Login as admin
       await loginAsAdmin(page)
       
-      // Install Turnstile plugin via API
-      const installResponse = await page.request.post('/admin/plugins/install', {
-        data: { name: 'turnstile-plugin' },
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-      
-      if (installResponse.ok()) {
-        console.log('Turnstile plugin installed successfully')
-      } else {
-        // Plugin might already be installed due to UNIQUE constraint - that's okay
-        const errorText = await installResponse.text()
-        if (errorText.includes('UNIQUE constraint')) {
-          console.log('Turnstile plugin already installed, proceeding to activate')
-        } else {
-          console.log('Turnstile plugin install failed:', installResponse.status(), errorText)
-        }
+      // Try to install plugin (will fail gracefully if already installed)
+      try {
+        const installResponse = await page.request.post('/admin/plugins/install', {
+          data: { name: 'turnstile-plugin' },
+          headers: { 'Content-Type': 'application/json' },
+          timeout: 10000
+        })
+        console.log('Install response:', installResponse.status())
+      } catch (e) {
+        console.log('Install attempt (may already exist):', e.message)
       }
       
-      // Activate the plugin (whether just installed or already existed)
-      const activateResponse = await page.request.post('/admin/plugins/turnstile/activate', {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-      
-      if (activateResponse.ok()) {
-        console.log('Turnstile plugin activated successfully')
-      } else {
-        console.log('Turnstile plugin activation response:', activateResponse.status(), await activateResponse.text())
+      // Try to activate plugin (will fail gracefully if already active)
+      try {
+        const activateResponse = await page.request.post('/admin/plugins/turnstile/activate', {
+          headers: { 'Content-Type': 'application/json' },
+          timeout: 10000
+        })
+        console.log('Activate response:', activateResponse.status())
+      } catch (e) {
+        console.log('Activate attempt (may already be active):', e.message)
       }
     } catch (error) {
-      console.log('Error setting up Turnstile plugin:', error)
+      console.log('Setup error (tests may still work if plugin exists):', error.message)
     } finally {
       await context.close()
     }
@@ -58,7 +48,7 @@ test.describe('Turnstile Plugin', () => {
   test('should display Turnstile plugin in plugins list', async ({ page }) => {
     await page.goto('/admin/plugins')
     await page.waitForLoadState('networkidle', { timeout: 15000 })
-    await page.waitForSelector('h2', { timeout: 10000 })
+    await page.waitForSelector('h1:has-text("Plugins")', { timeout: 10000 })
     
     // Check if Turnstile plugin heading is visible (more specific than text match)
     const turnstileHeading = page.getByRole('heading', { name: 'Cloudflare Turnstile' })
@@ -73,7 +63,7 @@ test.describe('Turnstile Plugin', () => {
     // Navigate directly to the Turnstile plugin settings page
     await page.goto('/admin/plugins/turnstile')
     await page.waitForLoadState('networkidle', { timeout: 15000 })
-    await page.waitForSelector('h2', { timeout: 10000 })
+    await page.waitForSelector('h2:has-text("Cloudflare Turnstile Settings")', { timeout: 10000 })
     
     // Should show settings page with Plugin Settings main heading
     await expect(page.getByRole('heading', { name: 'Plugin Settings' })).toBeVisible()
