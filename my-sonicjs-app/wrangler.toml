@@ -2,6 +2,7 @@ name = "my-sonicjs-app"
 main = "src/index.ts"
 compatibility_date = "2025-05-05"
 compatibility_flags = ["nodejs_compat"]
+account_id = "f61c658f1de7911b0a529f38308adb21"
 
 # Cloudflare Workers settings
 workers_dev = true

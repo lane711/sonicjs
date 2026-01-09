@@ -13,6 +13,31 @@ type JWTPayload = {
 // JWT secret - in production this should come from environment variables
 const JWT_SECRET = 'your-super-secret-jwt-key-change-in-production'
 
+// In-memory cache for token verification (fallback when KV is not available)
+// This is especially useful in CI environments where KV might be slow
+interface CacheEntry {
+  payload: JWTPayload
+  expires: number
+}
+
+const tokenCache = new Map<string, CacheEntry>()
+
+// Cache cleanup interval - run every 5 minutes
+const CACHE_CLEANUP_INTERVAL = 5 * 60 * 1000
+const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+
+// Cleanup expired cache entries periodically
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    const now = Date.now()
+    for (const [key, entry] of tokenCache.entries()) {
+      if (entry.expires < now) {
+        tokenCache.delete(key)
+      }
+    }
+  }, CACHE_CLEANUP_INTERVAL)
+}
+
 export class AuthManager {
   static async generateToken(userId: string, email: string, role: string): Promise<string> {
     const payload: JWTPayload = {
@@ -98,26 +123,56 @@ export const requireAuth = () => {
         return c.json({ error: 'Authentication required' }, 401)
       }
 
-      // Try to get cached token verification from KV
-      const kv = c.env?.KV
+      // Try to get cached token verification
+      const cacheKey = `auth:${token.substring(0, 20)}` // Use token prefix as key
       let payload: JWTPayload | null = null
 
-      if (kv) {
-        const cacheKey = `auth:${token.substring(0, 20)}` // Use token prefix as key
-        const cached = await kv.get(cacheKey, 'json')
-        if (cached) {
-          payload = cached as JWTPayload
+      // 1. Check in-memory cache first (fastest)
+      const memCached = tokenCache.get(cacheKey)
+      if (memCached && memCached.expires > Date.now()) {
+        payload = memCached.payload
+      }
+
+      // 2. If not in memory, try KV cache (slower but shared across requests)
+      if (!payload) {
+        const kv = c.env?.KV
+        if (kv) {
+          try {
+            const kvCached = await kv.get(cacheKey, 'json')
+            if (kvCached) {
+              payload = kvCached as JWTPayload
+              // Also store in memory cache for next time
+              tokenCache.set(cacheKey, {
+                payload,
+                expires: Date.now() + CACHE_TTL
+              })
+            }
+          } catch (error) {
+            // KV might be slow or unavailable in CI, continue without it
+            console.warn('KV cache unavailable, using memory cache only')
+          }
         }
       }
 
-      // If not cached, verify token
+      // 3. If not cached anywhere, verify token
       if (!payload) {
         payload = await AuthManager.verifyToken(token)
 
-        // Cache the verified payload for 5 minutes
-        if (payload && kv) {
-          const cacheKey = `auth:${token.substring(0, 20)}`
-          await kv.put(cacheKey, JSON.stringify(payload), { expirationTtl: 300 })
+        // Cache the verified payload in both stores
+        if (payload) {
+          // Memory cache (instant)
+          tokenCache.set(cacheKey, {
+            payload,
+            expires: Date.now() + CACHE_TTL
+          })
+
+          // KV cache (async, don't wait for it)
+          const kv = c.env?.KV
+          if (kv) {
+            kv.put(cacheKey, JSON.stringify(payload), { expirationTtl: 300 }).catch(() => {
+              // Ignore KV errors, memory cache is sufficient
+            })
+          }
         }
       }
 

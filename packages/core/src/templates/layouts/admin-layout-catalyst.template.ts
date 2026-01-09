@@ -436,8 +436,24 @@ export function renderAdminLayoutCatalyst(
         return;
       }
 
+      // Check if we've already checked recently (cache for 5 minutes)
+      const lastCheck = sessionStorage.getItem('migrationLastCheck');
+      const now = Date.now();
+      if (lastCheck && (now - parseInt(lastCheck)) < 5 * 60 * 1000) {
+        return; // Skip check if we checked less than 5 minutes ago
+      }
+
       try {
-        const response = await fetch('/admin/api/migrations/status');
+        // Add timeout to fetch request (10 seconds)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+        const response = await fetch('/admin/api/migrations/status', {
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.data && data.data.pendingMigrations > 0) {
@@ -448,9 +464,17 @@ export function renderAdminLayoutCatalyst(
               banner.classList.remove('hidden');
             }
           }
+          // Store successful check timestamp
+          sessionStorage.setItem('migrationLastCheck', now.toString());
         }
       } catch (error) {
-        console.error('Failed to check migration status:', error);
+        if (error.name === 'AbortError') {
+          console.warn('Migration status check timed out - skipping');
+        } else {
+          console.error('Failed to check migration status:', error);
+        }
+        // Don't retry immediately on error - wait for next page load
+        sessionStorage.setItem('migrationLastCheck', now.toString());
       }
     }
 

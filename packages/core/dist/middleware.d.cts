@@ -57,6 +57,17 @@ declare const optionalAuth: () => (c: Context, next: Next) => Promise<void>;
 declare const metricsMiddleware: () => MiddlewareHandler;
 
 /**
+ * Request timeout middleware
+ * Ensures requests don't hang indefinitely
+ */
+declare const requestTimeout: (timeoutMs?: number) => (c: Context, next: Next) => Promise<Response | undefined>;
+/**
+ * Database query timeout wrapper
+ * Wraps database queries with a timeout
+ */
+declare function withTimeout<T>(promise: Promise<T>, timeoutMs: number, errorMessage?: string): Promise<T>;
+
+/**
  * Middleware Module Exports
  *
  * Request processing middleware for SonicJS
@@ -86,4 +97,4 @@ declare const requireActivePlugins: any;
 declare const getActivePlugins: any;
 declare const isPluginActive: any;
 
-export { AuthManager, type Permission, PermissionManager, type UserPermissions, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, metricsMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware };
+export { AuthManager, type Permission, PermissionManager, type UserPermissions, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, metricsMiddleware, optionalAuth, performanceLoggingMiddleware, requestTimeout, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware, withTimeout };

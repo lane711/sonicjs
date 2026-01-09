@@ -1,4 +1,6 @@
-import { __esm, __export, __toCommonJS } from './chunk-V4OQ3NZ2.js';
+'use strict';
+
+var chunkIGJUBJBW_cjs = require('./chunk-IGJUBJBW.cjs');
 
 // src/templates/components/logo.template.ts
 function renderLogo(data = {}) {
@@ -42,7 +44,7 @@ function renderLogo(data = {}) {
   return logoContent;
 }
 var sizeClasses;
-var init_logo_template = __esm({
+var init_logo_template = chunkIGJUBJBW_cjs.__esm({
   "src/templates/components/logo.template.ts"() {
     sizeClasses = {
       sm: "h-6 w-auto",
@@ -55,7 +57,7 @@ var init_logo_template = __esm({
 
 // src/templates/layouts/admin-layout-catalyst.template.ts
 var admin_layout_catalyst_template_exports = {};
-__export(admin_layout_catalyst_template_exports, {
+chunkIGJUBJBW_cjs.__export(admin_layout_catalyst_template_exports, {
   renderAdminLayoutCatalyst: () => renderAdminLayoutCatalyst,
   renderCatalystCheckbox: () => renderCatalystCheckbox
 });
@@ -400,8 +402,24 @@ function renderAdminLayoutCatalyst(data) {
         return;
       }
 
+      // Check if we've already checked recently (cache for 5 minutes)
+      const lastCheck = sessionStorage.getItem('migrationLastCheck');
+      const now = Date.now();
+      if (lastCheck && (now - parseInt(lastCheck)) < 5 * 60 * 1000) {
+        return; // Skip check if we checked less than 5 minutes ago
+      }
+
       try {
-        const response = await fetch('/admin/api/migrations/status');
+        // Add timeout to fetch request (10 seconds)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+        const response = await fetch('/admin/api/migrations/status', {
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.data && data.data.pendingMigrations > 0) {
@@ -412,9 +430,17 @@ function renderAdminLayoutCatalyst(data) {
               banner.classList.remove('hidden');
             }
           }
+          // Store successful check timestamp
+          sessionStorage.setItem('migrationLastCheck', now.toString());
         }
       } catch (error) {
-        console.error('Failed to check migration status:', error);
+        if (error.name === 'AbortError') {
+          console.warn('Migration status check timed out - skipping');
+        } else {
+          console.error('Failed to check migration status:', error);
+        }
+        // Don't retry immediately on error - wait for next page load
+        sessionStorage.setItem('migrationLastCheck', now.toString());
       }
     }
 
@@ -601,7 +627,7 @@ function renderCatalystSidebar(currentPath = "", user, dynamicMenuItems, isMobil
     </nav>
   `;
 }
-var init_admin_layout_catalyst_template = __esm({
+var init_admin_layout_catalyst_template = chunkIGJUBJBW_cjs.__esm({
   "src/templates/layouts/admin-layout-catalyst.template.ts"() {
     init_logo_template();
   }
@@ -1139,7 +1165,7 @@ init_logo_template();
 function renderAdminLayout(data) {
   const {
     renderAdminLayoutCatalyst: renderAdminLayoutCatalyst2
-  } = (init_admin_layout_catalyst_template(), __toCommonJS(admin_layout_catalyst_template_exports));
+  } = (init_admin_layout_catalyst_template(), chunkIGJUBJBW_cjs.__toCommonJS(admin_layout_catalyst_template_exports));
   return renderAdminLayoutCatalyst2(data);
 }
 function adminLayoutV2(data) {
@@ -3528,6 +3554,22 @@ function renderFormField(field) {
   `;
 }
 
-export { adminLayoutV2, getConfirmationDialogScript, init_admin_layout_catalyst_template, init_logo_template, renderAdminLayout, renderAdminLayoutCatalyst, renderAlert, renderCheckboxPage, renderCodeExamplesList, renderConfirmationDialog, renderDesignPage, renderForm, renderFormField, renderLogo, renderPagination, renderTable, renderTestimonialsList };
-//# sourceMappingURL=chunk-V5LBQN3I.js.map
-//# sourceMappingURL=chunk-V5LBQN3I.js.map
+exports.adminLayoutV2 = adminLayoutV2;
+exports.getConfirmationDialogScript = getConfirmationDialogScript;
+exports.init_admin_layout_catalyst_template = init_admin_layout_catalyst_template;
+exports.init_logo_template = init_logo_template;
+exports.renderAdminLayout = renderAdminLayout;
+exports.renderAdminLayoutCatalyst = renderAdminLayoutCatalyst;
+exports.renderAlert = renderAlert;
+exports.renderCheckboxPage = renderCheckboxPage;
+exports.renderCodeExamplesList = renderCodeExamplesList;
+exports.renderConfirmationDialog = renderConfirmationDialog;
+exports.renderDesignPage = renderDesignPage;
+exports.renderForm = renderForm;
+exports.renderFormField = renderFormField;
+exports.renderLogo = renderLogo;
+exports.renderPagination = renderPagination;
+exports.renderTable = renderTable;
+exports.renderTestimonialsList = renderTestimonialsList;
+//# sourceMappingURL=chunk-HYSLP4JY.cjs.map
+//# sourceMappingURL=chunk-HYSLP4JY.cjs.map
