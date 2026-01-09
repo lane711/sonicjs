@@ -66,12 +66,17 @@ export async function ensureWorkflowTablesExist(page: Page) {
  * Ensure workflow plugin is active (for testing workflow features)
  */
 export async function ensureWorkflowPluginActive(page: Page) {
+  // SKIP: Workflow plugin not currently installed - this function just adds overhead
+  // Re-enable when workflow plugin is available
+  return;
+  
+  /* Disabled for now - workflow plugin not installed
   try {
     const currentUrl = page.url();
     
-    // Navigate to plugins page
-    await page.goto('/admin/plugins');
-    await page.waitForTimeout(1000);
+    // Navigate to plugins page with longer timeout for CI
+    await page.goto('/admin/plugins', { timeout: 20000 });
+    await page.waitForLoadState('networkidle', { timeout: 15000 });
     
     // Look for workflow plugin row
     const workflowRow = page.locator('tr').filter({ hasText: 'Workflow Management' });
@@ -98,12 +103,13 @@ export async function ensureWorkflowPluginActive(page: Page) {
     
     // Return to the original URL if it was an admin page
     if (currentUrl.includes('/admin') && !currentUrl.includes('/admin/plugins')) {
-      await page.goto(currentUrl);
-      await page.waitForTimeout(500);
+      await page.goto(currentUrl, { timeout: 20000 });
+      await page.waitForLoadState('networkidle', { timeout: 15000 });
     }
   } catch (error) {
     console.log('Could not ensure workflow plugin is active:', error);
   }
+  */
 }
 
 /**
