@@ -97,12 +97,18 @@ echo ""
 echo "Running migrations on local database..."
 npx wrangler d1 migrations apply "$DB_NAME" --local
 
+# Seed admin user
+echo ""
+echo "Seeding admin user..."
+npx tsx scripts/seed-admin.ts
+
 echo ""
 echo "=========================================="
 echo "Database setup complete!"
 echo "Database name: $DB_NAME"
 echo "Database ID: $DB_ID"
 echo "Both remote and local databases are ready."
+echo "Admin user: admin@sonicjs.com / sonicjs!"
 echo "=========================================="
 echo ""
 echo "You can now run: npm run dev"

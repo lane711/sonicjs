@@ -7,7 +7,7 @@ import { AuthManager, requireAuth } from '../middleware'
 import { renderLoginPage, LoginPageData } from '../templates/pages/auth-login.template'
 import { renderRegisterPage, RegisterPageData } from '../templates/pages/auth-register.template'
 import { getCacheService, CACHE_CONFIGS } from '../services'
-import { authValidationService, isRegistrationEnabled, isFirstUserRegistration } from '../services/auth-validation'
+import { authValidationService, isRegistrationEnabled, isFirstUserRegistration, setAdminExists } from '../services/auth-validation'
 import type { RegistrationData } from '../services/auth-validation'
 import type { Bindings, Variables } from '../app'
 
@@ -55,9 +55,11 @@ authRoutes.get('/register', async (c) => {
   }
 
   const error = c.req.query('error')
+  const isSetup = c.req.query('setup') === 'true'
 
   const pageData: RegisterPageData = {
-    error: error || undefined
+    error: error || undefined,
+    isSetup: isSetup && isFirstUser // Only show setup message if truly first user
   }
 
   return c.html(renderRegisterPage(pageData))
@@ -435,6 +437,11 @@ authRoutes.post('/register/form', async (c) => {
       now.getTime()
     ).run()
 
+    // If this was the first user (admin), update the admin exists cache
+    if (isFirstUser) {
+      setAdminExists()
+    }
+
     // Generate JWT token
     const token = await AuthManager.generateToken(userId, normalizedEmail, role)
 
@@ -595,6 +602,9 @@ authRoutes.post('/seed-admin', async (c) => {
         .bind(passwordHash, Date.now(), existingAdmin.id)
         .run()
 
+      // Update the admin exists cache so middleware doesn't redirect to setup
+      setAdminExists()
+
       return c.json({
         message: 'Admin user already exists (password updated)',
         user: {
@@ -629,7 +639,10 @@ authRoutes.post('/seed-admin', async (c) => {
       now,
       now
     ).run()
-    
+
+    // Update the admin exists cache so middleware doesn't redirect to setup
+    setAdminExists()
+
     return c.json({ 
       message: 'Admin user created successfully',
       user: {

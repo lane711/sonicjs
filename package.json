@@ -1,6 +1,6 @@
 {
   "name": "sonicjs",
-  "version": "2.3.14",
+  "version": "2.4.0",
   "private": true,
   "type": "module",
   "workspaces": [
