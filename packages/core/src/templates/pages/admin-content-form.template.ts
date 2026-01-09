@@ -546,10 +546,19 @@ export function renderContentFormPage(data: ContentFormData): string {
         gridItems.forEach(item => {
           const mediaUrl = item.getAttribute('data-media-url');
           const button = item.querySelector('.media-select-btn');
-          if (button && mediaUrl) {
-            const isSelected = selectedUrls.includes(mediaUrl);
+          if (!mediaUrl) return;
+
+          const isSelected = selectedUrls.includes(mediaUrl);
+
+          // Sync button label
+          if (button) {
             button.textContent = isSelected ? 'Deselect' : 'Select';
           }
+
+          // Sync visual selection ring
+          item.classList.toggle('ring-2', isSelected);
+          item.classList.toggle('ring-lime-500', isSelected);
+          item.classList.toggle('dark:ring-lime-400', isSelected);
         });
       }
 
