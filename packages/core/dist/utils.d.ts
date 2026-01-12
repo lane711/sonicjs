@@ -2,6 +2,32 @@ export { c as FilterCondition, d as FilterGroup, F as FilterOperator, f as Query
 import { b as TelemetryConfig } from './telemetry-UiD1i9GS.js';
 
 /**
+ * Slug generation utilities for creating URL-friendly slugs
+ */
+/**
+ * Generate URL-friendly slug from text
+ *
+ * Features:
+ * - Converts to lowercase
+ * - Handles accented characters (NFD normalization)
+ * - Removes diacritics
+ * - Keeps only alphanumeric, spaces, underscores, and hyphens
+ * - Replaces spaces with hyphens
+ * - Collapses multiple hyphens/underscores
+ * - Trims leading/trailing hyphens/underscores
+ * - Limits length to 100 characters
+ *
+ * @param text - Text to slugify
+ * @returns URL-safe slug
+ *
+ * @example
+ * generateSlug('Hello World!') // 'hello-world'
+ * generateSlug('Café París 2024') // 'cafe-paris-2024'
+ * generateSlug('Multiple   Spaces') // 'multiple-spaces'
+ */
+declare function generateSlug(text: string): string;
+
+/**
  * Telemetry ID Utilities
  *
  * Generates and manages anonymous installation IDs
@@ -50,4 +76,4 @@ declare function getTelemetryConfig(): TelemetryConfig;
  */
 declare function shouldSkipEvent(eventName: string, sampleRate?: number): boolean;
 
-export { generateInstallationId, generateProjectId, getDefaultTelemetryConfig, getTelemetryConfig, isTelemetryEnabled, sanitizeErrorMessage, sanitizeRoute, shouldSkipEvent };
+export { generateInstallationId, generateProjectId, generateSlug, getDefaultTelemetryConfig, getTelemetryConfig, isTelemetryEnabled, sanitizeErrorMessage, sanitizeRoute, shouldSkipEvent };

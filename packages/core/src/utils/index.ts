@@ -7,6 +7,9 @@
 // HTML Sanitization Utilities
 export { escapeHtml, sanitizeInput, sanitizeObject } from './sanitize'
 
+// Slug Generation Utilities
+export { generateSlug } from './slug-utils'
+
 // Template Rendering
 export { TemplateRenderer, templateRenderer, renderTemplate } from './template-renderer'
 
