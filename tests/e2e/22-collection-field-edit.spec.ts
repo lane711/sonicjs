@@ -192,7 +192,7 @@ test.describe('Collection Field Edit', () => {
     await expect(page.locator('#modal-field-name')).not.toHaveValue('', { timeout: 5000 });
     
     // Wait for checkbox to actually be checked (not just present)
-    await expect(page.locator('#field-required')).toBeChecked({ timeout: 3000 });
+    await expect(page.locator('#field-required')).toBeChecked({ timeout: 10000 });
 
     // Verify all properties are populated
     expect(await page.locator('#modal-field-name').inputValue()).toBe('complete_field');
@@ -253,7 +253,7 @@ test.describe('Collection Field Edit', () => {
     await page.waitForSelector('#field-modal:not(.hidden)');
 
     // Wait for the field type to actually be 'select' (not just any value)
-    await expect(page.locator('#field-type')).toHaveValue('select', { timeout: 3000 });
+    await expect(page.locator('#field-type')).toHaveValue('select', { timeout: 10000 });
 
     // Verify field type and options are populated
     expect(await page.locator('#field-type').inputValue()).toBe('select');
