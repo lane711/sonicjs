@@ -1,0 +1,105 @@
+{
+  "id": "contact-form",
+  "name": "Contact Form",
+  "version": "1.0.0",
+  "description": "Professional contact form with Google Maps integration, message storage, and configurable company information",
+  "author": "SonicJS Community",
+  "homepage": "https://sonicjs.com/plugins/contact-form",
+  "license": "MIT",
+  "category": "communication",
+  "tags": ["contact", "forms", "maps", "communication", "messaging"],
+  "dependencies": [],
+  "settings": {
+    "companyName": {
+      "type": "string",
+      "label": "Company Name",
+      "description": "Your company or organization name",
+      "default": "My Company"
+    },
+    "phoneNumber": {
+      "type": "string",
+      "label": "Phone Number",
+      "description": "Contact phone number",
+      "default": "555-0199"
+    },
+    "description": {
+      "type": "string",
+      "label": "Description",
+      "description": "Brief description or tagline for your contact page",
+      "default": ""
+    },
+    "address": {
+      "type": "string",
+      "label": "Street Address",
+      "description": "Physical address of your business",
+      "default": "123 Web Dev Lane"
+    },
+    "city": {
+      "type": "string",
+      "label": "City",
+      "description": "City name",
+      "default": ""
+    },
+    "state": {
+      "type": "string",
+      "label": "State/Province",
+      "description": "State, province, or region",
+      "default": ""
+    },
+    "showMap": {
+      "type": "boolean",
+      "label": "Show Google Map",
+      "description": "Display an embedded Google Map on the contact page",
+      "default": false
+    },
+    "mapApiKey": {
+      "type": "string",
+      "label": "Google Maps API Key",
+      "description": "API key for Google Maps Embed (required if showMap is enabled)",
+      "default": ""
+    }
+  },
+  "permissions": {
+    "contact_form.manage": "Manage contact form settings and view messages",
+    "contact_form.view": "View contact form and messages",
+    "contact_form.submit": "Submit contact form messages"
+  },
+  "routes": [
+    {
+      "path": "/contact",
+      "method": "GET",
+      "handler": "displayContactForm",
+      "description": "Public contact form page"
+    },
+    {
+      "path": "/api/contact",
+      "method": "POST",
+      "handler": "submitContactMessage",
+      "description": "Submit a contact form message"
+    },
+    {
+      "path": "/api/contact-form/settings",
+      "method": "GET",
+      "handler": "getSettings",
+      "description": "Get contact form settings (admin)"
+    },
+    {
+      "path": "/api/contact-form/settings",
+      "method": "POST",
+      "handler": "saveSettings",
+      "description": "Save contact form settings (admin)"
+    },
+    {
+      "path": "/api/contact-form/messages",
+      "method": "GET",
+      "handler": "getMessages",
+      "description": "Get all contact messages (admin)"
+    }
+  ],
+  "adminMenu": {
+    "label": "Contact Form",
+    "icon": "envelope",
+    "path": "/admin/contact-form/settings",
+    "order": 90
+  }
+}
