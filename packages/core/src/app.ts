@@ -26,7 +26,6 @@ import {
 import { getCoreVersion } from './utils/version'
 import { bootstrapMiddleware } from './middleware/bootstrap'
 import { metricsMiddleware } from './middleware/metrics'
-import { adminSetupMiddleware } from './middleware/admin-setup'
 import { createDatabaseToolsAdminRoutes } from './plugins/core-plugins/database-tools-plugin/admin-routes'
 import { createSeedDataAdminRoutes } from './plugins/core-plugins/seed-data-plugin/admin-routes'
 import { emailPlugin } from './plugins/core-plugins/email-plugin'
@@ -143,9 +142,6 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
 
   // Bootstrap middleware - runs migrations, syncs collections, and initializes plugins
   app.use('*', bootstrapMiddleware(config))
-
-  // Admin setup middleware - redirects to registration when no admin exists (fresh install)
-  app.use('*', adminSetupMiddleware())
 
   // Custom middleware - before auth
   if (config.middleware?.beforeAuth) {
