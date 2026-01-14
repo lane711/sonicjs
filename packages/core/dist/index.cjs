@@ -1,13 +1,14 @@
 'use strict';
 
-var chunkBCTUNTAE_cjs = require('./chunk-BCTUNTAE.cjs');
+var chunkW35UPVAS_cjs = require('./chunk-W35UPVAS.cjs');
 var chunk7FOAMNTI_cjs = require('./chunk-7FOAMNTI.cjs');
-var chunkX6ZRF7WG_cjs = require('./chunk-X6ZRF7WG.cjs');
-var chunkILZ3DP4I_cjs = require('./chunk-ILZ3DP4I.cjs');
-var chunk57V36AFO_cjs = require('./chunk-57V36AFO.cjs');
+var chunkSVEZNUPT_cjs = require('./chunk-SVEZNUPT.cjs');
+var chunkMPT5PA6U_cjs = require('./chunk-MPT5PA6U.cjs');
+var chunkYSJ65ITG_cjs = require('./chunk-YSJ65ITG.cjs');
 var chunkYIXSSJWD_cjs = require('./chunk-YIXSSJWD.cjs');
 var chunkAZLU3ROK_cjs = require('./chunk-AZLU3ROK.cjs');
-var chunkDTLB6UIH_cjs = require('./chunk-DTLB6UIH.cjs');
+var chunkBQQ7RDV3_cjs = require('./chunk-BQQ7RDV3.cjs');
+var chunkQBKCBF7C_cjs = require('./chunk-QBKCBF7C.cjs');
 var chunk2XCJ3HT5_cjs = require('./chunk-2XCJ3HT5.cjs');
 require('./chunk-P3XDZL6Q.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
@@ -558,7 +559,7 @@ function formatCellValue(value) {
 // src/plugins/core-plugins/database-tools-plugin/admin-routes.ts
 function createDatabaseToolsAdminRoutes() {
   const router2 = new hono.Hono();
-  router2.use("*", chunkX6ZRF7WG_cjs.requireAuth());
+  router2.use("*", chunkSVEZNUPT_cjs.requireAuth());
   router2.get("/api/stats", async (c) => {
     try {
       const user = c.get("user");
@@ -1306,7 +1307,7 @@ function createSeedDataAdminRoutes() {
   return routes;
 }
 function createEmailPlugin() {
-  const builder = chunkBCTUNTAE_cjs.PluginBuilder.create({
+  const builder = chunkQBKCBF7C_cjs.PluginBuilder.create({
     name: "email",
     version: "1.0.0-beta.1",
     description: "Send transactional emails using Resend"
@@ -1983,7 +1984,7 @@ var DEFAULT_SETTINGS = {
   appName: "SonicJS"
 };
 function createOTPLoginPlugin() {
-  const builder = chunkBCTUNTAE_cjs.PluginBuilder.create({
+  const builder = chunkQBKCBF7C_cjs.PluginBuilder.create({
     name: "otp-login",
     version: "1.0.0-beta.1",
     description: "Passwordless authentication via email one-time codes"
@@ -2147,7 +2148,7 @@ function createOTPLoginPlugin() {
           error: "Account is deactivated"
         }, 403);
       }
-      const token = await chunkX6ZRF7WG_cjs.AuthManager.generateToken(user.id, user.email, user.role);
+      const token = await chunkSVEZNUPT_cjs.AuthManager.generateToken(user.id, user.email, user.role);
       cookie.setCookie(c, "auth_token", token, {
         httpOnly: true,
         secure: true,
@@ -2202,8 +2203,8 @@ function createOTPLoginPlugin() {
     requiresAuth: false,
     priority: 100
   });
-  const adminRoutes = new hono.Hono();
-  adminRoutes.get("/settings", async (c) => {
+  const adminRoutes2 = new hono.Hono();
+  adminRoutes2.get("/settings", async (c) => {
     const user = c.get("user");
     const contentHTML = await html.html`
       <div class="p-8">
@@ -2383,7 +2384,7 @@ function createOTPLoginPlugin() {
       })
     );
   });
-  builder.addRoute("/admin/plugins/otp-login", adminRoutes, {
+  builder.addRoute("/admin/plugins/otp-login", adminRoutes2, {
     description: "OTP login admin interface",
     requiresAuth: true,
     priority: 85
@@ -2404,6 +2405,1840 @@ function createOTPLoginPlugin() {
   return builder.build();
 }
 var otpLoginPlugin = createOTPLoginPlugin();
+
+// src/plugins/core-plugins/ai-search-plugin/services/embedding.service.ts
+var EmbeddingService = class {
+  constructor(ai) {
+    this.ai = ai;
+  }
+  /**
+   * Generate embedding for a single text
+   */
+  async generateEmbedding(text) {
+    try {
+      const response = await this.ai.run("@cf/baai/bge-base-en-v1.5", {
+        text: this.preprocessText(text)
+      });
+      if (response.data && response.data.length > 0) {
+        return response.data[0];
+      }
+      throw new Error("No embedding data returned");
+    } catch (error) {
+      console.error("[EmbeddingService] Error generating embedding:", error);
+      throw error;
+    }
+  }
+  /**
+   * Generate embeddings for multiple texts (batch processing)
+   */
+  async generateBatch(texts) {
+    try {
+      const batchSize = 10;
+      const batches = [];
+      for (let i = 0; i < texts.length; i += batchSize) {
+        batches.push(texts.slice(i, i + batchSize));
+      }
+      const allEmbeddings = [];
+      for (const batch of batches) {
+        const batchEmbeddings = await Promise.all(
+          batch.map((text) => this.generateEmbedding(text))
+        );
+        allEmbeddings.push(...batchEmbeddings);
+      }
+      return allEmbeddings;
+    } catch (error) {
+      console.error("[EmbeddingService] Error generating batch embeddings:", error);
+      throw error;
+    }
+  }
+  /**
+   * Preprocess text before generating embedding
+   * - Trim whitespace
+   * - Limit length to avoid token limits
+   * - Remove special characters that might cause issues
+   */
+  preprocessText(text) {
+    if (!text) return "";
+    let processed = text.trim().replace(/\s+/g, " ");
+    if (processed.length > 8e3) {
+      processed = processed.substring(0, 8e3);
+    }
+    return processed;
+  }
+  /**
+   * Calculate cosine similarity between two embeddings
+   */
+  cosineSimilarity(a, b) {
+    if (a.length !== b.length) {
+      throw new Error("Embeddings must have same dimensions");
+    }
+    let dotProduct = 0;
+    let normA = 0;
+    let normB = 0;
+    for (let i = 0; i < a.length; i++) {
+      const aVal = a[i] ?? 0;
+      const bVal = b[i] ?? 0;
+      dotProduct += aVal * bVal;
+      normA += aVal * aVal;
+      normB += bVal * bVal;
+    }
+    return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+  }
+};
+
+// src/plugins/core-plugins/ai-search-plugin/services/chunking.service.ts
+var ChunkingService = class {
+  // Default chunk size (in approximate tokens)
+  CHUNK_SIZE = 500;
+  CHUNK_OVERLAP = 50;
+  /**
+   * Chunk a single content item
+   */
+  chunkContent(contentId, collectionId, title, data, metadata = {}) {
+    const text = this.extractText(data);
+    if (!text || text.trim().length === 0) {
+      console.warn(`[ChunkingService] No text found for content ${contentId}`);
+      return [];
+    }
+    const textChunks = this.splitIntoChunks(text);
+    return textChunks.map((chunkText, index) => ({
+      id: `${contentId}_chunk_${index}`,
+      content_id: contentId,
+      collection_id: collectionId,
+      title,
+      text: chunkText,
+      chunk_index: index,
+      metadata: {
+        ...metadata,
+        total_chunks: textChunks.length
+      }
+    }));
+  }
+  /**
+   * Chunk multiple content items
+   */
+  chunkContentBatch(items) {
+    const allChunks = [];
+    for (const item of items) {
+      const chunks = this.chunkContent(
+        item.id,
+        item.collection_id,
+        item.title,
+        item.data,
+        item.metadata
+      );
+      allChunks.push(...chunks);
+    }
+    return allChunks;
+  }
+  /**
+   * Extract all text from content data
+   */
+  extractText(data) {
+    const parts = [];
+    if (data.title) parts.push(String(data.title));
+    if (data.name) parts.push(String(data.name));
+    if (data.description) parts.push(String(data.description));
+    if (data.content) parts.push(String(data.content));
+    if (data.body) parts.push(String(data.body));
+    if (data.text) parts.push(String(data.text));
+    if (data.summary) parts.push(String(data.summary));
+    const extractRecursive = (obj) => {
+      if (typeof obj === "string") {
+        if (obj.length > 10 && !obj.startsWith("http")) {
+          parts.push(obj);
+        }
+      } else if (Array.isArray(obj)) {
+        obj.forEach(extractRecursive);
+      } else if (obj && typeof obj === "object") {
+        const skipKeys = ["id", "slug", "url", "image", "thumbnail", "metadata"];
+        Object.entries(obj).forEach(([key, value]) => {
+          if (!skipKeys.includes(key.toLowerCase())) {
+            extractRecursive(value);
+          }
+        });
+      }
+    };
+    extractRecursive(data);
+    return parts.join("\n\n").trim();
+  }
+  /**
+   * Split text into overlapping chunks
+   */
+  splitIntoChunks(text) {
+    const words = text.split(/\s+/);
+    if (words.length <= this.CHUNK_SIZE) {
+      return [text];
+    }
+    const chunks = [];
+    let startIndex = 0;
+    while (startIndex < words.length) {
+      const endIndex = Math.min(startIndex + this.CHUNK_SIZE, words.length);
+      const chunk = words.slice(startIndex, endIndex).join(" ");
+      chunks.push(chunk);
+      startIndex += this.CHUNK_SIZE - this.CHUNK_OVERLAP;
+      if (startIndex >= words.length - this.CHUNK_OVERLAP) {
+        break;
+      }
+    }
+    return chunks;
+  }
+  /**
+   * Get optimal chunk size based on content type
+   */
+  getOptimalChunkSize(contentType) {
+    switch (contentType) {
+      case "blog_posts":
+      case "articles":
+        return 600;
+      // Larger chunks for long-form content
+      case "products":
+      case "pages":
+        return 400;
+      // Medium chunks for structured content
+      case "messages":
+      case "comments":
+        return 200;
+      // Small chunks for short content
+      default:
+        return this.CHUNK_SIZE;
+    }
+  }
+};
+
+// src/plugins/core-plugins/ai-search-plugin/services/custom-rag.service.ts
+var CustomRAGService = class {
+  constructor(db, ai, vectorize) {
+    this.db = db;
+    this.ai = ai;
+    this.vectorize = vectorize;
+    this.embeddingService = new EmbeddingService(ai);
+    this.chunkingService = new ChunkingService();
+  }
+  embeddingService;
+  chunkingService;
+  /**
+   * Index all content from a collection
+   */
+  async indexCollection(collectionId) {
+    console.log(`[CustomRAG] Starting indexing for collection: ${collectionId}`);
+    try {
+      const { results: contentItems } = await this.db.prepare(`
+          SELECT c.id, c.title, c.data, c.collection_id, c.status,
+                 c.created_at, c.updated_at, c.author_id,
+                 col.name as collection_name, col.display_name as collection_display_name
+          FROM content c
+          JOIN collections col ON c.collection_id = col.id
+          WHERE c.collection_id = ? AND c.status = 'published'
+        `).bind(collectionId).all();
+      const totalItems = contentItems?.length || 0;
+      if (totalItems === 0) {
+        console.log(`[CustomRAG] No content found in collection ${collectionId}`);
+        return { total_items: 0, total_chunks: 0, indexed_chunks: 0, errors: 0 };
+      }
+      const items = (contentItems || []).map((item) => ({
+        id: item.id,
+        collection_id: item.collection_id,
+        title: item.title || "Untitled",
+        data: typeof item.data === "string" ? JSON.parse(item.data) : item.data,
+        metadata: {
+          status: item.status,
+          created_at: item.created_at,
+          updated_at: item.updated_at,
+          author_id: item.author_id,
+          collection_name: item.collection_name,
+          collection_display_name: item.collection_display_name
+        }
+      }));
+      const chunks = this.chunkingService.chunkContentBatch(items);
+      const totalChunks = chunks.length;
+      console.log(`[CustomRAG] Generated ${totalChunks} chunks from ${totalItems} items`);
+      const embeddings = await this.embeddingService.generateBatch(
+        chunks.map((c) => `${c.title}
+
+${c.text}`)
+      );
+      console.log(`[CustomRAG] Generated ${embeddings.length} embeddings`);
+      let indexedChunks = 0;
+      let errors = 0;
+      const batchSize = 100;
+      for (let i = 0; i < chunks.length; i += batchSize) {
+        const chunkBatch = chunks.slice(i, i + batchSize);
+        const embeddingBatch = embeddings.slice(i, i + batchSize);
+        try {
+          await this.vectorize.upsert(
+            chunkBatch.map((chunk, idx) => ({
+              id: chunk.id,
+              values: embeddingBatch[idx],
+              metadata: {
+                content_id: chunk.content_id,
+                collection_id: chunk.collection_id,
+                title: chunk.title,
+                text: chunk.text.substring(0, 500),
+                // Store snippet for display
+                chunk_index: chunk.chunk_index,
+                ...chunk.metadata
+              }
+            }))
+          );
+          indexedChunks += chunkBatch.length;
+          console.log(`[CustomRAG] Indexed batch ${i / batchSize + 1}: ${chunkBatch.length} chunks`);
+        } catch (error) {
+          console.error(`[CustomRAG] Error indexing batch ${i / batchSize + 1}:`, error);
+          errors += chunkBatch.length;
+        }
+      }
+      console.log(`[CustomRAG] Indexing complete: ${indexedChunks}/${totalChunks} chunks indexed`);
+      return {
+        total_items: totalItems,
+        total_chunks: totalChunks,
+        indexed_chunks: indexedChunks,
+        errors
+      };
+    } catch (error) {
+      console.error(`[CustomRAG] Error indexing collection ${collectionId}:`, error);
+      throw error;
+    }
+  }
+  /**
+   * Search using RAG (semantic search with Vectorize)
+   */
+  async search(query, settings) {
+    const startTime = Date.now();
+    try {
+      console.log(`[CustomRAG] Searching for: "${query.query}"`);
+      const queryEmbedding = await this.embeddingService.generateEmbedding(query.query);
+      const filter = {};
+      if (query.filters?.collections && query.filters.collections.length > 0) {
+        filter.collection_id = { $in: query.filters.collections };
+      } else if (settings.selected_collections.length > 0) {
+        filter.collection_id = { $in: settings.selected_collections };
+      }
+      if (query.filters?.status && query.filters.status.length > 0) {
+        filter.status = { $in: query.filters.status };
+      }
+      const vectorResults = await this.vectorize.query(queryEmbedding, {
+        topK: 50,
+        // Max allowed with returnMetadata: true
+        returnMetadata: true
+      });
+      let filteredMatches = vectorResults.matches || [];
+      if (filter.collection_id?.$in && Array.isArray(filter.collection_id.$in)) {
+        const allowedCollections = filter.collection_id.$in;
+        filteredMatches = filteredMatches.filter(
+          (match) => allowedCollections.includes(match.metadata?.collection_id)
+        );
+      }
+      if (filter.status?.$in && Array.isArray(filter.status.$in)) {
+        const allowedStatuses = filter.status.$in;
+        filteredMatches = filteredMatches.filter(
+          (match) => allowedStatuses.includes(match.metadata?.status)
+        );
+      }
+      const topK = query.limit || settings.results_limit || 20;
+      filteredMatches = filteredMatches.slice(0, topK);
+      vectorResults.matches = filteredMatches;
+      if (!vectorResults.matches || vectorResults.matches.length === 0) {
+        return {
+          results: [],
+          total: 0,
+          query_time_ms: Date.now() - startTime,
+          mode: "ai"
+        };
+      }
+      const contentIds = [...new Set(
+        vectorResults.matches.map((m) => m.metadata.content_id)
+      )];
+      const placeholders = contentIds.map(() => "?").join(",");
+      const { results: contentItems } = await this.db.prepare(`
+          SELECT c.id, c.title, c.slug, c.collection_id, c.status,
+                 c.created_at, c.updated_at, c.author_id,
+                 col.display_name as collection_name
+          FROM content c
+          JOIN collections col ON c.collection_id = col.id
+          WHERE c.id IN (${placeholders})
+        `).bind(...contentIds).all();
+      const searchResults = (contentItems || []).map((item) => {
+        const matchingChunks = vectorResults.matches.filter(
+          (m) => m.metadata.content_id === item.id
+        );
+        const bestMatch = matchingChunks.reduce(
+          (best, current) => current.score > (best?.score || 0) ? current : best,
+          null
+        );
+        return {
+          id: item.id,
+          title: item.title || "Untitled",
+          slug: item.slug || "",
+          collection_id: item.collection_id,
+          collection_name: item.collection_name,
+          snippet: bestMatch?.metadata?.text || "",
+          relevance_score: bestMatch?.score || 0,
+          status: item.status,
+          created_at: item.created_at,
+          updated_at: item.updated_at
+        };
+      });
+      searchResults.sort((a, b) => (b.relevance_score || 0) - (a.relevance_score || 0));
+      const queryTime = Date.now() - startTime;
+      console.log(`[CustomRAG] Search completed in ${queryTime}ms, ${searchResults.length} results`);
+      return {
+        results: searchResults,
+        total: searchResults.length,
+        query_time_ms: queryTime,
+        mode: "ai"
+      };
+    } catch (error) {
+      console.error("[CustomRAG] Search error:", error);
+      throw error;
+    }
+  }
+  /**
+   * Update index for a single content item
+   */
+  async updateContentIndex(contentId) {
+    try {
+      const content2 = await this.db.prepare(`
+          SELECT c.id, c.title, c.data, c.collection_id, c.status,
+                 c.created_at, c.updated_at, c.author_id,
+                 col.name as collection_name, col.display_name as collection_display_name
+          FROM content c
+          JOIN collections col ON c.collection_id = col.id
+          WHERE c.id = ?
+        `).bind(contentId).first();
+      if (!content2) {
+        console.warn(`[CustomRAG] Content ${contentId} not found`);
+        return;
+      }
+      if (content2.status !== "published") {
+        await this.removeContentFromIndex(contentId);
+        return;
+      }
+      const chunks = this.chunkingService.chunkContent(
+        content2.id,
+        content2.collection_id,
+        content2.title || "Untitled",
+        typeof content2.data === "string" ? JSON.parse(content2.data) : content2.data,
+        {
+          status: content2.status,
+          created_at: content2.created_at,
+          updated_at: content2.updated_at,
+          author_id: content2.author_id,
+          collection_name: content2.collection_name,
+          collection_display_name: content2.collection_display_name
+        }
+      );
+      const embeddings = await this.embeddingService.generateBatch(
+        chunks.map((c) => `${c.title}
+
+${c.text}`)
+      );
+      await this.vectorize.upsert(
+        chunks.map((chunk, idx) => ({
+          id: chunk.id,
+          values: embeddings[idx],
+          metadata: {
+            content_id: chunk.content_id,
+            collection_id: chunk.collection_id,
+            title: chunk.title,
+            text: chunk.text.substring(0, 500),
+            chunk_index: chunk.chunk_index,
+            ...chunk.metadata
+          }
+        }))
+      );
+      console.log(`[CustomRAG] Updated index for content ${contentId}: ${chunks.length} chunks`);
+    } catch (error) {
+      console.error(`[CustomRAG] Error updating index for ${contentId}:`, error);
+      throw error;
+    }
+  }
+  /**
+   * Remove content from index
+   */
+  async removeContentFromIndex(contentId) {
+    try {
+      console.log(`[CustomRAG] Removing content ${contentId} from index`);
+    } catch (error) {
+      console.error(`[CustomRAG] Error removing content ${contentId}:`, error);
+      throw error;
+    }
+  }
+  /**
+   * Get search suggestions based on query
+   */
+  async getSuggestions(partialQuery, limit = 5) {
+    try {
+      const queryEmbedding = await this.embeddingService.generateEmbedding(partialQuery);
+      const results = await this.vectorize.query(queryEmbedding, {
+        topK: limit * 2,
+        // Get more to filter
+        returnMetadata: true
+      });
+      const suggestions = [...new Set(
+        results.matches?.map((m) => m.metadata.title).filter(Boolean) || []
+      )].slice(0, limit);
+      return suggestions;
+    } catch (error) {
+      console.error("[CustomRAG] Error getting suggestions:", error);
+      return [];
+    }
+  }
+  /**
+   * Check if Vectorize is available and configured
+   */
+  isAvailable() {
+    return !!this.vectorize && !!this.ai;
+  }
+};
+
+// src/plugins/core-plugins/ai-search-plugin/services/ai-search.ts
+var AISearchService = class {
+  constructor(db, ai, vectorize) {
+    this.db = db;
+    this.ai = ai;
+    this.vectorize = vectorize;
+    if (this.ai && this.vectorize) {
+      this.customRAG = new CustomRAGService(db, ai, vectorize);
+      console.log("[AISearchService] Custom RAG initialized");
+    } else {
+      console.log("[AISearchService] Custom RAG not available, using keyword search only");
+    }
+  }
+  customRAG;
+  /**
+   * Get plugin settings
+   */
+  async getSettings() {
+    try {
+      const plugin = await this.db.prepare(`SELECT settings FROM plugins WHERE id = ? LIMIT 1`).bind("ai-search").first();
+      if (!plugin || !plugin.settings) {
+        return this.getDefaultSettings();
+      }
+      return JSON.parse(plugin.settings);
+    } catch (error) {
+      console.error("Error fetching AI Search settings:", error);
+      return this.getDefaultSettings();
+    }
+  }
+  /**
+   * Get default settings
+   */
+  getDefaultSettings() {
+    return {
+      enabled: true,
+      ai_mode_enabled: true,
+      selected_collections: [],
+      dismissed_collections: [],
+      autocomplete_enabled: true,
+      cache_duration: 1,
+      results_limit: 20,
+      index_media: false
+    };
+  }
+  /**
+   * Update plugin settings
+   */
+  async updateSettings(settings) {
+    const existing = await this.getSettings();
+    const updated = {
+      ...existing,
+      ...settings
+    };
+    try {
+      await this.db.prepare(`
+          UPDATE plugins
+          SET settings = ?,
+              updated_at = unixepoch()
+          WHERE id = 'ai-search'
+        `).bind(JSON.stringify(updated)).run();
+      return updated;
+    } catch (error) {
+      console.error("Error updating AI Search settings:", error);
+      throw error;
+    }
+  }
+  /**
+   * Detect new collections that aren't indexed or dismissed
+   */
+  async detectNewCollections() {
+    try {
+      const collectionsStmt = this.db.prepare(
+        "SELECT id, name, display_name, description FROM collections WHERE is_active = 1"
+      );
+      const { results: allCollections } = await collectionsStmt.all();
+      const collections2 = (allCollections || []).filter(
+        (col) => {
+          if (!col.name) return false;
+          const name = col.name.toLowerCase();
+          return !name.startsWith("test_") && !name.endsWith("_test") && name !== "test_collection" && !name.includes("_test_") && name !== "large_payload_test" && name !== "concurrent_test";
+        }
+      );
+      const settings = await this.getSettings();
+      const selected = settings?.selected_collections || [];
+      const dismissed = settings?.dismissed_collections || [];
+      const notifications = [];
+      for (const collection of collections2 || []) {
+        const collectionId = String(collection.id);
+        if (selected.includes(collectionId) || dismissed.includes(collectionId)) {
+          continue;
+        }
+        const countStmt = this.db.prepare(
+          "SELECT COUNT(*) as count FROM content WHERE collection_id = ?"
+        );
+        const countResult = await countStmt.bind(collectionId).first();
+        const itemCount = countResult?.count || 0;
+        notifications.push({
+          collection: {
+            id: collectionId,
+            name: collection.name,
+            display_name: collection.display_name,
+            description: collection.description,
+            item_count: itemCount,
+            is_indexed: false,
+            is_dismissed: false,
+            is_new: true
+          },
+          message: `New collection "${collection.display_name}" with ${itemCount} items available for indexing`
+        });
+      }
+      return notifications;
+    } catch (error) {
+      console.error("Error detecting new collections:", error);
+      return [];
+    }
+  }
+  /**
+   * Get all collections with indexing status
+   */
+  async getAllCollections() {
+    try {
+      const collectionsStmt = this.db.prepare(
+        "SELECT id, name, display_name, description FROM collections WHERE is_active = 1 ORDER BY display_name"
+      );
+      const { results: allCollections } = await collectionsStmt.all();
+      console.log("[AISearchService.getAllCollections] Raw collections from DB:", allCollections?.length || 0);
+      const firstCollection = allCollections?.[0];
+      if (firstCollection) {
+        console.log("[AISearchService.getAllCollections] Sample collection:", {
+          id: firstCollection.id,
+          name: firstCollection.name,
+          display_name: firstCollection.display_name
+        });
+      }
+      const collections2 = (allCollections || []).filter(
+        (col) => col.id && col.name
+      );
+      console.log("[AISearchService.getAllCollections] After filtering test collections:", collections2.length);
+      console.log("[AISearchService.getAllCollections] Remaining collections:", collections2.map((c) => c.name).join(", "));
+      const settings = await this.getSettings();
+      const selected = settings?.selected_collections || [];
+      const dismissed = settings?.dismissed_collections || [];
+      console.log("[AISearchService.getAllCollections] Settings:", {
+        selected_count: selected.length,
+        dismissed_count: dismissed.length,
+        selected
+      });
+      const collectionInfos = [];
+      for (const collection of collections2) {
+        if (!collection.id || !collection.name) continue;
+        const collectionId = String(collection.id);
+        if (!collectionId) {
+          console.warn("[AISearchService] Skipping invalid collection:", collection);
+          continue;
+        }
+        const countStmt = this.db.prepare(
+          "SELECT COUNT(*) as count FROM content WHERE collection_id = ?"
+        );
+        const countResult = await countStmt.bind(collectionId).first();
+        const itemCount = countResult?.count || 0;
+        collectionInfos.push({
+          id: collectionId,
+          name: collection.name,
+          display_name: collection.display_name || collection.name,
+          description: collection.description,
+          item_count: itemCount,
+          is_indexed: selected.includes(collectionId),
+          is_dismissed: dismissed.includes(collectionId),
+          is_new: !selected.includes(collectionId) && !dismissed.includes(collectionId)
+        });
+      }
+      console.log("[AISearchService.getAllCollections] Returning collectionInfos:", collectionInfos.length);
+      const firstInfo = collectionInfos[0];
+      if (collectionInfos.length > 0 && firstInfo) {
+        console.log("[AISearchService.getAllCollections] First collectionInfo:", {
+          id: firstInfo.id,
+          name: firstInfo.name,
+          display_name: firstInfo.display_name,
+          item_count: firstInfo.item_count
+        });
+      }
+      return collectionInfos;
+    } catch (error) {
+      console.error("[AISearchService] Error fetching collections:", error);
+      return [];
+    }
+  }
+  /**
+   * Execute search query
+   */
+  async search(query) {
+    const settings = await this.getSettings();
+    if (!settings?.enabled) {
+      return {
+        results: [],
+        total: 0,
+        query_time_ms: 0,
+        mode: query.mode
+      };
+    }
+    if (query.mode === "ai" && settings.ai_mode_enabled && this.customRAG?.isAvailable()) {
+      return this.searchAI(query, settings);
+    }
+    return this.searchKeyword(query, settings);
+  }
+  /**
+   * AI-powered semantic search using Custom RAG
+   */
+  async searchAI(query, settings) {
+    try {
+      if (!this.customRAG) {
+        console.warn("[AISearchService] CustomRAG not available, falling back to keyword search");
+        return this.searchKeyword(query, settings);
+      }
+      const result = await this.customRAG.search(query, settings);
+      return result;
+    } catch (error) {
+      console.error("[AISearchService] AI search error, falling back to keyword:", error);
+      return this.searchKeyword(query, settings);
+    }
+  }
+  /**
+   * Traditional keyword search
+   */
+  async searchKeyword(query, settings) {
+    const startTime = Date.now();
+    try {
+      const conditions = [];
+      const params = [];
+      if (query.query) {
+        conditions.push("(c.title LIKE ? OR c.slug LIKE ? OR c.data LIKE ?)");
+        const searchTerm = `%${query.query}%`;
+        params.push(searchTerm, searchTerm, searchTerm);
+      }
+      if (query.filters?.collections && query.filters.collections.length > 0) {
+        const placeholders = query.filters.collections.map(() => "?").join(",");
+        conditions.push(`c.collection_id IN (${placeholders})`);
+        params.push(...query.filters.collections);
+      } else if (settings.selected_collections.length > 0) {
+        const placeholders = settings.selected_collections.map(() => "?").join(",");
+        conditions.push(`c.collection_id IN (${placeholders})`);
+        params.push(...settings.selected_collections);
+      }
+      if (query.filters?.status && query.filters.status.length > 0) {
+        const placeholders = query.filters.status.map(() => "?").join(",");
+        conditions.push(`c.status IN (${placeholders})`);
+        params.push(...query.filters.status);
+      } else {
+        conditions.push("c.status != 'deleted'");
+      }
+      if (query.filters?.dateRange) {
+        const field = query.filters.dateRange.field || "created_at";
+        if (query.filters.dateRange.start) {
+          conditions.push(`c.${field} >= ?`);
+          params.push(query.filters.dateRange.start.getTime());
+        }
+        if (query.filters.dateRange.end) {
+          conditions.push(`c.${field} <= ?`);
+          params.push(query.filters.dateRange.end.getTime());
+        }
+      }
+      if (query.filters?.author) {
+        conditions.push("c.author_id = ?");
+        params.push(query.filters.author);
+      }
+      const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+      const countStmt = this.db.prepare(`
+        SELECT COUNT(*) as count 
+        FROM content c
+        ${whereClause}
+      `);
+      const countResult = await countStmt.bind(...params).first();
+      const total = countResult?.count || 0;
+      const limit = query.limit || settings.results_limit;
+      const offset = query.offset || 0;
+      const resultsStmt = this.db.prepare(`
+        SELECT 
+          c.id, c.title, c.slug, c.collection_id, c.status,
+          c.created_at, c.updated_at, c.author_id, c.data,
+          col.name as collection_name, col.display_name as collection_display_name,
+          u.email as author_email
+        FROM content c
+        JOIN collections col ON c.collection_id = col.id
+        LEFT JOIN users u ON c.author_id = u.id
+        ${whereClause}
+        ORDER BY c.updated_at DESC
+        LIMIT ? OFFSET ?
+      `);
+      const { results } = await resultsStmt.bind(...params, limit, offset).all();
+      const searchResults = (results || []).map((row) => ({
+        id: String(row.id),
+        title: row.title || "Untitled",
+        slug: row.slug || "",
+        collection_id: String(row.collection_id),
+        collection_name: row.collection_display_name || row.collection_name,
+        snippet: this.extractSnippet(row.data, query.query),
+        status: row.status,
+        created_at: Number(row.created_at),
+        updated_at: Number(row.updated_at),
+        author_name: row.author_email
+      }));
+      const queryTime = Date.now() - startTime;
+      await this.logSearch(query.query, query.mode, searchResults.length);
+      return {
+        results: searchResults,
+        total,
+        query_time_ms: queryTime,
+        mode: query.mode
+      };
+    } catch (error) {
+      console.error("Keyword search error:", error);
+      return {
+        results: [],
+        total: 0,
+        query_time_ms: Date.now() - startTime,
+        mode: query.mode
+      };
+    }
+  }
+  /**
+   * Extract snippet from content data
+   */
+  extractSnippet(data, query) {
+    try {
+      const parsed = typeof data === "string" ? JSON.parse(data) : data;
+      const text = JSON.stringify(parsed).toLowerCase();
+      const queryLower = query.toLowerCase();
+      const index = text.indexOf(queryLower);
+      if (index === -1) {
+        return JSON.stringify(parsed).substring(0, 200) + "...";
+      }
+      const start = Math.max(0, index - 50);
+      const end = Math.min(text.length, index + query.length + 50);
+      return text.substring(start, end) + "...";
+    } catch {
+      return data.substring(0, 200) + "...";
+    }
+  }
+  /**
+   * Get search suggestions (autocomplete)
+   */
+  async getSearchSuggestions(partial) {
+    try {
+      const settings = await this.getSettings();
+      if (!settings?.autocomplete_enabled) {
+        return [];
+      }
+      if (this.customRAG?.isAvailable()) {
+        try {
+          const aiSuggestions = await this.customRAG.getSuggestions(partial, 5);
+          if (aiSuggestions.length > 0) {
+            return aiSuggestions;
+          }
+        } catch (error) {
+          console.error("[AISearchService] Error getting AI suggestions:", error);
+        }
+      }
+      const stmt = this.db.prepare(`
+        SELECT DISTINCT query 
+        FROM ai_search_history 
+        WHERE query LIKE ? 
+        ORDER BY created_at DESC 
+        LIMIT 10
+      `);
+      const { results } = await stmt.bind(`%${partial}%`).all();
+      return (results || []).map((r) => r.query);
+    } catch (error) {
+      console.error("Error getting suggestions:", error);
+      return [];
+    }
+  }
+  /**
+   * Log search query to history
+   */
+  async logSearch(query, mode, resultsCount) {
+    try {
+      const stmt = this.db.prepare(`
+        INSERT INTO ai_search_history (query, mode, results_count, created_at)
+        VALUES (?, ?, ?, ?)
+      `);
+      await stmt.bind(query, mode, resultsCount, Date.now()).run();
+    } catch (error) {
+      console.error("Error logging search:", error);
+    }
+  }
+  /**
+   * Get search analytics
+   */
+  async getSearchAnalytics() {
+    try {
+      const totalStmt = this.db.prepare(`
+        SELECT COUNT(*) as count 
+        FROM ai_search_history 
+        WHERE created_at >= ?
+      `);
+      const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1e3;
+      const totalResult = await totalStmt.bind(thirtyDaysAgo).first();
+      const modeStmt = this.db.prepare(`
+        SELECT mode, COUNT(*) as count 
+        FROM ai_search_history 
+        WHERE created_at >= ?
+        GROUP BY mode
+      `);
+      const { results: modeResults } = await modeStmt.bind(thirtyDaysAgo).all();
+      const aiCount = modeResults?.find((r) => r.mode === "ai")?.count || 0;
+      const keywordCount = modeResults?.find((r) => r.mode === "keyword")?.count || 0;
+      const popularStmt = this.db.prepare(`
+        SELECT query, COUNT(*) as count 
+        FROM ai_search_history 
+        WHERE created_at >= ?
+        GROUP BY query 
+        ORDER BY count DESC 
+        LIMIT 10
+      `);
+      const { results: popularResults } = await popularStmt.bind(thirtyDaysAgo).all();
+      return {
+        total_queries: totalResult?.count || 0,
+        ai_queries: aiCount,
+        keyword_queries: keywordCount,
+        popular_queries: (popularResults || []).map((r) => ({
+          query: r.query,
+          count: r.count
+        })),
+        average_query_time: 0
+        // TODO: Track query times
+      };
+    } catch (error) {
+      console.error("Error getting analytics:", error);
+      return {
+        total_queries: 0,
+        ai_queries: 0,
+        keyword_queries: 0,
+        popular_queries: [],
+        average_query_time: 0
+      };
+    }
+  }
+  /**
+   * Verify Custom RAG is available
+   */
+  verifyBinding() {
+    return this.customRAG?.isAvailable() ?? false;
+  }
+  /**
+   * Get Custom RAG service instance (for indexer)
+   */
+  getCustomRAG() {
+    return this.customRAG;
+  }
+};
+
+// src/plugins/core-plugins/ai-search-plugin/services/indexer.ts
+var IndexManager = class {
+  constructor(db, ai, vectorize) {
+    this.db = db;
+    this.ai = ai;
+    this.vectorize = vectorize;
+    if (this.ai && this.vectorize) {
+      this.customRAG = new CustomRAGService(db, ai, vectorize);
+      console.log("[IndexManager] Custom RAG initialized");
+    }
+  }
+  customRAG;
+  /**
+   * Index all content items within a collection using Custom RAG
+   */
+  async indexCollection(collectionId) {
+    try {
+      const collectionStmt = this.db.prepare(
+        "SELECT id, name, display_name FROM collections WHERE id = ?"
+      );
+      const collection = await collectionStmt.bind(collectionId).first();
+      if (!collection) {
+        throw new Error(`Collection ${collectionId} not found`);
+      }
+      await this.updateIndexStatus(collectionId, {
+        collection_id: collectionId,
+        collection_name: collection.display_name,
+        total_items: 0,
+        indexed_items: 0,
+        status: "indexing"
+      });
+      if (this.customRAG?.isAvailable()) {
+        console.log(`[IndexManager] Using Custom RAG to index collection ${collectionId}`);
+        const result = await this.customRAG.indexCollection(collectionId);
+        const finalStatus = {
+          collection_id: collectionId,
+          collection_name: collection.display_name,
+          total_items: result.total_items,
+          indexed_items: result.indexed_chunks,
+          last_sync_at: Date.now(),
+          status: result.errors > 0 ? "error" : "completed",
+          error_message: result.errors > 0 ? `${result.errors} errors during indexing` : void 0
+        };
+        await this.updateIndexStatus(collectionId, finalStatus);
+        return finalStatus;
+      }
+      console.warn(`[IndexManager] Custom RAG not available, skipping indexing for ${collectionId}`);
+      const fallbackStatus = {
+        collection_id: collectionId,
+        collection_name: collection.display_name,
+        total_items: 0,
+        indexed_items: 0,
+        last_sync_at: Date.now(),
+        status: "completed",
+        error_message: "Custom RAG not available - using keyword search only"
+      };
+      await this.updateIndexStatus(collectionId, fallbackStatus);
+      return fallbackStatus;
+    } catch (error) {
+      console.error(`[IndexManager] Error indexing collection ${collectionId}:`, error);
+      const errorStatus = {
+        collection_id: collectionId,
+        collection_name: "Unknown",
+        total_items: 0,
+        indexed_items: 0,
+        status: "error",
+        error_message: error instanceof Error ? error.message : String(error)
+      };
+      await this.updateIndexStatus(collectionId, errorStatus);
+      return errorStatus;
+    }
+  }
+  /**
+   * Index a single content item
+   */
+  async indexContentItem(item, collectionId) {
+    try {
+      let parsedData = {};
+      try {
+        parsedData = typeof item.data === "string" ? JSON.parse(item.data) : item.data;
+      } catch {
+        parsedData = {};
+      }
+      const document = {
+        id: `content_${item.id}`,
+        title: item.title || "Untitled",
+        slug: item.slug || "",
+        content: this.extractSearchableText(parsedData),
+        metadata: {
+          collection_id: collectionId,
+          collection_name: item.collection_name,
+          collection_display_name: item.collection_display_name,
+          status: item.status,
+          created_at: item.created_at,
+          updated_at: item.updated_at,
+          author_id: item.author_id
+        }
+      };
+      console.log(`Indexed content item: ${item.id}`);
+    } catch (error) {
+      console.error(`Error indexing content item ${item.id}:`, error);
+      throw error;
+    }
+  }
+  /**
+   * Extract searchable text from content data
+   */
+  extractSearchableText(data) {
+    const parts = [];
+    if (data.title) parts.push(String(data.title));
+    if (data.name) parts.push(String(data.name));
+    if (data.description) parts.push(String(data.description));
+    if (data.content) parts.push(String(data.content));
+    if (data.body) parts.push(String(data.body));
+    if (data.text) parts.push(String(data.text));
+    const extractStrings = (obj) => {
+      if (typeof obj === "string") {
+        parts.push(obj);
+      } else if (Array.isArray(obj)) {
+        obj.forEach(extractStrings);
+      } else if (obj && typeof obj === "object") {
+        Object.values(obj).forEach(extractStrings);
+      }
+    };
+    extractStrings(data);
+    return parts.join(" ");
+  }
+  /**
+   * Update a single content item in the index
+   */
+  async updateIndex(collectionId, contentId) {
+    try {
+      const stmt = this.db.prepare(`
+            SELECT 
+              c.id, c.title, c.slug, c.data, c.status,
+              c.created_at, c.updated_at, c.author_id,
+              col.name as collection_name, col.display_name as collection_display_name
+            FROM content c
+            JOIN collections col ON c.collection_id = col.id
+            WHERE c.id = ? AND c.collection_id = ?
+          `);
+      const item = await stmt.bind(contentId, collectionId).first();
+      if (!item) {
+        throw new Error(`Content item ${contentId} not found`);
+      }
+      await this.indexContentItem(item, String(collectionId));
+      const status = await this.getIndexStatus(String(collectionId));
+      if (status) {
+        await this.updateIndexStatus(String(collectionId), {
+          ...status,
+          last_sync_at: Date.now()
+        });
+      }
+    } catch (error) {
+      console.error(`Error updating index for content ${contentId}:`, error);
+      throw error;
+    }
+  }
+  /**
+   * Remove a content item from the index using Custom RAG
+   */
+  async removeFromIndex(collectionId, contentId) {
+    try {
+      if (this.customRAG?.isAvailable()) {
+        console.log(`[IndexManager] Removing content ${contentId} from index`);
+        await this.customRAG.removeContentFromIndex(contentId);
+      } else {
+        console.warn(`[IndexManager] Custom RAG not available, skipping removal for ${contentId}`);
+      }
+    } catch (error) {
+      console.error(`[IndexManager] Error removing content ${contentId} from index:`, error);
+      throw error;
+    }
+  }
+  /**
+   * Get indexing status for a collection
+   */
+  async getIndexStatus(collectionId) {
+    try {
+      const stmt = this.db.prepare(
+        "SELECT * FROM ai_search_index_meta WHERE collection_id = ?"
+      );
+      const result = await stmt.bind(collectionId).first();
+      if (!result) {
+        return null;
+      }
+      return {
+        collection_id: String(result.collection_id),
+        collection_name: result.collection_name,
+        total_items: result.total_items,
+        indexed_items: result.indexed_items,
+        last_sync_at: result.last_sync_at,
+        status: result.status,
+        error_message: result.error_message
+      };
+    } catch (error) {
+      console.error(`Error getting index status for collection ${collectionId}:`, error);
+      return null;
+    }
+  }
+  /**
+   * Get indexing status for all collections
+   */
+  async getAllIndexStatus() {
+    try {
+      const stmt = this.db.prepare("SELECT * FROM ai_search_index_meta");
+      const { results } = await stmt.all();
+      const statusMap = {};
+      for (const row of results || []) {
+        const collectionId = String(row.collection_id);
+        statusMap[collectionId] = {
+          collection_id: collectionId,
+          collection_name: row.collection_name,
+          total_items: row.total_items,
+          indexed_items: row.indexed_items,
+          last_sync_at: row.last_sync_at,
+          status: row.status,
+          error_message: row.error_message
+        };
+      }
+      return statusMap;
+    } catch (error) {
+      console.error("Error getting all index status:", error);
+      return {};
+    }
+  }
+  /**
+   * Update index status in database
+   */
+  async updateIndexStatus(collectionId, status) {
+    try {
+      const checkStmt = this.db.prepare(
+        "SELECT id FROM ai_search_index_meta WHERE collection_id = ?"
+      );
+      const existing = await checkStmt.bind(collectionId).first();
+      if (existing) {
+        const stmt = this.db.prepare(`
+              UPDATE ai_search_index_meta 
+              SET collection_name = ?,
+                  total_items = ?,
+                  indexed_items = ?,
+                  last_sync_at = ?,
+                  status = ?,
+                  error_message = ?
+              WHERE collection_id = ?
+            `);
+        await stmt.bind(
+          status.collection_name,
+          status.total_items,
+          status.indexed_items,
+          status.last_sync_at || null,
+          status.status,
+          status.error_message || null,
+          String(collectionId)
+        ).run();
+      } else {
+        const stmt = this.db.prepare(`
+              INSERT INTO ai_search_index_meta (
+                collection_id, collection_name, total_items, indexed_items,
+                last_sync_at, status, error_message
+              ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            `);
+        await stmt.bind(
+          String(status.collection_id),
+          status.collection_name,
+          status.total_items,
+          status.indexed_items,
+          status.last_sync_at || null,
+          status.status,
+          status.error_message || null
+        ).run();
+      }
+    } catch (error) {
+      console.error(`Error updating index status for collection ${collectionId}:`, error);
+      throw error;
+    }
+  }
+  /**
+   * Sync all selected collections
+   */
+  async syncAll(selectedCollections) {
+    for (const collectionId of selectedCollections) {
+      try {
+        await this.indexCollection(collectionId);
+      } catch (error) {
+        console.error(`Error syncing collection ${collectionId}:`, error);
+      }
+    }
+  }
+};
+
+// src/plugins/core-plugins/ai-search-plugin/components/settings-page.ts
+function renderSettingsPage(data) {
+  const settings = data.settings || {
+    enabled: false,
+    ai_mode_enabled: true,
+    selected_collections: [],
+    dismissed_collections: [],
+    autocomplete_enabled: true,
+    cache_duration: 1,
+    results_limit: 20,
+    index_media: false
+  };
+  const selectedCollections = Array.isArray(settings.selected_collections) ? settings.selected_collections : [];
+  const dismissedCollections = Array.isArray(settings.dismissed_collections) ? settings.dismissed_collections : [];
+  const enabled = settings.enabled === true;
+  const aiModeEnabled = settings.ai_mode_enabled !== false;
+  const autocompleteEnabled = settings.autocomplete_enabled !== false;
+  const indexMedia = settings.index_media === true;
+  const selectedCollectionIds = new Set(selectedCollections.map((id) => String(id)));
+  const dismissedCollectionIds = new Set(dismissedCollections.map((id) => String(id)));
+  const collections2 = Array.isArray(data.collections) ? data.collections : [];
+  console.log("[SettingsPage Template] Collections received:", collections2.length);
+  if (collections2.length > 0) {
+    console.log("[SettingsPage Template] First collection:", collections2[0]);
+  }
+  const content2 = `
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+      <!-- Header with Back Button -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div>
+          <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">\u{1F50D} AI Search Settings</h1>
+          <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">
+            Configure advanced search with Cloudflare AI Search. Select collections to index and manage search preferences.
+          </p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <a href="/admin/plugins" class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm">
+            <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to Plugins
+          </a>
+        </div>
+      </div>
+
+
+          <!-- Main Settings Card -->
+          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 mb-6">
+            <form id="settingsForm" class="space-y-6">
+              <!-- Enable Search Section -->
+              <div>
+                <h2 class="text-xl font-semibold text-zinc-950 dark:text-white mb-4">\u{1F50D} Search Settings</h2>
+                <div class="space-y-3">
+                  <div class="flex items-center gap-3 p-4 border border-indigo-200 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                    <input type="checkbox" id="enabled" name="enabled" ${enabled ? "checked" : ""} class="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                    <div class="flex-1">
+                      <label for="enabled" class="text-base font-semibold text-zinc-900 dark:text-white select-none cursor-pointer block">Enable AI Search</label>
+                      <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">Turn on advanced search capabilities across your content</p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-3 p-4 border border-blue-200 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <input type="checkbox" id="ai_mode_enabled" name="ai_mode_enabled" ${aiModeEnabled ? "checked" : ""} class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                    <div class="flex-1">
+                      <label for="ai_mode_enabled" class="text-base font-semibold text-zinc-900 dark:text-white select-none cursor-pointer block">\u{1F916} AI/Semantic Search</label>
+                      <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
+                        Enable natural language queries (requires Cloudflare Workers AI binding)
+                        <a href="https://developers.cloudflare.com/workers-ai/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline ml-1">\u2192 Setup Guide</a>
+                      </p>
+                      <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                        \u26A0\uFE0F If AI binding unavailable, will fallback to keyword search
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="border-zinc-200 dark:border-zinc-800">
+
+              <!-- Collections Section -->
+              <div>
+                <div class="flex items-start justify-between mb-4">
+                  <div>
+                    <h2 class="text-xl font-semibold text-zinc-950 dark:text-white">\u{1F4DA} Collections to Index</h2>
+                    <p class="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+                      Select which content collections should be indexed and searchable. Only checked collections will be included in search results.
+                    </p>
+                  </div>
+                </div>
+            <div class="space-y-3 max-h-96 overflow-y-auto border-2 border-zinc-300 dark:border-zinc-700 rounded-lg p-4 bg-white dark:bg-zinc-800" id="collections-list">
+              ${collections2.length === 0 ? '<p class="text-sm text-zinc-500 dark:text-zinc-400 p-4">No collections available. Create collections first.</p>' : collections2.map((collection) => {
+    const collectionId = String(collection.id);
+    const isChecked = selectedCollectionIds.has(collectionId);
+    const isDismissed = dismissedCollectionIds.has(collectionId);
+    const indexStatusMap = data.indexStatus || {};
+    const status = indexStatusMap[collectionId];
+    const isNew = collection.is_new === true && !isDismissed && !status;
+    const statusBadge = status && isChecked ? `<span class="ml-2 px-2 py-1 text-xs rounded-full ${status.status === "completed" ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" : status.status === "indexing" ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" : status.status === "error" ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"}">${status.status}</span>` : "";
+    return `<div class="flex items-start gap-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-700 ${isNew ? "bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800" : "hover:bg-zinc-50 dark:hover:bg-zinc-800"}">
+                      <input
+                        type="checkbox"
+                        id="collection_${collectionId}"
+                        name="selected_collections"
+                        value="${collectionId}"
+                        ${isChecked ? "checked" : ""}
+                        class="mt-1 w-5 h-5 text-indigo-600 bg-white border-gray-300 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                        style="cursor: pointer; flex-shrink: 0;"
+                      />
+                      <div class="flex-1 min-w-0">
+                        <label for="collection_${collectionId}" class="text-sm font-medium text-zinc-950 dark:text-white select-none cursor-pointer flex items-center">
+                          ${collection.display_name || collection.name || "Unnamed Collection"}
+                          ${isNew ? '<span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">NEW</span>' : ""}
+                          ${statusBadge}
+                        </label>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                          ${collection.description || collection.name || "No description"} \u2022 ${collection.item_count || 0} items
+                          ${status ? ` \u2022 ${status.indexed_items}/${status.total_items} indexed` : ""}
+                        </p>
+                        ${status && status.status === "indexing" ? `<div class="mt-2 w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                              <div class="bg-blue-600 h-2 rounded-full" style="width: ${status.indexed_items / status.total_items * 100}%"></div>
+                            </div>` : ""}
+                      </div>
+                      ${isChecked ? `
+                        <button
+                          type="button"
+                          onclick="reindexCollection('${collectionId}')"
+                          class="px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap"
+                          ${status && status.status === "indexing" ? "disabled" : ""}
+                        >
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                          Re-index
+                        </button>
+                      ` : ""}
+                    </div>`;
+  }).join("")}
+            </div>
+          </div>
+
+              <hr class="border-zinc-200 dark:border-zinc-800">
+
+              <!-- Advanced Options -->
+              <div>
+                <h2 class="text-xl font-semibold text-zinc-950 dark:text-white mb-4">\u2699\uFE0F Advanced Options</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="flex items-start gap-3 p-3 border border-zinc-200 dark:border-zinc-700 rounded-lg">
+                    <input type="checkbox" id="autocomplete_enabled" name="autocomplete_enabled" ${autocompleteEnabled ? "checked" : ""} class="mt-0.5 w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                    <div>
+                      <label for="autocomplete_enabled" class="text-sm font-medium text-zinc-950 dark:text-white select-none cursor-pointer block">Autocomplete Suggestions</label>
+                      <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Show search suggestions as users type</p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-start gap-3 p-3 border border-zinc-200 dark:border-zinc-700 rounded-lg">
+                    <input type="checkbox" id="index_media" name="index_media" ${indexMedia ? "checked" : ""} class="mt-0.5 w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                    <div>
+                      <label for="index_media" class="text-sm font-medium text-zinc-950 dark:text-white select-none cursor-pointer block">Index Media Metadata</label>
+                      <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Include media files in search results</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Cache Duration (hours)</label>
+                    <input type="number" id="cache_duration" name="cache_duration" value="${settings.cache_duration || 1}" min="0" max="24" class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:ring-2 focus:ring-indigo-500">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">Results Per Page</label>
+                    <input type="number" id="results_limit" name="results_limit" value="${settings.results_limit || 20}" min="10" max="100" class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 focus:ring-2 focus:ring-indigo-500">
+                  </div>
+                </div>
+          </div>
+
+              <!-- Save Button -->
+              <div class="flex items-center justify-between pt-4 border-t border-zinc-200 dark:border-zinc-800">
+                <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                  \u{1F4A1} Collections marked as <span class="px-1.5 py-0.5 text-xs font-medium rounded-full bg-blue-500 text-white">NEW</span> haven't been indexed yet
+                </p>
+                <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-indigo-600 text-white px-6 py-2.5 text-sm font-semibold hover:bg-indigo-500 shadow-sm transition-colors">
+                  \u{1F4BE} Save Settings
+                </button>
+              </div>
+        </form>
+      </div>
+
+
+          <!-- Search Analytics -->
+          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
+            <h2 class="text-xl font-semibold text-zinc-950 dark:text-white mb-4">\u{1F4CA} Search Analytics</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-800">
+            <div class="text-sm text-zinc-500 dark:text-zinc-400">Total Queries</div>
+            <div class="text-2xl font-bold text-zinc-950 dark:text-white mt-1">${data.analytics.total_queries}</div>
+          </div>
+          <div class="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-800">
+            <div class="text-sm text-zinc-500 dark:text-zinc-400">AI Queries</div>
+            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">${data.analytics.ai_queries}</div>
+          </div>
+          <div class="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-800">
+            <div class="text-sm text-zinc-500 dark:text-zinc-400">Keyword Queries</div>
+            <div class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">${data.analytics.keyword_queries}</div>
+          </div>
+        </div>
+        ${data.analytics.popular_queries.length > 0 ? `
+              <div>
+                <h3 class="text-sm font-semibold text-zinc-950 dark:text-white mb-2">Popular Searches</h3>
+                <div class="space-y-1">
+                  ${data.analytics.popular_queries.map(
+    (item) => `
+                      <div class="flex items-center justify-between text-sm">
+                        <span class="text-zinc-700 dark:text-zinc-300">"${item.query}"</span>
+                        <span class="text-zinc-500 dark:text-zinc-400">${item.count} times</span>
+                      </div>
+                    `
+  ).join("")}
+                </div>
+              </div>
+            ` : '<p class="text-sm text-zinc-500 dark:text-zinc-400">No search history yet.</p>'}
+      </div>
+
+          <!-- Success Message -->
+          <div id="msg" class="hidden fixed bottom-4 right-4 p-4 rounded-lg bg-green-50 text-green-900 border border-green-200 dark:bg-green-900/20 dark:text-green-100 dark:border-green-800 shadow-lg z-50">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">\u2705</span>
+              <span class="font-semibold">Settings Saved Successfully!</span>
+            </div>
+          </div>
+    </div>
+    <script>
+      // Form submission with error handling
+      document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        console.log('[AI Search Client] Form submitted');
+        
+        try {
+          const btn = e.submitter;
+          btn.innerText = 'Saving...'; 
+          btn.disabled = true;
+          
+          const formData = new FormData(e.target);
+          const selectedCollections = Array.from(formData.getAll('selected_collections')).map(String);
+          
+          const data = {
+            enabled: document.getElementById('enabled').checked,
+            ai_mode_enabled: document.getElementById('ai_mode_enabled').checked,
+            selected_collections: selectedCollections,
+            autocomplete_enabled: document.getElementById('autocomplete_enabled').checked,
+            cache_duration: Number(formData.get('cache_duration')),
+            results_limit: Number(formData.get('results_limit')),
+            index_media: document.getElementById('index_media').checked,
+          };
+          
+          console.log('[AI Search Client] Sending data:', data);
+          console.log('[AI Search Client] Selected collections:', selectedCollections);
+          
+          const res = await fetch('/admin/plugins/ai-search', { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify(data) 
+          });
+          
+          console.log('[AI Search Client] Response status:', res.status);
+          
+          if (res.ok) {
+            const result = await res.json();
+            console.log('[AI Search Client] Save successful:', result);
+            document.getElementById('msg').classList.remove('hidden'); 
+            setTimeout(() => {
+              document.getElementById('msg').classList.add('hidden');
+              location.reload();
+            }, 2000); 
+          } else {
+            const error = await res.text();
+            console.error('[AI Search Client] Save failed:', error);
+            alert('Failed to save settings: ' + error);
+          }
+          
+          btn.innerText = 'Save Settings'; 
+          btn.disabled = false;
+        } catch (error) {
+          console.error('[AI Search Client] Error:', error);
+          alert('Error saving settings: ' + error.message);
+        }
+      });
+
+      // Add collection to index
+      async function addCollectionToIndex(collectionId) {
+        const form = document.getElementById('settingsForm');
+        const checkbox = document.getElementById('collection_' + collectionId);
+        if (checkbox) {
+          checkbox.checked = true;
+          form.dispatchEvent(new Event('submit'));
+        }
+      }
+
+      // Dismiss collection
+      async function dismissCollection(collectionId) {
+        const res = await fetch('/admin/plugins/ai-search', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            dismissed_collections: [collectionId]
+          })
+        });
+        if (res.ok) {
+          location.reload();
+        }
+      }
+
+      // Re-index collection
+      async function reindexCollection(collectionId) {
+        const res = await fetch('/admin/plugins/ai-search/api/reindex', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ collection_id: collectionId })
+        });
+        if (res.ok) {
+          alert('Re-indexing started. Page will refresh in a moment.');
+          setTimeout(() => location.reload(), 2000);
+        } else {
+          alert('Failed to start re-indexing. Please try again.');
+        }
+      }
+
+      // Poll for index status updates
+      setInterval(async () => {
+        const res = await fetch('/admin/plugins/ai-search/api/status');
+        if (res.ok) {
+          const { data } = await res.json();
+          // Update status indicators if needed
+          // For now, just reload every 30 seconds if indexing is in progress
+          const hasIndexing = Object.values(data).some((s) => s.status === 'indexing');
+          if (hasIndexing) {
+            location.reload();
+          }
+        }
+      }, 30000);
+    </script>
+  `;
+  return chunkAZLU3ROK_cjs.renderAdminLayout({
+    title: "AI Search Settings",
+    pageTitle: "AI Search Settings",
+    currentPath: "/admin/plugins/ai-search/settings",
+    user: data.user,
+    content: content2
+  });
+}
+
+// src/plugins/core-plugins/ai-search-plugin/routes/admin.ts
+var adminRoutes = new hono.Hono();
+adminRoutes.use("*", chunkSVEZNUPT_cjs.requireAuth());
+adminRoutes.get("/", async (c) => {
+  try {
+    const user = c.get("user");
+    const db = c.env.DB;
+    const ai = c.env.AI;
+    const vectorize = c.env.VECTORIZE_INDEX;
+    const service = new AISearchService(db, ai, vectorize);
+    const indexer = new IndexManager(db, ai, vectorize);
+    const settings = await service.getSettings();
+    console.log("[AI Search Settings Route] Settings loaded:", !!settings);
+    const collections2 = await service.getAllCollections();
+    console.log("[AI Search Settings Route] Collections returned:", collections2.length);
+    if (collections2.length === 0) {
+      const directQuery = await db.prepare("SELECT id, name, display_name FROM collections WHERE is_active = 1").all();
+      console.log("[AI Search Settings Route] Direct DB query found:", directQuery.results?.length || 0, "collections");
+      if (directQuery.results && directQuery.results.length > 0) {
+        console.log("[AI Search Settings Route] Sample from DB:", directQuery.results[0]);
+      }
+    } else if (collections2.length > 0 && collections2[0]) {
+      console.log("[AI Search Settings Route] First collection:", {
+        id: collections2[0].id,
+        name: collections2[0].name,
+        display_name: collections2[0].display_name
+      });
+    }
+    const newCollections = await service.detectNewCollections();
+    console.log("AI Search: New collections:", newCollections.length);
+    const indexStatus = await indexer.getAllIndexStatus();
+    console.log("AI Search: Index status:", Object.keys(indexStatus).length);
+    const analytics = await service.getSearchAnalytics();
+    return c.html(
+      renderSettingsPage({
+        settings,
+        collections: collections2 || [],
+        newCollections: newCollections || [],
+        indexStatus: indexStatus || {},
+        analytics,
+        user: {
+          name: user.email,
+          email: user.email,
+          role: user.role
+        }
+      })
+    );
+  } catch (error) {
+    console.error("Error rendering AI Search settings:", error);
+    return c.html(`<p>Error loading settings: ${error instanceof Error ? error.message : String(error)}</p>`, 500);
+  }
+});
+adminRoutes.post("/", async (c) => {
+  try {
+    const db = c.env.DB;
+    const ai = c.env.AI;
+    const vectorize = c.env.VECTORIZE_INDEX;
+    const service = new AISearchService(db, ai, vectorize);
+    const indexer = new IndexManager(db, ai, vectorize);
+    const body = await c.req.json();
+    console.log("[AI Search POST] Received body:", JSON.stringify(body, null, 2));
+    const currentSettings = await service.getSettings();
+    console.log("[AI Search POST] Current settings selected_collections:", currentSettings?.selected_collections);
+    const updatedSettings = {
+      enabled: body.enabled !== void 0 ? Boolean(body.enabled) : currentSettings?.enabled,
+      ai_mode_enabled: body.ai_mode_enabled !== void 0 ? Boolean(body.ai_mode_enabled) : currentSettings?.ai_mode_enabled,
+      selected_collections: Array.isArray(body.selected_collections) ? body.selected_collections.map(String) : currentSettings?.selected_collections || [],
+      dismissed_collections: Array.isArray(body.dismissed_collections) ? body.dismissed_collections.map(String) : currentSettings?.dismissed_collections || [],
+      autocomplete_enabled: body.autocomplete_enabled !== void 0 ? Boolean(body.autocomplete_enabled) : currentSettings?.autocomplete_enabled,
+      cache_duration: body.cache_duration ? Number(body.cache_duration) : currentSettings?.cache_duration,
+      results_limit: body.results_limit ? Number(body.results_limit) : currentSettings?.results_limit,
+      index_media: body.index_media !== void 0 ? Boolean(body.index_media) : currentSettings?.index_media
+    };
+    console.log("[AI Search POST] Updated settings selected_collections:", updatedSettings.selected_collections);
+    const collectionsChanged = JSON.stringify(updatedSettings.selected_collections) !== JSON.stringify(currentSettings?.selected_collections || []);
+    const saved = await service.updateSettings(updatedSettings);
+    console.log("[AI Search POST] Settings saved, selected_collections:", saved.selected_collections);
+    if (collectionsChanged && updatedSettings.selected_collections) {
+      console.log("[AI Search POST] Collections changed, starting background indexing");
+      c.executionCtx.waitUntil(
+        indexer.syncAll(updatedSettings.selected_collections).then(() => console.log("[AI Search POST] Background indexing completed")).catch((error) => console.error("[AI Search POST] Background indexing error:", error))
+      );
+    }
+    return c.json({ success: true, settings: saved });
+  } catch (error) {
+    console.error("Error updating AI Search settings:", error);
+    return c.json({ error: "Failed to update settings" }, 500);
+  }
+});
+adminRoutes.get("/api/settings", async (c) => {
+  try {
+    const db = c.env.DB;
+    const ai = c.env.AI;
+    const vectorize = c.env.VECTORIZE_INDEX;
+    const service = new AISearchService(db, ai, vectorize);
+    const settings = await service.getSettings();
+    return c.json({ success: true, data: settings });
+  } catch (error) {
+    console.error("Error fetching settings:", error);
+    return c.json({ error: "Failed to fetch settings" }, 500);
+  }
+});
+adminRoutes.get("/api/new-collections", async (c) => {
+  try {
+    const db = c.env.DB;
+    const ai = c.env.AI;
+    const vectorize = c.env.VECTORIZE_INDEX;
+    const service = new AISearchService(db, ai, vectorize);
+    const notifications = await service.detectNewCollections();
+    return c.json({ success: true, data: notifications });
+  } catch (error) {
+    console.error("Error detecting new collections:", error);
+    return c.json({ error: "Failed to detect new collections" }, 500);
+  }
+});
+adminRoutes.get("/api/status", async (c) => {
+  try {
+    const db = c.env.DB;
+    const ai = c.env.AI;
+    const vectorize = c.env.VECTORIZE_INDEX;
+    const indexer = new IndexManager(db, ai, vectorize);
+    const status = await indexer.getAllIndexStatus();
+    return c.json({ success: true, data: status });
+  } catch (error) {
+    console.error("Error fetching index status:", error);
+    return c.json({ error: "Failed to fetch status" }, 500);
+  }
+});
+adminRoutes.post("/api/reindex", async (c) => {
+  try {
+    const db = c.env.DB;
+    const ai = c.env.AI;
+    const vectorize = c.env.VECTORIZE_INDEX;
+    const indexer = new IndexManager(db, ai, vectorize);
+    const body = await c.req.json();
+    const collectionIdRaw = body.collection_id;
+    const collectionId = collectionIdRaw ? String(collectionIdRaw) : "";
+    if (!collectionId || collectionId === "undefined" || collectionId === "null") {
+      return c.json({ error: "collection_id is required" }, 400);
+    }
+    c.executionCtx.waitUntil(
+      indexer.indexCollection(collectionId).then(() => console.log(`[AI Search Reindex] Completed for collection ${collectionId}`)).catch((error) => console.error(`[AI Search Reindex] Error for collection ${collectionId}:`, error))
+    );
+    return c.json({ success: true, message: "Re-indexing started" });
+  } catch (error) {
+    console.error("Error starting re-index:", error);
+    return c.json({ error: "Failed to start re-indexing" }, 500);
+  }
+});
+var admin_default = adminRoutes;
+var apiRoutes = new hono.Hono();
+apiRoutes.post("/", async (c) => {
+  try {
+    const db = c.env.DB;
+    const ai = c.env.AI;
+    const vectorize = c.env.VECTORIZE_INDEX;
+    const service = new AISearchService(db, ai, vectorize);
+    const body = await c.req.json();
+    const query = {
+      query: body.query || "",
+      mode: body.mode || "keyword",
+      filters: body.filters || {},
+      limit: body.limit ? Number(body.limit) : void 0,
+      offset: body.offset ? Number(body.offset) : void 0
+    };
+    if (query.filters?.dateRange) {
+      if (typeof query.filters.dateRange.start === "string") {
+        query.filters.dateRange.start = new Date(query.filters.dateRange.start);
+      }
+      if (typeof query.filters.dateRange.end === "string") {
+        query.filters.dateRange.end = new Date(query.filters.dateRange.end);
+      }
+    }
+    const results = await service.search(query);
+    return c.json({
+      success: true,
+      data: results
+    });
+  } catch (error) {
+    console.error("Search error:", error);
+    return c.json(
+      {
+        success: false,
+        error: "Search failed",
+        message: error instanceof Error ? error.message : String(error)
+      },
+      500
+    );
+  }
+});
+apiRoutes.get("/suggest", async (c) => {
+  try {
+    const db = c.env.DB;
+    const ai = c.env.AI;
+    const vectorize = c.env.VECTORIZE_INDEX;
+    const service = new AISearchService(db, ai, vectorize);
+    const query = c.req.query("q") || "";
+    if (!query || query.length < 2) {
+      return c.json({ success: true, data: [] });
+    }
+    const suggestions = await service.getSearchSuggestions(query);
+    return c.json({
+      success: true,
+      data: suggestions
+    });
+  } catch (error) {
+    console.error("Suggestions error:", error);
+    return c.json(
+      {
+        success: false,
+        error: "Failed to get suggestions"
+      },
+      500
+    );
+  }
+});
+apiRoutes.get("/analytics", async (c) => {
+  try {
+    const db = c.env.DB;
+    const ai = c.env.AI;
+    const vectorize = c.env.VECTORIZE_INDEX;
+    const service = new AISearchService(db, ai, vectorize);
+    const analytics = await service.getSearchAnalytics();
+    return c.json({
+      success: true,
+      data: analytics
+    });
+  } catch (error) {
+    console.error("Analytics error:", error);
+    return c.json(
+      {
+        success: false,
+        error: "Failed to get analytics"
+      },
+      500
+    );
+  }
+});
+var api_default2 = apiRoutes;
+
+// src/plugins/core-plugins/ai-search-plugin/manifest.json
+var manifest_default = {
+  name: "AI Search",
+  description: "Advanced search with Cloudflare AI Search. Full-text search, semantic search, and advanced filtering across all content collections.",
+  version: "1.0.0",
+  author: "SonicJS"};
+
+// src/plugins/core-plugins/ai-search-plugin/index.ts
+var aiSearchPlugin = new chunkQBKCBF7C_cjs.PluginBuilder({
+  name: manifest_default.name,
+  version: manifest_default.version,
+  description: manifest_default.description,
+  author: { name: manifest_default.author }
+}).metadata({
+  description: manifest_default.description,
+  author: { name: manifest_default.author }
+}).addService("aiSearch", AISearchService).addService("indexManager", IndexManager).addRoute("/admin/plugins/ai-search", admin_default).addRoute("/api/search", api_default2).build();
 var magicLinkRequestSchema = zod.z.object({
   email: zod.z.string().email("Valid email is required")
 });
@@ -2550,12 +4385,12 @@ function createMagicLinkAuthPlugin() {
         SET used = 1, used_at = ?
         WHERE id = ?
       `).bind(Date.now(), magicLink.id).run();
-      const jwtToken = await chunkX6ZRF7WG_cjs.AuthManager.generateToken(
+      const jwtToken = await chunkSVEZNUPT_cjs.AuthManager.generateToken(
         user.id,
         user.email,
         user.role
       );
-      chunkX6ZRF7WG_cjs.AuthManager.setAuthCookie(c, jwtToken);
+      chunkSVEZNUPT_cjs.AuthManager.setAuthCookie(c, jwtToken);
       await db.prepare(`
         UPDATE users SET last_login_at = ? WHERE id = ?
       `).bind(Date.now(), user.id).run();
@@ -2709,8 +4544,8 @@ function createSonicJSApp(config = {}) {
     c.set("appVersion", appVersion);
     await next();
   });
-  app.use("*", chunkX6ZRF7WG_cjs.metricsMiddleware());
-  app.use("*", chunkX6ZRF7WG_cjs.bootstrapMiddleware(config));
+  app.use("*", chunkSVEZNUPT_cjs.metricsMiddleware());
+  app.use("*", chunkSVEZNUPT_cjs.bootstrapMiddleware(config));
   if (config.middleware?.beforeAuth) {
     for (const middleware of config.middleware.beforeAuth) {
       app.use("*", middleware);
@@ -2727,22 +4562,27 @@ function createSonicJSApp(config = {}) {
       app.use("*", middleware);
     }
   }
-  app.route("/api", chunkBCTUNTAE_cjs.api_default);
-  app.route("/api/media", chunkBCTUNTAE_cjs.api_media_default);
-  app.route("/api/system", chunkBCTUNTAE_cjs.api_system_default);
-  app.route("/admin/api", chunkBCTUNTAE_cjs.admin_api_default);
-  app.route("/admin/dashboard", chunkBCTUNTAE_cjs.router);
-  app.route("/admin/collections", chunkBCTUNTAE_cjs.adminCollectionsRoutes);
-  app.route("/admin/settings", chunkBCTUNTAE_cjs.adminSettingsRoutes);
+  app.route("/api", chunkW35UPVAS_cjs.api_default);
+  app.route("/api/media", chunkW35UPVAS_cjs.api_media_default);
+  app.route("/api/system", chunkW35UPVAS_cjs.api_system_default);
+  app.route("/admin/api", chunkW35UPVAS_cjs.admin_api_default);
+  app.route("/admin/dashboard", chunkW35UPVAS_cjs.router);
+  app.route("/admin/collections", chunkW35UPVAS_cjs.adminCollectionsRoutes);
+  app.route("/admin/settings", chunkW35UPVAS_cjs.adminSettingsRoutes);
   app.route("/admin/database-tools", createDatabaseToolsAdminRoutes());
   app.route("/admin/seed-data", createSeedDataAdminRoutes());
-  app.route("/admin/content", chunkBCTUNTAE_cjs.admin_content_default);
-  app.route("/admin/media", chunkBCTUNTAE_cjs.adminMediaRoutes);
-  app.route("/admin/plugins", chunkBCTUNTAE_cjs.adminPluginRoutes);
-  app.route("/admin/logs", chunkBCTUNTAE_cjs.adminLogsRoutes);
-  app.route("/admin", chunkBCTUNTAE_cjs.userRoutes);
-  app.route("/auth", chunkBCTUNTAE_cjs.auth_default);
-  app.route("/", chunkBCTUNTAE_cjs.test_cleanup_default);
+  app.route("/admin/content", chunkW35UPVAS_cjs.admin_content_default);
+  app.route("/admin/media", chunkW35UPVAS_cjs.adminMediaRoutes);
+  if (aiSearchPlugin.routes && aiSearchPlugin.routes.length > 0) {
+    for (const route of aiSearchPlugin.routes) {
+      app.route(route.path, route.handler);
+    }
+  }
+  app.route("/admin/plugins", chunkW35UPVAS_cjs.adminPluginRoutes);
+  app.route("/admin/logs", chunkW35UPVAS_cjs.adminLogsRoutes);
+  app.route("/admin", chunkW35UPVAS_cjs.userRoutes);
+  app.route("/auth", chunkW35UPVAS_cjs.auth_default);
+  app.route("/", chunkW35UPVAS_cjs.test_cleanup_default);
   if (emailPlugin.routes && emailPlugin.routes.length > 0) {
     for (const route of emailPlugin.routes) {
       app.route(route.path, route.handler);
@@ -2826,79 +4666,79 @@ var VERSION = chunk2XCJ3HT5_cjs.package_default.version;
 
 Object.defineProperty(exports, "ROUTES_INFO", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.ROUTES_INFO; }
+  get: function () { return chunkW35UPVAS_cjs.ROUTES_INFO; }
 });
 Object.defineProperty(exports, "adminApiRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.admin_api_default; }
+  get: function () { return chunkW35UPVAS_cjs.admin_api_default; }
 });
 Object.defineProperty(exports, "adminCheckboxRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.adminCheckboxRoutes; }
+  get: function () { return chunkW35UPVAS_cjs.adminCheckboxRoutes; }
 });
 Object.defineProperty(exports, "adminCodeExamplesRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.admin_code_examples_default; }
+  get: function () { return chunkW35UPVAS_cjs.admin_code_examples_default; }
 });
 Object.defineProperty(exports, "adminCollectionsRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.adminCollectionsRoutes; }
+  get: function () { return chunkW35UPVAS_cjs.adminCollectionsRoutes; }
 });
 Object.defineProperty(exports, "adminContentRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.admin_content_default; }
+  get: function () { return chunkW35UPVAS_cjs.admin_content_default; }
 });
 Object.defineProperty(exports, "adminDashboardRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.router; }
+  get: function () { return chunkW35UPVAS_cjs.router; }
 });
 Object.defineProperty(exports, "adminDesignRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.adminDesignRoutes; }
+  get: function () { return chunkW35UPVAS_cjs.adminDesignRoutes; }
 });
 Object.defineProperty(exports, "adminLogsRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.adminLogsRoutes; }
+  get: function () { return chunkW35UPVAS_cjs.adminLogsRoutes; }
 });
 Object.defineProperty(exports, "adminMediaRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.adminMediaRoutes; }
+  get: function () { return chunkW35UPVAS_cjs.adminMediaRoutes; }
 });
 Object.defineProperty(exports, "adminPluginRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.adminPluginRoutes; }
+  get: function () { return chunkW35UPVAS_cjs.adminPluginRoutes; }
 });
 Object.defineProperty(exports, "adminSettingsRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.adminSettingsRoutes; }
+  get: function () { return chunkW35UPVAS_cjs.adminSettingsRoutes; }
 });
 Object.defineProperty(exports, "adminTestimonialsRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.admin_testimonials_default; }
+  get: function () { return chunkW35UPVAS_cjs.admin_testimonials_default; }
 });
 Object.defineProperty(exports, "adminUsersRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.userRoutes; }
+  get: function () { return chunkW35UPVAS_cjs.userRoutes; }
 });
 Object.defineProperty(exports, "apiContentCrudRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.api_content_crud_default; }
+  get: function () { return chunkW35UPVAS_cjs.api_content_crud_default; }
 });
 Object.defineProperty(exports, "apiMediaRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.api_media_default; }
+  get: function () { return chunkW35UPVAS_cjs.api_media_default; }
 });
 Object.defineProperty(exports, "apiRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.api_default; }
+  get: function () { return chunkW35UPVAS_cjs.api_default; }
 });
 Object.defineProperty(exports, "apiSystemRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.api_system_default; }
+  get: function () { return chunkW35UPVAS_cjs.api_system_default; }
 });
 Object.defineProperty(exports, "authRoutes", {
   enumerable: true,
-  get: function () { return chunkBCTUNTAE_cjs.auth_default; }
+  get: function () { return chunkW35UPVAS_cjs.auth_default; }
 });
 Object.defineProperty(exports, "Logger", {
   enumerable: true,
@@ -3066,139 +4906,139 @@ Object.defineProperty(exports, "workflowHistory", {
 });
 Object.defineProperty(exports, "AuthManager", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.AuthManager; }
+  get: function () { return chunkSVEZNUPT_cjs.AuthManager; }
 });
 Object.defineProperty(exports, "PermissionManager", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.PermissionManager; }
+  get: function () { return chunkSVEZNUPT_cjs.PermissionManager; }
 });
 Object.defineProperty(exports, "bootstrapMiddleware", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.bootstrapMiddleware; }
+  get: function () { return chunkSVEZNUPT_cjs.bootstrapMiddleware; }
 });
 Object.defineProperty(exports, "cacheHeaders", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.cacheHeaders; }
+  get: function () { return chunkSVEZNUPT_cjs.cacheHeaders; }
 });
 Object.defineProperty(exports, "compressionMiddleware", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.compressionMiddleware; }
+  get: function () { return chunkSVEZNUPT_cjs.compressionMiddleware; }
 });
 Object.defineProperty(exports, "detailedLoggingMiddleware", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.detailedLoggingMiddleware; }
+  get: function () { return chunkSVEZNUPT_cjs.detailedLoggingMiddleware; }
 });
 Object.defineProperty(exports, "getActivePlugins", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.getActivePlugins; }
+  get: function () { return chunkSVEZNUPT_cjs.getActivePlugins; }
 });
 Object.defineProperty(exports, "isPluginActive", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.isPluginActive; }
+  get: function () { return chunkSVEZNUPT_cjs.isPluginActive; }
 });
 Object.defineProperty(exports, "logActivity", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.logActivity; }
+  get: function () { return chunkSVEZNUPT_cjs.logActivity; }
 });
 Object.defineProperty(exports, "loggingMiddleware", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.loggingMiddleware; }
+  get: function () { return chunkSVEZNUPT_cjs.loggingMiddleware; }
 });
 Object.defineProperty(exports, "optionalAuth", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.optionalAuth; }
+  get: function () { return chunkSVEZNUPT_cjs.optionalAuth; }
 });
 Object.defineProperty(exports, "performanceLoggingMiddleware", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.performanceLoggingMiddleware; }
+  get: function () { return chunkSVEZNUPT_cjs.performanceLoggingMiddleware; }
 });
 Object.defineProperty(exports, "requireActivePlugin", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.requireActivePlugin; }
+  get: function () { return chunkSVEZNUPT_cjs.requireActivePlugin; }
 });
 Object.defineProperty(exports, "requireActivePlugins", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.requireActivePlugins; }
+  get: function () { return chunkSVEZNUPT_cjs.requireActivePlugins; }
 });
 Object.defineProperty(exports, "requireAnyPermission", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.requireAnyPermission; }
+  get: function () { return chunkSVEZNUPT_cjs.requireAnyPermission; }
 });
 Object.defineProperty(exports, "requireAuth", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.requireAuth; }
+  get: function () { return chunkSVEZNUPT_cjs.requireAuth; }
 });
 Object.defineProperty(exports, "requirePermission", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.requirePermission; }
+  get: function () { return chunkSVEZNUPT_cjs.requirePermission; }
 });
 Object.defineProperty(exports, "requireRole", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.requireRole; }
+  get: function () { return chunkSVEZNUPT_cjs.requireRole; }
 });
 Object.defineProperty(exports, "securityHeaders", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.securityHeaders; }
+  get: function () { return chunkSVEZNUPT_cjs.securityHeaders; }
 });
 Object.defineProperty(exports, "securityLoggingMiddleware", {
   enumerable: true,
-  get: function () { return chunkX6ZRF7WG_cjs.securityLoggingMiddleware; }
+  get: function () { return chunkSVEZNUPT_cjs.securityLoggingMiddleware; }
 });
 Object.defineProperty(exports, "PluginBootstrapService", {
   enumerable: true,
-  get: function () { return chunkILZ3DP4I_cjs.PluginBootstrapService; }
+  get: function () { return chunkMPT5PA6U_cjs.PluginBootstrapService; }
 });
 Object.defineProperty(exports, "PluginServiceClass", {
   enumerable: true,
-  get: function () { return chunkILZ3DP4I_cjs.PluginService; }
+  get: function () { return chunkMPT5PA6U_cjs.PluginService; }
 });
 Object.defineProperty(exports, "cleanupRemovedCollections", {
   enumerable: true,
-  get: function () { return chunkILZ3DP4I_cjs.cleanupRemovedCollections; }
+  get: function () { return chunkMPT5PA6U_cjs.cleanupRemovedCollections; }
 });
 Object.defineProperty(exports, "fullCollectionSync", {
   enumerable: true,
-  get: function () { return chunkILZ3DP4I_cjs.fullCollectionSync; }
+  get: function () { return chunkMPT5PA6U_cjs.fullCollectionSync; }
 });
 Object.defineProperty(exports, "getAvailableCollectionNames", {
   enumerable: true,
-  get: function () { return chunkILZ3DP4I_cjs.getAvailableCollectionNames; }
+  get: function () { return chunkMPT5PA6U_cjs.getAvailableCollectionNames; }
 });
 Object.defineProperty(exports, "getManagedCollections", {
   enumerable: true,
-  get: function () { return chunkILZ3DP4I_cjs.getManagedCollections; }
+  get: function () { return chunkMPT5PA6U_cjs.getManagedCollections; }
 });
 Object.defineProperty(exports, "isCollectionManaged", {
   enumerable: true,
-  get: function () { return chunkILZ3DP4I_cjs.isCollectionManaged; }
+  get: function () { return chunkMPT5PA6U_cjs.isCollectionManaged; }
 });
 Object.defineProperty(exports, "loadCollectionConfig", {
   enumerable: true,
-  get: function () { return chunkILZ3DP4I_cjs.loadCollectionConfig; }
+  get: function () { return chunkMPT5PA6U_cjs.loadCollectionConfig; }
 });
 Object.defineProperty(exports, "loadCollectionConfigs", {
   enumerable: true,
-  get: function () { return chunkILZ3DP4I_cjs.loadCollectionConfigs; }
+  get: function () { return chunkMPT5PA6U_cjs.loadCollectionConfigs; }
 });
 Object.defineProperty(exports, "registerCollections", {
   enumerable: true,
-  get: function () { return chunkILZ3DP4I_cjs.registerCollections; }
+  get: function () { return chunkMPT5PA6U_cjs.registerCollections; }
 });
 Object.defineProperty(exports, "syncCollection", {
   enumerable: true,
-  get: function () { return chunkILZ3DP4I_cjs.syncCollection; }
+  get: function () { return chunkMPT5PA6U_cjs.syncCollection; }
 });
 Object.defineProperty(exports, "syncCollections", {
   enumerable: true,
-  get: function () { return chunkILZ3DP4I_cjs.syncCollections; }
+  get: function () { return chunkMPT5PA6U_cjs.syncCollections; }
 });
 Object.defineProperty(exports, "validateCollectionConfig", {
   enumerable: true,
-  get: function () { return chunkILZ3DP4I_cjs.validateCollectionConfig; }
+  get: function () { return chunkMPT5PA6U_cjs.validateCollectionConfig; }
 });
 Object.defineProperty(exports, "MigrationService", {
   enumerable: true,
-  get: function () { return chunk57V36AFO_cjs.MigrationService; }
+  get: function () { return chunkYSJ65ITG_cjs.MigrationService; }
 });
 Object.defineProperty(exports, "renderFilterBar", {
   enumerable: true,
@@ -3234,27 +5074,27 @@ Object.defineProperty(exports, "renderTable", {
 });
 Object.defineProperty(exports, "HookSystemImpl", {
   enumerable: true,
-  get: function () { return chunkDTLB6UIH_cjs.HookSystemImpl; }
+  get: function () { return chunkBQQ7RDV3_cjs.HookSystemImpl; }
 });
 Object.defineProperty(exports, "HookUtils", {
   enumerable: true,
-  get: function () { return chunkDTLB6UIH_cjs.HookUtils; }
+  get: function () { return chunkBQQ7RDV3_cjs.HookUtils; }
 });
 Object.defineProperty(exports, "PluginManagerClass", {
   enumerable: true,
-  get: function () { return chunkDTLB6UIH_cjs.PluginManager; }
+  get: function () { return chunkBQQ7RDV3_cjs.PluginManager; }
 });
 Object.defineProperty(exports, "PluginRegistryImpl", {
   enumerable: true,
-  get: function () { return chunkDTLB6UIH_cjs.PluginRegistryImpl; }
+  get: function () { return chunkBQQ7RDV3_cjs.PluginRegistryImpl; }
 });
 Object.defineProperty(exports, "PluginValidatorClass", {
   enumerable: true,
-  get: function () { return chunkDTLB6UIH_cjs.PluginValidator; }
+  get: function () { return chunkBQQ7RDV3_cjs.PluginValidator; }
 });
 Object.defineProperty(exports, "ScopedHookSystemClass", {
   enumerable: true,
-  get: function () { return chunkDTLB6UIH_cjs.ScopedHookSystem; }
+  get: function () { return chunkBQQ7RDV3_cjs.ScopedHookSystem; }
 });
 Object.defineProperty(exports, "QueryFilterBuilder", {
   enumerable: true,

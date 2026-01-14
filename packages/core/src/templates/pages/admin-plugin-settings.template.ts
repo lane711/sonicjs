@@ -329,6 +329,7 @@ function renderSettingsTab(plugin: any): string {
   const settings = plugin.settings || {}
   const isSeedDataPlugin = plugin.id === 'seed-data' || plugin.name === 'seed-data'
   const isAuthPlugin = plugin.id === 'core-auth' || plugin.name === 'core-auth'
+  const isTurnstilePlugin = plugin.id === 'turnstile' || plugin.name === 'turnstile'
 
   return `
     ${isSeedDataPlugin ? `
@@ -356,6 +357,9 @@ function renderSettingsTab(plugin: any): string {
       ${isAuthPlugin ? `
         <h2 class="text-xl font-semibold text-white mb-4">Authentication Settings</h2>
         <p class="text-gray-400 mb-6">Configure user registration fields and validation rules.</p>
+      ` : isTurnstilePlugin ? `
+        <h2 class="text-xl font-semibold text-white mb-4">Cloudflare Turnstile Settings</h2>
+        <p class="text-gray-400 mb-6">Configure CAPTCHA-free bot protection for your forms.</p>
       ` : `
         <h2 class="text-xl font-semibold text-white mb-4">Plugin Settings</h2>
       `}
@@ -363,9 +367,11 @@ function renderSettingsTab(plugin: any): string {
       <form id="settings-form" class="space-y-6">
         ${isAuthPlugin && Object.keys(settings).length > 0
           ? renderAuthSettingsForm(settings as AuthSettings)
-          : Object.keys(settings).length > 0
-            ? renderSettingsFields(settings)
-            : renderNoSettings(plugin)
+          : isTurnstilePlugin && Object.keys(settings).length > 0
+            ? renderTurnstileSettingsForm(settings)
+            : Object.keys(settings).length > 0
+              ? renderSettingsFields(settings)
+              : renderNoSettings(plugin)
         }
 
         ${Object.keys(settings).length > 0 ? `
@@ -431,6 +437,82 @@ function renderSettingsFields(settings: PluginSettings): string {
       `
     }
   }).join('')
+}
+
+function renderTurnstileSettingsForm(settings: any): string {
+  const inputClass = "backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full"
+  const selectClass = "backdrop-blur-sm bg-zinc-800 border border-white/20 rounded-lg px-3 py-2 text-white focus:border-blue-400 focus:outline-none transition-colors w-full [&>option]:bg-zinc-800 [&>option]:text-white"
+  
+  return `
+    <!-- Enable Toggle -->
+    <div class="flex items-center justify-between">
+      <div>
+        <label for="setting_enabled" class="text-sm font-medium text-gray-300">Enable Turnstile</label>
+        <p class="text-xs text-gray-400">Enable or disable Turnstile verification globally</p>
+      </div>
+      <label class="relative inline-flex items-center cursor-pointer">
+        <input type="checkbox" name="setting_enabled" id="setting_enabled" ${settings.enabled ? 'checked' : ''} class="sr-only peer">
+        <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+      </label>
+    </div>
+
+    <!-- Site Key -->
+    <div>
+      <label for="setting_siteKey" class="block text-sm font-medium text-gray-300 mb-2">Site Key</label>
+      <input type="text" name="setting_siteKey" id="setting_siteKey" value="${settings.siteKey || ''}" placeholder="0x4AAAAAAAA..." class="${inputClass}">
+      <p class="text-xs text-gray-400 mt-1">Your Cloudflare Turnstile site key (public)</p>
+    </div>
+
+    <!-- Secret Key -->
+    <div>
+      <label for="setting_secretKey" class="block text-sm font-medium text-gray-300 mb-2">Secret Key</label>
+      <input type="password" name="setting_secretKey" id="setting_secretKey" value="${settings.secretKey || ''}" placeholder="0x4AAAAAAAA..." class="${inputClass}">
+      <p class="text-xs text-gray-400 mt-1">Your Cloudflare Turnstile secret key (private)</p>
+    </div>
+
+    <!-- Theme -->
+    <div>
+      <label for="setting_theme" class="block text-sm font-medium text-gray-300 mb-2">Widget Theme</label>
+      <select name="setting_theme" id="setting_theme" class="${selectClass}" style="color: white; background-color: rgb(39, 39, 42);">
+        <option value="auto" ${settings.theme === 'auto' ? 'selected' : ''} style="background-color: rgb(39, 39, 42); color: white;">Auto (matches page theme)</option>
+        <option value="light" ${settings.theme === 'light' ? 'selected' : ''} style="background-color: rgb(39, 39, 42); color: white;">Light</option>
+        <option value="dark" ${settings.theme === 'dark' ? 'selected' : ''} style="background-color: rgb(39, 39, 42); color: white;">Dark</option>
+      </select>
+      <p class="text-xs text-gray-400 mt-1">Visual appearance of the Turnstile widget</p>
+    </div>
+
+    <!-- Size -->
+    <div>
+      <label for="setting_size" class="block text-sm font-medium text-gray-300 mb-2">Widget Size</label>
+      <select name="setting_size" id="setting_size" class="${selectClass}" style="color: white; background-color: rgb(39, 39, 42);">
+        <option value="normal" ${settings.size === 'normal' ? 'selected' : ''} style="background-color: rgb(39, 39, 42); color: white;">Normal (300x65px)</option>
+        <option value="compact" ${settings.size === 'compact' ? 'selected' : ''} style="background-color: rgb(39, 39, 42); color: white;">Compact (130x120px)</option>
+      </select>
+      <p class="text-xs text-gray-400 mt-1">Size of the Turnstile challenge widget</p>
+    </div>
+
+    <!-- Widget Mode -->
+    <div>
+      <label for="setting_mode" class="block text-sm font-medium text-gray-300 mb-2">Widget Mode</label>
+      <select name="setting_mode" id="setting_mode" class="${selectClass}" style="color: white; background-color: rgb(39, 39, 42);">
+        <option value="managed" ${(!settings.mode || settings.mode === 'managed') ? 'selected' : ''} style="background-color: rgb(39, 39, 42); color: white;">Managed (Recommended) - Adaptive challenge</option>
+        <option value="non-interactive" ${settings.mode === 'non-interactive' ? 'selected' : ''} style="background-color: rgb(39, 39, 42); color: white;">Non-Interactive - Always visible, minimal friction</option>
+        <option value="invisible" ${settings.mode === 'invisible' ? 'selected' : ''} style="background-color: rgb(39, 39, 42); color: white;">Invisible - No visible widget</option>
+      </select>
+      <p class="text-xs text-gray-400 mt-1"><strong>Managed:</strong> Shows challenge only when needed. <strong>Non-Interactive:</strong> Always shows but doesn't require interaction. <strong>Invisible:</strong> Runs in background without UI.</p>
+    </div>
+
+    <!-- Appearance (Pre-clearance) -->
+    <div>
+      <label for="setting_appearance" class="block text-sm font-medium text-gray-300 mb-2">Pre-clearance / Appearance</label>
+      <select name="setting_appearance" id="setting_appearance" class="${selectClass}" style="color: white; background-color: rgb(39, 39, 42);">
+        <option value="always" ${(!settings.appearance || settings.appearance === 'always') ? 'selected' : ''} style="background-color: rgb(39, 39, 42); color: white;">Always - Pre-clearance enabled (verifies immediately)</option>
+        <option value="execute" ${settings.appearance === 'execute' ? 'selected' : ''} style="background-color: rgb(39, 39, 42); color: white;">Execute - Challenge on form submit</option>
+        <option value="interaction-only" ${settings.appearance === 'interaction-only' ? 'selected' : ''} style="background-color: rgb(39, 39, 42); color: white;">Interaction Only - Only after user interaction</option>
+      </select>
+      <p class="text-xs text-gray-400 mt-1">Controls when Turnstile verification occurs. <strong>Always:</strong> Verifies immediately (pre-clearance). <strong>Execute:</strong> Verifies on form submit. <strong>Interaction Only:</strong> Only after user interaction.</p>
+    </div>
+  `
 }
 
 function renderNoSettings(plugin: any): string {

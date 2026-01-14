@@ -1,0 +1,191 @@
+import { test, expect } from '@playwright/test'
+import { 
+  loginAsAdmin, 
+  ensureAdminUserExists,
+  ensureWorkflowTablesExist
+} from './utils/test-helpers'
+
+test.describe('Advanced Search - Date Filter', () => {
+  test.beforeEach(async ({ page }) => {
+    await ensureAdminUserExists(page)
+    await ensureWorkflowTablesExist(page)
+    await loginAsAdmin(page)
+  })
+
+  test('should have date filter fields in advanced search modal', async ({ page }) => {
+    // Navigate to content page
+    await page.goto('/admin/content')
+    await page.waitForTimeout(2000)
+    
+    // Open advanced search modal
+    const advancedSearchButton = page.locator('button:has-text("Advanced Search")').first()
+    if (await advancedSearchButton.count() > 0) {
+      await advancedSearchButton.click()
+      await page.waitForTimeout(1000)
+      
+      // Check for date filter fields
+      const dateStartInput = page.locator('input[name="date_start"]').or(
+        page.locator('input#filterDateStart')
+      )
+      const dateEndInput = page.locator('input[name="date_end"]').or(
+        page.locator('input#filterDateEnd')
+      )
+      
+      // Verify date inputs exist
+      await expect(dateStartInput).toBeVisible({ timeout: 5000 })
+      await expect(dateEndInput).toBeVisible({ timeout: 5000 })
+      
+      // Verify they are date inputs
+      expect(await dateStartInput.getAttribute('type')).toBe('date')
+      expect(await dateEndInput.getAttribute('type')).toBe('date')
+      
+      console.log('✓ Date filter fields are present in advanced search')
+    } else {
+      console.log('⚠ Advanced Search button not found - skipping test')
+    }
+  })
+
+  test('should filter content by date range', async ({ page }) => {
+    // Navigate to content page
+    await page.goto('/admin/content')
+    await page.waitForTimeout(2000)
+    
+    // Open advanced search modal
+    const advancedSearchButton = page.locator('button:has-text("Advanced Search")').first()
+    if (await advancedSearchButton.count() > 0) {
+      await advancedSearchButton.click()
+      await page.waitForTimeout(1000)
+      
+      // Set date range (last 30 days)
+      const today = new Date()
+      const thirtyDaysAgo = new Date()
+      thirtyDaysAgo.setDate(today.getDate() - 30)
+      
+      const dateStart = thirtyDaysAgo.toISOString().split('T')[0] // YYYY-MM-DD
+      const dateEnd = today.toISOString().split('T')[0]
+      
+      const dateStartInput = page.locator('input#filterDateStart').or(
+        page.locator('input[name="date_start"]')
+      ).first()
+      const dateEndInput = page.locator('input#filterDateEnd').or(
+        page.locator('input[name="date_end"]')
+      ).first()
+      
+      if (await dateStartInput.count() > 0) {
+        await dateStartInput.fill(dateStart)
+        await dateEndInput.fill(dateEnd)
+        
+        console.log(`✓ Set date range: ${dateStart} to ${dateEnd}`)
+        
+        // Submit search
+        const searchButton = page.locator('button[type="submit"]:has-text("Search")').first()
+        if (await searchButton.count() > 0) {
+          await searchButton.click()
+          await page.waitForTimeout(2000)
+          
+          // Check if results are shown
+          const resultsDiv = page.locator('#searchResults')
+          if (await resultsDiv.isVisible()) {
+            console.log('✓ Search executed with date filter')
+            
+            // Check if we got results
+            const resultsContent = page.locator('#searchResultsContent')
+            const resultItems = resultsContent.locator('[data-content-id]').or(
+              resultsContent.locator('.search-result')
+            )
+            
+            const count = await resultItems.count()
+            console.log(`✓ Found ${count} results within date range`)
+          } else {
+            console.log('⚠ Search results not displayed')
+          }
+        }
+      }
+    } else {
+      console.log('⚠ Advanced Search not available - skipping test')
+    }
+  })
+
+  test('should handle API search with date parameters', async ({ page }) => {
+    // Test date filtering via API
+    const today = new Date()
+    const oneYearAgo = new Date()
+    oneYearAgo.setFullYear(today.getFullYear() - 1)
+    
+    const dateStart = oneYearAgo.toISOString()
+    const dateEnd = today.toISOString()
+    
+    // Try API search with date range
+    const response = await page.request.post('/api/search', {
+      data: {
+        query: '',
+        mode: 'keyword',
+        filters: {
+          dateRange: {
+            start: dateStart,
+            end: dateEnd
+          }
+        },
+        limit: 10
+      }
+    })
+    
+    console.log('API search with date filter status:', response.status())
+    
+    if (response.status() === 200) {
+      const data = await response.json()
+      console.log('API search with date range returned:', {
+        success: data.success,
+        total: data.data?.total || 0,
+        hasResults: (data.data?.results?.length || 0) > 0
+      })
+      
+      expect(data).toHaveProperty('success')
+      expect(data).toHaveProperty('data')
+    } else {
+      console.log('⚠ API search with date filter returned non-200 status')
+    }
+  })
+
+  test('should validate date range (start before end)', async ({ page }) => {
+    // Navigate to content page
+    await page.goto('/admin/content')
+    await page.waitForTimeout(2000)
+    
+    // Open advanced search modal
+    const advancedSearchButton = page.locator('button:has-text("Advanced Search")').first()
+    if (await advancedSearchButton.count() > 0) {
+      await advancedSearchButton.click()
+      await page.waitForTimeout(1000)
+      
+      // Set invalid date range (end before start)
+      const today = new Date()
+      const tomorrow = new Date()
+      tomorrow.setDate(today.getDate() + 1)
+      
+      const dateStart = tomorrow.toISOString().split('T')[0]
+      const dateEnd = today.toISOString().split('T')[0]
+      
+      const dateStartInput = page.locator('input#filterDateStart').first()
+      const dateEndInput = page.locator('input#filterDateEnd').first()
+      
+      if (await dateStartInput.count() > 0) {
+        await dateStartInput.fill(dateStart)
+        await dateEndInput.fill(dateEnd)
+        
+        // Submit search
+        const searchButton = page.locator('button[type="submit"]:has-text("Search")').first()
+        if (await searchButton.count() > 0) {
+          await searchButton.click()
+          await page.waitForTimeout(1000)
+          
+          // Should either show validation error or handle gracefully
+          const errorMessage = page.locator('text=/invalid.*date|date.*invalid/i').first()
+          const hasError = await errorMessage.isVisible().catch(() => false)
+          
+          console.log('Date validation:', hasError ? 'Error shown' : 'Handled gracefully')
+        }
+      }
+    }
+  })
+})

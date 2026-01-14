@@ -11,9 +11,9 @@ test.describe('Content Management', () => {
   test('should display content list', async ({ page }) => {
     await expect(page.locator('h1').first()).toContainText('Content Management');
     
-    // Should have filter dropdowns
-    await expect(page.locator('select[name="model"]')).toBeVisible();
-    await expect(page.locator('select[name="status"]')).toBeVisible();
+    // Should have filter dropdowns in main filter bar (use .first() to avoid strict mode violation with advanced search modal)
+    await expect(page.locator('select[name="model"]').first()).toBeVisible();
+    await expect(page.locator('select[name="status"]').first()).toBeVisible();
     
     // Check if table or empty state is visible
     const table = page.locator('table');

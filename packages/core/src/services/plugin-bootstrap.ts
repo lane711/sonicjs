@@ -167,6 +167,28 @@ export class PluginBootstrapService {
         placeholder: "Start writing your content...",
       },
     },
+    {
+      id: "ai-search",
+      name: "ai-search-plugin",
+      display_name: "AI Search",
+      description: "Advanced search with Cloudflare AI Search. Full-text search, semantic search, and advanced filtering across all content collections.",
+      version: "1.0.0",
+      author: "SonicJS Team",
+      category: "search",
+      icon: "🔍",
+      permissions: ["settings:write", "admin:access", "content:read"],
+      dependencies: [],
+      settings: {
+        enabled: false,
+        ai_mode_enabled: true,
+        selected_collections: [],
+        dismissed_collections: [],
+        autocomplete_enabled: true,
+        cache_duration: 1,
+        results_limit: 20,
+        index_media: false,
+      },
+    },
   ];
 
   /**

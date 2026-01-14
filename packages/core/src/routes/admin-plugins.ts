@@ -104,6 +104,32 @@ const AVAILABLE_PLUGINS = [
     permissions: [],
     dependencies: [],
     is_core: false
+  },
+  {
+    id: 'turnstile',
+    name: 'turnstile-plugin',
+    display_name: 'Cloudflare Turnstile',
+    description: 'CAPTCHA-free bot protection for forms using Cloudflare Turnstile. Provides seamless spam prevention with configurable modes, themes, and pre-clearance options.',
+    version: '1.0.0',
+    author: 'SonicJS Team',
+    category: 'security',
+    icon: '🛡️',
+    permissions: [],
+    dependencies: [],
+    is_core: true
+  },
+  {
+    id: 'ai-search',
+    name: 'ai-search-plugin',
+    display_name: 'AI Search',
+    description: 'Advanced search with Cloudflare AI Search. Full-text search, semantic search, and advanced filtering across all content collections.',
+    version: '1.0.0',
+    author: 'SonicJS Team',
+    category: 'search',
+    icon: '🔍',
+    permissions: [],
+    dependencies: [],
+    is_core: true
   }
 ]
 
@@ -208,6 +234,12 @@ adminPluginRoutes.get('/:id', async (c) => {
     const user = c.get('user')
     const db = c.env.DB
     const pluginId = c.req.param('id')
+    
+    // Skip AI Search - it has its own custom settings page
+    if (pluginId === 'ai-search') {
+      // Let the plugin's own route handle this
+      return c.text('', 404) // Return 404 so Hono continues to next route
+    }
     
     // Check authorization
     if (user?.role !== 'admin') {
@@ -559,6 +591,67 @@ adminPluginRoutes.post('/install', async (c) => {
       })
 
       return c.json({ success: true, plugin: easyMdxPlugin })
+    }
+
+    // Handle AI Search plugin installation
+    if (body.name === 'ai-search-plugin' || body.name === 'ai-search') {
+      const defaultSettings = {
+        enabled: true,
+        ai_mode_enabled: true,
+        selected_collections: [],
+        dismissed_collections: [],
+        autocomplete_enabled: true,
+        cache_duration: 1,
+        results_limit: 20,
+        index_media: false,
+      }
+      
+      const aiSearchPlugin = await pluginService.installPlugin({
+        id: 'ai-search',
+        name: 'ai-search-plugin',
+        display_name: 'AI Search',
+        description: 'Advanced search with Cloudflare AI Search. Full-text search, semantic search, and advanced filtering across all content collections.',
+        version: '1.0.0',
+        author: 'SonicJS Team',
+        category: 'search',
+        icon: '🔍',
+        permissions: [],
+        dependencies: [],
+        is_core: true,
+        settings: defaultSettings
+      })
+
+      return c.json({ success: true, plugin: aiSearchPlugin })
+    }
+
+    // Handle Turnstile plugin installation
+    if (body.name === 'turnstile-plugin') {
+      const turnstilePlugin = await pluginService.installPlugin({
+        id: 'turnstile',
+        name: 'turnstile-plugin',
+        display_name: 'Cloudflare Turnstile',
+        description: 'CAPTCHA-free bot protection for forms using Cloudflare Turnstile. Provides seamless spam prevention with configurable modes, themes, and pre-clearance options.',
+        version: '1.0.0',
+        author: 'SonicJS Team',
+        category: 'security',
+        icon: '🛡️',
+        permissions: [],
+        dependencies: [],
+        is_core: true,
+        settings: {
+          siteKey: '',
+          secretKey: '',
+          theme: 'auto',
+          size: 'normal',
+          mode: 'managed',
+          appearance: 'always',
+          preClearanceEnabled: false,
+          preClearanceLevel: 'managed',
+          enabled: false
+        }
+      })
+
+      return c.json({ success: true, plugin: turnstilePlugin })
     }
 
     return c.json({ error: 'Plugin not found in registry' }, 404)
