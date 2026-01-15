@@ -1,3 +1,5 @@
+import { getDragSortableScript } from './drag-sortable.template'
+
 export interface FieldDefinition {
   id: string
   field_name: string
@@ -21,12 +23,18 @@ export interface FieldRenderOptions {
   }
 }
 
-export function renderDynamicField(field: FieldDefinition, options: FieldRenderOptions = {}): string {
+export function renderDynamicField(
+  field: FieldDefinition,
+  options: FieldRenderOptions = {}
+): string {
   const { value = '', errors = [], disabled = false, className = '', pluginStatuses = {} } = options
   const opts = field.field_options || {}
   const required = field.is_required ? 'required' : ''
   const baseClasses = `w-full rounded-lg px-3 py-2 text-sm text-zinc-950 dark:text-white bg-white dark:bg-zinc-800 shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow ${className}`
-  const errorClasses = errors.length > 0 ? 'ring-pink-600 dark:ring-pink-500 focus:ring-pink-600 dark:focus:ring-pink-500' : ''
+  const errorClasses =
+    errors.length > 0
+      ? 'ring-pink-600 dark:ring-pink-500 focus:ring-pink-600 dark:focus:ring-pink-500'
+      : ''
 
   const fieldId = `field-${field.field_name}`
   const fieldName = field.field_name
@@ -72,14 +80,16 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
     case 'text':
       let patternHelp = ''
       let autoSlugScript = ''
-      
+
       if (opts.pattern) {
         if (opts.pattern === '^[a-z0-9-]+$' || opts.pattern === '^[a-zA-Z0-9_-]+$') {
-          patternHelp = '<p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Use letters, numbers, underscores, and hyphens only</p>'
+          patternHelp =
+            '<p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Use letters, numbers, underscores, and hyphens only</p>'
 
           // Add auto-slug generation for slug fields
           if (fieldName === 'slug') {
-            patternHelp += '<button type="button" class="mt-1 text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300" onclick="generateSlugFromTitle(\'${fieldId}\')">Generate from title</button>'
+            patternHelp +=
+              '<button type="button" class="mt-1 text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300" onclick="generateSlugFromTitle(\'${fieldId}\')">Generate from title</button>'
             autoSlugScript = `
               <script>
                 function generateSlugFromTitle(slugFieldId) {
@@ -112,10 +122,11 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
             `
           }
         } else {
-          patternHelp = '<p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Must match required format</p>'
+          patternHelp =
+            '<p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Must match required format</p>'
         }
       }
-      
+
       fieldHTML = `
         <input 
           type="text" 
@@ -131,7 +142,9 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         >
         ${patternHelp}
         ${autoSlugScript}
-        ${opts.pattern ? `
+        ${
+          opts.pattern
+            ? `
         <script>
           (function() {
             const field = document.getElementById('${fieldId}');
@@ -154,7 +167,9 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
             });
           })();
         </script>
-        ` : ''}
+        `
+            : ''
+        }
       `
       break
 
@@ -245,7 +260,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         >
       `
       break
-      
+
     case 'boolean':
       const checked = value === true || value === 'true' || value === '1' ? 'checked' : ''
       fieldHTML = `
@@ -266,7 +281,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         <input type="hidden" name="${fieldName}_submitted" value="1">
       `
       break
-      
+
     case 'date':
       fieldHTML = `
         <input
@@ -302,8 +317,10 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
     case 'slug':
       // Slug fields behave like text fields but with special validation
       let slugPattern = opts.pattern || '^[a-z0-9-]+$'
-      let slugHelp = '<p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Use lowercase letters, numbers, and hyphens only</p>'
-      slugHelp += '<button type="button" class="mt-1 text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300" onclick="generateSlugFromTitle(\'${fieldId}\')">Generate from title</button>'
+      let slugHelp =
+        '<p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Use lowercase letters, numbers, and hyphens only</p>'
+      slugHelp +=
+        '<button type="button" class="mt-1 text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300" onclick="generateSlugFromTitle(\'${fieldId}\')">Generate from title</button>'
 
       fieldHTML = `
         <input
@@ -367,11 +384,11 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
       `
       break
 
-    case 'select':
-      const options = opts.options || []
+    case 'select': {
+      const selectOptions = opts.options || []
       const multiple = opts.multiple ? 'multiple' : ''
       const selectedValues = Array.isArray(value) ? value : [value]
-      
+
       fieldHTML = `
         <select 
           id="${fieldId}"
@@ -382,14 +399,18 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
           ${disabled ? 'disabled' : ''}
         >
           ${!required && !opts.multiple ? '<option value="">Choose an option...</option>' : ''}
-          ${options.map((option: any) => {
-            const optionValue = typeof option === 'string' ? option : option.value
-            const optionLabel = typeof option === 'string' ? option : option.label
-            const selected = selectedValues.includes(optionValue) ? 'selected' : ''
-            return `<option value="${escapeHtml(optionValue)}" ${selected}>${escapeHtml(optionLabel)}</option>`
-          }).join('')}
+          ${selectOptions
+            .map((option: any) => {
+              const optionValue = typeof option === 'string' ? option : option.value
+              const optionLabel = typeof option === 'string' ? option : option.label
+              const selected = selectedValues.includes(optionValue) ? 'selected' : ''
+              return `<option value="${escapeHtml(optionValue)}" ${selected}>${escapeHtml(optionLabel)}</option>`
+            })
+            .join('')}
         </select>
-        ${opts.allowCustom ? `
+        ${
+          opts.allowCustom
+            ? `
           <div class="mt-2">
             <input 
               type="text" 
@@ -398,10 +419,13 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
               onkeypress="if(event.key==='Enter'){addCustomOption(this, '${fieldId}');event.preventDefault();}"
             >
           </div>
-        ` : ''}
+        `
+            : ''
+        }
       `
       break
-      
+    }
+
     case 'media':
       fieldHTML = `
         <div class="media-field-container">
@@ -421,7 +445,9 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
               </svg>
               Select Media
             </button>
-            ${value ? `
+            ${
+              value
+                ? `
               <button
                 type="button"
                 onclick="clearMediaField('${fieldId}')"
@@ -430,10 +456,48 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
               >
                 Remove
               </button>
-            ` : ''}
+            `
+                : ''
+            }
           </div>
         </div>
       `
+      break
+    case 'array':
+      if (opts.items && typeof opts.items === 'object' && opts.items.blocks) {
+        fieldHTML = renderBlocksField(field, options, baseClasses, errorClasses)
+      } else if (opts.items && typeof opts.items === 'object') {
+        fieldHTML = renderStructuredArrayField(field, options, baseClasses, errorClasses)
+      } else {
+        fieldHTML = `
+          <textarea
+            id="${fieldId}"
+            name="${fieldName}"
+            rows="${opts.rows || 6}"
+            placeholder="${opts.placeholder || 'Enter JSON array...'}"
+            class="${baseClasses} ${errorClasses} resize-y font-mono text-xs"
+            ${required}
+            ${disabled ? 'disabled' : ''}
+          >${escapeHtml(typeof value === 'string' ? value : JSON.stringify(value || []))}</textarea>
+        `
+      }
+      break
+    case 'object':
+      if (opts.properties && typeof opts.properties === 'object') {
+        fieldHTML = renderStructuredObjectField(field, options, baseClasses, errorClasses)
+      } else {
+        fieldHTML = `
+          <textarea
+            id="${fieldId}"
+            name="${fieldName}"
+            rows="${opts.rows || 6}"
+            placeholder="${opts.placeholder || 'Enter JSON object...'}"
+            class="${baseClasses} ${errorClasses} resize-y font-mono text-xs"
+            ${required}
+            ${disabled ? 'disabled' : ''}
+          >${escapeHtml(typeof value === 'string' ? value : JSON.stringify(value || {}))}</textarea>
+        `
+      }
       break
 
     default:
@@ -449,7 +513,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         >
       `
   }
-  
+
   return `
     <div class="form-group">
       <label for="${fieldId}" class="block text-sm/6 font-medium text-zinc-950 dark:text-white mb-2">
@@ -457,21 +521,33 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         ${field.is_required ? '<span class="text-pink-600 dark:text-pink-400 ml-1">*</span>' : ''}
       </label>
       ${fieldHTML}
-      ${errors.length > 0 ? `
+      ${
+        errors.length > 0
+          ? `
         <div class="mt-2 text-sm text-pink-600 dark:text-pink-400">
-          ${errors.map(error => `<div>${escapeHtml(error)}</div>`).join('')}
+          ${errors.map((error) => `<div>${escapeHtml(error)}</div>`).join('')}
         </div>
-      ` : ''}
-      ${opts.helpText ? `
+      `
+          : ''
+      }
+      ${
+        opts.helpText
+          ? `
         <div class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
           ${escapeHtml(opts.helpText)}
         </div>
-      ` : ''}
+      `
+          : ''
+      }
     </div>
   `
 }
 
-export function renderFieldGroup(title: string, fields: string[], collapsible: boolean = false): string {
+export function renderFieldGroup(
+  title: string,
+  fields: string[],
+  collapsible: boolean = false
+): string {
   const groupId = title.toLowerCase().replace(/\s+/g, '-')
 
   return `
@@ -479,11 +555,15 @@ export function renderFieldGroup(title: string, fields: string[], collapsible: b
       <div class="field-group-header border-b border-zinc-950/5 dark:border-white/10 px-6 py-4 ${collapsible ? 'cursor-pointer' : ''}" ${collapsible ? `onclick="toggleFieldGroup('${groupId}')"` : ''}>
         <h3 class="text-base/7 font-semibold text-zinc-950 dark:text-white flex items-center">
           ${escapeHtml(title)}
-          ${collapsible ? `
+          ${
+            collapsible
+              ? `
             <svg id="${groupId}-icon" class="w-5 h-5 ml-2 transform transition-transform text-zinc-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
             </svg>
-          ` : ''}
+          `
+              : ''
+          }
         </h3>
       </div>
       <div id="${groupId}-content" class="field-group-content px-6 py-6 space-y-6 ${collapsible ? 'collapsible' : ''}">
@@ -493,13 +573,1000 @@ export function renderFieldGroup(title: string, fields: string[], collapsible: b
   `
 }
 
+function renderBlocksField(
+  field: FieldDefinition,
+  options: FieldRenderOptions,
+  baseClasses: string,
+  errorClasses: string
+): string {
+  const { value = [], pluginStatuses = {} } = options
+  const opts = field.field_options || {}
+  const itemsConfig = opts.items && typeof opts.items === 'object' ? opts.items : {}
+  const blocks = normalizeBlockDefinitions(itemsConfig.blocks)
+  const discriminator =
+    typeof itemsConfig.discriminator === 'string' && itemsConfig.discriminator
+      ? itemsConfig.discriminator
+      : 'blockType'
+  const blockValues = normalizeBlocksValue(value, discriminator)
+  const fieldId = `field-${field.field_name}`
+  const fieldName = field.field_name
+  const emptyState =
+    blockValues.length === 0
+      ? `
+    <div class="rounded-lg border border-dashed border-zinc-200 dark:border-white/10 px-4 py-6 text-center text-sm text-zinc-500 dark:text-zinc-400" data-blocks-empty>
+      No blocks yet. Add your first block to get started.
+    </div>
+  `
+      : ''
+
+  const blockOptions = blocks
+    .map((block) => `<option value="${escapeHtml(block.name)}">${escapeHtml(block.label)}</option>`)
+    .join('')
+
+  const blockItems = blockValues
+    .map((blockValue, index) =>
+      renderBlockItem(field, blockValue, blocks, discriminator, index, pluginStatuses)
+    )
+    .join('')
+
+  const templates = blocks
+    .map((block) => renderBlockTemplate(field, block, discriminator, pluginStatuses))
+    .join('')
+
+  return `
+    <div
+      class="blocks-field space-y-4"
+      data-blocks='${escapeHtml(JSON.stringify(blocks))}'
+      data-blocks-discriminator="${escapeHtml(discriminator)}"
+      data-field-name="${escapeHtml(fieldName)}"
+    >
+      <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml(JSON.stringify(blockValues))}">
+
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex-1">
+          <select
+            class="${baseClasses} ${errorClasses}"
+            data-role="block-type-select"
+          >
+            <option value="">Choose a block...</option>
+            ${blockOptions}
+          </select>
+        </div>
+        <button
+          type="button"
+          data-action="add-block"
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-white/10 dark:hover:bg-white/20"
+        >
+          Add Block
+        </button>
+      </div>
+
+      <div class="space-y-4" data-blocks-list>
+        ${blockItems || emptyState}
+      </div>
+
+      ${templates}
+    </div>
+    ${getDragSortableScript()}
+    ${getBlocksFieldScript()}
+  `
+}
+
+function renderStructuredObjectField(
+  field: FieldDefinition,
+  options: FieldRenderOptions,
+  baseClasses: string,
+  errorClasses: string
+): string {
+  const { value = {}, pluginStatuses = {} } = options
+  const opts = field.field_options || {}
+  const properties = opts.properties && typeof opts.properties === 'object' ? opts.properties : {}
+  const fieldId = `field-${field.field_name}`
+  const fieldName = field.field_name
+  const objectValue = normalizeStructuredObjectValue(value)
+
+  const subfields = Object.entries(properties)
+    .map(([propertyName, propertyConfig]) =>
+      renderStructuredSubfield(
+        field,
+        propertyName,
+        propertyConfig,
+        objectValue,
+        pluginStatuses,
+        field.field_name
+      )
+    )
+    .join('')
+
+  return `
+    <div class="space-y-4" data-structured-object data-field-name="${escapeHtml(fieldName)}">
+      <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml(JSON.stringify(objectValue))}">
+      <div class="space-y-4" data-structured-object-fields>
+        ${subfields}
+      </div>
+    </div>
+    ${getStructuredFieldScript()}
+  `
+}
+
+function renderStructuredArrayField(
+  field: FieldDefinition,
+  options: FieldRenderOptions,
+  baseClasses: string,
+  errorClasses: string
+): string {
+  const { value = [], pluginStatuses = {} } = options
+  const opts = field.field_options || {}
+  const itemsConfig = opts.items && typeof opts.items === 'object' ? opts.items : {}
+  const fieldId = `field-${field.field_name}`
+  const fieldName = field.field_name
+  const arrayValue = normalizeStructuredArrayValue(value)
+
+  const items = arrayValue
+    .map((itemValue, index) =>
+      renderStructuredArrayItem(field, itemsConfig, String(index), itemValue, pluginStatuses)
+    )
+    .join('')
+
+  const emptyState =
+    arrayValue.length === 0
+      ? `
+    <div class="rounded-lg border border-dashed border-zinc-200 dark:border-white/10 px-4 py-6 text-center text-sm text-zinc-500 dark:text-zinc-400" data-structured-empty>
+      No items yet. Add the first item to get started.
+    </div>
+  `
+      : ''
+
+  return `
+    <div class="space-y-4" data-structured-array data-field-name="${escapeHtml(fieldName)}">
+      <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml(JSON.stringify(arrayValue))}">
+
+      <div class="flex items-center justify-between gap-3">
+        <div class="text-sm text-zinc-500 dark:text-zinc-400">
+          ${escapeHtml(opts.itemLabel || 'Items')}
+        </div>
+        <button
+          type="button"
+          data-action="add-item"
+          class="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-white/10 dark:hover:bg-white/20"
+        >
+          Add item
+        </button>
+      </div>
+
+      <div class="space-y-4" data-structured-array-list>
+        ${items || emptyState}
+      </div>
+
+      <template data-structured-array-template>
+        ${renderStructuredArrayItem(field, itemsConfig, '__INDEX__', {}, pluginStatuses)}
+      </template>
+    </div>
+    ${getDragSortableScript()}
+    ${getStructuredFieldScript()}
+  `
+}
+
+function renderStructuredArrayItem(
+  field: FieldDefinition,
+  itemConfig: Record<string, any>,
+  index: string,
+  itemValue: any,
+  pluginStatuses: FieldRenderOptions['pluginStatuses']
+): string {
+  const itemFields = renderStructuredItemFields(field, itemConfig, index, itemValue, pluginStatuses)
+
+  return `
+    <div class="structured-array-item rounded-lg border border-zinc-200 dark:border-white/10 bg-white/60 dark:bg-white/5 p-4 shadow-sm" data-array-index="${escapeHtml(index)}" draggable="true">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-3">
+          <div class="drag-handle cursor-move text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-400" data-action="drag-handle" title="Drag to reorder">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 8h16M4 16h16"/>
+            </svg>
+          </div>
+          <div class="text-sm font-semibold text-zinc-900 dark:text-white">
+            Item <span class="ml-2 text-xs font-normal text-zinc-500 dark:text-zinc-400" data-array-order-label></span>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-2 text-xs">
+          <button type="button" data-action="move-up" class="inline-flex items-center justify-center rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent dark:disabled:hover:bg-transparent" aria-label="Move item up" title="Move up">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6l-4 4m4-4l4 4m-4-4v12"/>
+            </svg>
+          </button>
+          <button type="button" data-action="move-down" class="inline-flex items-center justify-center rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent dark:disabled:hover:bg-transparent" aria-label="Move item down" title="Move down">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 18l4-4m-4 4l-4-4m4 4V6"/>
+            </svg>
+          </button>
+          <button type="button" data-action="remove-item" class="inline-flex items-center gap-x-1 px-2.5 py-1.5 text-xs font-medium text-pink-700 dark:text-pink-300 hover:bg-pink-50 dark:hover:bg-pink-900/20 rounded-lg transition-colors">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 0 00-7.5 0"/>
+            </svg>
+            Delete item
+          </button>
+        </div>
+      </div>
+      <div class="mt-4 space-y-4" data-array-item-fields>
+        ${itemFields}
+      </div>
+    </div>
+  `
+}
+
+function renderStructuredItemFields(
+  field: FieldDefinition,
+  itemConfig: Record<string, any>,
+  index: string,
+  itemValue: any,
+  pluginStatuses: FieldRenderOptions['pluginStatuses']
+): string {
+  const itemType = itemConfig?.type || 'string'
+  if (itemType === 'object' && itemConfig?.properties && typeof itemConfig.properties === 'object') {
+    const fieldPrefix = `array-${field.field_name}-${index}`
+    return Object.entries(itemConfig.properties)
+      .map(([propertyName, propertyConfig]) =>
+        renderStructuredSubfield(
+          field,
+          propertyName,
+          propertyConfig,
+          itemValue || {},
+          pluginStatuses,
+          fieldPrefix
+        )
+      )
+      .join('')
+  }
+
+  const normalizedField = normalizeBlockField(itemConfig, 'Item')
+  const fieldValue = itemValue ?? normalizedField.defaultValue ?? ''
+  const fieldDefinition: FieldDefinition = {
+    id: `array-${field.field_name}-${index}-value`,
+    field_name: `array-${field.field_name}-${index}-value`,
+    field_type: normalizedField.type,
+    field_label: normalizedField.label,
+    field_options: normalizedField.options,
+    field_order: 0,
+    is_required: normalizedField.required,
+    is_searchable: false,
+  }
+
+  return `
+    <div class="structured-subfield" data-structured-field="__value" data-field-type="${escapeHtml(normalizedField.type)}">
+      ${renderDynamicField(fieldDefinition, { value: fieldValue, pluginStatuses })}
+    </div>
+  `
+}
+
+function renderStructuredSubfield(
+  field: FieldDefinition,
+  propertyName: string,
+  propertyConfig: any,
+  objectValue: Record<string, any>,
+  pluginStatuses: FieldRenderOptions['pluginStatuses'],
+  fieldPrefix: string
+): string {
+  const normalizedField = normalizeBlockField(propertyConfig, propertyName)
+  const fieldValue = objectValue?.[propertyName] ?? normalizedField.defaultValue ?? ''
+  const fieldDefinition: FieldDefinition = {
+    id: `${fieldPrefix}-${propertyName}`,
+    field_name: `${fieldPrefix}__${propertyName}`,
+    field_type: normalizedField.type,
+    field_label: normalizedField.label,
+    field_options: normalizedField.options,
+    field_order: 0,
+    is_required: normalizedField.required,
+    is_searchable: false,
+  }
+
+  return `
+    <div class="structured-subfield" data-structured-field="${escapeHtml(propertyName)}" data-field-type="${escapeHtml(normalizedField.type)}">
+      ${renderDynamicField(fieldDefinition, { value: fieldValue, pluginStatuses })}
+    </div>
+  `
+}
+
+function normalizeStructuredObjectValue(value: any): Record<string, any> {
+  if (!value) return {}
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value)
+      return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {}
+    } catch {
+      return {}
+    }
+  }
+  if (typeof value === 'object' && !Array.isArray(value)) return value
+  return {}
+}
+
+function normalizeStructuredArrayValue(value: any): any[] {
+  if (!value) return []
+  if (Array.isArray(value)) return value
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value)
+      return Array.isArray(parsed) ? parsed : []
+    } catch {
+      return []
+    }
+  }
+  return []
+}
+
+function normalizeBlockDefinitions(
+  rawBlocks: any
+): Array<{ name: string; label: string; description?: string; properties: Record<string, any> }> {
+  if (!rawBlocks || typeof rawBlocks !== 'object') return []
+
+  return Object.entries(rawBlocks)
+    .filter(([name, block]) => typeof name === 'string' && block && typeof block === 'object')
+    .map(([name, block]: [string, any]) => ({
+      name,
+      label: block.label || name,
+      description: block.description,
+      properties: block.properties && typeof block.properties === 'object' ? block.properties : {},
+    }))
+}
+
+function normalizeBlocksValue(value: any, discriminator: string): any[] {
+  const normalizeItem = (item: any) => {
+    if (!item || typeof item !== 'object') return null
+    if (item[discriminator]) return item
+    if (item.blockType && item.data && typeof item.data === 'object') {
+      return { [discriminator]: item.blockType, ...item.data }
+    }
+    return item
+  }
+
+  const fromArray = (items: any[]) =>
+    items.map(normalizeItem).filter((item) => item && typeof item === 'object')
+
+  if (Array.isArray(value)) return fromArray(value)
+  if (typeof value === 'string' && value.trim()) {
+    try {
+      const parsed = JSON.parse(value)
+      return Array.isArray(parsed) ? fromArray(parsed) : []
+    } catch {
+      return []
+    }
+  }
+  return []
+}
+
+function renderBlockTemplate(
+  field: FieldDefinition,
+  block: { name: string; label: string; description?: string; properties: Record<string, any> },
+  discriminator: string,
+  pluginStatuses: FieldRenderOptions['pluginStatuses']
+): string {
+  return `
+    <template data-block-template="${escapeHtml(block.name)}">
+      ${renderBlockCard(field, block, discriminator, '__INDEX__', {}, pluginStatuses)}
+    </template>
+  `
+}
+
+function renderBlockItem(
+  field: FieldDefinition,
+  blockValue: any,
+  blocks: Array<{
+    name: string
+    label: string
+    description?: string
+    properties: Record<string, any>
+  }>,
+  discriminator: string,
+  index: number,
+  pluginStatuses: FieldRenderOptions['pluginStatuses']
+): string {
+  const blockType = blockValue?.[discriminator] || blockValue?.blockType
+  const blockDefinition = blocks.find((block) => block.name === blockType)
+
+  if (!blockDefinition) {
+    return `
+      <div class="rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3 text-sm text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200" data-block-raw="${escapeHtml(JSON.stringify(blockValue || {}))}">
+        Unknown block type: <strong>${escapeHtml(String(blockType || 'unknown'))}</strong>. This block will be preserved as-is.
+      </div>
+    `
+  }
+
+  const data =
+    blockValue && typeof blockValue === 'object'
+      ? Object.fromEntries(Object.entries(blockValue).filter(([key]) => key !== discriminator))
+      : {}
+
+  return renderBlockCard(field, blockDefinition, discriminator, String(index), data, pluginStatuses)
+}
+
+function renderBlockCard(
+  field: FieldDefinition,
+  block: { name: string; label: string; description?: string; properties: Record<string, any> },
+  discriminator: string,
+  index: string,
+  data: Record<string, any>,
+  pluginStatuses: FieldRenderOptions['pluginStatuses']
+): string {
+  const blockFields = Object.entries(block.properties)
+    .map(([fieldName, fieldConfig]) => {
+      if (fieldConfig?.type === 'array' && fieldConfig?.items?.blocks) {
+        return `
+        <div class="rounded-lg border border-dashed border-amber-200 bg-amber-50/50 px-4 py-3 text-xs text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+          Nested blocks are not supported yet for "${escapeHtml(fieldName)}".
+        </div>
+      `
+      }
+
+      const normalizedField = normalizeBlockField(fieldConfig, fieldName)
+      const fieldValue = data?.[fieldName] ?? normalizedField.defaultValue ?? ''
+      const fieldDefinition: FieldDefinition = {
+        id: `block-${field.field_name}-${index}-${fieldName}`,
+        field_name: `block-${field.field_name}-${index}-${fieldName}`,
+        field_type: normalizedField.type,
+        field_label: normalizedField.label,
+        field_options: normalizedField.options,
+        field_order: 0,
+        is_required: normalizedField.required,
+        is_searchable: false,
+      }
+
+      return `
+      <div class="blocks-subfield" data-block-field="${escapeHtml(fieldName)}" data-field-type="${escapeHtml(normalizedField.type)}">
+        ${renderDynamicField(fieldDefinition, { value: fieldValue, pluginStatuses })}
+      </div>
+    `
+    })
+    .join('')
+
+  return `
+    <div class="blocks-item rounded-lg border border-zinc-200 dark:border-white/10 bg-white/60 dark:bg-white/5 p-4 shadow-sm" data-block-type="${escapeHtml(block.name)}" data-block-discriminator="${escapeHtml(discriminator)}" draggable="true">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-start gap-3">
+          <div class="drag-handle cursor-move text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-400" data-action="drag-handle" title="Drag to reorder">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 8h16M4 16h16"/>
+            </svg>
+          </div>
+          <div>
+            <div class="text-sm font-semibold text-zinc-900 dark:text-white">
+              ${escapeHtml(block.label)}
+              <span class="ml-2 text-xs font-normal text-zinc-500 dark:text-zinc-400" data-block-order-label></span>
+            </div>
+            ${block.description ? `<p class="text-xs text-zinc-500 dark:text-zinc-400">${escapeHtml(block.description)}</p>` : ''}
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-2 text-xs">
+          <button type="button" data-action="move-up" class="inline-flex items-center justify-center rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent dark:disabled:hover:bg-transparent" aria-label="Move block up" title="Move up">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6l-4 4m4-4l4 4m-4-4v12"/>
+            </svg>
+          </button>
+          <button type="button" data-action="move-down" class="inline-flex items-center justify-center rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent dark:disabled:hover:bg-transparent" aria-label="Move block down" title="Move down">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 18l4-4m-4 4l-4-4m4 4V6"/>
+            </svg>
+          </button>
+          <button type="button" data-action="remove-block" class="inline-flex items-center gap-x-1 px-2.5 py-1.5 text-xs font-medium text-pink-700 dark:text-pink-300 hover:bg-pink-50 dark:hover:bg-pink-900/20 rounded-lg transition-colors">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+            </svg>
+            Delete block
+          </button>
+        </div>
+      </div>
+      <div class="mt-4 space-y-4">
+        ${blockFields}
+      </div>
+    </div>
+  `
+}
+
+function normalizeBlockField(fieldConfig: any, fieldName: string) {
+  const type = fieldConfig?.type || 'text'
+  const label = fieldConfig?.title || fieldName
+  const required = fieldConfig?.required === true
+  const options = { ...fieldConfig }
+
+  if (type === 'select' && Array.isArray(fieldConfig?.enum)) {
+    options.options = fieldConfig.enum.map((value: string, index: number) => ({
+      value,
+      label: fieldConfig.enumLabels?.[index] || value,
+    }))
+  }
+
+  return {
+    type,
+    label,
+    required,
+    defaultValue: fieldConfig?.default,
+    options,
+  }
+}
+
+function getStructuredFieldScript(): string {
+  return `
+    <script>
+      if (!window.__sonicStructuredFieldInit) {
+        window.__sonicStructuredFieldInit = true;
+
+        function initializeStructuredFields() {
+          const readFieldValue = (fieldWrapper) => {
+            const fieldType = fieldWrapper.dataset.fieldType;
+            const select = fieldWrapper.querySelector('select');
+            const textarea = fieldWrapper.querySelector('textarea');
+            const inputs = Array.from(fieldWrapper.querySelectorAll('input'));
+            const checkbox = inputs.find((input) => input.type === 'checkbox');
+            const nonHiddenInput = inputs.find((input) => input.type !== 'hidden' && input.type !== 'checkbox');
+            const hiddenInput = inputs.find((input) => input.type === 'hidden');
+
+            if (fieldType === 'object' || fieldType === 'array') {
+              if (!hiddenInput) {
+                return fieldType === 'array' ? [] : {};
+              }
+              const rawValue = hiddenInput.value || '';
+              if (!rawValue.trim()) {
+                return fieldType === 'array' ? [] : {};
+              }
+              try {
+                return JSON.parse(rawValue);
+              } catch {
+                return fieldType === 'array' ? [] : {};
+              }
+            }
+
+            if (fieldType === 'boolean' && checkbox) {
+              return checkbox.checked;
+            }
+
+            if (select) {
+              if (select.multiple) {
+                return Array.from(select.selectedOptions).map((option) => option.value);
+              }
+              return select.value;
+            }
+
+            if (fieldType === 'quill' || fieldType === 'media') {
+              return hiddenInput ? hiddenInput.value : '';
+            }
+
+            const textSource = textarea || nonHiddenInput || hiddenInput;
+            if (!textSource) {
+              return '';
+            }
+
+            if (fieldType === 'number') {
+              return textSource.value === '' ? null : Number(textSource.value);
+            }
+
+            return textSource.value;
+          };
+
+          const readStructuredValue = (container) => {
+            const fields = Array.from(container.querySelectorAll('.structured-subfield'));
+            if (fields.length === 1 && fields[0].dataset.structuredField === '__value') {
+              return readFieldValue(fields[0]);
+            }
+
+            return fields.reduce((acc, fieldWrapper) => {
+              const fieldName = fieldWrapper.dataset.structuredField;
+              if (!fieldName || fieldName === '__value') return acc;
+              acc[fieldName] = readFieldValue(fieldWrapper);
+              return acc;
+            }, {});
+          };
+
+          document.querySelectorAll('[data-structured-object]').forEach((container) => {
+            if (container.dataset.structuredInitialized === 'true') {
+              return;
+            }
+            container.dataset.structuredInitialized = 'true';
+            const hiddenInput = container.querySelector('input[type="hidden"]');
+
+            const updateHiddenInput = () => {
+              if (!hiddenInput) return;
+              const value = readStructuredValue(container);
+              hiddenInput.value = JSON.stringify(value);
+            };
+
+            container.addEventListener('input', updateHiddenInput);
+            container.addEventListener('change', updateHiddenInput);
+            updateHiddenInput();
+          });
+
+          document.querySelectorAll('[data-structured-array]').forEach((container) => {
+            if (container.dataset.structuredInitialized === 'true') {
+              return;
+            }
+            container.dataset.structuredInitialized = 'true';
+            const list = container.querySelector('[data-structured-array-list]');
+            const hiddenInput = container.querySelector('input[type="hidden"]');
+            const template = container.querySelector('template[data-structured-array-template]');
+
+            const updateOrderLabels = () => {
+              const items = Array.from(container.querySelectorAll('.structured-array-item'));
+              items.forEach((item, index) => {
+                const label = item.querySelector('[data-array-order-label]');
+                if (label) {
+                  label.textContent = '#'+ (index + 1);
+                }
+
+                const moveUpButton = item.querySelector('[data-action="move-up"]');
+                if (moveUpButton instanceof HTMLButtonElement) {
+                  moveUpButton.disabled = index === 0;
+                }
+
+                const moveDownButton = item.querySelector('[data-action="move-down"]');
+                if (moveDownButton instanceof HTMLButtonElement) {
+                  moveDownButton.disabled = index === items.length - 1;
+                }
+              });
+            };
+
+            const updateHiddenInput = () => {
+              if (!hiddenInput || !list) return;
+              const items = Array.from(list.querySelectorAll('.structured-array-item'));
+              const values = items.map((item) => readStructuredValue(item));
+              hiddenInput.value = JSON.stringify(values);
+
+              const emptyState = list.querySelector('[data-structured-empty]');
+              if (emptyState) {
+                emptyState.style.display = values.length === 0 ? 'block' : 'none';
+              }
+              updateOrderLabels();
+            };
+
+            if (typeof window.initializeDragSortable === 'function' && list) {
+              window.initializeDragSortable(list, {
+                itemSelector: '.structured-array-item',
+                handleSelector: '[data-action="drag-handle"]',
+                onUpdate: updateHiddenInput
+              });
+            }
+
+            container.addEventListener('click', (event) => {
+              const target = event.target;
+              if (!(target instanceof Element)) return;
+              const actionButton = target.closest('[data-action]');
+              if (!actionButton || actionButton.hasAttribute('disabled')) return;
+
+              const action = actionButton.getAttribute('data-action');
+
+              if (action === 'add-item') {
+                if (!list || !template) return;
+                const nextIndex = list.querySelectorAll('.structured-array-item').length;
+                const html = template.innerHTML.replace(/__INDEX__/g, String(nextIndex));
+                list.insertAdjacentHTML('beforeend', html);
+                if (typeof initializeTinyMCE === 'function') {
+                  initializeTinyMCE();
+                }
+                if (typeof window.initializeQuillEditors === 'function') {
+                  window.initializeQuillEditors();
+                }
+                if (typeof initializeMDXEditor === 'function') {
+                  initializeMDXEditor();
+                }
+                updateHiddenInput();
+                return;
+              }
+
+              const item = actionButton.closest('.structured-array-item');
+              if (!item || !list) return;
+
+              if (action === 'remove-item') {
+                item.remove();
+                updateHiddenInput();
+                return;
+              }
+
+              if (action === 'move-up') {
+                const previous = item.previousElementSibling;
+                if (previous) {
+                  list.insertBefore(item, previous);
+                  updateHiddenInput();
+                }
+                return;
+              }
+
+              if (action === 'move-down') {
+                const next = item.nextElementSibling;
+                if (next) {
+                  list.insertBefore(next, item);
+                  updateHiddenInput();
+                }
+              }
+            });
+
+            container.addEventListener('input', (event) => {
+              const target = event.target;
+              if (!(target instanceof Element)) return;
+              if (target.closest('[data-structured-array-list]')) {
+                updateHiddenInput();
+              }
+            });
+
+            container.addEventListener('change', (event) => {
+              const target = event.target;
+              if (!(target instanceof Element)) return;
+              if (target.closest('[data-structured-array-list]')) {
+                updateHiddenInput();
+              }
+            });
+
+            updateHiddenInput();
+          });
+        }
+
+        window.initializeStructuredFields = initializeStructuredFields;
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initializeStructuredFields);
+        } else {
+          initializeStructuredFields();
+        }
+
+        document.addEventListener('htmx:afterSwap', function() {
+          setTimeout(initializeStructuredFields, 50);
+        });
+      } else if (typeof window.initializeStructuredFields === 'function') {
+        window.initializeStructuredFields();
+      }
+    </script>
+  `
+}
+
+function getBlocksFieldScript(): string {
+  return `
+    <script>
+      if (!window.__sonicBlocksFieldInit) {
+        window.__sonicBlocksFieldInit = true;
+
+        function initializeBlocksFields() {
+          document.querySelectorAll('.blocks-field').forEach((container) => {
+            if (container.dataset.blocksInitialized === 'true') {
+              return;
+            }
+
+            container.dataset.blocksInitialized = 'true';
+            const list = container.querySelector('[data-blocks-list]');
+            const hiddenInput = container.querySelector('input[type="hidden"]');
+            const typeSelect = container.querySelector('[data-role="block-type-select"]');
+            const discriminator = container.dataset.blocksDiscriminator || 'blockType';
+
+            const updateOrderLabels = () => {
+              const items = Array.from(container.querySelectorAll('.blocks-item'));
+              items.forEach((item, index) => {
+                const label = item.querySelector('[data-block-order-label]');
+                if (label) {
+                  label.textContent = '#'+ (index + 1);
+                }
+
+                const moveUpButton = item.querySelector('[data-action="move-up"]');
+                if (moveUpButton instanceof HTMLButtonElement) {
+                  moveUpButton.disabled = index === 0;
+                }
+
+                const moveDownButton = item.querySelector('[data-action="move-down"]');
+                if (moveDownButton instanceof HTMLButtonElement) {
+                  moveDownButton.disabled = index === items.length - 1;
+                }
+              });
+            };
+
+            const readFieldValue = (fieldWrapper) => {
+              const fieldType = fieldWrapper.dataset.fieldType;
+              const select = fieldWrapper.querySelector('select');
+              const textarea = fieldWrapper.querySelector('textarea');
+              const inputs = Array.from(fieldWrapper.querySelectorAll('input'));
+              const checkbox = inputs.find((input) => input.type === 'checkbox');
+              const nonHiddenInput = inputs.find((input) => input.type !== 'hidden' && input.type !== 'checkbox');
+              const hiddenInput = inputs.find((input) => input.type === 'hidden');
+
+              if (fieldType === 'object' || fieldType === 'array') {
+                if (!hiddenInput) {
+                  return fieldType === 'array' ? [] : {};
+                }
+                const rawValue = hiddenInput.value || '';
+                if (!rawValue.trim()) {
+                  return fieldType === 'array' ? [] : {};
+                }
+                try {
+                  return JSON.parse(rawValue);
+                } catch {
+                  return fieldType === 'array' ? [] : {};
+                }
+              }
+
+              if (fieldType === 'boolean' && checkbox) {
+                return checkbox.checked;
+              }
+
+              if (select) {
+                if (select.multiple) {
+                  return Array.from(select.selectedOptions).map((option) => option.value);
+                }
+                return select.value;
+              }
+
+              if (fieldType === 'quill' || fieldType === 'media') {
+                return hiddenInput ? hiddenInput.value : '';
+              }
+
+              const textSource = textarea || nonHiddenInput || hiddenInput;
+              if (!textSource) {
+                return '';
+              }
+
+              if (fieldType === 'number') {
+                return textSource.value === '' ? null : Number(textSource.value);
+              }
+
+              return textSource.value;
+            };
+
+            const readBlockItem = (item) => {
+              if (item.dataset.blockRaw) {
+                try {
+                  return JSON.parse(item.dataset.blockRaw);
+                } catch (error) {
+                  return {};
+                }
+              }
+
+              const blockType = item.dataset.blockType;
+              const data = {};
+
+              item.querySelectorAll('.blocks-subfield').forEach((fieldWrapper) => {
+                const fieldName = fieldWrapper.dataset.blockField;
+                if (!fieldName) {
+                  return;
+                }
+                data[fieldName] = readFieldValue(fieldWrapper);
+              });
+
+              return { [discriminator]: blockType, ...data };
+            };
+
+            const updateHiddenInput = () => {
+              if (!hiddenInput || !list) return;
+              const items = Array.from(list.querySelectorAll('.blocks-item, [data-block-raw]'));
+              const blocksData = items.map((item) => readBlockItem(item));
+              hiddenInput.value = JSON.stringify(blocksData);
+
+              const emptyState = list.querySelector('[data-blocks-empty]');
+              if (emptyState) {
+                emptyState.style.display = blocksData.length === 0 ? 'block' : 'none';
+              }
+              updateOrderLabels();
+            };
+
+            const initializeEditors = () => {
+              if (typeof initializeTinyMCE === 'function') {
+                initializeTinyMCE();
+              }
+              if (typeof window.initializeQuillEditors === 'function') {
+                window.initializeQuillEditors();
+              }
+              if (typeof initializeMDXEditor === 'function') {
+                initializeMDXEditor();
+              }
+            };
+
+            if (typeof window.initializeDragSortable === 'function' && list) {
+              window.initializeDragSortable(list, {
+                itemSelector: '.blocks-item',
+                handleSelector: '[data-action="drag-handle"]',
+                onUpdate: updateHiddenInput
+              });
+            }
+
+            container.addEventListener('click', (event) => {
+              const target = event.target;
+              if (!(target instanceof Element)) return;
+              const actionButton = target.closest('[data-action]');
+              if (!actionButton) return;
+
+              if (actionButton.hasAttribute('disabled')) {
+                return;
+              }
+
+              const action = actionButton.getAttribute('data-action');
+              if (action === 'add-block') {
+                const blockType = typeSelect ? typeSelect.value : '';
+                if (!blockType || !list) return;
+                const template = container.querySelector('template[data-block-template="' + blockType + '"]');
+                if (!template) return;
+
+                const nextIndex = list.querySelectorAll('.blocks-item').length;
+                const html = template.innerHTML.replace(/__INDEX__/g, String(nextIndex));
+                list.insertAdjacentHTML('beforeend', html);
+                if (typeSelect) {
+                  typeSelect.value = '';
+                }
+                initializeEditors();
+                if (typeof window.initializeStructuredFields === 'function') {
+                  window.initializeStructuredFields();
+                }
+                updateHiddenInput();
+                return;
+              }
+
+              const item = actionButton.closest('.blocks-item');
+              if (!item || !list) return;
+
+              if (action === 'remove-block') {
+                item.remove();
+                updateHiddenInput();
+                return;
+              }
+
+              if (action === 'move-up') {
+                const previous = item.previousElementSibling;
+                if (previous) {
+                  list.insertBefore(item, previous);
+                  updateHiddenInput();
+                }
+                return;
+              }
+
+              if (action === 'move-down') {
+                const next = item.nextElementSibling;
+                if (next) {
+                  list.insertBefore(next, item);
+                  updateHiddenInput();
+                }
+              }
+            });
+
+            container.addEventListener('input', (event) => {
+              const target = event.target;
+              if (!(target instanceof Element)) return;
+              if (target.closest('[data-blocks-list]')) {
+                updateHiddenInput();
+              }
+            });
+
+            container.addEventListener('change', (event) => {
+              const target = event.target;
+              if (!(target instanceof Element)) return;
+              if (target.closest('[data-blocks-list]')) {
+                updateHiddenInput();
+              }
+            });
+
+            updateHiddenInput();
+          });
+        }
+
+        window.initializeBlocksFields = initializeBlocksFields;
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initializeBlocksFields);
+        } else {
+          initializeBlocksFields();
+        }
+
+        document.addEventListener('htmx:afterSwap', function() {
+          setTimeout(initializeBlocksFields, 50);
+        });
+      } else if (typeof window.initializeBlocksFields === 'function') {
+        window.initializeBlocksFields();
+      }
+    </script>
+  `
+}
+
 function escapeHtml(text: string): string {
   if (typeof text !== 'string') return String(text || '')
-  return text.replace(/[&<>"']/g, (char) => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-  }[char] || char))
+  return text.replace(
+    /[&<>"']/g,
+    (char) =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      })[char] || char
+  )
 }

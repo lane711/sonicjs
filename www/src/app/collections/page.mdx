@@ -7,8 +7,14 @@ export const metadata = {
 export const sections = [
   { title: 'Overview', id: 'overview' },
   { title: 'Creating Collections', id: 'creating-collections' },
-  { title: 'Creating via Admin UI', id: 'option-1-creating-collections-via-admin-ui' },
-  { title: 'Creating with Code', id: 'option-2-creating-collections-with-code' },
+  {
+    title: 'Creating via Admin UI',
+    id: 'option-1-creating-collections-via-admin-ui',
+  },
+  {
+    title: 'Creating with Code',
+    id: 'option-2-creating-collections-with-code',
+  },
   { title: 'When to Use Each Approach', id: 'when-to-use-each-approach' },
   { title: 'Field Types', id: 'field-types' },
   { title: 'Validation', id: 'validation' },
@@ -27,9 +33,14 @@ Define content types with TypeScript schemas and field validation. Collections a
       ✨
     </span>
     <div>
-      <h4 className="font-semibold text-emerald-900 dark:text-emerald-200 mb-1">Unique Flexibility</h4>
+      <h4 className="mb-1 font-semibold text-emerald-900 dark:text-emerald-200">
+        Unique Flexibility
+      </h4>
       <span className="text-sm text-emerald-800 dark:text-emerald-300">
-        Unlike most headless CMS platforms that only support one approach, SonicJS lets you create collections <strong>both</strong> through the admin UI and with code. Start prototyping in the UI, then migrate to code for production—or use both simultaneously.
+        Unlike most headless CMS platforms that only support one approach,
+        SonicJS lets you create collections <strong>both</strong> through the
+        admin UI and with code. Start prototyping in the UI, then migrate to
+        code for production—or use both simultaneously.
       </span>
     </div>
   </div>
@@ -123,14 +134,14 @@ SonicJS offers two ways to create collections: through the admin UI or with code
 
 ### Comparison: UI vs Code-Based Collections
 
-| Aspect | Admin UI | Code-Based |
-|--------|----------|------------|
-| **Best for** | Rapid prototyping, non-developers, quick iterations | Production apps, team collaboration, CI/CD |
-| **Version control** | Not version controlled | Full git history |
-| **Editing** | Fully editable in admin | Read-only in admin (edit code instead) |
-| **Type safety** | None | Full TypeScript support with IDE autocomplete |
-| **Deployment** | Manual recreation per environment | Automatic sync across environments |
-| **Field types** | Limited to active editor plugins | All 30+ field types available |
+| Aspect              | Admin UI                                            | Code-Based                                    |
+| ------------------- | --------------------------------------------------- | --------------------------------------------- |
+| **Best for**        | Rapid prototyping, non-developers, quick iterations | Production apps, team collaboration, CI/CD    |
+| **Version control** | Not version controlled                              | Full git history                              |
+| **Editing**         | Fully editable in admin                             | Read-only in admin (edit code instead)        |
+| **Type safety**     | None                                                | Full TypeScript support with IDE autocomplete |
+| **Deployment**      | Manual recreation per environment                   | Automatic sync across environments            |
+| **Field types**     | Limited to active editor plugins                    | All 30+ field types available                 |
 
 ---
 
@@ -189,12 +200,15 @@ On the collection edit page, click **"Add Field"** to open the field modal. Conf
 #### Step 5: Manage Fields
 
 After adding fields, you can:
+
 - **Reorder** fields using drag handles
 - **Edit** field settings by clicking the edit button
 - **Delete** fields using the delete button
 
 <Callout type="warning" title="UI-Created Collection Limitations">
-Collections created via UI have fewer field types available compared to code-based collections. Rich text editors (TinyMCE, Quill, EasyMDX) are only available if the corresponding plugin is active.
+  Collections created via UI have fewer field types available compared to
+  code-based collections. Rich text editors (TinyMCE, Quill, EasyMDX) are only
+  available if the corresponding plugin is active.
 </Callout>
 
 ---
@@ -227,44 +241,44 @@ export default {
         title: 'Title',
         required: true,
         minLength: 3,
-        maxLength: 200
+        maxLength: 200,
       },
       slug: {
         type: 'slug',
         title: 'URL Slug',
-        required: true
+        required: true,
       },
       content: {
         type: 'richtext',
         title: 'Content',
-        required: true
+        required: true,
       },
       excerpt: {
         type: 'textarea',
         title: 'Excerpt',
         maxLength: 500,
-        helpText: 'A short summary of the post'
+        helpText: 'A short summary of the post',
       },
       author: {
         type: 'reference',
         title: 'Author',
         collection: 'users',
-        required: true
+        required: true,
       },
       publishDate: {
         type: 'datetime',
         title: 'Publish Date',
-        required: true
+        required: true,
       },
       status: {
         type: 'select',
         title: 'Status',
         enum: ['draft', 'published', 'archived'],
         enumLabels: ['Draft', 'Published', 'Archived'],
-        default: 'draft'
-      }
+        default: 'draft',
+      },
     },
-    required: ['title', 'slug', 'content', 'author', 'publishDate']
+    required: ['title', 'slug', 'content', 'author', 'publishDate'],
   },
 
   // Display configuration
@@ -275,7 +289,7 @@ export default {
 
   // Mark as config-managed (read-only in admin UI)
   managed: true,
-  isActive: true
+  isActive: true,
 } satisfies CollectionConfig
 ```
 
@@ -293,15 +307,13 @@ import { createSonicJSApp, registerCollections } from '@sonicjs-cms/core'
 import blogPostsCollection from './collections/blog-posts.collection'
 
 // Register custom collections
-registerCollections([
-  blogPostsCollection
-])
+registerCollections([blogPostsCollection])
 
 // Create and export the app
 export default createSonicJSApp({
   collections: {
-    autoSync: true
-  }
+    autoSync: true,
+  },
 })
 ```
 
@@ -324,7 +336,9 @@ npm run sync-collections
 </CodeGroup>
 
 <Callout type="info" title="Config Badge in Admin UI">
-Code-based collections appear in the admin UI with a purple **"Config"** badge and are read-only. To modify them, edit the TypeScript file and restart the server.
+  Code-based collections appear in the admin UI with a purple **"Config"** badge
+  and are read-only. To modify them, edit the TypeScript file and restart the
+  server.
 </Callout>
 
 ---
@@ -332,12 +346,14 @@ Code-based collections appear in the admin UI with a purple **"Config"** badge a
 ### When to Use Each Approach
 
 **Use the Admin UI when:**
+
 - Prototyping a new content model quickly
 - Non-developers need to create collections
 - You need to iterate on schema design rapidly
 - Building a one-off project without deployment concerns
 
 **Use Code-Based collections when:**
+
 - Building production applications
 - Working with a team (version control is essential)
 - You need type safety and IDE autocomplete
@@ -346,7 +362,9 @@ Code-based collections appear in the admin UI with a purple **"Config"** badge a
 - You need advanced field types or validation
 
 <Callout type="tip" title="Migration Path">
-You can start with UI-created collections for prototyping, then convert them to code-based collections for production. Export the schema JSON from the database and convert it to a TypeScript collection file.
+  You can start with UI-created collections for prototyping, then convert them
+  to code-based collections for production. Export the schema JSON from the
+  database and convert it to a TypeScript collection file.
 </Callout>
 
 ---
@@ -447,6 +465,98 @@ SonicJS supports 30+ field types for building rich content schemas:
 
 ---
 
+## Content Blocks & Repeatable Fields
+There are three main patterns to model structured content in a page: blocks for mixed layouts, arrays for repeatable items, and objects for grouped fields.
+
+### When to use each:
+- **Blocks** - Mixed layouts in a single list (page builder sections).
+- **Arrays** - Repeatable items with the same shape (team members, FAQs, links).
+- **Objects** - Grouped fields that belong together (SEO, settings).
+
+<Callout type="info" >Blocks can include nested arrays/objects for repeatable sub-fields inside a block.</Callout>
+
+### Content Blocks
+
+Use an array field with `items.blocks` to define reusable content blocks (hero, text + image, testimonials, CTAs) with add/remove/reorder controls.
+
+<CodeGroup title="Blocks Field">
+
+```typescript
+body: {
+  type: 'array',
+  title: 'Content Blocks',
+  items: {
+    type: 'object',
+    discriminator: 'blockType',
+    blocks: {
+      text: {
+        label: 'Text',
+        properties: {
+          heading: { type: 'string', title: 'Heading', required: true },
+          body: { type: 'textarea', title: 'Body text', required: true },
+        }
+      },
+      callToAction: {
+        label: 'Call To Action',
+        properties: {
+          title: { type: 'string', title: 'Heading', required: true },
+          body: { type: 'textarea', title: 'Body text', required: true },
+          buttonLabel: { type: 'string', title: 'Button label',  required: true },
+          buttonUrl: { type: 'url', title: 'Button link',  required: true },
+        }
+      }
+    }
+  }
+}
+```
+
+</CodeGroup>
+
+### Repeatable Lists (Arrays)
+
+Use arrays for repeatable items that share the same structure.
+
+<CodeGroup title="Team Members List">
+
+```typescript
+teamMembers: {
+  type: 'array',
+  title: 'Team Members',
+  items: {
+    type: 'object',
+    properties: {
+      name: { type: 'string', title: 'Name', required: true },
+      role: { type: 'string', title: 'Role' },
+      bio: { type: 'textarea', title: 'Bio' },
+      photo: { type: 'media', title: 'Photo' },
+    },
+  },
+},
+```
+
+</CodeGroup>
+
+### Grouped Fields (Objects)
+
+Use objects to group related fields under a single heading.
+
+<CodeGroup title="Grouped SEO Fields">
+
+```typescript
+seo: {
+  type: 'object',
+  title: 'SEO',
+  properties: {
+    title: { type: 'string', title: 'SEO title' },
+    description: { type: 'textarea', title: 'SEO description' },
+  },
+},
+```
+
+</CodeGroup>
+
+---
+
 ## Validation
 
 ### Built-in Validators
@@ -464,36 +574,36 @@ export const productsCollection: CollectionConfig = {
         type: 'string',
         required: true,
         minLength: 3,
-        maxLength: 200
+        maxLength: 200,
       },
       sku: {
         type: 'string',
         required: true,
-        pattern: '^[A-Z0-9-]+$'  // Only uppercase, numbers, hyphens
+        pattern: '^[A-Z0-9-]+$', // Only uppercase, numbers, hyphens
       },
       price: {
         type: 'number',
         required: true,
         minimum: 0,
-        maximum: 999999
+        maximum: 999999,
       },
       email: {
         type: 'email',
-        required: true
+        required: true,
       },
       url: {
         type: 'url',
-        required: false
+        required: false,
       },
       status: {
         type: 'select',
         enum: ['draft', 'active', 'archived'],
-        default: 'draft'
-      }
-    }
+        default: 'draft',
+      },
+    },
   },
   managed: true,
-  isActive: true
+  isActive: true,
 }
 ```
 
@@ -526,44 +636,44 @@ export const productsCollection: CollectionConfig = {
     properties: {
       name: {
         type: 'string',
-        required: true
+        required: true,
       },
       sku: {
         type: 'string',
-        required: true
+        required: true,
       },
       price: {
         type: 'number',
         required: true,
-        minimum: 0
+        minimum: 0,
       },
       description: {
-        type: 'richtext'
+        type: 'richtext',
       },
       images: {
         type: 'array',
         items: {
           type: 'media',
-          accept: 'image/*'
-        }
+          accept: 'image/*',
+        },
       },
       category: {
         type: 'select',
-        enum: ['electronics', 'clothing', 'home', 'sports']
+        enum: ['electronics', 'clothing', 'home', 'sports'],
       },
       inStock: {
         type: 'boolean',
-        default: true
+        default: true,
       },
       tags: {
         type: 'array',
-        items: { type: 'string' }
-      }
-    }
+        items: { type: 'string' },
+      },
+    },
   },
   icon: '🛍️',
   managed: true,
-  isActive: true
+  isActive: true,
 }
 ```
 
@@ -582,33 +692,33 @@ export const docsCollection: CollectionConfig = {
     properties: {
       title: {
         type: 'string',
-        required: true
+        required: true,
       },
       slug: {
         type: 'slug',
-        required: true
+        required: true,
       },
       content: {
         type: 'markdown',
-        required: true
+        required: true,
       },
       category: {
         type: 'select',
-        enum: ['getting-started', 'api', 'guides', 'reference']
+        enum: ['getting-started', 'api', 'guides', 'reference'],
       },
       order: {
         type: 'number',
-        default: 0
+        default: 0,
       },
       published: {
         type: 'boolean',
-        default: false
-      }
-    }
+        default: false,
+      },
+    },
   },
   icon: '📚',
   managed: true,
-  isActive: true
+  isActive: true,
 }
 ```
 
@@ -627,42 +737,42 @@ export const eventsCollection: CollectionConfig = {
     properties: {
       title: {
         type: 'string',
-        required: true
+        required: true,
       },
       description: {
-        type: 'richtext'
+        type: 'richtext',
       },
       startDate: {
         type: 'datetime',
-        required: true
+        required: true,
       },
       endDate: {
         type: 'datetime',
-        required: true
+        required: true,
       },
       location: {
-        type: 'string'
+        type: 'string',
       },
       virtualLink: {
-        type: 'url'
+        type: 'url',
       },
       capacity: {
         type: 'number',
-        minimum: 1
+        minimum: 1,
       },
       registration: {
         type: 'boolean',
-        default: false
+        default: false,
       },
       organizer: {
         type: 'reference',
-        collection: 'users'
-      }
-    }
+        collection: 'users',
+      },
+    },
   },
   icon: '📅',
   managed: true,
-  isActive: true
+  isActive: true,
 }
 ```
 
@@ -678,26 +788,25 @@ export const eventsCollection: CollectionConfig = {
 
 ```typescript
 // Get all content from a collection
-const posts = await db.select()
+const posts = await db
+  .select()
   .from(content)
   .where(eq(content.collection_id, 'blog_posts'))
   .orderBy(desc(content.created_at))
   .limit(10)
 
 // Get single content item
-const post = await db.select()
-  .from(content)
-  .where(eq(content.id, postId))
-  .get()
+const post = await db.select().from(content).where(eq(content.id, postId)).get()
 
 // Search content
-const results = await db.select()
+const results = await db
+  .select()
   .from(content)
   .where(
     and(
       eq(content.collection_id, 'blog_posts'),
-      like(content.title, '%search%')
-    )
+      like(content.title, '%search%'),
+    ),
   )
   .all()
 ```
@@ -708,32 +817,56 @@ const results = await db.select()
 
 Collections automatically get REST API endpoints:
 
-<ApiEndpoint method="GET" path="/api/collections/{collection}/content" description="Get all content from a collection" auth={false} />
+<ApiEndpoint
+  method="GET"
+  path="/api/collections/{collection}/content"
+  description="Get all content from a collection"
+  auth={false}
+/>
 
-<ApiEndpoint method="GET" path="/api/content/{id}" description="Get single content item" auth={false} />
+<ApiEndpoint
+  method="GET"
+  path="/api/content/{id}"
+  description="Get single content item"
+  auth={false}
+/>
 
-<ApiEndpoint method="POST" path="/admin/content" description="Create new content" auth={true} />
+<ApiEndpoint
+  method="POST"
+  path="/admin/content"
+  description="Create new content"
+  auth={true}
+/>
 
-<ApiEndpoint method="PUT" path="/admin/content/{id}" description="Update content" auth={true} />
+<ApiEndpoint
+  method="PUT"
+  path="/admin/content/{id}"
+  description="Update content"
+  auth={true}
+/>
 
-<ApiEndpoint method="DELETE" path="/admin/content/{id}" description="Delete content" auth={true} />
+<ApiEndpoint
+  method="DELETE"
+  path="/admin/content/{id}"
+  description="Delete content"
+  auth={true}
+/>
 
 ---
 
 ## Best Practices
 
 <Callout type="tip" title="Collection Design Tips">
-- Use descriptive field names that reflect your content model
-- Set appropriate validation rules to maintain data quality
-- Use references for relationships between collections
-- Enable search on fields that users will query frequently
-- Set reasonable defaults for optional fields
+  - Use descriptive field names that reflect your content model - Set
+  appropriate validation rules to maintain data quality - Use references for
+  relationships between collections - Enable search on fields that users will
+  query frequently - Set reasonable defaults for optional fields
 </Callout>
 
 <Callout type="warning" title="Performance Considerations">
-- Limit the number of fields in `listFields` to improve list performance
-- Use appropriate field types (e.g., `select` instead of `string` for fixed options)
-- Index frequently queried fields in your database
+  - Limit the number of fields in `listFields` to improve list performance - Use
+  appropriate field types (e.g., `select` instead of `string` for fixed options)
+  - Index frequently queried fields in your database
 </Callout>
 
 ---

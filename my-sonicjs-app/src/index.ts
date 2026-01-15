@@ -9,13 +9,12 @@ import type { SonicJSConfig } from '@sonicjs-cms/core'
 
 // Import custom collections
 import blogPostsCollection from './collections/blog-posts.collection'
-
-// Import custom routes
-import profileRoutes from './routes/profile'
+import pageBlocksCollection from './collections/page-blocks.collection'
 
 // Register all custom collections
 registerCollections([
-  blogPostsCollection
+  blogPostsCollection,
+  pageBlocksCollection
 ])
 
 // Application configuration
@@ -28,11 +27,7 @@ const config: SonicJSConfig = {
     autoLoad: false,  // Set to true to auto-load custom plugins
     disableAll: false,  // Enable plugins
     enabled: ['email']  // Enable specific plugins
-  },
-  // Custom routes for app-specific functionality
-  routes: [
-    { path: '/api/profile', handler: profileRoutes }
-  ]
+  }
 }
 
 // Create and export the application

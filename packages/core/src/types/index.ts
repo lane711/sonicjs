@@ -8,6 +8,8 @@
 export type {
   FieldType,
   FieldConfig,
+  BlockDefinition,
+  BlockDefinitions,
   CollectionSchema,
   CollectionConfig,
   CollectionConfigModule,

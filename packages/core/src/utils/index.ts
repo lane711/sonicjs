@@ -41,3 +41,5 @@ export {
   isTelemetryEnabled,
   shouldSkipEvent
 } from './telemetry-config'
+
+export { getBlocksFieldConfig, parseBlocksValue } from './blocks'
