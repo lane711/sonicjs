@@ -95,17 +95,19 @@ export function createTurnstileMiddleware(options?: {
 
     let token: string | undefined
     const contentType = c.req.header('content-type') || ''
-    
+
     if (contentType.includes('application/json')) {
       const body = await c.req.json()
       token = body['cf-turnstile-response'] || body['turnstile-token']
+      // Store parsed body in context so route handler can access it
+      c.set('requestBody', body)
     } else if (contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
       const formData = await c.req.formData()
       token = formData.get('cf-turnstile-response')?.toString() || formData.get('turnstile-token')?.toString()
     }
 
     if (!token) {
-      return options?.onMissing?.(c) || 
+      return options?.onMissing?.(c) ||
         c.json({ error: 'Turnstile token missing' }, 400)
     }
 
