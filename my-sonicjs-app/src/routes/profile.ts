@@ -4,6 +4,10 @@
  * CRUD API for user profiles. These routes allow authenticated users
  * to manage their extended profile data.
  *
+ * DYNAMIC SCHEMA: These routes automatically adapt to schema changes.
+ * Add/remove columns in user-profiles.ts and they'll be available
+ * in the API without modifying this file.
+ *
  * Routes:
  * - GET  /api/profile      - Get current user's profile
  * - PUT  /api/profile      - Create or replace profile
@@ -12,16 +16,43 @@
  */
 
 import { Hono } from 'hono';
+import { drizzle } from 'drizzle-orm/d1';
+import { eq } from 'drizzle-orm';
 import { requireAuth } from '@sonicjs-cms/core';
 import type { Bindings, Variables } from '@sonicjs-cms/core';
+import { userProfiles, type NewUserProfile } from '../db/schema/user-profiles';
 
 // Generate a simple unique ID
 function generateId(): string {
   return `profile_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 }
 
+// Get valid column names from schema (excludes id, userId, createdAt, updatedAt)
+const schemaColumns = Object.keys(userProfiles).filter(
+  (key) => !['id', 'userId', 'createdAt', 'updatedAt'].includes(key)
+);
+
+// Map camelCase to snake_case for request body flexibility
+function normalizeFieldName(key: string): string {
+  // Convert snake_case to camelCase
+  return key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
+// Filter and normalize request body to only include valid schema columns
+function filterBodyToSchema(body: Record<string, unknown>): Partial<NewUserProfile> {
+  const filtered: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(body)) {
+    const normalizedKey = normalizeFieldName(key);
+    if (schemaColumns.includes(normalizedKey)) {
+      filtered[normalizedKey] = value;
+    }
+  }
+
+  return filtered as Partial<NewUserProfile>;
+}
+
 // Create routes with proper typing for Bindings/Variables
-// The type assertion at export handles config.routes compatibility
 const profileRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 // Apply authentication to all routes
@@ -32,18 +63,14 @@ profileRoutes.use('*', requireAuth());
  */
 profileRoutes.get('/', async (c) => {
   const user = c.get('user');
-  const db = c.env.DB;
+  const db = drizzle(c.env.DB);
 
   try {
-    const profile = await db
-      .prepare(
-        `SELECT id, user_id, display_name, bio, company, job_title,
-                website, location, date_of_birth, created_at, updated_at
-         FROM user_profiles
-         WHERE user_id = ?`
-      )
-      .bind(user!.userId)
-      .first();
+    const [profile] = await db
+      .select()
+      .from(userProfiles)
+      .where(eq(userProfiles.userId, user!.userId))
+      .limit(1);
 
     if (!profile) {
       return c.json({ error: 'Profile not found' }, 404);
@@ -61,77 +88,46 @@ profileRoutes.get('/', async (c) => {
  */
 profileRoutes.put('/', async (c) => {
   const user = c.get('user');
-  const db = c.env.DB;
+  const db = drizzle(c.env.DB);
 
   try {
     const body = await c.req.json();
     const now = Date.now();
 
+    // Filter body to only valid schema columns
+    const profileData = filterBodyToSchema(body);
+
     // Check if profile exists
-    const existing = await db
-      .prepare('SELECT id FROM user_profiles WHERE user_id = ?')
-      .bind(user!.userId)
-      .first();
+    const [existing] = await db
+      .select({ id: userProfiles.id })
+      .from(userProfiles)
+      .where(eq(userProfiles.userId, user!.userId))
+      .limit(1);
 
     if (existing) {
       // Update existing profile
-      await db
-        .prepare(
-          `UPDATE user_profiles
-           SET display_name = ?, bio = ?, company = ?, job_title = ?,
-               website = ?, location = ?, date_of_birth = ?, updated_at = ?
-           WHERE user_id = ?`
-        )
-        .bind(
-          body.displayName ?? body.display_name ?? null,
-          body.bio ?? null,
-          body.company ?? null,
-          body.jobTitle ?? body.job_title ?? null,
-          body.website ?? null,
-          body.location ?? null,
-          body.dateOfBirth ?? body.date_of_birth ?? null,
-          now,
-          user!.userId
-        )
-        .run();
-
-      // Fetch and return updated profile
-      const updated = await db
-        .prepare('SELECT * FROM user_profiles WHERE user_id = ?')
-        .bind(user!.userId)
-        .first();
+      const [updated] = await db
+        .update(userProfiles)
+        .set({
+          ...profileData,
+          updatedAt: now,
+        })
+        .where(eq(userProfiles.userId, user!.userId))
+        .returning();
 
       return c.json(updated);
     } else {
       // Create new profile
-      const id = generateId();
-
-      await db
-        .prepare(
-          `INSERT INTO user_profiles
-           (id, user_id, display_name, bio, company, job_title, website, location, date_of_birth, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-        )
-        .bind(
-          id,
-          user!.userId,
-          body.displayName ?? body.display_name ?? null,
-          body.bio ?? null,
-          body.company ?? null,
-          body.jobTitle ?? body.job_title ?? null,
-          body.website ?? null,
-          body.location ?? null,
-          body.dateOfBirth ?? body.date_of_birth ?? null,
-          now,
-          now
-        )
-        .run();
-
-      // Fetch and return created profile
-      const created = await db
-        .prepare('SELECT * FROM user_profiles WHERE id = ?')
-        .bind(id)
-        .first();
+      const [created] = await db
+        .insert(userProfiles)
+        .values({
+          id: generateId(),
+          userId: user!.userId,
+          ...profileData,
+          createdAt: now,
+          updatedAt: now,
+        } as NewUserProfile)
+        .returning();
 
       return c.json(created, 201);
     }
@@ -146,66 +142,38 @@ profileRoutes.put('/', async (c) => {
  */
 profileRoutes.patch('/', async (c) => {
   const user = c.get('user');
-  const db = c.env.DB;
+  const db = drizzle(c.env.DB);
 
   try {
     const body = await c.req.json();
 
+    // Filter body to only valid schema columns
+    const profileData = filterBodyToSchema(body);
+
+    if (Object.keys(profileData).length === 0) {
+      return c.json({ error: 'No valid fields to update' }, 400);
+    }
+
     // Check if profile exists
-    const existing = await db
-      .prepare('SELECT * FROM user_profiles WHERE user_id = ?')
-      .bind(user!.userId)
-      .first();
+    const [existing] = await db
+      .select({ id: userProfiles.id })
+      .from(userProfiles)
+      .where(eq(userProfiles.userId, user!.userId))
+      .limit(1);
 
     if (!existing) {
       return c.json({ error: 'Profile not found. Use PUT to create.' }, 404);
     }
 
-    // Build dynamic update query for provided fields only
-    const updates: string[] = [];
-    const values: (string | number | null)[] = [];
-
-    const fieldMap: Record<string, string> = {
-      displayName: 'display_name',
-      display_name: 'display_name',
-      bio: 'bio',
-      company: 'company',
-      jobTitle: 'job_title',
-      job_title: 'job_title',
-      website: 'website',
-      location: 'location',
-      dateOfBirth: 'date_of_birth',
-      date_of_birth: 'date_of_birth',
-    };
-
-    for (const [key, column] of Object.entries(fieldMap)) {
-      if (key in body) {
-        updates.push(`${column} = ?`);
-        values.push(body[key]);
-      }
-    }
-
-    if (updates.length === 0) {
-      return c.json({ error: 'No valid fields to update' }, 400);
-    }
-
-    // Add updated_at
-    updates.push('updated_at = ?');
-    values.push(Date.now());
-
-    // Add user_id for WHERE clause
-    values.push(user!.userId);
-
-    await db
-      .prepare(`UPDATE user_profiles SET ${updates.join(', ')} WHERE user_id = ?`)
-      .bind(...values)
-      .run();
-
-    // Fetch and return updated profile
-    const updated = await db
-      .prepare('SELECT * FROM user_profiles WHERE user_id = ?')
-      .bind(user!.userId)
-      .first();
+    // Update with provided fields
+    const [updated] = await db
+      .update(userProfiles)
+      .set({
+        ...profileData,
+        updatedAt: Date.now(),
+      })
+      .where(eq(userProfiles.userId, user!.userId))
+      .returning();
 
     return c.json(updated);
   } catch (error) {
@@ -219,15 +187,15 @@ profileRoutes.patch('/', async (c) => {
  */
 profileRoutes.delete('/', async (c) => {
   const user = c.get('user');
-  const db = c.env.DB;
+  const db = drizzle(c.env.DB);
 
   try {
     const result = await db
-      .prepare('DELETE FROM user_profiles WHERE user_id = ?')
-      .bind(user!.userId)
-      .run();
+      .delete(userProfiles)
+      .where(eq(userProfiles.userId, user!.userId))
+      .returning();
 
-    if (result.meta.changes === 0) {
+    if (result.length === 0) {
       return c.json({ error: 'Profile not found' }, 404);
     }
 
