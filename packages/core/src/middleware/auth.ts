@@ -23,12 +23,12 @@ export class AuthManager {
       iat: Math.floor(Date.now() / 1000)
     }
     
-    return await sign(payload, JWT_SECRET)
+    return await sign(payload, JWT_SECRET, 'HS256')
   }
 
   static async verifyToken(token: string): Promise<JWTPayload | null> {
     try {
-      const payload = await verify(token, JWT_SECRET) as JWTPayload
+      const payload = await verify(token, JWT_SECRET, 'HS256') as JWTPayload
       
       // Check if token is expired
       if (payload.exp < Math.floor(Date.now() / 1000)) {
