@@ -1,6 +1,18 @@
 import type { TurnstileSettings } from '../services/turnstile'
 
 /**
+ * Escape HTML attribute values to prevent XSS
+ */
+function escapeHtmlAttr(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
+/**
  * Generate Turnstile widget HTML
  * @param settings - Turnstile settings from database
  * @param containerId - Optional custom container ID (default: 'turnstile-widget')
@@ -21,15 +33,15 @@ export function renderTurnstileWidget(
 
   return `
     <!-- Cloudflare Turnstile Widget -->
-    <div 
-      id="${containerId}" 
-      class="cf-turnstile" 
-      data-sitekey="${settings.siteKey}"
-      data-theme="${theme}"
-      data-size="${size}"
+    <div
+      id="${escapeHtmlAttr(containerId)}"
+      class="cf-turnstile"
+      data-sitekey="${escapeHtmlAttr(settings.siteKey)}"
+      data-theme="${escapeHtmlAttr(theme)}"
+      data-size="${escapeHtmlAttr(size)}"
       data-action="submit"
-      data-appearance="${appearance}"
-      ${mode !== 'managed' ? `data-execution="${mode}"` : ''}
+      data-appearance="${escapeHtmlAttr(appearance)}"
+      ${mode !== 'managed' ? `data-execution="${escapeHtmlAttr(mode)}"` : ''}
       data-callback="onTurnstileSuccess"
       data-error-callback="onTurnstileError"
     ></div>
@@ -59,12 +71,12 @@ export function renderInlineTurnstile(siteKey: string, options?: {
   const containerId = options?.containerId || 'turnstile-widget'
 
   return `
-    <div 
-      id="${containerId}" 
-      class="cf-turnstile mb-3" 
-      data-sitekey="${siteKey}"
-      data-theme="${theme}"
-      data-size="${size}"
+    <div
+      id="${escapeHtmlAttr(containerId)}"
+      class="cf-turnstile mb-3"
+      data-sitekey="${escapeHtmlAttr(siteKey)}"
+      data-theme="${escapeHtmlAttr(theme)}"
+      data-size="${escapeHtmlAttr(size)}"
     ></div>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   `
@@ -91,17 +103,20 @@ export function renderExplicitTurnstile(siteKey: string, options?: {
   const containerId = options?.containerId || 'turnstile-widget'
   const callback = options?.callback || 'onTurnstileSuccess'
 
+  // Validate callback name to prevent code injection (only allow valid JS identifiers)
+  const safeCallback = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(callback) ? callback : 'onTurnstileSuccess'
+
   return `
-    <div id="${containerId}"></div>
+    <div id="${escapeHtmlAttr(containerId)}"></div>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <script>
       window.onloadTurnstileCallback = function() {
-        turnstile.render('#${containerId}', {
-          sitekey: '${siteKey}',
-          theme: '${theme}',
-          size: '${size}',
+        turnstile.render(${JSON.stringify('#' + containerId)}, {
+          sitekey: ${JSON.stringify(siteKey)},
+          theme: ${JSON.stringify(theme)},
+          size: ${JSON.stringify(size)},
           callback: function(token) {
-            window.${callback}?.(token);
+            window.${safeCallback}?.(token);
           }
         });
       };

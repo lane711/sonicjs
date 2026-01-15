@@ -2,6 +2,18 @@ import { renderAdminLayout, AdminLayoutData } from '../layouts/admin-layout-v2.t
 import { renderAuthSettingsForm } from '../components/auth-settings-form.template'
 import type { AuthSettings } from '../../services/auth-validation'
 
+/**
+ * Escape HTML attribute values to prevent XSS
+ */
+function escapeHtmlAttr(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
 export interface PluginSettings {
   [key: string]: any
 }
@@ -459,14 +471,14 @@ function renderTurnstileSettingsForm(settings: any): string {
     <!-- Site Key -->
     <div>
       <label for="setting_siteKey" class="block text-sm font-medium text-gray-300 mb-2">Site Key</label>
-      <input type="text" name="setting_siteKey" id="setting_siteKey" value="${settings.siteKey || ''}" placeholder="0x4AAAAAAAA..." class="${inputClass}">
+      <input type="text" name="setting_siteKey" id="setting_siteKey" value="${escapeHtmlAttr(settings.siteKey || '')}" placeholder="0x4AAAAAAAA..." class="${inputClass}">
       <p class="text-xs text-gray-400 mt-1">Your Cloudflare Turnstile site key (public)</p>
     </div>
 
     <!-- Secret Key -->
     <div>
       <label for="setting_secretKey" class="block text-sm font-medium text-gray-300 mb-2">Secret Key</label>
-      <input type="password" name="setting_secretKey" id="setting_secretKey" value="${settings.secretKey || ''}" placeholder="0x4AAAAAAAA..." class="${inputClass}">
+      <input type="password" name="setting_secretKey" id="setting_secretKey" value="${escapeHtmlAttr(settings.secretKey || '')}" placeholder="0x4AAAAAAAA..." class="${inputClass}">
       <p class="text-xs text-gray-400 mt-1">Your Cloudflare Turnstile secret key (private)</p>
     </div>
 
