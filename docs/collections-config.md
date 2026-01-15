@@ -1200,6 +1200,50 @@ faqs: {
 }
 ```
 
+### Blocks Field (Repeater)
+
+Blocks are modeled as an `array` whose `items` define a discriminator and a map of block definitions. Each block is stored as an object with the discriminator key plus its fields.
+
+```typescript
+contentBlocks: {
+  type: 'array',
+  title: 'Content Blocks',
+  items: {
+    type: 'object',
+    discriminator: 'blockType',
+    blocks: {
+      textAndImage: {
+        label: 'Text + Image',
+        properties: {
+          heading: { type: 'string', required: true },
+          body: { type: 'richtext', required: true },
+          image: { type: 'media' }
+        }
+      },
+      team: {
+        label: 'Team',
+        properties: {
+          title: { type: 'string' },
+          members: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                name: { type: 'string', required: true },
+                role: { type: 'string' },
+                photo: { type: 'media' }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Note: blocks are currently available for code-based collections; the collection builder UI does not yet expose block definitions.
+
 ### Object Field
 
 ```typescript

@@ -1,5 +1,6 @@
 export { c as FilterCondition, d as FilterGroup, F as FilterOperator, f as QueryFilter, Q as QueryFilterBuilder, h as QueryResult, S as SONICJS_VERSION, T as TemplateRenderer, b as buildQuery, e as escapeHtml, g as getCoreVersion, m as metricsTracker, r as renderTemplate, s as sanitizeInput, a as sanitizeObject, t as templateRenderer } from './version-vktVAxhe.cjs';
 import { b as TelemetryConfig } from './telemetry-UiD1i9GS.cjs';
+import { b as BlockDefinitions } from './collection-config-B6gMPunn.cjs';
 
 /**
  * Telemetry ID Utilities
@@ -50,4 +51,14 @@ declare function getTelemetryConfig(): TelemetryConfig;
  */
 declare function shouldSkipEvent(eventName: string, sampleRate?: number): boolean;
 
-export { generateInstallationId, generateProjectId, getDefaultTelemetryConfig, getTelemetryConfig, isTelemetryEnabled, sanitizeErrorMessage, sanitizeRoute, shouldSkipEvent };
+type BlocksFieldConfig = {
+    blocks: BlockDefinitions;
+    discriminator: string;
+};
+declare function getBlocksFieldConfig(fieldOptions: any): BlocksFieldConfig | null;
+declare function parseBlocksValue(value: unknown, config: BlocksFieldConfig): {
+    value: any[];
+    errors: string[];
+};
+
+export { generateInstallationId, generateProjectId, getBlocksFieldConfig, getDefaultTelemetryConfig, getTelemetryConfig, isTelemetryEnabled, parseBlocksValue, sanitizeErrorMessage, sanitizeRoute, shouldSkipEvent };
