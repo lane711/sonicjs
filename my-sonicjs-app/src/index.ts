@@ -6,10 +6,13 @@ import blogPostsCollection from './collections/blog-posts.collection'
 import contactMessagesCollection from './collections/contact-messages.collection'
 // import servicesCollection from './collections/services.collection' // TODO: Create this collection
 
-// 2. USER PLUGINS 
+// 2. USER PLUGINS
 // NOTE: Full plugin auto-loading isn't implemented yet in SonicJS
 // For now, manually import and mount plugin routes
-import contactFormPlugin from './plugins/contact-form/index' 
+import contactFormPlugin from './plugins/contact-form/index'
+
+// Import custom routes
+import profileRoutes from './routes/profile'
 
 console.log("🔥 DEBUG: src/index.ts is running! 🔥")
 
@@ -30,7 +33,7 @@ const app = new Hono()
 // Mount user plugin routes
 function mountPluginRoutes(app: Hono, plugin: any) {
   if (!plugin || !plugin.routes) return
-  
+
   plugin.routes.forEach((routeDef: any) => {
     if (routeDef.path && routeDef.handler) {
       console.log(`   └─ Mounting plugin route: ${routeDef.path}`)
@@ -45,8 +48,12 @@ function mountPluginRoutes(app: Hono, plugin: any) {
 console.log("➡️ Step 4: Mounting Contact Form Plugin Routes...")
 mountPluginRoutes(app, contactFormPlugin)
 
-// 2. Mount Core (Admin, API, etc.)
-console.log("➡️ Step 5: Mounting Core App...")
+// 2. Mount profile routes
+console.log("➡️ Step 5: Mounting Profile Routes...")
+app.route('/api/profile', profileRoutes)
+
+// 3. Mount Core (Admin, API, etc.)
+console.log("➡️ Step 6: Mounting Core App...")
 app.route('/', coreApp)
 
 // 4. Mount Website (Custom Homepage) - TODO: Create website routes
