@@ -100,12 +100,14 @@ test.describe('Turnstile Plugin', () => {
       await enableToggle.click({ force: true })
     }
     
-    // Save settings
+    // Save settings and wait for the API response
+    const saveResponsePromise = page.waitForResponse(
+      response => response.url().includes('/admin/plugins/turnstile/settings') && response.status() === 200,
+      { timeout: 10000 }
+    )
     await page.click('button:has-text("Save Settings")')
-    
-    // Wait for save to complete
-    await page.waitForTimeout(1000)
-    
+    await saveResponsePromise
+
     // Should stay on plugin settings page
     await expect(page).toHaveURL(/\/admin\/plugins\/turnstile/)
   })
