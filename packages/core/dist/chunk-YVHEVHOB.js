@@ -1,10 +1,10 @@
 import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-4PTABHLC.js';
-import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-VWGRDVB4.js';
+import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-GKMBLNUT.js';
 import { PluginService } from './chunk-SGAG6FD3.js';
-import { MigrationService } from './chunk-ZMJPSRKK.js';
+import { MigrationService } from './chunk-LEFYPY2D.js';
 import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-V5LBQN3I.js';
 import { PluginBuilder } from './chunk-QDBNW7KQ.js';
-import { QueryFilterBuilder, getBlocksFieldConfig, parseBlocksValue, sanitizeInput, getCoreVersion, escapeHtml } from './chunk-UTYEV466.js';
+import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml, getBlocksFieldConfig, parseBlocksValue } from './chunk-BHNDALCA.js';
 import { metricsTracker } from './chunk-FICTAGD4.js';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
@@ -1752,7 +1752,7 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
 });
 adminApiRoutes.get("/migrations/status", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-X4CAR4NB.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-CZW7MJET.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const status = await migrationService.getMigrationStatus();
@@ -1777,7 +1777,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const { MigrationService: MigrationService2 } = await import('./migrations-X4CAR4NB.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-CZW7MJET.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const result = await migrationService.runPendingMigrations();
@@ -1796,7 +1796,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
 });
 adminApiRoutes.get("/migrations/validate", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-X4CAR4NB.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-CZW7MJET.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const validation = await migrationService.validateSchema();
@@ -5965,6 +5965,122 @@ async function isPluginActive2(db, pluginId) {
 
 // src/routes/admin-content.ts
 var adminContentRoutes = new Hono();
+function parseFieldValue(field, formData, options = {}) {
+  const { skipValidation = false } = options;
+  const value = formData.get(field.field_name);
+  const errors = [];
+  const blocksConfig = getBlocksFieldConfig(field.field_options);
+  if (blocksConfig) {
+    const parsed = parseBlocksValue(value, blocksConfig);
+    if (!skipValidation && field.is_required && parsed.value.length === 0) {
+      parsed.errors.push(`${field.field_label} is required`);
+    }
+    return { value: parsed.value, errors: parsed.errors };
+  }
+  if (!skipValidation && field.is_required && (!value || value.toString().trim() === "")) {
+    return { value: null, errors: [`${field.field_label} is required`] };
+  }
+  switch (field.field_type) {
+    case "number":
+      if (value && isNaN(Number(value))) {
+        if (!skipValidation) {
+          errors.push(`${field.field_label} must be a valid number`);
+        }
+        return { value: null, errors };
+      }
+      return { value: value ? Number(value) : null, errors: [] };
+    case "boolean":
+      const submitted = formData.get(`${field.field_name}_submitted`);
+      return { value: submitted ? value === "true" : false, errors: [] };
+    case "select":
+      if (field.field_options?.multiple) {
+        return { value: formData.getAll(`${field.field_name}[]`), errors: [] };
+      }
+      return { value, errors: [] };
+    case "array": {
+      if (!value || value.toString().trim() === "") {
+        if (!skipValidation && field.is_required) {
+          errors.push(`${field.field_label} is required`);
+        }
+        return { value: [], errors };
+      }
+      try {
+        const parsed = JSON.parse(value.toString());
+        if (!Array.isArray(parsed)) {
+          if (!skipValidation) {
+            errors.push(`${field.field_label} must be a JSON array`);
+          }
+          return { value: [], errors };
+        }
+        if (!skipValidation && field.is_required && parsed.length === 0) {
+          errors.push(`${field.field_label} is required`);
+        }
+        return { value: parsed, errors };
+      } catch {
+        if (!skipValidation) {
+          errors.push(`${field.field_label} must be valid JSON`);
+        }
+        return { value: [], errors };
+      }
+    }
+    case "object": {
+      if (!value || value.toString().trim() === "") {
+        if (!skipValidation && field.is_required) {
+          errors.push(`${field.field_label} is required`);
+        }
+        return { value: {}, errors };
+      }
+      try {
+        const parsed = JSON.parse(value.toString());
+        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+          if (!skipValidation) {
+            errors.push(`${field.field_label} must be a JSON object`);
+          }
+          return { value: {}, errors };
+        }
+        if (!skipValidation && field.is_required && Object.keys(parsed).length === 0) {
+          errors.push(`${field.field_label} is required`);
+        }
+        return { value: parsed, errors };
+      } catch {
+        if (!skipValidation) {
+          errors.push(`${field.field_label} must be valid JSON`);
+        }
+        return { value: {}, errors };
+      }
+    }
+    case "json": {
+      if (!value || value.toString().trim() === "") {
+        if (!skipValidation && field.is_required) {
+          errors.push(`${field.field_label} is required`);
+        }
+        return { value: null, errors };
+      }
+      try {
+        return { value: JSON.parse(value.toString()), errors: [] };
+      } catch {
+        if (!skipValidation) {
+          errors.push(`${field.field_label} must be valid JSON`);
+        }
+        return { value: null, errors };
+      }
+    }
+    default:
+      return { value, errors: [] };
+  }
+}
+function extractFieldData(fields, formData, options = {}) {
+  const data = {};
+  const errors = {};
+  for (const field of fields) {
+    const result = parseFieldValue(field, formData, options);
+    data[field.field_name] = result.value;
+    if (result.errors.length > 0) {
+      errors[field.field_name] = result.errors;
+    }
+  }
+  return { data, errors };
+}
 adminContentRoutes.use("*", requireAuth());
 async function getCollectionFields(db, collectionId) {
   const cache = getCacheService(CACHE_CONFIGS.collection);
@@ -6438,109 +6554,7 @@ adminContentRoutes.post("/", async (c) => {
       `);
     }
     const fields = await getCollectionFields(db, collectionId);
-    const data = {};
-    const errors = {};
-    for (const field of fields) {
-      const value = formData.get(field.field_name);
-      const blocksConfig = getBlocksFieldConfig(field.field_options);
-      if (blocksConfig) {
-        const parsed = parseBlocksValue(value, blocksConfig);
-        if (field.is_required && parsed.value.length === 0) {
-          parsed.errors.push(`${field.field_label} is required`);
-        }
-        if (parsed.errors.length > 0) {
-          errors[field.field_name] = parsed.errors;
-        }
-        data[field.field_name] = parsed.value;
-        continue;
-      }
-      if (field.is_required && (!value || value.toString().trim() === "")) {
-        errors[field.field_name] = [`${field.field_label} is required`];
-        continue;
-      }
-      switch (field.field_type) {
-        case "number":
-          if (value && isNaN(Number(value))) {
-            errors[field.field_name] = [`${field.field_label} must be a valid number`];
-          } else {
-            data[field.field_name] = value ? Number(value) : null;
-          }
-          break;
-        case "boolean":
-          data[field.field_name] = formData.get(`${field.field_name}_submitted`) ? value === "true" : false;
-          break;
-        case "select":
-          if (field.field_options?.multiple) {
-            data[field.field_name] = formData.getAll(`${field.field_name}[]`);
-          } else {
-            data[field.field_name] = value;
-          }
-          break;
-        case "array": {
-          if (!value || value.toString().trim() === "") {
-            data[field.field_name] = [];
-            if (field.is_required) {
-              errors[field.field_name] = [`${field.field_label} is required`];
-            }
-            break;
-          }
-          try {
-            const parsed = JSON.parse(value.toString());
-            if (!Array.isArray(parsed)) {
-              errors[field.field_name] = [`${field.field_label} must be a JSON array`];
-            } else {
-              if (field.is_required && parsed.length === 0) {
-                errors[field.field_name] = [`${field.field_label} is required`];
-              }
-              data[field.field_name] = parsed;
-            }
-          } catch {
-            errors[field.field_name] = [`${field.field_label} must be valid JSON`];
-          }
-          break;
-        }
-        case "object": {
-          if (!value || value.toString().trim() === "") {
-            data[field.field_name] = {};
-            if (field.is_required) {
-              errors[field.field_name] = [`${field.field_label} is required`];
-            }
-            break;
-          }
-          try {
-            const parsed = JSON.parse(value.toString());
-            if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-              errors[field.field_name] = [`${field.field_label} must be a JSON object`];
-            } else {
-              if (field.is_required && Object.keys(parsed).length === 0) {
-                errors[field.field_name] = [`${field.field_label} is required`];
-              }
-              data[field.field_name] = parsed;
-            }
-          } catch {
-            errors[field.field_name] = [`${field.field_label} must be valid JSON`];
-          }
-          break;
-        }
-        case "json": {
-          if (!value || value.toString().trim() === "") {
-            data[field.field_name] = null;
-            if (field.is_required) {
-              errors[field.field_name] = [`${field.field_label} is required`];
-            }
-            break;
-          }
-          try {
-            data[field.field_name] = JSON.parse(value.toString());
-          } catch {
-            errors[field.field_name] = [`${field.field_label} must be valid JSON`];
-          }
-          break;
-        }
-        default:
-          data[field.field_name] = value;
-      }
-    }
+    const { data, errors } = extractFieldData(fields, formData);
     if (Object.keys(errors).length > 0) {
       const formDataWithErrors = {
         collection,
@@ -6657,109 +6671,7 @@ adminContentRoutes.put("/:id", async (c) => {
       `);
     }
     const fields = await getCollectionFields(db, existingContent.collection_id);
-    const data = {};
-    const errors = {};
-    for (const field of fields) {
-      const value = formData.get(field.field_name);
-      const blocksConfig = getBlocksFieldConfig(field.field_options);
-      if (blocksConfig) {
-        const parsed = parseBlocksValue(value, blocksConfig);
-        if (field.is_required && parsed.value.length === 0) {
-          parsed.errors.push(`${field.field_label} is required`);
-        }
-        if (parsed.errors.length > 0) {
-          errors[field.field_name] = parsed.errors;
-        }
-        data[field.field_name] = parsed.value;
-        continue;
-      }
-      if (field.is_required && (!value || value.toString().trim() === "")) {
-        errors[field.field_name] = [`${field.field_label} is required`];
-        continue;
-      }
-      switch (field.field_type) {
-        case "number":
-          if (value && isNaN(Number(value))) {
-            errors[field.field_name] = [`${field.field_label} must be a valid number`];
-          } else {
-            data[field.field_name] = value ? Number(value) : null;
-          }
-          break;
-        case "boolean":
-          data[field.field_name] = formData.get(`${field.field_name}_submitted`) ? value === "true" : false;
-          break;
-        case "select":
-          if (field.field_options?.multiple) {
-            data[field.field_name] = formData.getAll(`${field.field_name}[]`);
-          } else {
-            data[field.field_name] = value;
-          }
-          break;
-        case "array": {
-          if (!value || value.toString().trim() === "") {
-            data[field.field_name] = [];
-            if (field.is_required) {
-              errors[field.field_name] = [`${field.field_label} is required`];
-            }
-            break;
-          }
-          try {
-            const parsed = JSON.parse(value.toString());
-            if (!Array.isArray(parsed)) {
-              errors[field.field_name] = [`${field.field_label} must be a JSON array`];
-            } else {
-              if (field.is_required && parsed.length === 0) {
-                errors[field.field_name] = [`${field.field_label} is required`];
-              }
-              data[field.field_name] = parsed;
-            }
-          } catch {
-            errors[field.field_name] = [`${field.field_label} must be valid JSON`];
-          }
-          break;
-        }
-        case "object": {
-          if (!value || value.toString().trim() === "") {
-            data[field.field_name] = {};
-            if (field.is_required) {
-              errors[field.field_name] = [`${field.field_label} is required`];
-            }
-            break;
-          }
-          try {
-            const parsed = JSON.parse(value.toString());
-            if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-              errors[field.field_name] = [`${field.field_label} must be a JSON object`];
-            } else {
-              if (field.is_required && Object.keys(parsed).length === 0) {
-                errors[field.field_name] = [`${field.field_label} is required`];
-              }
-              data[field.field_name] = parsed;
-            }
-          } catch {
-            errors[field.field_name] = [`${field.field_label} must be valid JSON`];
-          }
-          break;
-        }
-        case "json": {
-          if (!value || value.toString().trim() === "") {
-            data[field.field_name] = null;
-            if (field.is_required) {
-              errors[field.field_name] = [`${field.field_label} is required`];
-            }
-            break;
-          }
-          try {
-            data[field.field_name] = JSON.parse(value.toString());
-          } catch {
-            errors[field.field_name] = [`${field.field_label} must be valid JSON`];
-          }
-          break;
-        }
-        default:
-          data[field.field_name] = value;
-      }
-    }
+    const { data, errors } = extractFieldData(fields, formData);
     if (Object.keys(errors).length > 0) {
       const formDataWithErrors = {
         id,
@@ -6872,33 +6784,7 @@ adminContentRoutes.post("/preview", async (c) => {
       return c.html("<p>Collection not found</p>");
     }
     const fields = await getCollectionFields(db, collectionId);
-    const data = {};
-    for (const field of fields) {
-      const value = formData.get(field.field_name);
-      const blocksConfig = getBlocksFieldConfig(field.field_options);
-      if (blocksConfig) {
-        const parsed = parseBlocksValue(value, blocksConfig);
-        data[field.field_name] = parsed.value;
-        continue;
-      }
-      switch (field.field_type) {
-        case "number":
-          data[field.field_name] = value ? Number(value) : null;
-          break;
-        case "boolean":
-          data[field.field_name] = value === "true";
-          break;
-        case "select":
-          if (field.field_options?.multiple) {
-            data[field.field_name] = formData.getAll(`${field.field_name}[]`);
-          } else {
-            data[field.field_name] = value;
-          }
-          break;
-        default:
-          data[field.field_name] = value;
-      }
-    }
+    const { data } = extractFieldData(fields, formData, { skipValidation: true });
     const previewHTML = `
       <!DOCTYPE html>
       <html lang="en">
@@ -22035,5 +21921,5 @@ var ROUTES_INFO = {
 };
 
 export { ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, checkAdminUserExists, router, test_cleanup_default, userRoutes };
-//# sourceMappingURL=chunk-DHH4SLIM.js.map
-//# sourceMappingURL=chunk-DHH4SLIM.js.map
+//# sourceMappingURL=chunk-YVHEVHOB.js.map
+//# sourceMappingURL=chunk-YVHEVHOB.js.map

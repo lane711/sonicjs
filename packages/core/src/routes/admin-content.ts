@@ -13,6 +13,169 @@ import { getBlocksFieldConfig, parseBlocksValue } from '../utils/blocks'
 
 const adminContentRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
+// Field definition type for form processing
+interface FieldDefinition {
+  field_name: string
+  field_label: string
+  field_type: string
+  field_options?: any
+  is_required?: boolean
+}
+
+// Result of parsing a single field value
+interface ParsedFieldResult {
+  value: any
+  errors: string[]
+}
+
+/**
+ * Parse a single field value from form data with validation
+ * Centralizes field parsing logic used in POST, PUT, and preview handlers
+ */
+function parseFieldValue(
+  field: FieldDefinition,
+  formData: FormData,
+  options: { skipValidation?: boolean } = {}
+): ParsedFieldResult {
+  const { skipValidation = false } = options
+  const value = formData.get(field.field_name)
+  const errors: string[] = []
+
+  // Handle blocks fields (array with blocks config)
+  const blocksConfig = getBlocksFieldConfig(field.field_options)
+  if (blocksConfig) {
+    const parsed = parseBlocksValue(value, blocksConfig)
+    if (!skipValidation && field.is_required && parsed.value.length === 0) {
+      parsed.errors.push(`${field.field_label} is required`)
+    }
+    return { value: parsed.value, errors: parsed.errors }
+  }
+
+  // Required field validation
+  if (!skipValidation && field.is_required && (!value || value.toString().trim() === '')) {
+    return { value: null, errors: [`${field.field_label} is required`] }
+  }
+
+  // Type-specific parsing
+  switch (field.field_type) {
+    case 'number':
+      if (value && isNaN(Number(value))) {
+        if (!skipValidation) {
+          errors.push(`${field.field_label} must be a valid number`)
+        }
+        return { value: null, errors }
+      }
+      return { value: value ? Number(value) : null, errors: [] }
+
+    case 'boolean':
+      // Check for the hidden _submitted field to determine if checkbox was rendered
+      const submitted = formData.get(`${field.field_name}_submitted`)
+      return { value: submitted ? value === 'true' : false, errors: [] }
+
+    case 'select':
+      if (field.field_options?.multiple) {
+        return { value: formData.getAll(`${field.field_name}[]`), errors: [] }
+      }
+      return { value: value, errors: [] }
+
+    case 'array': {
+      if (!value || value.toString().trim() === '') {
+        if (!skipValidation && field.is_required) {
+          errors.push(`${field.field_label} is required`)
+        }
+        return { value: [], errors }
+      }
+      try {
+        const parsed = JSON.parse(value.toString())
+        if (!Array.isArray(parsed)) {
+          if (!skipValidation) {
+            errors.push(`${field.field_label} must be a JSON array`)
+          }
+          return { value: [], errors }
+        }
+        if (!skipValidation && field.is_required && parsed.length === 0) {
+          errors.push(`${field.field_label} is required`)
+        }
+        return { value: parsed, errors }
+      } catch {
+        if (!skipValidation) {
+          errors.push(`${field.field_label} must be valid JSON`)
+        }
+        return { value: [], errors }
+      }
+    }
+
+    case 'object': {
+      if (!value || value.toString().trim() === '') {
+        if (!skipValidation && field.is_required) {
+          errors.push(`${field.field_label} is required`)
+        }
+        return { value: {}, errors }
+      }
+      try {
+        const parsed = JSON.parse(value.toString())
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+          if (!skipValidation) {
+            errors.push(`${field.field_label} must be a JSON object`)
+          }
+          return { value: {}, errors }
+        }
+        if (!skipValidation && field.is_required && Object.keys(parsed).length === 0) {
+          errors.push(`${field.field_label} is required`)
+        }
+        return { value: parsed, errors }
+      } catch {
+        if (!skipValidation) {
+          errors.push(`${field.field_label} must be valid JSON`)
+        }
+        return { value: {}, errors }
+      }
+    }
+
+    case 'json': {
+      if (!value || value.toString().trim() === '') {
+        if (!skipValidation && field.is_required) {
+          errors.push(`${field.field_label} is required`)
+        }
+        return { value: null, errors }
+      }
+      try {
+        return { value: JSON.parse(value.toString()), errors: [] }
+      } catch {
+        if (!skipValidation) {
+          errors.push(`${field.field_label} must be valid JSON`)
+        }
+        return { value: null, errors }
+      }
+    }
+
+    default:
+      return { value: value, errors: [] }
+  }
+}
+
+/**
+ * Extract all field values from form data
+ */
+function extractFieldData(
+  fields: FieldDefinition[],
+  formData: FormData,
+  options: { skipValidation?: boolean } = {}
+): { data: Record<string, any>; errors: Record<string, string[]> } {
+  const data: Record<string, any> = {}
+  const errors: Record<string, string[]> = {}
+
+  for (const field of fields) {
+    const result = parseFieldValue(field, formData, options)
+    data[field.field_name] = result.value
+    if (result.errors.length > 0) {
+      errors[field.field_name] = result.errors
+    }
+  }
+
+  return { data, errors }
+}
+
 // Apply authentication middleware
 adminContentRoutes.use('*', requireAuth())
 
@@ -580,118 +743,10 @@ adminContentRoutes.post('/', async (c) => {
     }
     
     const fields = await getCollectionFields(db, collectionId)
-    
-    // Extract field data
-    const data: any = {}
-    const errors: Record<string, string[]> = {}
-    
-    for (const field of fields) {
-      const value = formData.get(field.field_name)
-      const blocksConfig = getBlocksFieldConfig(field.field_options)
 
-      if (blocksConfig) {
-        const parsed = parseBlocksValue(value, blocksConfig)
-        if (field.is_required && parsed.value.length === 0) {
-          parsed.errors.push(`${field.field_label} is required`)
-        }
-        if (parsed.errors.length > 0) {
-          errors[field.field_name] = parsed.errors
-        }
-        data[field.field_name] = parsed.value
-        continue
-      }
+    // Extract and validate field data
+    const { data, errors } = extractFieldData(fields, formData)
 
-      // Validation
-      if (field.is_required && (!value || value.toString().trim() === '')) {
-        errors[field.field_name] = [`${field.field_label} is required`]
-        continue
-      }
-
-      // Type conversion and validation
-      switch (field.field_type) {
-        case 'number':
-          if (value && isNaN(Number(value))) {
-            errors[field.field_name] = [`${field.field_label} must be a valid number`]
-          } else {
-            data[field.field_name] = value ? Number(value) : null
-          }
-          break
-        case 'boolean':
-          data[field.field_name] = formData.get(`${field.field_name}_submitted`) ? (value === 'true') : false
-          break
-        case 'select':
-          if (field.field_options?.multiple) {
-            data[field.field_name] = formData.getAll(`${field.field_name}[]`)
-          } else {
-            data[field.field_name] = value
-          }
-          break
-        case 'array': {
-          if (!value || value.toString().trim() === '') {
-            data[field.field_name] = []
-            if (field.is_required) {
-              errors[field.field_name] = [`${field.field_label} is required`]
-            }
-            break
-          }
-          try {
-            const parsed = JSON.parse(value.toString())
-            if (!Array.isArray(parsed)) {
-              errors[field.field_name] = [`${field.field_label} must be a JSON array`]
-            } else {
-              if (field.is_required && parsed.length === 0) {
-                errors[field.field_name] = [`${field.field_label} is required`]
-              }
-              data[field.field_name] = parsed
-            }
-          } catch {
-            errors[field.field_name] = [`${field.field_label} must be valid JSON`]
-          }
-          break
-        }
-        case 'object': {
-          if (!value || value.toString().trim() === '') {
-            data[field.field_name] = {}
-            if (field.is_required) {
-              errors[field.field_name] = [`${field.field_label} is required`]
-            }
-            break
-          }
-          try {
-            const parsed = JSON.parse(value.toString())
-            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-              errors[field.field_name] = [`${field.field_label} must be a JSON object`]
-            } else {
-              if (field.is_required && Object.keys(parsed).length === 0) {
-                errors[field.field_name] = [`${field.field_label} is required`]
-              }
-              data[field.field_name] = parsed
-            }
-          } catch {
-            errors[field.field_name] = [`${field.field_label} must be valid JSON`]
-          }
-          break
-        }
-        case 'json': {
-          if (!value || value.toString().trim() === '') {
-            data[field.field_name] = null
-            if (field.is_required) {
-              errors[field.field_name] = [`${field.field_label} is required`]
-            }
-            break
-          }
-          try {
-            data[field.field_name] = JSON.parse(value.toString())
-          } catch {
-            errors[field.field_name] = [`${field.field_label} must be valid JSON`]
-          }
-          break
-        }
-        default:
-          data[field.field_name] = value
-      }
-    }
-    
     // Check for validation errors
     if (Object.keys(errors).length > 0) {
       const formDataWithErrors: ContentFormData = {
@@ -851,116 +906,10 @@ adminContentRoutes.put('/:id', async (c) => {
     }
     
     const fields = await getCollectionFields(db, existingContent.collection_id)
-    
-    // Extract and validate field data (same as create)
-    const data: any = {}
-    const errors: Record<string, string[]> = {}
-    
-    for (const field of fields) {
-      const value = formData.get(field.field_name)
-      const blocksConfig = getBlocksFieldConfig(field.field_options)
 
-      if (blocksConfig) {
-        const parsed = parseBlocksValue(value, blocksConfig)
-        if (field.is_required && parsed.value.length === 0) {
-          parsed.errors.push(`${field.field_label} is required`)
-        }
-        if (parsed.errors.length > 0) {
-          errors[field.field_name] = parsed.errors
-        }
-        data[field.field_name] = parsed.value
-        continue
-      }
+    // Extract and validate field data
+    const { data, errors } = extractFieldData(fields, formData)
 
-      if (field.is_required && (!value || value.toString().trim() === '')) {
-        errors[field.field_name] = [`${field.field_label} is required`]
-        continue
-      }
-      
-      switch (field.field_type) {
-        case 'number':
-          if (value && isNaN(Number(value))) {
-            errors[field.field_name] = [`${field.field_label} must be a valid number`]
-          } else {
-            data[field.field_name] = value ? Number(value) : null
-          }
-          break
-        case 'boolean':
-          data[field.field_name] = formData.get(`${field.field_name}_submitted`) ? (value === 'true') : false
-          break
-        case 'select':
-          if (field.field_options?.multiple) {
-            data[field.field_name] = formData.getAll(`${field.field_name}[]`)
-          } else {
-            data[field.field_name] = value
-          }
-          break
-        case 'array': {
-          if (!value || value.toString().trim() === '') {
-            data[field.field_name] = []
-            if (field.is_required) {
-              errors[field.field_name] = [`${field.field_label} is required`]
-            }
-            break
-          }
-          try {
-            const parsed = JSON.parse(value.toString())
-            if (!Array.isArray(parsed)) {
-              errors[field.field_name] = [`${field.field_label} must be a JSON array`]
-            } else {
-              if (field.is_required && parsed.length === 0) {
-                errors[field.field_name] = [`${field.field_label} is required`]
-              }
-              data[field.field_name] = parsed
-            }
-          } catch {
-            errors[field.field_name] = [`${field.field_label} must be valid JSON`]
-          }
-          break
-        }
-        case 'object': {
-          if (!value || value.toString().trim() === '') {
-            data[field.field_name] = {}
-            if (field.is_required) {
-              errors[field.field_name] = [`${field.field_label} is required`]
-            }
-            break
-          }
-          try {
-            const parsed = JSON.parse(value.toString())
-            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-              errors[field.field_name] = [`${field.field_label} must be a JSON object`]
-            } else {
-              if (field.is_required && Object.keys(parsed).length === 0) {
-                errors[field.field_name] = [`${field.field_label} is required`]
-              }
-              data[field.field_name] = parsed
-            }
-          } catch {
-            errors[field.field_name] = [`${field.field_label} must be valid JSON`]
-          }
-          break
-        }
-        case 'json': {
-          if (!value || value.toString().trim() === '') {
-            data[field.field_name] = null
-            if (field.is_required) {
-              errors[field.field_name] = [`${field.field_label} is required`]
-            }
-            break
-          }
-          try {
-            data[field.field_name] = JSON.parse(value.toString())
-          } catch {
-            errors[field.field_name] = [`${field.field_label} must be valid JSON`]
-          }
-          break
-        }
-        default:
-          data[field.field_name] = value
-      }
-    }
-    
     if (Object.keys(errors).length > 0) {
       const formDataWithErrors: ContentFormData = {
         id,
@@ -1114,38 +1063,10 @@ adminContentRoutes.post('/preview', async (c) => {
     }
     
     const fields = await getCollectionFields(db, collectionId)
-    
-    // Extract field data for preview
-    const data: any = {}
-    for (const field of fields) {
-      const value = formData.get(field.field_name)
-      const blocksConfig = getBlocksFieldConfig(field.field_options)
 
-      if (blocksConfig) {
-        const parsed = parseBlocksValue(value, blocksConfig)
-        data[field.field_name] = parsed.value
-        continue
-      }
+    // Extract field data for preview (skip validation)
+    const { data } = extractFieldData(fields, formData, { skipValidation: true })
 
-      switch (field.field_type) {
-        case 'number':
-          data[field.field_name] = value ? Number(value) : null
-          break
-        case 'boolean':
-          data[field.field_name] = value === 'true'
-          break
-        case 'select':
-          if (field.field_options?.multiple) {
-            data[field.field_name] = formData.getAll(`${field.field_name}[]`)
-          } else {
-            data[field.field_name] = value
-          }
-          break
-        default:
-          data[field.field_name] = value
-      }
-    }
-    
     // Generate preview HTML
     const previewHTML = `
       <!DOCTYPE html>
