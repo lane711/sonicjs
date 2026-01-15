@@ -1,5 +1,5 @@
 import { syncCollections, PluginBootstrapService } from './chunk-SGAG6FD3.js';
-import { MigrationService } from './chunk-CZI27OXC.js';
+import { MigrationService } from './chunk-46UJ6PRV.js';
 import { metricsTracker } from './chunk-FICTAGD4.js';
 import { sign, verify } from 'hono/jwt';
 import { setCookie, getCookie } from 'hono/cookie';
@@ -55,11 +55,11 @@ var AuthManager = class {
       // 24 hours
       iat: Math.floor(Date.now() / 1e3)
     };
-    return await sign(payload, JWT_SECRET);
+    return await sign(payload, JWT_SECRET, "HS256");
   }
   static async verifyToken(token) {
     try {
-      const payload = await verify(token, JWT_SECRET);
+      const payload = await verify(token, JWT_SECRET, "HS256");
       if (payload.exp < Math.floor(Date.now() / 1e3)) {
         return null;
       }
@@ -217,5 +217,5 @@ var getActivePlugins = () => [];
 var isPluginActive = () => false;
 
 export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, metricsMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware };
-//# sourceMappingURL=chunk-XRT3YP2H.js.map
-//# sourceMappingURL=chunk-XRT3YP2H.js.map
+//# sourceMappingURL=chunk-SZKEPU6Z.js.map
+//# sourceMappingURL=chunk-SZKEPU6Z.js.map

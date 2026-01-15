@@ -1,7 +1,7 @@
 'use strict';
 
 var chunkILZ3DP4I_cjs = require('./chunk-ILZ3DP4I.cjs');
-var chunk4SZJQD43_cjs = require('./chunk-4SZJQD43.cjs');
+var chunkFSDXSLRG_cjs = require('./chunk-FSDXSLRG.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 var jwt = require('hono/jwt');
 var cookie = require('hono/cookie');
@@ -20,7 +20,7 @@ function bootstrapMiddleware(config = {}) {
     try {
       console.log("[Bootstrap] Starting system initialization...");
       console.log("[Bootstrap] Running database migrations...");
-      const migrationService = new chunk4SZJQD43_cjs.MigrationService(c.env.DB);
+      const migrationService = new chunkFSDXSLRG_cjs.MigrationService(c.env.DB);
       await migrationService.runPendingMigrations();
       console.log("[Bootstrap] Syncing collection configurations...");
       try {
@@ -57,11 +57,11 @@ var AuthManager = class {
       // 24 hours
       iat: Math.floor(Date.now() / 1e3)
     };
-    return await jwt.sign(payload, JWT_SECRET);
+    return await jwt.sign(payload, JWT_SECRET, "HS256");
   }
   static async verifyToken(token) {
     try {
-      const payload = await jwt.verify(token, JWT_SECRET);
+      const payload = await jwt.verify(token, JWT_SECRET, "HS256");
       if (payload.exp < Math.floor(Date.now() / 1e3)) {
         return null;
       }
@@ -239,5 +239,5 @@ exports.requirePermission = requirePermission;
 exports.requireRole = requireRole;
 exports.securityHeaders = securityHeaders;
 exports.securityLoggingMiddleware = securityLoggingMiddleware;
-//# sourceMappingURL=chunk-MC2HO526.cjs.map
-//# sourceMappingURL=chunk-MC2HO526.cjs.map
+//# sourceMappingURL=chunk-7CFPJCUH.cjs.map
+//# sourceMappingURL=chunk-7CFPJCUH.cjs.map
