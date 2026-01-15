@@ -45,6 +45,26 @@ export const sections = [
   <div className="space-y-4">
     <div>
       <h4 className="text-sm font-bold text-gray-800 dark:text-gray-300 mb-2 flex items-center gap-2">
+        <span className="text-lg">✨</span> Added
+      </h4>
+      <ul className="space-y-2 ml-6">
+        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+          <span className="text-gray-500 mt-0.5">▸</span>
+          <span><strong className="font-semibold">User Profiles Table</strong> - New `user_profiles` table in app template for storing extended user data (company, bio, location, etc.) separate from core authentication</span>
+        </li>
+        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+          <span className="text-gray-500 mt-0.5">▸</span>
+          <span><strong className="font-semibold">Dynamic Profile API</strong> - Drizzle ORM-based routes that automatically adapt to schema changes - add a column and it's instantly available in the API</span>
+        </li>
+        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+          <span className="text-gray-500 mt-0.5">▸</span>
+          <span><strong className="font-semibold">Profile CRUD Endpoints</strong> - GET/PUT/PATCH/DELETE at `/api/profile` with authentication</span>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 className="text-sm font-bold text-gray-800 dark:text-gray-300 mb-2 flex items-center gap-2">
         <span className="text-lg">🔧</span> Fixed
       </h4>
       <ul className="space-y-2 ml-6">
@@ -59,6 +79,18 @@ export const sections = [
         <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
           <span className="text-gray-500 mt-0.5">▸</span>
           <span><strong className="font-semibold">Auto-detection for Managed Column</strong> - Graceful handling when managed column doesn't exist</span>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 className="text-sm font-bold text-gray-800 dark:text-gray-300 mb-2 flex items-center gap-2">
+        <span className="text-lg">📝</span> For Existing Projects
+      </h4>
+      <ul className="space-y-2 ml-6">
+        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+          <span className="text-gray-500 mt-0.5">▸</span>
+          <span>The user profiles feature is included in the app template for <strong>new projects</strong>. Existing projects can manually add it by copying the schema, routes, and migration files from the template.</span>
         </li>
       </ul>
     </div>
