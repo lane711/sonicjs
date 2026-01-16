@@ -4,7 +4,7 @@ import { sanitizeInput } from '../utils/sanitize'
 import { renderProfilePage, renderAvatarImage, type UserProfile, type ProfilePageData } from '../templates/pages/admin-profile.template'
 import { renderAlert } from '../templates/components/alert.template'
 import { renderActivityLogsPage, type ActivityLogsPageData, type ActivityLog } from '../templates/pages/admin-activity-logs.template'
-import { renderUserEditPage, type UserEditPageData, type UserEditData } from '../templates/pages/admin-user-edit.template'
+import { renderUserEditPage, type UserEditPageData, type UserEditData, type UserProfileData } from '../templates/pages/admin-user-edit.template'
 import { renderUserNewPage, type UserNewPageData } from '../templates/pages/admin-user-new.template'
 import { renderUsersListPage, type UsersListPageData, type User } from '../templates/pages/admin-users-list.template'
 import type { Bindings, Variables } from '../app'
@@ -788,9 +788,9 @@ userRoutes.get('/users/:id/edit', async (c) => {
   const userId = c.req.param('id')
 
   try {
-    // Get user data
+    // Get user data (removed bio - now in profile)
     const userStmt = db.prepare(`
-      SELECT id, email, username, first_name, last_name, phone, bio, avatar_url,
+      SELECT id, email, username, first_name, last_name, phone, avatar_url,
              role, is_active, email_verified, two_factor_enabled, created_at, last_login_at
       FROM users
       WHERE id = ?
@@ -806,6 +806,25 @@ userRoutes.get('/users/:id/edit', async (c) => {
       }), 404)
     }
 
+    // Get user profile data
+    const profileStmt = db.prepare(`
+      SELECT display_name, bio, company, job_title, website, location, date_of_birth
+      FROM user_profiles
+      WHERE user_id = ?
+    `)
+    const profileData = await profileStmt.bind(userId).first() as any
+
+    // Convert profile to UserProfileData interface
+    const profile: UserProfileData | undefined = profileData ? {
+      displayName: profileData.display_name,
+      bio: profileData.bio,
+      company: profileData.company,
+      jobTitle: profileData.job_title,
+      website: profileData.website,
+      location: profileData.location,
+      dateOfBirth: profileData.date_of_birth
+    } : undefined
+
     // Convert to UserEditData interface
     const editData: UserEditData = {
       id: userToEdit.id,
@@ -814,14 +833,14 @@ userRoutes.get('/users/:id/edit', async (c) => {
       firstName: userToEdit.first_name || '',
       lastName: userToEdit.last_name || '',
       phone: userToEdit.phone,
-      bio: userToEdit.bio,
       avatarUrl: userToEdit.avatar_url,
       role: userToEdit.role,
       isActive: Boolean(userToEdit.is_active),
       emailVerified: Boolean(userToEdit.email_verified),
       twoFactorEnabled: Boolean(userToEdit.two_factor_enabled),
       createdAt: userToEdit.created_at,
-      lastLoginAt: userToEdit.last_login_at
+      lastLoginAt: userToEdit.last_login_at,
+      profile
     }
 
     const pageData: UserEditPageData = {
@@ -840,7 +859,7 @@ userRoutes.get('/users/:id/edit', async (c) => {
 
     return c.html(renderAlert({
       type: 'error',
-      message: 'Failed to load user!. Please try again.',
+      message: 'Failed to load user. Please try again.',
       dismissible: true
     }), 500)
   }
@@ -863,10 +882,19 @@ userRoutes.put('/users/:id', async (c) => {
     const username = sanitizeInput(formData.get('username')?.toString())
     const email = formData.get('email')?.toString()?.trim().toLowerCase() || ''
     const phone = sanitizeInput(formData.get('phone')?.toString()) || null
-    const bio = sanitizeInput(formData.get('bio')?.toString()) || null
     const role = formData.get('role')?.toString() || 'viewer'
     const isActive = formData.get('is_active') === '1'
     const emailVerified = formData.get('email_verified') === '1'
+
+    // Extract profile fields
+    const profileDisplayName = sanitizeInput(formData.get('profile_display_name')?.toString()) || null
+    const profileBio = sanitizeInput(formData.get('profile_bio')?.toString()) || null
+    const profileCompany = sanitizeInput(formData.get('profile_company')?.toString()) || null
+    const profileJobTitle = sanitizeInput(formData.get('profile_job_title')?.toString()) || null
+    const profileWebsite = formData.get('profile_website')?.toString()?.trim() || null
+    const profileLocation = sanitizeInput(formData.get('profile_location')?.toString()) || null
+    const profileDateOfBirthStr = formData.get('profile_date_of_birth')?.toString()?.trim() || null
+    const profileDateOfBirth = profileDateOfBirthStr ? new Date(profileDateOfBirthStr).getTime() : null
 
     // Validate required fields
     if (!firstName || !lastName || !username || !email) {
@@ -887,6 +915,19 @@ userRoutes.put('/users/:id', async (c) => {
       }))
     }
 
+    // Validate website URL if provided
+    if (profileWebsite) {
+      try {
+        new URL(profileWebsite)
+      } catch {
+        return c.html(renderAlert({
+          type: 'error',
+          message: 'Please enter a valid website URL.',
+          dismissible: true
+        }))
+      }
+    }
+
     // Check if username/email are taken by another user
     const checkStmt = db.prepare(`
       SELECT id FROM users
@@ -897,30 +938,67 @@ userRoutes.put('/users/:id', async (c) => {
     if (existingUser) {
       return c.html(renderAlert({
         type: 'error',
-        message: 'Username or email is already taken by another user!.',
+        message: 'Username or email is already taken by another user.',
         dismissible: true
       }))
     }
 
-    // Update user
+    // Update user (removed bio - now in profile)
     const updateStmt = db.prepare(`
       UPDATE users SET
         first_name = ?, last_name = ?, username = ?, email = ?,
-        phone = ?, bio = ?, role = ?, is_active = ?, email_verified = ?,
+        phone = ?, role = ?, is_active = ?, email_verified = ?,
         updated_at = ?
       WHERE id = ?
     `)
 
     await updateStmt.bind(
       firstName, lastName, username, email,
-      phone, bio, role, isActive ? 1 : 0, emailVerified ? 1 : 0,
+      phone, role, isActive ? 1 : 0, emailVerified ? 1 : 0,
       Date.now(), userId
     ).run()
 
+    // Check if any profile field has data
+    const hasProfileData = profileDisplayName || profileBio || profileCompany ||
+      profileJobTitle || profileWebsite || profileLocation || profileDateOfBirth
+
+    if (hasProfileData) {
+      const now = Date.now()
+
+      // Check if profile exists
+      const profileCheckStmt = db.prepare(`SELECT id FROM user_profiles WHERE user_id = ?`)
+      const existingProfile = await profileCheckStmt.bind(userId).first() as any
+
+      if (existingProfile) {
+        // Update existing profile
+        const updateProfileStmt = db.prepare(`
+          UPDATE user_profiles SET
+            display_name = ?, bio = ?, company = ?, job_title = ?,
+            website = ?, location = ?, date_of_birth = ?, updated_at = ?
+          WHERE user_id = ?
+        `)
+        await updateProfileStmt.bind(
+          profileDisplayName, profileBio, profileCompany, profileJobTitle,
+          profileWebsite, profileLocation, profileDateOfBirth, now, userId
+        ).run()
+      } else {
+        // Create new profile
+        const profileId = `profile_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
+        const insertProfileStmt = db.prepare(`
+          INSERT INTO user_profiles (id, user_id, display_name, bio, company, job_title, website, location, date_of_birth, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `)
+        await insertProfileStmt.bind(
+          profileId, userId, profileDisplayName, profileBio, profileCompany, profileJobTitle,
+          profileWebsite, profileLocation, profileDateOfBirth, now, now
+        ).run()
+      }
+    }
+
     // Log the activity
     await logActivity(
-      db, user!.userId, 'user!.update', 'users', userId,
-      { fields: ['first_name', 'last_name', 'username', 'email', 'phone', 'bio', 'role', 'is_active', 'email_verified'] },
+      db, user!.userId, 'user.update', 'users', userId,
+      { fields: ['first_name', 'last_name', 'username', 'email', 'phone', 'role', 'is_active', 'email_verified', 'profile'] },
       c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip'),
       c.req.header('user-agent')
     )
@@ -935,7 +1013,7 @@ userRoutes.put('/users/:id', async (c) => {
     console.error('User update error:', error)
     return c.html(renderAlert({
       type: 'error',
-      message: 'Failed to update user!. Please try again.',
+      message: 'Failed to update user. Please try again.',
       dismissible: true
     }))
   }
