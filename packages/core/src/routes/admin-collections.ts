@@ -452,10 +452,20 @@ adminCollectionsRoutes.get('/:id', async (c) => {
             fieldOptions = {}
           }
         }
+        
+        // Normalize field types - check if field_options indicates slug type
+        let fieldType = row.field_type
+        if (fieldOptions && typeof fieldOptions === 'object' && 'type' in fieldOptions && (fieldOptions.type === 'slug' || (fieldOptions as any).format === 'slug')) {
+          fieldType = 'slug'
+        } else if (row.field_name === 'slug' && row.field_type === 'text') {
+          // Legacy: if field name is 'slug' but type is 'text', upgrade to slug
+          fieldType = 'slug'
+        }
+        
         return {
           id: row.id,
           field_name: row.field_name,
-          field_type: row.field_type,
+          field_type: fieldType,
           field_label: row.field_label,
           field_options: fieldOptions,
           field_order: row.field_order,
@@ -732,6 +742,16 @@ adminCollectionsRoutes.post('/:id/fields', async (c) => {
     const fieldId = crypto.randomUUID()
     const now = Date.now()
 
+    // Prepare field options for slug type
+    let finalFieldOptions = parsedOptions
+    if (fieldType === 'slug') {
+      finalFieldOptions = {
+        ...parsedOptions,
+        type: 'slug',
+        format: 'slug'
+      }
+    }
+
     const insertStmt = db.prepare(`
       INSERT INTO content_fields (
         id, collection_id, field_name, field_type, field_label,
@@ -746,7 +766,7 @@ adminCollectionsRoutes.post('/:id/fields', async (c) => {
       fieldName,
       fieldType,
       fieldLabel,
-      fieldOptions,
+      JSON.stringify(finalFieldOptions),
       nextOrder,
       isRequired ? 1 : 0,
       isSearchable ? 1 : 0,

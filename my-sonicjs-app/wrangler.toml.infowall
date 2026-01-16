@@ -1,0 +1,58 @@
+name = "infowall-development"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+account_id = "f61c658f1de7911b0a529f38308adb21"
+
+# Cloudflare Workers settings
+workers_dev = true
+
+# Local development settings
+[dev]
+port = 8788
+
+# D1 Database
+[[d1_databases]]
+binding = "DB"
+database_name = "infowall-development-db"
+database_id = "a331db92-586b-443b-8cc2-7238b1800442"
+migrations_dir = "../packages/core/migrations"
+
+# R2 Bucket for media storage
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "infowall-development-media"
+
+# KV Cache
+[[kv_namespaces]]
+binding = "CACHE_KV"
+id = "f2df7de3ecbd4861a73b79df7a3c3fec"
+preview_id = "9962a9a9ddca41ef869727bbc2bf11aa"
+
+# Environment variables
+[vars]
+ENVIRONMENT = "development"
+
+# Staging environment
+[env.staging]
+name = "infowall-staging"
+vars = { ENVIRONMENT = "staging" }
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "infowall-staging-db"
+database_id = "128e64c8-1e9e-4f31-b380-fe4c6eeb1bc2"
+migrations_dir = "../packages/core/migrations"
+
+[[env.staging.r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "infowall-staging-media"
+
+[[env.staging.kv_namespaces]]
+binding = "CACHE_KV"
+id = "36a2bdcbda7341659155f8e831fd2cb2"
+preview_id = "00e80589e80a4d55a1af51938c05e0b1"
+
+# Observability
+[observability]
+enabled = true
