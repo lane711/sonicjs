@@ -1,0 +1,102 @@
+{
+  "id": "turnstile",
+  "name": "Cloudflare Turnstile",
+  "description": "CAPTCHA-free bot protection using Cloudflare Turnstile. Provides reusable verification for any form.",
+  "version": "1.0.0",
+  "author": "SonicJS",
+  "category": "security",
+  "icon": "shield-check",
+  "homepage": "https://developers.cloudflare.com/turnstile/",
+  "repository": "https://github.com/sonicjs/sonicjs",
+  "license": "MIT",
+  "permissions": ["settings:write", "admin:access"],
+  "dependencies": [],
+  "configSchema": {
+    "siteKey": {
+      "type": "string",
+      "label": "Site Key",
+      "description": "Your Cloudflare Turnstile site key (public)",
+      "required": true
+    },
+    "secretKey": {
+      "type": "string",
+      "label": "Secret Key",
+      "description": "Your Cloudflare Turnstile secret key (private)",
+      "required": true,
+      "sensitive": true
+    },
+    "theme": {
+      "type": "select",
+      "label": "Widget Theme",
+      "description": "Visual theme for the Turnstile widget",
+      "default": "auto",
+      "options": [
+        { "value": "light", "label": "Light" },
+        { "value": "dark", "label": "Dark" },
+        { "value": "auto", "label": "Auto" }
+      ]
+    },
+    "size": {
+      "type": "select",
+      "label": "Widget Size",
+      "description": "Size of the Turnstile widget",
+      "default": "normal",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "compact", "label": "Compact" }
+      ]
+    },
+    "mode": {
+      "type": "select",
+      "label": "Widget Mode",
+      "description": "Managed: Adaptive challenge. Non-Interactive: Always visible, minimal friction. Invisible: No visible widget",
+      "default": "managed",
+      "options": [
+        { "value": "managed", "label": "Managed (Recommended)" },
+        { "value": "non-interactive", "label": "Non-Interactive" },
+        { "value": "invisible", "label": "Invisible" }
+      ]
+    },
+    "appearance": {
+      "type": "select",
+      "label": "Appearance",
+      "description": "When the Turnstile challenge is executed. Always: Verifies immediately. Execute: Challenge on form submit. Interaction Only: Only after user interaction",
+      "default": "always",
+      "options": [
+        { "value": "always", "label": "Always" },
+        { "value": "execute", "label": "Execute" },
+        { "value": "interaction-only", "label": "Interaction Only" }
+      ]
+    },
+    "preClearance": {
+      "type": "boolean",
+      "label": "Enable Pre-clearance",
+      "description": "Issue a clearance cookie that bypasses Cloudflare Firewall Rules (as if the user passed a challenge on your proxied site)",
+      "default": false
+    },
+    "preClearanceLevel": {
+      "type": "select",
+      "label": "Pre-clearance Level",
+      "description": "Controls which Cloudflare Firewall Rules the clearance cookie bypasses. Only applies if Pre-clearance is enabled",
+      "default": "managed",
+      "options": [
+        { "value": "interactive", "label": "Interactive - Bypasses Interactive, Managed & JS Challenge Rules" },
+        { "value": "managed", "label": "Managed - Bypasses Managed & JS Challenge Rules" },
+        { "value": "non-interactive", "label": "Non-interactive - Bypasses JS Challenge Rules only" }
+      ]
+    },
+    "enabled": {
+      "type": "boolean",
+      "label": "Enable Turnstile",
+      "description": "Enable or disable Turnstile verification globally",
+      "default": true
+    }
+  },
+  "adminMenu": {
+    "label": "Turnstile",
+    "icon": "shield-check",
+    "href": "/admin/plugins/turnstile/settings",
+    "parentId": "plugins",
+    "order": 100
+  }
+}

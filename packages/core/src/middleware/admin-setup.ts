@@ -41,8 +41,11 @@ export function adminSetupMiddleware() {
     const adminExists = await checkAdminUserExists(db)
 
     if (!adminExists) {
-      // Redirect to registration with setup flag
-      return c.redirect('/auth/register?setup=true')
+      // Only redirect admin routes when no admin exists
+      // Let other routes proceed normally (including 404s)
+      if (path.startsWith('/admin')) {
+        return c.redirect('/auth/register?setup=true')
+      }
     }
 
     return next()

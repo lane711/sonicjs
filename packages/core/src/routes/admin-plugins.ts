@@ -104,6 +104,19 @@ const AVAILABLE_PLUGINS = [
     permissions: [],
     dependencies: [],
     is_core: false
+  },
+  {
+    id: 'turnstile',
+    name: 'turnstile-plugin',
+    display_name: 'Cloudflare Turnstile',
+    description: 'CAPTCHA-free bot protection for forms using Cloudflare Turnstile. Provides seamless spam prevention with configurable modes, themes, and pre-clearance options.',
+    version: '1.0.0',
+    author: 'SonicJS Team',
+    category: 'security',
+    icon: '🛡️',
+    permissions: [],
+    dependencies: [],
+    is_core: true
   }
 ]
 
@@ -559,6 +572,36 @@ adminPluginRoutes.post('/install', async (c) => {
       })
 
       return c.json({ success: true, plugin: easyMdxPlugin })
+    }
+
+    // Handle Turnstile plugin installation
+    if (body.name === 'turnstile-plugin') {
+      const turnstilePlugin = await pluginService.installPlugin({
+        id: 'turnstile',
+        name: 'turnstile-plugin',
+        display_name: 'Cloudflare Turnstile',
+        description: 'CAPTCHA-free bot protection for forms using Cloudflare Turnstile. Provides seamless spam prevention with configurable modes, themes, and pre-clearance options.',
+        version: '1.0.0',
+        author: 'SonicJS Team',
+        category: 'security',
+        icon: '🛡️',
+        permissions: [],
+        dependencies: [],
+        is_core: true,
+        settings: {
+          siteKey: '',
+          secretKey: '',
+          theme: 'auto',
+          size: 'normal',
+          mode: 'managed',
+          appearance: 'always',
+          preClearanceEnabled: false,
+          preClearanceLevel: 'managed',
+          enabled: false
+        }
+      })
+
+      return c.json({ success: true, plugin: turnstilePlugin })
     }
 
     return c.json({ error: 'Plugin not found in registry' }, 404)

@@ -1,330 +1,73 @@
-import { l as HookSystem, H as HookHandler, j as PluginHook, s as PluginValidator$1, P as Plugin, t as PluginValidationResult, m as PluginRegistry, b as PluginConfig, o as PluginStatus, n as PluginManager$1, a as PluginContext } from './plugin-zvZpaiP5.cjs';
-import { Hono } from 'hono';
+export { H as HookSystemImpl, a as HookUtils, b as PluginManager, P as PluginRegistryImpl, c as PluginValidator, S as ScopedHookSystem } from './plugin-manager-vBal9Zip.cjs';
+import { D1Database } from '@cloudflare/workers-types';
+import * as hono from 'hono';
+import { Context, Next } from 'hono';
+import './plugin-zvZpaiP5.cjs';
 import 'zod';
-import '@cloudflare/workers-types';
 
-/**
- * Hook System Implementation
- *
- * Provides event-driven extensibility for plugins
- */
-
-declare class HookSystemImpl implements HookSystem {
-    private hooks;
-    private executing;
-    /**
-     * Register a hook handler
-     */
-    register(hookName: string, handler: HookHandler, priority?: number): void;
-    /**
-     * Execute all handlers for a hook
-     */
-    execute(hookName: string, data: any, context?: any): Promise<any>;
-    /**
-     * Remove a hook handler
-     */
-    unregister(hookName: string, handler: HookHandler): void;
-    /**
-     * Get all registered hooks for a name
-     */
-    getHooks(hookName: string): PluginHook[];
-    /**
-     * Get all registered hook names
-     */
-    getHookNames(): string[];
-    /**
-     * Get hook statistics
-     */
-    getStats(): {
-        hookName: string;
-        handlerCount: number;
-    }[];
-    /**
-     * Clear all hooks (useful for testing)
-     */
-    clear(): void;
-    /**
-     * Create a scoped hook system for a plugin
-     */
-    createScope(_pluginName: string): ScopedHookSystem;
+interface TurnstileSettings {
+    siteKey: string;
+    secretKey: string;
+    theme?: 'light' | 'dark' | 'auto';
+    size?: 'normal' | 'compact';
+    mode?: 'managed' | 'non-interactive' | 'invisible';
+    appearance?: 'always' | 'execute' | 'interaction-only';
+    preClearance?: boolean;
+    preClearanceLevel?: 'interactive' | 'managed' | 'non-interactive';
+    enabled: boolean;
 }
-/**
- * Scoped hook system for individual plugins
- */
-declare class ScopedHookSystem {
-    private parent;
-    private registeredHooks;
-    constructor(parent: HookSystemImpl);
+declare class TurnstileService {
+    private db;
+    private readonly VERIFY_URL;
+    constructor(db: D1Database);
     /**
-     * Register a hook (scoped to this plugin)
+     * Get Turnstile settings from database
      */
-    register(hookName: string, handler: HookHandler, priority?: number): void;
+    getSettings(): Promise<TurnstileSettings | null>;
     /**
-     * Execute a hook
+     * Verify a Turnstile token with Cloudflare
      */
-    execute(hookName: string, data: any, context?: any): Promise<any>;
-    /**
-     * Unregister a specific hook
-     */
-    unregister(hookName: string, handler: HookHandler): void;
-    /**
-     * Unregister all hooks for this plugin
-     */
-    unregisterAll(): void;
-    /**
-     * Get hooks registered by this plugin
-     */
-    getRegisteredHooks(): {
-        hookName: string;
-        handler: HookHandler;
-    }[];
-}
-/**
- * Hook utilities
- */
-declare class HookUtils {
-    /**
-     * Create a hook name with namespace
-     */
-    static createHookName(namespace: string, event: string): string;
-    /**
-     * Parse a hook name to extract namespace and event
-     */
-    static parseHookName(hookName: string): {
-        namespace: string;
-        event: string;
-    };
-    /**
-     * Create a middleware that executes hooks
-     */
-    static createHookMiddleware(hookSystem: HookSystem, beforeHook?: string, afterHook?: string): (c: any, next: any) => Promise<void>;
-    /**
-     * Create a debounced hook handler
-     */
-    static debounce(handler: HookHandler, delay: number): HookHandler;
-    /**
-     * Create a throttled hook handler
-     */
-    static throttle(handler: HookHandler, limit: number): HookHandler;
-}
-
-/**
- * Plugin Validator
- *
- * Validates plugin definitions, dependencies, and compatibility
- */
-
-declare class PluginValidator implements PluginValidator$1 {
-    private static readonly RESERVED_NAMES;
-    private static readonly RESERVED_PATHS;
-    /**
-     * Validate plugin definition
-     */
-    validate(plugin: Plugin): PluginValidationResult;
-    /**
-     * Validate plugin dependencies
-     */
-    validateDependencies(plugin: Plugin, registry: PluginRegistry): PluginValidationResult;
-    /**
-     * Validate plugin compatibility with SonicJS version
-     */
-    validateCompatibility(plugin: Plugin, sonicVersion: string): PluginValidationResult;
-    /**
-     * Check if two version ranges are compatible
-     */
-    private isCompatible;
-    /**
-     * Validate plugin security constraints
-     */
-    validateSecurity(plugin: Plugin): PluginValidationResult;
-}
-
-/**
- * Plugin Registry Implementation
- *
- * Manages plugin registration, activation, and lifecycle
- */
-
-declare class PluginRegistryImpl implements PluginRegistry {
-    private plugins;
-    private configs;
-    private statuses;
-    private validator;
-    constructor(validator?: PluginValidator);
-    /**
-     * Get plugin by name
-     */
-    get(name: string): Plugin | undefined;
-    /**
-     * Get all registered plugins
-     */
-    getAll(): Plugin[];
-    /**
-     * Get active plugins
-     */
-    getActive(): Plugin[];
-    /**
-     * Register a plugin
-     */
-    register(plugin: Plugin): Promise<void>;
-    /**
-     * Unregister a plugin
-     */
-    unregister(name: string): Promise<void>;
-    /**
-     * Check if plugin is registered
-     */
-    has(name: string): boolean;
-    /**
-     * Activate a plugin
-     */
-    activate(name: string): Promise<void>;
-    /**
-     * Deactivate a plugin
-     */
-    deactivate(name: string): Promise<void>;
-    /**
-     * Get plugin configuration
-     */
-    getConfig(name: string): PluginConfig | undefined;
-    /**
-     * Set plugin configuration
-     */
-    setConfig(name: string, config: PluginConfig): void;
-    /**
-     * Get plugin status
-     */
-    getStatus(name: string): PluginStatus | undefined;
-    /**
-     * Get all plugin statuses
-     */
-    getAllStatuses(): Map<string, PluginStatus>;
-    /**
-     * Update plugin status
-     */
-    private updateStatus;
-    /**
-     * Get plugins that depend on the specified plugin
-     */
-    private getDependents;
-    /**
-     * Get dependency graph
-     */
-    getDependencyGraph(): Map<string, string[]>;
-    /**
-     * Resolve plugin load order based on dependencies
-     */
-    resolveLoadOrder(): string[];
-    /**
-     * Export plugin configuration
-     */
-    exportConfig(): {
-        plugins: PluginConfig[];
-    };
-    /**
-     * Import plugin configuration
-     */
-    importConfig(config: {
-        plugins: PluginConfig[];
-    }): void;
-    /**
-     * Clear all plugins (useful for testing)
-     */
-    clear(): void;
-    /**
-     * Get registry statistics
-     */
-    getStats(): {
-        total: number;
-        active: number;
-        inactive: number;
-        withErrors: number;
-    };
-}
-
-/**
- * Plugin Manager
- *
- * Central orchestrator for the plugin system
- */
-
-declare class PluginManager implements PluginManager$1 {
-    readonly registry: PluginRegistry;
-    readonly hooks: HookSystem;
-    private validator;
-    private context?;
-    private scopedHooks;
-    private pluginRoutes;
-    constructor();
-    /**
-     * Initialize plugin system
-     */
-    initialize(context: PluginContext): Promise<void>;
-    /**
-     * Load plugins from configuration
-     */
-    loadPlugins(configs: PluginConfig[]): Promise<void>;
-    /**
-     * Install a plugin
-     */
-    install(plugin: Plugin, config?: PluginConfig): Promise<void>;
-    /**
-     * Uninstall a plugin
-     */
-    uninstall(name: string): Promise<void>;
-    /**
-     * Get plugin status
-     */
-    getStatus(name: string): PluginStatus;
-    /**
-     * Get all plugin statuses
-     */
-    getAllStatuses(): PluginStatus[];
-    /**
-     * Register plugin extensions (routes, middleware, etc.)
-     */
-    private registerPluginExtensions;
-    /**
-     * Unregister plugin extensions
-     */
-    private unregisterPluginExtensions;
-    /**
-     * Update plugin status
-     */
-    private updatePluginStatus;
-    /**
-     * Create a logger for a plugin
-     */
-    private createLogger;
-    /**
-     * Get plugin routes for mounting in main app
-     */
-    getPluginRoutes(): Map<string, Hono>;
-    /**
-     * Get plugin middleware for main app
-     */
-    getPluginMiddleware(): Array<{
-        name: string;
-        handler: any;
-        priority: number;
-        global: boolean;
+    verifyToken(token: string, remoteIp?: string): Promise<{
+        success: boolean;
+        error?: string;
     }>;
     /**
-     * Execute shutdown procedures
+     * Save Turnstile settings to database
      */
-    shutdown(): Promise<void>;
+    saveSettings(settings: TurnstileSettings): Promise<void>;
     /**
-     * Get plugin system statistics
+     * Check if Turnstile is enabled
      */
-    getStats(): {
-        registry: ReturnType<PluginRegistryImpl['getStats']>;
-        hooks: Array<{
-            hookName: string;
-            handlerCount: number;
-        }>;
-        routes: number;
-        middleware: number;
-    };
+    isEnabled(): Promise<boolean>;
 }
 
-export { HookSystemImpl, HookUtils, PluginManager, PluginRegistryImpl, PluginValidator, ScopedHookSystem };
+/**
+ * Middleware to verify Turnstile token on form submissions
+ *
+ * Usage:
+ * ```typescript
+ * import { verifyTurnstile } from '@sonicjs-cms/core/plugins'
+ *
+ * app.post('/api/contact', verifyTurnstile, async (c) => {
+ *   // Token already verified, process form...
+ * })
+ * ```
+ */
+declare function verifyTurnstile(c: Context, next: Next): Promise<void | (Response & hono.TypedResponse<{
+    error: string;
+}, 500, "json">) | (Response & hono.TypedResponse<{
+    error: string;
+    message: string;
+}, 400, "json">) | (Response & hono.TypedResponse<{
+    error: string;
+    message: string;
+}, 403, "json">)>;
+/**
+ * Middleware factory that allows custom error handling
+ */
+declare function createTurnstileMiddleware(options?: {
+    onError?: (c: Context, error: string) => Response;
+    onMissing?: (c: Context) => Response;
+}): (c: Context, next: Next) => Promise<void | Response>;
+
+export { TurnstileService, createTurnstileMiddleware, verifyTurnstile };

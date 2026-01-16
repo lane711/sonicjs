@@ -402,16 +402,32 @@ adminCollectionsRoutes.get('/:id', async (c) => {
         if (schema && schema.properties) {
           // Convert schema properties to field format
           let fieldOrder = 0
-          fields = Object.entries(schema.properties).map(([fieldName, fieldConfig]: [string, any]) => ({
-            id: `schema-${fieldName}`,
-            field_name: fieldName,
-            field_type: fieldConfig.type || 'string',
-            field_label: fieldConfig.title || fieldName,
-            field_options: fieldConfig,
-            field_order: fieldOrder++,
-            is_required: fieldConfig.required === true || (schema.required && schema.required.includes(fieldName)),
-            is_searchable: fieldConfig.searchable === true || false
-          }))
+          fields = Object.entries(schema.properties).map(([fieldName, fieldConfig]: [string, any]) => {
+            // Normalize schema formats to UI field types
+            let fieldType = fieldConfig.type || 'string'
+            if (fieldConfig.enum) {
+              fieldType = 'select'
+            } else if (fieldConfig.format === 'richtext') {
+              fieldType = 'richtext'
+            } else if (fieldConfig.format === 'media') {
+              fieldType = 'media'
+            } else if (fieldConfig.format === 'date-time') {
+              fieldType = 'date'
+            } else if (fieldConfig.type === 'slug' || fieldConfig.format === 'slug') {
+              fieldType = 'slug'
+            }
+            
+            return {
+              id: `schema-${fieldName}`,
+              field_name: fieldName,
+              field_type: fieldType,
+              field_label: fieldConfig.title || fieldName,
+              field_options: fieldConfig,
+              field_order: fieldOrder++,
+              is_required: fieldConfig.required === true || (schema.required && schema.required.includes(fieldName)),
+              is_searchable: fieldConfig.searchable === true || false
+            }
+          })
         }
       } catch (e) {
         console.error('Error parsing collection schema:', e)
@@ -676,6 +692,9 @@ adminCollectionsRoutes.post('/:id/fields', async (c) => {
         fieldConfig.enum = (parsedOptions as any).options || []
       } else if (fieldType === 'media') {
         fieldConfig.format = 'media'
+      } else if (fieldType === 'slug') {
+        fieldConfig.type = 'slug'
+        fieldConfig.format = 'slug'
       } else if (fieldType === 'quill') {
         fieldConfig.type = 'quill'
       } else if (fieldType === 'mdxeditor') {

@@ -5,6 +5,48 @@ import type { Bindings, Variables } from '../app'
 
 const apiContentCrudRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
+// GET /api/content/check-slug - Check if slug is available in collection
+// Query params: collectionId, slug, excludeId (optional - when editing)
+// NOTE: This MUST come before /:id route to avoid route conflict
+apiContentCrudRoutes.get('/check-slug', async (c) => {
+  try {
+    const db = c.env.DB
+    const collectionId = c.req.query('collectionId')
+    const slug = c.req.query('slug')
+    const excludeId = c.req.query('excludeId') // When editing, exclude current item
+    
+    if (!collectionId || !slug) {
+      return c.json({ error: 'collectionId and slug are required' }, 400)
+    }
+    
+    // Check for existing content with this slug in the collection
+    let query = 'SELECT id FROM content WHERE collection_id = ? AND slug = ?'
+    const params: string[] = [collectionId, slug]
+    
+    if (excludeId) {
+      query += ' AND id != ?'
+      params.push(excludeId)
+    }
+    
+    const existing = await db.prepare(query).bind(...params).first()
+    
+    if (existing) {
+      return c.json({ 
+        available: false, 
+        message: 'This URL slug is already in use in this collection' 
+      })
+    }
+    
+    return c.json({ available: true })
+  } catch (error: unknown) {
+    console.error('Error checking slug:', error)
+    return c.json({ 
+      error: 'Failed to check slug availability',
+      details: error instanceof Error ? error.message : String(error)
+    }, 500)
+  }
+})
+
 // GET /api/content/:id - Get single content item by ID
 apiContentCrudRoutes.get('/:id', async (c) => {
   try {

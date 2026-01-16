@@ -428,11 +428,32 @@ END;
     name: string
     type: 'string' | 'number' | 'boolean' | 'date' | 'array' | 'object'
     optional?: boolean
+    required?: boolean
     validation?: any
+    items?: any
+    properties?: Record<string, any>
   }>): z.ZodSchema {
     const shape: Record<string, z.ZodTypeAny> = {}
 
-    for (const field of fields) {
+    const applyValidation = (field: any, schema: z.ZodTypeAny) => {
+      if (field.validation) {
+        if (field.type === 'string' && field.validation.min) {
+          schema = (schema as z.ZodString).min(field.validation.min)
+        }
+        if (field.type === 'string' && field.validation.max) {
+          schema = (schema as z.ZodString).max(field.validation.max)
+        }
+        if (field.type === 'string' && field.validation.email) {
+          schema = (schema as z.ZodString).email()
+        }
+        if (field.type === 'string' && field.validation.url) {
+          schema = (schema as z.ZodString).url()
+        }
+      }
+      return schema
+    }
+
+    const buildSchema = (field: any): z.ZodTypeAny => {
       let schema: z.ZodTypeAny
 
       switch (field.type) {
@@ -449,36 +470,79 @@ END;
           schema = z.date()
           break
         case 'array':
+          if (field.items?.blocks && typeof field.items.blocks === 'object') {
+            const discriminator = typeof field.items.discriminator === 'string' && field.items.discriminator
+              ? field.items.discriminator
+              : 'blockType'
+            const blockSchemas = Object.entries(field.items.blocks).map(([blockName, blockDef]: [string, any]) => {
+              const properties = blockDef?.properties && typeof blockDef.properties === 'object'
+                ? blockDef.properties
+                : {}
+              const blockShape: Record<string, z.ZodTypeAny> = {
+                [discriminator]: z.literal(blockName)
+              }
+
+              Object.entries(properties).forEach(([propertyName, propertyConfigRaw]) => {
+                const propertyConfig = propertyConfigRaw && typeof propertyConfigRaw === 'object'
+                  ? propertyConfigRaw as Record<string, any>
+                  : {}
+                const propertySchema = buildSchema({
+                  ...propertyConfig,
+                  optional: propertyConfig.required === false
+                })
+                blockShape[propertyName] = propertySchema
+              })
+
+              return z.object(blockShape)
+            })
+
+            if (blockSchemas.length === 1 && blockSchemas[0]) {
+              schema = z.array(blockSchemas[0])
+            } else if (blockSchemas.length > 1) {
+              schema = z.array(z.union(blockSchemas as unknown as [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]]))
+            } else {
+              schema = z.array(z.any())
+            }
+            break
+          }
+          if (field.items) {
+            schema = z.array(buildSchema(field.items))
+            break
+          }
           schema = z.array(z.any())
           break
         case 'object':
+          if (field.properties && typeof field.properties === 'object') {
+            const objectShape: Record<string, z.ZodTypeAny> = {}
+            Object.entries(field.properties).forEach(([propertyName, propertyConfigRaw]) => {
+              const propertyConfig = propertyConfigRaw && typeof propertyConfigRaw === 'object'
+                ? propertyConfigRaw as Record<string, any>
+                : {}
+              objectShape[propertyName] = buildSchema({
+                ...propertyConfig,
+                optional: propertyConfig.required === false
+              })
+            })
+            schema = z.object(objectShape)
+            break
+          }
           schema = z.object({})
           break
         default:
           schema = z.any()
       }
 
-      if (field.optional) {
+      schema = applyValidation(field, schema)
+
+      if (field.optional || field.required === false) {
         schema = schema.optional()
       }
 
-      if (field.validation) {
-        // Apply additional validation
-        if (field.type === 'string' && field.validation.min) {
-          schema = (schema as z.ZodString).min(field.validation.min)
-        }
-        if (field.type === 'string' && field.validation.max) {
-          schema = (schema as z.ZodString).max(field.validation.max)
-        }
-        if (field.type === 'string' && field.validation.email) {
-          schema = (schema as z.ZodString).email()
-        }
-        if (field.type === 'string' && field.validation.url) {
-          schema = (schema as z.ZodString).url()
-        }
-      }
+      return schema
+    }
 
-      shape[field.name] = schema
+    for (const field of fields) {
+      shape[field.name] = buildSchema(field)
     }
 
     return z.object(shape)

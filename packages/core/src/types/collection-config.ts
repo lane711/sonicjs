@@ -29,6 +29,14 @@ export type FieldType =
   | 'color'
   | 'file'
 
+export interface BlockDefinition {
+  label?: string
+  description?: string
+  properties: Record<string, FieldConfig>
+}
+
+export type BlockDefinitions = Record<string, BlockDefinition>
+
 export interface FieldConfig {
   type: FieldType
   title?: string
@@ -55,6 +63,8 @@ export interface FieldConfig {
   // Array/Object fields
   items?: FieldConfig
   properties?: Record<string, FieldConfig>
+  blocks?: BlockDefinitions
+  discriminator?: string
 
   // UI hints
   format?: string
