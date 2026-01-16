@@ -45,58 +45,6 @@ export const sections = [
   <div className="space-y-4">
     <div>
       <h4 className="text-sm font-bold text-gray-800 dark:text-gray-300 mb-2 flex items-center gap-2">
-        <span className="text-lg">✨</span> Added
-      </h4>
-      <ul className="space-y-2 ml-6">
-        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
-          <span className="text-gray-500 mt-0.5">▸</span>
-          <span><strong className="font-semibold">User Profiles Table</strong> - New `user_profiles` table in app template for storing extended user data (company, bio, location, etc.) separate from core authentication</span>
-        </li>
-        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
-          <span className="text-gray-500 mt-0.5">▸</span>
-          <span><strong className="font-semibold">Dynamic Profile API</strong> - Drizzle ORM-based routes that automatically adapt to schema changes - add a column and it's instantly available in the API</span>
-        </li>
-        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
-          <span className="text-gray-500 mt-0.5">▸</span>
-          <span><strong className="font-semibold">Profile CRUD Endpoints</strong> - GET/PUT/PATCH/DELETE at `/api/profile` with authentication</span>
-        </li>
-      </ul>
-    </div>
-
-    <div>
-      <h4 className="text-sm font-bold text-gray-800 dark:text-gray-300 mb-2 flex items-center gap-2">
-        <span className="text-lg">🔧</span> Fixed
-      </h4>
-      <ul className="space-y-2 ml-6">
-        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
-          <span className="text-gray-500 mt-0.5">▸</span>
-          <span><strong className="font-semibold">Migration System Refactor</strong> - Build-time migration bundler for Cloudflare Workers (fixes "no such column: managed" error on preview deployments)</span>
-        </li>
-        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
-          <span className="text-gray-500 mt-0.5">▸</span>
-          <span><strong className="font-semibold">Duplicate Migration ID</strong> - Fixed migration 021 renamed to 026 for add_otp_login</span>
-        </li>
-        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
-          <span className="text-gray-500 mt-0.5">▸</span>
-          <span><strong className="font-semibold">Auto-detection for Managed Column</strong> - Graceful handling when managed column doesn't exist</span>
-        </li>
-      </ul>
-    </div>
-
-    <div>
-      <h4 className="text-sm font-bold text-gray-800 dark:text-gray-300 mb-2 flex items-center gap-2">
-        <span className="text-lg">📝</span> For Existing Projects
-      </h4>
-      <ul className="space-y-2 ml-6">
-        <li className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
-          <span className="text-gray-500 mt-0.5">▸</span>
-          <span>The user profiles feature is included in the app template for <strong>new projects</strong>. Existing projects can manually add it by copying the schema, routes, and migration files from the template.</span>
-        </li>
-      </ul>
-    </div>
-
-    <div>
-      <h4 className="text-sm font-bold text-gray-800 dark:text-gray-300 mb-2 flex items-center gap-2">
         <span className="text-lg">🚀</span> Planned
       </h4>
       <ul className="space-y-2 ml-6">
@@ -134,17 +82,48 @@ export const sections = [
       <span className="px-2 py-1 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 border border-orange-300 dark:border-orange-700 text-orange-800 dark:text-orange-300 text-xs font-bold rounded uppercase">Latest</span>
     </div>
 
-    <div className="space-y-3">
+    <div className="space-y-4">
       <div>
         <h4 className="text-sm font-bold text-emerald-800 dark:text-emerald-300 mb-2 flex items-center gap-2">
-          <span>✨</span> Highlights
+          <span>✨</span> New Features
         </h4>
         <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
-          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Slug Auto-Generation</strong> - Auto-generates URL-friendly slugs from titles as you type (500ms debounce)</li>
-          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Real-time Duplicate Detection</strong> - Visual status indicators (✓ Available / ✗ Already in use / ⟳ Checking...)</li>
-          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Manual Override</strong> - Edit slugs manually with "Regenerate from title" button</li>
-          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Edit Mode Protection</strong> - Doesn't auto-change existing content slugs</li>
-          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span>New <code className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs">/api/content/check-slug</code> endpoint for validation</li>
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Slug Auto-Generation</strong> - Auto-generates URL-friendly slugs from titles as you type with 500ms debounce</li>
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Real-time Duplicate Detection</strong> - Visual status indicators (✓ Available / ✗ Already in use / ⟳ Checking...) with new <code className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs">/api/content/check-slug</code> endpoint</li>
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Content Blocks UI</strong> - New content blocks and repeatable fields interface for structured content</li>
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Cloudflare Turnstile Plugin</strong> - Bot protection plugin with XSS protection for forms and authentication</li>
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>User Profiles</strong> - New user profiles table and dynamic API routes using Drizzle ORM (in app template)</li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 className="text-sm font-bold text-emerald-800 dark:text-emerald-300 mb-2 flex items-center gap-2">
+          <span>🔧</span> Improvements
+        </h4>
+        <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Slug Manual Override</strong> - Edit slugs manually with "Regenerate from title" button</li>
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Edit Mode Protection</strong> - Slug auto-generation doesn't change existing content slugs</li>
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Dynamic Profile API</strong> - Schema changes automatically reflect in the API</li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 className="text-sm font-bold text-emerald-800 dark:text-emerald-300 mb-2 flex items-center gap-2">
+          <span>🐛</span> Bug Fixes
+        </h4>
+        <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>JWT Verification</strong> - Fixed HS256 algorithm specification in Hono JWT verify</li>
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Turnstile Plugin</strong> - Fixed body storage bug and added XSS protection</li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 className="text-sm font-bold text-emerald-800 dark:text-emerald-300 mb-2 flex items-center gap-2">
+          <span>📦</span> Dependencies
+        </h4>
+        <ul className="space-y-1.5 ml-6 text-sm text-gray-700 dark:text-gray-300">
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span>Updated Hono from 4.10.6 to 4.11.4</li>
+          <li className="flex items-start gap-2"><span className="text-emerald-500">▸</span>Updated glob from 10.4.5 to 10.5.0</li>
         </ul>
       </div>
     </div>
