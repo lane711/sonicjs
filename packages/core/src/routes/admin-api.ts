@@ -322,6 +322,111 @@ adminApiRoutes.get('/collections/:id', async (c) => {
 })
 
 /**
+ * Get reference options for a collection
+ * GET /admin/api/references?collection=<nameOrId>&search=<query>&limit=20&id=<contentId>
+ */
+adminApiRoutes.get('/references', async (c) => {
+  try {
+    const db = c.env.DB
+    const collectionParam = c.req.query('collection') || ''
+    const search = c.req.query('search') || ''
+    const id = c.req.query('id') || ''
+    const limit = Math.min(Number.parseInt(c.req.query('limit') || '20', 10) || 20, 100)
+
+    if (!collectionParam) {
+      return c.json({ error: 'Collection is required' }, 400)
+    }
+
+    const collectionStmt = db.prepare(`
+      SELECT id, name, display_name
+      FROM collections
+      WHERE id = ? OR name = ?
+      LIMIT 1
+    `)
+    const collection = await collectionStmt.bind(collectionParam, collectionParam).first() as any
+
+    if (!collection) {
+      return c.json({ error: 'Collection not found' }, 404)
+    }
+
+    if (id) {
+      const itemStmt = db.prepare(`
+        SELECT id, title, slug
+        FROM content
+        WHERE id = ? AND collection_id = ? AND deleted_at IS NULL
+        LIMIT 1
+      `)
+      const item = await itemStmt.bind(id, collection.id).first() as any
+
+      if (!item) {
+        return c.json({ error: 'Reference not found' }, 404)
+      }
+
+      return c.json({
+        collection: {
+          id: collection.id,
+          name: collection.name,
+          display_name: collection.display_name
+        },
+        data: {
+          id: item.id,
+          title: item.title,
+          slug: item.slug
+        }
+      })
+    }
+
+    let stmt
+    let results
+
+    if (search) {
+      const searchParam = `%${search}%`
+      stmt = db.prepare(`
+        SELECT id, title, slug, status, updated_at
+        FROM content
+        WHERE collection_id = ? AND deleted_at IS NULL
+        AND (title LIKE ? OR slug LIKE ?)
+        ORDER BY updated_at DESC
+        LIMIT ?
+      `)
+      const queryResults = await stmt.bind(collection.id, searchParam, searchParam, limit).all()
+      results = queryResults.results
+    } else {
+      stmt = db.prepare(`
+        SELECT id, title, slug, status, updated_at
+        FROM content
+        WHERE collection_id = ? AND deleted_at IS NULL
+        ORDER BY updated_at DESC
+        LIMIT ?
+      `)
+      const queryResults = await stmt.bind(collection.id, limit).all()
+      results = queryResults.results
+    }
+
+    const items = (results || []).map((row: any) => ({
+      id: row.id,
+      title: row.title,
+      slug: row.slug,
+      status: row.status,
+      updated_at: row.updated_at ? Number(row.updated_at) : null
+    }))
+
+    return c.json({
+      collection: {
+        id: collection.id,
+        name: collection.name,
+        display_name: collection.display_name
+      },
+      data: items,
+      count: items.length
+    })
+  } catch (error) {
+    console.error('Error fetching reference options:', error)
+    return c.json({ error: 'Failed to fetch references' }, 500)
+  }
+})
+
+/**
  * Create collection
  * POST /admin/api/collections
  */

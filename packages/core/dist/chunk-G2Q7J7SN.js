@@ -1,7 +1,7 @@
-import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-4PTABHLC.js';
-import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-GKMBLNUT.js';
+import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-3YNNVSMC.js';
+import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-XIBAPIVD.js';
 import { PluginService } from './chunk-SGAG6FD3.js';
-import { MigrationService } from './chunk-LEFYPY2D.js';
+import { MigrationService } from './chunk-MPLWZPBW.js';
 import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-V5LBQN3I.js';
 import { PluginBuilder } from './chunk-QDBNW7KQ.js';
 import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml, getBlocksFieldConfig, parseBlocksValue } from './chunk-BHNDALCA.js';
@@ -1583,6 +1583,96 @@ adminApiRoutes.get("/collections/:id", async (c) => {
     return c.json({ error: "Failed to fetch collection" }, 500);
   }
 });
+adminApiRoutes.get("/references", async (c) => {
+  try {
+    const db = c.env.DB;
+    const collectionParam = c.req.query("collection") || "";
+    const search = c.req.query("search") || "";
+    const id = c.req.query("id") || "";
+    const limit = Math.min(Number.parseInt(c.req.query("limit") || "20", 10) || 20, 100);
+    if (!collectionParam) {
+      return c.json({ error: "Collection is required" }, 400);
+    }
+    const collectionStmt = db.prepare(`
+      SELECT id, name, display_name
+      FROM collections
+      WHERE id = ? OR name = ?
+      LIMIT 1
+    `);
+    const collection = await collectionStmt.bind(collectionParam, collectionParam).first();
+    if (!collection) {
+      return c.json({ error: "Collection not found" }, 404);
+    }
+    if (id) {
+      const itemStmt = db.prepare(`
+        SELECT id, title, slug
+        FROM content
+        WHERE id = ? AND collection_id = ? AND deleted_at IS NULL
+        LIMIT 1
+      `);
+      const item = await itemStmt.bind(id, collection.id).first();
+      if (!item) {
+        return c.json({ error: "Reference not found" }, 404);
+      }
+      return c.json({
+        collection: {
+          id: collection.id,
+          name: collection.name,
+          display_name: collection.display_name
+        },
+        data: {
+          id: item.id,
+          title: item.title,
+          slug: item.slug
+        }
+      });
+    }
+    let stmt;
+    let results;
+    if (search) {
+      const searchParam = `%${search}%`;
+      stmt = db.prepare(`
+        SELECT id, title, slug, status, updated_at
+        FROM content
+        WHERE collection_id = ? AND deleted_at IS NULL
+        AND (title LIKE ? OR slug LIKE ?)
+        ORDER BY updated_at DESC
+        LIMIT ?
+      `);
+      const queryResults = await stmt.bind(collection.id, searchParam, searchParam, limit).all();
+      results = queryResults.results;
+    } else {
+      stmt = db.prepare(`
+        SELECT id, title, slug, status, updated_at
+        FROM content
+        WHERE collection_id = ? AND deleted_at IS NULL
+        ORDER BY updated_at DESC
+        LIMIT ?
+      `);
+      const queryResults = await stmt.bind(collection.id, limit).all();
+      results = queryResults.results;
+    }
+    const items = (results || []).map((row) => ({
+      id: row.id,
+      title: row.title,
+      slug: row.slug,
+      status: row.status,
+      updated_at: row.updated_at ? Number(row.updated_at) : null
+    }));
+    return c.json({
+      collection: {
+        id: collection.id,
+        name: collection.name,
+        display_name: collection.display_name
+      },
+      data: items,
+      count: items.length
+    });
+  } catch (error) {
+    console.error("Error fetching reference options:", error);
+    return c.json({ error: "Failed to fetch references" }, 500);
+  }
+});
 adminApiRoutes.post("/collections", async (c) => {
   try {
     const contentType = c.req.header("Content-Type");
@@ -1752,7 +1842,7 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
 });
 adminApiRoutes.get("/migrations/status", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-CZW7MJET.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-L6JPY4AO.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const status = await migrationService.getMigrationStatus();
@@ -1777,7 +1867,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const { MigrationService: MigrationService2 } = await import('./migrations-CZW7MJET.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-L6JPY4AO.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const result = await migrationService.runPendingMigrations();
@@ -1796,7 +1886,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
 });
 adminApiRoutes.get("/migrations/validate", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-CZW7MJET.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-L6JPY4AO.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const validation = await migrationService.validateSchema();
@@ -3869,6 +3959,37 @@ function renderDynamicField(field, options = {}) {
         ` : ""}
       `;
       break;
+    case "reference":
+      const referenceCollection = typeof opts.collection === "string" ? opts.collection : "";
+      const hasReferenceValue = Boolean(value);
+      fieldHTML = `
+        <div class="reference-field-container space-y-3" data-reference-field data-field-name="${escapeHtml2(fieldName)}" data-reference-collection="${escapeHtml2(referenceCollection)}">
+          <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml2(value)}">
+          <div class="rounded-lg border border-zinc-200 bg-white/60 px-3 py-2 text-sm text-zinc-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300" data-reference-display>
+            ${referenceCollection ? hasReferenceValue ? "Loading selection..." : "No reference selected." : "Reference collection not configured."}
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onclick="openReferenceSelector('${fieldId}')"
+              class="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-white/10 dark:hover:bg-white/20"
+              ${referenceCollection ? "" : "disabled"}
+            >
+              Select reference
+            </button>
+            <button
+              type="button"
+              onclick="clearReferenceField('${fieldId}')"
+              class="inline-flex items-center justify-center rounded-lg border border-zinc-200 px-3 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/10"
+              data-reference-clear
+              ${hasReferenceValue ? "" : "disabled"}
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+      `;
+      break;
     case "media":
       fieldHTML = `
         <div class="media-field-container">
@@ -4919,6 +5040,227 @@ function renderContentFormPage(data) {
         document.getElementById(fieldId).value = '';
         document.getElementById(fieldId + '-preview').classList.add('hidden');
       }
+
+      // Reference field functions
+      let currentReferenceFieldId = null;
+      let referenceSearchTimeout = null;
+
+      function getReferenceContainer(fieldId) {
+        const input = document.getElementById(fieldId);
+        return input ? input.closest('[data-reference-field]') : null;
+      }
+
+      async function fetchReferenceItems(collection, search = '', limit = 20) {
+        const params = new URLSearchParams({ collection, limit: String(limit) });
+        if (search) {
+          params.set('search', search);
+        }
+        const response = await fetch('/admin/api/references?' + params.toString());
+        if (!response.ok) {
+          throw new Error('Failed to load references');
+        }
+        const data = await response.json();
+        return data?.data || [];
+      }
+
+      async function fetchReferenceById(collection, id) {
+        if (!id) return null;
+        const params = new URLSearchParams({ collection, id });
+        const response = await fetch('/admin/api/references?' + params.toString());
+        if (!response.ok) {
+          return null;
+        }
+        const data = await response.json();
+        return data?.data || null;
+      }
+
+      function renderReferenceDisplay(container, item, fallbackMessage = 'No reference selected.') {
+        const display = container.querySelector('[data-reference-display]');
+        const removeButton = container.querySelector('[data-reference-clear]');
+        if (!display) return;
+
+        display.innerHTML = '';
+
+        if (!item) {
+          display.textContent = fallbackMessage;
+          if (removeButton) {
+            removeButton.disabled = true;
+          }
+          return;
+        }
+
+        const title = item.title || item.slug || item.id || 'Untitled';
+        const titleEl = document.createElement('div');
+        titleEl.className = 'font-medium text-zinc-900 dark:text-white';
+        titleEl.textContent = title;
+
+        display.appendChild(titleEl);
+
+        if (item.slug) {
+          const slugEl = document.createElement('div');
+          slugEl.className = 'text-xs text-zinc-500 dark:text-zinc-400';
+          slugEl.textContent = item.slug;
+          display.appendChild(slugEl);
+        }
+
+        if (removeButton) {
+          removeButton.disabled = false;
+        }
+      }
+
+      function updateReferenceField(fieldId, item) {
+        const input = document.getElementById(fieldId);
+        const container = getReferenceContainer(fieldId);
+        if (!input || !container) return;
+
+        input.value = item?.id || '';
+        renderReferenceDisplay(container, item, 'No reference selected.');
+      }
+
+      function clearReferenceField(fieldId) {
+        updateReferenceField(fieldId, null);
+      }
+
+      function closeReferenceSelector() {
+        const modal = document.getElementById('reference-selector-modal');
+        if (modal) {
+          modal.remove();
+        }
+        currentReferenceFieldId = null;
+      }
+
+      function openReferenceSelector(fieldId) {
+        const container = getReferenceContainer(fieldId);
+        const collection = container?.dataset.referenceCollection;
+        if (!container || !collection) {
+          console.error('Reference collection is missing for field', fieldId);
+          return;
+        }
+
+        currentReferenceFieldId = fieldId;
+
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50';
+        modal.id = 'reference-selector-modal';
+        modal.innerHTML = \`
+          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="text-lg font-semibold text-zinc-950 dark:text-white">Select Reference</h3>
+              <button
+                type="button"
+                onclick="closeReferenceSelector()"
+                class="rounded-md text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                aria-label="Close"
+              >
+                \u2715
+              </button>
+            </div>
+            <div class="mt-4">
+              <input
+                type="search"
+                id="reference-search-input"
+                placeholder="Search by title or slug..."
+                class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 dark:border-white/10 dark:bg-zinc-900 dark:text-white"
+              >
+            </div>
+            <div id="reference-results" class="mt-4 space-y-2"></div>
+            <div class="mt-4 flex justify-end">
+              <button
+                type="button"
+                onclick="closeReferenceSelector()"
+                class="rounded-lg bg-zinc-950 dark:bg-white px-4 py-2 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        \`;
+
+        document.body.appendChild(modal);
+
+        const resultsContainer = modal.querySelector('#reference-results');
+        const searchInput = modal.querySelector('#reference-search-input');
+
+        const renderResults = (items) => {
+          resultsContainer.innerHTML = '';
+          if (!items || items.length === 0) {
+            resultsContainer.innerHTML = '<div class="rounded-lg border border-dashed border-zinc-200 p-4 text-sm text-zinc-500 dark:border-white/10 dark:text-zinc-400">No items found.</div>';
+            return;
+          }
+
+          const selectedId = document.getElementById(fieldId)?.value;
+
+          items.forEach((item) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'w-full text-left rounded-lg border border-zinc-200 px-4 py-3 text-sm text-zinc-700 hover:bg-zinc-50 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/5';
+            if (item.id === selectedId) {
+              button.classList.add('ring-2', 'ring-cyan-500', 'dark:ring-cyan-400');
+            }
+
+            const title = item.title || item.slug || item.id || 'Untitled';
+            const titleEl = document.createElement('div');
+            titleEl.className = 'font-medium text-zinc-900 dark:text-white';
+            titleEl.textContent = title;
+
+            button.appendChild(titleEl);
+
+            if (item.slug) {
+              const slugEl = document.createElement('div');
+              slugEl.className = 'text-xs text-zinc-500 dark:text-zinc-400';
+              slugEl.textContent = item.slug;
+              button.appendChild(slugEl);
+            }
+
+            button.addEventListener('click', () => {
+              updateReferenceField(fieldId, item);
+              closeReferenceSelector();
+            });
+
+            resultsContainer.appendChild(button);
+          });
+        };
+
+        const loadResults = async (searchValue = '') => {
+          try {
+            const items = await fetchReferenceItems(collection, searchValue);
+            renderResults(items);
+          } catch (error) {
+            resultsContainer.innerHTML = '<div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Failed to load references.</div>';
+          }
+        };
+
+        loadResults();
+
+        searchInput.addEventListener('input', () => {
+          if (referenceSearchTimeout) {
+            clearTimeout(referenceSearchTimeout);
+          }
+          referenceSearchTimeout = setTimeout(() => {
+            loadResults(searchInput.value.trim());
+          }, 250);
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-reference-field]').forEach(async (container) => {
+          const input = container.querySelector('input[type="hidden"]');
+          const collection = container.dataset.referenceCollection;
+          if (!input || !collection) return;
+
+          if (!input.value) {
+            renderReferenceDisplay(container, null, 'No reference selected.');
+            return;
+          }
+
+          const item = await fetchReferenceById(collection, input.value);
+          if (item) {
+            renderReferenceDisplay(container, item);
+          } else {
+            renderReferenceDisplay(container, null, 'Reference not found.');
+          }
+        });
+      });
 
       // Global function called by media selector buttons
       window.selectMediaFile = function(mediaId, mediaUrl, filename) {
@@ -21921,5 +22263,5 @@ var ROUTES_INFO = {
 };
 
 export { ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, checkAdminUserExists, router, test_cleanup_default, userRoutes };
-//# sourceMappingURL=chunk-YVHEVHOB.js.map
-//# sourceMappingURL=chunk-YVHEVHOB.js.map
+//# sourceMappingURL=chunk-G2Q7J7SN.js.map
+//# sourceMappingURL=chunk-G2Q7J7SN.js.map

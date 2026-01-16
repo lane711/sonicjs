@@ -1,9 +1,9 @@
 'use strict';
 
-var chunkQCMSQFCP_cjs = require('./chunk-QCMSQFCP.cjs');
-var chunkDV23QT2D_cjs = require('./chunk-DV23QT2D.cjs');
+var chunk7FOAMNTI_cjs = require('./chunk-7FOAMNTI.cjs');
+var chunkWJR272SE_cjs = require('./chunk-WJR272SE.cjs');
 var chunkILZ3DP4I_cjs = require('./chunk-ILZ3DP4I.cjs');
-var chunkNFDCOQTI_cjs = require('./chunk-NFDCOQTI.cjs');
+var chunkKSDFZLNL_cjs = require('./chunk-KSDFZLNL.cjs');
 var chunkAZLU3ROK_cjs = require('./chunk-AZLU3ROK.cjs');
 var chunkAI2JJIJX_cjs = require('./chunk-AI2JJIJX.cjs');
 var chunkZWV3EBZ7_cjs = require('./chunk-ZWV3EBZ7.cjs');
@@ -76,7 +76,7 @@ apiContentCrudRoutes.get("/:id", async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.post("/", chunkDV23QT2D_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.post("/", chunkWJR272SE_cjs.requireAuth(), async (c) => {
   try {
     const db = c.env.DB;
     const user = c.get("user");
@@ -117,7 +117,7 @@ apiContentCrudRoutes.post("/", chunkDV23QT2D_cjs.requireAuth(), async (c) => {
       now,
       now
     ).run();
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
     await cache.invalidate(`content:list:${collectionId}:*`);
     await cache.invalidate("content-filtered:*");
     const getStmt = db.prepare("SELECT * FROM content WHERE id = ?");
@@ -142,7 +142,7 @@ apiContentCrudRoutes.post("/", chunkDV23QT2D_cjs.requireAuth(), async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.put("/:id", chunkDV23QT2D_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.put("/:id", chunkWJR272SE_cjs.requireAuth(), async (c) => {
   try {
     const id = c.req.param("id");
     const db = c.env.DB;
@@ -180,7 +180,7 @@ apiContentCrudRoutes.put("/:id", chunkDV23QT2D_cjs.requireAuth(), async (c) => {
       WHERE id = ?
     `);
     await updateStmt.bind(...params).run();
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existing.collection_id}:*`);
     await cache.invalidate("content-filtered:*");
@@ -206,7 +206,7 @@ apiContentCrudRoutes.put("/:id", chunkDV23QT2D_cjs.requireAuth(), async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.delete("/:id", chunkDV23QT2D_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.delete("/:id", chunkWJR272SE_cjs.requireAuth(), async (c) => {
   try {
     const id = c.req.param("id");
     const db = c.env.DB;
@@ -217,7 +217,7 @@ apiContentCrudRoutes.delete("/:id", chunkDV23QT2D_cjs.requireAuth(), async (c) =
     }
     const deleteStmt = db.prepare("DELETE FROM content WHERE id = ?");
     await deleteStmt.bind(id).run();
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existing.collection_id}:*`);
     await cache.invalidate("content-filtered:*");
@@ -242,7 +242,7 @@ apiRoutes.use("*", async (c, next) => {
   c.header("X-Response-Time", `${totalTime}ms`);
 });
 apiRoutes.use("*", async (c, next) => {
-  const cacheEnabled = await chunkDV23QT2D_cjs.isPluginActive(c.env.DB, "core-cache");
+  const cacheEnabled = await chunkWJR272SE_cjs.isPluginActive(c.env.DB, "core-cache");
   c.set("cacheEnabled", cacheEnabled);
   await next();
 });
@@ -290,7 +290,7 @@ apiRoutes.get("/collections", async (c) => {
   try {
     const db = c.env.DB;
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("collections", "all");
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -381,7 +381,7 @@ apiRoutes.get("/content", async (c) => {
       }, 400);
     }
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("content-filtered", JSON.stringify({ filter, query: queryResult.sql }));
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -484,7 +484,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
       }, 400);
     }
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("collection-content-filtered", `${collection}:${JSON.stringify({ filter, query: queryResult.sql })}`);
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -600,7 +600,7 @@ var fileValidationSchema = zod.z.object({
   // 50MB max
 });
 var apiMediaRoutes = new hono.Hono();
-apiMediaRoutes.use("*", chunkDV23QT2D_cjs.requireAuth());
+apiMediaRoutes.use("*", chunkWJR272SE_cjs.requireAuth());
 apiMediaRoutes.post("/upload", async (c) => {
   try {
     const user = c.get("user");
@@ -1344,8 +1344,8 @@ apiSystemRoutes.get("/env", (c) => {
 });
 var api_system_default = apiSystemRoutes;
 var adminApiRoutes = new hono.Hono();
-adminApiRoutes.use("*", chunkDV23QT2D_cjs.requireAuth());
-adminApiRoutes.use("*", chunkDV23QT2D_cjs.requireRole(["admin", "editor"]));
+adminApiRoutes.use("*", chunkWJR272SE_cjs.requireAuth());
+adminApiRoutes.use("*", chunkWJR272SE_cjs.requireRole(["admin", "editor"]));
 adminApiRoutes.get("/stats", async (c) => {
   try {
     const db = c.env.DB;
@@ -1585,6 +1585,96 @@ adminApiRoutes.get("/collections/:id", async (c) => {
     return c.json({ error: "Failed to fetch collection" }, 500);
   }
 });
+adminApiRoutes.get("/references", async (c) => {
+  try {
+    const db = c.env.DB;
+    const collectionParam = c.req.query("collection") || "";
+    const search = c.req.query("search") || "";
+    const id = c.req.query("id") || "";
+    const limit = Math.min(Number.parseInt(c.req.query("limit") || "20", 10) || 20, 100);
+    if (!collectionParam) {
+      return c.json({ error: "Collection is required" }, 400);
+    }
+    const collectionStmt = db.prepare(`
+      SELECT id, name, display_name
+      FROM collections
+      WHERE id = ? OR name = ?
+      LIMIT 1
+    `);
+    const collection = await collectionStmt.bind(collectionParam, collectionParam).first();
+    if (!collection) {
+      return c.json({ error: "Collection not found" }, 404);
+    }
+    if (id) {
+      const itemStmt = db.prepare(`
+        SELECT id, title, slug
+        FROM content
+        WHERE id = ? AND collection_id = ? AND deleted_at IS NULL
+        LIMIT 1
+      `);
+      const item = await itemStmt.bind(id, collection.id).first();
+      if (!item) {
+        return c.json({ error: "Reference not found" }, 404);
+      }
+      return c.json({
+        collection: {
+          id: collection.id,
+          name: collection.name,
+          display_name: collection.display_name
+        },
+        data: {
+          id: item.id,
+          title: item.title,
+          slug: item.slug
+        }
+      });
+    }
+    let stmt;
+    let results;
+    if (search) {
+      const searchParam = `%${search}%`;
+      stmt = db.prepare(`
+        SELECT id, title, slug, status, updated_at
+        FROM content
+        WHERE collection_id = ? AND deleted_at IS NULL
+        AND (title LIKE ? OR slug LIKE ?)
+        ORDER BY updated_at DESC
+        LIMIT ?
+      `);
+      const queryResults = await stmt.bind(collection.id, searchParam, searchParam, limit).all();
+      results = queryResults.results;
+    } else {
+      stmt = db.prepare(`
+        SELECT id, title, slug, status, updated_at
+        FROM content
+        WHERE collection_id = ? AND deleted_at IS NULL
+        ORDER BY updated_at DESC
+        LIMIT ?
+      `);
+      const queryResults = await stmt.bind(collection.id, limit).all();
+      results = queryResults.results;
+    }
+    const items = (results || []).map((row) => ({
+      id: row.id,
+      title: row.title,
+      slug: row.slug,
+      status: row.status,
+      updated_at: row.updated_at ? Number(row.updated_at) : null
+    }));
+    return c.json({
+      collection: {
+        id: collection.id,
+        name: collection.name,
+        display_name: collection.display_name
+      },
+      data: items,
+      count: items.length
+    });
+  } catch (error) {
+    console.error("Error fetching reference options:", error);
+    return c.json({ error: "Failed to fetch references" }, 500);
+  }
+});
 adminApiRoutes.post("/collections", async (c) => {
   try {
     const contentType = c.req.header("Content-Type");
@@ -1754,7 +1844,7 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
 });
 adminApiRoutes.get("/migrations/status", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-2H4QWMAL.cjs');
+    const { MigrationService: MigrationService2 } = await import('./migrations-27FWARYE.cjs');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const status = await migrationService.getMigrationStatus();
@@ -1779,7 +1869,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const { MigrationService: MigrationService2 } = await import('./migrations-2H4QWMAL.cjs');
+    const { MigrationService: MigrationService2 } = await import('./migrations-27FWARYE.cjs');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const result = await migrationService.runPendingMigrations();
@@ -1798,7 +1888,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
 });
 adminApiRoutes.get("/migrations/validate", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-2H4QWMAL.cjs');
+    const { MigrationService: MigrationService2 } = await import('./migrations-27FWARYE.cjs');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const validation = await migrationService.validateSchema();
@@ -2321,7 +2411,7 @@ authRoutes.post(
       if (existingUser) {
         return c.json({ error: "User with this email or username already exists" }, 400);
       }
-      const passwordHash = await chunkDV23QT2D_cjs.AuthManager.hashPassword(password);
+      const passwordHash = await chunkWJR272SE_cjs.AuthManager.hashPassword(password);
       const userId = crypto.randomUUID();
       const now = /* @__PURE__ */ new Date();
       await db.prepare(`
@@ -2341,7 +2431,7 @@ authRoutes.post(
         now.getTime(),
         now.getTime()
       ).run();
-      const token = await chunkDV23QT2D_cjs.AuthManager.generateToken(userId, normalizedEmail, "viewer");
+      const token = await chunkWJR272SE_cjs.AuthManager.generateToken(userId, normalizedEmail, "viewer");
       cookie.setCookie(c, "auth_token", token, {
         httpOnly: true,
         secure: true,
@@ -2382,7 +2472,7 @@ authRoutes.post("/login", async (c) => {
     const { email, password } = validation.data;
     const db = c.env.DB;
     const normalizedEmail = email.toLowerCase();
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.user);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.user);
     let user = await cache.get(cache.generateKey("user", `email:${normalizedEmail}`));
     if (!user) {
       user = await db.prepare("SELECT * FROM users WHERE email = ? AND is_active = 1").bind(normalizedEmail).first();
@@ -2394,11 +2484,11 @@ authRoutes.post("/login", async (c) => {
     if (!user) {
       return c.json({ error: "Invalid email or password" }, 401);
     }
-    const isValidPassword = await chunkDV23QT2D_cjs.AuthManager.verifyPassword(password, user.password_hash);
+    const isValidPassword = await chunkWJR272SE_cjs.AuthManager.verifyPassword(password, user.password_hash);
     if (!isValidPassword) {
       return c.json({ error: "Invalid email or password" }, 401);
     }
-    const token = await chunkDV23QT2D_cjs.AuthManager.generateToken(user.id, user.email, user.role);
+    const token = await chunkWJR272SE_cjs.AuthManager.generateToken(user.id, user.email, user.role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: true,
@@ -2447,7 +2537,7 @@ authRoutes.get("/logout", (c) => {
   });
   return c.redirect("/auth/login?message=You have been logged out successfully");
 });
-authRoutes.get("/me", chunkDV23QT2D_cjs.requireAuth(), async (c) => {
+authRoutes.get("/me", chunkWJR272SE_cjs.requireAuth(), async (c) => {
   try {
     const user = c.get("user");
     if (!user) {
@@ -2464,13 +2554,13 @@ authRoutes.get("/me", chunkDV23QT2D_cjs.requireAuth(), async (c) => {
     return c.json({ error: "Failed to get user" }, 500);
   }
 });
-authRoutes.post("/refresh", chunkDV23QT2D_cjs.requireAuth(), async (c) => {
+authRoutes.post("/refresh", chunkWJR272SE_cjs.requireAuth(), async (c) => {
   try {
     const user = c.get("user");
     if (!user) {
       return c.json({ error: "Not authenticated" }, 401);
     }
-    const token = await chunkDV23QT2D_cjs.AuthManager.generateToken(user.userId, user.email, user.role);
+    const token = await chunkWJR272SE_cjs.AuthManager.generateToken(user.userId, user.email, user.role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: true,
@@ -2530,7 +2620,7 @@ authRoutes.post("/register/form", async (c) => {
         </div>
       `);
     }
-    const passwordHash = await chunkDV23QT2D_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await chunkWJR272SE_cjs.AuthManager.hashPassword(password);
     const role = isFirstUser ? "admin" : "viewer";
     const userId = crypto.randomUUID();
     const now = /* @__PURE__ */ new Date();
@@ -2553,7 +2643,7 @@ authRoutes.post("/register/form", async (c) => {
     if (isFirstUser) {
       setAdminExists();
     }
-    const token = await chunkDV23QT2D_cjs.AuthManager.generateToken(userId, normalizedEmail, role);
+    const token = await chunkWJR272SE_cjs.AuthManager.generateToken(userId, normalizedEmail, role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: false,
@@ -2605,7 +2695,7 @@ authRoutes.post("/login/form", async (c) => {
         </div>
       `);
     }
-    const isValidPassword = await chunkDV23QT2D_cjs.AuthManager.verifyPassword(password, user.password_hash);
+    const isValidPassword = await chunkWJR272SE_cjs.AuthManager.verifyPassword(password, user.password_hash);
     if (!isValidPassword) {
       return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -2613,7 +2703,7 @@ authRoutes.post("/login/form", async (c) => {
         </div>
       `);
     }
-    const token = await chunkDV23QT2D_cjs.AuthManager.generateToken(user.id, user.email, user.role);
+    const token = await chunkWJR272SE_cjs.AuthManager.generateToken(user.id, user.email, user.role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: false,
@@ -2672,7 +2762,7 @@ authRoutes.post("/seed-admin", async (c) => {
     `).run();
     const existingAdmin = await db.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind("admin@sonicjs.com", "admin").first();
     if (existingAdmin) {
-      const passwordHash2 = await chunkDV23QT2D_cjs.AuthManager.hashPassword("sonicjs!");
+      const passwordHash2 = await chunkWJR272SE_cjs.AuthManager.hashPassword("sonicjs!");
       await db.prepare("UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?").bind(passwordHash2, Date.now(), existingAdmin.id).run();
       setAdminExists();
       return c.json({
@@ -2685,7 +2775,7 @@ authRoutes.post("/seed-admin", async (c) => {
         }
       });
     }
-    const passwordHash = await chunkDV23QT2D_cjs.AuthManager.hashPassword("sonicjs!");
+    const passwordHash = await chunkWJR272SE_cjs.AuthManager.hashPassword("sonicjs!");
     const userId = "admin-user-id";
     const now = Date.now();
     const adminEmail = "admin@sonicjs.com".toLowerCase();
@@ -2906,7 +2996,7 @@ authRoutes.post("/accept-invitation", async (c) => {
     if (existingUsername) {
       return c.json({ error: "Username is already taken" }, 400);
     }
-    const passwordHash = await chunkDV23QT2D_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await chunkWJR272SE_cjs.AuthManager.hashPassword(password);
     const updateStmt = db.prepare(`
       UPDATE users SET 
         username = ?,
@@ -2925,7 +3015,7 @@ authRoutes.post("/accept-invitation", async (c) => {
       Date.now(),
       invitedUser.id
     ).run();
-    const authToken = await chunkDV23QT2D_cjs.AuthManager.generateToken(invitedUser.id, invitedUser.email, invitedUser.role);
+    const authToken = await chunkWJR272SE_cjs.AuthManager.generateToken(invitedUser.id, invitedUser.email, invitedUser.role);
     cookie.setCookie(c, "auth_token", authToken, {
       httpOnly: true,
       secure: true,
@@ -3155,7 +3245,7 @@ authRoutes.post("/reset-password", async (c) => {
     if (Date.now() > user.password_reset_expires) {
       return c.json({ error: "Reset token has expired" }, 400);
     }
-    const newPasswordHash = await chunkDV23QT2D_cjs.AuthManager.hashPassword(password);
+    const newPasswordHash = await chunkWJR272SE_cjs.AuthManager.hashPassword(password);
     try {
       const historyStmt = db.prepare(`
         INSERT INTO password_history (id, user_id, password_hash, created_at)
@@ -3869,6 +3959,37 @@ function renderDynamicField(field, options = {}) {
             >
           </div>
         ` : ""}
+      `;
+      break;
+    case "reference":
+      const referenceCollection = typeof opts.collection === "string" ? opts.collection : "";
+      const hasReferenceValue = Boolean(value);
+      fieldHTML = `
+        <div class="reference-field-container space-y-3" data-reference-field data-field-name="${escapeHtml2(fieldName)}" data-reference-collection="${escapeHtml2(referenceCollection)}">
+          <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml2(value)}">
+          <div class="rounded-lg border border-zinc-200 bg-white/60 px-3 py-2 text-sm text-zinc-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300" data-reference-display>
+            ${referenceCollection ? hasReferenceValue ? "Loading selection..." : "No reference selected." : "Reference collection not configured."}
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onclick="openReferenceSelector('${fieldId}')"
+              class="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-white/10 dark:hover:bg-white/20"
+              ${referenceCollection ? "" : "disabled"}
+            >
+              Select reference
+            </button>
+            <button
+              type="button"
+              onclick="clearReferenceField('${fieldId}')"
+              class="inline-flex items-center justify-center rounded-lg border border-zinc-200 px-3 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/10"
+              data-reference-clear
+              ${hasReferenceValue ? "" : "disabled"}
+            >
+              Remove
+            </button>
+          </div>
+        </div>
       `;
       break;
     case "media":
@@ -4921,6 +5042,227 @@ function renderContentFormPage(data) {
         document.getElementById(fieldId).value = '';
         document.getElementById(fieldId + '-preview').classList.add('hidden');
       }
+
+      // Reference field functions
+      let currentReferenceFieldId = null;
+      let referenceSearchTimeout = null;
+
+      function getReferenceContainer(fieldId) {
+        const input = document.getElementById(fieldId);
+        return input ? input.closest('[data-reference-field]') : null;
+      }
+
+      async function fetchReferenceItems(collection, search = '', limit = 20) {
+        const params = new URLSearchParams({ collection, limit: String(limit) });
+        if (search) {
+          params.set('search', search);
+        }
+        const response = await fetch('/admin/api/references?' + params.toString());
+        if (!response.ok) {
+          throw new Error('Failed to load references');
+        }
+        const data = await response.json();
+        return data?.data || [];
+      }
+
+      async function fetchReferenceById(collection, id) {
+        if (!id) return null;
+        const params = new URLSearchParams({ collection, id });
+        const response = await fetch('/admin/api/references?' + params.toString());
+        if (!response.ok) {
+          return null;
+        }
+        const data = await response.json();
+        return data?.data || null;
+      }
+
+      function renderReferenceDisplay(container, item, fallbackMessage = 'No reference selected.') {
+        const display = container.querySelector('[data-reference-display]');
+        const removeButton = container.querySelector('[data-reference-clear]');
+        if (!display) return;
+
+        display.innerHTML = '';
+
+        if (!item) {
+          display.textContent = fallbackMessage;
+          if (removeButton) {
+            removeButton.disabled = true;
+          }
+          return;
+        }
+
+        const title = item.title || item.slug || item.id || 'Untitled';
+        const titleEl = document.createElement('div');
+        titleEl.className = 'font-medium text-zinc-900 dark:text-white';
+        titleEl.textContent = title;
+
+        display.appendChild(titleEl);
+
+        if (item.slug) {
+          const slugEl = document.createElement('div');
+          slugEl.className = 'text-xs text-zinc-500 dark:text-zinc-400';
+          slugEl.textContent = item.slug;
+          display.appendChild(slugEl);
+        }
+
+        if (removeButton) {
+          removeButton.disabled = false;
+        }
+      }
+
+      function updateReferenceField(fieldId, item) {
+        const input = document.getElementById(fieldId);
+        const container = getReferenceContainer(fieldId);
+        if (!input || !container) return;
+
+        input.value = item?.id || '';
+        renderReferenceDisplay(container, item, 'No reference selected.');
+      }
+
+      function clearReferenceField(fieldId) {
+        updateReferenceField(fieldId, null);
+      }
+
+      function closeReferenceSelector() {
+        const modal = document.getElementById('reference-selector-modal');
+        if (modal) {
+          modal.remove();
+        }
+        currentReferenceFieldId = null;
+      }
+
+      function openReferenceSelector(fieldId) {
+        const container = getReferenceContainer(fieldId);
+        const collection = container?.dataset.referenceCollection;
+        if (!container || !collection) {
+          console.error('Reference collection is missing for field', fieldId);
+          return;
+        }
+
+        currentReferenceFieldId = fieldId;
+
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50';
+        modal.id = 'reference-selector-modal';
+        modal.innerHTML = \`
+          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="text-lg font-semibold text-zinc-950 dark:text-white">Select Reference</h3>
+              <button
+                type="button"
+                onclick="closeReferenceSelector()"
+                class="rounded-md text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                aria-label="Close"
+              >
+                \u2715
+              </button>
+            </div>
+            <div class="mt-4">
+              <input
+                type="search"
+                id="reference-search-input"
+                placeholder="Search by title or slug..."
+                class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 dark:border-white/10 dark:bg-zinc-900 dark:text-white"
+              >
+            </div>
+            <div id="reference-results" class="mt-4 space-y-2"></div>
+            <div class="mt-4 flex justify-end">
+              <button
+                type="button"
+                onclick="closeReferenceSelector()"
+                class="rounded-lg bg-zinc-950 dark:bg-white px-4 py-2 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        \`;
+
+        document.body.appendChild(modal);
+
+        const resultsContainer = modal.querySelector('#reference-results');
+        const searchInput = modal.querySelector('#reference-search-input');
+
+        const renderResults = (items) => {
+          resultsContainer.innerHTML = '';
+          if (!items || items.length === 0) {
+            resultsContainer.innerHTML = '<div class="rounded-lg border border-dashed border-zinc-200 p-4 text-sm text-zinc-500 dark:border-white/10 dark:text-zinc-400">No items found.</div>';
+            return;
+          }
+
+          const selectedId = document.getElementById(fieldId)?.value;
+
+          items.forEach((item) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'w-full text-left rounded-lg border border-zinc-200 px-4 py-3 text-sm text-zinc-700 hover:bg-zinc-50 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/5';
+            if (item.id === selectedId) {
+              button.classList.add('ring-2', 'ring-cyan-500', 'dark:ring-cyan-400');
+            }
+
+            const title = item.title || item.slug || item.id || 'Untitled';
+            const titleEl = document.createElement('div');
+            titleEl.className = 'font-medium text-zinc-900 dark:text-white';
+            titleEl.textContent = title;
+
+            button.appendChild(titleEl);
+
+            if (item.slug) {
+              const slugEl = document.createElement('div');
+              slugEl.className = 'text-xs text-zinc-500 dark:text-zinc-400';
+              slugEl.textContent = item.slug;
+              button.appendChild(slugEl);
+            }
+
+            button.addEventListener('click', () => {
+              updateReferenceField(fieldId, item);
+              closeReferenceSelector();
+            });
+
+            resultsContainer.appendChild(button);
+          });
+        };
+
+        const loadResults = async (searchValue = '') => {
+          try {
+            const items = await fetchReferenceItems(collection, searchValue);
+            renderResults(items);
+          } catch (error) {
+            resultsContainer.innerHTML = '<div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Failed to load references.</div>';
+          }
+        };
+
+        loadResults();
+
+        searchInput.addEventListener('input', () => {
+          if (referenceSearchTimeout) {
+            clearTimeout(referenceSearchTimeout);
+          }
+          referenceSearchTimeout = setTimeout(() => {
+            loadResults(searchInput.value.trim());
+          }, 250);
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-reference-field]').forEach(async (container) => {
+          const input = container.querySelector('input[type="hidden"]');
+          const collection = container.dataset.referenceCollection;
+          if (!input || !collection) return;
+
+          if (!input.value) {
+            renderReferenceDisplay(container, null, 'No reference selected.');
+            return;
+          }
+
+          const item = await fetchReferenceById(collection, input.value);
+          if (item) {
+            renderReferenceDisplay(container, item);
+          } else {
+            renderReferenceDisplay(container, null, 'Reference not found.');
+          }
+        });
+      });
 
       // Global function called by media selector buttons
       window.selectMediaFile = function(mediaId, mediaUrl, filename) {
@@ -6083,9 +6425,9 @@ function extractFieldData(fields, formData, options = {}) {
   }
   return { data, errors };
 }
-adminContentRoutes.use("*", chunkDV23QT2D_cjs.requireAuth());
+adminContentRoutes.use("*", chunkWJR272SE_cjs.requireAuth());
 async function getCollectionFields(db, collectionId) {
-  const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.collection);
+  const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.collection);
   return cache.getOrSet(
     cache.generateKey("fields", collectionId),
     async () => {
@@ -6140,7 +6482,7 @@ async function getCollectionFields(db, collectionId) {
   );
 }
 async function getCollection(db, collectionId) {
-  const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.collection);
+  const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.collection);
   return cache.getOrSet(
     cache.generateKey("collection", collectionId),
     async () => {
@@ -6429,7 +6771,7 @@ adminContentRoutes.get("/:id/edit", async (c) => {
     const db = c.env.DB;
     const url = new URL(c.req.url);
     const referrerParams = url.searchParams.get("ref") || "";
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.content);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.content);
     const content = await cache.getOrSet(
       cache.generateKey("content", id),
       async () => {
@@ -6602,7 +6944,7 @@ adminContentRoutes.post("/", async (c) => {
       now,
       now
     ).run();
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.content);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.content);
     await cache.invalidate(`content:list:${collectionId}:*`);
     const versionStmt = db.prepare(`
       INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
@@ -6721,7 +7063,7 @@ adminContentRoutes.put("/:id", async (c) => {
       now,
       id
     ).run();
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.content);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.content);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existingContent.collection_id}:*`);
     const existingData = JSON.parse(existingContent.data || "{}");
@@ -6994,7 +7336,7 @@ adminContentRoutes.post("/bulk-action", async (c) => {
     } else {
       return c.json({ success: false, error: "Invalid action" });
     }
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.content);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.content);
     for (const contentId of ids) {
       await cache.delete(cache.generateKey("content", contentId));
     }
@@ -7022,7 +7364,7 @@ adminContentRoutes.delete("/:id", async (c) => {
       WHERE id = ?
     `);
     await deleteStmt.bind(now, id).run();
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.content);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.content);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate("content:list:*");
     return c.html(`
@@ -9040,7 +9382,7 @@ function renderUsersListPage(data) {
 
 // src/routes/admin-users.ts
 var userRoutes = new hono.Hono();
-userRoutes.use("*", chunkDV23QT2D_cjs.requireAuth());
+userRoutes.use("*", chunkWJR272SE_cjs.requireAuth());
 userRoutes.get("/", (c) => {
   return c.redirect("/admin/dashboard");
 });
@@ -9195,7 +9537,7 @@ userRoutes.put("/profile", async (c) => {
       Date.now(),
       user.userId
     ).run();
-    await chunkDV23QT2D_cjs.logActivity(
+    await chunkWJR272SE_cjs.logActivity(
       db,
       user.userId,
       "profile.update",
@@ -9258,7 +9600,7 @@ userRoutes.post("/profile/avatar", async (c) => {
       SELECT first_name, last_name FROM users WHERE id = ?
     `);
     const userData = await userStmt.bind(user.userId).first();
-    await chunkDV23QT2D_cjs.logActivity(
+    await chunkWJR272SE_cjs.logActivity(
       db,
       user.userId,
       "profile.avatar_update",
@@ -9329,7 +9671,7 @@ userRoutes.post("/profile/password", async (c) => {
         dismissible: true
       }));
     }
-    const validPassword = await chunkDV23QT2D_cjs.AuthManager.verifyPassword(currentPassword, userData.password_hash);
+    const validPassword = await chunkWJR272SE_cjs.AuthManager.verifyPassword(currentPassword, userData.password_hash);
     if (!validPassword) {
       return c.html(renderAlert2({
         type: "error",
@@ -9337,7 +9679,7 @@ userRoutes.post("/profile/password", async (c) => {
         dismissible: true
       }));
     }
-    const newPasswordHash = await chunkDV23QT2D_cjs.AuthManager.hashPassword(newPassword);
+    const newPasswordHash = await chunkWJR272SE_cjs.AuthManager.hashPassword(newPassword);
     const historyStmt = db.prepare(`
       INSERT INTO password_history (id, user_id, password_hash, created_at)
       VALUES (?, ?, ?, ?)
@@ -9353,7 +9695,7 @@ userRoutes.post("/profile/password", async (c) => {
       WHERE id = ?
     `);
     await updateStmt.bind(newPasswordHash, Date.now(), user.userId).run();
-    await chunkDV23QT2D_cjs.logActivity(
+    await chunkWJR272SE_cjs.logActivity(
       db,
       user.userId,
       "profile.password_change",
@@ -9420,7 +9762,7 @@ userRoutes.get("/users", async (c) => {
     `);
     const countResult = await countStmt.bind(...params).first();
     const totalUsers = countResult?.total || 0;
-    await chunkDV23QT2D_cjs.logActivity(
+    await chunkWJR272SE_cjs.logActivity(
       db,
       user.userId,
       "users.list_view",
@@ -9574,7 +9916,7 @@ userRoutes.post("/users/new", async (c) => {
         dismissible: true
       }));
     }
-    const passwordHash = await chunkDV23QT2D_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await chunkWJR272SE_cjs.AuthManager.hashPassword(password);
     const userId = crypto.randomUUID();
     const createStmt = db.prepare(`
       INSERT INTO users (
@@ -9597,7 +9939,7 @@ userRoutes.post("/users/new", async (c) => {
       Date.now(),
       Date.now()
     ).run();
-    await chunkDV23QT2D_cjs.logActivity(
+    await chunkWJR272SE_cjs.logActivity(
       db,
       user.userId,
       "user!.create",
@@ -9635,7 +9977,7 @@ userRoutes.get("/users/:id", async (c) => {
     if (!userRecord) {
       return c.json({ error: "User not found" }, 404);
     }
-    await chunkDV23QT2D_cjs.logActivity(
+    await chunkWJR272SE_cjs.logActivity(
       db,
       user.userId,
       "user!.view",
@@ -9784,7 +10126,7 @@ userRoutes.put("/users/:id", async (c) => {
       Date.now(),
       userId
     ).run();
-    await chunkDV23QT2D_cjs.logActivity(
+    await chunkWJR272SE_cjs.logActivity(
       db,
       user.userId,
       "user!.update",
@@ -9829,7 +10171,7 @@ userRoutes.post("/users/:id/toggle", async (c) => {
       UPDATE users SET is_active = ?, updated_at = ? WHERE id = ?
     `);
     await toggleStmt.bind(active ? 1 : 0, Date.now(), userId).run();
-    await chunkDV23QT2D_cjs.logActivity(
+    await chunkWJR272SE_cjs.logActivity(
       db,
       user.userId,
       active ? "user.activate" : "user.deactivate",
@@ -9870,7 +10212,7 @@ userRoutes.delete("/users/:id", async (c) => {
         DELETE FROM users WHERE id = ?
       `);
       await deleteStmt.bind(userId).run();
-      await chunkDV23QT2D_cjs.logActivity(
+      await chunkWJR272SE_cjs.logActivity(
         db,
         user.userId,
         "user!.hard_delete",
@@ -9889,7 +10231,7 @@ userRoutes.delete("/users/:id", async (c) => {
         UPDATE users SET is_active = 0, updated_at = ? WHERE id = ?
       `);
       await deleteStmt.bind(Date.now(), userId).run();
-      await chunkDV23QT2D_cjs.logActivity(
+      await chunkWJR272SE_cjs.logActivity(
         db,
         user.userId,
         "user!.soft_delete",
@@ -9955,7 +10297,7 @@ userRoutes.post("/invite-user", async (c) => {
       Date.now(),
       Date.now()
     ).run();
-    await chunkDV23QT2D_cjs.logActivity(
+    await chunkWJR272SE_cjs.logActivity(
       db,
       user.userId,
       "user!.invite_sent",
@@ -10012,7 +10354,7 @@ userRoutes.post("/resend-invitation/:id", async (c) => {
       Date.now(),
       userId
     ).run();
-    await chunkDV23QT2D_cjs.logActivity(
+    await chunkWJR272SE_cjs.logActivity(
       db,
       user.userId,
       "user!.invitation_resent",
@@ -10048,7 +10390,7 @@ userRoutes.delete("/cancel-invitation/:id", async (c) => {
     }
     const deleteStmt = db.prepare(`DELETE FROM users WHERE id = ?`);
     await deleteStmt.bind(userId).run();
-    await chunkDV23QT2D_cjs.logActivity(
+    await chunkWJR272SE_cjs.logActivity(
       db,
       user.userId,
       "user!.invitation_cancelled",
@@ -10131,7 +10473,7 @@ userRoutes.get("/activity-logs", async (c) => {
       ...log,
       details: log.details ? JSON.parse(log.details) : null
     }));
-    await chunkDV23QT2D_cjs.logActivity(
+    await chunkWJR272SE_cjs.logActivity(
       db,
       user.userId,
       "activity.logs_viewed",
@@ -10238,7 +10580,7 @@ userRoutes.get("/activity-logs/export", async (c) => {
       csvRows.push(row.join(","));
     }
     const csvContent = csvRows.join("\n");
-    await chunkDV23QT2D_cjs.logActivity(
+    await chunkWJR272SE_cjs.logActivity(
       db,
       user.userId,
       "activity.logs_exported",
@@ -11577,7 +11919,7 @@ var fileValidationSchema2 = zod.z.object({
   // 50MB max
 });
 var adminMediaRoutes = new hono.Hono();
-adminMediaRoutes.use("*", chunkDV23QT2D_cjs.requireAuth());
+adminMediaRoutes.use("*", chunkWJR272SE_cjs.requireAuth());
 adminMediaRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -12163,7 +12505,7 @@ adminMediaRoutes.put("/:id", async (c) => {
     `);
   }
 });
-adminMediaRoutes.delete("/cleanup", chunkDV23QT2D_cjs.requireRole("admin"), async (c) => {
+adminMediaRoutes.delete("/cleanup", chunkWJR272SE_cjs.requireRole("admin"), async (c) => {
   try {
     const db = c.env.DB;
     const allMediaStmt = db.prepare("SELECT id, r2_key, filename FROM media WHERE deleted_at IS NULL");
@@ -13889,7 +14231,7 @@ function formatTimestamp(timestamp) {
 
 // src/routes/admin-plugins.ts
 var adminPluginRoutes = new hono.Hono();
-adminPluginRoutes.use("*", chunkDV23QT2D_cjs.requireAuth());
+adminPluginRoutes.use("*", chunkWJR272SE_cjs.requireAuth());
 var AVAILABLE_PLUGINS = [
   {
     id: "third-party-faq",
@@ -15220,11 +15562,11 @@ function renderLogConfigPage(data) {
 
 // src/routes/admin-logs.ts
 var adminLogsRoutes = new hono.Hono();
-adminLogsRoutes.use("*", chunkDV23QT2D_cjs.requireAuth());
+adminLogsRoutes.use("*", chunkWJR272SE_cjs.requireAuth());
 adminLogsRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
-    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
+    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
     const query = c.req.query();
     const page = parseInt(query.page || "1");
     const limit = parseInt(query.limit || "50");
@@ -15304,7 +15646,7 @@ adminLogsRoutes.get("/:id", async (c) => {
   try {
     const id = c.req.param("id");
     const user = c.get("user");
-    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
+    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
     const { logs } = await logger.getLogs({
       limit: 1,
       offset: 0,
@@ -15341,7 +15683,7 @@ adminLogsRoutes.get("/:id", async (c) => {
 adminLogsRoutes.get("/config", async (c) => {
   try {
     const user = c.get("user");
-    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
+    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
     const configs = await logger.getAllConfigs();
     const pageData = {
       configs,
@@ -15365,7 +15707,7 @@ adminLogsRoutes.post("/config/:category", async (c) => {
     const level = formData.get("level");
     const retention = parseInt(formData.get("retention"));
     const maxSize = parseInt(formData.get("max_size"));
-    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
+    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
     await logger.updateConfig(category, {
       enabled,
       level,
@@ -15394,7 +15736,7 @@ adminLogsRoutes.get("/export", async (c) => {
     const category = query.category;
     const startDate = query.start_date;
     const endDate = query.end_date;
-    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
+    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
     const filter = {
       limit: 1e4,
       // Export up to 10k logs
@@ -15475,7 +15817,7 @@ adminLogsRoutes.post("/cleanup", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
+    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
     await logger.cleanupByRetention();
     return c.html(html.html`
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
@@ -15497,7 +15839,7 @@ adminLogsRoutes.post("/search", async (c) => {
     const search = formData.get("search");
     const level = formData.get("level");
     const category = formData.get("category");
-    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
+    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
     const filter = {
       limit: 20,
       offset: 0,
@@ -17550,7 +17892,7 @@ function renderStorageUsage(databaseSizeBytes, mediaSizeBytes) {
 // src/routes/admin-dashboard.ts
 var VERSION = chunkZWV3EBZ7_cjs.getCoreVersion();
 var router = new hono.Hono();
-router.use("*", chunkDV23QT2D_cjs.requireAuth());
+router.use("*", chunkWJR272SE_cjs.requireAuth());
 router.get("/", async (c) => {
   const user = c.get("user");
   try {
@@ -19308,7 +19650,7 @@ function renderCollectionFormPage(data) {
 
 // src/routes/admin-collections.ts
 var adminCollectionsRoutes = new hono.Hono();
-adminCollectionsRoutes.use("*", chunkDV23QT2D_cjs.requireAuth());
+adminCollectionsRoutes.use("*", chunkWJR272SE_cjs.requireAuth());
 adminCollectionsRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -21488,7 +21830,7 @@ function renderDatabaseToolsSettings(settings) {
 
 // src/routes/admin-settings.ts
 var adminSettingsRoutes = new hono.Hono();
-adminSettingsRoutes.use("*", chunkDV23QT2D_cjs.requireAuth());
+adminSettingsRoutes.use("*", chunkWJR272SE_cjs.requireAuth());
 function getMockSettings(user) {
   return {
     general: {
@@ -21553,7 +21895,7 @@ adminSettingsRoutes.get("/", (c) => {
 adminSettingsRoutes.get("/general", async (c) => {
   const user = c.get("user");
   const db = c.env.DB;
-  const settingsService = new chunkQCMSQFCP_cjs.SettingsService(db);
+  const settingsService = new chunk7FOAMNTI_cjs.SettingsService(db);
   const generalSettings = await settingsService.getGeneralSettings(user?.email);
   const mockSettings = getMockSettings(user);
   mockSettings.general = generalSettings;
@@ -21656,7 +21998,7 @@ adminSettingsRoutes.get("/database-tools", (c) => {
 adminSettingsRoutes.get("/api/migrations/status", async (c) => {
   try {
     const db = c.env.DB;
-    const migrationService = new chunkNFDCOQTI_cjs.MigrationService(db);
+    const migrationService = new chunkKSDFZLNL_cjs.MigrationService(db);
     const status = await migrationService.getMigrationStatus();
     return c.json({
       success: true,
@@ -21680,7 +22022,7 @@ adminSettingsRoutes.post("/api/migrations/run", async (c) => {
       }, 403);
     }
     const db = c.env.DB;
-    const migrationService = new chunkNFDCOQTI_cjs.MigrationService(db);
+    const migrationService = new chunkKSDFZLNL_cjs.MigrationService(db);
     const result = await migrationService.runPendingMigrations();
     return c.json({
       success: result.success,
@@ -21698,7 +22040,7 @@ adminSettingsRoutes.post("/api/migrations/run", async (c) => {
 adminSettingsRoutes.get("/api/migrations/validate", async (c) => {
   try {
     const db = c.env.DB;
-    const migrationService = new chunkNFDCOQTI_cjs.MigrationService(db);
+    const migrationService = new chunkKSDFZLNL_cjs.MigrationService(db);
     const validation = await migrationService.validateSchema();
     return c.json({
       success: true,
@@ -21855,7 +22197,7 @@ adminSettingsRoutes.post("/general", async (c) => {
     }
     const formData = await c.req.formData();
     const db = c.env.DB;
-    const settingsService = new chunkQCMSQFCP_cjs.SettingsService(db);
+    const settingsService = new chunk7FOAMNTI_cjs.SettingsService(db);
     const settings = {
       siteName: formData.get("siteName"),
       siteDescription: formData.get("siteDescription"),
@@ -21943,5 +22285,5 @@ exports.checkAdminUserExists = checkAdminUserExists;
 exports.router = router;
 exports.test_cleanup_default = test_cleanup_default;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-C6WWINTO.cjs.map
-//# sourceMappingURL=chunk-C6WWINTO.cjs.map
+//# sourceMappingURL=chunk-NXCIX4O5.cjs.map
+//# sourceMappingURL=chunk-NXCIX4O5.cjs.map
