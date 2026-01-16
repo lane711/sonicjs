@@ -1,5 +1,3 @@
-'use strict';
-
 // src/utils/sanitize.ts
 function escapeHtml(text) {
   if (typeof text !== "string") {
@@ -28,6 +26,12 @@ function sanitizeObject(obj, fields) {
     }
   }
   return sanitized;
+}
+
+// src/utils/slug-utils.ts
+function generateSlug(text) {
+  if (!text) return "";
+  return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\s_-]/g, "").replace(/\s+/g, "-").replace(/[-_]+/g, "-").replace(/^[-_]+|[-_]+$/g, "").substring(0, 100);
 }
 
 // src/utils/template-renderer.ts
@@ -595,18 +599,6 @@ function parseBlocksValue(value, config) {
   return { value: normalized, errors };
 }
 
-exports.QueryFilterBuilder = QueryFilterBuilder;
-exports.SONICJS_VERSION = SONICJS_VERSION;
-exports.TemplateRenderer = TemplateRenderer;
-exports.buildQuery = buildQuery;
-exports.escapeHtml = escapeHtml;
-exports.getBlocksFieldConfig = getBlocksFieldConfig;
-exports.getCoreVersion = getCoreVersion;
-exports.package_default = package_default;
-exports.parseBlocksValue = parseBlocksValue;
-exports.renderTemplate = renderTemplate;
-exports.sanitizeInput = sanitizeInput;
-exports.sanitizeObject = sanitizeObject;
-exports.templateRenderer = templateRenderer;
-//# sourceMappingURL=chunk-VQLXDT7P.cjs.map
-//# sourceMappingURL=chunk-VQLXDT7P.cjs.map
+export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, generateSlug, getBlocksFieldConfig, getCoreVersion, package_default, parseBlocksValue, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer };
+//# sourceMappingURL=chunk-UTYEV466.js.map
+//# sourceMappingURL=chunk-UTYEV466.js.map

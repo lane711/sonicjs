@@ -3,6 +3,32 @@ import { b as TelemetryConfig } from './telemetry-UiD1i9GS.js';
 import { b as BlockDefinitions } from './collection-config-B6gMPunn.js';
 
 /**
+ * Slug generation utilities for creating URL-friendly slugs
+ */
+/**
+ * Generate URL-friendly slug from text
+ *
+ * Features:
+ * - Converts to lowercase
+ * - Handles accented characters (NFD normalization)
+ * - Removes diacritics
+ * - Keeps only alphanumeric, spaces, underscores, and hyphens
+ * - Replaces spaces with hyphens
+ * - Collapses multiple hyphens/underscores
+ * - Trims leading/trailing hyphens/underscores
+ * - Limits length to 100 characters
+ *
+ * @param text - Text to slugify
+ * @returns URL-safe slug
+ *
+ * @example
+ * generateSlug('Hello World!') // 'hello-world'
+ * generateSlug('Café París 2024') // 'cafe-paris-2024'
+ * generateSlug('Multiple   Spaces') // 'multiple-spaces'
+ */
+declare function generateSlug(text: string): string;
+
+/**
  * Telemetry ID Utilities
  *
  * Generates and manages anonymous installation IDs
@@ -61,4 +87,4 @@ declare function parseBlocksValue(value: unknown, config: BlocksFieldConfig): {
     errors: string[];
 };
 
-export { generateInstallationId, generateProjectId, getBlocksFieldConfig, getDefaultTelemetryConfig, getTelemetryConfig, isTelemetryEnabled, parseBlocksValue, sanitizeErrorMessage, sanitizeRoute, shouldSkipEvent };
+export { generateInstallationId, generateProjectId, generateSlug, getBlocksFieldConfig, getDefaultTelemetryConfig, getTelemetryConfig, isTelemetryEnabled, parseBlocksValue, sanitizeErrorMessage, sanitizeRoute, shouldSkipEvent };

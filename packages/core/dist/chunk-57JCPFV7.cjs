@@ -1,12 +1,12 @@
 'use strict';
 
-var chunk7FOAMNTI_cjs = require('./chunk-7FOAMNTI.cjs');
-var chunk2GH4GRU2_cjs = require('./chunk-2GH4GRU2.cjs');
+var chunkQCMSQFCP_cjs = require('./chunk-QCMSQFCP.cjs');
+var chunkCZOX6237_cjs = require('./chunk-CZOX6237.cjs');
 var chunkILZ3DP4I_cjs = require('./chunk-ILZ3DP4I.cjs');
-var chunkZ4ABPL6G_cjs = require('./chunk-Z4ABPL6G.cjs');
+var chunkJEN5TGDJ_cjs = require('./chunk-JEN5TGDJ.cjs');
 var chunkAZLU3ROK_cjs = require('./chunk-AZLU3ROK.cjs');
 var chunkAI2JJIJX_cjs = require('./chunk-AI2JJIJX.cjs');
-var chunkVQLXDT7P_cjs = require('./chunk-VQLXDT7P.cjs');
+var chunk34VHXNMW_cjs = require('./chunk-34VHXNMW.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 var hono = require('hono');
 var cors = require('hono/cors');
@@ -17,6 +17,37 @@ var html = require('hono/html');
 // src/schemas/index.ts
 var schemaDefinitions = [];
 var apiContentCrudRoutes = new hono.Hono();
+apiContentCrudRoutes.get("/check-slug", async (c) => {
+  try {
+    const db = c.env.DB;
+    const collectionId = c.req.query("collectionId");
+    const slug = c.req.query("slug");
+    const excludeId = c.req.query("excludeId");
+    if (!collectionId || !slug) {
+      return c.json({ error: "collectionId and slug are required" }, 400);
+    }
+    let query = "SELECT id FROM content WHERE collection_id = ? AND slug = ?";
+    const params = [collectionId, slug];
+    if (excludeId) {
+      query += " AND id != ?";
+      params.push(excludeId);
+    }
+    const existing = await db.prepare(query).bind(...params).first();
+    if (existing) {
+      return c.json({
+        available: false,
+        message: "This URL slug is already in use in this collection"
+      });
+    }
+    return c.json({ available: true });
+  } catch (error) {
+    console.error("Error checking slug:", error);
+    return c.json({
+      error: "Failed to check slug availability",
+      details: error instanceof Error ? error.message : String(error)
+    }, 500);
+  }
+});
 apiContentCrudRoutes.get("/:id", async (c) => {
   try {
     const id = c.req.param("id");
@@ -45,7 +76,7 @@ apiContentCrudRoutes.get("/:id", async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.post("/", chunk2GH4GRU2_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.post("/", chunkCZOX6237_cjs.requireAuth(), async (c) => {
   try {
     const db = c.env.DB;
     const user = c.get("user");
@@ -86,7 +117,7 @@ apiContentCrudRoutes.post("/", chunk2GH4GRU2_cjs.requireAuth(), async (c) => {
       now,
       now
     ).run();
-    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
+    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
     await cache.invalidate(`content:list:${collectionId}:*`);
     await cache.invalidate("content-filtered:*");
     const getStmt = db.prepare("SELECT * FROM content WHERE id = ?");
@@ -111,7 +142,7 @@ apiContentCrudRoutes.post("/", chunk2GH4GRU2_cjs.requireAuth(), async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.put("/:id", chunk2GH4GRU2_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.put("/:id", chunkCZOX6237_cjs.requireAuth(), async (c) => {
   try {
     const id = c.req.param("id");
     const db = c.env.DB;
@@ -149,7 +180,7 @@ apiContentCrudRoutes.put("/:id", chunk2GH4GRU2_cjs.requireAuth(), async (c) => {
       WHERE id = ?
     `);
     await updateStmt.bind(...params).run();
-    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
+    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existing.collection_id}:*`);
     await cache.invalidate("content-filtered:*");
@@ -175,7 +206,7 @@ apiContentCrudRoutes.put("/:id", chunk2GH4GRU2_cjs.requireAuth(), async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.delete("/:id", chunk2GH4GRU2_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.delete("/:id", chunkCZOX6237_cjs.requireAuth(), async (c) => {
   try {
     const id = c.req.param("id");
     const db = c.env.DB;
@@ -186,7 +217,7 @@ apiContentCrudRoutes.delete("/:id", chunk2GH4GRU2_cjs.requireAuth(), async (c) =
     }
     const deleteStmt = db.prepare("DELETE FROM content WHERE id = ?");
     await deleteStmt.bind(id).run();
-    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
+    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existing.collection_id}:*`);
     await cache.invalidate("content-filtered:*");
@@ -211,7 +242,7 @@ apiRoutes.use("*", async (c, next) => {
   c.header("X-Response-Time", `${totalTime}ms`);
 });
 apiRoutes.use("*", async (c, next) => {
-  const cacheEnabled = await chunk2GH4GRU2_cjs.isPluginActive(c.env.DB, "core-cache");
+  const cacheEnabled = await chunkCZOX6237_cjs.isPluginActive(c.env.DB, "core-cache");
   c.set("cacheEnabled", cacheEnabled);
   await next();
 });
@@ -259,7 +290,7 @@ apiRoutes.get("/collections", async (c) => {
   try {
     const db = c.env.DB;
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
+    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("collections", "all");
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -336,12 +367,12 @@ apiRoutes.get("/content", async (c) => {
         });
       }
     }
-    const filter = chunkVQLXDT7P_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunk34VHXNMW_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.limit) {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder3 = new chunkVQLXDT7P_cjs.QueryFilterBuilder();
+    const builder3 = new chunk34VHXNMW_cjs.QueryFilterBuilder();
     const queryResult = builder3.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -350,7 +381,7 @@ apiRoutes.get("/content", async (c) => {
       }, 400);
     }
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
+    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("content-filtered", JSON.stringify({ filter, query: queryResult.sql }));
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -428,7 +459,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
     if (!collectionResult) {
       return c.json({ error: "Collection not found" }, 404);
     }
-    const filter = chunkVQLXDT7P_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunk34VHXNMW_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.where) {
       filter.where = { and: [] };
     }
@@ -444,7 +475,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder3 = new chunkVQLXDT7P_cjs.QueryFilterBuilder();
+    const builder3 = new chunk34VHXNMW_cjs.QueryFilterBuilder();
     const queryResult = builder3.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -453,7 +484,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
       }, 400);
     }
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
+    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("collection-content-filtered", `${collection}:${JSON.stringify({ filter, query: queryResult.sql })}`);
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -569,7 +600,7 @@ var fileValidationSchema = zod.z.object({
   // 50MB max
 });
 var apiMediaRoutes = new hono.Hono();
-apiMediaRoutes.use("*", chunk2GH4GRU2_cjs.requireAuth());
+apiMediaRoutes.use("*", chunkCZOX6237_cjs.requireAuth());
 apiMediaRoutes.post("/upload", async (c) => {
   try {
     const user = c.get("user");
@@ -1313,8 +1344,8 @@ apiSystemRoutes.get("/env", (c) => {
 });
 var api_system_default = apiSystemRoutes;
 var adminApiRoutes = new hono.Hono();
-adminApiRoutes.use("*", chunk2GH4GRU2_cjs.requireAuth());
-adminApiRoutes.use("*", chunk2GH4GRU2_cjs.requireRole(["admin", "editor"]));
+adminApiRoutes.use("*", chunkCZOX6237_cjs.requireAuth());
+adminApiRoutes.use("*", chunkCZOX6237_cjs.requireRole(["admin", "editor"]));
 adminApiRoutes.get("/stats", async (c) => {
   try {
     const db = c.env.DB;
@@ -1723,7 +1754,7 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
 });
 adminApiRoutes.get("/migrations/status", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-VNEMASYC.cjs');
+    const { MigrationService: MigrationService2 } = await import('./migrations-EEVBLY5P.cjs');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const status = await migrationService.getMigrationStatus();
@@ -1748,7 +1779,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const { MigrationService: MigrationService2 } = await import('./migrations-VNEMASYC.cjs');
+    const { MigrationService: MigrationService2 } = await import('./migrations-EEVBLY5P.cjs');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const result = await migrationService.runPendingMigrations();
@@ -1767,7 +1798,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
 });
 adminApiRoutes.get("/migrations/validate", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-VNEMASYC.cjs');
+    const { MigrationService: MigrationService2 } = await import('./migrations-EEVBLY5P.cjs');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const validation = await migrationService.validateSchema();
@@ -2290,7 +2321,7 @@ authRoutes.post(
       if (existingUser) {
         return c.json({ error: "User with this email or username already exists" }, 400);
       }
-      const passwordHash = await chunk2GH4GRU2_cjs.AuthManager.hashPassword(password);
+      const passwordHash = await chunkCZOX6237_cjs.AuthManager.hashPassword(password);
       const userId = crypto.randomUUID();
       const now = /* @__PURE__ */ new Date();
       await db.prepare(`
@@ -2310,7 +2341,7 @@ authRoutes.post(
         now.getTime(),
         now.getTime()
       ).run();
-      const token = await chunk2GH4GRU2_cjs.AuthManager.generateToken(userId, normalizedEmail, "viewer");
+      const token = await chunkCZOX6237_cjs.AuthManager.generateToken(userId, normalizedEmail, "viewer");
       cookie.setCookie(c, "auth_token", token, {
         httpOnly: true,
         secure: true,
@@ -2351,7 +2382,7 @@ authRoutes.post("/login", async (c) => {
     const { email, password } = validation.data;
     const db = c.env.DB;
     const normalizedEmail = email.toLowerCase();
-    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.user);
+    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.user);
     let user = await cache.get(cache.generateKey("user", `email:${normalizedEmail}`));
     if (!user) {
       user = await db.prepare("SELECT * FROM users WHERE email = ? AND is_active = 1").bind(normalizedEmail).first();
@@ -2363,11 +2394,11 @@ authRoutes.post("/login", async (c) => {
     if (!user) {
       return c.json({ error: "Invalid email or password" }, 401);
     }
-    const isValidPassword = await chunk2GH4GRU2_cjs.AuthManager.verifyPassword(password, user.password_hash);
+    const isValidPassword = await chunkCZOX6237_cjs.AuthManager.verifyPassword(password, user.password_hash);
     if (!isValidPassword) {
       return c.json({ error: "Invalid email or password" }, 401);
     }
-    const token = await chunk2GH4GRU2_cjs.AuthManager.generateToken(user.id, user.email, user.role);
+    const token = await chunkCZOX6237_cjs.AuthManager.generateToken(user.id, user.email, user.role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: true,
@@ -2416,7 +2447,7 @@ authRoutes.get("/logout", (c) => {
   });
   return c.redirect("/auth/login?message=You have been logged out successfully");
 });
-authRoutes.get("/me", chunk2GH4GRU2_cjs.requireAuth(), async (c) => {
+authRoutes.get("/me", chunkCZOX6237_cjs.requireAuth(), async (c) => {
   try {
     const user = c.get("user");
     if (!user) {
@@ -2433,13 +2464,13 @@ authRoutes.get("/me", chunk2GH4GRU2_cjs.requireAuth(), async (c) => {
     return c.json({ error: "Failed to get user" }, 500);
   }
 });
-authRoutes.post("/refresh", chunk2GH4GRU2_cjs.requireAuth(), async (c) => {
+authRoutes.post("/refresh", chunkCZOX6237_cjs.requireAuth(), async (c) => {
   try {
     const user = c.get("user");
     if (!user) {
       return c.json({ error: "Not authenticated" }, 401);
     }
-    const token = await chunk2GH4GRU2_cjs.AuthManager.generateToken(user.userId, user.email, user.role);
+    const token = await chunkCZOX6237_cjs.AuthManager.generateToken(user.userId, user.email, user.role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: true,
@@ -2499,7 +2530,7 @@ authRoutes.post("/register/form", async (c) => {
         </div>
       `);
     }
-    const passwordHash = await chunk2GH4GRU2_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await chunkCZOX6237_cjs.AuthManager.hashPassword(password);
     const role = isFirstUser ? "admin" : "viewer";
     const userId = crypto.randomUUID();
     const now = /* @__PURE__ */ new Date();
@@ -2522,7 +2553,7 @@ authRoutes.post("/register/form", async (c) => {
     if (isFirstUser) {
       setAdminExists();
     }
-    const token = await chunk2GH4GRU2_cjs.AuthManager.generateToken(userId, normalizedEmail, role);
+    const token = await chunkCZOX6237_cjs.AuthManager.generateToken(userId, normalizedEmail, role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: false,
@@ -2574,7 +2605,7 @@ authRoutes.post("/login/form", async (c) => {
         </div>
       `);
     }
-    const isValidPassword = await chunk2GH4GRU2_cjs.AuthManager.verifyPassword(password, user.password_hash);
+    const isValidPassword = await chunkCZOX6237_cjs.AuthManager.verifyPassword(password, user.password_hash);
     if (!isValidPassword) {
       return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -2582,7 +2613,7 @@ authRoutes.post("/login/form", async (c) => {
         </div>
       `);
     }
-    const token = await chunk2GH4GRU2_cjs.AuthManager.generateToken(user.id, user.email, user.role);
+    const token = await chunkCZOX6237_cjs.AuthManager.generateToken(user.id, user.email, user.role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: false,
@@ -2641,7 +2672,7 @@ authRoutes.post("/seed-admin", async (c) => {
     `).run();
     const existingAdmin = await db.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind("admin@sonicjs.com", "admin").first();
     if (existingAdmin) {
-      const passwordHash2 = await chunk2GH4GRU2_cjs.AuthManager.hashPassword("sonicjs!");
+      const passwordHash2 = await chunkCZOX6237_cjs.AuthManager.hashPassword("sonicjs!");
       await db.prepare("UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?").bind(passwordHash2, Date.now(), existingAdmin.id).run();
       setAdminExists();
       return c.json({
@@ -2654,7 +2685,7 @@ authRoutes.post("/seed-admin", async (c) => {
         }
       });
     }
-    const passwordHash = await chunk2GH4GRU2_cjs.AuthManager.hashPassword("sonicjs!");
+    const passwordHash = await chunkCZOX6237_cjs.AuthManager.hashPassword("sonicjs!");
     const userId = "admin-user-id";
     const now = Date.now();
     const adminEmail = "admin@sonicjs.com".toLowerCase();
@@ -2875,7 +2906,7 @@ authRoutes.post("/accept-invitation", async (c) => {
     if (existingUsername) {
       return c.json({ error: "Username is already taken" }, 400);
     }
-    const passwordHash = await chunk2GH4GRU2_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await chunkCZOX6237_cjs.AuthManager.hashPassword(password);
     const updateStmt = db.prepare(`
       UPDATE users SET 
         username = ?,
@@ -2894,7 +2925,7 @@ authRoutes.post("/accept-invitation", async (c) => {
       Date.now(),
       invitedUser.id
     ).run();
-    const authToken = await chunk2GH4GRU2_cjs.AuthManager.generateToken(invitedUser.id, invitedUser.email, invitedUser.role);
+    const authToken = await chunkCZOX6237_cjs.AuthManager.generateToken(invitedUser.id, invitedUser.email, invitedUser.role);
     cookie.setCookie(c, "auth_token", authToken, {
       httpOnly: true,
       secure: true,
@@ -3124,7 +3155,7 @@ authRoutes.post("/reset-password", async (c) => {
     if (Date.now() > user.password_reset_expires) {
       return c.json({ error: "Reset token has expired" }, 400);
     }
-    const newPasswordHash = await chunk2GH4GRU2_cjs.AuthManager.hashPassword(password);
+    const newPasswordHash = await chunkCZOX6237_cjs.AuthManager.hashPassword(password);
     try {
       const historyStmt = db.prepare(`
         INSERT INTO password_history (id, user_id, password_hash, created_at)
@@ -3384,106 +3415,9 @@ var test_cleanup_default = app;
 // src/templates/pages/admin-content-form.template.ts
 chunkAZLU3ROK_cjs.init_admin_layout_catalyst_template();
 
-// src/templates/components/drag-sortable.template.ts
-function getDragSortableScript() {
-  return `
-    <script>
-      if (!window.__sonicDragSortableInit) {
-        window.__sonicDragSortableInit = true;
-
-        window.initializeDragSortable = function(container, options) {
-          if (!container || container.dataset.dragSortableInit === 'true') {
-            return;
-          }
-
-          container.dataset.dragSortableInit = 'true';
-          const itemSelector = options && options.itemSelector ? options.itemSelector : '.sortable-item';
-          const handleSelector = options && options.handleSelector ? options.handleSelector : '[data-action="drag-handle"]';
-          const onUpdate = options && typeof options.onUpdate === 'function' ? options.onUpdate : function() {};
-          let activeDragItem = null;
-
-          const getDragAfterElement = function(list, y) {
-            const items = Array.from(list.querySelectorAll(itemSelector + ':not(.is-dragging)'));
-            let closest = { offset: Number.NEGATIVE_INFINITY, element: null };
-            items.forEach(function(item) {
-              const box = item.getBoundingClientRect();
-              const offset = y - box.top - box.height / 2;
-              if (offset < 0 && offset > closest.offset) {
-                closest = { offset: offset, element: item };
-              }
-            });
-            return closest.element;
-          };
-
-          const activateDragItem = function(event) {
-            const target = event.target;
-            if (!(target instanceof Element)) return;
-            const handle = target.closest(handleSelector);
-            if (!handle) return;
-            const item = handle.closest(itemSelector);
-            if (!item) return;
-            activeDragItem = item;
-          };
-
-          const clearActiveDragItem = function() {
-            activeDragItem = null;
-          };
-
-          container.addEventListener('pointerdown', activateDragItem);
-          container.addEventListener('mousedown', activateDragItem);
-          container.addEventListener('pointerup', clearActiveDragItem);
-          container.addEventListener('mouseup', clearActiveDragItem);
-
-          container.addEventListener('dragstart', function(event) {
-            const target = event.target;
-            if (!(target instanceof Element)) return;
-            const item = target.closest(itemSelector);
-            if (!item || item !== activeDragItem) {
-              event.preventDefault();
-              return;
-            }
-            item.classList.add('is-dragging');
-            if (event.dataTransfer) {
-              event.dataTransfer.setData('text/plain', '');
-            }
-          });
-
-          container.addEventListener('dragend', function(event) {
-            const target = event.target;
-            if (target instanceof Element) {
-              const item = target.closest(itemSelector);
-              if (item) {
-                item.classList.remove('is-dragging');
-              }
-            }
-            activeDragItem = null;
-            onUpdate();
-          });
-
-          container.addEventListener('dragover', function(event) {
-            event.preventDefault();
-            const dragging = container.querySelector(itemSelector + '.is-dragging');
-            if (!dragging) return;
-            const afterElement = getDragAfterElement(container, event.clientY);
-            if (afterElement === null) {
-              container.appendChild(dragging);
-            } else {
-              container.insertBefore(dragging, afterElement);
-            }
-          });
-
-          container.addEventListener('drop', function() {
-            onUpdate();
-          });
-        };
-      }
-    </script>
-  `;
-}
-
 // src/templates/components/dynamic-field.template.ts
 function renderDynamicField(field, options = {}) {
-  const { value = "", errors = [], disabled = false, className = "", pluginStatuses = {} } = options;
+  const { value = "", errors = [], disabled = false, className = "", pluginStatuses = {}, collectionId = "", contentId = "" } = options;
   const opts = field.field_options || {};
   const required = field.is_required ? "required" : "";
   const baseClasses = `w-full rounded-lg px-3 py-2 text-sm text-zinc-950 dark:text-white bg-white dark:bg-zinc-800 shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow ${className}`;
@@ -3736,72 +3670,176 @@ function renderDynamicField(field, options = {}) {
       `;
       break;
     case "slug":
-      let slugPattern = opts.pattern || "^[a-z0-9-]+$";
-      let slugHelp = '<p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Use lowercase letters, numbers, and hyphens only</p>';
-      slugHelp += `<button type="button" class="mt-1 text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300" onclick="generateSlugFromTitle('\${fieldId}')">Generate from title</button>`;
+      const slugPattern = opts.pattern || "^[a-z0-9-]+$";
+      const collectionIdValue = collectionId || opts.collectionId || "";
+      const contentIdValue = contentId || opts.contentId || "";
+      const isEditMode = !!value;
       fieldHTML = `
-        <input
-          type="text"
-          id="${fieldId}"
-          name="${fieldName}"
-          value="${escapeHtml2(value)}"
-          placeholder="${opts.placeholder || "url-friendly-slug"}"
-          maxlength="${opts.maxLength || ""}"
-          data-pattern="${slugPattern}"
-          class="${baseClasses} ${errorClasses}"
-          ${required}
-          ${disabled ? "disabled" : ""}
-        >
-        ${slugHelp}
+        <div class="slug-field-container">
+          <input
+            type="text"
+            id="${fieldId}"
+            name="${fieldName}"
+            value="${escapeHtml2(value)}"
+            placeholder="${opts.placeholder || "url-friendly-slug"}"
+            maxlength="${opts.maxLength || 100}"
+            data-pattern="${slugPattern}"
+            data-collection-id="${collectionIdValue}"
+            data-content-id="${contentIdValue}"
+            data-is-edit-mode="${isEditMode}"
+            class="${baseClasses} ${errorClasses}"
+            ${required}
+            ${disabled ? "disabled" : ""}
+          >
+          <div id="${fieldId}-status" class="slug-status mt-1 text-sm min-h-[20px]"></div>
+          <button 
+            type="button" 
+            class="regenerate-slug-btn mt-2 text-sm text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 flex items-center gap-1 transition-colors"
+            onclick="window.regenerateSlugFromTitle_${fieldId.replace(/-/g, "_")}()"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Regenerate from title
+          </button>
+          <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Use lowercase letters, numbers, and hyphens only</p>
+        </div>
+        
         <script>
           (function() {
-            const field = document.getElementById('${fieldId}');
+            const slugField = document.getElementById('${fieldId}');
+            const statusDiv = document.getElementById('${fieldId}-status');
+            const isEditMode = slugField.dataset.isEditMode === 'true';
             const pattern = new RegExp('${slugPattern}');
-
-            field.addEventListener('input', function() {
-              if (this.value && !pattern.test(this.value)) {
-                this.setCustomValidity('Please use only lowercase letters, numbers, and hyphens.');
-              } else {
-                this.setCustomValidity('');
-              }
-            });
-
-            field.addEventListener('blur', function() {
-              this.reportValidity();
-            });
-          })();
-
-          function generateSlugFromTitle(slugFieldId) {
-            const titleField = document.querySelector('input[name="title"]');
-            const slugField = document.getElementById(slugFieldId);
-            if (titleField && slugField) {
-              const slug = titleField.value
+            const collectionId = slugField.dataset.collectionId;
+            const contentId = slugField.dataset.contentId;
+            
+            let checkTimeout;
+            let lastCheckedSlug = '';
+            let manuallyEdited = false;
+            
+            // Shared slug generation function
+            function generateSlug(text) {
+              if (!text) return '';
+              
+              return text
                 .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\\u0300-\\u036f]/g, '')
                 .replace(/[^a-z0-9\\s_-]/g, '')
                 .replace(/\\s+/g, '-')
                 .replace(/[-_]+/g, '-')
-                .replace(/^[-_]|[-_]$/g, '');
-              slugField.value = slug;
+                .replace(/^[-_]+|[-_]+$/g, '')
+                .substring(0, 100);
             }
-          }
-
-          // Auto-generate slug when title changes
-          document.addEventListener('DOMContentLoaded', function() {
-            const titleField = document.querySelector('input[name="title"]');
-            const slugField = document.getElementById('${fieldId}');
-            if (titleField && slugField && !slugField.value) {
-              titleField.addEventListener('input', function() {
-                if (!slugField.value) {
-                  generateSlugFromTitle('${fieldId}');
+            
+            // Check if slug is available
+            async function checkSlugAvailability(slug) {
+              if (!slug || !collectionId) return;
+              
+              // Don't check if it's the same as last time
+              if (slug === lastCheckedSlug) return;
+              lastCheckedSlug = slug;
+              
+              try {
+                // Show checking status
+                statusDiv.innerHTML = '<span class="text-gray-400">\u23F3 Checking availability...</span>';
+                
+                // Build URL
+                let url = \`/api/content/check-slug?collectionId=\${encodeURIComponent(collectionId)}&slug=\${encodeURIComponent(slug)}\`;
+                if (contentId) {
+                  url += \`&excludeId=\${encodeURIComponent(contentId)}\`;
                 }
-              });
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.available) {
+                  statusDiv.innerHTML = '<span class="text-green-500 dark:text-green-400">\u2713 Available</span>';
+                  slugField.setCustomValidity('');
+                } else {
+                  statusDiv.innerHTML = \`<span class="text-red-500 dark:text-red-400">\u2717 \${data.message || 'Already in use'}</span>\`;
+                  slugField.setCustomValidity(data.message || 'This slug is already in use');
+                }
+              } catch (error) {
+                console.error('Error checking slug:', error);
+                statusDiv.innerHTML = '<span class="text-yellow-500 dark:text-yellow-400">\u26A0 Could not verify</span>';
+              }
             }
-          });
+            
+            // Format validation and duplicate checking
+            slugField.addEventListener('input', function() {
+              const value = this.value;
+              
+              // Mark as manually edited if user types directly
+              if (document.activeElement === this) {
+                manuallyEdited = true;
+              }
+              
+              // Clear status if empty
+              if (!value) {
+                statusDiv.innerHTML = '';
+                this.setCustomValidity('');
+                return;
+              }
+              
+              // Pattern validation
+              if (!pattern.test(value)) {
+                this.setCustomValidity('Please use only lowercase letters, numbers, and hyphens.');
+                statusDiv.innerHTML = '<span class="text-red-500 dark:text-red-400">\u2717 Invalid format</span>';
+                return;
+              }
+              
+              // Debounce the availability check
+              clearTimeout(checkTimeout);
+              checkTimeout = setTimeout(() => {
+                checkSlugAvailability(value);
+              }, 500); // Wait 500ms after user stops typing
+            });
+            
+            // Initial check if field has value
+            if (slugField.value) {
+              checkSlugAvailability(slugField.value);
+            }
+            
+            // Auto-generate only in create mode
+            // Wait for all fields to be rendered before attaching listeners
+            if (!isEditMode) {
+              // Use setTimeout to ensure all fields in the form are rendered
+              setTimeout(() => {
+                const titleField = document.querySelector('input[name="title"]');
+                if (titleField) {
+                  titleField.addEventListener('input', function() {
+                    if (!manuallyEdited) {
+                      const slug = generateSlug(this.value);
+                      slugField.value = slug;
+                      
+                      // Trigger validation and duplicate check
+                      slugField.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                  });
+                }
+              }, 0);
+            }
+            
+            // Global function for regenerate button
+            window.regenerateSlugFromTitle_${fieldId.replace(/-/g, "_")} = function() {
+              const titleField = document.querySelector('input[name="title"]');
+              if (titleField && slugField) {
+                const slug = generateSlug(titleField.value);
+                slugField.value = slug;
+                manuallyEdited = false;
+                
+                // Trigger validation and duplicate check
+                slugField.dispatchEvent(new Event('input', { bubbles: true }));
+              }
+            };
+          })();
         </script>
       `;
       break;
-    case "select": {
-      const selectOptions = opts.options || [];
+    case "select":
+      const options2 = opts.options || [];
       const multiple = opts.multiple ? "multiple" : "";
       const selectedValues = Array.isArray(value) ? value : [value];
       fieldHTML = `
@@ -3814,7 +3852,7 @@ function renderDynamicField(field, options = {}) {
           ${disabled ? "disabled" : ""}
         >
           ${!required && !opts.multiple ? '<option value="">Choose an option...</option>' : ""}
-          ${selectOptions.map((option) => {
+          ${options2.map((option) => {
         const optionValue = typeof option === "string" ? option : option.value;
         const optionLabel = typeof option === "string" ? option : option.label;
         const selected = selectedValues.includes(optionValue) ? "selected" : "";
@@ -3833,7 +3871,6 @@ function renderDynamicField(field, options = {}) {
         ` : ""}
       `;
       break;
-    }
     case "media":
       fieldHTML = `
         <div class="media-field-container">
@@ -3866,42 +3903,6 @@ function renderDynamicField(field, options = {}) {
           </div>
         </div>
       `;
-      break;
-    case "array":
-      if (opts.items && typeof opts.items === "object" && opts.items.blocks) {
-        fieldHTML = renderBlocksField(field, options, baseClasses, errorClasses);
-      } else if (opts.items && typeof opts.items === "object") {
-        fieldHTML = renderStructuredArrayField(field, options);
-      } else {
-        fieldHTML = `
-          <textarea
-            id="${fieldId}"
-            name="${fieldName}"
-            rows="${opts.rows || 6}"
-            placeholder="${opts.placeholder || "Enter JSON array..."}"
-            class="${baseClasses} ${errorClasses} resize-y font-mono text-xs"
-            ${required}
-            ${disabled ? "disabled" : ""}
-          >${escapeHtml2(typeof value === "string" ? value : JSON.stringify(value || []))}</textarea>
-        `;
-      }
-      break;
-    case "object":
-      if (opts.properties && typeof opts.properties === "object") {
-        fieldHTML = renderStructuredObjectField(field, options);
-      } else {
-        fieldHTML = `
-          <textarea
-            id="${fieldId}"
-            name="${fieldName}"
-            rows="${opts.rows || 6}"
-            placeholder="${opts.placeholder || "Enter JSON object..."}"
-            class="${baseClasses} ${errorClasses} resize-y font-mono text-xs"
-            ${required}
-            ${disabled ? "disabled" : ""}
-          >${escapeHtml2(typeof value === "string" ? value : JSON.stringify(value || {}))}</textarea>
-        `;
-      }
       break;
     default:
       fieldHTML = `
@@ -3956,862 +3957,15 @@ function renderFieldGroup(title, fields, collapsible = false) {
     </div>
   `;
 }
-function renderBlocksField(field, options, baseClasses, errorClasses) {
-  const { value = [], pluginStatuses = {} } = options;
-  const opts = field.field_options || {};
-  const itemsConfig = opts.items && typeof opts.items === "object" ? opts.items : {};
-  const blocks = normalizeBlockDefinitions(itemsConfig.blocks);
-  const discriminator = typeof itemsConfig.discriminator === "string" && itemsConfig.discriminator ? itemsConfig.discriminator : "blockType";
-  const blockValues = normalizeBlocksValue(value, discriminator);
-  const fieldId = `field-${field.field_name}`;
-  const fieldName = field.field_name;
-  const emptyState = blockValues.length === 0 ? `
-    <div class="rounded-lg border border-dashed border-zinc-200 dark:border-white/10 px-4 py-6 text-center text-sm text-zinc-500 dark:text-zinc-400" data-blocks-empty>
-      No blocks yet. Add your first block to get started.
-    </div>
-  ` : "";
-  const blockOptions = blocks.map((block) => `<option value="${escapeHtml2(block.name)}">${escapeHtml2(block.label)}</option>`).join("");
-  const blockItems = blockValues.map(
-    (blockValue, index) => renderBlockItem(field, blockValue, blocks, discriminator, index, pluginStatuses)
-  ).join("");
-  const templates = blocks.map((block) => renderBlockTemplate(field, block, discriminator, pluginStatuses)).join("");
-  return `
-    <div
-      class="blocks-field space-y-4"
-      data-blocks='${escapeHtml2(JSON.stringify(blocks))}'
-      data-blocks-discriminator="${escapeHtml2(discriminator)}"
-      data-field-name="${escapeHtml2(fieldName)}"
-    >
-      <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml2(JSON.stringify(blockValues))}">
-
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex-1">
-          <select
-            class="${baseClasses} ${errorClasses}"
-            data-role="block-type-select"
-          >
-            <option value="">Choose a block...</option>
-            ${blockOptions}
-          </select>
-        </div>
-        <button
-          type="button"
-          data-action="add-block"
-          class="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-white/10 dark:hover:bg-white/20"
-        >
-          Add Block
-        </button>
-      </div>
-
-      <div class="space-y-4" data-blocks-list>
-        ${blockItems || emptyState}
-      </div>
-
-      ${templates}
-    </div>
-    ${getDragSortableScript()}
-    ${getBlocksFieldScript()}
-  `;
-}
-function renderStructuredObjectField(field, options, baseClasses, errorClasses) {
-  const { value = {}, pluginStatuses = {} } = options;
-  const opts = field.field_options || {};
-  const properties = opts.properties && typeof opts.properties === "object" ? opts.properties : {};
-  const fieldId = `field-${field.field_name}`;
-  const fieldName = field.field_name;
-  const objectValue = normalizeStructuredObjectValue(value);
-  const subfields = Object.entries(properties).map(
-    ([propertyName, propertyConfig]) => renderStructuredSubfield(
-      field,
-      propertyName,
-      propertyConfig,
-      objectValue,
-      pluginStatuses,
-      field.field_name
-    )
-  ).join("");
-  return `
-    <div class="space-y-4" data-structured-object data-field-name="${escapeHtml2(fieldName)}">
-      <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml2(JSON.stringify(objectValue))}">
-      <div class="space-y-4" data-structured-object-fields>
-        ${subfields}
-      </div>
-    </div>
-    ${getStructuredFieldScript()}
-  `;
-}
-function renderStructuredArrayField(field, options, baseClasses, errorClasses) {
-  const { value = [], pluginStatuses = {} } = options;
-  const opts = field.field_options || {};
-  const itemsConfig = opts.items && typeof opts.items === "object" ? opts.items : {};
-  const fieldId = `field-${field.field_name}`;
-  const fieldName = field.field_name;
-  const arrayValue = normalizeStructuredArrayValue(value);
-  const items = arrayValue.map(
-    (itemValue, index) => renderStructuredArrayItem(field, itemsConfig, String(index), itemValue, pluginStatuses)
-  ).join("");
-  const emptyState = arrayValue.length === 0 ? `
-    <div class="rounded-lg border border-dashed border-zinc-200 dark:border-white/10 px-4 py-6 text-center text-sm text-zinc-500 dark:text-zinc-400" data-structured-empty>
-      No items yet. Add the first item to get started.
-    </div>
-  ` : "";
-  return `
-    <div class="space-y-4" data-structured-array data-field-name="${escapeHtml2(fieldName)}">
-      <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml2(JSON.stringify(arrayValue))}">
-
-      <div class="flex items-center justify-between gap-3">
-        <div class="text-sm text-zinc-500 dark:text-zinc-400">
-          ${escapeHtml2(opts.itemLabel || "Items")}
-        </div>
-        <button
-          type="button"
-          data-action="add-item"
-          class="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-white/10 dark:hover:bg-white/20"
-        >
-          Add item
-        </button>
-      </div>
-
-      <div class="space-y-4" data-structured-array-list>
-        ${items || emptyState}
-      </div>
-
-      <template data-structured-array-template>
-        ${renderStructuredArrayItem(field, itemsConfig, "__INDEX__", {}, pluginStatuses)}
-      </template>
-    </div>
-    ${getDragSortableScript()}
-    ${getStructuredFieldScript()}
-  `;
-}
-function renderStructuredArrayItem(field, itemConfig, index, itemValue, pluginStatuses) {
-  const itemFields = renderStructuredItemFields(field, itemConfig, index, itemValue, pluginStatuses);
-  return `
-    <div class="structured-array-item rounded-lg border border-zinc-200 dark:border-white/10 bg-white/60 dark:bg-white/5 p-4 shadow-sm" data-array-index="${escapeHtml2(index)}" draggable="true">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex items-center gap-3">
-          <div class="drag-handle cursor-move text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-400" data-action="drag-handle" title="Drag to reorder">
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4 8h16M4 16h16"/>
-            </svg>
-          </div>
-          <div class="text-sm font-semibold text-zinc-900 dark:text-white">
-            Item <span class="ml-2 text-xs font-normal text-zinc-500 dark:text-zinc-400" data-array-order-label></span>
-          </div>
-        </div>
-        <div class="flex flex-wrap gap-2 text-xs">
-          <button type="button" data-action="move-up" class="inline-flex items-center justify-center rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent dark:disabled:hover:bg-transparent" aria-label="Move item up" title="Move up">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6l-4 4m4-4l4 4m-4-4v12"/>
-            </svg>
-          </button>
-          <button type="button" data-action="move-down" class="inline-flex items-center justify-center rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent dark:disabled:hover:bg-transparent" aria-label="Move item down" title="Move down">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 18l4-4m-4 4l-4-4m4 4V6"/>
-            </svg>
-          </button>
-          <button type="button" data-action="remove-item" class="inline-flex items-center gap-x-1 px-2.5 py-1.5 text-xs font-medium text-pink-700 dark:text-pink-300 hover:bg-pink-50 dark:hover:bg-pink-900/20 rounded-lg transition-colors">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 0 00-7.5 0"/>
-            </svg>
-            Delete item
-          </button>
-        </div>
-      </div>
-      <div class="mt-4 space-y-4" data-array-item-fields>
-        ${itemFields}
-      </div>
-    </div>
-  `;
-}
-function renderStructuredItemFields(field, itemConfig, index, itemValue, pluginStatuses) {
-  const itemType = itemConfig?.type || "string";
-  if (itemType === "object" && itemConfig?.properties && typeof itemConfig.properties === "object") {
-    const fieldPrefix = `array-${field.field_name}-${index}`;
-    return Object.entries(itemConfig.properties).map(
-      ([propertyName, propertyConfig]) => renderStructuredSubfield(
-        field,
-        propertyName,
-        propertyConfig,
-        itemValue || {},
-        pluginStatuses,
-        fieldPrefix
-      )
-    ).join("");
-  }
-  const normalizedField = normalizeBlockField(itemConfig, "Item");
-  const fieldValue = itemValue ?? normalizedField.defaultValue ?? "";
-  const fieldDefinition = {
-    id: `array-${field.field_name}-${index}-value`,
-    field_name: `array-${field.field_name}-${index}-value`,
-    field_type: normalizedField.type,
-    field_label: normalizedField.label,
-    field_options: normalizedField.options,
-    is_required: normalizedField.required};
-  return `
-    <div class="structured-subfield" data-structured-field="__value" data-field-type="${escapeHtml2(normalizedField.type)}">
-      ${renderDynamicField(fieldDefinition, { value: fieldValue, pluginStatuses })}
-    </div>
-  `;
-}
-function renderStructuredSubfield(field, propertyName, propertyConfig, objectValue, pluginStatuses, fieldPrefix) {
-  const normalizedField = normalizeBlockField(propertyConfig, propertyName);
-  const fieldValue = objectValue?.[propertyName] ?? normalizedField.defaultValue ?? "";
-  const fieldDefinition = {
-    field_name: `${fieldPrefix}__${propertyName}`,
-    field_type: normalizedField.type,
-    field_label: normalizedField.label,
-    field_options: normalizedField.options,
-    is_required: normalizedField.required};
-  return `
-    <div class="structured-subfield" data-structured-field="${escapeHtml2(propertyName)}" data-field-type="${escapeHtml2(normalizedField.type)}">
-      ${renderDynamicField(fieldDefinition, { value: fieldValue, pluginStatuses })}
-    </div>
-  `;
-}
-function normalizeStructuredObjectValue(value) {
-  if (!value) return {};
-  if (typeof value === "string") {
-    try {
-      const parsed = JSON.parse(value);
-      return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
-    } catch {
-      return {};
-    }
-  }
-  if (typeof value === "object" && !Array.isArray(value)) return value;
-  return {};
-}
-function normalizeStructuredArrayValue(value) {
-  if (!value) return [];
-  if (Array.isArray(value)) return value;
-  if (typeof value === "string") {
-    try {
-      const parsed = JSON.parse(value);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  }
-  return [];
-}
-function normalizeBlockDefinitions(rawBlocks) {
-  if (!rawBlocks || typeof rawBlocks !== "object") return [];
-  return Object.entries(rawBlocks).filter(([name, block]) => typeof name === "string" && block && typeof block === "object").map(([name, block]) => ({
-    name,
-    label: block.label || name,
-    description: block.description,
-    properties: block.properties && typeof block.properties === "object" ? block.properties : {}
-  }));
-}
-function normalizeBlocksValue(value, discriminator) {
-  const normalizeItem = (item) => {
-    if (!item || typeof item !== "object") return null;
-    if (item[discriminator]) return item;
-    if (item.blockType && item.data && typeof item.data === "object") {
-      return { [discriminator]: item.blockType, ...item.data };
-    }
-    return item;
-  };
-  const fromArray = (items) => items.map(normalizeItem).filter((item) => item && typeof item === "object");
-  if (Array.isArray(value)) return fromArray(value);
-  if (typeof value === "string" && value.trim()) {
-    try {
-      const parsed = JSON.parse(value);
-      return Array.isArray(parsed) ? fromArray(parsed) : [];
-    } catch {
-      return [];
-    }
-  }
-  return [];
-}
-function renderBlockTemplate(field, block, discriminator, pluginStatuses) {
-  return `
-    <template data-block-template="${escapeHtml2(block.name)}">
-      ${renderBlockCard(field, block, discriminator, "__INDEX__", {}, pluginStatuses)}
-    </template>
-  `;
-}
-function renderBlockItem(field, blockValue, blocks, discriminator, index, pluginStatuses) {
-  const blockType = blockValue?.[discriminator] || blockValue?.blockType;
-  const blockDefinition = blocks.find((block) => block.name === blockType);
-  if (!blockDefinition) {
-    return `
-      <div class="rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3 text-sm text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200" data-block-raw="${escapeHtml2(JSON.stringify(blockValue || {}))}">
-        Unknown block type: <strong>${escapeHtml2(String(blockType || "unknown"))}</strong>. This block will be preserved as-is.
-      </div>
-    `;
-  }
-  const data = blockValue && typeof blockValue === "object" ? Object.fromEntries(Object.entries(blockValue).filter(([key]) => key !== discriminator)) : {};
-  return renderBlockCard(field, blockDefinition, discriminator, String(index), data, pluginStatuses);
-}
-function renderBlockCard(field, block, discriminator, index, data, pluginStatuses) {
-  const blockFields = Object.entries(block.properties).map(([fieldName, fieldConfig]) => {
-    if (fieldConfig?.type === "array" && fieldConfig?.items?.blocks) {
-      return `
-        <div class="rounded-lg border border-dashed border-amber-200 bg-amber-50/50 px-4 py-3 text-xs text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
-          Nested blocks are not supported yet for "${escapeHtml2(fieldName)}".
-        </div>
-      `;
-    }
-    const normalizedField = normalizeBlockField(fieldConfig, fieldName);
-    const fieldValue = data?.[fieldName] ?? normalizedField.defaultValue ?? "";
-    const fieldDefinition = {
-      id: `block-${field.field_name}-${index}-${fieldName}`,
-      field_name: `block-${field.field_name}-${index}-${fieldName}`,
-      field_type: normalizedField.type,
-      field_label: normalizedField.label,
-      field_options: normalizedField.options,
-      is_required: normalizedField.required};
-    return `
-      <div class="blocks-subfield" data-block-field="${escapeHtml2(fieldName)}" data-field-type="${escapeHtml2(normalizedField.type)}">
-        ${renderDynamicField(fieldDefinition, { value: fieldValue, pluginStatuses })}
-      </div>
-    `;
-  }).join("");
-  return `
-    <div class="blocks-item rounded-lg border border-zinc-200 dark:border-white/10 bg-white/60 dark:bg-white/5 p-4 shadow-sm" data-block-type="${escapeHtml2(block.name)}" data-block-discriminator="${escapeHtml2(discriminator)}" draggable="true">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex items-start gap-3">
-          <div class="drag-handle cursor-move text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-400" data-action="drag-handle" title="Drag to reorder">
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4 8h16M4 16h16"/>
-            </svg>
-          </div>
-          <div>
-            <div class="text-sm font-semibold text-zinc-900 dark:text-white">
-              ${escapeHtml2(block.label)}
-              <span class="ml-2 text-xs font-normal text-zinc-500 dark:text-zinc-400" data-block-order-label></span>
-            </div>
-            ${block.description ? `<p class="text-xs text-zinc-500 dark:text-zinc-400">${escapeHtml2(block.description)}</p>` : ""}
-          </div>
-        </div>
-        <div class="flex flex-wrap gap-2 text-xs">
-          <button type="button" data-action="move-up" class="inline-flex items-center justify-center rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent dark:disabled:hover:bg-transparent" aria-label="Move block up" title="Move up">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6l-4 4m4-4l4 4m-4-4v12"/>
-            </svg>
-          </button>
-          <button type="button" data-action="move-down" class="inline-flex items-center justify-center rounded-md border border-zinc-200 px-2 py-1 text-zinc-600 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent dark:disabled:hover:bg-transparent" aria-label="Move block down" title="Move down">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 18l4-4m-4 4l-4-4m4 4V6"/>
-            </svg>
-          </button>
-          <button type="button" data-action="remove-block" class="inline-flex items-center gap-x-1 px-2.5 py-1.5 text-xs font-medium text-pink-700 dark:text-pink-300 hover:bg-pink-50 dark:hover:bg-pink-900/20 rounded-lg transition-colors">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
-            </svg>
-            Delete block
-          </button>
-        </div>
-      </div>
-      <div class="mt-4 space-y-4">
-        ${blockFields}
-      </div>
-    </div>
-  `;
-}
-function normalizeBlockField(fieldConfig, fieldName) {
-  const type = fieldConfig?.type || "text";
-  const label = fieldConfig?.title || fieldName;
-  const required = fieldConfig?.required === true;
-  const options = { ...fieldConfig };
-  if (type === "select" && Array.isArray(fieldConfig?.enum)) {
-    options.options = fieldConfig.enum.map((value, index) => ({
-      value,
-      label: fieldConfig.enumLabels?.[index] || value
-    }));
-  }
-  return {
-    type,
-    label,
-    required,
-    defaultValue: fieldConfig?.default,
-    options
-  };
-}
-function getStructuredFieldScript() {
-  return `
-    <script>
-      if (!window.__sonicStructuredFieldInit) {
-        window.__sonicStructuredFieldInit = true;
-
-        function initializeStructuredFields() {
-          const readFieldValue = (fieldWrapper) => {
-            const fieldType = fieldWrapper.dataset.fieldType;
-            const select = fieldWrapper.querySelector('select');
-            const textarea = fieldWrapper.querySelector('textarea');
-            const inputs = Array.from(fieldWrapper.querySelectorAll('input'));
-            const checkbox = inputs.find((input) => input.type === 'checkbox');
-            const nonHiddenInput = inputs.find((input) => input.type !== 'hidden' && input.type !== 'checkbox');
-            const hiddenInput = inputs.find((input) => input.type === 'hidden');
-
-            if (fieldType === 'object' || fieldType === 'array') {
-              if (!hiddenInput) {
-                return fieldType === 'array' ? [] : {};
-              }
-              const rawValue = hiddenInput.value || '';
-              if (!rawValue.trim()) {
-                return fieldType === 'array' ? [] : {};
-              }
-              try {
-                return JSON.parse(rawValue);
-              } catch {
-                return fieldType === 'array' ? [] : {};
-              }
-            }
-
-            if (fieldType === 'boolean' && checkbox) {
-              return checkbox.checked;
-            }
-
-            if (select) {
-              if (select.multiple) {
-                return Array.from(select.selectedOptions).map((option) => option.value);
-              }
-              return select.value;
-            }
-
-            if (fieldType === 'quill' || fieldType === 'media') {
-              return hiddenInput ? hiddenInput.value : '';
-            }
-
-            const textSource = textarea || nonHiddenInput || hiddenInput;
-            if (!textSource) {
-              return '';
-            }
-
-            if (fieldType === 'number') {
-              return textSource.value === '' ? null : Number(textSource.value);
-            }
-
-            return textSource.value;
-          };
-
-          const readStructuredValue = (container) => {
-            const fields = Array.from(container.querySelectorAll('.structured-subfield'));
-            if (fields.length === 1 && fields[0].dataset.structuredField === '__value') {
-              return readFieldValue(fields[0]);
-            }
-
-            return fields.reduce((acc, fieldWrapper) => {
-              const fieldName = fieldWrapper.dataset.structuredField;
-              if (!fieldName || fieldName === '__value') return acc;
-              acc[fieldName] = readFieldValue(fieldWrapper);
-              return acc;
-            }, {});
-          };
-
-          document.querySelectorAll('[data-structured-object]').forEach((container) => {
-            if (container.dataset.structuredInitialized === 'true') {
-              return;
-            }
-            container.dataset.structuredInitialized = 'true';
-            const hiddenInput = container.querySelector('input[type="hidden"]');
-
-            const updateHiddenInput = () => {
-              if (!hiddenInput) return;
-              const value = readStructuredValue(container);
-              hiddenInput.value = JSON.stringify(value);
-            };
-
-            container.addEventListener('input', updateHiddenInput);
-            container.addEventListener('change', updateHiddenInput);
-            updateHiddenInput();
-          });
-
-          document.querySelectorAll('[data-structured-array]').forEach((container) => {
-            if (container.dataset.structuredInitialized === 'true') {
-              return;
-            }
-            container.dataset.structuredInitialized = 'true';
-            const list = container.querySelector('[data-structured-array-list]');
-            const hiddenInput = container.querySelector('input[type="hidden"]');
-            const template = container.querySelector('template[data-structured-array-template]');
-
-            const updateOrderLabels = () => {
-              const items = Array.from(container.querySelectorAll('.structured-array-item'));
-              items.forEach((item, index) => {
-                const label = item.querySelector('[data-array-order-label]');
-                if (label) {
-                  label.textContent = '#'+ (index + 1);
-                }
-
-                const moveUpButton = item.querySelector('[data-action="move-up"]');
-                if (moveUpButton instanceof HTMLButtonElement) {
-                  moveUpButton.disabled = index === 0;
-                }
-
-                const moveDownButton = item.querySelector('[data-action="move-down"]');
-                if (moveDownButton instanceof HTMLButtonElement) {
-                  moveDownButton.disabled = index === items.length - 1;
-                }
-              });
-            };
-
-            const updateHiddenInput = () => {
-              if (!hiddenInput || !list) return;
-              const items = Array.from(list.querySelectorAll('.structured-array-item'));
-              const values = items.map((item) => readStructuredValue(item));
-              hiddenInput.value = JSON.stringify(values);
-
-              const emptyState = list.querySelector('[data-structured-empty]');
-              if (emptyState) {
-                emptyState.style.display = values.length === 0 ? 'block' : 'none';
-              }
-              updateOrderLabels();
-            };
-
-            if (typeof window.initializeDragSortable === 'function' && list) {
-              window.initializeDragSortable(list, {
-                itemSelector: '.structured-array-item',
-                handleSelector: '[data-action="drag-handle"]',
-                onUpdate: updateHiddenInput
-              });
-            }
-
-            container.addEventListener('click', (event) => {
-              const target = event.target;
-              if (!(target instanceof Element)) return;
-              const actionButton = target.closest('[data-action]');
-              if (!actionButton || actionButton.hasAttribute('disabled')) return;
-
-              const action = actionButton.getAttribute('data-action');
-
-              if (action === 'add-item') {
-                if (!list || !template) return;
-                const nextIndex = list.querySelectorAll('.structured-array-item').length;
-                const html = template.innerHTML.replace(/__INDEX__/g, String(nextIndex));
-                list.insertAdjacentHTML('beforeend', html);
-                if (typeof initializeTinyMCE === 'function') {
-                  initializeTinyMCE();
-                }
-                if (typeof window.initializeQuillEditors === 'function') {
-                  window.initializeQuillEditors();
-                }
-                if (typeof initializeMDXEditor === 'function') {
-                  initializeMDXEditor();
-                }
-                updateHiddenInput();
-                return;
-              }
-
-              const item = actionButton.closest('.structured-array-item');
-              if (!item || !list) return;
-
-              if (action === 'remove-item') {
-                item.remove();
-                updateHiddenInput();
-                return;
-              }
-
-              if (action === 'move-up') {
-                const previous = item.previousElementSibling;
-                if (previous) {
-                  list.insertBefore(item, previous);
-                  updateHiddenInput();
-                }
-                return;
-              }
-
-              if (action === 'move-down') {
-                const next = item.nextElementSibling;
-                if (next) {
-                  list.insertBefore(next, item);
-                  updateHiddenInput();
-                }
-              }
-            });
-
-            container.addEventListener('input', (event) => {
-              const target = event.target;
-              if (!(target instanceof Element)) return;
-              if (target.closest('[data-structured-array-list]')) {
-                updateHiddenInput();
-              }
-            });
-
-            container.addEventListener('change', (event) => {
-              const target = event.target;
-              if (!(target instanceof Element)) return;
-              if (target.closest('[data-structured-array-list]')) {
-                updateHiddenInput();
-              }
-            });
-
-            updateHiddenInput();
-          });
-        }
-
-        window.initializeStructuredFields = initializeStructuredFields;
-
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', initializeStructuredFields);
-        } else {
-          initializeStructuredFields();
-        }
-
-        document.addEventListener('htmx:afterSwap', function() {
-          setTimeout(initializeStructuredFields, 50);
-        });
-      } else if (typeof window.initializeStructuredFields === 'function') {
-        window.initializeStructuredFields();
-      }
-    </script>
-  `;
-}
-function getBlocksFieldScript() {
-  return `
-    <script>
-      if (!window.__sonicBlocksFieldInit) {
-        window.__sonicBlocksFieldInit = true;
-
-        function initializeBlocksFields() {
-          document.querySelectorAll('.blocks-field').forEach((container) => {
-            if (container.dataset.blocksInitialized === 'true') {
-              return;
-            }
-
-            container.dataset.blocksInitialized = 'true';
-            const list = container.querySelector('[data-blocks-list]');
-            const hiddenInput = container.querySelector('input[type="hidden"]');
-            const typeSelect = container.querySelector('[data-role="block-type-select"]');
-            const discriminator = container.dataset.blocksDiscriminator || 'blockType';
-
-            const updateOrderLabels = () => {
-              const items = Array.from(container.querySelectorAll('.blocks-item'));
-              items.forEach((item, index) => {
-                const label = item.querySelector('[data-block-order-label]');
-                if (label) {
-                  label.textContent = '#'+ (index + 1);
-                }
-
-                const moveUpButton = item.querySelector('[data-action="move-up"]');
-                if (moveUpButton instanceof HTMLButtonElement) {
-                  moveUpButton.disabled = index === 0;
-                }
-
-                const moveDownButton = item.querySelector('[data-action="move-down"]');
-                if (moveDownButton instanceof HTMLButtonElement) {
-                  moveDownButton.disabled = index === items.length - 1;
-                }
-              });
-            };
-
-            const readFieldValue = (fieldWrapper) => {
-              const fieldType = fieldWrapper.dataset.fieldType;
-              const select = fieldWrapper.querySelector('select');
-              const textarea = fieldWrapper.querySelector('textarea');
-              const inputs = Array.from(fieldWrapper.querySelectorAll('input'));
-              const checkbox = inputs.find((input) => input.type === 'checkbox');
-              const nonHiddenInput = inputs.find((input) => input.type !== 'hidden' && input.type !== 'checkbox');
-              const hiddenInput = inputs.find((input) => input.type === 'hidden');
-
-              if (fieldType === 'object' || fieldType === 'array') {
-                if (!hiddenInput) {
-                  return fieldType === 'array' ? [] : {};
-                }
-                const rawValue = hiddenInput.value || '';
-                if (!rawValue.trim()) {
-                  return fieldType === 'array' ? [] : {};
-                }
-                try {
-                  return JSON.parse(rawValue);
-                } catch {
-                  return fieldType === 'array' ? [] : {};
-                }
-              }
-
-              if (fieldType === 'boolean' && checkbox) {
-                return checkbox.checked;
-              }
-
-              if (select) {
-                if (select.multiple) {
-                  return Array.from(select.selectedOptions).map((option) => option.value);
-                }
-                return select.value;
-              }
-
-              if (fieldType === 'quill' || fieldType === 'media') {
-                return hiddenInput ? hiddenInput.value : '';
-              }
-
-              const textSource = textarea || nonHiddenInput || hiddenInput;
-              if (!textSource) {
-                return '';
-              }
-
-              if (fieldType === 'number') {
-                return textSource.value === '' ? null : Number(textSource.value);
-              }
-
-              return textSource.value;
-            };
-
-            const readBlockItem = (item) => {
-              if (item.dataset.blockRaw) {
-                try {
-                  return JSON.parse(item.dataset.blockRaw);
-                } catch (error) {
-                  return {};
-                }
-              }
-
-              const blockType = item.dataset.blockType;
-              const data = {};
-
-              item.querySelectorAll('.blocks-subfield').forEach((fieldWrapper) => {
-                const fieldName = fieldWrapper.dataset.blockField;
-                if (!fieldName) {
-                  return;
-                }
-                data[fieldName] = readFieldValue(fieldWrapper);
-              });
-
-              return { [discriminator]: blockType, ...data };
-            };
-
-            const updateHiddenInput = () => {
-              if (!hiddenInput || !list) return;
-              const items = Array.from(list.querySelectorAll('.blocks-item, [data-block-raw]'));
-              const blocksData = items.map((item) => readBlockItem(item));
-              hiddenInput.value = JSON.stringify(blocksData);
-
-              const emptyState = list.querySelector('[data-blocks-empty]');
-              if (emptyState) {
-                emptyState.style.display = blocksData.length === 0 ? 'block' : 'none';
-              }
-              updateOrderLabels();
-            };
-
-            const initializeEditors = () => {
-              if (typeof initializeTinyMCE === 'function') {
-                initializeTinyMCE();
-              }
-              if (typeof window.initializeQuillEditors === 'function') {
-                window.initializeQuillEditors();
-              }
-              if (typeof initializeMDXEditor === 'function') {
-                initializeMDXEditor();
-              }
-            };
-
-            if (typeof window.initializeDragSortable === 'function' && list) {
-              window.initializeDragSortable(list, {
-                itemSelector: '.blocks-item',
-                handleSelector: '[data-action="drag-handle"]',
-                onUpdate: updateHiddenInput
-              });
-            }
-
-            container.addEventListener('click', (event) => {
-              const target = event.target;
-              if (!(target instanceof Element)) return;
-              const actionButton = target.closest('[data-action]');
-              if (!actionButton) return;
-
-              if (actionButton.hasAttribute('disabled')) {
-                return;
-              }
-
-              const action = actionButton.getAttribute('data-action');
-              if (action === 'add-block') {
-                const blockType = typeSelect ? typeSelect.value : '';
-                if (!blockType || !list) return;
-                const template = container.querySelector('template[data-block-template="' + blockType + '"]');
-                if (!template) return;
-
-                const nextIndex = list.querySelectorAll('.blocks-item').length;
-                const html = template.innerHTML.replace(/__INDEX__/g, String(nextIndex));
-                list.insertAdjacentHTML('beforeend', html);
-                if (typeSelect) {
-                  typeSelect.value = '';
-                }
-                initializeEditors();
-                if (typeof window.initializeStructuredFields === 'function') {
-                  window.initializeStructuredFields();
-                }
-                updateHiddenInput();
-                return;
-              }
-
-              const item = actionButton.closest('.blocks-item');
-              if (!item || !list) return;
-
-              if (action === 'remove-block') {
-                item.remove();
-                updateHiddenInput();
-                return;
-              }
-
-              if (action === 'move-up') {
-                const previous = item.previousElementSibling;
-                if (previous) {
-                  list.insertBefore(item, previous);
-                  updateHiddenInput();
-                }
-                return;
-              }
-
-              if (action === 'move-down') {
-                const next = item.nextElementSibling;
-                if (next) {
-                  list.insertBefore(next, item);
-                  updateHiddenInput();
-                }
-              }
-            });
-
-            container.addEventListener('input', (event) => {
-              const target = event.target;
-              if (!(target instanceof Element)) return;
-              if (target.closest('[data-blocks-list]')) {
-                updateHiddenInput();
-              }
-            });
-
-            container.addEventListener('change', (event) => {
-              const target = event.target;
-              if (!(target instanceof Element)) return;
-              if (target.closest('[data-blocks-list]')) {
-                updateHiddenInput();
-              }
-            });
-
-            updateHiddenInput();
-          });
-        }
-
-        window.initializeBlocksFields = initializeBlocksFields;
-
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', initializeBlocksFields);
-        } else {
-          initializeBlocksFields();
-        }
-
-        document.addEventListener('htmx:afterSwap', function() {
-          setTimeout(initializeBlocksFields, 50);
-        });
-      } else if (typeof window.initializeBlocksFields === 'function') {
-        window.initializeBlocksFields();
-      }
-    </script>
-  `;
-}
 function escapeHtml2(text) {
   if (typeof text !== "string") return String(text || "");
-  return text.replace(
-    /[&<>"']/g,
-    (char) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    })[char] || char
-  );
+  return text.replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char] || char);
 }
 
 // src/plugins/available/tinymce-plugin/index.ts
@@ -5356,17 +4510,24 @@ function renderContentFormPage(data) {
   const coreFieldsHTML = coreFields.sort((a, b) => a.field_order - b.field_order).map((field) => renderDynamicField(field, {
     value: getFieldValue(field.field_name),
     errors: data.validationErrors?.[field.field_name] || [],
-    pluginStatuses
+    pluginStatuses,
+    collectionId: data.collection.id,
+    contentId: data.id
+    // Pass content ID when editing
   }));
   const contentFieldsHTML = contentFields.sort((a, b) => a.field_order - b.field_order).map((field) => renderDynamicField(field, {
     value: getFieldValue(field.field_name),
     errors: data.validationErrors?.[field.field_name] || [],
-    pluginStatuses
+    pluginStatuses,
+    collectionId: data.collection.id,
+    contentId: data.id
   }));
   const metaFieldsHTML = metaFields.sort((a, b) => a.field_order - b.field_order).map((field) => renderDynamicField(field, {
     value: getFieldValue(field.field_name),
     errors: data.validationErrors?.[field.field_name] || [],
-    pluginStatuses
+    pluginStatuses,
+    collectionId: data.collection.id,
+    contentId: data.id
   }));
   const pageContent = `
     <div class="space-y-6">
@@ -6806,9 +5967,9 @@ async function isPluginActive2(db, pluginId) {
 
 // src/routes/admin-content.ts
 var adminContentRoutes = new hono.Hono();
-adminContentRoutes.use("*", chunk2GH4GRU2_cjs.requireAuth());
+adminContentRoutes.use("*", chunkCZOX6237_cjs.requireAuth());
 async function getCollectionFields(db, collectionId) {
-  const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.collection);
+  const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.collection);
   return cache.getOrSet(
     cache.generateKey("fields", collectionId),
     async () => {
@@ -6863,7 +6024,7 @@ async function getCollectionFields(db, collectionId) {
   );
 }
 async function getCollection(db, collectionId) {
-  const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.collection);
+  const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.collection);
   return cache.getOrSet(
     cache.generateKey("collection", collectionId),
     async () => {
@@ -7152,7 +6313,7 @@ adminContentRoutes.get("/:id/edit", async (c) => {
     const db = c.env.DB;
     const url = new URL(c.req.url);
     const referrerParams = url.searchParams.get("ref") || "";
-    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.content);
+    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.content);
     const content = await cache.getOrSet(
       cache.generateKey("content", id),
       async () => {
@@ -7283,9 +6444,9 @@ adminContentRoutes.post("/", async (c) => {
     const errors = {};
     for (const field of fields) {
       const value = formData.get(field.field_name);
-      const blocksConfig = chunkVQLXDT7P_cjs.getBlocksFieldConfig(field.field_options);
+      const blocksConfig = chunk34VHXNMW_cjs.getBlocksFieldConfig(field.field_options);
       if (blocksConfig) {
-        const parsed = chunkVQLXDT7P_cjs.parseBlocksValue(value, blocksConfig);
+        const parsed = chunk34VHXNMW_cjs.parseBlocksValue(value, blocksConfig);
         if (field.is_required && parsed.value.length === 0) {
           parsed.errors.push(`${field.field_label} is required`);
         }
@@ -7427,7 +6588,7 @@ adminContentRoutes.post("/", async (c) => {
       now,
       now
     ).run();
-    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.content);
+    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.content);
     await cache.invalidate(`content:list:${collectionId}:*`);
     const versionStmt = db.prepare(`
       INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
@@ -7502,9 +6663,9 @@ adminContentRoutes.put("/:id", async (c) => {
     const errors = {};
     for (const field of fields) {
       const value = formData.get(field.field_name);
-      const blocksConfig = chunkVQLXDT7P_cjs.getBlocksFieldConfig(field.field_options);
+      const blocksConfig = chunk34VHXNMW_cjs.getBlocksFieldConfig(field.field_options);
       if (blocksConfig) {
-        const parsed = chunkVQLXDT7P_cjs.parseBlocksValue(value, blocksConfig);
+        const parsed = chunk34VHXNMW_cjs.parseBlocksValue(value, blocksConfig);
         if (field.is_required && parsed.value.length === 0) {
           parsed.errors.push(`${field.field_label} is required`);
         }
@@ -7648,7 +6809,7 @@ adminContentRoutes.put("/:id", async (c) => {
       now,
       id
     ).run();
-    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.content);
+    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.content);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existingContent.collection_id}:*`);
     const existingData = JSON.parse(existingContent.data || "{}");
@@ -7716,9 +6877,9 @@ adminContentRoutes.post("/preview", async (c) => {
     const data = {};
     for (const field of fields) {
       const value = formData.get(field.field_name);
-      const blocksConfig = chunkVQLXDT7P_cjs.getBlocksFieldConfig(field.field_options);
+      const blocksConfig = chunk34VHXNMW_cjs.getBlocksFieldConfig(field.field_options);
       if (blocksConfig) {
-        const parsed = chunkVQLXDT7P_cjs.parseBlocksValue(value, blocksConfig);
+        const parsed = chunk34VHXNMW_cjs.parseBlocksValue(value, blocksConfig);
         data[field.field_name] = parsed.value;
         continue;
       }
@@ -7947,7 +7108,7 @@ adminContentRoutes.post("/bulk-action", async (c) => {
     } else {
       return c.json({ success: false, error: "Invalid action" });
     }
-    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.content);
+    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.content);
     for (const contentId of ids) {
       await cache.delete(cache.generateKey("content", contentId));
     }
@@ -7975,7 +7136,7 @@ adminContentRoutes.delete("/:id", async (c) => {
       WHERE id = ?
     `);
     await deleteStmt.bind(now, id).run();
-    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.content);
+    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.content);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate("content:list:*");
     return c.html(`
@@ -9019,7 +8180,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="first_name"
-                      value="${chunkVQLXDT7P_cjs.escapeHtml(data.userToEdit.firstName || "")}"
+                      value="${chunk34VHXNMW_cjs.escapeHtml(data.userToEdit.firstName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -9030,7 +8191,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="last_name"
-                      value="${chunkVQLXDT7P_cjs.escapeHtml(data.userToEdit.lastName || "")}"
+                      value="${chunk34VHXNMW_cjs.escapeHtml(data.userToEdit.lastName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -9041,7 +8202,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="username"
-                      value="${chunkVQLXDT7P_cjs.escapeHtml(data.userToEdit.username || "")}"
+                      value="${chunk34VHXNMW_cjs.escapeHtml(data.userToEdit.username || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -9052,7 +8213,7 @@ function renderUserEditPage(data) {
                     <input
                       type="email"
                       name="email"
-                      value="${chunkVQLXDT7P_cjs.escapeHtml(data.userToEdit.email || "")}"
+                      value="${chunk34VHXNMW_cjs.escapeHtml(data.userToEdit.email || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -9063,7 +8224,7 @@ function renderUserEditPage(data) {
                     <input
                       type="tel"
                       name="phone"
-                      value="${chunkVQLXDT7P_cjs.escapeHtml(data.userToEdit.phone || "")}"
+                      value="${chunk34VHXNMW_cjs.escapeHtml(data.userToEdit.phone || "")}"
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
                   </div>
@@ -9077,7 +8238,7 @@ function renderUserEditPage(data) {
                         class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-zinc-500/30 dark:outline-zinc-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-500 dark:focus-visible:outline-zinc-400 sm:text-sm/6"
                       >
                         ${data.roles.map((role) => `
-                          <option value="${chunkVQLXDT7P_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunkVQLXDT7P_cjs.escapeHtml(role.label)}</option>
+                          <option value="${chunk34VHXNMW_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunk34VHXNMW_cjs.escapeHtml(role.label)}</option>
                         `).join("")}
                       </select>
                       <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-zinc-600 dark:text-zinc-400 sm:size-4">
@@ -9093,7 +8254,7 @@ function renderUserEditPage(data) {
                     name="bio"
                     rows="3"
                     class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-                  >${chunkVQLXDT7P_cjs.escapeHtml(data.userToEdit.bio || "")}</textarea>
+                  >${chunk34VHXNMW_cjs.escapeHtml(data.userToEdit.bio || "")}</textarea>
                 </div>
               </div>
 
@@ -9993,7 +9154,7 @@ function renderUsersListPage(data) {
 
 // src/routes/admin-users.ts
 var userRoutes = new hono.Hono();
-userRoutes.use("*", chunk2GH4GRU2_cjs.requireAuth());
+userRoutes.use("*", chunkCZOX6237_cjs.requireAuth());
 userRoutes.get("/", (c) => {
   return c.redirect("/admin/dashboard");
 });
@@ -10092,12 +9253,12 @@ userRoutes.put("/profile", async (c) => {
   const db = c.env.DB;
   try {
     const formData = await c.req.formData();
-    const firstName = chunkVQLXDT7P_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkVQLXDT7P_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkVQLXDT7P_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunk34VHXNMW_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunk34VHXNMW_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunk34VHXNMW_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkVQLXDT7P_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkVQLXDT7P_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunk34VHXNMW_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunk34VHXNMW_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const timezone = formData.get("timezone")?.toString() || "UTC";
     const language = formData.get("language")?.toString() || "en";
     const emailNotifications = formData.get("email_notifications") === "1";
@@ -10148,7 +9309,7 @@ userRoutes.put("/profile", async (c) => {
       Date.now(),
       user.userId
     ).run();
-    await chunk2GH4GRU2_cjs.logActivity(
+    await chunkCZOX6237_cjs.logActivity(
       db,
       user.userId,
       "profile.update",
@@ -10211,7 +9372,7 @@ userRoutes.post("/profile/avatar", async (c) => {
       SELECT first_name, last_name FROM users WHERE id = ?
     `);
     const userData = await userStmt.bind(user.userId).first();
-    await chunk2GH4GRU2_cjs.logActivity(
+    await chunkCZOX6237_cjs.logActivity(
       db,
       user.userId,
       "profile.avatar_update",
@@ -10282,7 +9443,7 @@ userRoutes.post("/profile/password", async (c) => {
         dismissible: true
       }));
     }
-    const validPassword = await chunk2GH4GRU2_cjs.AuthManager.verifyPassword(currentPassword, userData.password_hash);
+    const validPassword = await chunkCZOX6237_cjs.AuthManager.verifyPassword(currentPassword, userData.password_hash);
     if (!validPassword) {
       return c.html(renderAlert2({
         type: "error",
@@ -10290,7 +9451,7 @@ userRoutes.post("/profile/password", async (c) => {
         dismissible: true
       }));
     }
-    const newPasswordHash = await chunk2GH4GRU2_cjs.AuthManager.hashPassword(newPassword);
+    const newPasswordHash = await chunkCZOX6237_cjs.AuthManager.hashPassword(newPassword);
     const historyStmt = db.prepare(`
       INSERT INTO password_history (id, user_id, password_hash, created_at)
       VALUES (?, ?, ?, ?)
@@ -10306,7 +9467,7 @@ userRoutes.post("/profile/password", async (c) => {
       WHERE id = ?
     `);
     await updateStmt.bind(newPasswordHash, Date.now(), user.userId).run();
-    await chunk2GH4GRU2_cjs.logActivity(
+    await chunkCZOX6237_cjs.logActivity(
       db,
       user.userId,
       "profile.password_change",
@@ -10373,7 +9534,7 @@ userRoutes.get("/users", async (c) => {
     `);
     const countResult = await countStmt.bind(...params).first();
     const totalUsers = countResult?.total || 0;
-    await chunk2GH4GRU2_cjs.logActivity(
+    await chunkCZOX6237_cjs.logActivity(
       db,
       user.userId,
       "users.list_view",
@@ -10475,12 +9636,12 @@ userRoutes.post("/users/new", async (c) => {
   const user = c.get("user");
   try {
     const formData = await c.req.formData();
-    const firstName = chunkVQLXDT7P_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkVQLXDT7P_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkVQLXDT7P_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunk34VHXNMW_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunk34VHXNMW_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunk34VHXNMW_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkVQLXDT7P_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkVQLXDT7P_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunk34VHXNMW_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunk34VHXNMW_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const password = formData.get("password")?.toString() || "";
     const confirmPassword = formData.get("confirm_password")?.toString() || "";
@@ -10527,7 +9688,7 @@ userRoutes.post("/users/new", async (c) => {
         dismissible: true
       }));
     }
-    const passwordHash = await chunk2GH4GRU2_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await chunkCZOX6237_cjs.AuthManager.hashPassword(password);
     const userId = crypto.randomUUID();
     const createStmt = db.prepare(`
       INSERT INTO users (
@@ -10550,7 +9711,7 @@ userRoutes.post("/users/new", async (c) => {
       Date.now(),
       Date.now()
     ).run();
-    await chunk2GH4GRU2_cjs.logActivity(
+    await chunkCZOX6237_cjs.logActivity(
       db,
       user.userId,
       "user!.create",
@@ -10588,7 +9749,7 @@ userRoutes.get("/users/:id", async (c) => {
     if (!userRecord) {
       return c.json({ error: "User not found" }, 404);
     }
-    await chunk2GH4GRU2_cjs.logActivity(
+    await chunkCZOX6237_cjs.logActivity(
       db,
       user.userId,
       "user!.view",
@@ -10681,12 +9842,12 @@ userRoutes.put("/users/:id", async (c) => {
   const userId = c.req.param("id");
   try {
     const formData = await c.req.formData();
-    const firstName = chunkVQLXDT7P_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkVQLXDT7P_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkVQLXDT7P_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunk34VHXNMW_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunk34VHXNMW_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunk34VHXNMW_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkVQLXDT7P_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkVQLXDT7P_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunk34VHXNMW_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunk34VHXNMW_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const isActive = formData.get("is_active") === "1";
     const emailVerified = formData.get("email_verified") === "1";
@@ -10737,7 +9898,7 @@ userRoutes.put("/users/:id", async (c) => {
       Date.now(),
       userId
     ).run();
-    await chunk2GH4GRU2_cjs.logActivity(
+    await chunkCZOX6237_cjs.logActivity(
       db,
       user.userId,
       "user!.update",
@@ -10782,7 +9943,7 @@ userRoutes.post("/users/:id/toggle", async (c) => {
       UPDATE users SET is_active = ?, updated_at = ? WHERE id = ?
     `);
     await toggleStmt.bind(active ? 1 : 0, Date.now(), userId).run();
-    await chunk2GH4GRU2_cjs.logActivity(
+    await chunkCZOX6237_cjs.logActivity(
       db,
       user.userId,
       active ? "user.activate" : "user.deactivate",
@@ -10823,7 +9984,7 @@ userRoutes.delete("/users/:id", async (c) => {
         DELETE FROM users WHERE id = ?
       `);
       await deleteStmt.bind(userId).run();
-      await chunk2GH4GRU2_cjs.logActivity(
+      await chunkCZOX6237_cjs.logActivity(
         db,
         user.userId,
         "user!.hard_delete",
@@ -10842,7 +10003,7 @@ userRoutes.delete("/users/:id", async (c) => {
         UPDATE users SET is_active = 0, updated_at = ? WHERE id = ?
       `);
       await deleteStmt.bind(Date.now(), userId).run();
-      await chunk2GH4GRU2_cjs.logActivity(
+      await chunkCZOX6237_cjs.logActivity(
         db,
         user.userId,
         "user!.soft_delete",
@@ -10869,8 +10030,8 @@ userRoutes.post("/invite-user", async (c) => {
     const formData = await c.req.formData();
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
     const role = formData.get("role")?.toString()?.trim() || "viewer";
-    const firstName = chunkVQLXDT7P_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkVQLXDT7P_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const firstName = chunk34VHXNMW_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunk34VHXNMW_cjs.sanitizeInput(formData.get("last_name")?.toString());
     if (!email || !firstName || !lastName) {
       return c.json({ error: "Email, first name, and last name are required" }, 400);
     }
@@ -10908,7 +10069,7 @@ userRoutes.post("/invite-user", async (c) => {
       Date.now(),
       Date.now()
     ).run();
-    await chunk2GH4GRU2_cjs.logActivity(
+    await chunkCZOX6237_cjs.logActivity(
       db,
       user.userId,
       "user!.invite_sent",
@@ -10965,7 +10126,7 @@ userRoutes.post("/resend-invitation/:id", async (c) => {
       Date.now(),
       userId
     ).run();
-    await chunk2GH4GRU2_cjs.logActivity(
+    await chunkCZOX6237_cjs.logActivity(
       db,
       user.userId,
       "user!.invitation_resent",
@@ -11001,7 +10162,7 @@ userRoutes.delete("/cancel-invitation/:id", async (c) => {
     }
     const deleteStmt = db.prepare(`DELETE FROM users WHERE id = ?`);
     await deleteStmt.bind(userId).run();
-    await chunk2GH4GRU2_cjs.logActivity(
+    await chunkCZOX6237_cjs.logActivity(
       db,
       user.userId,
       "user!.invitation_cancelled",
@@ -11084,7 +10245,7 @@ userRoutes.get("/activity-logs", async (c) => {
       ...log,
       details: log.details ? JSON.parse(log.details) : null
     }));
-    await chunk2GH4GRU2_cjs.logActivity(
+    await chunkCZOX6237_cjs.logActivity(
       db,
       user.userId,
       "activity.logs_viewed",
@@ -11191,7 +10352,7 @@ userRoutes.get("/activity-logs/export", async (c) => {
       csvRows.push(row.join(","));
     }
     const csvContent = csvRows.join("\n");
-    await chunk2GH4GRU2_cjs.logActivity(
+    await chunkCZOX6237_cjs.logActivity(
       db,
       user.userId,
       "activity.logs_exported",
@@ -12530,7 +11691,7 @@ var fileValidationSchema2 = zod.z.object({
   // 50MB max
 });
 var adminMediaRoutes = new hono.Hono();
-adminMediaRoutes.use("*", chunk2GH4GRU2_cjs.requireAuth());
+adminMediaRoutes.use("*", chunkCZOX6237_cjs.requireAuth());
 adminMediaRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -13116,7 +12277,7 @@ adminMediaRoutes.put("/:id", async (c) => {
     `);
   }
 });
-adminMediaRoutes.delete("/cleanup", chunk2GH4GRU2_cjs.requireRole("admin"), async (c) => {
+adminMediaRoutes.delete("/cleanup", chunkCZOX6237_cjs.requireRole("admin"), async (c) => {
   try {
     const db = c.env.DB;
     const allMediaStmt = db.prepare("SELECT id, r2_key, filename FROM media WHERE deleted_at IS NULL");
@@ -14842,7 +14003,7 @@ function formatTimestamp(timestamp) {
 
 // src/routes/admin-plugins.ts
 var adminPluginRoutes = new hono.Hono();
-adminPluginRoutes.use("*", chunk2GH4GRU2_cjs.requireAuth());
+adminPluginRoutes.use("*", chunkCZOX6237_cjs.requireAuth());
 var AVAILABLE_PLUGINS = [
   {
     id: "third-party-faq",
@@ -16173,11 +15334,11 @@ function renderLogConfigPage(data) {
 
 // src/routes/admin-logs.ts
 var adminLogsRoutes = new hono.Hono();
-adminLogsRoutes.use("*", chunk2GH4GRU2_cjs.requireAuth());
+adminLogsRoutes.use("*", chunkCZOX6237_cjs.requireAuth());
 adminLogsRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
-    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
+    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
     const query = c.req.query();
     const page = parseInt(query.page || "1");
     const limit = parseInt(query.limit || "50");
@@ -16257,7 +15418,7 @@ adminLogsRoutes.get("/:id", async (c) => {
   try {
     const id = c.req.param("id");
     const user = c.get("user");
-    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
+    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
     const { logs } = await logger.getLogs({
       limit: 1,
       offset: 0,
@@ -16294,7 +15455,7 @@ adminLogsRoutes.get("/:id", async (c) => {
 adminLogsRoutes.get("/config", async (c) => {
   try {
     const user = c.get("user");
-    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
+    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
     const configs = await logger.getAllConfigs();
     const pageData = {
       configs,
@@ -16318,7 +15479,7 @@ adminLogsRoutes.post("/config/:category", async (c) => {
     const level = formData.get("level");
     const retention = parseInt(formData.get("retention"));
     const maxSize = parseInt(formData.get("max_size"));
-    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
+    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
     await logger.updateConfig(category, {
       enabled,
       level,
@@ -16347,7 +15508,7 @@ adminLogsRoutes.get("/export", async (c) => {
     const category = query.category;
     const startDate = query.start_date;
     const endDate = query.end_date;
-    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
+    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
     const filter = {
       limit: 1e4,
       // Export up to 10k logs
@@ -16428,7 +15589,7 @@ adminLogsRoutes.post("/cleanup", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
+    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
     await logger.cleanupByRetention();
     return c.html(html.html`
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
@@ -16450,7 +15611,7 @@ adminLogsRoutes.post("/search", async (c) => {
     const search = formData.get("search");
     const level = formData.get("level");
     const category = formData.get("category");
-    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
+    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
     const filter = {
       limit: 20,
       offset: 0,
@@ -18501,9 +17662,9 @@ function renderStorageUsage(databaseSizeBytes, mediaSizeBytes) {
 }
 
 // src/routes/admin-dashboard.ts
-var VERSION = chunkVQLXDT7P_cjs.getCoreVersion();
+var VERSION = chunk34VHXNMW_cjs.getCoreVersion();
 var router = new hono.Hono();
-router.use("*", chunk2GH4GRU2_cjs.requireAuth());
+router.use("*", chunkCZOX6237_cjs.requireAuth());
 router.get("/", async (c) => {
   const user = c.get("user");
   try {
@@ -20261,7 +19422,7 @@ function renderCollectionFormPage(data) {
 
 // src/routes/admin-collections.ts
 var adminCollectionsRoutes = new hono.Hono();
-adminCollectionsRoutes.use("*", chunk2GH4GRU2_cjs.requireAuth());
+adminCollectionsRoutes.use("*", chunkCZOX6237_cjs.requireAuth());
 adminCollectionsRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -20517,16 +19678,30 @@ adminCollectionsRoutes.get("/:id", async (c) => {
         const schema = typeof collection.schema === "string" ? JSON.parse(collection.schema) : collection.schema;
         if (schema && schema.properties) {
           let fieldOrder = 0;
-          fields = Object.entries(schema.properties).map(([fieldName, fieldConfig]) => ({
-            id: `schema-${fieldName}`,
-            field_name: fieldName,
-            field_type: fieldConfig.type || "string",
-            field_label: fieldConfig.title || fieldName,
-            field_options: fieldConfig,
-            field_order: fieldOrder++,
-            is_required: fieldConfig.required === true || schema.required && schema.required.includes(fieldName),
-            is_searchable: fieldConfig.searchable === true || false
-          }));
+          fields = Object.entries(schema.properties).map(([fieldName, fieldConfig]) => {
+            let fieldType = fieldConfig.type || "string";
+            if (fieldConfig.enum) {
+              fieldType = "select";
+            } else if (fieldConfig.format === "richtext") {
+              fieldType = "richtext";
+            } else if (fieldConfig.format === "media") {
+              fieldType = "media";
+            } else if (fieldConfig.format === "date-time") {
+              fieldType = "date";
+            } else if (fieldConfig.type === "slug" || fieldConfig.format === "slug") {
+              fieldType = "slug";
+            }
+            return {
+              id: `schema-${fieldName}`,
+              field_name: fieldName,
+              field_type: fieldType,
+              field_label: fieldConfig.title || fieldName,
+              field_options: fieldConfig,
+              field_order: fieldOrder++,
+              is_required: fieldConfig.required === true || schema.required && schema.required.includes(fieldName),
+              is_searchable: fieldConfig.searchable === true || false
+            };
+          });
         }
       } catch (e) {
         console.error("Error parsing collection schema:", e);
@@ -20741,6 +19916,9 @@ adminCollectionsRoutes.post("/:id/fields", async (c) => {
         fieldConfig.enum = parsedOptions.options || [];
       } else if (fieldType === "media") {
         fieldConfig.format = "media";
+      } else if (fieldType === "slug") {
+        fieldConfig.type = "slug";
+        fieldConfig.format = "slug";
       } else if (fieldType === "quill") {
         fieldConfig.type = "quill";
       } else if (fieldType === "mdxeditor") {
@@ -22424,7 +21602,7 @@ function renderDatabaseToolsSettings(settings) {
 
 // src/routes/admin-settings.ts
 var adminSettingsRoutes = new hono.Hono();
-adminSettingsRoutes.use("*", chunk2GH4GRU2_cjs.requireAuth());
+adminSettingsRoutes.use("*", chunkCZOX6237_cjs.requireAuth());
 function getMockSettings(user) {
   return {
     general: {
@@ -22489,7 +21667,7 @@ adminSettingsRoutes.get("/", (c) => {
 adminSettingsRoutes.get("/general", async (c) => {
   const user = c.get("user");
   const db = c.env.DB;
-  const settingsService = new chunk7FOAMNTI_cjs.SettingsService(db);
+  const settingsService = new chunkQCMSQFCP_cjs.SettingsService(db);
   const generalSettings = await settingsService.getGeneralSettings(user?.email);
   const mockSettings = getMockSettings(user);
   mockSettings.general = generalSettings;
@@ -22592,7 +21770,7 @@ adminSettingsRoutes.get("/database-tools", (c) => {
 adminSettingsRoutes.get("/api/migrations/status", async (c) => {
   try {
     const db = c.env.DB;
-    const migrationService = new chunkZ4ABPL6G_cjs.MigrationService(db);
+    const migrationService = new chunkJEN5TGDJ_cjs.MigrationService(db);
     const status = await migrationService.getMigrationStatus();
     return c.json({
       success: true,
@@ -22616,7 +21794,7 @@ adminSettingsRoutes.post("/api/migrations/run", async (c) => {
       }, 403);
     }
     const db = c.env.DB;
-    const migrationService = new chunkZ4ABPL6G_cjs.MigrationService(db);
+    const migrationService = new chunkJEN5TGDJ_cjs.MigrationService(db);
     const result = await migrationService.runPendingMigrations();
     return c.json({
       success: result.success,
@@ -22634,7 +21812,7 @@ adminSettingsRoutes.post("/api/migrations/run", async (c) => {
 adminSettingsRoutes.get("/api/migrations/validate", async (c) => {
   try {
     const db = c.env.DB;
-    const migrationService = new chunkZ4ABPL6G_cjs.MigrationService(db);
+    const migrationService = new chunkJEN5TGDJ_cjs.MigrationService(db);
     const validation = await migrationService.validateSchema();
     return c.json({
       success: true,
@@ -22791,7 +21969,7 @@ adminSettingsRoutes.post("/general", async (c) => {
     }
     const formData = await c.req.formData();
     const db = c.env.DB;
-    const settingsService = new chunk7FOAMNTI_cjs.SettingsService(db);
+    const settingsService = new chunkQCMSQFCP_cjs.SettingsService(db);
     const settings = {
       siteName: formData.get("siteName"),
       siteDescription: formData.get("siteDescription"),
@@ -22879,5 +22057,5 @@ exports.checkAdminUserExists = checkAdminUserExists;
 exports.router = router;
 exports.test_cleanup_default = test_cleanup_default;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-DQQMR5CK.cjs.map
-//# sourceMappingURL=chunk-DQQMR5CK.cjs.map
+//# sourceMappingURL=chunk-57JCPFV7.cjs.map
+//# sourceMappingURL=chunk-57JCPFV7.cjs.map
