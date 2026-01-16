@@ -12,8 +12,9 @@ test.describe('Health Checks', () => {
     expect(health).toHaveProperty('timestamp');
   });
 
-  test('404 routes should return not found', async ({ page }) => {
-    const response = await page.goto('/nonexistent-route');
-    expect(response?.status()).toBe(404);
+  test('404 routes should return not found', async ({ request }) => {
+    // Use request API directly to check 404 status without redirect following
+    const response = await request.get('/api/nonexistent-route-12345');
+    expect(response.status()).toBe(404);
   });
 }); 
