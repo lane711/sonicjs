@@ -96,7 +96,9 @@ export function renderContentFormPage(data: ContentFormData): string {
     .map(field => renderDynamicField(field, {
       value: getFieldValue(field.field_name),
       errors: data.validationErrors?.[field.field_name] || [],
-      pluginStatuses
+      pluginStatuses,
+      collectionId: data.collection.id,
+      contentId: data.id // Pass content ID when editing
     }))
 
   const contentFieldsHTML = contentFields
@@ -104,7 +106,9 @@ export function renderContentFormPage(data: ContentFormData): string {
     .map(field => renderDynamicField(field, {
       value: getFieldValue(field.field_name),
       errors: data.validationErrors?.[field.field_name] || [],
-      pluginStatuses
+      pluginStatuses,
+      collectionId: data.collection.id,
+      contentId: data.id
     }))
 
   const metaFieldsHTML = metaFields
@@ -112,7 +116,9 @@ export function renderContentFormPage(data: ContentFormData): string {
     .map(field => renderDynamicField(field, {
       value: getFieldValue(field.field_name),
       errors: data.validationErrors?.[field.field_name] || [],
-      pluginStatuses
+      pluginStatuses,
+      collectionId: data.collection.id,
+      contentId: data.id
     }))
 
   const pageContent = `
