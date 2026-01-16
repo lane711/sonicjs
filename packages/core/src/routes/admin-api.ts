@@ -38,7 +38,7 @@ adminApiRoutes.get('/stats', async (c) => {
     // Get content count
     let contentCount = 0
     try {
-      const contentStmt = db.prepare('SELECT COUNT(*) as count FROM content WHERE deleted_at IS NULL')
+      const contentStmt = db.prepare('SELECT COUNT(*) as count FROM content')
       const contentResult = await contentStmt.first()
       contentCount = (contentResult as any)?.count || 0
     } catch (error) {
@@ -353,7 +353,7 @@ adminApiRoutes.get('/references', async (c) => {
       const itemStmt = db.prepare(`
         SELECT id, title, slug
         FROM content
-        WHERE id = ? AND collection_id = ? AND deleted_at IS NULL
+        WHERE id = ? AND collection_id = ?
         LIMIT 1
       `)
       const item = await itemStmt.bind(id, collection.id).first() as any
@@ -384,7 +384,7 @@ adminApiRoutes.get('/references', async (c) => {
       stmt = db.prepare(`
         SELECT id, title, slug, status, updated_at
         FROM content
-        WHERE collection_id = ? AND deleted_at IS NULL
+        WHERE collection_id = ?
         AND (title LIKE ? OR slug LIKE ?)
         ORDER BY updated_at DESC
         LIMIT ?
@@ -395,7 +395,7 @@ adminApiRoutes.get('/references', async (c) => {
       stmt = db.prepare(`
         SELECT id, title, slug, status, updated_at
         FROM content
-        WHERE collection_id = ? AND deleted_at IS NULL
+        WHERE collection_id = ?
         ORDER BY updated_at DESC
         LIMIT ?
       `)
