@@ -23,7 +23,8 @@ const pageBlocksCollection: CollectionConfig = {
       featuredPage: {
         type: 'reference',
         title: 'Featured Page',
-        collection: 'page_blocks',
+        collections: ['page_blocks', 'pages', 'blog_posts'],
+        referenceStatus: 'published',
       },
       seo: {
         type: 'object',
@@ -52,7 +53,29 @@ const pageBlocksCollection: CollectionConfig = {
           },
         },
       },
+      menu: {
+        type: 'object',
+        title: 'Menu',
+        properties: {
+          heading: { type: 'string', title: 'Heading' },
+          members: {
+            type: 'array',
+            title: 'Menu Items',
+            items: {
+              type: 'reference',
+              title: 'Menu Item',
+              collections: ['page_blocks'],
 
+              // type: 'object',
+              // properties: {
+              //   name: { type: 'string', title: 'Name', required: true },
+              //   role: { type: 'string', title: 'Role' },
+              //   photo: { type: 'media', title: 'Photo' },
+              // },
+            },
+          },
+        },
+      },
       body: {
         type: 'array',
         title: 'Content Blocks',

@@ -59,6 +59,8 @@ export interface FieldConfig {
 
   // Reference field
   collection?: string
+  collections?: string[]
+  referenceStatus?: string | string[]
 
   // Array/Object fields
   items?: FieldConfig

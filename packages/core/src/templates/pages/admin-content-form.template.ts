@@ -1,10 +1,20 @@
-import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
-import { renderAlert } from '../alert.template'
-import { renderDynamicField, renderFieldGroup, FieldDefinition } from '../components/dynamic-field.template'
-import { renderConfirmationDialog, getConfirmationDialogScript } from '../confirmation-dialog.template'
-import { getTinyMCEScript, getTinyMCEInitScript } from '../../plugins/available/tinymce-plugin'
+import { getMDXEditorInitScript, getMDXEditorScripts } from '../../plugins/available/easy-mdx'
+import { getTinyMCEInitScript, getTinyMCEScript } from '../../plugins/available/tinymce-plugin'
 import { getQuillCDN, getQuillInitScript } from '../../plugins/core-plugins/quill-editor'
-import { getMDXEditorScripts, getMDXEditorInitScript } from '../../plugins/available/easy-mdx'
+import { renderAlert } from '../alert.template'
+import {
+  FieldDefinition,
+  renderDynamicField,
+  renderFieldGroup,
+} from '../components/dynamic-field.template'
+import {
+  getConfirmationDialogScript,
+  renderConfirmationDialog,
+} from '../confirmation-dialog.template'
+import {
+  AdminLayoutCatalystData,
+  renderAdminLayoutCatalyst,
+} from '../layouts/admin-layout-catalyst.template'
 
 export interface Collection {
   id: string
@@ -72,10 +82,12 @@ export function renderContentFormPage(data: ContentFormData): string {
     : `/admin/content?collection=${data.collection.id}`
 
   // Group fields by category
-  const coreFields = data.fields.filter(f => ['title', 'slug', 'content'].includes(f.field_name))
-  const contentFields = data.fields.filter(f => !['title', 'slug', 'content'].includes(f.field_name) && !f.field_name.startsWith('meta_'))
-  const metaFields = data.fields.filter(f => f.field_name.startsWith('meta_'))
-  
+  const coreFields = data.fields.filter((f) => ['title', 'slug', 'content'].includes(f.field_name))
+  const contentFields = data.fields.filter(
+    (f) => !['title', 'slug', 'content'].includes(f.field_name) && !f.field_name.startsWith('meta_')
+  )
+  const metaFields = data.fields.filter((f) => f.field_name.startsWith('meta_'))
+
   // Helper function to get field value - title and slug are stored as columns, others in data JSON
   const getFieldValue = (fieldName: string) => {
     if (fieldName === 'title') return data.title || data.data?.[fieldName] || ''
@@ -87,39 +99,45 @@ export function renderContentFormPage(data: ContentFormData): string {
   const pluginStatuses = {
     quillEnabled: data.quillEnabled || false,
     mdxeditorEnabled: data.mdxeditorEnabled || false,
-    tinymceEnabled: data.tinymceEnabled || false
+    tinymceEnabled: data.tinymceEnabled || false,
   }
 
   // Render field groups
   const coreFieldsHTML = coreFields
     .sort((a, b) => a.field_order - b.field_order)
-    .map(field => renderDynamicField(field, {
-      value: getFieldValue(field.field_name),
-      errors: data.validationErrors?.[field.field_name] || [],
-      pluginStatuses,
-      collectionId: data.collection.id,
-      contentId: data.id // Pass content ID when editing
-    }))
+    .map((field) =>
+      renderDynamicField(field, {
+        value: getFieldValue(field.field_name),
+        errors: data.validationErrors?.[field.field_name] || [],
+        pluginStatuses,
+        collectionId: data.collection.id,
+        contentId: data.id, // Pass content ID when editing
+      })
+    )
 
   const contentFieldsHTML = contentFields
     .sort((a, b) => a.field_order - b.field_order)
-    .map(field => renderDynamicField(field, {
-      value: getFieldValue(field.field_name),
-      errors: data.validationErrors?.[field.field_name] || [],
-      pluginStatuses,
-      collectionId: data.collection.id,
-      contentId: data.id
-    }))
+    .map((field) =>
+      renderDynamicField(field, {
+        value: getFieldValue(field.field_name),
+        errors: data.validationErrors?.[field.field_name] || [],
+        pluginStatuses,
+        collectionId: data.collection.id,
+        contentId: data.id,
+      })
+    )
 
   const metaFieldsHTML = metaFields
     .sort((a, b) => a.field_order - b.field_order)
-    .map(field => renderDynamicField(field, {
-      value: getFieldValue(field.field_name),
-      errors: data.validationErrors?.[field.field_name] || [],
-      pluginStatuses,
-      collectionId: data.collection.id,
-      contentId: data.id
-    }))
+    .map((field) =>
+      renderDynamicField(field, {
+        value: getFieldValue(field.field_name),
+        errors: data.validationErrors?.[field.field_name] || [],
+        pluginStatuses,
+        collectionId: data.collection.id,
+        contentId: data.id,
+      })
+    )
 
   const pageContent = `
     <div class="space-y-6">
@@ -198,7 +216,9 @@ export function renderContentFormPage(data: ContentFormData): string {
           <div class="rounded-lg bg-zinc-50 dark:bg-zinc-800/50 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
             <h3 class="text-base/7 font-semibold text-zinc-950 dark:text-white mb-4">Publishing</h3>
 
-            ${data.workflowEnabled ? `
+            ${
+              data.workflowEnabled
+                ? `
               <!-- Workflow Status (when workflow plugin is enabled) -->
               <div class="mb-4">
                 <label for="status" class="block text-sm/6 font-medium text-zinc-950 dark:text-white">Status</label>
@@ -245,7 +265,8 @@ export function renderContentFormPage(data: ContentFormData): string {
                 >
                 <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Automatically unpublish at this time</p>
               </div>
-            ` : `
+            `
+                : `
               <!-- Simple Status (when workflow plugin is disabled) -->
               <div class="mb-6">
                 <label for="status" class="block text-sm/6 font-medium text-zinc-950 dark:text-white">Status</label>
@@ -265,11 +286,14 @@ export function renderContentFormPage(data: ContentFormData): string {
                 </div>
                 <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Enable Workflow plugin for advanced status management</p>
               </div>
-            `}
+            `
+            }
           </div>
 
           <!-- Content Info -->
-          ${isEdit ? `
+          ${
+            isEdit
+              ? `
             <div class="rounded-lg bg-zinc-50 dark:bg-zinc-800/50 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
               <h3 class="text-base/7 font-semibold text-zinc-950 dark:text-white mb-4">Content Info</h3>
 
@@ -286,12 +310,16 @@ export function renderContentFormPage(data: ContentFormData): string {
                   <dt class="text-zinc-500 dark:text-zinc-400">Author</dt>
                   <dd class="mt-1 text-zinc-950 dark:text-white">${data.data?.author || 'Unknown'}</dd>
                 </div>
-                ${data.data?.published_at ? `
+                ${
+                  data.data?.published_at
+                    ? `
                   <div>
                     <dt class="text-zinc-500 dark:text-zinc-400">Published</dt>
                     <dd class="mt-1 text-zinc-950 dark:text-white">${new Date(data.data.published_at).toLocaleDateString()}</dd>
                   </div>
-                ` : ''}
+                `
+                    : ''
+                }
               </dl>
 
               <div class="mt-4 pt-4 border-t border-zinc-950/5 dark:border-white/10">
@@ -307,7 +335,9 @@ export function renderContentFormPage(data: ContentFormData): string {
                 </button>
               </div>
             </div>
-          ` : ''}
+          `
+              : ''
+          }
 
           <!-- Quick Actions -->
           <div class="rounded-lg bg-zinc-50 dark:bg-zinc-800/50 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6">
@@ -337,7 +367,9 @@ export function renderContentFormPage(data: ContentFormData): string {
                 Duplicate Content
               </button>
 
-              ${isEdit ? `
+              ${
+                isEdit
+                  ? `
                 <button
                   type="button"
                   onclick="deleteContent('${data.id}')"
@@ -348,7 +380,9 @@ export function renderContentFormPage(data: ContentFormData): string {
                   </svg>
                   Delete Content
                 </button>
-              ` : ''}
+              `
+                  : ''
+              }
             </div>
           </div>
         </div>
@@ -376,7 +410,9 @@ export function renderContentFormPage(data: ContentFormData): string {
               ${isEdit ? 'Update' : 'Save'}
             </button>
 
-            ${data.user?.role !== 'viewer' ? `
+            ${
+              data.user?.role !== 'viewer'
+                ? `
               <button
                 type="submit"
                 form="content-form"
@@ -389,7 +425,9 @@ export function renderContentFormPage(data: ContentFormData): string {
                 </svg>
                 ${isEdit ? 'Update' : 'Save'} & Publish
               </button>
-            ` : ''}
+            `
+                : ''
+            }
           </div>
         </div>
       </div>
@@ -405,7 +443,7 @@ export function renderContentFormPage(data: ContentFormData): string {
       cancelText: 'Cancel',
       iconColor: 'blue',
       confirmClass: 'bg-blue-500 hover:bg-blue-400',
-      onConfirm: 'performDuplicateContent()'
+      onConfirm: 'performDuplicateContent()',
     })}
 
     ${renderConfirmationDialog({
@@ -416,7 +454,7 @@ export function renderContentFormPage(data: ContentFormData): string {
       cancelText: 'Cancel',
       iconColor: 'red',
       confirmClass: 'bg-red-500 hover:bg-red-400',
-      onConfirm: `performDeleteContent('${data.id}')`
+      onConfirm: `performDeleteContent('${data.id}')`,
     })}
 
     ${getConfirmationDialogScript()}
@@ -523,10 +561,28 @@ export function renderContentFormPage(data: ContentFormData): string {
         return input ? input.closest('[data-reference-field]') : null;
       }
 
-      async function fetchReferenceItems(collection, search = '', limit = 20) {
-        const params = new URLSearchParams({ collection, limit: String(limit) });
+      function getReferenceCollections(container) {
+        if (!container) return [];
+        const rawCollections = container.dataset.referenceCollections || '';
+        const collections = rawCollections
+          .split(',')
+          .map((value) => value.trim())
+          .filter(Boolean);
+        if (collections.length > 0) {
+          return collections;
+        }
+        const singleCollection = container.dataset.referenceCollection;
+        return singleCollection ? [singleCollection] : [];
+      }
+
+      async function fetchReferenceItems(collections, search = '', limit = 20, status = '') {
+        const params = new URLSearchParams({ limit: String(limit) });
+        collections.forEach((collection) => params.append('collection', collection));
         if (search) {
           params.set('search', search);
+        }
+        if (status) {
+          params.set('status', status);
         }
         const response = await fetch('/admin/api/references?' + params.toString());
         if (!response.ok) {
@@ -536,9 +592,10 @@ export function renderContentFormPage(data: ContentFormData): string {
         return data?.data || [];
       }
 
-      async function fetchReferenceById(collection, id) {
+      async function fetchReferenceById(collections, id) {
         if (!id) return null;
-        const params = new URLSearchParams({ collection, id });
+        const params = new URLSearchParams({ id });
+        collections.forEach((collection) => params.append('collection', collection));
         const response = await fetch('/admin/api/references?' + params.toString());
         if (!response.ok) {
           return null;
@@ -569,11 +626,24 @@ export function renderContentFormPage(data: ContentFormData): string {
 
         display.appendChild(titleEl);
 
+        const metaRow = document.createElement('div');
+        metaRow.className = 'mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400';
+
+        if (item.collection?.display_name || item.collection?.name) {
+          const collectionLabel = document.createElement('span');
+          collectionLabel.className = 'inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-zinc-600 dark:bg-white/10 dark:text-zinc-200';
+          collectionLabel.textContent = item.collection.display_name || item.collection.name;
+          metaRow.appendChild(collectionLabel);
+        }
+
         if (item.slug) {
-          const slugEl = document.createElement('div');
-          slugEl.className = 'text-xs text-zinc-500 dark:text-zinc-400';
+          const slugEl = document.createElement('span');
           slugEl.textContent = item.slug;
-          display.appendChild(slugEl);
+          metaRow.appendChild(slugEl);
+        }
+
+        if (metaRow.childElementCount > 0) {
+          display.appendChild(metaRow);
         }
 
         if (removeButton) {
@@ -594,6 +664,11 @@ export function renderContentFormPage(data: ContentFormData): string {
         updateReferenceField(fieldId, null);
       }
 
+      function getReferenceStatus(container) {
+        if (!container) return '';
+        return (container.dataset.referenceStatus || '').trim();
+      }
+
       function closeReferenceSelector() {
         const modal = document.getElementById('reference-selector-modal');
         if (modal) {
@@ -604,8 +679,9 @@ export function renderContentFormPage(data: ContentFormData): string {
 
       function openReferenceSelector(fieldId) {
         const container = getReferenceContainer(fieldId);
-        const collection = container?.dataset.referenceCollection;
-        if (!container || !collection) {
+        const collections = getReferenceCollections(container);
+        const status = getReferenceStatus(container);
+        if (!container || collections.length === 0) {
           console.error('Reference collection is missing for field', fieldId);
           return;
         }
@@ -678,11 +754,24 @@ export function renderContentFormPage(data: ContentFormData): string {
 
             button.appendChild(titleEl);
 
+            const metaRow = document.createElement('div');
+            metaRow.className = 'mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400';
+
+            if (item.collection?.display_name || item.collection?.name) {
+              const collectionLabel = document.createElement('span');
+              collectionLabel.className = 'inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-zinc-600 dark:bg-white/10 dark:text-zinc-200';
+              collectionLabel.textContent = item.collection.display_name || item.collection.name;
+              metaRow.appendChild(collectionLabel);
+            }
+
             if (item.slug) {
-              const slugEl = document.createElement('div');
-              slugEl.className = 'text-xs text-zinc-500 dark:text-zinc-400';
+              const slugEl = document.createElement('span');
               slugEl.textContent = item.slug;
-              button.appendChild(slugEl);
+              metaRow.appendChild(slugEl);
+            }
+
+            if (metaRow.childElementCount > 0) {
+              button.appendChild(metaRow);
             }
 
             button.addEventListener('click', () => {
@@ -696,7 +785,7 @@ export function renderContentFormPage(data: ContentFormData): string {
 
         const loadResults = async (searchValue = '') => {
           try {
-            const items = await fetchReferenceItems(collection, searchValue);
+            const items = await fetchReferenceItems(collections, searchValue, 20, status);
             renderResults(items);
           } catch (error) {
             resultsContainer.innerHTML = '<div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Failed to load references.</div>';
@@ -718,15 +807,15 @@ export function renderContentFormPage(data: ContentFormData): string {
       document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('[data-reference-field]').forEach(async (container) => {
           const input = container.querySelector('input[type="hidden"]');
-          const collection = container.dataset.referenceCollection;
-          if (!input || !collection) return;
+          const collections = getReferenceCollections(container);
+          if (!input || collections.length === 0) return;
 
           if (!input.value) {
             renderReferenceDisplay(container, null, 'No reference selected.');
             return;
           }
 
-          const item = await fetchReferenceById(collection, input.value);
+          const item = await fetchReferenceById(collections, input.value);
           if (item) {
             renderReferenceDisplay(container, item);
           } else {
@@ -924,17 +1013,25 @@ export function renderContentFormPage(data: ContentFormData): string {
         form.addEventListener('change', scheduleAutoSave);
       });
 
-      ${data.tinymceEnabled ? getTinyMCEInitScript({
-        skin: data.tinymceSettings?.skin,
-        defaultHeight: data.tinymceSettings?.defaultHeight,
-        defaultToolbar: data.tinymceSettings?.defaultToolbar
-      }) : ''}
+      ${
+        data.tinymceEnabled
+          ? getTinyMCEInitScript({
+              skin: data.tinymceSettings?.skin,
+              defaultHeight: data.tinymceSettings?.defaultHeight,
+              defaultToolbar: data.tinymceSettings?.defaultToolbar,
+            })
+          : ''
+      }
 
-      ${data.mdxeditorEnabled ? getMDXEditorInitScript({
-        defaultHeight: data.mdxeditorSettings?.defaultHeight,
-        toolbar: data.mdxeditorSettings?.toolbar,
-        placeholder: data.mdxeditorSettings?.placeholder
-      }) : ''}
+      ${
+        data.mdxeditorEnabled
+          ? getMDXEditorInitScript({
+              defaultHeight: data.mdxeditorSettings?.defaultHeight,
+              toolbar: data.mdxeditorSettings?.toolbar,
+              placeholder: data.mdxeditorSettings?.placeholder,
+            })
+          : ''
+      }
     </script>
   `
 
@@ -944,7 +1041,7 @@ export function renderContentFormPage(data: ContentFormData): string {
     currentPath: '/admin/content',
     user: data.user,
     content: pageContent,
-    version: data.version
+    version: data.version,
   }
 
   return renderAdminLayoutCatalyst(layoutData)

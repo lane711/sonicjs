@@ -576,20 +576,30 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
       break
 
     case 'reference':
-      const referenceCollection = typeof opts.collection === 'string' ? opts.collection : ''
+      let referenceCollections = Array.isArray(opts.collections) ? opts.collections.filter(Boolean) : []
+      const singleReferenceCollection = typeof opts.collection === 'string' ? opts.collection : ''
+      if (referenceCollections.length === 0 && singleReferenceCollection) {
+        referenceCollections = [singleReferenceCollection]
+      }
+      const referenceCollectionsAttr = referenceCollections.join(',')
+      const referenceStatus = Array.isArray(opts.referenceStatus)
+        ? opts.referenceStatus.filter(Boolean).join(',')
+        : (typeof opts.referenceStatus === 'string' ? opts.referenceStatus : '')
+      const referenceStatusAttr = referenceStatus ? ` data-reference-status="${escapeHtml(referenceStatus)}"` : ''
+      const hasReferenceCollection = referenceCollections.length > 0
       const hasReferenceValue = Boolean(value)
       fieldHTML = `
-        <div class="reference-field-container space-y-3" data-reference-field data-field-name="${escapeHtml(fieldName)}" data-reference-collection="${escapeHtml(referenceCollection)}">
+        <div class="reference-field-container space-y-3" data-reference-field data-field-name="${escapeHtml(fieldName)}" data-reference-collection="${escapeHtml(referenceCollections[0] || '')}" data-reference-collections="${escapeHtml(referenceCollectionsAttr)}"${referenceStatusAttr}>
           <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml(value)}">
           <div class="rounded-lg border border-zinc-200 bg-white/60 px-3 py-2 text-sm text-zinc-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300" data-reference-display>
-            ${referenceCollection ? (hasReferenceValue ? 'Loading selection...' : 'No reference selected.') : 'Reference collection not configured.'}
+            ${hasReferenceCollection ? (hasReferenceValue ? 'Loading selection...' : 'No reference selected.') : 'Reference collection not configured.'}
           </div>
           <div class="flex flex-wrap gap-2">
             <button
               type="button"
               onclick="openReferenceSelector('${fieldId}')"
               class="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-white/10 dark:hover:bg-white/20"
-              ${referenceCollection ? '' : 'disabled'}
+              ${hasReferenceCollection ? '' : 'disabled'}
             >
               Select reference
             </button>

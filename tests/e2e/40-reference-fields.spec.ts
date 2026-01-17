@@ -20,6 +20,7 @@ test.describe('Reference Fields', () => {
 
     await page.fill('input[name="title"]', targetTitle)
     await page.fill('input[name="slug"]', targetSlug)
+    await page.selectOption('select[name="status"]', 'published')
     await page.click('button[type="submit"][value="save"]')
     await page.waitForURL(/\/admin\/content\?collection=/)
 
