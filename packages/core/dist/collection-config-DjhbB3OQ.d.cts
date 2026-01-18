@@ -28,7 +28,6 @@ interface FieldConfig {
     enumLabels?: string[];
     collection?: string;
     collections?: string[];
-    referenceStatus?: string | string[];
     items?: FieldConfig;
     properties?: Record<string, FieldConfig>;
     blocks?: BlockDefinitions;

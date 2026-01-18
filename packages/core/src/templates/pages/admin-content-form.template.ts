@@ -575,14 +575,11 @@ export function renderContentFormPage(data: ContentFormData): string {
         return singleCollection ? [singleCollection] : [];
       }
 
-      async function fetchReferenceItems(collections, search = '', limit = 20, status = '') {
+      async function fetchReferenceItems(collections, search = '', limit = 20) {
         const params = new URLSearchParams({ limit: String(limit) });
         collections.forEach((collection) => params.append('collection', collection));
         if (search) {
           params.set('search', search);
-        }
-        if (status) {
-          params.set('status', status);
         }
         const response = await fetch('/admin/api/references?' + params.toString());
         if (!response.ok) {
@@ -664,11 +661,6 @@ export function renderContentFormPage(data: ContentFormData): string {
         updateReferenceField(fieldId, null);
       }
 
-      function getReferenceStatus(container) {
-        if (!container) return '';
-        return (container.dataset.referenceStatus || '').trim();
-      }
-
       function closeReferenceSelector() {
         const modal = document.getElementById('reference-selector-modal');
         if (modal) {
@@ -680,7 +672,6 @@ export function renderContentFormPage(data: ContentFormData): string {
       function openReferenceSelector(fieldId) {
         const container = getReferenceContainer(fieldId);
         const collections = getReferenceCollections(container);
-        const status = getReferenceStatus(container);
         if (!container || collections.length === 0) {
           console.error('Reference collection is missing for field', fieldId);
           return;
@@ -785,7 +776,7 @@ export function renderContentFormPage(data: ContentFormData): string {
 
         const loadResults = async (searchValue = '') => {
           try {
-            const items = await fetchReferenceItems(collections, searchValue, 20, status);
+            const items = await fetchReferenceItems(collections, searchValue);
             renderResults(items);
           } catch (error) {
             resultsContainer.innerHTML = '<div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Failed to load references.</div>';

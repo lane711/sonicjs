@@ -335,7 +335,6 @@ adminApiRoutes.get('/references', async (c) => {
       .map((value) => value.trim())
       .filter(Boolean)
     const search = c.req.query('search') || ''
-    const rawStatus = (c.req.query('status') || '').trim()
     const id = c.req.query('id') || ''
     const limit = Math.min(Number.parseInt(c.req.query('limit') || '20', 10) || 20, 100)
 
@@ -398,18 +397,8 @@ adminApiRoutes.get('/references', async (c) => {
     let results
 
     const listPlaceholders = collectionIds.map(() => '?').join(', ')
-    const parsedStatusValues = rawStatus
-      ? rawStatus.split(',').map((value) => value.trim()).filter(Boolean)
-      : ['published']
-    const statusValues = parsedStatusValues.length ? parsedStatusValues : ['published']
-    const [firstStatus] = statusValues
-    const allowAnyStatus = statusValues.length === 1
-      && typeof firstStatus === 'string'
-      && ['all', 'any', '*'].includes(firstStatus.toLowerCase())
-    const statusFilterValues = allowAnyStatus ? [] : statusValues
-    const statusClause = statusFilterValues.length
-      ? ` AND status IN (${statusFilterValues.map(() => '?').join(', ')})`
-      : ''
+    const statusFilterValues = ['published']
+    const statusClause = ` AND status IN (${statusFilterValues.map(() => '?').join(', ')})`
 
     if (search) {
       const searchParam = `%${search}%`

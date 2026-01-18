@@ -582,14 +582,10 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         referenceCollections = [singleReferenceCollection]
       }
       const referenceCollectionsAttr = referenceCollections.join(',')
-      const referenceStatus = Array.isArray(opts.referenceStatus)
-        ? opts.referenceStatus.filter(Boolean).join(',')
-        : (typeof opts.referenceStatus === 'string' ? opts.referenceStatus : '')
-      const referenceStatusAttr = referenceStatus ? ` data-reference-status="${escapeHtml(referenceStatus)}"` : ''
       const hasReferenceCollection = referenceCollections.length > 0
       const hasReferenceValue = Boolean(value)
       fieldHTML = `
-        <div class="reference-field-container space-y-3" data-reference-field data-field-name="${escapeHtml(fieldName)}" data-reference-collection="${escapeHtml(referenceCollections[0] || '')}" data-reference-collections="${escapeHtml(referenceCollectionsAttr)}"${referenceStatusAttr}>
+        <div class="reference-field-container space-y-3" data-reference-field data-field-name="${escapeHtml(fieldName)}" data-reference-collection="${escapeHtml(referenceCollections[0] || '')}" data-reference-collections="${escapeHtml(referenceCollectionsAttr)}">
           <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml(value)}">
           <div class="rounded-lg border border-zinc-200 bg-white/60 px-3 py-2 text-sm text-zinc-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300" data-reference-display>
             ${hasReferenceCollection ? (hasReferenceValue ? 'Loading selection...' : 'No reference selected.') : 'Reference collection not configured.'}

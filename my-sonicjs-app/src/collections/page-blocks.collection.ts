@@ -24,7 +24,6 @@ const pageBlocksCollection: CollectionConfig = {
         type: 'reference',
         title: 'Featured Page',
         collections: ['page_blocks', 'pages', 'blog_posts'],
-        referenceStatus: 'published',
       },
       seo: {
         type: 'object',

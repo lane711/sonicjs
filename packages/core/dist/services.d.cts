@@ -1,6 +1,6 @@
-export { C as CorePlugin, p as LogCategory, q as LogEntry, t as LogFilter, o as LogLevel, L as Logger, m as Migration, M as MigrationService, n as MigrationStatus, k as PluginBootstrapService, P as PluginService, e as cleanupRemovedCollections, f as fullCollectionSync, g as getAvailableCollectionNames, h as getLogger, d as getManagedCollections, j as initLogger, i as isCollectionManaged, a as loadCollectionConfig, l as loadCollectionConfigs, r as registerCollections, c as syncCollection, b as syncCollections, v as validateCollectionConfig } from './plugin-bootstrap-lJfZYUrl.cjs';
+export { C as CorePlugin, p as LogCategory, q as LogEntry, t as LogFilter, o as LogLevel, L as Logger, m as Migration, M as MigrationService, n as MigrationStatus, k as PluginBootstrapService, P as PluginService, e as cleanupRemovedCollections, f as fullCollectionSync, g as getAvailableCollectionNames, h as getLogger, d as getManagedCollections, j as initLogger, i as isCollectionManaged, a as loadCollectionConfig, l as loadCollectionConfigs, r as registerCollections, c as syncCollection, b as syncCollections, v as validateCollectionConfig } from './plugin-bootstrap-D9fmGK0r.cjs';
 import { b as TelemetryConfig, c as TelemetryIdentity, T as TelemetryEvent, a as TelemetryProperties } from './telemetry-UiD1i9GS.cjs';
-import './collection-config-DTvpUq3t.cjs';
+import './collection-config-DjhbB3OQ.cjs';
 import '@cloudflare/workers-types';
 import 'drizzle-zod';
 import 'drizzle-orm/sqlite-core';

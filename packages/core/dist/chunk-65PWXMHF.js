@@ -1,7 +1,7 @@
 import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-3YNNVSMC.js';
-import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-FGSF2IXC.js';
+import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-MM76SCDR.js';
 import { PluginService } from './chunk-S3XEUEVJ.js';
-import { MigrationService } from './chunk-LUNRUIMG.js';
+import { MigrationService } from './chunk-IQFLD2KF.js';
 import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-OFXAUS5Y.js';
 import { PluginBuilder } from './chunk-QDBNW7KQ.js';
 import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml, getBlocksFieldConfig, parseBlocksValue } from './chunk-BHNDALCA.js';
@@ -1589,7 +1589,6 @@ adminApiRoutes.get("/references", async (c) => {
     const url = new URL(c.req.url);
     const collectionParams = url.searchParams.getAll("collection").flatMap((value) => value.split(",")).map((value) => value.trim()).filter(Boolean);
     const search = c.req.query("search") || "";
-    const rawStatus = (c.req.query("status") || "").trim();
     const id = c.req.query("id") || "";
     const limit = Math.min(Number.parseInt(c.req.query("limit") || "20", 10) || 20, 100);
     if (collectionParams.length === 0) {
@@ -1641,12 +1640,8 @@ adminApiRoutes.get("/references", async (c) => {
     let stmt;
     let results;
     const listPlaceholders = collectionIds.map(() => "?").join(", ");
-    const parsedStatusValues = rawStatus ? rawStatus.split(",").map((value) => value.trim()).filter(Boolean) : ["published"];
-    const statusValues = parsedStatusValues.length ? parsedStatusValues : ["published"];
-    const [firstStatus] = statusValues;
-    const allowAnyStatus = statusValues.length === 1 && typeof firstStatus === "string" && ["all", "any", "*"].includes(firstStatus.toLowerCase());
-    const statusFilterValues = allowAnyStatus ? [] : statusValues;
-    const statusClause = statusFilterValues.length ? ` AND status IN (${statusFilterValues.map(() => "?").join(", ")})` : "";
+    const statusFilterValues = ["published"];
+    const statusClause = ` AND status IN (${statusFilterValues.map(() => "?").join(", ")})`;
     if (search) {
       const searchParam = `%${search}%`;
       stmt = db.prepare(`
@@ -1858,7 +1853,7 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
 });
 adminApiRoutes.get("/migrations/status", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-WQCB74TK.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-HN7GLK3R.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const status = await migrationService.getMigrationStatus();
@@ -1883,7 +1878,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const { MigrationService: MigrationService2 } = await import('./migrations-WQCB74TK.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-HN7GLK3R.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const result = await migrationService.runPendingMigrations();
@@ -1902,7 +1897,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
 });
 adminApiRoutes.get("/migrations/validate", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-WQCB74TK.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-HN7GLK3R.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const validation = await migrationService.validateSchema();
@@ -4500,12 +4495,10 @@ function renderDynamicField(field, options = {}) {
         referenceCollections = [singleReferenceCollection];
       }
       const referenceCollectionsAttr = referenceCollections.join(",");
-      const referenceStatus = Array.isArray(opts.referenceStatus) ? opts.referenceStatus.filter(Boolean).join(",") : typeof opts.referenceStatus === "string" ? opts.referenceStatus : "";
-      const referenceStatusAttr = referenceStatus ? ` data-reference-status="${escapeHtml2(referenceStatus)}"` : "";
       const hasReferenceCollection = referenceCollections.length > 0;
       const hasReferenceValue = Boolean(value);
       fieldHTML = `
-        <div class="reference-field-container space-y-3" data-reference-field data-field-name="${escapeHtml2(fieldName)}" data-reference-collection="${escapeHtml2(referenceCollections[0] || "")}" data-reference-collections="${escapeHtml2(referenceCollectionsAttr)}"${referenceStatusAttr}>
+        <div class="reference-field-container space-y-3" data-reference-field data-field-name="${escapeHtml2(fieldName)}" data-reference-collection="${escapeHtml2(referenceCollections[0] || "")}" data-reference-collections="${escapeHtml2(referenceCollectionsAttr)}">
           <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml2(value)}">
           <div class="rounded-lg border border-zinc-200 bg-white/60 px-3 py-2 text-sm text-zinc-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300" data-reference-display>
             ${hasReferenceCollection ? hasReferenceValue ? "Loading selection..." : "No reference selected." : "Reference collection not configured."}
@@ -5094,14 +5087,11 @@ function renderContentFormPage(data) {
         return singleCollection ? [singleCollection] : [];
       }
 
-      async function fetchReferenceItems(collections, search = '', limit = 20, status = '') {
+      async function fetchReferenceItems(collections, search = '', limit = 20) {
         const params = new URLSearchParams({ limit: String(limit) });
         collections.forEach((collection) => params.append('collection', collection));
         if (search) {
           params.set('search', search);
-        }
-        if (status) {
-          params.set('status', status);
         }
         const response = await fetch('/admin/api/references?' + params.toString());
         if (!response.ok) {
@@ -5183,11 +5173,6 @@ function renderContentFormPage(data) {
         updateReferenceField(fieldId, null);
       }
 
-      function getReferenceStatus(container) {
-        if (!container) return '';
-        return (container.dataset.referenceStatus || '').trim();
-      }
-
       function closeReferenceSelector() {
         const modal = document.getElementById('reference-selector-modal');
         if (modal) {
@@ -5199,7 +5184,6 @@ function renderContentFormPage(data) {
       function openReferenceSelector(fieldId) {
         const container = getReferenceContainer(fieldId);
         const collections = getReferenceCollections(container);
-        const status = getReferenceStatus(container);
         if (!container || collections.length === 0) {
           console.error('Reference collection is missing for field', fieldId);
           return;
@@ -5304,7 +5288,7 @@ function renderContentFormPage(data) {
 
         const loadResults = async (searchValue = '') => {
           try {
-            const items = await fetchReferenceItems(collections, searchValue, 20, status);
+            const items = await fetchReferenceItems(collections, searchValue);
             renderResults(items);
           } catch (error) {
             resultsContainer.innerHTML = '<div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Failed to load references.</div>';
@@ -22344,5 +22328,5 @@ var ROUTES_INFO = {
 };
 
 export { ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, checkAdminUserExists, router, test_cleanup_default, userRoutes };
-//# sourceMappingURL=chunk-FWVO4JWK.js.map
-//# sourceMappingURL=chunk-FWVO4JWK.js.map
+//# sourceMappingURL=chunk-65PWXMHF.js.map
+//# sourceMappingURL=chunk-65PWXMHF.js.map
