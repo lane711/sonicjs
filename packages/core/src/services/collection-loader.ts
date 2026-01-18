@@ -173,9 +173,9 @@ export function validateCollectionConfig(config: CollectionConfig): { valid: boo
 
       // Validate reference fields
       if (fieldConfig.type === 'reference') {
-        const hasCollection = typeof fieldConfig.collection === 'string' && fieldConfig.collection.length > 0
-        const hasCollections = Array.isArray(fieldConfig.collections) && fieldConfig.collections.length > 0
-        if (!hasCollection && !hasCollections) {
+        const hasCollection = (typeof fieldConfig.collection === 'string' && fieldConfig.collection.length > 0)
+          || (Array.isArray(fieldConfig.collection) && fieldConfig.collection.length > 0)
+        if (!hasCollection) {
           errors.push(`Reference field "${fieldName}" is missing collection property`)
         }
       }

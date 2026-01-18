@@ -1,7 +1,7 @@
 'use strict';
 
-var chunkAFG3UJZK_cjs = require('./chunk-AFG3UJZK.cjs');
-var chunkS44DR44K_cjs = require('./chunk-S44DR44K.cjs');
+var chunkYQ5277EK_cjs = require('./chunk-YQ5277EK.cjs');
+var chunk6JJSIQKZ_cjs = require('./chunk-6JJSIQKZ.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 var jwt = require('hono/jwt');
 var cookie = require('hono/cookie');
@@ -20,17 +20,17 @@ function bootstrapMiddleware(config = {}) {
     try {
       console.log("[Bootstrap] Starting system initialization...");
       console.log("[Bootstrap] Running database migrations...");
-      const migrationService = new chunkS44DR44K_cjs.MigrationService(c.env.DB);
+      const migrationService = new chunk6JJSIQKZ_cjs.MigrationService(c.env.DB);
       await migrationService.runPendingMigrations();
       console.log("[Bootstrap] Syncing collection configurations...");
       try {
-        await chunkAFG3UJZK_cjs.syncCollections(c.env.DB);
+        await chunkYQ5277EK_cjs.syncCollections(c.env.DB);
       } catch (error) {
         console.error("[Bootstrap] Error syncing collections:", error);
       }
       if (!config.plugins?.disableAll) {
         console.log("[Bootstrap] Bootstrapping core plugins...");
-        const bootstrapService = new chunkAFG3UJZK_cjs.PluginBootstrapService(c.env.DB);
+        const bootstrapService = new chunkYQ5277EK_cjs.PluginBootstrapService(c.env.DB);
         const needsBootstrap = await bootstrapService.isBootstrapNeeded();
         if (needsBootstrap) {
           await bootstrapService.bootstrapCorePlugins();
@@ -239,5 +239,5 @@ exports.requirePermission = requirePermission;
 exports.requireRole = requireRole;
 exports.securityHeaders = securityHeaders;
 exports.securityLoggingMiddleware = securityLoggingMiddleware;
-//# sourceMappingURL=chunk-S6EEFVZ4.cjs.map
-//# sourceMappingURL=chunk-S6EEFVZ4.cjs.map
+//# sourceMappingURL=chunk-6VS22EVW.cjs.map
+//# sourceMappingURL=chunk-6VS22EVW.cjs.map

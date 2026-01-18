@@ -107,9 +107,8 @@ function validateCollectionConfig(config) {
         errors.push(`Field "${fieldName}" is missing type`);
       }
       if (fieldConfig.type === "reference") {
-        const hasCollection = typeof fieldConfig.collection === "string" && fieldConfig.collection.length > 0;
-        const hasCollections = Array.isArray(fieldConfig.collections) && fieldConfig.collections.length > 0;
-        if (!hasCollection && !hasCollections) {
+        const hasCollection = typeof fieldConfig.collection === "string" && fieldConfig.collection.length > 0 || Array.isArray(fieldConfig.collection) && fieldConfig.collection.length > 0;
+        if (!hasCollection) {
           errors.push(`Reference field "${fieldName}" is missing collection property`);
         }
       }
@@ -797,5 +796,5 @@ var PluginBootstrapService = class {
 };
 
 export { PluginBootstrapService, PluginService, cleanupRemovedCollections, fullCollectionSync, getAvailableCollectionNames, getManagedCollections, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, registerCollections, syncCollection, syncCollections, validateCollectionConfig };
-//# sourceMappingURL=chunk-S3XEUEVJ.js.map
-//# sourceMappingURL=chunk-S3XEUEVJ.js.map
+//# sourceMappingURL=chunk-QC4YXN4H.js.map
+//# sourceMappingURL=chunk-QC4YXN4H.js.map

@@ -58,8 +58,7 @@ export interface FieldConfig {
   enumLabels?: string[]
 
   // Reference field
-  collection?: string
-  collections?: string[]
+  collection?: string | string[]
 
   // Array/Object fields
   items?: FieldConfig

@@ -23,7 +23,7 @@ const pageBlocksCollection: CollectionConfig = {
       featuredPage: {
         type: 'reference',
         title: 'Featured Page',
-        collections: ['page_blocks', 'pages', 'blog_posts'],
+        collection: ['page_blocks', 'pages', 'blog_posts'],
       },
       seo: {
         type: 'object',
@@ -63,7 +63,7 @@ const pageBlocksCollection: CollectionConfig = {
             items: {
               type: 'reference',
               title: 'Menu Item',
-              collections: ['page_blocks'],
+              collection: ['page_blocks'],
 
               // type: 'object',
               // properties: {

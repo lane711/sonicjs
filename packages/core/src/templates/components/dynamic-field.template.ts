@@ -576,10 +576,11 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
       break
 
     case 'reference':
-      let referenceCollections = Array.isArray(opts.collections) ? opts.collections.filter(Boolean) : []
-      const singleReferenceCollection = typeof opts.collection === 'string' ? opts.collection : ''
-      if (referenceCollections.length === 0 && singleReferenceCollection) {
-        referenceCollections = [singleReferenceCollection]
+      let referenceCollections: string[] = []
+      if (Array.isArray(opts.collection)) {
+        referenceCollections = opts.collection.filter(Boolean)
+      } else if (typeof opts.collection === 'string' && opts.collection) {
+        referenceCollections = [opts.collection]
       }
       const referenceCollectionsAttr = referenceCollections.join(',')
       const hasReferenceCollection = referenceCollections.length > 0
