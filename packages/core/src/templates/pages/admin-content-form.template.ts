@@ -655,6 +655,8 @@ export function renderContentFormPage(data: ContentFormData): string {
 
         input.value = item?.id || '';
         renderReferenceDisplay(container, item, 'No reference selected.');
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
       }
 
       function clearReferenceField(fieldId) {
