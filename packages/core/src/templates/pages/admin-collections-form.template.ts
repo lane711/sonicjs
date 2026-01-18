@@ -1,7 +1,7 @@
-import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
-import { renderForm, FormData, FormField } from '../form.template'
 import { renderAlert } from '../components/alert.template'
-import { renderConfirmationDialog, getConfirmationDialogScript } from '../components/confirmation-dialog.template'
+import { getConfirmationDialogScript, renderConfirmationDialog } from '../components/confirmation-dialog.template'
+import { FormData, FormField, renderForm } from '../form.template'
+import { AdminLayoutCatalystData, renderAdminLayoutCatalyst } from '../layouts/admin-layout-catalyst.template'
 
 export interface CollectionField {
   id: string
@@ -768,10 +768,13 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
 
           // Check if it's a schema field with field_options that might indicate the actual type
           if (field.field_options && typeof field.field_options === 'object') {
-            // Only convert to richtext if type is explicitly 'string' and format is richtext
-            // Don't convert if it's already a specific editor type like 'mdxeditor', 'quill', etc.
+            // Handle format-based type conversions
             if (field.field_options.format === 'richtext' && uiFieldType === 'string') {
               uiFieldType = 'richtext';
+            } else if ((field.field_options.format === 'media' || field.field_options.type === 'media') && uiFieldType === 'string') {
+              uiFieldType = 'media';
+            } else if (field.field_options.format === 'date-time' && uiFieldType === 'string') {
+              uiFieldType = 'date';
             }
             // Check for other format indicators
             else if (field.field_options.type && !uiFieldType) {
@@ -1080,15 +1083,15 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
 
     <!-- Confirmation Dialogs -->
     ${renderConfirmationDialog({
-      id: 'delete-field-confirm',
-      title: 'Delete Field',
-      message: 'Are you sure you want to delete this field? This action cannot be undone.',
-      confirmText: 'Delete',
-      cancelText: 'Cancel',
-      iconColor: 'red',
-      confirmClass: 'bg-red-500 hover:bg-red-400',
-      onConfirm: 'performDeleteField()'
-    })}
+    id: 'delete-field-confirm',
+    title: 'Delete Field',
+    message: 'Are you sure you want to delete this field? This action cannot be undone.',
+    confirmText: 'Delete',
+    cancelText: 'Cancel',
+    iconColor: 'red',
+    confirmClass: 'bg-red-500 hover:bg-red-400',
+    onConfirm: 'performDeleteField()'
+  })}
 
     ${getConfirmationDialogScript()}
   `

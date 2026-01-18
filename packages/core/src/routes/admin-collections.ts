@@ -2,8 +2,8 @@ import { Hono } from 'hono'
 import { html } from 'hono/html'
 import { requireAuth } from '../middleware'
 import { isPluginActive } from '../middleware/plugin-middleware'
-import { renderCollectionsListPage } from '../templates/pages/admin-collections-list.template'
 import { renderCollectionFormPage } from '../templates/pages/admin-collections-form.template'
+import { renderCollectionsListPage } from '../templates/pages/admin-collections-list.template'
 
 // Type definitions for collections
 interface Collection {
@@ -402,16 +402,32 @@ adminCollectionsRoutes.get('/:id', async (c) => {
         if (schema && schema.properties) {
           // Convert schema properties to field format
           let fieldOrder = 0
-          fields = Object.entries(schema.properties).map(([fieldName, fieldConfig]: [string, any]) => ({
-            id: `schema-${fieldName}`,
-            field_name: fieldName,
-            field_type: fieldConfig.type || 'string',
-            field_label: fieldConfig.title || fieldName,
-            field_options: fieldConfig,
-            field_order: fieldOrder++,
-            is_required: fieldConfig.required === true || (schema.required && schema.required.includes(fieldName)),
-            is_searchable: fieldConfig.searchable === true || false
-          }))
+          fields = Object.entries(schema.properties).map(([fieldName, fieldConfig]: [string, any]) => {
+            // Determine field type based on format or type
+            let fieldType = fieldConfig.type || 'string'
+            if (fieldConfig.format === 'media' || fieldConfig.type === 'media') {
+              fieldType = 'media'
+            } else if (fieldConfig.format === 'richtext' || fieldConfig.type === 'richtext') {
+              fieldType = 'richtext'
+            } else if (fieldConfig.format === 'date-time' || fieldConfig.type === 'date') {
+              fieldType = 'date'
+            } else if (fieldConfig.type === 'quill') {
+              fieldType = 'quill'
+            } else if (fieldConfig.type === 'mdxeditor') {
+              fieldType = 'mdxeditor'
+            }
+
+            return {
+              id: `schema-${fieldName}`,
+              field_name: fieldName,
+              field_type: fieldType,
+              field_label: fieldConfig.title || fieldName,
+              field_options: fieldConfig,
+              field_order: fieldOrder++,
+              is_required: fieldConfig.required === true || (schema.required && schema.required.includes(fieldName)),
+              is_searchable: fieldConfig.searchable === true || false
+            }
+          })
         }
       } catch (e) {
         console.error('Error parsing collection schema:', e)
@@ -805,10 +821,45 @@ adminCollectionsRoutes.put('/:collectionId/fields/:fieldId', async (c) => {
       if (schema.properties[fieldName]) {
         // Build the updated field config
         const updatedFieldConfig: any = {
-          ...schema.properties[fieldName],
-          type: fieldType,
+          type: fieldType === 'number' ? 'number' : fieldType === 'boolean' ? 'boolean' : fieldType === 'quill' ? 'quill' : fieldType === 'mdxeditor' ? 'mdxeditor' : 'string',
           title: fieldLabel,
           searchable: isSearchable
+        }
+
+        // Handle special field types
+        if (fieldType === 'richtext') {
+          updatedFieldConfig.format = 'richtext'
+        } else if (fieldType === 'date') {
+          updatedFieldConfig.format = 'date-time'
+        } else if (fieldType === 'select') {
+          // Parse options to get enum
+          try {
+            const parsedOptions = fieldOptions ? JSON.parse(fieldOptions) : {}
+            updatedFieldConfig.enum = parsedOptions.options || []
+          } catch (e) {
+            console.error('Error parsing field options for select:', e)
+          }
+        } else if (fieldType === 'media') {
+          updatedFieldConfig.format = 'media'
+        }
+
+        // Preserve existing options that aren't overridden
+        const existingConfig = schema.properties[fieldName]
+        if (existingConfig) {
+          // Keep any additional properties from the existing config
+          Object.keys(existingConfig).forEach(key => {
+            if (!['type', 'title', 'searchable', 'format', 'enum', 'required'].includes(key)) {
+              updatedFieldConfig[key] = existingConfig[key]
+            }
+          })
+        }
+
+        // Add parsed options
+        try {
+          const parsedOptions = fieldOptions ? JSON.parse(fieldOptions) : {}
+          Object.assign(updatedFieldConfig, parsedOptions)
+        } catch (e) {
+          console.error('Error parsing field options:', e)
         }
 
         // Also set/remove the individual required property on the field

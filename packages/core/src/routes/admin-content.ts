@@ -1,14 +1,14 @@
+import type { D1Database } from '@cloudflare/workers-types'
 import { Hono } from 'hono'
 import { html } from 'hono/html'
-import type { D1Database, KVNamespace } from '@cloudflare/workers-types'
-import { requireAuth } from '../middleware'
-import { renderContentFormPage, ContentFormData } from '../templates/pages/admin-content-form.template'
-import { renderContentListPage, ContentListPageData } from '../templates/pages/admin-content-list.template'
-import { renderVersionHistory, VersionHistoryData, ContentVersion } from '../templates/components/version-history.template'
-import { isPluginActive } from '../middleware/plugin-middleware'
-import { getCacheService, CACHE_CONFIGS } from '../services/cache'
 import type { Bindings, Variables } from '../app'
+import { requireAuth } from '../middleware'
+import { isPluginActive } from '../middleware/plugin-middleware'
+import { CACHE_CONFIGS, getCacheService } from '../services/cache'
 import { PluginService } from '../services/plugin-service'
+import { ContentVersion, renderVersionHistory, VersionHistoryData } from '../templates/components/version-history.template'
+import { ContentFormData, renderContentFormPage } from '../templates/pages/admin-content-form.template'
+import { ContentListPageData, renderContentListPage } from '../templates/pages/admin-content-list.template'
 
 const adminContentRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
@@ -42,10 +42,24 @@ async function getCollectionFields(db: D1Database, collectionId: string) {
                 }))
               }
 
+              // Determine field type based on format or type
+              let fieldType = fieldConfig.type || 'string'
+              if (fieldConfig.format === 'media' || fieldConfig.type === 'media') {
+                fieldType = 'media'
+              } else if (fieldConfig.format === 'richtext' || fieldConfig.type === 'richtext') {
+                fieldType = 'richtext'
+              } else if (fieldConfig.format === 'date-time' || fieldConfig.type === 'date') {
+                fieldType = 'date'
+              } else if (fieldConfig.type === 'quill') {
+                fieldType = 'quill'
+              } else if (fieldConfig.type === 'mdxeditor') {
+                fieldType = 'mdxeditor'
+              }
+
               return {
                 id: `schema-${fieldName}`,
                 field_name: fieldName,
-                field_type: fieldConfig.type || 'string',
+                field_type: fieldType,
                 field_label: fieldConfig.title || fieldName,
                 field_options: fieldOptions,
                 field_order: fieldOrder++,
@@ -110,7 +124,7 @@ adminContentRoutes.get('/', async (c) => {
     const user = c.get('user')
     const url = new URL(c.req.url)
     const db = c.env.DB
-    
+
     // Get query parameters
     const page = parseInt(url.searchParams.get('page') || '1')
     const limit = parseInt(url.searchParams.get('limit') || '20')
@@ -118,7 +132,7 @@ adminContentRoutes.get('/', async (c) => {
     const status = url.searchParams.get('status') || 'all'
     const search = url.searchParams.get('search') || ''
     const offset = (page - 1) * limit
-    
+
     // Get all collections for filter dropdown
     const collectionsStmt = db.prepare('SELECT id, name, display_name FROM collections WHERE is_active = 1 ORDER BY display_name')
     const { results: collectionsResults } = await collectionsStmt.all()
@@ -126,7 +140,7 @@ adminContentRoutes.get('/', async (c) => {
       name: row.name,
       displayName: row.display_name
     }))
-    
+
     // Build where conditions
     const conditions: string[] = []
     const params: any[] = []
@@ -154,7 +168,7 @@ adminContentRoutes.get('/', async (c) => {
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
-    
+
     // Get total count
     const countStmt = db.prepare(`
       SELECT COUNT(*) as count 
@@ -164,7 +178,7 @@ adminContentRoutes.get('/', async (c) => {
     `)
     const countResult = await countStmt.bind(...params).first() as any
     const totalItems = countResult?.count || 0
-    
+
     // Get content items
     const contentStmt = db.prepare(`
       SELECT c.id, c.title, c.slug, c.status, c.created_at, c.updated_at,
@@ -178,7 +192,7 @@ adminContentRoutes.get('/', async (c) => {
       LIMIT ? OFFSET ?
     `)
     const { results } = await contentStmt.bind(...params, limit, offset).all()
-    
+
     // Process content items
     const contentItems = (results || []).map((row: any) => {
       const statusConfig: Record<string, { class: string; text: string }> = {
@@ -214,13 +228,13 @@ adminContentRoutes.get('/', async (c) => {
           ${config?.text || row.status}
         </span>
       `
-      
-      const authorName = row.first_name && row.last_name 
+
+      const authorName = row.first_name && row.last_name
         ? `${row.first_name} ${row.last_name}`
         : row.author_email || 'Unknown'
-      
+
       const formattedDate = new Date(row.updated_at).toLocaleDateString()
-      
+
       // Determine available workflow actions based on status
       const availableActions: string[] = []
       switch (row.status) {
@@ -237,7 +251,7 @@ adminContentRoutes.get('/', async (c) => {
           availableActions.push('unschedule')
           break
       }
-      
+
       return {
         id: row.id,
         title: row.title,
@@ -249,7 +263,7 @@ adminContentRoutes.get('/', async (c) => {
         availableActions
       }
     })
-    
+
     const pageData: ContentListPageData = {
       modelName,
       status,
@@ -280,20 +294,20 @@ adminContentRoutes.get('/new', async (c) => {
     const user = c.get('user')
     const url = new URL(c.req.url)
     const collectionId = url.searchParams.get('collection')
-    
+
     if (!collectionId) {
       // Show collection selection page
       const db = c.env.DB
       const collectionsStmt = db.prepare('SELECT id, name, display_name, description FROM collections WHERE is_active = 1 ORDER BY display_name')
       const { results } = await collectionsStmt.all()
-      
+
       const collections = (results || []).map((row: any) => ({
         id: row.id,
         name: row.name,
         display_name: row.display_name,
         description: row.description
       }))
-      
+
       // Render collection selection page
       const selectionHTML = `
         <!DOCTYPE html>
@@ -326,13 +340,13 @@ adminContentRoutes.get('/new', async (c) => {
         </body>
         </html>
       `
-      
+
       return c.html(selectionHTML)
     }
-    
+
     const db = c.env.DB
     const collection = await getCollection(db, collectionId)
-    
+
     if (!collection) {
       const formData: ContentFormData = {
         collection: { id: '', name: '', display_name: 'Unknown', schema: {} },
@@ -346,7 +360,7 @@ adminContentRoutes.get('/new', async (c) => {
       }
       return c.html(renderContentFormPage(formData))
     }
-    
+
     const fields = await getCollectionFields(db, collectionId)
 
     // Check if workflow plugin is active
@@ -403,7 +417,7 @@ adminContentRoutes.get('/new', async (c) => {
         role: user.role
       } : undefined
     }
-    
+
     return c.html(renderContentFormPage(formData))
   } catch (error) {
     console.error('Error loading new content form:', error)
@@ -462,7 +476,7 @@ adminContentRoutes.get('/:id/edit', async (c) => {
       }
       return c.html(renderContentFormPage(formData))
     }
-    
+
     const collection = {
       id: content.collection_id,
       name: content.collection_name,
@@ -470,7 +484,7 @@ adminContentRoutes.get('/:id/edit', async (c) => {
       description: content.collection_description,
       schema: content.collection_schema ? JSON.parse(content.collection_schema) : {}
     }
-    
+
     const fields = await getCollectionFields(db, content.collection_id)
     const contentData = content.data ? JSON.parse(content.data) : {}
 
@@ -558,7 +572,7 @@ adminContentRoutes.post('/', async (c) => {
     const formData = await c.req.formData()
     const collectionId = formData.get('collection_id') as string
     const action = formData.get('action') as string
-    
+
     if (!collectionId) {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -566,10 +580,10 @@ adminContentRoutes.post('/', async (c) => {
         </div>
       `)
     }
-    
+
     const db = c.env.DB
     const collection = await getCollection(db, collectionId)
-    
+
     if (!collection) {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -577,13 +591,13 @@ adminContentRoutes.post('/', async (c) => {
         </div>
       `)
     }
-    
+
     const fields = await getCollectionFields(db, collectionId)
-    
+
     // Extract field data
     const data: any = {}
     const errors: Record<string, string[]> = {}
-    
+
     for (const field of fields) {
       const value = formData.get(field.field_name)
 
@@ -616,7 +630,7 @@ adminContentRoutes.post('/', async (c) => {
           data[field.field_name] = value
       }
     }
-    
+
     // Check for validation errors
     if (Object.keys(errors).length > 0) {
       const formDataWithErrors: ContentFormData = {
@@ -633,7 +647,7 @@ adminContentRoutes.post('/', async (c) => {
       }
       return c.html(renderContentFormPage(formDataWithErrors))
     }
-    
+
     // Generate slug if not provided
     let slug = data.slug || data.title
     if (slug) {
@@ -643,21 +657,21 @@ adminContentRoutes.post('/', async (c) => {
         .replace(/-+/g, '-')
         .trim('-')
     }
-    
+
     // Determine status
     let status = formData.get('status') as string || 'draft'
     if (action === 'save_and_publish') {
       status = 'published'
     }
-    
+
     // Handle scheduling
     const scheduledPublishAt = formData.get('scheduled_publish_at') as string
     const scheduledUnpublishAt = formData.get('scheduled_unpublish_at') as string
-    
+
     // Create content
     const contentId = crypto.randomUUID()
     const now = Date.now()
-    
+
     const insertStmt = db.prepare(`
       INSERT INTO content (
         id, collection_id, slug, title, data, status,
@@ -687,7 +701,7 @@ adminContentRoutes.post('/', async (c) => {
       INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
       VALUES (?, ?, ?, ?, ?, ?)
     `)
-    
+
     await versionStmt.bind(
       crypto.randomUUID(),
       contentId,
@@ -696,13 +710,13 @@ adminContentRoutes.post('/', async (c) => {
       user?.userId || 'unknown',
       now
     ).run()
-    
+
     // Log workflow action
     const workflowStmt = db.prepare(`
       INSERT INTO workflow_history (id, content_id, action, from_status, to_status, user_id, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `)
-    
+
     await workflowStmt.bind(
       crypto.randomUUID(),
       contentId,
@@ -712,7 +726,7 @@ adminContentRoutes.post('/', async (c) => {
       user?.userId || 'unknown',
       now
     ).run()
-    
+
     // Handle different actions
     const referrerParams = formData.get('referrer_params') as string
     const redirectUrl = action === 'save_and_continue'
@@ -723,7 +737,7 @@ adminContentRoutes.post('/', async (c) => {
 
     // Check if this is an HTMX request
     const isHTMX = c.req.header('HX-Request') === 'true'
-    
+
     if (isHTMX) {
       // For HTMX requests, use HX-Redirect header to trigger client-side redirect
       return c.text('', 200, {
@@ -733,7 +747,7 @@ adminContentRoutes.post('/', async (c) => {
       // For regular requests, use server-side redirect
       return c.redirect(redirectUrl)
     }
-    
+
   } catch (error) {
     console.error('Error creating content:', error)
     return c.html(html`
@@ -751,13 +765,13 @@ adminContentRoutes.put('/:id', async (c) => {
     const user = c.get('user')
     const formData = await c.req.formData()
     const action = formData.get('action') as string
-    
+
     const db = c.env.DB
-    
+
     // Get existing content
     const contentStmt = db.prepare('SELECT * FROM content WHERE id = ?')
     const existingContent = await contentStmt.bind(id).first() as any
-    
+
     if (!existingContent) {
       return c.html(html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -765,7 +779,7 @@ adminContentRoutes.put('/:id', async (c) => {
         </div>
       `)
     }
-    
+
     const collection = await getCollection(db, existingContent.collection_id)
     if (!collection) {
       return c.html(html`
@@ -774,21 +788,21 @@ adminContentRoutes.put('/:id', async (c) => {
         </div>
       `)
     }
-    
+
     const fields = await getCollectionFields(db, existingContent.collection_id)
-    
+
     // Extract and validate field data (same as create)
     const data: any = {}
     const errors: Record<string, string[]> = {}
-    
+
     for (const field of fields) {
       const value = formData.get(field.field_name)
-      
+
       if (field.is_required && (!value || value.toString().trim() === '')) {
         errors[field.field_name] = [`${field.field_label} is required`]
         continue
       }
-      
+
       switch (field.field_type) {
         case 'number':
           if (value && isNaN(Number(value))) {
@@ -811,7 +825,7 @@ adminContentRoutes.put('/:id', async (c) => {
           data[field.field_name] = value
       }
     }
-    
+
     if (Object.keys(errors).length > 0) {
       const formDataWithErrors: ContentFormData = {
         id,
@@ -829,7 +843,7 @@ adminContentRoutes.put('/:id', async (c) => {
       }
       return c.html(renderContentFormPage(formDataWithErrors))
     }
-    
+
     // Update slug if title changed
     let slug = data.slug || data.title
     if (slug) {
@@ -839,20 +853,20 @@ adminContentRoutes.put('/:id', async (c) => {
         .replace(/-+/g, '-')
         .trim('-')
     }
-    
+
     // Determine status
     let status = formData.get('status') as string || existingContent.status
     if (action === 'save_and_publish') {
       status = 'published'
     }
-    
+
     // Handle scheduling
     const scheduledPublishAt = formData.get('scheduled_publish_at') as string
     const scheduledUnpublishAt = formData.get('scheduled_unpublish_at') as string
-    
+
     // Update content
     const now = Date.now()
-    
+
     const updateStmt = db.prepare(`
       UPDATE content SET
         slug = ?, title = ?, data = ?, status = ?,
@@ -860,7 +874,7 @@ adminContentRoutes.put('/:id', async (c) => {
         meta_title = ?, meta_description = ?, updated_at = ?
       WHERE id = ?
     `)
-    
+
     await updateStmt.bind(
       slug,
       data.title || 'Untitled',
@@ -886,12 +900,12 @@ adminContentRoutes.put('/:id', async (c) => {
       const versionCountStmt = db.prepare('SELECT MAX(version) as max_version FROM content_versions WHERE content_id = ?')
       const versionResult = await versionCountStmt.bind(id).first() as any
       const nextVersion = (versionResult?.max_version || 0) + 1
-      
+
       const versionStmt = db.prepare(`
         INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
         VALUES (?, ?, ?, ?, ?, ?)
       `)
-      
+
       await versionStmt.bind(
         crypto.randomUUID(),
         id,
@@ -901,14 +915,14 @@ adminContentRoutes.put('/:id', async (c) => {
         now
       ).run()
     }
-    
+
     // Log workflow action if status changed
     if (status !== existingContent.status) {
       const workflowStmt = db.prepare(`
         INSERT INTO workflow_history (id, content_id, action, from_status, to_status, user_id, created_at)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `)
-      
+
       await workflowStmt.bind(
         crypto.randomUUID(),
         id,
@@ -919,7 +933,7 @@ adminContentRoutes.put('/:id', async (c) => {
         now
       ).run()
     }
-    
+
     // Handle different actions
     const referrerParams = formData.get('referrer_params') as string
     const redirectUrl = action === 'save_and_continue'
@@ -930,7 +944,7 @@ adminContentRoutes.put('/:id', async (c) => {
 
     // Check if this is an HTMX request
     const isHTMX = c.req.header('HX-Request') === 'true'
-    
+
     if (isHTMX) {
       // For HTMX requests, use HX-Redirect header to trigger client-side redirect
       return c.text('', 200, {
@@ -940,7 +954,7 @@ adminContentRoutes.put('/:id', async (c) => {
       // For regular requests, use server-side redirect
       return c.redirect(redirectUrl)
     }
-    
+
   } catch (error) {
     console.error('Error updating content:', error)
     return c.html(html`
@@ -956,21 +970,21 @@ adminContentRoutes.post('/preview', async (c) => {
   try {
     const formData = await c.req.formData()
     const collectionId = formData.get('collection_id') as string
-    
+
     const db = c.env.DB
     const collection = await getCollection(db, collectionId)
-    
+
     if (!collection) {
       return c.html('<p>Collection not found</p>')
     }
-    
+
     const fields = await getCollectionFields(db, collectionId)
-    
+
     // Extract field data for preview
     const data: any = {}
     for (const field of fields) {
       const value = formData.get(field.field_name)
-      
+
       switch (field.field_type) {
         case 'number':
           data[field.field_name] = value ? Number(value) : null
@@ -989,7 +1003,7 @@ adminContentRoutes.post('/preview', async (c) => {
           data[field.field_name] = value
       }
     }
-    
+
     // Generate preview HTML
     const previewHTML = `
       <!DOCTYPE html>
@@ -1029,7 +1043,7 @@ adminContentRoutes.post('/preview', async (c) => {
       </body>
       </html>
     `
-    
+
     return c.html(previewHTML)
   } catch (error) {
     console.error('Error generating preview:', error)
@@ -1043,29 +1057,29 @@ adminContentRoutes.post('/duplicate', async (c) => {
     const user = c.get('user')
     const formData = await c.req.formData()
     const originalId = formData.get('id') as string
-    
+
     if (!originalId) {
       return c.json({ success: false, error: 'Content ID required' })
     }
-    
+
     const db = c.env.DB
-    
+
     // Get original content
     const contentStmt = db.prepare('SELECT * FROM content WHERE id = ?')
     const original = await contentStmt.bind(originalId).first() as any
-    
+
     if (!original) {
       return c.json({ success: false, error: 'Content not found' })
     }
-    
+
     // Create duplicate
     const newId = crypto.randomUUID()
     const now = Date.now()
     const originalData = JSON.parse(original.data || '{}')
-    
+
     // Modify title to indicate it's a copy
     originalData.title = `${originalData.title || 'Untitled'} (Copy)`
-    
+
     const insertStmt = db.prepare(`
       INSERT INTO content (
         id, collection_id, slug, title, data, status,
@@ -1085,7 +1099,7 @@ adminContentRoutes.post('/duplicate', async (c) => {
       now,
       now
     ).run()
-    
+
     return c.json({ success: true, id: newId })
   } catch (error) {
     console.error('Error duplicating content:', error)
@@ -1291,15 +1305,15 @@ adminContentRoutes.get('/:id/versions', async (c) => {
   try {
     const id = c.req.param('id')
     const db = c.env.DB
-    
+
     // Get current content
     const contentStmt = db.prepare('SELECT * FROM content WHERE id = ?')
     const content = await contentStmt.bind(id).first() as any
-    
+
     if (!content) {
       return c.html('<p>Content not found</p>')
     }
-    
+
     // Get all versions with author info
     const versionsStmt = db.prepare(`
       SELECT cv.*, u.first_name, u.last_name, u.email
@@ -1309,7 +1323,7 @@ adminContentRoutes.get('/:id/versions', async (c) => {
       ORDER BY cv.version DESC
     `)
     const { results } = await versionsStmt.bind(id).all()
-    
+
     const versions: ContentVersion[] = (results || []).map((row: any) => ({
       id: row.id,
       version: row.version,
@@ -1319,18 +1333,18 @@ adminContentRoutes.get('/:id/versions', async (c) => {
       created_at: row.created_at,
       is_current: false // Will be set below
     }))
-    
+
     // Mark the latest version as current
     if (versions.length > 0) {
       versions[0]!.is_current = true
     }
-    
+
     const data: VersionHistoryData = {
       contentId: id,
       versions,
       currentVersion: versions.length > 0 ? versions[0]!.version : 1
     }
-    
+
     return c.html(renderVersionHistory(data))
   } catch (error) {
     console.error('Error loading version history:', error)
@@ -1345,53 +1359,53 @@ adminContentRoutes.post('/:id/restore/:version', async (c) => {
     const version = parseInt(c.req.param('version'))
     const user = c.get('user')
     const db = c.env.DB
-    
+
     // Get the specific version
     const versionStmt = db.prepare(`
       SELECT * FROM content_versions 
       WHERE content_id = ? AND version = ?
     `)
     const versionData = await versionStmt.bind(id, version).first() as any
-    
+
     if (!versionData) {
       return c.json({ success: false, error: 'Version not found' })
     }
-    
+
     // Get current content
     const contentStmt = db.prepare('SELECT * FROM content WHERE id = ?')
     const currentContent = await contentStmt.bind(id).first() as any
-    
+
     if (!currentContent) {
       return c.json({ success: false, error: 'Content not found' })
     }
-    
+
     const restoredData = JSON.parse(versionData.data)
     const now = Date.now()
-    
+
     // Update content with restored data
     const updateStmt = db.prepare(`
       UPDATE content SET
         title = ?, data = ?, updated_at = ?
       WHERE id = ?
     `)
-    
+
     await updateStmt.bind(
       restoredData.title || 'Untitled',
       versionData.data,
       now,
       id
     ).run()
-    
+
     // Create new version for the restoration
     const nextVersionStmt = db.prepare('SELECT MAX(version) as max_version FROM content_versions WHERE content_id = ?')
     const nextVersionResult = await nextVersionStmt.bind(id).first() as any
     const nextVersion = (nextVersionResult?.max_version || 0) + 1
-    
+
     const newVersionStmt = db.prepare(`
       INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
       VALUES (?, ?, ?, ?, ?, ?)
     `)
-    
+
     await newVersionStmt.bind(
       crypto.randomUUID(),
       id,
@@ -1400,13 +1414,13 @@ adminContentRoutes.post('/:id/restore/:version', async (c) => {
       user?.userId || 'unknown',
       now
     ).run()
-    
+
     // Log workflow action
     const workflowStmt = db.prepare(`
       INSERT INTO workflow_history (id, content_id, action, from_status, to_status, user_id, comment, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `)
-    
+
     await workflowStmt.bind(
       crypto.randomUUID(),
       id,
@@ -1417,7 +1431,7 @@ adminContentRoutes.post('/:id/restore/:version', async (c) => {
       `Restored to version ${version}`,
       now
     ).run()
-    
+
     return c.json({ success: true })
   } catch (error) {
     console.error('Error restoring version:', error)
@@ -1431,7 +1445,7 @@ adminContentRoutes.get('/:id/version/:version/preview', async (c) => {
     const id = c.req.param('id')
     const version = parseInt(c.req.param('version'))
     const db = c.env.DB
-    
+
     // Get the specific version
     const versionStmt = db.prepare(`
       SELECT cv.*, c.collection_id, col.display_name as collection_name
@@ -1441,13 +1455,13 @@ adminContentRoutes.get('/:id/version/:version/preview', async (c) => {
       WHERE cv.content_id = ? AND cv.version = ?
     `)
     const versionData = await versionStmt.bind(id, version).first() as any
-    
+
     if (!versionData) {
       return c.html('<p>Version not found</p>')
     }
-    
+
     const data = JSON.parse(versionData.data || '{}')
-    
+
     // Generate preview HTML
     const previewHTML = `
       <!DOCTYPE html>
@@ -1487,7 +1501,7 @@ ${JSON.stringify(data, null, 2)}
       </body>
       </html>
     `
-    
+
     return c.html(previewHTML)
   } catch (error) {
     console.error('Error generating version preview:', error)
