@@ -456,7 +456,8 @@ SonicJS supports 30+ field types for building rich content schemas:
 
 <Properties>
   <Property name="reference" type="string">
-    Reference to another collection. Use for authors, categories.
+    Reference to another collection. Use for authors, categories. `collection`
+    accepts a string or array.
   </Property>
   <Property name="array" type="array">
     Array of items. Can contain any field type.
@@ -466,14 +467,19 @@ SonicJS supports 30+ field types for building rich content schemas:
 ---
 
 ## Content Blocks & Repeatable Fields
+
 There are three main patterns to model structured content in a page: blocks for mixed layouts, arrays for repeatable items, and objects for grouped fields.
 
 ### When to use each:
+
 - **Blocks** - Mixed layouts in a single list (page builder sections).
 - **Arrays** - Repeatable items with the same shape (team members, FAQs, links).
 - **Objects** - Grouped fields that belong together (SEO, settings).
 
-<Callout type="info" >Blocks can include nested arrays/objects for repeatable sub-fields inside a block.</Callout>
+<Callout type="info">
+  Blocks can include nested arrays/objects for repeatable sub-fields inside a
+  block.
+</Callout>
 
 ### Content Blocks
 
@@ -551,6 +557,24 @@ seo: {
     description: { type: 'textarea', title: 'SEO description' },
   },
 },
+```
+
+</CodeGroup>
+
+---
+
+## Relationships
+
+Use reference fields to link content across collections.
+
+<CodeGroup title="Reference Field">
+
+```typescript
+featuredPage: {
+  type: 'reference',
+  title: 'Featured Page',
+  collection: ['pages', 'blog_posts'],
+}
 ```
 
 </CodeGroup>
