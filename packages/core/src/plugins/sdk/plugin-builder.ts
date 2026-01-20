@@ -1,13 +1,35 @@
 /**
  * Plugin Builder SDK
- * 
+ *
  * Provides a fluent API for building SonicJS plugins
+ *
+ * @packageDocumentation
  */
 
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { Plugin, PluginBuilderOptions, PluginRoutes, PluginMiddleware, PluginModel, PluginService, PluginAdminPage, PluginComponent, PluginHook, PluginMenuItem } from '../types'
 
+/**
+ * Fluent builder for creating SonicJS plugins.
+ *
+ * @beta This API is in beta and may change in future releases.
+ *
+ * @example
+ * ```typescript
+ * import { PluginBuilder } from '@sonicjs-cms/core'
+ *
+ * const plugin = PluginBuilder.create({
+ *   name: 'my-plugin',
+ *   version: '1.0.0',
+ *   description: 'My custom plugin'
+ * })
+ *   .addRoute('/api/my-plugin', routes)
+ *   .addHook('content:save', handler)
+ *   .lifecycle({ activate: async () => console.log('Activated!') })
+ *   .build()
+ * ```
+ */
 export class PluginBuilder {
   private plugin: Partial<Plugin>
 
@@ -282,11 +304,15 @@ export class PluginBuilder {
 }
 
 /**
- * Helper functions for common plugin patterns
+ * Helper functions for common plugin patterns.
+ *
+ * @beta This API is in beta and may change in future releases.
  */
 export class PluginHelpers {
   /**
-   * Create a REST API route for a model
+   * Create a REST API route for a model.
+   *
+   * @experimental This method returns placeholder routes. Full implementation coming soon.
    */
   static createModelAPI(modelName: string, options?: {
     basePath?: string
@@ -332,7 +358,9 @@ export class PluginHelpers {
   }
 
   /**
-   * Create an admin CRUD interface for a model
+   * Create an admin CRUD interface for a model.
+   *
+   * @experimental This method generates basic admin page structures. Full implementation coming soon.
    */
   static createAdminInterface(modelName: string, options?: {
     icon?: string
@@ -550,7 +578,10 @@ END;
 }
 
 /**
- * Common plugin templates
+ * Common plugin templates for rapid plugin development.
+ *
+ * @beta This API is in beta and may change in future releases.
+ * @experimental Templates are provided as starting points and may require customization.
  */
 export class PluginTemplates {
   /**

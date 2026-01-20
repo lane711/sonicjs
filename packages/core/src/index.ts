@@ -296,8 +296,8 @@ export type {
   NewLogConfig,
 } from './db'
 
-// Plugins - Week 2
-// export { PluginBuilder, HookSystem } from './plugins/sdk'
+// Plugin SDK (Beta)
+export { PluginBuilder, PluginHelpers } from './plugins/sdk'
 
 // ============================================================================
 // Version

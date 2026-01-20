@@ -136,8 +136,8 @@ Create `index.ts`:
 ```typescript
 import { Hono } from 'hono'
 import { html } from 'hono/html'
-import { PluginBuilder } from '@sonicjs/core'
-import type { Plugin } from '@sonicjs/core'
+import { PluginBuilder } from '@sonicjs-cms/core'
+import type { Plugin } from '@sonicjs-cms/core'
 
 export function createMyPlugin(): Plugin {
   const builder = PluginBuilder.create({
@@ -417,7 +417,7 @@ Define database structures using Zod schemas and migrations.
 
 ```typescript
 import { z } from 'zod'
-import { PluginHelpers } from '@sonicjs/core'
+import { PluginHelpers } from '@sonicjs-cms/core'
 
 const userSchema = z.object({
   email: z.string().email(),

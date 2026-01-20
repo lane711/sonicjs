@@ -279,7 +279,7 @@ const CACHE_TTL = 300
 Follow this pattern for collection definitions:
 
 ```typescript
-import { CollectionConfig } from '@sonicjs/core'
+import { CollectionConfig } from '@sonicjs-cms/core'
 
 export const blogPostsCollection: CollectionConfig = {
   name: 'blog_posts',  // snake_case

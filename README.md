@@ -326,7 +326,7 @@ Create plugins for extending SonicJS functionality:
 
 ```typescript
 // src/plugins/my-plugin/index.ts
-import { Plugin } from '@sonicjs/core'
+import { Plugin } from '@sonicjs-cms/core'
 
 export default {
   name: 'my-plugin',
