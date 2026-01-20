@@ -1,5 +1,11 @@
 # SonicJS
 
+[![PR Tests](https://github.com/lane711/sonicjs/actions/workflows/pr-tests.yml/badge.svg)](https://github.com/lane711/sonicjs/actions/workflows/pr-tests.yml)
+[![npm version](https://img.shields.io/npm/v/@sonicjs-cms/core.svg)](https://www.npmjs.com/package/@sonicjs-cms/core)
+[![npm downloads](https://img.shields.io/npm/dm/@sonicjs-cms/core.svg)](https://www.npmjs.com/package/@sonicjs-cms/core)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
+
 A modern, TypeScript-first headless CMS built for Cloudflare's edge platform with Hono.js.
 
 **[sonicjs.com](https://sonicjs.com)**
