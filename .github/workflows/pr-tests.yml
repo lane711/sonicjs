@@ -50,8 +50,17 @@ jobs:
       # - name: Type check
       #   run: npm run type-check
 
-      - name: Run unit tests
-        run: npm test
+      - name: Run unit tests with coverage
+        run: npm run test:cov
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./packages/core/coverage/coverage-final.json
+          flags: unittests
+          fail_ci_if_error: false
+          verbose: true
 
       - name: Build core package
         run: npm run build:core

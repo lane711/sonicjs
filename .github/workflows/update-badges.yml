@@ -1,0 +1,56 @@
+name: Update Badges
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  update-test-count-badge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Count tests
+        id: count-tests
+        run: |
+          # Count unit tests (it/test calls in test files)
+          UNIT_TESTS=$(grep -rE "(it|test)\(" --include="*.test.ts" --include="*.spec.ts" packages/ 2>/dev/null | wc -l | tr -d ' ')
+
+          # Count e2e tests
+          E2E_TESTS=$(grep -rE "(it|test)\(" --include="*.spec.ts" tests/e2e/ 2>/dev/null | wc -l | tr -d ' ')
+
+          # Total tests
+          TOTAL_TESTS=$((UNIT_TESTS + E2E_TESTS))
+
+          echo "Unit tests: $UNIT_TESTS"
+          echo "E2E tests: $E2E_TESTS"
+          echo "Total tests: $TOTAL_TESTS"
+
+          echo "unit_tests=$UNIT_TESTS" >> $GITHUB_OUTPUT
+          echo "e2e_tests=$E2E_TESTS" >> $GITHUB_OUTPUT
+          echo "total_tests=$TOTAL_TESTS" >> $GITHUB_OUTPUT
+
+      - name: Update test count gist
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_TOKEN }}
+          gistID: ${{ vars.TEST_BADGE_GIST_ID }}
+          filename: test-count.json
+          label: tests
+          message: ${{ steps.count-tests.outputs.total_tests }}
+          color: brightgreen
+          namedLogo: vitest
+          logoColor: white

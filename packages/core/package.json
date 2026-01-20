@@ -68,6 +68,7 @@
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "test": "vitest --run",
+    "test:cov": "vitest --run --coverage",
     "test:watch": "vitest",
     "prepublishOnly": "npm run build"
   },
@@ -107,6 +108,7 @@
     "semver": "^7.7.3"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^4.0.5",
     "@cloudflare/workers-types": "^4.20251014.0",
     "@types/node": "^24.9.2",
     "@typescript-eslint/eslint-plugin": "^8.50.0",
