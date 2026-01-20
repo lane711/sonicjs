@@ -609,10 +609,24 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
       `
       break
 
+    case 'object':
+      // Structured object field (like SEO with nested properties)
+      return renderStructuredObjectField(field, options, baseClasses, errorClasses)
+
+    case 'array':
+      // Check if this is a blocks field (has discriminator/blocks config) or a regular array
+      const itemsConfig = opts.items && typeof opts.items === 'object' ? opts.items : {}
+      if (itemsConfig.blocks && typeof itemsConfig.blocks === 'object') {
+        // Blocks field with discriminated union
+        return renderBlocksField(field, options, baseClasses, errorClasses)
+      }
+      // Regular structured array field
+      return renderStructuredArrayField(field, options, baseClasses, errorClasses)
+
     default:
       fieldHTML = `
-        <input 
-          type="text" 
+        <input
+          type="text"
           id="${fieldId}"
           name="${fieldName}"
           value="${escapeHtml(value)}"
