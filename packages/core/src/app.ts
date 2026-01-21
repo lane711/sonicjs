@@ -109,7 +109,7 @@ export type SonicJSApp = Hono<{ Bindings: Bindings; Variables: Variables }>
  *
  * @example
  * ```typescript
- * import { createSonicJSApp } from '@sonicjs/core'
+ * import { createSonicJSApp } from '@sonicjs-cms/core'
  *
  * const app = createSonicJSApp({
  *   collections: {

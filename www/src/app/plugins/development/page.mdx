@@ -17,6 +17,7 @@ export const sections = [
   { title: 'Plugin Context', id: 'plugin-context' },
   { title: 'Best Practices', id: 'best-practices' },
   { title: 'Testing', id: 'testing' },
+  { title: 'Troubleshooting', id: 'troubleshooting' },
 ]
 
 # Plugin Development Guide
@@ -136,8 +137,8 @@ Create `index.ts`:
 ```typescript
 import { Hono } from 'hono'
 import { html } from 'hono/html'
-import { PluginBuilder } from '@sonicjs/core'
-import type { Plugin } from '@sonicjs/core'
+import { PluginBuilder } from '@sonicjs-cms/core'
+import type { Plugin } from '@sonicjs-cms/core'
 
 export function createMyPlugin(): Plugin {
   const builder = PluginBuilder.create({
@@ -190,6 +191,38 @@ export { myPlugin } from './my-plugin'
 ```
 
 Your plugin will be automatically loaded when the app starts.
+
+### Alternative: Plain Object Pattern
+
+If you prefer a simpler approach without the builder, you can create plugins as plain objects that implement the `Plugin` interface:
+
+```typescript
+import type { Plugin } from '@sonicjs-cms/core'
+
+export default {
+  name: 'my-plugin',
+  version: '1.0.0',
+  description: 'My first SonicJS plugin',
+
+  hooks: [{
+    name: 'content:save',
+    handler: async (data) => {
+      console.log('Content saved:', data.id)
+      return data
+    }
+  }],
+
+  async activate() {
+    console.log('My plugin activated!')
+  },
+
+  async deactivate() {
+    console.log('My plugin deactivated!')
+  }
+} satisfies Plugin
+```
+
+Both approaches produce the same result - choose whichever feels more natural for your use case. The `PluginBuilder` provides better IDE autocomplete and guided development, while plain objects are more concise for simple plugins.
 
 ---
 
@@ -417,7 +450,7 @@ Define database structures using Zod schemas and migrations.
 
 ```typescript
 import { z } from 'zod'
-import { PluginHelpers } from '@sonicjs/core'
+import { PluginHelpers } from '@sonicjs-cms/core'
 
 const userSchema = z.object({
   email: z.string().email(),
@@ -643,6 +676,54 @@ describe('My Plugin', () => {
 
 ```bash
 npm run test
+```
+
+---
+
+## Troubleshooting
+
+### "PLUGIN_REGISTRY configuration" Message
+
+If you see this console message during startup:
+
+```
+[PluginService] ensureAllPluginsExist - requires PLUGIN_REGISTRY configuration
+```
+
+This is an **informational message**, not an error. It indicates that the plugin service is running without a custom plugin registry configured. This is normal for most applications.
+
+**When you can ignore this:**
+- You're using the built-in plugin system as-is
+- Your plugins are loading and working correctly
+- You don't need dynamic plugin discovery
+
+**When you might need to configure it:**
+- You're building a plugin marketplace
+- You need to auto-discover plugins from external sources
+- You're implementing custom plugin installation workflows
+
+For advanced plugin registry configuration, see the [Plugin System Architecture](/plugins) documentation.
+
+### Plugin Not Loading
+
+If your plugin isn't being loaded:
+
+1. **Check the export** - Ensure your plugin is exported from `src/plugins/index.ts`
+2. **Verify the structure** - Make sure your plugin has `name` and `version` properties
+3. **Check for errors** - Look for validation errors in the console during startup
+4. **Restart the dev server** - Some changes require a full restart
+
+### TypeScript Errors
+
+If you get type errors with the `Plugin` interface:
+
+```typescript
+// Use 'satisfies' for type checking while keeping inference
+export default { ... } satisfies Plugin
+
+// Or use explicit type annotation
+const myPlugin: Plugin = { ... }
+export default myPlugin
 ```
 
 ---
