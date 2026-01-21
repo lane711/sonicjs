@@ -21,11 +21,11 @@ export interface ContactSettings {
   /** State, province, or region */
   state?: string
   /** Whether to show Google Map embed */
-  showMap: boolean | number | string
+  showMap: boolean
   /** Google Maps API key */
   mapApiKey?: string
   /** Whether to enable Turnstile bot protection (optional, requires Turnstile plugin) */
-  useTurnstile?: boolean | number | string
+  useTurnstile?: boolean
 }
 
 /**

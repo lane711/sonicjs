@@ -7,6 +7,9 @@
 // HTML Sanitization Utilities
 export { escapeHtml, sanitizeInput, sanitizeObject } from './sanitize'
 
+// Type Coercion Utilities
+export { toBoolean } from './coercion'
+
 // Template Rendering
 export { TemplateRenderer, templateRenderer, renderTemplate } from './template-renderer'
 

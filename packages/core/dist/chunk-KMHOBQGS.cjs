@@ -30,6 +30,11 @@ function sanitizeObject(obj, fields) {
   return sanitized;
 }
 
+// src/utils/coercion.ts
+function toBoolean(value) {
+  return value === 1 || value === true || value === "true" || value === "on";
+}
+
 // src/utils/template-renderer.ts
 var TemplateRenderer = class {
   templateCache = /* @__PURE__ */ new Map();
@@ -560,5 +565,6 @@ exports.renderTemplate = renderTemplate;
 exports.sanitizeInput = sanitizeInput;
 exports.sanitizeObject = sanitizeObject;
 exports.templateRenderer = templateRenderer;
-//# sourceMappingURL=chunk-2XCJ3HT5.cjs.map
-//# sourceMappingURL=chunk-2XCJ3HT5.cjs.map
+exports.toBoolean = toBoolean;
+//# sourceMappingURL=chunk-KMHOBQGS.cjs.map
+//# sourceMappingURL=chunk-KMHOBQGS.cjs.map

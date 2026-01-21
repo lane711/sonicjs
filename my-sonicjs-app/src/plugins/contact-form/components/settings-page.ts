@@ -1,9 +1,10 @@
 import { html } from 'hono/html'
 import type { ContactSettings } from '../types'
+import { toBoolean } from '@sonicjs-cms/core/utils'
 
 export function renderSettingsPage(settings: ContactSettings, turnstileAvailable: boolean = false) {
-  const showMap = settings.showMap === 1 || settings.showMap === true || settings.showMap === 'true' || settings.showMap === 'on'
-  const useTurnstile = settings.useTurnstile === 1 || settings.useTurnstile === true || settings.useTurnstile === 'true' || settings.useTurnstile === 'on'
+  const showMap = toBoolean(settings.showMap)
+  const useTurnstile = toBoolean(settings.useTurnstile)
 
   const content = html`
     <div class="w-full px-4 sm:px-6 lg:px-8 py-6">

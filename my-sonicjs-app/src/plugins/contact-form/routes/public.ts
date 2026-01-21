@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { html } from 'hono/html'
 import type { Context } from 'hono'
 import { ContactService } from '../services/contact'
+import { toBoolean } from '@sonicjs-cms/core/utils'
 
 const publicRoutes = new Hono()
 
@@ -40,7 +41,7 @@ publicRoutes.get('/contact', async (c: any) => {
   const safeState = String(state || 'MD')
   
   const fullAddressDisplay = city ? `${street}, ${city}, ${state}` : street
-  const isEnabled = settings.showMap === 1 || settings.showMap === true || settings.showMap === 'true' || settings.showMap === 'on'
+  const isEnabled = toBoolean(settings.showMap)
   const hasKey = apiKey && apiKey.length > 5
   
   // Only show map if we have valid address data (prevent "undefined undefined" in URL)
@@ -52,7 +53,7 @@ publicRoutes.get('/contact', async (c: any) => {
   const mapSrc = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodeURIComponent(mapQuery)}`
 
   // Check if Turnstile is enabled and available
-  const useTurnstile = settings.useTurnstile === 1 || settings.useTurnstile === true || settings.useTurnstile === 'true' || settings.useTurnstile === 'on'
+  const useTurnstile = toBoolean(settings.useTurnstile)
   let turnstileSiteKey = ''
   let turnstileEnabled = false
   let turnstileTheme = 'auto'
@@ -226,7 +227,7 @@ publicRoutes.post('/api/contact', async (c: any) => {
 
     // Check if Turnstile is enabled for this form
     const { data: settings } = await service.getSettings()
-    const useTurnstile = settings.useTurnstile === 1 || settings.useTurnstile === true || settings.useTurnstile === 'true' || settings.useTurnstile === 'on'
+    const useTurnstile = toBoolean(settings.useTurnstile)
     
     if (useTurnstile) {
       // Verify Turnstile token if enabled

@@ -28,6 +28,11 @@ function sanitizeObject(obj, fields) {
   return sanitized;
 }
 
+// src/utils/coercion.ts
+function toBoolean(value) {
+  return value === 1 || value === true || value === "true" || value === "on";
+}
+
 // src/utils/template-renderer.ts
 var TemplateRenderer = class {
   templateCache = /* @__PURE__ */ new Map();
@@ -547,6 +552,6 @@ function getCoreVersion() {
   return SONICJS_VERSION;
 }
 
-export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, package_default, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer };
-//# sourceMappingURL=chunk-TMQOLXLY.js.map
-//# sourceMappingURL=chunk-TMQOLXLY.js.map
+export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, package_default, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer, toBoolean };
+//# sourceMappingURL=chunk-BGBLFHHR.js.map
+//# sourceMappingURL=chunk-BGBLFHHR.js.map
