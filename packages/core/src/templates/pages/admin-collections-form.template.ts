@@ -542,9 +542,10 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
                 required
                 class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-blue-500/30 dark:outline-blue-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue-500 dark:focus-visible:outline-blue-400 sm:text-sm/6"
               >
-                <option value="">Select field type...</option>
-                <option value="text">Text</option>
-                ${data.editorPlugins?.tinymce ? '<option value="richtext">Rich Text (TinyMCE)</option>' : ''}
+              <option value="">Select field type...</option>
+              <option value="text">Text</option>
+              <option value="slug">URL Slug</option>
+              ${data.editorPlugins?.tinymce ? '<option value="richtext">Rich Text (TinyMCE)</option>' : ''}
                 ${data.editorPlugins?.quill ? '<option value="quill">Rich Text (Quill)</option>' : ''}
                 ${data.editorPlugins?.easyMdx ? '<option value="mdxeditor">EasyMDX</option>' : ''}
                 <option value="number">Number</option>
