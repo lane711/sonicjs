@@ -57,6 +57,32 @@ These instructions mirror the workflow Claude Code already follows in Conductor 
 - PR body should mirror `.github/pull_request_template.md`: include summary, linked issue, detailed change bullets, and explicit test commands + outcomes (unit + E2E).
 - Keep docs in sync (`docs/`, `www/src/app/*.mdx`, READMEs). Mention any migrations or plugin contract changes.
 
+## Available Agents
+
+Specialized agents are defined in `.claude/commands/`. All agents are prefixed with `sonicjs-` for namespacing.
+
+For detailed documentation, see [docs/ai/claude-agents.md](docs/ai/claude-agents.md).
+
+### Development Agents
+| Agent | Purpose |
+|-------|---------|
+| `/sonicjs-fullstack-dev` | Full stack development with planning, testing, and documentation |
+| `/sonicjs-pr-fixer` | Fix PRs: cherry-pick forks, enable Dependabot e2e, fix conflicts/tests |
+| `/sonicjs-release-engineer` | Manage releases and versioning |
+
+### Marketing & Content Agents
+| Agent | Purpose |
+|-------|---------|
+| `/sonicjs-release-announcement` | Generate release announcements |
+| `/sonicjs-seo` | SEO expert for optimization recommendations |
+| `/sonicjs-seo-blog` | Generate SEO-optimized blog posts |
+| `/sonicjs-seo-audit` | Audit website for SEO improvements |
+| `/sonicjs-seo-keywords` | Keyword research for content |
+| `/sonicjs-seo-sitemap` | Generate/update sitemaps |
+| `/sonicjs-seo-discord-sync` | Sync Discord content for searchability |
+| `/sonicjs-social-post` | Generate social media posts |
+| `/sonicjs-blog-image` | Generate blog images via DALL-E |
+
 ## AI/Tooling Notes
 - Claude Desktop memory is shared via `docs/ai/claude-memory.json`. Copy `.claude/settings.shared.json` to `.claude/settings.local.json` and install the `@modelcontextprotocol/server-memory` MCP server if you need consistent AI context.
 - Graphiti MCP integration is documented in `docs/graphiti-setup.md`; update API keys there and restart Claude Desktop when tooling changes.
