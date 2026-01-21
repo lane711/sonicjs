@@ -68,6 +68,7 @@
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "test": "vitest --run",
+    "test:cov": "vitest --run --coverage",
     "test:watch": "vitest",
     "prepublishOnly": "npm run build"
   },
