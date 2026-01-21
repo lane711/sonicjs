@@ -47,10 +47,6 @@ publicRoutes.get('/contact', async (c: any) => {
   const hasValidAddress = city && city !== 'undefined' && city.length > 0
   const showMap = isEnabled && hasKey && hasValidAddress
   
-  console.log('[Contact Form Public] settings.showMap:', settings.showMap, 'type:', typeof settings.showMap)
-  console.log('[Contact Form Public] isEnabled:', isEnabled, 'hasKey:', hasKey, 'showMap:', showMap)
-  console.log('[Contact Form Public] apiKey length:', apiKey.length, 'city:', city)
-  
   // Use safe values for map query to prevent "undefined undefined" in URL
   const mapQuery = `${safeStreet} ${safeCity} ${safeState}`.trim()
   const mapSrc = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodeURIComponent(mapQuery)}`
@@ -149,16 +145,12 @@ publicRoutes.get('/contact', async (c: any) => {
                 body: JSON.stringify(data)
               });
               
-              console.log('Response status:', r.status);
               const res = await r.json();
-              console.log('Response data:', res);
               
               if (res.success) {
-                console.log('Showing success message');
                 const successAlert = document.getElementById('success-alert');
                 if (successAlert) {
                   successAlert.classList.remove('d-none');
-                  console.log('Success alert classes:', successAlert.className);
                 }
                 e.target.reset();
                 if (turnstileEnabled && window.turnstile) {
@@ -223,6 +215,15 @@ publicRoutes.post('/api/contact', async (c: any) => {
       }, 400)
     }
 
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(data.email)) {
+      return c.json({
+        success: false,
+        error: 'Invalid email format'
+      }, 400)
+    }
+
     // Check if Turnstile is enabled for this form
     const { data: settings } = await service.getSettings()
     const useTurnstile = settings.useTurnstile === 1 || settings.useTurnstile === true || settings.useTurnstile === 'true' || settings.useTurnstile === 'on'
@@ -246,7 +247,6 @@ publicRoutes.post('/api/contact', async (c: any) => {
           .first()
         
         if (!turnstilePlugin || !turnstilePlugin.settings) {
-          console.error('Turnstile plugin not available or not configured')
           return c.json({
             success: false,
             error: 'Security verification unavailable'
@@ -285,8 +285,6 @@ publicRoutes.post('/api/contact', async (c: any) => {
             error: 'Security verification failed. Please try again.'
           }, 400)
         }
-        
-        console.log('Turnstile verification successful')
       } catch (error) {
         console.error('Error verifying Turnstile token:', error)
         return c.json({

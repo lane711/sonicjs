@@ -57,30 +57,21 @@ export class ContactService {
    */
   async saveSettings(settings: ContactSettings): Promise<void> {
     try {
-      console.log('[ContactService.saveSettings] Starting save for plugin:', manifest.id)
-      console.log('[ContactService.saveSettings] Settings:', JSON.stringify(settings))
-      
       // Check if plugin row exists
       const existing = await this.db
         .prepare(`SELECT id, status FROM plugins WHERE id = ?`)
         .bind(manifest.id)
         .first()
 
-      console.log('[ContactService.saveSettings] Existing row:', JSON.stringify(existing))
-
       if (existing) {
         // Update existing row
-        console.log('[ContactService.saveSettings] Updating existing row...')
-        const result = await this.db
+        await this.db
           .prepare(`UPDATE plugins SET settings = ?, last_updated = ? WHERE id = ?`)
           .bind(JSON.stringify(settings), Date.now(), manifest.id)
           .run()
-        console.log('[ContactService.saveSettings] UPDATE result:', JSON.stringify(result))
-        console.log('[ContactService.saveSettings] Successfully updated')
       } else {
         // Insert new row
-        console.log('[ContactService.saveSettings] No existing row, inserting new...')
-        const result = await this.db
+        await this.db
           .prepare(`
             INSERT INTO plugins (id, name, display_name, description, version, author, category, status, settings, installed_at, last_updated)
             VALUES (?, ?, ?, ?, ?, ?, ?, 'inactive', ?, ?, ?)
@@ -98,10 +89,7 @@ export class ContactService {
             Date.now()
           )
           .run()
-        console.log('[ContactService.saveSettings] INSERT result:', JSON.stringify(result))
-        console.log('[ContactService.saveSettings] Successfully inserted')
       }
-      console.log('[ContactService.saveSettings] Settings saved successfully')
     } catch (error) {
       console.error('[ContactService.saveSettings] ERROR:', error)
       console.error('[ContactService.saveSettings] Error message:', error instanceof Error ? error.message : String(error))
@@ -157,8 +145,6 @@ export class ContactService {
           Date.now()
         )
         .run()
-      
-      console.log('Contact message saved successfully:', id, result)
     } catch (error) {
       console.error('Error saving contact message - Full error:', error)
       console.error('Error details:', {
@@ -235,7 +221,6 @@ export class ContactService {
           Date.now()
         )
         .run()
-      console.log('Contact form plugin installed successfully')
     } catch (error) {
       console.error('Error installing contact form plugin:', error)
       throw new Error('Failed to install contact form plugin')
@@ -252,10 +237,9 @@ export class ContactService {
           UPDATE plugins 
           SET status = 'active', last_updated = ? 
           WHERE id = ?
-        `)
+        `        )
         .bind(Date.now(), manifest.id)
         .run()
-      console.log('Contact form plugin activated')
     } catch (error) {
       console.error('Error activating contact form plugin:', error)
       throw new Error('Failed to activate contact form plugin')
@@ -272,10 +256,9 @@ export class ContactService {
           UPDATE plugins 
           SET status = 'inactive', last_updated = ? 
           WHERE id = ?
-        `)
+        `        )
         .bind(Date.now(), manifest.id)
         .run()
-      console.log('Contact form plugin deactivated')
     } catch (error) {
       console.error('Error deactivating contact form plugin:', error)
       throw new Error('Failed to deactivate contact form plugin')
@@ -291,7 +274,6 @@ export class ContactService {
         .prepare(`DELETE FROM plugins WHERE id = ?`)
         .bind(manifest.id)
         .run()
-      console.log('Contact form plugin uninstalled')
     } catch (error) {
       console.error('Error uninstalling contact form plugin:', error)
       throw new Error('Failed to uninstall contact form plugin')
