@@ -25,8 +25,8 @@ bucket_name = "my-sonicjs-app-media"
 # KV Cache
 [[kv_namespaces]]
 binding = "CACHE_KV"
-id = "b03d586f143e40c8b9da02fb54b2d557"
-preview_id = "6cd51bcf46d246798e54af26929134f9"
+id = "a16f8246fc294d809c90b0fb2df6d363"
+preview_id = "25360861fb2745fab3b1ef2f0f13ffc8"
 
 # Environment variables
 [vars]

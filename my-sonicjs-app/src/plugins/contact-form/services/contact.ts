@@ -129,7 +129,7 @@ export class ContactService {
         throw new Error('Admin user not found')
       }
       
-      const result = await this.db
+      await this.db
         .prepare(`
           INSERT INTO content (id, collection_id, slug, title, data, status, author_id, created_at, updated_at) 
           VALUES (?, ?, ?, ?, ?, 'published', ?, ?, ?)

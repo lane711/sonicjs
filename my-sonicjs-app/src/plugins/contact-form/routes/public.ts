@@ -1,6 +1,5 @@
 import { Hono } from 'hono'
 import { html } from 'hono/html'
-import type { Context } from 'hono'
 import { ContactService } from '../services/contact'
 import { toBoolean } from '@sonicjs-cms/core/utils'
 
@@ -19,7 +18,7 @@ publicRoutes.get('/contact', async (c: any) => {
     }
 
     const service = new ContactService(db)
-    const { status, data: settings } = await service.getSettings()
+    const { data: settings } = await service.getSettings()
 
     // For testing: Allow form to work even if not activated
     // TODO: Remove this after proper plugin activation
@@ -58,7 +57,6 @@ publicRoutes.get('/contact', async (c: any) => {
   let turnstileEnabled = false
   let turnstileTheme = 'auto'
   let turnstileSize = 'normal'
-  let turnstileMode = 'managed'
   let turnstileAppearance = 'always'
   
   if (useTurnstile) {
@@ -74,7 +72,6 @@ publicRoutes.get('/contact', async (c: any) => {
         turnstileEnabled = turnstileSettings.enabled && turnstileSiteKey.length > 0
         turnstileTheme = turnstileSettings.theme || 'auto'
         turnstileSize = turnstileSettings.size || 'normal'
-        turnstileMode = turnstileSettings.mode || 'managed'
         turnstileAppearance = turnstileSettings.appearance || 'always'
       }
     } catch (error) {
@@ -203,7 +200,7 @@ publicRoutes.post('/api/contact', async (c: any) => {
       data = await c.req.json()
     } else if (contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
       const formData = await c.req.formData()
-      formData.forEach((value, key) => {
+      formData.forEach((value: any, key: any) => {
         data[key] = value;
       });
     }

@@ -72,14 +72,14 @@ export function createContactPlugin(): Plugin {
       await contactService.activate()
       console.log('Contact Form plugin activated')
     },
-    deactivate: async (context: PluginContext) => {
+    deactivate: async (_context: PluginContext) => {
       if (contactService) {
         await contactService.deactivate()
         contactService = null
       }
       console.log('Contact Form plugin deactivated')
     },
-    uninstall: async (context: PluginContext) => {
+    uninstall: async (_context: PluginContext) => {
       if (contactService) {
         await contactService.uninstall()
         contactService = null

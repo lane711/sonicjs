@@ -1,5 +1,4 @@
 import { Hono } from 'hono'
-import type { Context } from 'hono'
 import { requireAuth } from '@sonicjs-cms/core'
 import { ContactService } from '../services/contact'
 import { renderSettingsPage } from '../components/settings-page'
