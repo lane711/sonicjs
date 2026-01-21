@@ -76,7 +76,7 @@
     "tsx": "^4.20.3",
     "typescript": "^5.9.3",
     "vitest": "^4.0.5",
-    "wrangler": "^4.45.4"
+    "wrangler": "^4.59.1"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
