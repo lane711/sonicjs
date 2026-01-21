@@ -99,7 +99,7 @@
   "adminMenu": {
     "label": "Contact Form",
     "icon": "envelope",
-    "path": "/admin/contact-form/settings",
+    "path": "/admin/plugins/contact-form/settings",
     "order": 90
   }
 }
