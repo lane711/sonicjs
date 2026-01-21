@@ -61,15 +61,4 @@ app.route('/', coreApp)
 
 console.log("✅ DEBUG: Initialization Complete. Starting Server...")
 
-// --- DEBUG ROUTE (Delete after use) ---
-app.get('/debug-db', async (c) => {
-  try {
-    // This command asks SQLite to list all columns in the 'plugins' table
-    const result = await c.env.DB.prepare("PRAGMA table_info(plugins);").all();
-    return c.json(result);
-  } catch (err: any) {
-    return c.json({ error: err.message });
-  }
-})
-
 export default app

@@ -175,13 +175,24 @@ export class ContactService {
    */
   async getMessages(): Promise<ContactMessage[]> {
     try {
+      // Get the collection ID for contact_messages (same lookup as saveMessage)
+      const collection = await this.db
+        .prepare(`SELECT id FROM collections WHERE name = 'contact_messages' LIMIT 1`)
+        .first()
+      
+      if (!collection || !collection.id) {
+        console.error('Contact messages collection not found in database')
+        return []
+      }
+      
       const results = await this.db
         .prepare(`
           SELECT data 
           FROM content 
-          WHERE collection_id = 'contact_messages' 
+          WHERE collection_id = ? 
           ORDER BY created_at DESC
         `)
+        .bind(collection.id)
         .all()
 
       return results.results.map((row: any) => JSON.parse(row.data))
