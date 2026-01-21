@@ -22,7 +22,7 @@
     "drizzle-orm": "^0.44.2",
     "hono": "^4.11.4",
     "typescript": "^5.8.3",
-    "wrangler": "^4.45.4"
+    "wrangler": "^4.59.1"
   },
   "engines": {
     "node": ">=18.0.0"
