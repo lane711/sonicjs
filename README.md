@@ -81,6 +81,7 @@ npx create-sonicjs@latest my-app
 - TypeScript types for autocomplete
 - Clear conventions and patterns
 - Built for AI-assisted development
+- **12 specialized Claude Code agents** for development ([View all agents](https://sonicjs.com/ai-agents))
 
 ## 🛠 Technology Stack
 
