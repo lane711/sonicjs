@@ -872,9 +872,12 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         }
 
         // Show/hide options container based on field type
-        const fieldType = field.field_type;
+        // Use the dropdown's actual value (not field.field_type) to ensure consistency
+        const fieldType = fieldTypeSelect?.value || field.field_type;
         const optionsContainer = document.getElementById('field-options-container');
         const helpText = document.getElementById('field-type-help');
+
+        console.log('[Edit Field] Showing options for field type:', fieldType, '(original:', field.field_type, ')');
 
         if (['select', 'media', 'richtext', 'reference'].includes(fieldType)) {
           optionsContainer.classList.remove('hidden');
