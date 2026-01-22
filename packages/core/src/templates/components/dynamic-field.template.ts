@@ -574,7 +574,62 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         ` : ''}
       `
       break
-      
+
+    case 'reference':
+      // Reference field - allows selecting content from other collections
+      const collections = opts.collection || []
+      const collectionList = Array.isArray(collections) ? collections : [collections]
+      const collectionAttr = escapeHtml(JSON.stringify(collectionList))
+
+      fieldHTML = `
+        <div class="reference-field-container" data-reference-field data-field-name="${fieldName}" data-collections='${collectionAttr}'>
+          <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml(value || '')}">
+
+          <div class="reference-display ${value ? '' : 'hidden'}" data-reference-display>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                </svg>
+                <div>
+                  <div class="text-sm font-medium text-zinc-900 dark:text-white" data-reference-title>Loading...</div>
+                  <div class="text-xs text-zinc-500 dark:text-zinc-400" data-reference-collection></div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onclick="clearReferenceField('${fieldId}')"
+                class="text-zinc-400 hover:text-red-500 dark:text-zinc-500 dark:hover:text-red-400 transition-colors"
+                title="Remove reference"
+                ${disabled ? 'disabled' : ''}
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="reference-actions ${value ? 'hidden' : ''}" data-reference-actions>
+            <button
+              type="button"
+              onclick="openReferenceSelector('${fieldId}')"
+              class="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all text-sm font-medium"
+              ${disabled ? 'disabled' : ''}
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+              </svg>
+              Select Reference
+            </button>
+            <p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+              Link to: ${collectionList.map((c: string) => escapeHtml(c)).join(', ')}
+            </p>
+          </div>
+        </div>
+      `
+      break
+
     case 'media':
       fieldHTML = `
         <div class="media-field-container">

@@ -621,4 +621,90 @@ adminApiRoutes.get('/migrations/validate', async (c) => {
   }
 })
 
+// References endpoint - for reference field picker
+adminApiRoutes.get('/references', async (c) => {
+  try {
+    const db = c.env.DB
+    const query = c.req.query('q') || ''
+    const collections = c.req.query('collections')?.split(',').filter(Boolean) || []
+    const id = c.req.query('id')
+    const limit = parseInt(c.req.query('limit') || '20', 10)
+
+    // If requesting a specific item by ID
+    if (id && collections.length > 0) {
+      for (const collectionName of collections) {
+        try {
+          const result = await db.prepare(`
+            SELECT id, title, status FROM ${collectionName} WHERE id = ?
+          `).bind(id).first()
+
+          if (result) {
+            return c.json({
+              item: {
+                id: result.id,
+                title: result.title || 'Untitled',
+                collection: collectionName,
+                status: result.status
+              }
+            })
+          }
+        } catch (e) {
+          // Collection might not exist or have different schema, continue
+          console.log(`Could not query ${collectionName}:`, e)
+        }
+      }
+      return c.json({ item: null })
+    }
+
+    // Search across collections
+    const items: Array<{ id: string; title: string; collection: string; status: string }> = []
+
+    for (const collectionName of collections) {
+      try {
+        // Try to query the collection - skip if it doesn't exist or has issues
+        let sql = `SELECT id, title, status FROM ${collectionName} WHERE status = 'published'`
+        const params: string[] = []
+
+        if (query) {
+          sql += ` AND title LIKE ?`
+          params.push(`%${query}%`)
+        }
+
+        sql += ` ORDER BY updated_at DESC LIMIT ?`
+        params.push(String(Math.ceil(limit / collections.length)))
+
+        const stmt = db.prepare(sql)
+        const results = await stmt.bind(...params).all()
+
+        if (results.results) {
+          for (const row of results.results) {
+            items.push({
+              id: String(row.id),
+              title: String(row.title || 'Untitled'),
+              collection: collectionName,
+              status: String(row.status || 'draft')
+            })
+          }
+        }
+      } catch (e) {
+        // Collection might not exist, continue with others
+        console.log(`Could not query ${collectionName}:`, e)
+      }
+    }
+
+    // Sort by title and limit total results
+    items.sort((a, b) => a.title.localeCompare(b.title))
+    const limitedItems = items.slice(0, limit)
+
+    return c.json({ items: limitedItems })
+  } catch (error) {
+    console.error('Error fetching references:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to fetch references',
+      items: []
+    }, 500)
+  }
+})
+
 export default adminApiRoutes

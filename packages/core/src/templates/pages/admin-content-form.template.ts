@@ -514,6 +514,216 @@ export function renderContentFormPage(data: ContentFormData): string {
         document.getElementById(fieldId + '-preview').classList.add('hidden');
       }
 
+      // Reference field functions
+      let currentReferenceFieldId = null;
+      let referenceModal = null;
+
+      function openReferenceSelector(fieldId) {
+        currentReferenceFieldId = fieldId;
+        const container = document.querySelector(\`[data-reference-field][data-field-name="\${fieldId.replace('field-', '')}"]\`);
+        if (!container) return;
+
+        const collections = JSON.parse(container.dataset.collections || '[]');
+
+        // Create modal
+        referenceModal = document.createElement('div');
+        referenceModal.className = 'fixed inset-0 z-50 overflow-y-auto';
+        referenceModal.innerHTML = \`
+          <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" onclick="closeReferenceSelector()"></div>
+          <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+              <div class="px-6 py-4 border-b border-zinc-200 dark:border-zinc-700">
+                <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">Select Reference</h3>
+                <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Choose content from: \${collections.join(', ')}</p>
+              </div>
+
+              <div class="px-6 py-4 border-b border-zinc-200 dark:border-zinc-700">
+                <div class="flex gap-3">
+                  <input
+                    type="text"
+                    id="reference-search-input"
+                    placeholder="Search by title..."
+                    class="flex-1 rounded-lg px-3 py-2 text-sm bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    oninput="searchReferences(this.value)"
+                  >
+                  <select
+                    id="reference-collection-filter"
+                    class="rounded-lg px-3 py-2 text-sm bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    onchange="searchReferences(document.getElementById('reference-search-input').value)"
+                  >
+                    <option value="">All collections</option>
+                    \${collections.map(c => \`<option value="\${c}">\${c}</option>\`).join('')}
+                  </select>
+                </div>
+              </div>
+
+              <div class="flex-1 overflow-y-auto px-6 py-4" id="reference-results">
+                <div class="text-center text-zinc-500 dark:text-zinc-400 py-8">
+                  Type to search or browse collections...
+                </div>
+              </div>
+
+              <div class="px-6 py-4 border-t border-zinc-200 dark:border-zinc-700 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onclick="closeReferenceSelector()"
+                  class="px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        \`;
+        document.body.appendChild(referenceModal);
+
+        // Initial search
+        setTimeout(() => {
+          document.getElementById('reference-search-input')?.focus();
+          searchReferences('');
+        }, 100);
+      }
+
+      function closeReferenceSelector() {
+        if (referenceModal) {
+          referenceModal.remove();
+          referenceModal = null;
+        }
+        currentReferenceFieldId = null;
+      }
+
+      async function searchReferences(query) {
+        const container = document.querySelector(\`[data-reference-field][data-field-name="\${currentReferenceFieldId?.replace('field-', '')}"]\`);
+        if (!container) return;
+
+        const collections = JSON.parse(container.dataset.collections || '[]');
+        const collectionFilter = document.getElementById('reference-collection-filter')?.value || '';
+        const resultsDiv = document.getElementById('reference-results');
+
+        if (!resultsDiv) return;
+
+        resultsDiv.innerHTML = '<div class="text-center py-8 text-zinc-500">Searching...</div>';
+
+        try {
+          const params = new URLSearchParams();
+          if (query) params.set('q', query);
+          if (collectionFilter) {
+            params.set('collections', collectionFilter);
+          } else {
+            params.set('collections', collections.join(','));
+          }
+          params.set('limit', '20');
+
+          const response = await fetch(\`/admin/api/references?\${params.toString()}\`);
+          const data = await response.json();
+
+          if (!data.items || data.items.length === 0) {
+            resultsDiv.innerHTML = '<div class="text-center py-8 text-zinc-500 dark:text-zinc-400">No results found</div>';
+            return;
+          }
+
+          resultsDiv.innerHTML = data.items.map(item => \`
+            <button
+              type="button"
+              onclick="selectReference('\${currentReferenceFieldId}', '\${item.id}', '\${escapeHtmlAttr(item.title)}', '\${item.collection}')"
+              class="w-full text-left p-3 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center gap-3 group"
+            >
+              <svg class="w-5 h-5 text-teal-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium text-zinc-900 dark:text-white truncate">\${escapeHtml(item.title)}</div>
+                <div class="text-xs text-zinc-500 dark:text-zinc-400">\${item.collection}</div>
+              </div>
+              <svg class="w-5 h-5 text-zinc-400 group-hover:text-teal-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          \`).join('');
+        } catch (error) {
+          console.error('Error searching references:', error);
+          resultsDiv.innerHTML = '<div class="text-center py-8 text-red-500">Error loading results</div>';
+        }
+      }
+
+      function selectReference(fieldId, refId, title, collection) {
+        const hiddenInput = document.getElementById(fieldId);
+        if (hiddenInput) {
+          hiddenInput.value = refId;
+        }
+
+        const container = hiddenInput?.closest('[data-reference-field]');
+        if (container) {
+          const displayDiv = container.querySelector('[data-reference-display]');
+          const actionsDiv = container.querySelector('[data-reference-actions]');
+          const titleEl = container.querySelector('[data-reference-title]');
+          const collectionEl = container.querySelector('[data-reference-collection]');
+
+          if (titleEl) titleEl.textContent = title;
+          if (collectionEl) collectionEl.textContent = collection;
+          if (displayDiv) displayDiv.classList.remove('hidden');
+          if (actionsDiv) actionsDiv.classList.add('hidden');
+        }
+
+        closeReferenceSelector();
+      }
+
+      function clearReferenceField(fieldId) {
+        const hiddenInput = document.getElementById(fieldId);
+        if (hiddenInput) {
+          hiddenInput.value = '';
+        }
+
+        const container = hiddenInput?.closest('[data-reference-field]');
+        if (container) {
+          const displayDiv = container.querySelector('[data-reference-display]');
+          const actionsDiv = container.querySelector('[data-reference-actions]');
+
+          if (displayDiv) displayDiv.classList.add('hidden');
+          if (actionsDiv) actionsDiv.classList.remove('hidden');
+        }
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function escapeHtmlAttr(text) {
+        return text.replace(/'/g, "\\\\'").replace(/"/g, '&quot;');
+      }
+
+      // Initialize existing reference fields on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('[data-reference-field]').forEach(async function(container) {
+          const hiddenInput = container.querySelector('input[type="hidden"]');
+          if (hiddenInput && hiddenInput.value) {
+            const collections = JSON.parse(container.dataset.collections || '[]');
+            try {
+              const params = new URLSearchParams();
+              params.set('id', hiddenInput.value);
+              params.set('collections', collections.join(','));
+              const response = await fetch(\`/admin/api/references?\${params.toString()}\`);
+              const data = await response.json();
+              if (data.item) {
+                const titleEl = container.querySelector('[data-reference-title]');
+                const collectionEl = container.querySelector('[data-reference-collection]');
+                const displayDiv = container.querySelector('[data-reference-display]');
+                const actionsDiv = container.querySelector('[data-reference-actions]');
+
+                if (titleEl) titleEl.textContent = data.item.title;
+                if (collectionEl) collectionEl.textContent = data.item.collection;
+                if (displayDiv) displayDiv.classList.remove('hidden');
+                if (actionsDiv) actionsDiv.classList.add('hidden');
+              }
+            } catch (error) {
+              console.error('Error loading reference:', error);
+            }
+          }
+        });
+      });
+
       // Global function called by media selector buttons
       window.selectMediaFile = function(mediaId, mediaUrl, filename) {
         if (!currentMediaFieldId) {
