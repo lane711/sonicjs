@@ -25,7 +25,7 @@ bucket_name = "sonicjs-ci-media"
 # KV Cache (using CI namespace)
 [[kv_namespaces]]
 binding = "CACHE_KV"
-id = "f0814f19589a484da200cc3c3ba4d717"
+id = "a16f8246fc294d809c90b0fb2df6d363"
 
 # Environment variables
 [vars]
