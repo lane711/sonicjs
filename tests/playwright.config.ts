@@ -78,7 +78,8 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests (local only) */
   webServer: process.env.BASE_URL ? undefined : {
-    command: 'cd my-sonicjs-app && npm run dev',
+    command: 'npm run dev',
+    cwd: resolve(__dirname, '../my-sonicjs-app'),
     url: 'http://localhost:8787',
     reuseExistingServer: true,
     timeout: 180 * 1000, // Increased to 3 minutes
