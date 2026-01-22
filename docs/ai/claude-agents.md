@@ -18,6 +18,7 @@ All agents are prefixed with `sonicjs-` for namespacing. Invoke them using the s
 |-------|---------|---------|
 | Fullstack Dev | `/sonicjs-fullstack-dev` | Full stack development with planning, testing, documentation |
 | PR Fixer | `/sonicjs-pr-fixer` | Fix PRs: cherry-pick forks, enable Dependabot e2e, resolve issues |
+| PR Maker | `/sonicjs-pr-maker` | Create PRs, monitor CI/CD, analyze failures, auto-fix issues |
 | Release Engineer | `/sonicjs-release-engineer` | Manage releases, versioning, and changelogs |
 
 ### Marketing & Content Agents
@@ -114,6 +115,72 @@ Checkout and fix any PR with issues.
 - Runs tests to identify issues
 - Applies fixes with proper attribution
 - Pushes updates
+
+---
+
+### `/sonicjs-pr-maker`
+
+**Purpose**: Create Pull Requests, monitor CI/CD pipelines, analyze failures, and automatically fix issues including E2E test failures.
+
+**Modes**:
+
+#### Mode 1: Create PR and Monitor (Default)
+Creates a PR from the current branch and monitors CI until it passes or fails.
+
+```
+/sonicjs-pr-maker
+```
+
+**What it does**:
+- Runs pre-flight checks (not on main, uncommitted changes)
+- Analyzes commits and changes for PR description
+- Generates conventional commit-style title
+- Creates PR with proper description
+- Monitors CI/CD until completion
+- If checks fail, proceeds to analyze and fix
+
+#### Mode 2: Create PR Only
+Creates a PR without monitoring.
+
+```
+/sonicjs-pr-maker create
+```
+
+#### Mode 3: Monitor Existing PR
+Monitor an existing PR's CI/CD pipeline.
+
+```
+/sonicjs-pr-maker monitor <PR_NUMBER>
+```
+
+**What it does**:
+- Polls check status every 30 seconds
+- Reports when checks pass or fail
+- On failure, identifies which checks failed
+
+#### Mode 4: Analyze and Fix Failures
+Analyze CI failures and automatically fix them.
+
+```
+/sonicjs-pr-maker fix <PR_NUMBER>
+```
+
+**What it does**:
+- Downloads workflow logs
+- Identifies failure type (unit test, build, E2E)
+- Checks out the PR branch
+- Applies appropriate fixes
+- Runs tests locally to verify
+- Pushes fixes and resumes monitoring
+
+**Failure Types Handled**:
+- **Unit Tests**: Timing issues, assertion errors, missing mocks
+- **Build Failures**: TypeScript errors, missing imports, type mismatches
+- **E2E Tests**: Timeout issues, selector problems, HTMX wait issues
+
+**Retry Strategy**:
+- Attempts fixes up to 3 times
+- After 3 failures on same test, asks for user guidance
 
 ---
 

@@ -68,6 +68,7 @@ For detailed documentation, see [docs/ai/claude-agents.md](docs/ai/claude-agents
 |-------|---------|
 | `/sonicjs-fullstack-dev` | Full stack development with planning, testing, and documentation |
 | `/sonicjs-pr-fixer` | Fix PRs: cherry-pick forks, enable Dependabot e2e, fix conflicts/tests |
+| `/sonicjs-pr-maker` | Create PRs, monitor CI/CD, analyze failures, auto-fix issues |
 | `/sonicjs-release-engineer` | Manage releases and versioning |
 
 ### Marketing & Content Agents
