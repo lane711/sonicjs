@@ -14,7 +14,7 @@ export function renderLoginPage(data: LoginPageData, demoLoginActive: boolean = 
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Login - SonicJS AI</title>
-      <link rel="icon" type="image/x-icon" href="https://demo.sonicjs.com/images/favicon.ico">
+      <link rel="icon" type="image/svg+xml" href="/favicon.svg">
       <script src="https://unpkg.com/htmx.org@2.0.3"></script>
       <script src="https://cdn.tailwindcss.com"></script>
       <script>

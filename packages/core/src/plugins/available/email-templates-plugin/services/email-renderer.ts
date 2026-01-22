@@ -84,7 +84,7 @@ export class EmailTemplateRenderer {
       site: {
         name: 'SonicJS AI',
         url: 'https://sonicjs-ai.com',
-        logo: 'https://demo.sonicjs.com/images/favicon.ico',
+        logo: '/favicon.svg',
       },
       date: {
         now: now.toISOString().split('T')[0],

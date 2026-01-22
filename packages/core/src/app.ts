@@ -32,6 +32,7 @@ import { createSeedDataAdminRoutes } from './plugins/core-plugins/seed-data-plug
 import { emailPlugin } from './plugins/core-plugins/email-plugin'
 import { otpLoginPlugin } from './plugins/core-plugins/otp-login-plugin'
 import { createMagicLinkAuthPlugin } from './plugins/available/magic-link-auth'
+import { faviconSvg } from './assets/favicon'
 
 // ============================================================================
 // Type Definitions
@@ -216,6 +217,16 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
       app.route(route.path, route.handler)
     }
   }
+
+  // Serve favicon
+  app.get('/favicon.svg', (c) => {
+    return new Response(faviconSvg, {
+      headers: {
+        'Content-Type': 'image/svg+xml',
+        'Cache-Control': 'public, max-age=31536000'
+      }
+    })
+  })
 
   // Serve files from R2 storage (public file access)
   app.get('/files/*', async (c) => {

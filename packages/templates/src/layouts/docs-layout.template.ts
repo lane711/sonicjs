@@ -32,7 +32,7 @@ export function renderDocsLayout(data: DocsLayoutData): string {
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>${data.title} - SonicJS AI Documentation</title>
-  <link rel="icon" type="image/x-icon" href="https://demo.sonicjs.com/images/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   
   <!-- Styles -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
