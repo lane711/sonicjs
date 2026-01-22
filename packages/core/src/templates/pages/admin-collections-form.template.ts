@@ -48,7 +48,8 @@ function getFieldTypeBadge(fieldType: string): string {
     'boolean': 'Boolean',
     'date': 'Date',
     'select': 'Select',
-    'media': 'Media'
+    'media': 'Media',
+    'reference': 'Reference'
   }
   const typeColors: Record<string, string> = {
     'text': 'bg-blue-500/10 dark:bg-blue-400/10 text-blue-700 dark:text-blue-300 ring-blue-500/20 dark:ring-blue-400/20',
@@ -59,7 +60,8 @@ function getFieldTypeBadge(fieldType: string): string {
     'boolean': 'bg-amber-500/10 dark:bg-amber-400/10 text-amber-700 dark:text-amber-300 ring-amber-500/20 dark:ring-amber-400/20',
     'date': 'bg-cyan-500/10 dark:bg-cyan-400/10 text-cyan-700 dark:text-cyan-300 ring-cyan-500/20 dark:ring-cyan-400/20',
     'select': 'bg-indigo-500/10 dark:bg-indigo-400/10 text-indigo-700 dark:text-indigo-300 ring-indigo-500/20 dark:ring-indigo-400/20',
-    'media': 'bg-rose-500/10 dark:bg-rose-400/10 text-rose-700 dark:text-rose-300 ring-rose-500/20 dark:ring-rose-400/20'
+    'media': 'bg-rose-500/10 dark:bg-rose-400/10 text-rose-700 dark:text-rose-300 ring-rose-500/20 dark:ring-rose-400/20',
+    'reference': 'bg-teal-500/10 dark:bg-teal-400/10 text-teal-700 dark:text-teal-300 ring-teal-500/20 dark:ring-teal-400/20'
   }
   const label = typeLabels[fieldType] || fieldType
   const color = typeColors[fieldType] || 'bg-zinc-500/10 dark:bg-zinc-400/10 text-zinc-700 dark:text-zinc-300 ring-zinc-500/20 dark:ring-zinc-400/20'
@@ -552,6 +554,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
                 <option value="date">Date</option>
                 <option value="select">Select</option>
                 <option value="media">Media</option>
+                <option value="reference">Reference</option>
               </select>
               <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-blue-600 dark:text-blue-400 sm:size-4">
                 <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
@@ -873,7 +876,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         const optionsContainer = document.getElementById('field-options-container');
         const helpText = document.getElementById('field-type-help');
 
-        if (['select', 'media', 'richtext'].includes(fieldType)) {
+        if (['select', 'media', 'richtext', 'reference'].includes(fieldType)) {
           optionsContainer.classList.remove('hidden');
 
           // Set help text based on type
@@ -886,6 +889,9 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
               break;
             case 'richtext':
               helpText.textContent = 'Full-featured WYSIWYG text editor with formatting options';
+              break;
+            case 'reference':
+              helpText.textContent = 'Link to content from other collections';
               break;
           }
         } else {
@@ -1021,7 +1027,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
         const fieldNameInput = document.getElementById('modal-field-name');
 
         // Show/hide options based on field type
-        if (['select', 'media', 'richtext', 'guid'].includes(this.value)) {
+        if (['select', 'media', 'richtext', 'guid', 'reference'].includes(this.value)) {
           optionsContainer.classList.remove('hidden');
 
           // Set default options and help text based on type
@@ -1037,6 +1043,10 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
             case 'richtext':
               fieldOptions.value = '{"toolbar": "full", "height": 400}';
               helpText.textContent = 'Full-featured WYSIWYG text editor with formatting options';
+              break;
+            case 'reference':
+              fieldOptions.value = '{"collection": ["pages", "posts"]}';
+              helpText.textContent = 'Link to content from other collections';
               break;
           }
         } else {
