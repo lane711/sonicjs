@@ -1,0 +1,70 @@
+{
+  "id": "ai-search",
+  "name": "AI Search",
+  "description": "Advanced search with Cloudflare AI Search. Full-text search, semantic search, and advanced filtering across all content collections.",
+  "version": "1.0.0",
+  "author": "SonicJS",
+  "category": "search",
+  "icon": "magnifying-glass",
+  "homepage": "https://developers.cloudflare.com/ai-search/",
+  "repository": "https://github.com/sonicjs/sonicjs",
+  "license": "MIT",
+  "permissions": ["settings:write", "admin:access", "content:read"],
+  "dependencies": [],
+  "configSchema": {
+    "enabled": {
+      "type": "boolean",
+      "label": "Enable AI Search",
+      "description": "Enable or disable AI Search functionality",
+      "default": true
+    },
+    "ai_mode_enabled": {
+      "type": "boolean",
+      "label": "Enable AI/Semantic Search",
+      "description": "Enable AI-powered semantic search (requires Cloudflare Workers AI binding)",
+      "default": false
+    },
+    "ai_provider": {
+      "type": "string",
+      "label": "AI Provider",
+      "description": "Which AI service to use for semantic search",
+      "default": "cloudflare",
+      "enum": ["cloudflare", "keyword-only"]
+    },
+    "autocomplete_enabled": {
+      "type": "boolean",
+      "label": "Enable Autocomplete",
+      "description": "Show search suggestions as user types",
+      "default": true
+    },
+    "cache_duration": {
+      "type": "number",
+      "label": "Cache Duration (hours)",
+      "description": "How long to cache search results",
+      "default": 1,
+      "min": 0,
+      "max": 24
+    },
+    "results_limit": {
+      "type": "number",
+      "label": "Results Per Page",
+      "description": "Maximum number of results to show per page",
+      "default": 20,
+      "min": 10,
+      "max": 100
+    },
+    "index_media": {
+      "type": "boolean",
+      "label": "Index Media Metadata",
+      "description": "Include R2 media files in search index",
+      "default": false
+    }
+  },
+      "adminMenu": {
+        "label": "AI Search",
+        "icon": "magnifying-glass",
+        "href": "/admin/plugins/ai-search",
+        "parentId": "plugins",
+        "order": 50
+      }
+}
