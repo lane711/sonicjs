@@ -648,7 +648,7 @@ adminApiRoutes.get('/references', async (c) => {
         SELECT c.id, c.title, c.status, col.name as collection_name, col.display_name
         FROM content c
         JOIN collections col ON c.collection_id = col.id
-        WHERE c.id = ? AND c.deleted_at IS NULL
+        WHERE c.id = ?
       `).bind(id).first()
 
       if (result) {
@@ -696,7 +696,7 @@ adminApiRoutes.get('/references', async (c) => {
       SELECT c.id, c.title, c.status, col.name as collection_name, col.display_name
       FROM content c
       JOIN collections col ON c.collection_id = col.id
-      WHERE c.deleted_at IS NULL ${collectionFilter}
+      WHERE 1=1 ${collectionFilter}
     `
     const params: (string | number)[] = [...collectionParams]
 
