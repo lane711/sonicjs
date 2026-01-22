@@ -7,6 +7,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/@sonicjs-cms/core.svg)](https://www.npmjs.com/package/@sonicjs-cms/core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/lane711/sonicjs)](https://github.com/lane711/sonicjs/commits/main)
 
 A modern, TypeScript-first headless CMS built for Cloudflare's edge platform with Hono.js.
 
