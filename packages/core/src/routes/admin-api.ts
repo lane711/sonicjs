@@ -630,6 +630,18 @@ adminApiRoutes.get('/references', async (c) => {
     const id = c.req.query('id')
     const limit = parseInt(c.req.query('limit') || '20', 10)
 
+    console.log('[References API] Request:', { query, collectionNames, id, limit })
+
+    // Get all available collections for reference
+    const allCollections = await db.prepare(`
+      SELECT name, display_name FROM collections WHERE is_active = 1 ORDER BY display_name
+    `).all()
+    const availableCollections = (allCollections.results || []).map((c: any) => ({
+      name: c.name,
+      displayName: c.display_name
+    }))
+    console.log('[References API] Available collections:', availableCollections.map((c: any) => c.name))
+
     // If requesting a specific item by ID
     if (id) {
       const result = await db.prepare(`
@@ -658,9 +670,25 @@ adminApiRoutes.get('/references', async (c) => {
     const collectionParams: string[] = []
 
     if (collectionNames.length > 0) {
-      const placeholders = collectionNames.map(() => '?').join(', ')
-      collectionFilter = `AND col.name IN (${placeholders})`
-      collectionParams.push(...collectionNames)
+      // Check if any of the requested collections exist
+      const matchedCollections = availableCollections.filter((c: any) =>
+        collectionNames.includes(c.name)
+      )
+      console.log('[References API] Matched collections:', matchedCollections)
+
+      if (matchedCollections.length > 0) {
+        const placeholders = matchedCollections.map(() => '?').join(', ')
+        collectionFilter = `AND col.name IN (${placeholders})`
+        collectionParams.push(...matchedCollections.map((c: any) => c.name))
+      } else {
+        // None of the requested collections exist - return empty with available collections
+        console.log('[References API] No matching collections found. Requested:', collectionNames)
+        return c.json({
+          items: [],
+          availableCollections,
+          message: `Collections not found: ${collectionNames.join(', ')}. Available: ${availableCollections.map((c: any) => c.name).join(', ')}`
+        })
+      }
     }
 
     // Search across collections - include all statuses, not just published
@@ -680,7 +708,9 @@ adminApiRoutes.get('/references', async (c) => {
     sql += ` ORDER BY c.updated_at DESC LIMIT ?`
     params.push(limit)
 
+    console.log('[References API] SQL:', sql, 'Params:', params)
     const results = await db.prepare(sql).bind(...params).all()
+    console.log('[References API] Results count:', results.results?.length || 0)
 
     const items = (results.results || []).map((row: any) => ({
       id: String(row.id),

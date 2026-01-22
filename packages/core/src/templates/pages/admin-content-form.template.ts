@@ -618,7 +618,15 @@ export function renderContentFormPage(data: ContentFormData): string {
           const data = await response.json();
 
           if (!data.items || data.items.length === 0) {
-            resultsDiv.innerHTML = '<div class="text-center py-8 text-zinc-500 dark:text-zinc-400">No results found</div>';
+            let message = 'No results found';
+            if (data.message) {
+              message = data.message;
+            }
+            if (data.availableCollections && data.availableCollections.length > 0) {
+              message += '<br><br><span class="text-xs">Available collections: ' +
+                data.availableCollections.map(c => c.name).join(', ') + '</span>';
+            }
+            resultsDiv.innerHTML = \`<div class="text-center py-8 text-zinc-500 dark:text-zinc-400">\${message}</div>\`;
             return;
           }
 
