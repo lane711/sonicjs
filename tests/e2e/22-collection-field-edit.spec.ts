@@ -30,8 +30,8 @@ test.describe('Collection Field Edit', () => {
     if (fieldCount === 0) {
       console.log('No existing fields found, creating a test field first');
 
-      // Add a field first
-      await page.click('button:has-text("Add Field")');
+      // Add a field first - use specific selector to avoid matching the modal's submit button
+      await page.click('button[type="button"]:has-text("Add Field")');
       await page.waitForSelector('#field-modal:not(.hidden)');
 
       // Fill in field details
@@ -102,8 +102,8 @@ test.describe('Collection Field Edit', () => {
     // Ensure there's at least one field
     const fieldCount = await page.locator('.field-item').count();
     if (fieldCount === 0) {
-      // Add a field
-      await page.click('button:has-text("Add Field")');
+      // Add a field - use specific selector to avoid matching the modal's submit button
+      await page.click('button[type="button"]:has-text("Add Field")');
       await page.fill('#modal-field-name', 'editable_test');
       await page.selectOption('#field-type', 'text');
       await page.fill('#field-label', 'Editable Test');
