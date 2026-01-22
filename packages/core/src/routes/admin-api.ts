@@ -626,77 +626,71 @@ adminApiRoutes.get('/references', async (c) => {
   try {
     const db = c.env.DB
     const query = c.req.query('q') || ''
-    const collections = c.req.query('collections')?.split(',').filter(Boolean) || []
+    const collectionNames = c.req.query('collections')?.split(',').filter(Boolean) || []
     const id = c.req.query('id')
     const limit = parseInt(c.req.query('limit') || '20', 10)
 
     // If requesting a specific item by ID
-    if (id && collections.length > 0) {
-      for (const collectionName of collections) {
-        try {
-          const result = await db.prepare(`
-            SELECT id, title, status FROM ${collectionName} WHERE id = ?
-          `).bind(id).first()
+    if (id) {
+      const result = await db.prepare(`
+        SELECT c.id, c.title, c.status, col.name as collection_name, col.display_name
+        FROM content c
+        JOIN collections col ON c.collection_id = col.id
+        WHERE c.id = ? AND c.deleted_at IS NULL
+      `).bind(id).first()
 
-          if (result) {
-            return c.json({
-              item: {
-                id: result.id,
-                title: result.title || 'Untitled',
-                collection: collectionName,
-                status: result.status
-              }
-            })
+      if (result) {
+        return c.json({
+          item: {
+            id: result.id,
+            title: result.title || 'Untitled',
+            collection: result.collection_name,
+            collectionDisplay: result.display_name,
+            status: result.status
           }
-        } catch (e) {
-          // Collection might not exist or have different schema, continue
-          console.log(`Could not query ${collectionName}:`, e)
-        }
+        })
       }
       return c.json({ item: null })
     }
 
-    // Search across collections
-    const items: Array<{ id: string; title: string; collection: string; status: string }> = []
+    // Get collection IDs for the requested collection names
+    let collectionFilter = ''
+    const collectionParams: string[] = []
 
-    for (const collectionName of collections) {
-      try {
-        // Try to query the collection - skip if it doesn't exist or has issues
-        let sql = `SELECT id, title, status FROM ${collectionName} WHERE status = 'published'`
-        const params: string[] = []
-
-        if (query) {
-          sql += ` AND title LIKE ?`
-          params.push(`%${query}%`)
-        }
-
-        sql += ` ORDER BY updated_at DESC LIMIT ?`
-        params.push(String(Math.ceil(limit / collections.length)))
-
-        const stmt = db.prepare(sql)
-        const results = await stmt.bind(...params).all()
-
-        if (results.results) {
-          for (const row of results.results) {
-            items.push({
-              id: String(row.id),
-              title: String(row.title || 'Untitled'),
-              collection: collectionName,
-              status: String(row.status || 'draft')
-            })
-          }
-        }
-      } catch (e) {
-        // Collection might not exist, continue with others
-        console.log(`Could not query ${collectionName}:`, e)
-      }
+    if (collectionNames.length > 0) {
+      const placeholders = collectionNames.map(() => '?').join(', ')
+      collectionFilter = `AND col.name IN (${placeholders})`
+      collectionParams.push(...collectionNames)
     }
 
-    // Sort by title and limit total results
-    items.sort((a, b) => a.title.localeCompare(b.title))
-    const limitedItems = items.slice(0, limit)
+    // Search across collections - include all statuses, not just published
+    let sql = `
+      SELECT c.id, c.title, c.status, col.name as collection_name, col.display_name
+      FROM content c
+      JOIN collections col ON c.collection_id = col.id
+      WHERE c.deleted_at IS NULL ${collectionFilter}
+    `
+    const params: (string | number)[] = [...collectionParams]
 
-    return c.json({ items: limitedItems })
+    if (query) {
+      sql += ` AND c.title LIKE ?`
+      params.push(`%${query}%`)
+    }
+
+    sql += ` ORDER BY c.updated_at DESC LIMIT ?`
+    params.push(limit)
+
+    const results = await db.prepare(sql).bind(...params).all()
+
+    const items = (results.results || []).map((row: any) => ({
+      id: String(row.id),
+      title: String(row.title || 'Untitled'),
+      collection: String(row.collection_name),
+      collectionDisplay: String(row.display_name || row.collection_name),
+      status: String(row.status || 'draft')
+    }))
+
+    return c.json({ items })
   } catch (error) {
     console.error('Error fetching references:', error)
     return c.json({
