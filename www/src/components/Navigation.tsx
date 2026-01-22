@@ -284,6 +284,7 @@ export const navigation: Array<NavGroup> = [
       { title: 'Community', href: '/community' },
       { title: 'Sponsor', href: '/sponsor' },
       { title: 'Contributing', href: '/contributing' },
+      { title: 'AI Agents', href: '/ai-agents' },
       { title: 'Coding Standards', href: '/coding-standards' },
       { title: 'Telemetry', href: '/telemetry' },
     ],

@@ -1,0 +1,417 @@
+export const metadata = {
+  title: 'AI Agents - SonicJS',
+  description:
+    'Discover the AI-powered Claude agents that help automate development, releases, SEO, and marketing tasks for the SonicJS project.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Development Agents', id: 'development-agents' },
+  { title: 'Release & DevOps Agents', id: 'release-devops-agents' },
+  { title: 'SEO Agents', id: 'seo-agents' },
+  { title: 'Marketing Agents', id: 'marketing-agents' },
+  { title: 'Using Agents', id: 'using-agents' },
+]
+
+# AI Agents
+
+SonicJS uses AI-powered Claude agents to automate development workflows, releases, SEO optimization, and marketing tasks. These agents are available when using Claude Code with the SonicJS repository. {{ className: 'lead' }}
+
+---
+
+## Overview
+
+The SonicJS project includes **12 specialized AI agents** that help maintainers and contributors work more efficiently. Each agent is designed for specific tasks and follows established best practices.
+
+<div className="not-prose mb-8 p-6 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
+  <div className="flex items-start gap-4">
+    <div className="text-3xl">🤖</div>
+    <div>
+      <h3 className="text-lg font-semibold mb-2 m-0 text-blue-900 dark:text-blue-100">Powered by Claude Code</h3>
+      <p className="text-blue-800 dark:text-blue-200 mb-0">These agents work with <a href="https://claude.ai/code" className="text-blue-700 dark:text-blue-300 underline">Claude Code</a> and are configured in the <code>.claude/commands/</code> directory. Invoke them using slash commands like <code>/fullstack-dev</code> or <code>/release-engineer</code>.</p>
+    </div>
+  </div>
+</div>
+
+### Agent Categories
+
+<FeatureGrid
+  features={[
+    {
+      icon: '🛠️',
+      title: 'Development',
+      description: '2 agents for feature development and PR management',
+    },
+    {
+      icon: '🚀',
+      title: 'Release & DevOps',
+      description: '3 agents for releases, announcements, and dependency management',
+    },
+    {
+      icon: '🔍',
+      title: 'SEO',
+      description: '5 agents for search optimization and content strategy',
+    },
+    {
+      icon: '📢',
+      title: 'Marketing',
+      description: '2 agents for social media and image generation',
+    },
+  ]}
+  columns={2}
+/>
+
+---
+
+## Development Agents
+
+### Full Stack Developer Agent
+
+**Command:** `/fullstack-dev` or `/sonicjs-fullstack-dev`
+
+The primary development agent for implementing features in SonicJS. This agent enforces a structured workflow with mandatory planning, testing, and documentation.
+
+<div className="not-prose mb-6">
+  <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+    <div className="bg-zinc-100 dark:bg-zinc-800 px-4 py-2 border-b border-zinc-200 dark:border-zinc-700">
+      <span className="font-mono text-sm">Key Features</span>
+    </div>
+    <div className="p-4 space-y-2 text-sm">
+      <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span>Mandatory planning phase with plan documents in <code>docs/ai/plans/</code></div>
+      <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span>Test-driven development with 90% coverage target</div>
+      <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span>Unit tests with Vitest, E2E tests with Playwright</div>
+      <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span>Regression testing before completing any feature</div>
+    </div>
+  </div>
+</div>
+
+**Usage:**
+```bash
+/fullstack-dev plan [feature]     # Create implementation plan
+/fullstack-dev implement          # Start implementing approved plan
+/fullstack-dev test unit [feature]  # Write unit tests
+/fullstack-dev test e2e [feature]   # Write E2E tests
+/fullstack-dev review             # Run all tests and report status
+```
+
+---
+
+### PR Fixer Agent
+
+**Command:** `/sonicjs-pr-fixer`
+
+Handles problematic pull requests including fork PRs that need cherry-picking, Dependabot PRs that need E2E tests enabled, and any PR needing fixes before merge.
+
+<div className="not-prose mb-6">
+  <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+    <div className="bg-zinc-100 dark:bg-zinc-800 px-4 py-2 border-b border-zinc-200 dark:border-zinc-700">
+      <span className="font-mono text-sm">Modes</span>
+    </div>
+    <div className="p-4 space-y-2 text-sm">
+      <div className="flex items-start gap-2"><span className="text-blue-500">1.</span><strong>Fork Mode:</strong> Cherry-pick commits from fork PRs, preserve attribution, fix conflicts</div>
+      <div className="flex items-start gap-2"><span className="text-blue-500">2.</span><strong>Dependabot Mode:</strong> Enable E2E tests by pushing human commits</div>
+      <div className="flex items-start gap-2"><span className="text-blue-500">3.</span><strong>Fix Mode:</strong> Checkout any PR, fix issues, and push updates</div>
+    </div>
+  </div>
+</div>
+
+**Usage:**
+```bash
+/sonicjs-pr-fixer fork 532       # Cherry-pick fork PR with attribution
+/sonicjs-pr-fixer dependabot     # List and enable e2e on Dependabot PRs
+/sonicjs-pr-fixer dependabot all # Enable e2e on all Dependabot PRs
+/sonicjs-pr-fixer fix 532        # Checkout and fix any PR
+```
+
+---
+
+## Release & DevOps Agents
+
+### Release Engineer Agent
+
+**Command:** `/release-engineer` or `/sonicjs-release-engineer`
+
+Manages npm package releases and dependency updates for SonicJS. Handles version bumping, npm publishing, GitHub releases, and changelog updates.
+
+<div className="not-prose mb-6">
+  <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+    <div className="bg-zinc-100 dark:bg-zinc-800 px-4 py-2 border-b border-zinc-200 dark:border-zinc-700">
+      <span className="font-mono text-sm">Packages Managed</span>
+    </div>
+    <div className="p-4 space-y-2 text-sm">
+      <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span><code>@sonicjs-cms/core</code> - The core CMS framework</div>
+      <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span><code>create-sonicjs</code> - The CLI scaffolding tool</div>
+    </div>
+  </div>
+</div>
+
+**Usage:**
+```bash
+/release-engineer update   # Update npm dependencies
+/release-engineer patch    # Publish patch release (x.x.X)
+/release-engineer minor    # Publish minor release (x.X.0)
+/release-engineer major    # Publish major release (X.0.0)
+/release-engineer beta     # Publish beta pre-release
+/release-engineer status   # Check current version and npm status
+```
+
+---
+
+### Release Announcement Agent
+
+**Command:** `/release-announcement` or `/sonicjs-release-announcement`
+
+Creates compelling release announcements for Discord, Twitter/X, and the website. Generates platform-specific content with proper formatting.
+
+**Usage:**
+```bash
+/release-announcement generate  # Generate content for current version
+/release-announcement post      # Post to all platforms
+/release-announcement dry-run   # Preview without posting
+/release-announcement discord   # Post to Discord only
+/release-announcement twitter   # Post to Twitter only
+```
+
+---
+
+### Dependabot Manager Agent
+
+**Command:** `/dependabot-manager`
+
+Manages automated dependency update PRs from Dependabot. Enables E2E tests on Dependabot PRs by pushing empty commits (changes the actor from bot to human).
+
+**Usage:**
+```bash
+/dependabot-manager         # List open Dependabot PRs
+/dependabot-manager all     # Process all Dependabot PRs
+/dependabot-manager 123,124 # Process specific PRs
+```
+
+---
+
+## SEO Agents
+
+### SEO Expert Agent
+
+**Command:** `/seo` or `/sonicjs-seo`
+
+The main SEO agent for SonicJS. Handles keyword research, blog content generation, documentation SEO optimization, and technical SEO audits.
+
+<div className="not-prose mb-6">
+  <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+    <div className="bg-zinc-100 dark:bg-zinc-800 px-4 py-2 border-b border-zinc-200 dark:border-zinc-700">
+      <span className="font-mono text-sm">Target Keywords</span>
+    </div>
+    <div className="p-4 space-y-2 text-sm">
+      <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span>headless cms cloudflare, edge cms, typescript headless cms</div>
+      <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span>cloudflare workers cms, hono cms, d1 database cms</div>
+      <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span>serverless cms, open source headless cms</div>
+    </div>
+  </div>
+</div>
+
+**Usage:**
+```bash
+/seo audit         # Audit current SEO status
+/seo keywords      # Generate keyword research report
+/seo blog [topic]  # Generate a blog post
+/seo meta [page]   # Generate optimized meta tags
+/seo sitemap       # Create/update sitemap.xml
+/seo schema [type] # Generate JSON-LD structured data
+```
+
+---
+
+### SEO Blog Agent
+
+**Command:** `/seo-blog` or `/sonicjs-seo-blog`
+
+Generates SEO-optimized blog posts (1500-2500 words) with proper structure, TL;DR boxes for featured snippets, and metadata.
+
+**Output Location:** `www/src/app/blog/[slug]/page.mdx`
+
+**Content Types:**
+- Tutorials and step-by-step guides
+- Comparison posts (SonicJS vs competitors)
+- Technical deep dives
+- Use case articles
+- Migration guides
+
+---
+
+### SEO Keywords Agent
+
+**Command:** `/seo-keywords` or `/sonicjs-seo-keywords`
+
+Performs keyword research to identify ranking opportunities. Analyzes competitors (Strapi, Sanity, Contentful, Payload CMS, Directus) and finds content gaps.
+
+**Output:** Keyword research report with:
+- High priority keywords with search volume
+- Quick win opportunities
+- Content gaps vs competitors
+- Recommended content calendar
+
+---
+
+### SEO Audit Agent
+
+**Command:** `/seo-audit` or `/sonicjs-seo-audit`
+
+Performs comprehensive SEO audits of the SonicJS documentation website.
+
+**Audit Categories:**
+- Technical SEO (sitemap, robots.txt, meta tags, canonicals)
+- On-Page SEO (titles, descriptions, OpenGraph)
+- Content SEO (thin content, keyword opportunities)
+- Structured Data (JSON-LD, Organization, Article schema)
+
+---
+
+### SEO Sitemap Agent
+
+**Command:** `/seo-sitemap` or `/sonicjs-seo-sitemap`
+
+Creates or updates the sitemap.xml for the documentation website. Can generate dynamic sitemaps via Next.js or static XML files.
+
+---
+
+### Discord Sync Agent
+
+**Command:** `/seo-discord-sync` or `/sonicjs-seo-discord-sync`
+
+Transforms valuable Discord discussions into searchable web content. Creates FAQs, troubleshooting guides, and community showcases from real Discord conversations.
+
+**Output Locations:**
+- `www/src/app/faq/page.mdx` - FAQ from Discord Q&A
+- `www/src/app/showcase/page.mdx` - Community projects
+- `www/src/app/troubleshooting/page.mdx` - Common issues and solutions
+
+---
+
+## Marketing Agents
+
+### Social Media Agent
+
+**Command:** `/social-post` or `/sonicjs-social-post`
+
+Posts announcements to Discord and Twitter/X using configured webhooks and API credentials.
+
+**Usage:**
+```bash
+# Post to Discord
+node scripts/social/post-discord.js "Your message here"
+
+# Post to Twitter
+node scripts/social/post-twitter.js "Your tweet here"
+
+# Post to both platforms
+node scripts/social/post-both.js "Your announcement"
+```
+
+**Auto-Hashtags:** #SonicJS #CloudflareCMS #OpenSource #Webdev
+
+---
+
+### Blog Image Agent
+
+**Command:** `/blog-image` or `/sonicjs-blog-image`
+
+Generates professional blog post images using OpenAI's DALL-E API with SonicJS brand guidelines.
+
+<div className="not-prose mb-6">
+  <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+    <div className="bg-zinc-100 dark:bg-zinc-800 px-4 py-2 border-b border-zinc-200 dark:border-zinc-700">
+      <span className="font-mono text-sm">Brand Guidelines</span>
+    </div>
+    <div className="p-4 space-y-2 text-sm">
+      <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Background:</strong> Dark slate (#1E293B or darker)</div>
+      <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Accent:</strong> Electric blue (#3B82F6) for glowing elements</div>
+      <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Style:</strong> 3D isometric with depth, futuristic tech aesthetic</div>
+      <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Dimensions:</strong> 1792x1024px (hero images)</div>
+    </div>
+  </div>
+</div>
+
+**Output Location:** `www/public/images/blog/[slug]/`
+
+---
+
+## Using Agents
+
+### Prerequisites
+
+1. **Claude Code** - Install from [claude.ai/code](https://claude.ai/code)
+2. **SonicJS Repository** - Clone the repository locally
+3. **Environment Variables** - Set up required API keys for certain agents
+
+### Invoking Agents
+
+Open the SonicJS repository in Claude Code and use slash commands:
+
+```bash
+# Start a full stack development session
+/fullstack-dev plan add-dark-mode-toggle
+
+# Publish a new release
+/release-engineer minor
+
+# Generate an SEO blog post
+/seo-blog Building a REST API with SonicJS
+
+# Enable E2E tests on Dependabot PRs
+/dependabot-manager all
+```
+
+### Environment Variables
+
+Some agents require API keys. Set these in your environment or `.env` file:
+
+```bash
+# Discord (for announcements)
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+
+# Twitter/X (for announcements)
+TWITTER_API_KEY=your_api_key
+TWITTER_API_SECRET=your_api_secret
+TWITTER_ACCESS_TOKEN=your_access_token
+TWITTER_ACCESS_SECRET=your_access_secret
+
+# OpenAI (for image generation)
+OPENAI_API_KEY=your_openai_key
+```
+
+### Agent Configuration
+
+Agents are defined as Markdown files in `.claude/commands/`:
+
+```
+.claude/
+├── commands/
+│   ├── sonicjs-fullstack-dev.md
+│   ├── sonicjs-release-engineer.md
+│   ├── sonicjs-seo.md
+│   └── ... (12 agent files)
+├── instructions.md
+└── settings.json
+```
+
+---
+
+## Questions?
+
+If you have questions about using the AI agents:
+
+1. **Check the agent file** - Each `.claude/commands/*.md` file has detailed instructions
+2. **Ask in [Discord](https://discord.gg/SJArGfJgPJ)** - Our community can help
+3. **Open an issue** - For bugs or feature requests
+
+<div className="not-prose mt-8">
+  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <Button href="https://github.com/lane711/sonicjs/tree/main/.claude/commands" variant="primary">
+      <>View Agent Source Files</>
+    </Button>
+    <Button href="/contributing" variant="secondary">
+      <>Contributing Guide</>
+    </Button>
+  </div>
+</div>
