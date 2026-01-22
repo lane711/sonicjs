@@ -47,9 +47,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       authors: [post.author.name],
       images: [
         {
-          url: post.featuredImage?.url || 'https://sonicjs.com/sonicjs-discord.png',
-          width: post.featuredImage?.width || 1200,
-          height: post.featuredImage?.height || 630,
+          url: post.featuredImage?.url || 'https://sonicjs.com/sonicjs-og.png',
+          width: post.featuredImage?.width || 1792,
+          height: post.featuredImage?.height || 1024,
           alt: post.title,
         },
       ],
@@ -60,7 +60,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: post.title,
       description: post.description,
-      images: [post.featuredImage?.url || 'https://sonicjs.com/sonicjs-discord.png'],
+      images: [post.featuredImage?.url || 'https://sonicjs.com/sonicjs-og.png'],
     },
     alternates: {
       canonical: `https://sonicjs.com/blog/${post.slug}`,
