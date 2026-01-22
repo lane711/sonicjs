@@ -574,34 +574,114 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         ` : ''}
       `
       break
-      
+
+    case 'reference':
+      let referenceCollections: string[] = []
+      if (Array.isArray(opts.collection)) {
+        referenceCollections = opts.collection.filter(Boolean)
+      } else if (typeof opts.collection === 'string' && opts.collection) {
+        referenceCollections = [opts.collection]
+      }
+      const referenceCollectionsAttr = referenceCollections.join(',')
+      const hasReferenceCollection = referenceCollections.length > 0
+      const hasReferenceValue = Boolean(value)
+      fieldHTML = `
+        <div class="reference-field-container space-y-3" data-reference-field data-field-name="${escapeHtml(fieldName)}" data-reference-collection="${escapeHtml(referenceCollections[0] || '')}" data-reference-collections="${escapeHtml(referenceCollectionsAttr)}">
+          <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml(value)}">
+          <div class="rounded-lg border border-zinc-200 bg-white/60 px-3 py-2 text-sm text-zinc-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300" data-reference-display>
+            ${hasReferenceCollection ? (hasReferenceValue ? 'Loading selection...' : 'No reference selected.') : 'Reference collection not configured.'}
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onclick="openReferenceSelector('${fieldId}')"
+              class="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-white/10 dark:hover:bg-white/20"
+              ${hasReferenceCollection ? '' : 'disabled'}
+            >
+              Select reference
+            </button>
+            <button
+              type="button"
+              onclick="clearReferenceField('${fieldId}')"
+              class="inline-flex items-center justify-center rounded-lg border border-zinc-200 px-3 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/10"
+              data-reference-clear
+              ${hasReferenceValue ? '' : 'disabled'}
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+      `
+      break
+
     case 'media':
+      // Check if multiple selection is enabled
+      const isMultiple = opts.multiple === true
+      const mediaValues = isMultiple && value ? (Array.isArray(value) ? value : String(value).split(',').filter(Boolean)) : []
+      const singleValue = !isMultiple ? value : ''
+
+      // Helper to detect if URL is a video
+      const isVideoUrl = (url: string) => {
+        const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi']
+        return videoExtensions.some(ext => url.toLowerCase().endsWith(ext))
+      }
+
+      // Helper to render media element
+      const renderMediaPreview = (url: string, alt: string, classes: string) => {
+        if (isVideoUrl(url)) {
+          return `<video src="${url}" class="${classes}" muted></video>`
+        }
+        return `<img src="${url}" alt="${alt}" class="${classes}">`
+      }
+
       fieldHTML = `
         <div class="media-field-container">
-          <input type="hidden" id="${fieldId}" name="${fieldName}" value="${value}">
-          <div class="media-preview ${value ? '' : 'hidden'}" id="${fieldId}-preview">
-            ${value ? `<img src="${value}" alt="Selected media" class="w-32 h-32 object-cover rounded-lg border border-white/20">` : ''}
-          </div>
+          <input type="hidden" id="${fieldId}" name="${fieldName}" value="${isMultiple ? mediaValues.join(',') : singleValue}" data-multiple="${isMultiple}">
+
+          ${isMultiple ? `
+            <div class="media-preview-grid grid grid-cols-4 gap-2 mb-2 ${mediaValues.length === 0 ? 'hidden' : ''}" id="${fieldId}-preview">
+              ${mediaValues.map((url: string, idx: number) => `
+                <div class="relative media-preview-item" data-url="${url}">
+                  ${renderMediaPreview(url, `Media ${idx + 1}`, 'w-full h-24 object-cover rounded-lg border border-white/20')}
+                  <button
+                    type="button"
+                    onclick="removeMediaFromMultiple('${fieldId}', '${url}')"
+                    class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 hover:bg-red-700"
+                    ${disabled ? 'disabled' : ''}
+                  >
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                </div>
+              `).join('')}
+            </div>
+          ` : `
+            <div class="media-preview ${singleValue ? '' : 'hidden'}" id="${fieldId}-preview">
+              ${singleValue ? renderMediaPreview(singleValue, 'Selected media', 'w-32 h-32 object-cover rounded-lg border border-white/20') : ''}
+            </div>
+          `}
+
           <div class="media-actions mt-2 space-x-2">
             <button
               type="button"
-              onclick="openMediaSelector('${fieldId}')"
+              onclick="openMediaSelector('${fieldId}', ${isMultiple})"
               class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all"
               ${disabled ? 'disabled' : ''}
             >
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
-              Select Media
+              ${isMultiple ? 'Select Media (Multiple)' : 'Select Media'}
             </button>
-            ${value ? `
+            ${(isMultiple ? mediaValues.length > 0 : singleValue) ? `
               <button
                 type="button"
                 onclick="clearMediaField('${fieldId}')"
                 class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all"
                 ${disabled ? 'disabled' : ''}
               >
-                Remove
+                ${isMultiple ? 'Clear All' : 'Remove'}
               </button>
             ` : ''}
           </div>

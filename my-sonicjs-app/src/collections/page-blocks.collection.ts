@@ -20,6 +20,11 @@ const pageBlocksCollection: CollectionConfig = {
         title: 'Slug',
         required: true,
       },
+      featuredPage: {
+        type: 'reference',
+        title: 'Featured Page',
+        collection: ['page_blocks', 'pages', 'blog_posts'],
+      },
       seo: {
         type: 'object',
         title: 'SEO',

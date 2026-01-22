@@ -1,6 +1,6 @@
 import * as hono_types from 'hono/types';
 import { Hono } from 'hono';
-import { B as Bindings$7, V as Variables$8 } from './app-Db0AfT5F.cjs';
+import { B as Bindings$7, V as Variables$8 } from './app-DV27cjPy.cjs';
 import { D1Database as D1Database$1, KVNamespace as KVNamespace$1, R2Bucket as R2Bucket$1 } from '@cloudflare/workers-types';
 
 interface Variables$7 extends Variables$8 {

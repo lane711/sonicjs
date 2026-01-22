@@ -510,9 +510,44 @@ export function renderContentFormPage(data: ContentFormData): string {
       }
 
       function clearMediaField(fieldId) {
-        document.getElementById(fieldId).value = '';
-        document.getElementById(fieldId + '-preview').classList.add('hidden');
+        const hiddenInput = document.getElementById(fieldId);
+        const preview = document.getElementById(fieldId + '-preview');
+
+        if (hiddenInput) {
+          hiddenInput.value = '';
+        }
+
+        if (preview) {
+          // Clear all children if it's a grid, or hide it
+          if (preview.classList.contains('media-preview-grid')) {
+            preview.innerHTML = '';
+          }
+          preview.classList.add('hidden');
+        }
       }
+
+      // Global function to remove a single media from multiple selection
+      window.removeMediaFromMultiple = function(fieldId, urlToRemove) {
+        const hiddenInput = document.getElementById(fieldId);
+        if (!hiddenInput) return;
+
+        const values = hiddenInput.value.split(',').filter(url => url !== urlToRemove);
+        hiddenInput.value = values.join(',');
+
+        // Remove preview item
+        const previewItem = document.querySelector(\`[data-url="\${urlToRemove}"]\`);
+        if (previewItem) {
+          previewItem.remove();
+        }
+
+        // Hide preview grid if empty
+        if (values.length === 0) {
+          const preview = document.getElementById(fieldId + '-preview');
+          if (preview) {
+            preview.classList.add('hidden');
+          }
+        }
+      };
 
       // Global function called by media selector buttons
       window.selectMediaFile = function(mediaId, mediaUrl, filename) {
@@ -570,6 +605,271 @@ export function renderContentFormPage(data: ContentFormData): string {
         // Close modal
         document.querySelector('.fixed.inset-0')?.remove();
       }
+
+      // Reference field functions
+      let currentReferenceFieldId = null;
+      let referenceSearchTimeout = null;
+
+      function getReferenceContainer(fieldId) {
+        const input = document.getElementById(fieldId);
+        return input ? input.closest('[data-reference-field]') : null;
+      }
+
+      function getReferenceCollections(container) {
+        if (!container) return [];
+        const rawCollections = container.dataset.referenceCollections || '';
+        const collections = rawCollections
+          .split(',')
+          .map((value) => value.trim())
+          .filter(Boolean);
+        if (collections.length > 0) {
+          return collections;
+        }
+        const singleCollection = container.dataset.referenceCollection;
+        return singleCollection ? [singleCollection] : [];
+      }
+
+      async function fetchReferenceItems(collections, search = '', limit = 20) {
+        const params = new URLSearchParams({ limit: String(limit) });
+        collections.forEach((collection) => params.append('collection', collection));
+        if (search) {
+          params.set('search', search);
+        }
+        const response = await fetch('/admin/api/references?' + params.toString());
+        if (!response.ok) {
+          throw new Error('Failed to load references');
+        }
+        const data = await response.json();
+        return data?.data || [];
+      }
+
+      async function fetchReferenceById(collections, id) {
+        if (!id) return null;
+        const params = new URLSearchParams({ id });
+        collections.forEach((collection) => params.append('collection', collection));
+        const response = await fetch('/admin/api/references?' + params.toString());
+        if (!response.ok) {
+          return null;
+        }
+        const data = await response.json();
+        return data?.data || null;
+      }
+
+      function renderReferenceDisplay(container, item, fallbackMessage = 'No reference selected.') {
+        const display = container.querySelector('[data-reference-display]');
+        const removeButton = container.querySelector('[data-reference-clear]');
+        if (!display) return;
+
+        display.innerHTML = '';
+
+        if (!item) {
+          display.textContent = fallbackMessage;
+          if (removeButton) {
+            removeButton.disabled = true;
+          }
+          return;
+        }
+
+        const title = item.title || item.slug || item.id || 'Untitled';
+        const titleEl = document.createElement('div');
+        titleEl.className = 'font-medium text-zinc-900 dark:text-white';
+        titleEl.textContent = title;
+
+        display.appendChild(titleEl);
+
+        const metaRow = document.createElement('div');
+        metaRow.className = 'mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400';
+
+        if (item.collection?.display_name || item.collection?.name) {
+          const collectionLabel = document.createElement('span');
+          collectionLabel.className = 'inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-zinc-600 dark:bg-white/10 dark:text-zinc-200';
+          collectionLabel.textContent = item.collection.display_name || item.collection.name;
+          metaRow.appendChild(collectionLabel);
+        }
+
+        if (item.slug) {
+          const slugEl = document.createElement('span');
+          slugEl.textContent = item.slug;
+          metaRow.appendChild(slugEl);
+        }
+
+        if (metaRow.childElementCount > 0) {
+          display.appendChild(metaRow);
+        }
+
+        if (removeButton) {
+          removeButton.disabled = false;
+        }
+      }
+
+      function updateReferenceField(fieldId, item) {
+        const input = document.getElementById(fieldId);
+        const container = getReferenceContainer(fieldId);
+        if (!input || !container) return;
+
+        input.value = item?.id || '';
+        renderReferenceDisplay(container, item, 'No reference selected.');
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+
+      function clearReferenceField(fieldId) {
+        updateReferenceField(fieldId, null);
+      }
+
+      function closeReferenceSelector() {
+        const modal = document.getElementById('reference-selector-modal');
+        if (modal) {
+          modal.remove();
+        }
+        currentReferenceFieldId = null;
+      }
+
+      function openReferenceSelector(fieldId) {
+        const container = getReferenceContainer(fieldId);
+        const collections = getReferenceCollections(container);
+        if (!container || collections.length === 0) {
+          console.error('Reference collection is missing for field', fieldId);
+          return;
+        }
+
+        currentReferenceFieldId = fieldId;
+
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50';
+        modal.id = 'reference-selector-modal';
+        modal.innerHTML = \`
+          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-xl ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="text-lg font-semibold text-zinc-950 dark:text-white">Select Reference</h3>
+              <button
+                type="button"
+                onclick="closeReferenceSelector()"
+                class="rounded-md text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+            <div class="mt-4">
+              <input
+                type="search"
+                id="reference-search-input"
+                placeholder="Search by title or slug..."
+                class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 dark:border-white/10 dark:bg-zinc-900 dark:text-white"
+              >
+            </div>
+            <div id="reference-results" class="mt-4 space-y-2"></div>
+            <div class="mt-4 flex justify-end">
+              <button
+                type="button"
+                onclick="closeReferenceSelector()"
+                class="rounded-lg bg-zinc-950 dark:bg-white px-4 py-2 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        \`;
+
+        document.body.appendChild(modal);
+
+        const resultsContainer = modal.querySelector('#reference-results');
+        const searchInput = modal.querySelector('#reference-search-input');
+
+        const renderResults = (items) => {
+          resultsContainer.innerHTML = '';
+          if (!items || items.length === 0) {
+            resultsContainer.innerHTML = '<div class="rounded-lg border border-dashed border-zinc-200 p-4 text-sm text-zinc-500 dark:border-white/10 dark:text-zinc-400">No items found.</div>';
+            return;
+          }
+
+          const selectedId = document.getElementById(fieldId)?.value;
+
+          items.forEach((item) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'w-full text-left rounded-lg border border-zinc-200 px-4 py-3 text-sm text-zinc-700 hover:bg-zinc-50 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/5';
+            if (item.id === selectedId) {
+              button.classList.add('ring-2', 'ring-cyan-500', 'dark:ring-cyan-400');
+            }
+
+            const title = item.title || item.slug || item.id || 'Untitled';
+            const titleEl = document.createElement('div');
+            titleEl.className = 'font-medium text-zinc-900 dark:text-white';
+            titleEl.textContent = title;
+
+            button.appendChild(titleEl);
+
+            const metaRow = document.createElement('div');
+            metaRow.className = 'mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400';
+
+            if (item.collection?.display_name || item.collection?.name) {
+              const collectionLabel = document.createElement('span');
+              collectionLabel.className = 'inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-zinc-600 dark:bg-white/10 dark:text-zinc-200';
+              collectionLabel.textContent = item.collection.display_name || item.collection.name;
+              metaRow.appendChild(collectionLabel);
+            }
+
+            if (item.slug) {
+              const slugEl = document.createElement('span');
+              slugEl.textContent = item.slug;
+              metaRow.appendChild(slugEl);
+            }
+
+            if (metaRow.childElementCount > 0) {
+              button.appendChild(metaRow);
+            }
+
+            button.addEventListener('click', () => {
+              updateReferenceField(fieldId, item);
+              closeReferenceSelector();
+            });
+
+            resultsContainer.appendChild(button);
+          });
+        };
+
+        const loadResults = async (searchValue = '') => {
+          try {
+            const items = await fetchReferenceItems(collections, searchValue);
+            renderResults(items);
+          } catch (error) {
+            resultsContainer.innerHTML = '<div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Failed to load references.</div>';
+          }
+        };
+
+        loadResults();
+
+        searchInput.addEventListener('input', () => {
+          if (referenceSearchTimeout) {
+            clearTimeout(referenceSearchTimeout);
+          }
+          referenceSearchTimeout = setTimeout(() => {
+            loadResults(searchInput.value.trim());
+          }, 250);
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-reference-field]').forEach(async (container) => {
+          const input = container.querySelector('input[type="hidden"]');
+          const collections = getReferenceCollections(container);
+          if (!input || collections.length === 0) return;
+
+          if (!input.value) {
+            renderReferenceDisplay(container, null, 'No reference selected.');
+            return;
+          }
+
+          const item = await fetchReferenceById(collections, input.value);
+          if (item) {
+            renderReferenceDisplay(container, item);
+          } else {
+            renderReferenceDisplay(container, null, 'Reference not found.');
+          }
+        });
+      });
 
       // Custom select options
       function addCustomOption(input, selectId) {
