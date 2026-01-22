@@ -604,6 +604,69 @@ export function getFieldTypeDefinitions(): FieldTypeDefinition[] {
         'Gallery and portfolio images',
         'Video and audio content'
       ]
+    },
+    {
+      name: 'reference',
+      displayName: 'Reference',
+      description: 'Link to content from other collections for creating relationships between items',
+      category: 'Relationship',
+      icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+      </svg>`,
+      dataType: 'string',
+      storageFormat: 'VARCHAR(255)',
+      supportedOptions: [
+        {
+          name: 'collection',
+          type: 'string | string[]',
+          required: true,
+          description: 'The collection(s) that can be referenced. Can be a single collection name or an array of collection names.',
+          examples: ['"posts"', '["pages", "posts", "products"]']
+        },
+        {
+          name: 'displayField',
+          type: 'string',
+          required: false,
+          defaultValue: 'title',
+          description: 'The field to display when showing the referenced item',
+          examples: ['title', 'name', 'label']
+        }
+      ],
+      validations: [
+        {
+          name: 'Required',
+          description: 'A reference must be selected',
+          implementation: 'Check for valid reference ID',
+          example: 'if (!value || !isValidId(value)) throw new Error("Reference required")'
+        },
+        {
+          name: 'Valid Reference',
+          description: 'Referenced item must exist in the allowed collection(s)',
+          implementation: 'Database lookup to verify reference exists',
+          example: 'if (!await findById(collection, value)) throw new Error("Invalid reference")'
+        }
+      ],
+      examples: [
+        {
+          title: 'Featured Post Reference',
+          configuration: { collection: 'posts' },
+          sampleValue: 'abc123-def456',
+          renderedOutput: 'Reference picker showing posts'
+        },
+        {
+          title: 'Multi-Collection Reference',
+          configuration: { collection: ['pages', 'posts', 'products'] },
+          sampleValue: 'xyz789-uvw012',
+          renderedOutput: 'Reference picker with collection tabs'
+        }
+      ],
+      useCases: [
+        'Featured content on homepage',
+        'Related posts and articles',
+        'Author references on blog posts',
+        'Product references in categories',
+        'Parent/child page relationships'
+      ]
     }
   ]
 }
