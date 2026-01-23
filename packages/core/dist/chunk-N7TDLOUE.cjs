@@ -1,12 +1,12 @@
 'use strict';
 
-var chunkQCMSQFCP_cjs = require('./chunk-QCMSQFCP.cjs');
-var chunk2I4SVRUC_cjs = require('./chunk-2I4SVRUC.cjs');
+var chunk7FOAMNTI_cjs = require('./chunk-7FOAMNTI.cjs');
+var chunkT3YIKW2A_cjs = require('./chunk-T3YIKW2A.cjs');
 var chunkMPT5PA6U_cjs = require('./chunk-MPT5PA6U.cjs');
-var chunk3PV5CBDJ_cjs = require('./chunk-3PV5CBDJ.cjs');
+var chunkIIRVZSP2_cjs = require('./chunk-IIRVZSP2.cjs');
 var chunkBZC4FYW7_cjs = require('./chunk-BZC4FYW7.cjs');
 var chunkYHW27CBV_cjs = require('./chunk-YHW27CBV.cjs');
-var chunkJZM4YII7_cjs = require('./chunk-JZM4YII7.cjs');
+var chunkYMTTGHEK_cjs = require('./chunk-YMTTGHEK.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 var hono = require('hono');
 var cors = require('hono/cors');
@@ -76,7 +76,7 @@ apiContentCrudRoutes.get("/:id", async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.post("/", chunk2I4SVRUC_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.post("/", chunkT3YIKW2A_cjs.requireAuth(), async (c) => {
   try {
     const db = c.env.DB;
     const user = c.get("user");
@@ -117,7 +117,7 @@ apiContentCrudRoutes.post("/", chunk2I4SVRUC_cjs.requireAuth(), async (c) => {
       now,
       now
     ).run();
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
     await cache.invalidate(`content:list:${collectionId}:*`);
     await cache.invalidate("content-filtered:*");
     const getStmt = db.prepare("SELECT * FROM content WHERE id = ?");
@@ -142,7 +142,7 @@ apiContentCrudRoutes.post("/", chunk2I4SVRUC_cjs.requireAuth(), async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.put("/:id", chunk2I4SVRUC_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.put("/:id", chunkT3YIKW2A_cjs.requireAuth(), async (c) => {
   try {
     const id = c.req.param("id");
     const db = c.env.DB;
@@ -180,7 +180,7 @@ apiContentCrudRoutes.put("/:id", chunk2I4SVRUC_cjs.requireAuth(), async (c) => {
       WHERE id = ?
     `);
     await updateStmt.bind(...params).run();
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existing.collection_id}:*`);
     await cache.invalidate("content-filtered:*");
@@ -206,7 +206,7 @@ apiContentCrudRoutes.put("/:id", chunk2I4SVRUC_cjs.requireAuth(), async (c) => {
     }, 500);
   }
 });
-apiContentCrudRoutes.delete("/:id", chunk2I4SVRUC_cjs.requireAuth(), async (c) => {
+apiContentCrudRoutes.delete("/:id", chunkT3YIKW2A_cjs.requireAuth(), async (c) => {
   try {
     const id = c.req.param("id");
     const db = c.env.DB;
@@ -217,7 +217,7 @@ apiContentCrudRoutes.delete("/:id", chunk2I4SVRUC_cjs.requireAuth(), async (c) =
     }
     const deleteStmt = db.prepare("DELETE FROM content WHERE id = ?");
     await deleteStmt.bind(id).run();
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existing.collection_id}:*`);
     await cache.invalidate("content-filtered:*");
@@ -242,7 +242,7 @@ apiRoutes.use("*", async (c, next) => {
   c.header("X-Response-Time", `${totalTime}ms`);
 });
 apiRoutes.use("*", async (c, next) => {
-  const cacheEnabled = await chunk2I4SVRUC_cjs.isPluginActive(c.env.DB, "core-cache");
+  const cacheEnabled = await chunkT3YIKW2A_cjs.isPluginActive(c.env.DB, "core-cache");
   c.set("cacheEnabled", cacheEnabled);
   await next();
 });
@@ -290,7 +290,7 @@ apiRoutes.get("/collections", async (c) => {
   try {
     const db = c.env.DB;
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("collections", "all");
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -367,12 +367,12 @@ apiRoutes.get("/content", async (c) => {
         });
       }
     }
-    const filter = chunkJZM4YII7_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunkYMTTGHEK_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.limit) {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder3 = new chunkJZM4YII7_cjs.QueryFilterBuilder();
+    const builder3 = new chunkYMTTGHEK_cjs.QueryFilterBuilder();
     const queryResult = builder3.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -381,7 +381,7 @@ apiRoutes.get("/content", async (c) => {
       }, 400);
     }
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("content-filtered", JSON.stringify({ filter, query: queryResult.sql }));
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -459,7 +459,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
     if (!collectionResult) {
       return c.json({ error: "Collection not found" }, 404);
     }
-    const filter = chunkJZM4YII7_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
+    const filter = chunkYMTTGHEK_cjs.QueryFilterBuilder.parseFromQuery(queryParams);
     if (!filter.where) {
       filter.where = { and: [] };
     }
@@ -475,7 +475,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
       filter.limit = 50;
     }
     filter.limit = Math.min(filter.limit, 1e3);
-    const builder3 = new chunkJZM4YII7_cjs.QueryFilterBuilder();
+    const builder3 = new chunkYMTTGHEK_cjs.QueryFilterBuilder();
     const queryResult = builder3.build("content", filter);
     if (queryResult.errors.length > 0) {
       return c.json({
@@ -484,7 +484,7 @@ apiRoutes.get("/collections/:collection/content", async (c) => {
       }, 400);
     }
     const cacheEnabled = c.get("cacheEnabled");
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.api);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.api);
     const cacheKey = cache.generateKey("collection-content-filtered", `${collection}:${JSON.stringify({ filter, query: queryResult.sql })}`);
     if (cacheEnabled) {
       const cacheResult = await cache.getWithSource(cacheKey);
@@ -600,7 +600,7 @@ var fileValidationSchema = zod.z.object({
   // 50MB max
 });
 var apiMediaRoutes = new hono.Hono();
-apiMediaRoutes.use("*", chunk2I4SVRUC_cjs.requireAuth());
+apiMediaRoutes.use("*", chunkT3YIKW2A_cjs.requireAuth());
 apiMediaRoutes.post("/upload", async (c) => {
   try {
     const user = c.get("user");
@@ -1344,8 +1344,8 @@ apiSystemRoutes.get("/env", (c) => {
 });
 var api_system_default = apiSystemRoutes;
 var adminApiRoutes = new hono.Hono();
-adminApiRoutes.use("*", chunk2I4SVRUC_cjs.requireAuth());
-adminApiRoutes.use("*", chunk2I4SVRUC_cjs.requireRole(["admin", "editor"]));
+adminApiRoutes.use("*", chunkT3YIKW2A_cjs.requireAuth());
+adminApiRoutes.use("*", chunkT3YIKW2A_cjs.requireRole(["admin", "editor"]));
 adminApiRoutes.get("/stats", async (c) => {
   try {
     const db = c.env.DB;
@@ -1855,7 +1855,7 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
 });
 adminApiRoutes.get("/migrations/status", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-VJGGEQ3B.cjs');
+    const { MigrationService: MigrationService2 } = await import('./migrations-QNYAWQLB.cjs');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const status = await migrationService.getMigrationStatus();
@@ -1880,7 +1880,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const { MigrationService: MigrationService2 } = await import('./migrations-VJGGEQ3B.cjs');
+    const { MigrationService: MigrationService2 } = await import('./migrations-QNYAWQLB.cjs');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const result = await migrationService.runPendingMigrations();
@@ -1899,7 +1899,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
 });
 adminApiRoutes.get("/migrations/validate", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-VJGGEQ3B.cjs');
+    const { MigrationService: MigrationService2 } = await import('./migrations-QNYAWQLB.cjs');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const validation = await migrationService.validateSchema();
@@ -2381,7 +2381,7 @@ authRoutes.post(
       if (existingUser) {
         return c.json({ error: "User with this email or username already exists" }, 400);
       }
-      const passwordHash = await chunk2I4SVRUC_cjs.AuthManager.hashPassword(password);
+      const passwordHash = await chunkT3YIKW2A_cjs.AuthManager.hashPassword(password);
       const userId = crypto.randomUUID();
       const now = /* @__PURE__ */ new Date();
       await db.prepare(`
@@ -2401,7 +2401,7 @@ authRoutes.post(
         now.getTime(),
         now.getTime()
       ).run();
-      const token = await chunk2I4SVRUC_cjs.AuthManager.generateToken(userId, normalizedEmail, "viewer");
+      const token = await chunkT3YIKW2A_cjs.AuthManager.generateToken(userId, normalizedEmail, "viewer");
       cookie.setCookie(c, "auth_token", token, {
         httpOnly: true,
         secure: true,
@@ -2442,7 +2442,7 @@ authRoutes.post("/login", async (c) => {
     const { email, password } = validation.data;
     const db = c.env.DB;
     const normalizedEmail = email.toLowerCase();
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.user);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.user);
     let user = await cache.get(cache.generateKey("user", `email:${normalizedEmail}`));
     if (!user) {
       user = await db.prepare("SELECT * FROM users WHERE email = ? AND is_active = 1").bind(normalizedEmail).first();
@@ -2454,11 +2454,11 @@ authRoutes.post("/login", async (c) => {
     if (!user) {
       return c.json({ error: "Invalid email or password" }, 401);
     }
-    const isValidPassword = await chunk2I4SVRUC_cjs.AuthManager.verifyPassword(password, user.password_hash);
+    const isValidPassword = await chunkT3YIKW2A_cjs.AuthManager.verifyPassword(password, user.password_hash);
     if (!isValidPassword) {
       return c.json({ error: "Invalid email or password" }, 401);
     }
-    const token = await chunk2I4SVRUC_cjs.AuthManager.generateToken(user.id, user.email, user.role);
+    const token = await chunkT3YIKW2A_cjs.AuthManager.generateToken(user.id, user.email, user.role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: true,
@@ -2507,7 +2507,7 @@ authRoutes.get("/logout", (c) => {
   });
   return c.redirect("/auth/login?message=You have been logged out successfully");
 });
-authRoutes.get("/me", chunk2I4SVRUC_cjs.requireAuth(), async (c) => {
+authRoutes.get("/me", chunkT3YIKW2A_cjs.requireAuth(), async (c) => {
   try {
     const user = c.get("user");
     if (!user) {
@@ -2524,13 +2524,13 @@ authRoutes.get("/me", chunk2I4SVRUC_cjs.requireAuth(), async (c) => {
     return c.json({ error: "Failed to get user" }, 500);
   }
 });
-authRoutes.post("/refresh", chunk2I4SVRUC_cjs.requireAuth(), async (c) => {
+authRoutes.post("/refresh", chunkT3YIKW2A_cjs.requireAuth(), async (c) => {
   try {
     const user = c.get("user");
     if (!user) {
       return c.json({ error: "Not authenticated" }, 401);
     }
-    const token = await chunk2I4SVRUC_cjs.AuthManager.generateToken(user.userId, user.email, user.role);
+    const token = await chunkT3YIKW2A_cjs.AuthManager.generateToken(user.userId, user.email, user.role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: true,
@@ -2590,7 +2590,7 @@ authRoutes.post("/register/form", async (c) => {
         </div>
       `);
     }
-    const passwordHash = await chunk2I4SVRUC_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await chunkT3YIKW2A_cjs.AuthManager.hashPassword(password);
     const role = isFirstUser ? "admin" : "viewer";
     const userId = crypto.randomUUID();
     const now = /* @__PURE__ */ new Date();
@@ -2610,7 +2610,7 @@ authRoutes.post("/register/form", async (c) => {
       now.getTime(),
       now.getTime()
     ).run();
-    const token = await chunk2I4SVRUC_cjs.AuthManager.generateToken(userId, normalizedEmail, role);
+    const token = await chunkT3YIKW2A_cjs.AuthManager.generateToken(userId, normalizedEmail, role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: false,
@@ -2662,7 +2662,7 @@ authRoutes.post("/login/form", async (c) => {
         </div>
       `);
     }
-    const isValidPassword = await chunk2I4SVRUC_cjs.AuthManager.verifyPassword(password, user.password_hash);
+    const isValidPassword = await chunkT3YIKW2A_cjs.AuthManager.verifyPassword(password, user.password_hash);
     if (!isValidPassword) {
       return c.html(html.html`
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -2670,7 +2670,7 @@ authRoutes.post("/login/form", async (c) => {
         </div>
       `);
     }
-    const token = await chunk2I4SVRUC_cjs.AuthManager.generateToken(user.id, user.email, user.role);
+    const token = await chunkT3YIKW2A_cjs.AuthManager.generateToken(user.id, user.email, user.role);
     cookie.setCookie(c, "auth_token", token, {
       httpOnly: true,
       secure: false,
@@ -2729,7 +2729,7 @@ authRoutes.post("/seed-admin", async (c) => {
     `).run();
     const existingAdmin = await db.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind("admin@sonicjs.com", "admin").first();
     if (existingAdmin) {
-      const passwordHash2 = await chunk2I4SVRUC_cjs.AuthManager.hashPassword("sonicjs!");
+      const passwordHash2 = await chunkT3YIKW2A_cjs.AuthManager.hashPassword("sonicjs!");
       await db.prepare("UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?").bind(passwordHash2, Date.now(), existingAdmin.id).run();
       return c.json({
         message: "Admin user already exists (password updated)",
@@ -2741,7 +2741,7 @@ authRoutes.post("/seed-admin", async (c) => {
         }
       });
     }
-    const passwordHash = await chunk2I4SVRUC_cjs.AuthManager.hashPassword("sonicjs!");
+    const passwordHash = await chunkT3YIKW2A_cjs.AuthManager.hashPassword("sonicjs!");
     const userId = "admin-user-id";
     const now = Date.now();
     const adminEmail = "admin@sonicjs.com".toLowerCase();
@@ -2961,7 +2961,7 @@ authRoutes.post("/accept-invitation", async (c) => {
     if (existingUsername) {
       return c.json({ error: "Username is already taken" }, 400);
     }
-    const passwordHash = await chunk2I4SVRUC_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await chunkT3YIKW2A_cjs.AuthManager.hashPassword(password);
     const updateStmt = db.prepare(`
       UPDATE users SET 
         username = ?,
@@ -2980,7 +2980,7 @@ authRoutes.post("/accept-invitation", async (c) => {
       Date.now(),
       invitedUser.id
     ).run();
-    const authToken = await chunk2I4SVRUC_cjs.AuthManager.generateToken(invitedUser.id, invitedUser.email, invitedUser.role);
+    const authToken = await chunkT3YIKW2A_cjs.AuthManager.generateToken(invitedUser.id, invitedUser.email, invitedUser.role);
     cookie.setCookie(c, "auth_token", authToken, {
       httpOnly: true,
       secure: true,
@@ -3210,7 +3210,7 @@ authRoutes.post("/reset-password", async (c) => {
     if (Date.now() > user.password_reset_expires) {
       return c.json({ error: "Reset token has expired" }, 400);
     }
-    const newPasswordHash = await chunk2I4SVRUC_cjs.AuthManager.hashPassword(password);
+    const newPasswordHash = await chunkT3YIKW2A_cjs.AuthManager.hashPassword(password);
     try {
       const historyStmt = db.prepare(`
         INSERT INTO password_history (id, user_id, password_hash, created_at)
@@ -7597,9 +7597,9 @@ function parseFieldValue(field, formData, options = {}) {
   const { skipValidation = false } = options;
   const value = formData.get(field.field_name);
   const errors = [];
-  const blocksConfig = chunkJZM4YII7_cjs.getBlocksFieldConfig(field.field_options);
+  const blocksConfig = chunkYMTTGHEK_cjs.getBlocksFieldConfig(field.field_options);
   if (blocksConfig) {
-    const parsed = chunkJZM4YII7_cjs.parseBlocksValue(value, blocksConfig);
+    const parsed = chunkYMTTGHEK_cjs.parseBlocksValue(value, blocksConfig);
     if (!skipValidation && field.is_required && parsed.value.length === 0) {
       parsed.errors.push(`${field.field_label} is required`);
     }
@@ -7709,9 +7709,9 @@ function extractFieldData(fields, formData, options = {}) {
   }
   return { data, errors };
 }
-adminContentRoutes.use("*", chunk2I4SVRUC_cjs.requireAuth());
+adminContentRoutes.use("*", chunkT3YIKW2A_cjs.requireAuth());
 async function getCollectionFields(db, collectionId) {
-  const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.collection);
+  const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.collection);
   return cache.getOrSet(
     cache.generateKey("fields", collectionId),
     async () => {
@@ -7766,7 +7766,7 @@ async function getCollectionFields(db, collectionId) {
   );
 }
 async function getCollection(db, collectionId) {
-  const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.collection);
+  const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.collection);
   return cache.getOrSet(
     cache.generateKey("collection", collectionId),
     async () => {
@@ -8055,7 +8055,7 @@ adminContentRoutes.get("/:id/edit", async (c) => {
     const db = c.env.DB;
     const url = new URL(c.req.url);
     const referrerParams = url.searchParams.get("ref") || "";
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.content);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.content);
     const content = await cache.getOrSet(
       cache.generateKey("content", id),
       async () => {
@@ -8228,7 +8228,7 @@ adminContentRoutes.post("/", async (c) => {
       now,
       now
     ).run();
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.content);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.content);
     await cache.invalidate(`content:list:${collectionId}:*`);
     const versionStmt = db.prepare(`
       INSERT INTO content_versions (id, content_id, version, data, author_id, created_at)
@@ -8347,7 +8347,7 @@ adminContentRoutes.put("/:id", async (c) => {
       now,
       id
     ).run();
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.content);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.content);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate(`content:list:${existingContent.collection_id}:*`);
     const existingData = JSON.parse(existingContent.data || "{}");
@@ -8620,7 +8620,7 @@ adminContentRoutes.post("/bulk-action", async (c) => {
     } else {
       return c.json({ success: false, error: "Invalid action" });
     }
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.content);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.content);
     for (const contentId of ids) {
       await cache.delete(cache.generateKey("content", contentId));
     }
@@ -8648,7 +8648,7 @@ adminContentRoutes.delete("/:id", async (c) => {
       WHERE id = ?
     `);
     await deleteStmt.bind(now, id).run();
-    const cache = chunkQCMSQFCP_cjs.getCacheService(chunkQCMSQFCP_cjs.CACHE_CONFIGS.content);
+    const cache = chunk7FOAMNTI_cjs.getCacheService(chunk7FOAMNTI_cjs.CACHE_CONFIGS.content);
     await cache.delete(cache.generateKey("content", id));
     await cache.invalidate("content:list:*");
     return c.html(`
@@ -9692,7 +9692,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="first_name"
-                      value="${chunkJZM4YII7_cjs.escapeHtml(data.userToEdit.firstName || "")}"
+                      value="${chunkYMTTGHEK_cjs.escapeHtml(data.userToEdit.firstName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -9703,7 +9703,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="last_name"
-                      value="${chunkJZM4YII7_cjs.escapeHtml(data.userToEdit.lastName || "")}"
+                      value="${chunkYMTTGHEK_cjs.escapeHtml(data.userToEdit.lastName || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -9714,7 +9714,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="username"
-                      value="${chunkJZM4YII7_cjs.escapeHtml(data.userToEdit.username || "")}"
+                      value="${chunkYMTTGHEK_cjs.escapeHtml(data.userToEdit.username || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -9725,7 +9725,7 @@ function renderUserEditPage(data) {
                     <input
                       type="email"
                       name="email"
-                      value="${chunkJZM4YII7_cjs.escapeHtml(data.userToEdit.email || "")}"
+                      value="${chunkYMTTGHEK_cjs.escapeHtml(data.userToEdit.email || "")}"
                       required
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -9736,7 +9736,7 @@ function renderUserEditPage(data) {
                     <input
                       type="tel"
                       name="phone"
-                      value="${chunkJZM4YII7_cjs.escapeHtml(data.userToEdit.phone || "")}"
+                      value="${chunkYMTTGHEK_cjs.escapeHtml(data.userToEdit.phone || "")}"
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
                   </div>
@@ -9750,7 +9750,7 @@ function renderUserEditPage(data) {
                         class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white/5 dark:bg-white/5 py-1.5 pl-3 pr-8 text-base text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-zinc-500/30 dark:outline-zinc-400/30 *:bg-white dark:*:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-500 dark:focus-visible:outline-zinc-400 sm:text-sm/6"
                       >
                         ${data.roles.map((role) => `
-                          <option value="${chunkJZM4YII7_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunkJZM4YII7_cjs.escapeHtml(role.label)}</option>
+                          <option value="${chunkYMTTGHEK_cjs.escapeHtml(role.value)}" ${data.userToEdit.role === role.value ? "selected" : ""}>${chunkYMTTGHEK_cjs.escapeHtml(role.label)}</option>
                         `).join("")}
                       </select>
                       <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-zinc-600 dark:text-zinc-400 sm:size-4">
@@ -9771,7 +9771,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="profile_display_name"
-                      value="${chunkJZM4YII7_cjs.escapeHtml(data.userToEdit.profile?.displayName || "")}"
+                      value="${chunkYMTTGHEK_cjs.escapeHtml(data.userToEdit.profile?.displayName || "")}"
                       placeholder="Public display name"
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -9782,7 +9782,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="profile_company"
-                      value="${chunkJZM4YII7_cjs.escapeHtml(data.userToEdit.profile?.company || "")}"
+                      value="${chunkYMTTGHEK_cjs.escapeHtml(data.userToEdit.profile?.company || "")}"
                       placeholder="Company or organization"
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -9793,7 +9793,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="profile_job_title"
-                      value="${chunkJZM4YII7_cjs.escapeHtml(data.userToEdit.profile?.jobTitle || "")}"
+                      value="${chunkYMTTGHEK_cjs.escapeHtml(data.userToEdit.profile?.jobTitle || "")}"
                       placeholder="Job title or role"
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -9804,7 +9804,7 @@ function renderUserEditPage(data) {
                     <input
                       type="url"
                       name="profile_website"
-                      value="${chunkJZM4YII7_cjs.escapeHtml(data.userToEdit.profile?.website || "")}"
+                      value="${chunkYMTTGHEK_cjs.escapeHtml(data.userToEdit.profile?.website || "")}"
                       placeholder="https://example.com"
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -9815,7 +9815,7 @@ function renderUserEditPage(data) {
                     <input
                       type="text"
                       name="profile_location"
-                      value="${chunkJZM4YII7_cjs.escapeHtml(data.userToEdit.profile?.location || "")}"
+                      value="${chunkYMTTGHEK_cjs.escapeHtml(data.userToEdit.profile?.location || "")}"
                       placeholder="City, Country"
                       class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
                     />
@@ -9839,7 +9839,7 @@ function renderUserEditPage(data) {
                     rows="3"
                     placeholder="Short bio or description"
                     class="w-full rounded-lg bg-white dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
-                  >${chunkJZM4YII7_cjs.escapeHtml(data.userToEdit.profile?.bio || "")}</textarea>
+                  >${chunkYMTTGHEK_cjs.escapeHtml(data.userToEdit.profile?.bio || "")}</textarea>
                 </div>
               </div>
 
@@ -10739,7 +10739,7 @@ function renderUsersListPage(data) {
 
 // src/routes/admin-users.ts
 var userRoutes = new hono.Hono();
-userRoutes.use("*", chunk2I4SVRUC_cjs.requireAuth());
+userRoutes.use("*", chunkT3YIKW2A_cjs.requireAuth());
 userRoutes.get("/", (c) => {
   return c.redirect("/admin/dashboard");
 });
@@ -10838,12 +10838,12 @@ userRoutes.put("/profile", async (c) => {
   const db = c.env.DB;
   try {
     const formData = await c.req.formData();
-    const firstName = chunkJZM4YII7_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkJZM4YII7_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkJZM4YII7_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkJZM4YII7_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkJZM4YII7_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const timezone = formData.get("timezone")?.toString() || "UTC";
     const language = formData.get("language")?.toString() || "en";
     const emailNotifications = formData.get("email_notifications") === "1";
@@ -10894,7 +10894,7 @@ userRoutes.put("/profile", async (c) => {
       Date.now(),
       user.userId
     ).run();
-    await chunk2I4SVRUC_cjs.logActivity(
+    await chunkT3YIKW2A_cjs.logActivity(
       db,
       user.userId,
       "profile.update",
@@ -10957,7 +10957,7 @@ userRoutes.post("/profile/avatar", async (c) => {
       SELECT first_name, last_name FROM users WHERE id = ?
     `);
     const userData = await userStmt.bind(user.userId).first();
-    await chunk2I4SVRUC_cjs.logActivity(
+    await chunkT3YIKW2A_cjs.logActivity(
       db,
       user.userId,
       "profile.avatar_update",
@@ -11028,7 +11028,7 @@ userRoutes.post("/profile/password", async (c) => {
         dismissible: true
       }));
     }
-    const validPassword = await chunk2I4SVRUC_cjs.AuthManager.verifyPassword(currentPassword, userData.password_hash);
+    const validPassword = await chunkT3YIKW2A_cjs.AuthManager.verifyPassword(currentPassword, userData.password_hash);
     if (!validPassword) {
       return c.html(renderAlert2({
         type: "error",
@@ -11036,7 +11036,7 @@ userRoutes.post("/profile/password", async (c) => {
         dismissible: true
       }));
     }
-    const newPasswordHash = await chunk2I4SVRUC_cjs.AuthManager.hashPassword(newPassword);
+    const newPasswordHash = await chunkT3YIKW2A_cjs.AuthManager.hashPassword(newPassword);
     const historyStmt = db.prepare(`
       INSERT INTO password_history (id, user_id, password_hash, created_at)
       VALUES (?, ?, ?, ?)
@@ -11052,7 +11052,7 @@ userRoutes.post("/profile/password", async (c) => {
       WHERE id = ?
     `);
     await updateStmt.bind(newPasswordHash, Date.now(), user.userId).run();
-    await chunk2I4SVRUC_cjs.logActivity(
+    await chunkT3YIKW2A_cjs.logActivity(
       db,
       user.userId,
       "profile.password_change",
@@ -11119,7 +11119,7 @@ userRoutes.get("/users", async (c) => {
     `);
     const countResult = await countStmt.bind(...params).first();
     const totalUsers = countResult?.total || 0;
-    await chunk2I4SVRUC_cjs.logActivity(
+    await chunkT3YIKW2A_cjs.logActivity(
       db,
       user.userId,
       "users.list_view",
@@ -11221,12 +11221,12 @@ userRoutes.post("/users/new", async (c) => {
   const user = c.get("user");
   try {
     const formData = await c.req.formData();
-    const firstName = chunkJZM4YII7_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkJZM4YII7_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkJZM4YII7_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkJZM4YII7_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
-    const bio = chunkJZM4YII7_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
+    const phone = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const bio = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("bio")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const password = formData.get("password")?.toString() || "";
     const confirmPassword = formData.get("confirm_password")?.toString() || "";
@@ -11273,7 +11273,7 @@ userRoutes.post("/users/new", async (c) => {
         dismissible: true
       }));
     }
-    const passwordHash = await chunk2I4SVRUC_cjs.AuthManager.hashPassword(password);
+    const passwordHash = await chunkT3YIKW2A_cjs.AuthManager.hashPassword(password);
     const userId = crypto.randomUUID();
     const createStmt = db.prepare(`
       INSERT INTO users (
@@ -11296,7 +11296,7 @@ userRoutes.post("/users/new", async (c) => {
       Date.now(),
       Date.now()
     ).run();
-    await chunk2I4SVRUC_cjs.logActivity(
+    await chunkT3YIKW2A_cjs.logActivity(
       db,
       user.userId,
       "user!.create",
@@ -11334,7 +11334,7 @@ userRoutes.get("/users/:id", async (c) => {
     if (!userRecord) {
       return c.json({ error: "User not found" }, 404);
     }
-    await chunk2I4SVRUC_cjs.logActivity(
+    await chunkT3YIKW2A_cjs.logActivity(
       db,
       user.userId,
       "user!.view",
@@ -11442,20 +11442,20 @@ userRoutes.put("/users/:id", async (c) => {
   const userId = c.req.param("id");
   try {
     const formData = await c.req.formData();
-    const firstName = chunkJZM4YII7_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkJZM4YII7_cjs.sanitizeInput(formData.get("last_name")?.toString());
-    const username = chunkJZM4YII7_cjs.sanitizeInput(formData.get("username")?.toString());
+    const firstName = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const username = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("username")?.toString());
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
-    const phone = chunkJZM4YII7_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
+    const phone = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("phone")?.toString()) || null;
     const role = formData.get("role")?.toString() || "viewer";
     const isActive = formData.get("is_active") === "1";
     const emailVerified = formData.get("email_verified") === "1";
-    const profileDisplayName = chunkJZM4YII7_cjs.sanitizeInput(formData.get("profile_display_name")?.toString()) || null;
-    const profileBio = chunkJZM4YII7_cjs.sanitizeInput(formData.get("profile_bio")?.toString()) || null;
-    const profileCompany = chunkJZM4YII7_cjs.sanitizeInput(formData.get("profile_company")?.toString()) || null;
-    const profileJobTitle = chunkJZM4YII7_cjs.sanitizeInput(formData.get("profile_job_title")?.toString()) || null;
+    const profileDisplayName = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("profile_display_name")?.toString()) || null;
+    const profileBio = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("profile_bio")?.toString()) || null;
+    const profileCompany = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("profile_company")?.toString()) || null;
+    const profileJobTitle = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("profile_job_title")?.toString()) || null;
     const profileWebsite = formData.get("profile_website")?.toString()?.trim() || null;
-    const profileLocation = chunkJZM4YII7_cjs.sanitizeInput(formData.get("profile_location")?.toString()) || null;
+    const profileLocation = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("profile_location")?.toString()) || null;
     const profileDateOfBirthStr = formData.get("profile_date_of_birth")?.toString()?.trim() || null;
     const profileDateOfBirth = profileDateOfBirthStr ? new Date(profileDateOfBirthStr).getTime() : null;
     if (!firstName || !lastName || !username || !email) {
@@ -11559,7 +11559,7 @@ userRoutes.put("/users/:id", async (c) => {
         ).run();
       }
     }
-    await chunk2I4SVRUC_cjs.logActivity(
+    await chunkT3YIKW2A_cjs.logActivity(
       db,
       user.userId,
       "user.update",
@@ -11604,7 +11604,7 @@ userRoutes.post("/users/:id/toggle", async (c) => {
       UPDATE users SET is_active = ?, updated_at = ? WHERE id = ?
     `);
     await toggleStmt.bind(active ? 1 : 0, Date.now(), userId).run();
-    await chunk2I4SVRUC_cjs.logActivity(
+    await chunkT3YIKW2A_cjs.logActivity(
       db,
       user.userId,
       active ? "user.activate" : "user.deactivate",
@@ -11645,7 +11645,7 @@ userRoutes.delete("/users/:id", async (c) => {
         DELETE FROM users WHERE id = ?
       `);
       await deleteStmt.bind(userId).run();
-      await chunk2I4SVRUC_cjs.logActivity(
+      await chunkT3YIKW2A_cjs.logActivity(
         db,
         user.userId,
         "user!.hard_delete",
@@ -11664,7 +11664,7 @@ userRoutes.delete("/users/:id", async (c) => {
         UPDATE users SET is_active = 0, updated_at = ? WHERE id = ?
       `);
       await deleteStmt.bind(Date.now(), userId).run();
-      await chunk2I4SVRUC_cjs.logActivity(
+      await chunkT3YIKW2A_cjs.logActivity(
         db,
         user.userId,
         "user!.soft_delete",
@@ -11691,8 +11691,8 @@ userRoutes.post("/invite-user", async (c) => {
     const formData = await c.req.formData();
     const email = formData.get("email")?.toString()?.trim().toLowerCase() || "";
     const role = formData.get("role")?.toString()?.trim() || "viewer";
-    const firstName = chunkJZM4YII7_cjs.sanitizeInput(formData.get("first_name")?.toString());
-    const lastName = chunkJZM4YII7_cjs.sanitizeInput(formData.get("last_name")?.toString());
+    const firstName = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("first_name")?.toString());
+    const lastName = chunkYMTTGHEK_cjs.sanitizeInput(formData.get("last_name")?.toString());
     if (!email || !firstName || !lastName) {
       return c.json({ error: "Email, first name, and last name are required" }, 400);
     }
@@ -11730,7 +11730,7 @@ userRoutes.post("/invite-user", async (c) => {
       Date.now(),
       Date.now()
     ).run();
-    await chunk2I4SVRUC_cjs.logActivity(
+    await chunkT3YIKW2A_cjs.logActivity(
       db,
       user.userId,
       "user!.invite_sent",
@@ -11787,7 +11787,7 @@ userRoutes.post("/resend-invitation/:id", async (c) => {
       Date.now(),
       userId
     ).run();
-    await chunk2I4SVRUC_cjs.logActivity(
+    await chunkT3YIKW2A_cjs.logActivity(
       db,
       user.userId,
       "user!.invitation_resent",
@@ -11823,7 +11823,7 @@ userRoutes.delete("/cancel-invitation/:id", async (c) => {
     }
     const deleteStmt = db.prepare(`DELETE FROM users WHERE id = ?`);
     await deleteStmt.bind(userId).run();
-    await chunk2I4SVRUC_cjs.logActivity(
+    await chunkT3YIKW2A_cjs.logActivity(
       db,
       user.userId,
       "user!.invitation_cancelled",
@@ -11906,7 +11906,7 @@ userRoutes.get("/activity-logs", async (c) => {
       ...log,
       details: log.details ? JSON.parse(log.details) : null
     }));
-    await chunk2I4SVRUC_cjs.logActivity(
+    await chunkT3YIKW2A_cjs.logActivity(
       db,
       user.userId,
       "activity.logs_viewed",
@@ -12013,7 +12013,7 @@ userRoutes.get("/activity-logs/export", async (c) => {
       csvRows.push(row.join(","));
     }
     const csvContent = csvRows.join("\n");
-    await chunk2I4SVRUC_cjs.logActivity(
+    await chunkT3YIKW2A_cjs.logActivity(
       db,
       user.userId,
       "activity.logs_exported",
@@ -13352,7 +13352,7 @@ var fileValidationSchema2 = zod.z.object({
   // 50MB max
 });
 var adminMediaRoutes = new hono.Hono();
-adminMediaRoutes.use("*", chunk2I4SVRUC_cjs.requireAuth());
+adminMediaRoutes.use("*", chunkT3YIKW2A_cjs.requireAuth());
 adminMediaRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -13938,7 +13938,7 @@ adminMediaRoutes.put("/:id", async (c) => {
     `);
   }
 });
-adminMediaRoutes.delete("/cleanup", chunk2I4SVRUC_cjs.requireRole("admin"), async (c) => {
+adminMediaRoutes.delete("/cleanup", chunkT3YIKW2A_cjs.requireRole("admin"), async (c) => {
   try {
     const db = c.env.DB;
     const allMediaStmt = db.prepare("SELECT id, r2_key, filename FROM media WHERE deleted_at IS NULL");
@@ -15664,7 +15664,7 @@ function formatTimestamp(timestamp) {
 
 // src/routes/admin-plugins.ts
 var adminPluginRoutes = new hono.Hono();
-adminPluginRoutes.use("*", chunk2I4SVRUC_cjs.requireAuth());
+adminPluginRoutes.use("*", chunkT3YIKW2A_cjs.requireAuth());
 var AVAILABLE_PLUGINS = [
   {
     id: "third-party-faq",
@@ -17038,11 +17038,11 @@ function renderLogConfigPage(data) {
 
 // src/routes/admin-logs.ts
 var adminLogsRoutes = new hono.Hono();
-adminLogsRoutes.use("*", chunk2I4SVRUC_cjs.requireAuth());
+adminLogsRoutes.use("*", chunkT3YIKW2A_cjs.requireAuth());
 adminLogsRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
-    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
+    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
     const query = c.req.query();
     const page = parseInt(query.page || "1");
     const limit = parseInt(query.limit || "50");
@@ -17122,7 +17122,7 @@ adminLogsRoutes.get("/:id", async (c) => {
   try {
     const id = c.req.param("id");
     const user = c.get("user");
-    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
+    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
     const { logs } = await logger.getLogs({
       limit: 1,
       offset: 0,
@@ -17159,7 +17159,7 @@ adminLogsRoutes.get("/:id", async (c) => {
 adminLogsRoutes.get("/config", async (c) => {
   try {
     const user = c.get("user");
-    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
+    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
     const configs = await logger.getAllConfigs();
     const pageData = {
       configs,
@@ -17183,7 +17183,7 @@ adminLogsRoutes.post("/config/:category", async (c) => {
     const level = formData.get("level");
     const retention = parseInt(formData.get("retention"));
     const maxSize = parseInt(formData.get("max_size"));
-    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
+    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
     await logger.updateConfig(category, {
       enabled,
       level,
@@ -17212,7 +17212,7 @@ adminLogsRoutes.get("/export", async (c) => {
     const category = query.category;
     const startDate = query.start_date;
     const endDate = query.end_date;
-    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
+    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
     const filter = {
       limit: 1e4,
       // Export up to 10k logs
@@ -17293,7 +17293,7 @@ adminLogsRoutes.post("/cleanup", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
+    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
     await logger.cleanupByRetention();
     return c.html(html.html`
       <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
@@ -17315,7 +17315,7 @@ adminLogsRoutes.post("/search", async (c) => {
     const search = formData.get("search");
     const level = formData.get("level");
     const category = formData.get("category");
-    const logger = chunkQCMSQFCP_cjs.getLogger(c.env.DB);
+    const logger = chunk7FOAMNTI_cjs.getLogger(c.env.DB);
     const filter = {
       limit: 20,
       offset: 0,
@@ -19366,9 +19366,9 @@ function renderStorageUsage(databaseSizeBytes, mediaSizeBytes) {
 }
 
 // src/routes/admin-dashboard.ts
-var VERSION = chunkJZM4YII7_cjs.getCoreVersion();
+var VERSION = chunkYMTTGHEK_cjs.getCoreVersion();
 var router = new hono.Hono();
-router.use("*", chunk2I4SVRUC_cjs.requireAuth());
+router.use("*", chunkT3YIKW2A_cjs.requireAuth());
 router.get("/", async (c) => {
   const user = c.get("user");
   try {
@@ -21126,7 +21126,7 @@ function renderCollectionFormPage(data) {
 
 // src/routes/admin-collections.ts
 var adminCollectionsRoutes = new hono.Hono();
-adminCollectionsRoutes.use("*", chunk2I4SVRUC_cjs.requireAuth());
+adminCollectionsRoutes.use("*", chunkT3YIKW2A_cjs.requireAuth());
 adminCollectionsRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -23306,7 +23306,7 @@ function renderDatabaseToolsSettings(settings) {
 
 // src/routes/admin-settings.ts
 var adminSettingsRoutes = new hono.Hono();
-adminSettingsRoutes.use("*", chunk2I4SVRUC_cjs.requireAuth());
+adminSettingsRoutes.use("*", chunkT3YIKW2A_cjs.requireAuth());
 function getMockSettings(user) {
   return {
     general: {
@@ -23371,7 +23371,7 @@ adminSettingsRoutes.get("/", (c) => {
 adminSettingsRoutes.get("/general", async (c) => {
   const user = c.get("user");
   const db = c.env.DB;
-  const settingsService = new chunkQCMSQFCP_cjs.SettingsService(db);
+  const settingsService = new chunk7FOAMNTI_cjs.SettingsService(db);
   const generalSettings = await settingsService.getGeneralSettings(user?.email);
   const mockSettings = getMockSettings(user);
   mockSettings.general = generalSettings;
@@ -23474,7 +23474,7 @@ adminSettingsRoutes.get("/database-tools", (c) => {
 adminSettingsRoutes.get("/api/migrations/status", async (c) => {
   try {
     const db = c.env.DB;
-    const migrationService = new chunk3PV5CBDJ_cjs.MigrationService(db);
+    const migrationService = new chunkIIRVZSP2_cjs.MigrationService(db);
     const status = await migrationService.getMigrationStatus();
     return c.json({
       success: true,
@@ -23498,7 +23498,7 @@ adminSettingsRoutes.post("/api/migrations/run", async (c) => {
       }, 403);
     }
     const db = c.env.DB;
-    const migrationService = new chunk3PV5CBDJ_cjs.MigrationService(db);
+    const migrationService = new chunkIIRVZSP2_cjs.MigrationService(db);
     const result = await migrationService.runPendingMigrations();
     return c.json({
       success: result.success,
@@ -23516,7 +23516,7 @@ adminSettingsRoutes.post("/api/migrations/run", async (c) => {
 adminSettingsRoutes.get("/api/migrations/validate", async (c) => {
   try {
     const db = c.env.DB;
-    const migrationService = new chunk3PV5CBDJ_cjs.MigrationService(db);
+    const migrationService = new chunkIIRVZSP2_cjs.MigrationService(db);
     const validation = await migrationService.validateSchema();
     return c.json({
       success: true,
@@ -23673,7 +23673,7 @@ adminSettingsRoutes.post("/general", async (c) => {
     }
     const formData = await c.req.formData();
     const db = c.env.DB;
-    const settingsService = new chunkQCMSQFCP_cjs.SettingsService(db);
+    const settingsService = new chunk7FOAMNTI_cjs.SettingsService(db);
     const settings = {
       siteName: formData.get("siteName"),
       siteDescription: formData.get("siteDescription"),
@@ -23760,5 +23760,5 @@ exports.auth_default = auth_default;
 exports.router = router;
 exports.test_cleanup_default = test_cleanup_default;
 exports.userRoutes = userRoutes;
-//# sourceMappingURL=chunk-OZG7SMUX.cjs.map
-//# sourceMappingURL=chunk-OZG7SMUX.cjs.map
+//# sourceMappingURL=chunk-N7TDLOUE.cjs.map
+//# sourceMappingURL=chunk-N7TDLOUE.cjs.map
