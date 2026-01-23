@@ -1,6 +1,4 @@
-'use strict';
-
-var chunkIGJUBJBW_cjs = require('./chunk-IGJUBJBW.cjs');
+import { __esm, __export, __toCommonJS } from './chunk-V4OQ3NZ2.js';
 
 // src/templates/components/logo.template.ts
 function renderLogo(data = {}) {
@@ -44,7 +42,7 @@ function renderLogo(data = {}) {
   return logoContent;
 }
 var sizeClasses;
-var init_logo_template = chunkIGJUBJBW_cjs.__esm({
+var init_logo_template = __esm({
   "src/templates/components/logo.template.ts"() {
     sizeClasses = {
       sm: "h-6 w-auto",
@@ -57,7 +55,7 @@ var init_logo_template = chunkIGJUBJBW_cjs.__esm({
 
 // src/templates/layouts/admin-layout-catalyst.template.ts
 var admin_layout_catalyst_template_exports = {};
-chunkIGJUBJBW_cjs.__export(admin_layout_catalyst_template_exports, {
+__export(admin_layout_catalyst_template_exports, {
   renderAdminLayoutCatalyst: () => renderAdminLayoutCatalyst,
   renderCatalystCheckbox: () => renderCatalystCheckbox
 });
@@ -150,7 +148,7 @@ function renderAdminLayoutCatalyst(data) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${data.title} - SonicJS AI Admin</title>
-  <link rel="icon" type="image/x-icon" href="https://demo.sonicjs.com/images/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -603,7 +601,7 @@ function renderCatalystSidebar(currentPath = "", user, dynamicMenuItems, isMobil
     </nav>
   `;
 }
-var init_admin_layout_catalyst_template = chunkIGJUBJBW_cjs.__esm({
+var init_admin_layout_catalyst_template = __esm({
   "src/templates/layouts/admin-layout-catalyst.template.ts"() {
     init_logo_template();
   }
@@ -1141,7 +1139,7 @@ init_logo_template();
 function renderAdminLayout(data) {
   const {
     renderAdminLayoutCatalyst: renderAdminLayoutCatalyst2
-  } = (init_admin_layout_catalyst_template(), chunkIGJUBJBW_cjs.__toCommonJS(admin_layout_catalyst_template_exports));
+  } = (init_admin_layout_catalyst_template(), __toCommonJS(admin_layout_catalyst_template_exports));
   return renderAdminLayoutCatalyst2(data);
 }
 function adminLayoutV2(data) {
@@ -1151,7 +1149,7 @@ function adminLayoutV2(data) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${data.title} - SonicJS AI Admin</title>
-  <link rel="icon" type="image/x-icon" href="https://demo.sonicjs.com/images/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -3530,22 +3528,6 @@ function renderFormField(field) {
   `;
 }
 
-exports.adminLayoutV2 = adminLayoutV2;
-exports.getConfirmationDialogScript = getConfirmationDialogScript;
-exports.init_admin_layout_catalyst_template = init_admin_layout_catalyst_template;
-exports.init_logo_template = init_logo_template;
-exports.renderAdminLayout = renderAdminLayout;
-exports.renderAdminLayoutCatalyst = renderAdminLayoutCatalyst;
-exports.renderAlert = renderAlert;
-exports.renderCheckboxPage = renderCheckboxPage;
-exports.renderCodeExamplesList = renderCodeExamplesList;
-exports.renderConfirmationDialog = renderConfirmationDialog;
-exports.renderDesignPage = renderDesignPage;
-exports.renderForm = renderForm;
-exports.renderFormField = renderFormField;
-exports.renderLogo = renderLogo;
-exports.renderPagination = renderPagination;
-exports.renderTable = renderTable;
-exports.renderTestimonialsList = renderTestimonialsList;
-//# sourceMappingURL=chunk-AZLU3ROK.cjs.map
-//# sourceMappingURL=chunk-AZLU3ROK.cjs.map
+export { adminLayoutV2, getConfirmationDialogScript, init_admin_layout_catalyst_template, init_logo_template, renderAdminLayout, renderAdminLayoutCatalyst, renderAlert, renderCheckboxPage, renderCodeExamplesList, renderConfirmationDialog, renderDesignPage, renderForm, renderFormField, renderLogo, renderPagination, renderTable, renderTestimonialsList };
+//# sourceMappingURL=chunk-KA2PDJNB.js.map
+//# sourceMappingURL=chunk-KA2PDJNB.js.map

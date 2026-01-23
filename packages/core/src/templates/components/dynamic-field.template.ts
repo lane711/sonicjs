@@ -541,12 +541,12 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
       break
 
     case 'select':
-      const options = opts.options || []
+      const selectOptions = opts.options || []
       const multiple = opts.multiple ? 'multiple' : ''
       const selectedValues = Array.isArray(value) ? value : [value]
-      
+
       fieldHTML = `
-        <select 
+        <select
           id="${fieldId}"
           name="${fieldName}${opts.multiple ? '[]' : ''}"
           class="${baseClasses} ${errorClasses}"
@@ -555,7 +555,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
           ${disabled ? 'disabled' : ''}
         >
           ${!required && !opts.multiple ? '<option value="">Choose an option...</option>' : ''}
-          ${options.map((option: any) => {
+          ${selectOptions.map((option: any) => {
             const optionValue = typeof option === 'string' ? option : option.value
             const optionLabel = typeof option === 'string' ? option : option.label
             const selected = selectedValues.includes(optionValue) ? 'selected' : ''
