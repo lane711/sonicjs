@@ -22,6 +22,8 @@ export { emailPlugin, createEmailPlugin } from './email-plugin'
 export { otpLoginPlugin, createOTPLoginPlugin } from './otp-login-plugin'
 export { turnstilePlugin } from './turnstile-plugin'
 export { TurnstileService, verifyTurnstile, createTurnstileMiddleware } from './turnstile-plugin'
+export { aiSearchPlugin } from './ai-search-plugin'
+export { AISearchService, IndexManager } from './ai-search-plugin'
 
 // Core plugins list - now imported from auto-generated registry
 export const CORE_PLUGIN_IDS = [
@@ -38,7 +40,8 @@ export const CORE_PLUGIN_IDS = [
   'quill-editor',
   'email',
   'otp-login',
-  'turnstile'
+  'turnstile',
+  'ai-search'
 ] as const
 
 export type CorePluginNames = (typeof CORE_PLUGIN_IDS)[number]

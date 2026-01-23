@@ -34,8 +34,8 @@ export default defineConfig({
     /* Screenshot on failure */
     screenshot: 'only-on-failure',
 
-    /* Video on failure */
-    video: 'retain-on-failure',
+    /* Video on ALL tests (temporary for PR videos) */
+    video: 'on',
   },
 
   /* Configure projects for major browsers */
@@ -78,7 +78,8 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests (local only) */
   webServer: process.env.BASE_URL ? undefined : {
-    command: 'cd my-sonicjs-app && npm run dev',
+    command: 'npm run dev',
+    cwd: resolve(__dirname, '../my-sonicjs-app'),
     url: 'http://localhost:8787',
     reuseExistingServer: true,
     timeout: 180 * 1000, // Increased to 3 minutes

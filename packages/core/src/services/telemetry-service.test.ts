@@ -147,3 +147,163 @@ describe('createInstallationIdentity', () => {
     expect(identity1.projectId).not.toBe(identity2.projectId)
   })
 })
+
+describe('TelemetryService extended tests', () => {
+  let telemetryService: TelemetryService
+  let identity: TelemetryIdentity
+
+  beforeEach(() => {
+    identity = createInstallationIdentity('test-project')
+    telemetryService = new TelemetryService({ enabled: true, debug: false, host: 'https://test-stats.example.com' })
+  })
+
+  describe('dev server tracking', () => {
+    it('should track dev server started event', async () => {
+      await telemetryService.initialize(identity)
+      await expect(telemetryService.trackDevServerStarted({
+        port: 3000,
+        environment: 'development'
+      })).resolves.not.toThrow()
+    })
+  })
+
+  describe('plugin tracking', () => {
+    it('should track plugin activated event', async () => {
+      await telemetryService.initialize(identity)
+      await expect(telemetryService.trackPluginActivated({
+        pluginName: 'test-plugin',
+        version: '1.0.0'
+      })).resolves.not.toThrow()
+    })
+  })
+
+  describe('migration tracking', () => {
+    it('should track migration run event', async () => {
+      await telemetryService.initialize(identity)
+      await expect(telemetryService.trackMigrationRun({
+        migrationCount: 5,
+        duration: 2000
+      })).resolves.not.toThrow()
+    })
+  })
+
+  describe('debug mode', () => {
+    it('should not log when debug is disabled', async () => {
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+      const debugDisabledService = new TelemetryService({ enabled: true, debug: false })
+      await debugDisabledService.initialize(identity)
+
+      // Debug logs should not be called
+      const debugCalls = consoleSpy.mock.calls.filter(call =>
+        call[0] && typeof call[0] === 'string' && call[0].includes('[Telemetry]')
+      )
+      // With debug off, there should be no telemetry debug logs
+      expect(debugCalls.length).toBe(0)
+
+      consoleSpy.mockRestore()
+    })
+  })
+
+  describe('event queue', () => {
+    it('should queue events before initialization', async () => {
+      // Track event before initialization
+      await telemetryService.track('test_event', { test: true })
+
+      // Now initialize
+      await telemetryService.initialize(identity)
+
+      // Event should have been queued and flushed (no error thrown)
+    })
+
+    it('should handle multiple queued events', async () => {
+      // Track multiple events before initialization
+      await telemetryService.track('event_1')
+      await telemetryService.track('event_2')
+      await telemetryService.track('event_3')
+
+      // Initialize to flush queue
+      await telemetryService.initialize(identity)
+
+      // No errors should be thrown
+    })
+  })
+
+  describe('error tracking with string', () => {
+    it('should track installation failed with string error', async () => {
+      await telemetryService.initialize(identity)
+      await expect(telemetryService.trackInstallationFailed(
+        'Simple error message',
+        { duration: 500 }
+      )).resolves.not.toThrow()
+    })
+
+    it('should track generic error with string', async () => {
+      await telemetryService.initialize(identity)
+      await expect(telemetryService.trackError('Generic error string')).resolves.not.toThrow()
+    })
+  })
+
+  describe('property sanitization edge cases', () => {
+    it('should handle undefined properties', async () => {
+      await telemetryService.initialize(identity)
+      await expect(telemetryService.track('test_event', {
+        definedProp: 'value',
+        undefinedProp: undefined
+      })).resolves.not.toThrow()
+    })
+
+    it('should handle error property names', async () => {
+      await telemetryService.initialize(identity)
+      await expect(telemetryService.track('test_event', {
+        errorMessage: 'some error message',
+        lastError: 'another error',
+        customError: 'custom error text'
+      })).resolves.not.toThrow()
+    })
+
+    it('should handle non-string/number/boolean properties', async () => {
+      await telemetryService.initialize(identity)
+      await expect(telemetryService.track('test_event', {
+        stringProp: 'string',
+        numberProp: 123,
+        boolProp: true,
+        objectProp: { nested: 'value' } as any, // Should be filtered out
+        arrayProp: [1, 2, 3] as any // Should be filtered out
+      })).resolves.not.toThrow()
+    })
+
+    it('should handle empty properties', async () => {
+      await telemetryService.initialize(identity)
+      await expect(telemetryService.track('test_event', {})).resolves.not.toThrow()
+    })
+  })
+
+  describe('tracking when disabled', () => {
+    it('should skip tracking when service is disabled', async () => {
+      telemetryService.disable()
+
+      // None of these should throw or do anything
+      await telemetryService.track('test_event')
+      await telemetryService.trackInstallationStarted()
+      await telemetryService.trackInstallationCompleted()
+      await telemetryService.trackInstallationFailed('error')
+      await telemetryService.trackDevServerStarted()
+      await telemetryService.trackPageView('/test')
+      await telemetryService.trackError('error')
+      await telemetryService.trackPluginActivated()
+      await telemetryService.trackMigrationRun()
+
+      expect(telemetryService.isEnabled()).toBe(false)
+    })
+  })
+
+  describe('initialization when disabled', () => {
+    it('should not initialize when disabled', async () => {
+      telemetryService.disable()
+      await telemetryService.initialize(identity)
+
+      // Should still be disabled
+      expect(telemetryService.isEnabled()).toBe(false)
+    })
+  })
+})

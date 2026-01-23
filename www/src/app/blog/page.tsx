@@ -27,9 +27,9 @@ export const metadata: Metadata = {
     siteName: 'SonicJS',
     images: [
       {
-        url: 'https://sonicjs.com/sonicjs-discord.png',
-        width: 1200,
-        height: 630,
+        url: 'https://sonicjs.com/sonicjs-og.png',
+        width: 1792,
+        height: 1024,
         alt: 'SonicJS Blog',
       },
     ],
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     title: 'Blog | SonicJS',
     description:
       'Tutorials, guides, and updates about SonicJS - the edge-first headless CMS for Cloudflare Workers.',
-    images: ['https://sonicjs.com/sonicjs-discord.png'],
+    images: ['https://sonicjs.com/sonicjs-og.png'],
   },
   alternates: {
     canonical: 'https://sonicjs.com/blog',

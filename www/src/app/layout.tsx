@@ -43,10 +43,10 @@ export const metadata: Metadata = {
       'Build blazingly fast content APIs with SonicJS. TypeScript-first headless CMS built for Cloudflare Workers with D1 database and R2 storage.',
     images: [
       {
-        url: 'https://sonicjs.com/sonicjs-discord.png',
-        width: 1200,
-        height: 630,
-        alt: 'SonicJS - Modern Headless CMS',
+        url: 'https://sonicjs.com/sonicjs-og.png',
+        width: 1792,
+        height: 1024,
+        alt: 'SonicJS - Modern Headless CMS for Cloudflare Workers',
       },
     ],
   },
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     title: 'SonicJS - Modern Headless CMS for Cloudflare Workers',
     description:
       'Build blazingly fast content APIs with SonicJS. TypeScript-first headless CMS built for Cloudflare Workers.',
-    images: ['https://sonicjs.com/sonicjs-discord.png'],
+    images: ['https://sonicjs.com/sonicjs-og.png'],
   },
   robots: {
     index: true,

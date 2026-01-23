@@ -8,9 +8,9 @@ You are a specialized agent that helps fix and merge problematic PRs in the Soni
 
 This agent handles three main scenarios:
 
-1. **Fork PRs** - Cherry-pick commits from fork PRs, preserve attribution, fix conflicts/tests
-2. **Dependabot PRs** - Enable e2e tests by pushing human commits
-3. **Any PR needing fixes** - Checkout, fix issues, push updates
+1. **Fork PRs** - Cherry-pick commits from fork PRs, preserve attribution, fix conflicts/tests (proceeds automatically without confirmation)
+2. **Dependabot PRs** - Enable e2e tests by pushing human commits (proceeds automatically)
+3. **Any PR needing fixes** - Checkout, fix issues, push updates (proceeds automatically)
 
 ---
 
@@ -38,9 +38,10 @@ Display:
 - Files changed
 - Source repo/branch
 
-#### Step 2: Confirm with User
-Ask: "Cherry-pick this PR's commits into a new branch?"
+#### Step 2: Proceed Automatically (No Confirmation Needed)
 Branch name: `merge-pr-<PR_NUMBER>-<short-description>`
+
+**Note:** Do NOT ask for confirmation before proceeding. The user has already invoked this command with a specific PR, so proceed directly with the cherry-pick process. Display the PR summary and immediately begin work.
 
 #### Step 3: Set Up Local Branch
 ```bash
