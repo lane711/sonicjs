@@ -699,6 +699,8 @@ adminCollectionsRoutes.post('/:id/fields', async (c) => {
         fieldConfig.type = 'quill'
       } else if (fieldType === 'mdxeditor') {
         fieldConfig.type = 'mdxeditor'
+      } else if (fieldType === 'reference') {
+        fieldConfig.type = 'reference'
       }
 
       schema.properties[fieldName] = fieldConfig
