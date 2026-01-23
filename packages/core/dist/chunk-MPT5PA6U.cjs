@@ -1,3 +1,5 @@
+'use strict';
+
 // src/services/collection-loader.ts
 var registeredCollections = [];
 function registerCollections(collections) {
@@ -25,7 +27,7 @@ async function loadCollectionConfigs() {
     console.log(`            registerCollections([myCollection])`);
   }
   try {
-    const modules = import.meta.glob?.("../collections/*.collection.ts", { eager: true }) || {};
+    const modules = undefined?.("../collections/*.collection.ts", { eager: true }) || {};
     let coreCollectionCount = 0;
     for (const [path, module] of Object.entries(modules)) {
       try {
@@ -69,7 +71,7 @@ async function loadCollectionConfig(name) {
 }
 async function getAvailableCollectionNames() {
   try {
-    const modules = import.meta.glob?.("../collections/*.collection.ts") || {};
+    const modules = undefined?.("../collections/*.collection.ts") || {};
     const names = [];
     for (const path of Object.keys(modules)) {
       const match = path.match(/\/([^/]+)\.collection\.ts$/);
@@ -681,6 +683,28 @@ var PluginBootstrapService = class {
         toolbar: "full",
         placeholder: "Start writing your content..."
       }
+    },
+    {
+      id: "ai-search",
+      name: "ai-search-plugin",
+      display_name: "AI Search",
+      description: "Advanced search with Cloudflare AI Search. Full-text search, semantic search, and advanced filtering across all content collections.",
+      version: "1.0.0",
+      author: "SonicJS Team",
+      category: "search",
+      icon: "\u{1F50D}",
+      permissions: ["settings:write", "admin:access", "content:read"],
+      dependencies: [],
+      settings: {
+        enabled: false,
+        ai_mode_enabled: true,
+        selected_collections: [],
+        dismissed_collections: [],
+        autocomplete_enabled: true,
+        cache_duration: 1,
+        results_limit: 20,
+        index_media: false
+      }
     }
   ];
   /**
@@ -792,6 +816,18 @@ var PluginBootstrapService = class {
   }
 };
 
-export { PluginBootstrapService, PluginService, cleanupRemovedCollections, fullCollectionSync, getAvailableCollectionNames, getManagedCollections, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, registerCollections, syncCollection, syncCollections, validateCollectionConfig };
-//# sourceMappingURL=chunk-SGAG6FD3.js.map
-//# sourceMappingURL=chunk-SGAG6FD3.js.map
+exports.PluginBootstrapService = PluginBootstrapService;
+exports.PluginService = PluginService;
+exports.cleanupRemovedCollections = cleanupRemovedCollections;
+exports.fullCollectionSync = fullCollectionSync;
+exports.getAvailableCollectionNames = getAvailableCollectionNames;
+exports.getManagedCollections = getManagedCollections;
+exports.isCollectionManaged = isCollectionManaged;
+exports.loadCollectionConfig = loadCollectionConfig;
+exports.loadCollectionConfigs = loadCollectionConfigs;
+exports.registerCollections = registerCollections;
+exports.syncCollection = syncCollection;
+exports.syncCollections = syncCollections;
+exports.validateCollectionConfig = validateCollectionConfig;
+//# sourceMappingURL=chunk-MPT5PA6U.cjs.map
+//# sourceMappingURL=chunk-MPT5PA6U.cjs.map

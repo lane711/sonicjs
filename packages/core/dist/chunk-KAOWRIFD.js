@@ -1,4 +1,4 @@
-import { init_admin_layout_catalyst_template, init_logo_template } from './chunk-V5LBQN3I.js';
+import { init_admin_layout_catalyst_template, init_logo_template } from './chunk-KA2PDJNB.js';
 
 // src/templates/filter-bar.template.ts
 function renderFilterBar(data) {
@@ -70,5 +70,5 @@ init_admin_layout_catalyst_template();
 init_logo_template();
 
 export { renderFilterBar };
-//# sourceMappingURL=chunk-AVPUX57O.js.map
-//# sourceMappingURL=chunk-AVPUX57O.js.map
+//# sourceMappingURL=chunk-KAOWRIFD.js.map
+//# sourceMappingURL=chunk-KAOWRIFD.js.map

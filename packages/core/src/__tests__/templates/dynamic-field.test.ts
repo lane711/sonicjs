@@ -4,6 +4,172 @@ import {
   FieldDefinition,
 } from '../../templates/components/dynamic-field.template';
 
+/**
+ * TDZ Bug Fix Tests (GitHub Issue #555, PR #556)
+ *
+ * Bug: The `select` case in renderDynamicField declares `const options = opts.options || []`
+ * which shadows the function parameter `options: FieldRenderOptions`. Because const declarations
+ * in switch cases are scoped to the entire switch block, this creates a TDZ (Temporal Dead Zone)
+ * error when other cases (object, array) try to access the `options` parameter.
+ *
+ * These tests verify that object and array fields can be rendered without TDZ errors.
+ */
+describe('renderDynamicField - TDZ Bug Fix (Issue #555)', () => {
+  it('should render object field without TDZ error', () => {
+    const objectField: FieldDefinition = {
+      id: 'seo-field',
+      field_name: 'seo',
+      field_type: 'object',
+      field_label: 'SEO',
+      field_options: {
+        properties: {
+          title: { type: 'string', title: 'SEO Title' },
+          description: { type: 'textarea', title: 'SEO Description' },
+        },
+      },
+      field_order: 1,
+      is_required: false,
+      is_searchable: false,
+    };
+
+    // This should not throw "ReferenceError: Cannot access 'options' before initialization"
+    const html = renderDynamicField(objectField, {
+      value: { title: 'Test Title', description: 'Test Description' },
+    });
+
+    expect(html).toContain('data-structured-object');
+    expect(html).toContain('data-field-name="seo"');
+    expect(html).toContain('SEO Title');
+    expect(html).toContain('SEO Description');
+  });
+
+  it('should render array field without TDZ error', () => {
+    const arrayField: FieldDefinition = {
+      id: 'tags-field',
+      field_name: 'tags',
+      field_type: 'array',
+      field_label: 'Tags',
+      field_options: {
+        items: {
+          type: 'string',
+          title: 'Tag',
+        },
+      },
+      field_order: 1,
+      is_required: false,
+      is_searchable: false,
+    };
+
+    // This should not throw "ReferenceError: Cannot access 'options' before initialization"
+    const html = renderDynamicField(arrayField, {
+      value: ['tag1', 'tag2'],
+    });
+
+    expect(html).toContain('data-structured-array');
+    expect(html).toContain('data-field-name="tags"');
+  });
+
+  it('should render blocks array field without TDZ error', () => {
+    const blocksField: FieldDefinition = {
+      id: 'body-field',
+      field_name: 'body',
+      field_type: 'array',
+      field_label: 'Content Blocks',
+      field_options: {
+        items: {
+          type: 'object',
+          discriminator: 'blockType',
+          blocks: {
+            text: {
+              label: 'Text',
+              properties: {
+                heading: { type: 'string', title: 'Heading' },
+                body: { type: 'textarea', title: 'Body' },
+              },
+            },
+          },
+        },
+      },
+      field_order: 1,
+      is_required: false,
+      is_searchable: false,
+    };
+
+    // This should not throw "ReferenceError: Cannot access 'options' before initialization"
+    const html = renderDynamicField(blocksField, {
+      value: [{ blockType: 'text', heading: 'Hello', body: 'World' }],
+    });
+
+    expect(html).toContain('blocks-field');
+    expect(html).toContain('data-field-name="body"');
+  });
+
+  it('should render select field correctly (has the options variable)', () => {
+    const selectField: FieldDefinition = {
+      id: 'status-field',
+      field_name: 'status',
+      field_type: 'select',
+      field_label: 'Status',
+      field_options: {
+        options: [
+          { value: 'draft', label: 'Draft' },
+          { value: 'published', label: 'Published' },
+        ],
+      },
+      field_order: 1,
+      is_required: false,
+      is_searchable: false,
+    };
+
+    const html = renderDynamicField(selectField, { value: 'draft' });
+
+    expect(html).toContain('<select');
+    expect(html).toContain('value="draft"');
+    expect(html).toContain('Draft');
+    expect(html).toContain('Published');
+  });
+
+  it('should render object and select fields in the same test run without TDZ issues', () => {
+    // This test verifies that both field types can be rendered together
+    // without the const options declaration in select case causing TDZ issues
+
+    const objectField: FieldDefinition = {
+      id: 'seo-field',
+      field_name: 'seo',
+      field_type: 'object',
+      field_label: 'SEO',
+      field_options: {
+        properties: {
+          title: { type: 'string', title: 'Title' },
+        },
+      },
+      field_order: 1,
+      is_required: false,
+      is_searchable: false,
+    };
+
+    const selectField: FieldDefinition = {
+      id: 'category-field',
+      field_name: 'category',
+      field_type: 'select',
+      field_label: 'Category',
+      field_options: {
+        options: ['tech', 'business'],
+      },
+      field_order: 2,
+      is_required: false,
+      is_searchable: false,
+    };
+
+    // Both should render without errors
+    const objectHtml = renderDynamicField(objectField, { value: { title: 'Test' } });
+    const selectHtml = renderDynamicField(selectField, { value: 'tech' });
+
+    expect(objectHtml).toContain('data-structured-object');
+    expect(selectHtml).toContain('<select');
+  });
+});
+
 describe('renderDynamicField - Media', () => {
   const baseField: FieldDefinition = {
     id: 'test-field',

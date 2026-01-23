@@ -1486,6 +1486,13 @@ SET schema = REPLACE(
 )
 WHERE id = 'news-collection' AND schema LIKE '%"slug":{"type":"string"%';
 `
+  },
+  {
+    id: "029",
+    name: "Ai Search Plugin",
+    filename: "029_ai_search_plugin.sql",
+    description: "Migration 029: Ai Search Plugin",
+    sql: "-- AI Search plugin settings\nCREATE TABLE IF NOT EXISTS ai_search_settings (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  enabled BOOLEAN DEFAULT 0,\n  ai_mode_enabled BOOLEAN DEFAULT 1,\n  selected_collections TEXT, -- JSON array of collection IDs to index\n  dismissed_collections TEXT, -- JSON array of collection IDs user chose not to index\n  autocomplete_enabled BOOLEAN DEFAULT 1,\n  cache_duration INTEGER DEFAULT 1, -- hours\n  results_limit INTEGER DEFAULT 20,\n  index_media BOOLEAN DEFAULT 0,\n  index_status TEXT, -- JSON object with status per collection\n  last_indexed_at INTEGER,\n  created_at INTEGER DEFAULT (strftime('%s', 'now') * 1000),\n  updated_at INTEGER DEFAULT (strftime('%s', 'now') * 1000)\n);\n\n-- Search history/analytics\nCREATE TABLE IF NOT EXISTS ai_search_history (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  query TEXT NOT NULL,\n  mode TEXT, -- 'ai' or 'keyword'\n  results_count INTEGER,\n  user_id INTEGER,\n  created_at INTEGER DEFAULT (strftime('%s', 'now') * 1000)\n);\n\n-- Index metadata tracking (per collection)\nCREATE TABLE IF NOT EXISTS ai_search_index_meta (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  collection_id INTEGER NOT NULL,\n  collection_name TEXT NOT NULL, -- Cache collection name for display\n  total_items INTEGER DEFAULT 0,\n  indexed_items INTEGER DEFAULT 0,\n  last_sync_at INTEGER,\n  status TEXT DEFAULT 'pending', -- 'pending', 'indexing', 'completed', 'error'\n  error_message TEXT,\n  UNIQUE(collection_id)\n);\n\n-- Indexes for performance\nCREATE INDEX IF NOT EXISTS idx_ai_search_history_created_at ON ai_search_history(created_at);\nCREATE INDEX IF NOT EXISTS idx_ai_search_history_mode ON ai_search_history(mode);\nCREATE INDEX IF NOT EXISTS idx_ai_search_index_meta_collection_id ON ai_search_index_meta(collection_id);\nCREATE INDEX IF NOT EXISTS idx_ai_search_index_meta_status ON ai_search_index_meta(status);\n"
   }
 ];
 var migrationsByIdMap = new Map(
@@ -1894,5 +1901,5 @@ var MigrationService = class {
 };
 
 export { MigrationService };
-//# sourceMappingURL=chunk-O2XER4GZ.js.map
-//# sourceMappingURL=chunk-O2XER4GZ.js.map
+//# sourceMappingURL=chunk-D7OQ65B4.js.map
+//# sourceMappingURL=chunk-D7OQ65B4.js.map
