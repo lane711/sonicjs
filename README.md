@@ -23,6 +23,7 @@ npx create-sonicjs@latest my-app
 ```
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink?style=for-the-badge&logo=github-sponsors)](https://github.com/sponsors/lane711)
+[![Open Collective](https://img.shields.io/badge/Open_Collective-Support-7FADF2?style=for-the-badge&logo=opencollective)](https://opencollective.com/sonicjs)
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/lane711/sonicjs-deploy-now)
 
@@ -398,8 +399,11 @@ We welcome contributions! Please see our [contributing guidelines](https://sonic
 SonicJS is 100% open source and free forever. If you find it useful, please consider sponsoring:
 
 [![Sponsor on GitHub](https://img.shields.io/badge/Sponsor_on_GitHub-%E2%9D%A4-pink?style=for-the-badge&logo=github-sponsors)](https://github.com/sponsors/lane711)
+[![Support on Open Collective](https://img.shields.io/badge/Open_Collective-Support-7FADF2?style=for-the-badge&logo=opencollective)](https://opencollective.com/sonicjs)
 
 **100% of sponsorship funds go to marketing** - spreading the word about SonicJS to help grow our community. The more developers who know about us, the stronger we become!
+
+> SonicJS is a member of [Open Source Collective](https://opencollective.com/sonicjs), a 501(c)(3) nonprofit. Donations are tax-deductible for US contributors.
 
 ### Thank You to Our Sponsors
 

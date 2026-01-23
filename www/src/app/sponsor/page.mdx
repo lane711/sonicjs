@@ -1,7 +1,7 @@
 export const metadata = {
   title: 'Sponsor SonicJS - Support the World\'s Fastest Headless CMS',
   description:
-    'Support SonicJS development through GitHub Sponsors. Help keep the world\'s fastest headless CMS free and actively maintained.',
+    'Support SonicJS development through GitHub Sponsors or Open Collective. Tax-deductible donations available via 501(c)(3). Help keep the world\'s fastest headless CMS free and actively maintained.',
 }
 
 export const sections = [
@@ -280,7 +280,28 @@ Ready to support SonicJS? Choose your preferred platform:
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
       </svg>
     </a>
+    <a
+      href="https://opencollective.com/sonicjs"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-4 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 p-6 hover:border-blue-500 dark:hover:border-blue-500 transition group"
+    >
+      <div className="text-4xl">🌐</div>
+      <div>
+        <h3 className="text-lg font-bold m-0 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">Open Collective</h3>
+        <p className="text-sm text-zinc-600 dark:text-zinc-400 m-0">Tax-deductible via 501(c)(3)</p>
+      </div>
+      <svg className="w-5 h-5 ml-auto text-zinc-400 group-hover:text-blue-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+      </svg>
+    </a>
   </div>
+</div>
+
+<div className="not-prose my-6 p-4 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
+  <p className="text-sm text-blue-800 dark:text-blue-200 m-0">
+    <strong>Tax-deductible donations:</strong> SonicJS is a member of <a href="https://opencollective.com/sonicjs" className="underline">Open Source Collective</a>, a 501(c)(3) nonprofit. Donations through Open Collective are tax-deductible for US contributors.
+  </p>
 </div>
 
 ### For Businesses
@@ -335,9 +356,12 @@ A huge thank you to all our sponsors who make SonicJS possible!
 Whether you sponsor, contribute code, write documentation, or just use SonicJS - thank you for being part of this community. Every contribution matters.
 
 <div className="not-prose mt-8">
-  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
     <Button href="https://github.com/sponsors/lane711" variant="primary">
       <>❤️ Sponsor on GitHub</>
+    </Button>
+    <Button href="https://opencollective.com/sonicjs" variant="primary">
+      <>🌐 Open Collective</>
     </Button>
     <Button href="/community" variant="secondary">
       <>Join the Community</>
