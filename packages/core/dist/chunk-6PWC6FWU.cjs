@@ -443,6 +443,13 @@ function renderCatalystSidebar(currentPath = "", user, dynamicMenuItems, isMobil
       </svg>`
     },
     {
+      label: "Forms",
+      path: "/admin/forms",
+      icon: `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>`
+    },
+    {
       label: "Content",
       path: "/admin/content",
       icon: `<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -3547,5 +3554,5 @@ exports.renderLogo = renderLogo;
 exports.renderPagination = renderPagination;
 exports.renderTable = renderTable;
 exports.renderTestimonialsList = renderTestimonialsList;
-//# sourceMappingURL=chunk-BZC4FYW7.cjs.map
-//# sourceMappingURL=chunk-BZC4FYW7.cjs.map
+//# sourceMappingURL=chunk-6PWC6FWU.cjs.map
+//# sourceMappingURL=chunk-6PWC6FWU.cjs.map
