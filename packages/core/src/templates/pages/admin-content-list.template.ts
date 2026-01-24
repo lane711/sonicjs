@@ -540,8 +540,9 @@ export function renderContentListPage(data: ContentListPageData): string {
       });
 
       // Store current bulk action context
-      let currentBulkAction = null;
-      let currentSelectedIds = [];
+      // Using var instead of let to avoid redeclaration errors when HTMX re-executes script tags
+      var currentBulkAction = null;
+      var currentSelectedIds = [];
 
       // Perform bulk action
       function performBulkAction(action) {
@@ -818,8 +819,9 @@ export function renderContentListPage(data: ContentListPageData): string {
       }
 
       // Autocomplete
-      let autocompleteTimeout;
-      const searchQueryInput = document.getElementById('searchQuery');
+      // Using var instead of let to avoid redeclaration errors when HTMX re-executes script tags
+      var autocompleteTimeout;
+      var searchQueryInput = document.getElementById('searchQuery');
       if (searchQueryInput) {
         searchQueryInput.addEventListener('input', (e) => {
           const query = e.target.value.trim();
@@ -866,7 +868,7 @@ export function renderContentListPage(data: ContentListPageData): string {
       });
 
       // Form submission
-      const advancedSearchForm = document.getElementById('advancedSearchForm');
+      var advancedSearchForm = document.getElementById('advancedSearchForm');
       if (advancedSearchForm) {
         advancedSearchForm.addEventListener('submit', async (e) => {
           e.preventDefault();
