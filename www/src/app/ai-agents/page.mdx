@@ -21,7 +21,7 @@ SonicJS uses AI-powered Claude agents to automate development workflows, release
 
 ## Overview
 
-The SonicJS project includes **12 specialized AI agents** that help maintainers and contributors work more efficiently. Each agent is designed for specific tasks and follows established best practices.
+The SonicJS project includes **13 specialized AI agents** that help maintainers and contributors work more efficiently. Each agent is designed for specific tasks and follows established best practices.
 
 <div className="not-prose mb-8 p-6 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
   <div className="flex items-start gap-4">
@@ -40,7 +40,7 @@ The SonicJS project includes **12 specialized AI agents** that help maintainers 
     {
       icon: '🛠️',
       title: 'Development',
-      description: '2 agents for feature development and PR management',
+      description: '3 agents for feature development and PR management',
     },
     {
       icon: '🚀',
@@ -93,6 +93,51 @@ The primary development agent for implementing features in SonicJS. This agent e
 /fullstack-dev test e2e [feature]   # Write E2E tests
 /fullstack-dev review             # Run all tests and report status
 ```
+
+---
+
+### PR Maker Agent
+
+**Command:** `/sonicjs-pr-maker`
+
+A specialized agent that automates the entire PR lifecycle: creating well-formatted pull requests, monitoring CI/CD pipelines, analyzing failures, and automatically fixing issues including E2E test failures.
+
+<div className="not-prose mb-6">
+  <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+    <div className="bg-zinc-100 dark:bg-zinc-800 px-4 py-2 border-b border-zinc-200 dark:border-zinc-700">
+      <span className="font-mono text-sm">Operational Modes</span>
+    </div>
+    <div className="p-4 space-y-2 text-sm">
+      <div className="flex items-start gap-2"><span className="text-blue-500">1.</span><strong>Create & Monitor (default):</strong> Create PR and watch CI until all checks pass</div>
+      <div className="flex items-start gap-2"><span className="text-blue-500">2.</span><strong>Create Only:</strong> Create the PR without monitoring</div>
+      <div className="flex items-start gap-2"><span className="text-blue-500">3.</span><strong>Monitor:</strong> Watch an existing PR's CI/CD status</div>
+      <div className="flex items-start gap-2"><span className="text-blue-500">4.</span><strong>Fix Failures:</strong> Analyze failed checks and automatically apply fixes</div>
+    </div>
+  </div>
+</div>
+
+<div className="not-prose mb-6">
+  <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+    <div className="bg-zinc-100 dark:bg-zinc-800 px-4 py-2 border-b border-zinc-200 dark:border-zinc-700">
+      <span className="font-mono text-sm">Failure Types Handled</span>
+    </div>
+    <div className="p-4 space-y-2 text-sm">
+      <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Unit Tests:</strong> Runs tests locally, identifies assertion errors, fixes implementations</div>
+      <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>Build Errors:</strong> Resolves TypeScript errors, missing imports, type mismatches</div>
+      <div className="flex items-start gap-2"><span className="text-emerald-500">▸</span><strong>E2E Tests:</strong> Downloads artifacts, fixes timing issues, updates selectors</div>
+    </div>
+  </div>
+</div>
+
+**Usage:**
+```bash
+/sonicjs-pr-maker                  # Create PR and monitor until CI passes
+/sonicjs-pr-maker create           # Create PR only (no monitoring)
+/sonicjs-pr-maker monitor 123      # Monitor existing PR #123
+/sonicjs-pr-maker fix 123          # Analyze and fix failing PR #123
+```
+
+**Retry Strategy:** The agent attempts fixes up to 3 times. If the same test fails after 3 attempts, it reports the issue and asks for guidance.
 
 ---
 
