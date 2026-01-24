@@ -62,7 +62,7 @@ This isn't a marketing comparison. We'll share the honest critiques developers h
 | **Database** | PostgreSQL, MySQL, SQLite | MongoDB, PostgreSQL | D1 (SQLite at edge) |
 | **TypeScript** | Added in v4, partial | Native, excellent | Native, full type safety |
 | **Cold starts** | 500-2000ms | 100-300ms | 0-5ms (V8 isolates) |
-| **Global latency** | 200-500ms (depends on server) | 150-400ms | <50ms worldwide |
+| **Global latency** | 200-500ms (depends on server) | 150-400ms | Under 50ms worldwide |
 | **Plugin ecosystem** | 100+ marketplace plugins | Growing, code-first | 15+ core plugins, extensible |
 | **License** | MIT (features gated) | MIT | MIT (no gating) |
 | **AI Search** | No | No | Yes (Cloudflare AI + RAG) |
@@ -210,7 +210,7 @@ export default cms.app
 
 | Scenario | Traditional CMS | SonicJS |
 |----------|-----------------|---------|
-| User in Tokyo, server in Virginia | 200-400ms latency | <50ms (served from Tokyo edge) |
+| User in Tokyo, server in Virginia | 200-400ms latency | Under 50ms (served from Tokyo edge) |
 | Traffic spike (10x normal) | Requires scaling configuration | Automatic, no configuration |
 | Cold start after idle | 500-2000ms | 0-5ms (V8 isolates) |
 | Infrastructure management | Servers, databases, CDN | Single `wrangler deploy` |
