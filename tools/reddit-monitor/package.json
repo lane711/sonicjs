@@ -1,0 +1,20 @@
+{
+  "name": "sonicjs-reddit-monitor",
+  "version": "1.0.0",
+  "description": "Monitor Reddit for SonicJS marketing opportunities",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "test-cron": "curl \"http://localhost:8787/__scheduled?cron=0+*+*+*+*\""
+  },
+  "dependencies": {
+    "resend": "^4.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240117.0",
+    "typescript": "^5.3.3",
+    "wrangler": "^3.24.0"
+  }
+}

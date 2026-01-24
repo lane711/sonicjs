@@ -1,0 +1,22 @@
+name = "sonicjs-reddit-monitor"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+# Run every hour
+[triggers]
+crons = ["0 * * * *"]
+
+# KV namespace for tracking seen posts
+[[kv_namespaces]]
+binding = "SEEN_POSTS"
+id = "YOUR_KV_NAMESPACE_ID"
+
+[vars]
+NOTIFICATION_EMAIL = "ldf0618@gmail.com"
+# Add your keywords here
+KEYWORDS = "headless CMS,Strapi alternative,Cloudflare Workers CMS,lightweight CMS,Node.js CMS,edge CMS,serverless CMS,API framework Node"
+# Subreddits to monitor
+SUBREDDITS = "webdev,nextjs,node,CloudFlare,selfhosted,javascript,typescript,reactjs"
+
+# You'll need to add these secrets:
+# wrangler secret put RESEND_API_KEY
