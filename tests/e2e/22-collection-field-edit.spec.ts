@@ -30,8 +30,8 @@ test.describe('Collection Field Edit', () => {
     if (fieldCount === 0) {
       console.log('No existing fields found, creating a test field first');
 
-      // Add a field first - use specific selector to avoid matching the modal's submit button
-      await page.click('button[type="button"]:has-text("Add Field")');
+      // Add a field first
+      await page.click('button:has-text("Add Field")');
       await page.waitForSelector('#field-modal:not(.hidden)');
 
       // Fill in field details
@@ -102,8 +102,8 @@ test.describe('Collection Field Edit', () => {
     // Ensure there's at least one field
     const fieldCount = await page.locator('.field-item').count();
     if (fieldCount === 0) {
-      // Add a field - use specific selector to avoid matching the modal's submit button
-      await page.click('button[type="button"]:has-text("Add Field")');
+      // Add a field
+      await page.click('button:has-text("Add Field")');
       await page.fill('#modal-field-name', 'editable_test');
       await page.selectOption('#field-type', 'text');
       await page.fill('#field-label', 'Editable Test');
@@ -264,5 +264,105 @@ test.describe('Collection Field Edit', () => {
     // Verify options textarea has content
     const optionsValue = await page.locator('#field-options').inputValue();
     expect(optionsValue).toContain('options');
+  });
+
+  test('should persist field options when editing and saving', async ({ page }) => {
+    await page.goto(`${BASE_URL}/admin/collections`);
+
+    // Navigate to first collection
+    const firstRow = page.locator('tbody tr').first();
+    await firstRow.click();
+    await expect(page.locator('h1')).toContainText('Edit Collection');
+
+    // Create a reference field with specific options
+    await page.click('button:has-text("Add Field")');
+    await page.waitForSelector('#field-modal:not(.hidden)', { timeout: 10000 });
+
+    const fieldNameInput = page.locator('#modal-field-name');
+    await fieldNameInput.waitFor({ state: 'visible', timeout: 10000 });
+
+    const isReadonly = await fieldNameInput.getAttribute('readonly');
+    if (isReadonly !== null) {
+      console.log('Skipping - field is readonly');
+      await page.click('button:has-text("Cancel")');
+      return;
+    }
+
+    const testFieldName = `ref_options_test_${Date.now()}`;
+    await page.fill('#modal-field-name', testFieldName);
+    await page.selectOption('#field-type', 'reference');
+    await page.fill('#field-label', 'Reference Options Test');
+
+    // Wait for options container to be visible
+    await expect(page.locator('#field-options-container')).not.toHaveClass(/hidden/, { timeout: 5000 });
+
+    // Set specific field options
+    const testOptions = '{"collection": ["test_collection_1", "test_collection_2"]}';
+    await page.fill('#field-options', testOptions);
+
+    // Submit and wait for page reload
+    await page.click('#field-modal button[type="submit"]');
+    const newField = page.locator(`.field-item:has(code:has-text("${testFieldName}"))`);
+    await expect(newField).toBeVisible({ timeout: 15000 });
+
+    // Close modal if still open
+    const modalVisible = await page.locator('#field-modal:not(.hidden)').isVisible().catch(() => false);
+    if (modalVisible) {
+      await page.click('button:has-text("Cancel")');
+      await expect(page.locator('#field-modal')).toHaveClass(/hidden/, { timeout: 5000 });
+    }
+
+    // Edit the field again
+    await newField.locator('button:has-text("Edit")').click();
+    await page.waitForSelector('#field-modal:not(.hidden)');
+
+    // Wait for field type to be set
+    await expect(page.locator('#field-type')).toHaveValue('reference', { timeout: 10000 });
+
+    // Verify options container is visible
+    await expect(page.locator('#field-options-container')).not.toHaveClass(/hidden/);
+
+    // Verify field options were persisted
+    const savedOptions = await page.locator('#field-options').inputValue();
+    console.log('Saved options:', savedOptions);
+
+    // Parse and check the collection array is present
+    expect(savedOptions).toContain('collection');
+    expect(savedOptions).toContain('test_collection_1');
+    expect(savedOptions).toContain('test_collection_2');
+
+    // Now update the options
+    const updatedOptions = '{"collection": ["updated_collection"]}';
+    await page.fill('#field-options', updatedOptions);
+
+    // Save the update
+    await page.click('#field-modal button[type="submit"]');
+    await page.waitForLoadState('networkidle');
+
+    // Re-edit to verify update persisted
+    const updatedField = page.locator(`.field-item:has(code:has-text("${testFieldName}"))`);
+    await expect(updatedField).toBeVisible({ timeout: 15000 });
+
+    // Close modal if still open after save
+    const modalStillVisible = await page.locator('#field-modal:not(.hidden)').isVisible().catch(() => false);
+    if (modalStillVisible) {
+      await page.click('button:has-text("Cancel")');
+      await expect(page.locator('#field-modal')).toHaveClass(/hidden/, { timeout: 5000 });
+    }
+
+    await updatedField.locator('button:has-text("Edit")').click();
+    await page.waitForSelector('#field-modal:not(.hidden)');
+
+    // Wait for field options to load
+    await expect(page.locator('#field-options-container')).not.toHaveClass(/hidden/, { timeout: 5000 });
+
+    const finalOptions = await page.locator('#field-options').inputValue();
+    console.log('Final options after update:', finalOptions);
+
+    expect(finalOptions).toContain('updated_collection');
+    expect(finalOptions).not.toContain('test_collection_1');
+
+    // Close modal
+    await page.click('button:has-text("Cancel")');
   });
 });

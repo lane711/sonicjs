@@ -699,6 +699,8 @@ adminCollectionsRoutes.post('/:id/fields', async (c) => {
         fieldConfig.type = 'quill'
       } else if (fieldType === 'mdxeditor') {
         fieldConfig.type = 'mdxeditor'
+      } else if (fieldType === 'reference') {
+        fieldConfig.type = 'reference'
       }
 
       schema.properties[fieldName] = fieldConfig
@@ -822,9 +824,18 @@ adminCollectionsRoutes.put('/:collectionId/fields/:fieldId', async (c) => {
 
       // Update the field in the schema
       if (schema.properties[fieldName]) {
-        // Build the updated field config
+        // Parse field options from form
+        let parsedFieldOptions: Record<string, any> = {}
+        try {
+          parsedFieldOptions = JSON.parse(fieldOptions)
+        } catch (e) {
+          console.error('[Field Update] Error parsing field options:', e)
+        }
+
+        // Build the updated field config - merge in field options
         const updatedFieldConfig: any = {
           ...schema.properties[fieldName],
+          ...parsedFieldOptions,
           type: fieldType,
           title: fieldLabel,
           searchable: isSearchable
