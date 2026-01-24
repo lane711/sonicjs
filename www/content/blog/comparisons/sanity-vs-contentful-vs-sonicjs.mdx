@@ -1,0 +1,404 @@
+---
+title: "Sanity vs Contentful vs SonicJS: Premium CMS Showdown"
+description: "Compare Sanity, Contentful, and SonicJS headless CMS platforms. Real-time collaboration, enterprise pricing, and edge performance analyzed."
+keywords:
+  - "sanity vs contentful"
+  - "sanity cms alternative"
+  - "contentful alternative"
+  - "headless cms comparison"
+  - "best headless cms 2026"
+category: "comparisons"
+tags:
+  - "sanity"
+  - "contentful"
+  - "comparison"
+  - "headless-cms"
+  - "enterprise"
+  - "real-time"
+publishedAt: "2026-01-23"
+updatedAt: "2026-01-23"
+author:
+  name: "SonicJS Team"
+  twitter: "sonicjs"
+  github: "lane711/sonicjs"
+featuredImage:
+  url: "/images/blog/sanity-vs-contentful-vs-sonicjs/hero.png"
+  alt: "Comparison of Sanity, Contentful, and SonicJS CMS platforms"
+  width: 1792
+  height: 1024
+openGraph:
+  title: "Sanity vs Contentful vs SonicJS: Enterprise CMS Comparison"
+  description: "Real-time collaboration vs enterprise features vs edge performance: which premium headless CMS fits your needs?"
+  image: "/images/blog/sanity-vs-contentful-vs-sonicjs/og.png"
+canonical: "https://sonicjs.com/blog/comparisons/sanity-vs-contentful-vs-sonicjs"
+---
+
+# Sanity vs Contentful vs SonicJS: Premium CMS Showdown
+
+<TLDRBox>
+**TL;DR** — Sanity offers best-in-class real-time collaboration but usage-based pricing surprises teams. Contentful is enterprise-focused with $60k+/year pricing. SonicJS delivers edge-first performance with predictable costs under $20/month.
+
+**Key Stats:**
+- Sanity: Custom roles require $949/month enterprise plan
+- Contentful: 45% of users report performance issues during peak usage
+- SonicJS: Under 50ms globally, zero cold starts
+- Both Sanity & Contentful: Usage-based pricing with escalating costs
+</TLDRBox>
+
+Sanity and Contentful are two leading SaaS headless CMS platforms with overlapping enterprise focus but different strengths. SonicJS offers a fundamentally different approach with edge-first architecture.
+
+## Quick Comparison
+
+| Feature | Sanity | Contentful | SonicJS |
+|---------|--------|------------|---------|
+| Hosting | Cloud SaaS | Cloud SaaS | Edge (Cloudflare Workers) |
+| Pricing Model | Usage-based | Tiered enterprise | Predictable flat rate |
+| Real-time Collab | Best-in-class | Basic | Roadmap |
+| Query Language | GROQ | REST/GraphQL | REST API |
+| Data Storage | Proprietary | Proprietary | D1 (you own it) |
+| Cold starts | N/A (SaaS) | N/A (SaaS) | 0-5ms |
+| Global latency | CDN-cached | CDN-cached | Under 50ms (edge-native) |
+| Custom Roles (free) | No | No | Yes |
+| Open Source | Studio only | No | Yes (MIT) |
+
+## The Real Problems
+
+### Sanity: Pricing Surprises and Learning Curves
+
+Sanity's usage-based model catches teams off guard:
+
+> "Started at $99/month, ended up at $400+ with document growth and API calls we didn't anticipate."
+
+**GROQ learning curve:**
+> "GROQ is its own thing. Your team needs to learn yet another query syntax that's useful nowhere else."
+
+**Common Sanity frustrations:**
+- Custom roles require enterprise plan ($949/month)
+- Studio keystroke lag with large documents (GitHub Issue #7456)
+- Preview integration complexity with Next.js
+- Proprietary data format creates lock-in
+- Slow builds reported (10+ minutes)
+
+Real-world example: Cursor.com famously spent $260 and developer time migrating away from Sanity to markdown files.
+
+### Contentful: Enterprise Everything
+
+Contentful is built for enterprise budgets:
+
+> "Premium starts at $60,000/year. Space add-ons can reach $75,000+ each."
+
+**Common Contentful frustrations:**
+- 45% of users report slow performance during peak usage
+- Content type limits on non-enterprise plans
+- No true relational models
+- Heavy developer dependency
+- 40% faced integration challenges
+- Publishing affects all environments at once
+
+### SonicJS: Honest Limitations
+
+SonicJS is newer and building rapidly:
+
+- Real-time collaboration on roadmap (not shipped)
+- Smaller plugin ecosystem
+- D1 database only
+- Fewer enterprise integrations currently
+
+## Architecture Comparison
+
+### Sanity: Real-Time First
+
+Sanity's architecture prioritizes collaboration:
+
+```javascript
+// Sanity Studio configuration
+export default defineConfig({
+  projectId: 'your-project',
+  dataset: 'production',
+  schema: { types: schemaTypes },
+})
+```
+
+**Strengths:**
+- Multiple editors, same document, real-time
+- Live presence indicators
+- Instant sync across clients
+
+**Trade-offs:**
+- GROQ query language lock-in
+- Proprietary data storage
+- Usage-based pricing unpredictability
+
+### Contentful: Enterprise SaaS
+
+Enterprise-grade with enterprise complexity:
+
+```javascript
+const client = createClient({
+  space: 'space_id',
+  accessToken: 'access_token',
+})
+```
+
+**Strengths:**
+- Robust governance and workflows
+- Extensive integration marketplace
+- Enterprise compliance features
+
+**Trade-offs:**
+- Significant pricing
+- Content type limitations
+- Performance issues reported
+
+### SonicJS: Edge-First
+
+Runs globally on Cloudflare Workers:
+
+```typescript
+import { createSonicJS } from '@sonicjs-cms/core'
+
+const cms = createSonicJS({
+  database: env.DB,
+  cache: env.CACHE,
+  storage: env.STORAGE,
+})
+
+export default cms.app
+```
+
+**Strengths:**
+- Under 50ms response worldwide
+- Zero cold starts
+- Your data, full ownership
+- Predictable pricing
+
+## Performance Analysis
+
+### Sanity
+
+- Good performance via CDN caching
+- Studio can lag with large documents
+- Build times can extend to 10+ minutes
+- GROQ queries optimized for their backend
+
+### Contentful
+
+- CDN-cached for reads
+- 45% report peak-time slowdowns
+- API rate limits can throttle high-volume apps
+- Dynamic queries hit origin servers
+
+### SonicJS
+
+- Under 50ms globally (edge-native)
+- Zero cold starts
+- Three-tier caching (memory → KV → D1)
+- Consistent performance regardless of load
+
+**Key difference:** Sanity and Contentful cache content at the edge. SonicJS runs the entire CMS at the edge—no origin round-trips for API calls.
+
+## Pricing Deep Dive
+
+### Sanity Pricing
+
+**Published tiers:**
+- Free: 100k API requests/month, 500k documents
+- Growth: $15/user/month + usage
+- Enterprise: $949/month minimum
+
+**Watch out for:**
+- Document count limits
+- API request overages
+- Asset bandwidth charges
+- Custom roles only on enterprise
+
+**Real-world example:** A mid-size marketing site easily hits $300-500/month with moderate traffic.
+
+### Contentful Pricing
+
+**Enterprise tiers:**
+- Premium: $60,000/year list
+- Premium Plus: $140,000/year list
+- Space add-ons: $8,000-75,000+ each
+
+**Negotiated rates:**
+- 40-45% discounts common on large deals
+- Still $35,000-80,000/year typical
+
+### SonicJS Pricing
+
+**Cloudflare-based:**
+- Free tier: 100,000 requests/day, 10GB D1
+- Workers Paid: $5/month flat
+- Typical production site: $5-20/month
+
+**No surprises:**
+- No per-seat charges
+- No usage overages
+- No feature gating
+
+## Query Languages
+
+### Sanity: GROQ
+
+Powerful but proprietary:
+
+```groq
+*[_type == "post" && publishedAt < now()]{
+  title,
+  "author": author->name,
+  categories[]->
+}
+```
+
+**Pros:** Powerful, flexible
+**Cons:** Learning curve, only useful in Sanity
+
+### Contentful: REST/GraphQL
+
+Standard approaches:
+
+```graphql
+query {
+  postCollection {
+    items {
+      title
+      author { name }
+    }
+  }
+}
+```
+
+### SonicJS: REST API
+
+Clean, intuitive:
+
+```bash
+curl https://your-site.workers.dev/api/content/posts?status=published
+```
+
+**Philosophy:** Standard patterns that transfer to any system.
+
+## Real-Time Collaboration
+
+### Sanity: Best-in-Class
+
+Genuinely excellent real-time collaboration:
+- Multiple editors, same document
+- Live presence indicators
+- Instant sync
+- No conflict resolution needed
+
+If real-time collaboration is your primary requirement, Sanity excels.
+
+### Contentful: Basic
+
+- Draft/publish workflow
+- Content locking
+- No real-time co-editing
+
+### SonicJS: Roadmap
+
+- Optimistic locking current
+- Real-time collaboration planned
+- Clear conflict resolution
+
+## Data Ownership & Lock-in
+
+### Sanity
+
+- Proprietary data format
+- GROQ creates query lock-in
+- Export available but transformation required
+- Cursor.com's migration cost: $260 + developer time
+
+### Contentful
+
+- Proprietary format
+- Content type limits create artificial constraints
+- Export requires significant transformation
+- Space structure doesn't map to other systems
+
+### SonicJS
+
+- Standard SQLite in D1
+- Export anytime
+- No proprietary formats
+- MIT licensed, truly open source
+
+## When to Choose Each
+
+### Choose Sanity If:
+
+- Real-time collaboration is essential
+- Budget can handle usage-based pricing
+- Team can learn GROQ
+- Lock-in is acceptable
+
+### Choose Contentful If:
+
+- Enterprise budget available ($60k+/year)
+- Extensive compliance requirements
+- Large integration ecosystem needed
+- Enterprise governance essential
+
+### Choose SonicJS If:
+
+- Global performance is critical
+- Predictable costs matter
+- Data ownership is required
+- Edge-first architecture appeals
+
+## FAQ
+
+### Is Sanity's real-time collaboration worth the pricing?
+
+For content teams that heavily collaborate in real-time, yes. For API-first usage or solo content creators, probably not worth the complexity.
+
+### Can SonicJS match Contentful's enterprise features?
+
+Core CMS features, yes. Contentful has more compliance certifications and enterprise integrations. SonicJS offers edge performance neither can match.
+
+### Why did Cursor.com leave Sanity?
+
+They switched to markdown files for simplicity and control. Their experience highlighted the migration cost from proprietary platforms.
+
+### What about preview functionality?
+
+- Sanity: Powerful but complex to configure
+- Contentful: Built-in preview environments
+- SonicJS: Live preview with simple setup
+
+## Conclusion
+
+Three SaaS approaches:
+
+- **Sanity**: Real-time collaboration leader with usage-based pricing risk
+- **Contentful**: Enterprise fortress with enterprise pricing
+- **SonicJS**: Edge-first performance with data ownership
+
+For teams prioritizing global performance, predictable costs, and avoiding vendor lock-in, SonicJS provides a modern alternative.
+
+## Key Takeaways
+
+- Sanity's custom roles require $949/month enterprise plan
+- Contentful Premium starts at $60,000/year
+- Both use usage-based pricing that can escalate unexpectedly
+- SonicJS delivers under 50ms global latency for $5-20/month
+- Edge-first architecture provides performance neither SaaS can match
+
+Ready to try edge-first CMS? [Get started with SonicJS](/quickstart) in under 5 minutes.
+
+---
+
+## Sources & References
+
+### Sanity
+- [Sanity Studio Performance Issues (GitHub #7456)](https://github.com/sanity-io/sanity/issues/7456)
+- [Sanity Pricing Page](https://www.sanity.io/pricing)
+- [Cursor.com Migration](https://cursor.com)
+
+### Contentful
+- [Contentful Pricing (G2)](https://www.g2.com/products/contentful/pricing)
+- [Contentful Disadvantages (Contentstack)](https://www.contentstack.com/blog/all-about-headless/9-disadvantages-of-contentful-real-users-reveal-the-biggest-issues)
+- [Common Contentful Challenges (Net Solutions)](https://www.netsolutions.com/insights/7-common-contentful-challenges-and-how-to-fix-them/)

@@ -1,0 +1,363 @@
+---
+title: "Strapi vs Contentful vs SonicJS: Self-Hosted vs SaaS vs Edge"
+description: "Compare Strapi, Contentful, and SonicJS headless CMS. Self-hosted flexibility, enterprise SaaS, and edge-first performance compared."
+keywords:
+  - "strapi vs contentful"
+  - "contentful alternative"
+  - "strapi alternative"
+  - "headless cms comparison"
+  - "best headless cms 2026"
+category: "comparisons"
+tags:
+  - "strapi"
+  - "contentful"
+  - "comparison"
+  - "headless-cms"
+  - "enterprise"
+  - "open-source"
+publishedAt: "2026-01-23"
+updatedAt: "2026-01-23"
+author:
+  name: "SonicJS Team"
+  twitter: "sonicjs"
+  github: "lane711/sonicjs"
+featuredImage:
+  url: "/images/blog/strapi-vs-contentful-vs-sonicjs/hero.png"
+  alt: "Comparison of self-hosted, SaaS, and edge-first CMS architectures"
+  width: 1792
+  height: 1024
+openGraph:
+  title: "Strapi vs Contentful vs SonicJS: Complete CMS Comparison"
+  description: "Self-hosted vs enterprise SaaS vs edge-first: which headless CMS architecture fits your project?"
+  image: "/images/blog/strapi-vs-contentful-vs-sonicjs/og.png"
+canonical: "https://sonicjs.com/blog/comparisons/strapi-vs-contentful-vs-sonicjs"
+---
+
+# Strapi vs Contentful vs SonicJS: Self-Hosted vs SaaS vs Edge
+
+<TLDRBox>
+**TL;DR** — Strapi is self-hosted and open source but has painful migrations. Contentful is enterprise SaaS with pricing that starts at $60k/year for premium. SonicJS is edge-first with sub-50ms global latency and predictable $5-20/month costs.
+
+**Key Stats:**
+- Strapi: 50+ breaking changes between v4→v5
+- Contentful: 45% of users report slow performance during peak usage
+- SonicJS: Under 50ms globally, zero cold starts
+- Contentful Premium: $60,000/year list price
+</TLDRBox>
+
+Strapi and Contentful represent two ends of the headless CMS spectrum: self-hosted open source vs managed enterprise SaaS. SonicJS offers a third path: edge-first architecture with the benefits of both.
+
+## Quick Comparison
+
+| Feature | Strapi | Contentful | SonicJS |
+|---------|--------|------------|---------|
+| Hosting Model | Self-hosted | Cloud SaaS | Edge (Cloudflare Workers) |
+| Pricing | Free + cloud options | $60k+/year enterprise | $5-20/month typical |
+| Database | PostgreSQL, MySQL, SQLite | Proprietary | D1 (SQLite at edge) |
+| Data Ownership | Full | Contentful-controlled | Full |
+| Cold starts | 500-2000ms | N/A (SaaS) | 0-5ms |
+| Global latency | 200-500ms | Varies (CDN-cached) | Under 50ms |
+| Content Types Limit | Unlimited | Limited on lower tiers | Unlimited |
+| Open Source | Yes (MIT) | No | Yes (MIT) |
+| GraphQL | Plugin | Yes | Roadmap |
+
+## The Real Problems
+
+### Strapi: Migration Hell
+
+Strapi's major version upgrades have become notorious:
+
+> "40+ hours converting our project from v4 to v5. 50+ breaking changes, countless undocumented gotchas."
+
+**Common Strapi frustrations:**
+- Breaking changes between versions
+- Limited to 3 roles on free tier
+- Plugin compatibility breaks on upgrades
+- Self-hosting complexity in production
+
+### Contentful: Enterprise Pricing, Enterprise Problems
+
+Contentful's costs catch teams off guard:
+
+> "Premium starts at $60,000/year. Space add-ons can reach $75,000+ each."
+
+**Common Contentful frustrations:**
+- 45% of users report slow performance during peak usage
+- Content type limits on non-enterprise plans
+- No true relational models (one-to-many, many-to-many)
+- Heavy developer dependency—non-technical users struggle
+- Publishing affects all environments simultaneously
+- 40% faced integration challenges due to API limitations
+
+Real user feedback on content limits:
+> "If you wish to port an existing design system 1:1 and don't have the enterprise plan, you'll quickly run out of components. The development team had to prioritize which content types were critical—this frustrated both developers and the content team."
+
+### SonicJS: Honest Limitations
+
+SonicJS is newer and building rapidly:
+
+- Smaller plugin ecosystem (growing)
+- D1 database only (edge-native design)
+- GraphQL on roadmap
+- Fewer enterprise integrations currently
+
+## Architecture Comparison
+
+### Strapi: Traditional Self-Hosted
+
+You own and manage everything:
+
+```javascript
+// Strapi requires a server
+module.exports = {
+  host: '0.0.0.0',
+  port: 1337,
+  app: { keys: env.array('APP_KEYS') },
+}
+```
+
+**Responsibilities:**
+- Server provisioning and scaling
+- Database management
+- Security updates
+- Backup strategies
+- CDN configuration
+
+### Contentful: Managed SaaS
+
+Everything managed, but at a cost:
+
+```javascript
+// Contentful configuration
+const client = createClient({
+  space: 'your_space_id',
+  accessToken: 'your_access_token',
+})
+```
+
+**Trade-offs:**
+- No infrastructure management
+- Proprietary data storage
+- Vendor lock-in
+- Premium pricing
+
+### SonicJS: Edge-First
+
+Best of both worlds:
+
+```typescript
+// SonicJS on Cloudflare Workers
+import { createSonicJS } from '@sonicjs-cms/core'
+
+const cms = createSonicJS({
+  database: env.DB,
+  cache: env.CACHE,
+  storage: env.STORAGE,
+})
+
+export default cms.app
+```
+
+**Benefits:**
+- No server management
+- Your data, your control
+- Global distribution automatic
+- Predictable pricing
+
+## Performance Comparison
+
+| Scenario | Strapi | Contentful | SonicJS |
+|----------|--------|------------|---------|
+| API response (same region) | 50-150ms | 30-100ms | 15-30ms |
+| API response (cross-region) | 200-500ms | 50-150ms (CDN) | 30-60ms |
+| Cold start | 500-2000ms | N/A | 0-5ms |
+| Peak traffic performance | Degrades without scaling | Reported slowdowns (45%) | Consistent |
+
+### The Edge Advantage
+
+Strapi and Contentful serve from centralized locations. Even with Contentful's CDN, dynamic API calls still hit origin servers.
+
+SonicJS runs your entire CMS at the edge:
+
+```
+Request → Nearest Edge Location → Response
+         (300+ locations globally)
+```
+
+No origin round-trips for API calls. Consistent under 50ms worldwide.
+
+## Pricing Deep Dive
+
+### Strapi Costs
+
+**Software**: Free (open source)
+
+**Real costs:**
+- Server hosting: $20-200+/month
+- Database: $15-100+/month
+- CDN: $20-50+/month
+- DevOps time: Ongoing
+
+**Total**: $100-500+/month for production
+
+### Contentful Costs
+
+**Published pricing:**
+- Free: Very limited (5 users, 25K API calls)
+- Premium: $60,000/year list
+- Premium Plus: $140,000/year list
+
+**Space add-ons:**
+- Medium Space: ~$8,000
+- Large Space: $19,000
+- Extra Large: $35,000
+- 2XL/3XL: $75,000+
+
+**Real cost**: Most enterprise deals: $40,000-150,000+/year
+
+### SonicJS Costs
+
+**Cloudflare pricing:**
+- Free tier: 100,000 requests/day, 10GB D1
+- Workers Paid: $5/month flat
+- Typical usage: $5-20/month total
+
+**No hidden costs:**
+- No per-seat charges
+- No feature gating
+- No surprise overages
+
+## Content Modeling
+
+### Strapi
+
+Code or visual builder, flexible but versions can break schemas:
+
+```javascript
+// strapi content type
+{
+  "kind": "collectionType",
+  "attributes": {
+    "title": { "type": "string", "required": true },
+    "content": { "type": "richtext" }
+  }
+}
+```
+
+### Contentful
+
+Visual editor primarily, JSON schema under the hood:
+
+**Limitations:**
+- No true relational models
+- Content type limits on lower tiers
+- Complex localization requires workarounds
+
+### SonicJS
+
+TypeScript-native, full type safety:
+
+```typescript
+const posts = defineCollection({
+  name: 'posts',
+  fields: {
+    title: { type: 'string', required: true },
+    content: { type: 'richtext' },
+    author: { type: 'relation', collection: 'users' },
+  },
+})
+```
+
+## Data Ownership & Lock-in
+
+### Strapi: Full Ownership
+- Your database, your data
+- Export anytime
+- Migration between versions is the challenge
+
+### Contentful: Vendor Lock-in
+- Proprietary data format
+- Export available but transformation required
+- Content type limits create artificial constraints
+- Significant migration effort to leave
+
+### SonicJS: Full Ownership
+- Standard SQLite in D1
+- Export anytime
+- No proprietary formats
+
+## When to Choose Each
+
+### Choose Strapi If:
+
+- You have DevOps capacity
+- Full infrastructure control is required
+- You're okay managing migrations
+- Budget constraints favor self-hosting
+
+### Choose Contentful If:
+
+- Enterprise budget is available ($60k+/year)
+- No infrastructure team available
+- Extensive third-party integrations needed
+- Enterprise compliance requirements
+
+### Choose SonicJS If:
+
+- Global performance is critical
+- Budget is under $100/month
+- You want data ownership without DevOps
+- Edge-first architecture appeals to you
+
+## FAQ
+
+### Is Contentful worth the enterprise pricing?
+
+For large enterprises with compliance requirements and existing Contentful expertise, possibly. For most teams, the pricing is difficult to justify when alternatives exist.
+
+### Why are Strapi migrations so painful?
+
+Strapi's architecture has evolved significantly between major versions. Database schemas and plugin APIs change substantially, requiring manual intervention.
+
+### Can SonicJS match Contentful's features?
+
+Core CMS features, yes. Contentful has more enterprise integrations currently. SonicJS offers edge performance that Contentful can't match.
+
+### What about localization?
+
+- Strapi: Built-in localization
+- Contentful: Basic localization, no workflow features
+- SonicJS: Localization support with flexible implementation
+
+## Conclusion
+
+Three philosophies:
+
+- **Strapi**: Maximum control with operational overhead
+- **Contentful**: Enterprise convenience at enterprise prices
+- **SonicJS**: Edge-first performance with modern simplicity
+
+For teams wanting performance, data ownership, and predictable costs, SonicJS offers a compelling alternative to both extremes.
+
+## Key Takeaways
+
+- Strapi's v4→v5 migration required 40+ hours for some teams
+- Contentful Premium starts at $60,000/year
+- 45% of Contentful users report peak-time performance issues
+- SonicJS delivers under 50ms global latency for $5-20/month
+- Edge-first architecture eliminates the self-host vs SaaS trade-off
+
+Ready to try edge-first CMS? [Get started with SonicJS](/quickstart) in under 5 minutes.
+
+---
+
+## Sources & References
+
+### Strapi
+- [Strapi v5 Migration Issues (Forum)](https://forum.strapi.io/t/an-honest-review-of-strapi/20602)
+- [Strapi v5 Breaking Changes](https://docs.strapi.io/cms/migration/v4-to-v5/breaking-changes)
+
+### Contentful
+- [Contentful Pricing Analysis (Vendr)](https://www.vendr.com/marketplace/contentful)
+- [Contentful Disadvantages (Contentstack)](https://www.contentstack.com/blog/all-about-headless/9-disadvantages-of-contentful-real-users-reveal-the-biggest-issues)
+- [Common Contentful Challenges (Net Solutions)](https://www.netsolutions.com/insights/7-common-contentful-challenges-and-how-to-fix-them/)
