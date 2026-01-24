@@ -32,6 +32,7 @@ import { emailPlugin } from './plugins/core-plugins/email-plugin'
 import { otpLoginPlugin } from './plugins/core-plugins/otp-login-plugin'
 import { aiSearchPlugin } from './plugins/core-plugins/ai-search-plugin'
 import { createMagicLinkAuthPlugin } from './plugins/available/magic-link-auth'
+import cachePlugin from './plugins/cache'
 import { faviconSvg } from './assets/favicon'
 
 // ============================================================================
@@ -192,6 +193,10 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
       app.route(route.path, route.handler)
     }
   }
+
+  // Plugin routes - Cache (dashboard and management API)
+  // Fixes GitHub Issue #461: Cache routes were not registered
+  app.route('/admin/cache', cachePlugin.getRoutes())
 
   app.route('/admin/plugins', adminPluginRoutes)
   app.route('/admin/logs', adminLogsRoutes)
