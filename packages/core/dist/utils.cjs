@@ -1,6 +1,6 @@
 'use strict';
 
-var chunkYMTTGHEK_cjs = require('./chunk-YMTTGHEK.cjs');
+var chunkMYB5RY7H_cjs = require('./chunk-MYB5RY7H.cjs');
 var chunkP3XDZL6Q_cjs = require('./chunk-P3XDZL6Q.cjs');
 var chunkRCQ2HIQD_cjs = require('./chunk-RCQ2HIQD.cjs');
 require('./chunk-IGJUBJBW.cjs');
@@ -9,55 +9,55 @@ require('./chunk-IGJUBJBW.cjs');
 
 Object.defineProperty(exports, "QueryFilterBuilder", {
   enumerable: true,
-  get: function () { return chunkYMTTGHEK_cjs.QueryFilterBuilder; }
+  get: function () { return chunkMYB5RY7H_cjs.QueryFilterBuilder; }
 });
 Object.defineProperty(exports, "SONICJS_VERSION", {
   enumerable: true,
-  get: function () { return chunkYMTTGHEK_cjs.SONICJS_VERSION; }
+  get: function () { return chunkMYB5RY7H_cjs.SONICJS_VERSION; }
 });
 Object.defineProperty(exports, "TemplateRenderer", {
   enumerable: true,
-  get: function () { return chunkYMTTGHEK_cjs.TemplateRenderer; }
+  get: function () { return chunkMYB5RY7H_cjs.TemplateRenderer; }
 });
 Object.defineProperty(exports, "buildQuery", {
   enumerable: true,
-  get: function () { return chunkYMTTGHEK_cjs.buildQuery; }
+  get: function () { return chunkMYB5RY7H_cjs.buildQuery; }
 });
 Object.defineProperty(exports, "escapeHtml", {
   enumerable: true,
-  get: function () { return chunkYMTTGHEK_cjs.escapeHtml; }
+  get: function () { return chunkMYB5RY7H_cjs.escapeHtml; }
 });
 Object.defineProperty(exports, "generateSlug", {
   enumerable: true,
-  get: function () { return chunkYMTTGHEK_cjs.generateSlug; }
+  get: function () { return chunkMYB5RY7H_cjs.generateSlug; }
 });
 Object.defineProperty(exports, "getBlocksFieldConfig", {
   enumerable: true,
-  get: function () { return chunkYMTTGHEK_cjs.getBlocksFieldConfig; }
+  get: function () { return chunkMYB5RY7H_cjs.getBlocksFieldConfig; }
 });
 Object.defineProperty(exports, "getCoreVersion", {
   enumerable: true,
-  get: function () { return chunkYMTTGHEK_cjs.getCoreVersion; }
+  get: function () { return chunkMYB5RY7H_cjs.getCoreVersion; }
 });
 Object.defineProperty(exports, "parseBlocksValue", {
   enumerable: true,
-  get: function () { return chunkYMTTGHEK_cjs.parseBlocksValue; }
+  get: function () { return chunkMYB5RY7H_cjs.parseBlocksValue; }
 });
 Object.defineProperty(exports, "renderTemplate", {
   enumerable: true,
-  get: function () { return chunkYMTTGHEK_cjs.renderTemplate; }
+  get: function () { return chunkMYB5RY7H_cjs.renderTemplate; }
 });
 Object.defineProperty(exports, "sanitizeInput", {
   enumerable: true,
-  get: function () { return chunkYMTTGHEK_cjs.sanitizeInput; }
+  get: function () { return chunkMYB5RY7H_cjs.sanitizeInput; }
 });
 Object.defineProperty(exports, "sanitizeObject", {
   enumerable: true,
-  get: function () { return chunkYMTTGHEK_cjs.sanitizeObject; }
+  get: function () { return chunkMYB5RY7H_cjs.sanitizeObject; }
 });
 Object.defineProperty(exports, "templateRenderer", {
   enumerable: true,
-  get: function () { return chunkYMTTGHEK_cjs.templateRenderer; }
+  get: function () { return chunkMYB5RY7H_cjs.templateRenderer; }
 });
 Object.defineProperty(exports, "generateInstallationId", {
   enumerable: true,
