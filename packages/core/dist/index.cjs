@@ -1,13 +1,13 @@
 'use strict';
 
-var chunk56YVHBI5_cjs = require('./chunk-56YVHBI5.cjs');
-var chunk7FOAMNTI_cjs = require('./chunk-7FOAMNTI.cjs');
-var chunk4DRGQMTH_cjs = require('./chunk-4DRGQMTH.cjs');
+var chunkOWXQO4V7_cjs = require('./chunk-OWXQO4V7.cjs');
+var chunkQCMSQFCP_cjs = require('./chunk-QCMSQFCP.cjs');
+var chunkGP4ZR3LD_cjs = require('./chunk-GP4ZR3LD.cjs');
 var chunkMPT5PA6U_cjs = require('./chunk-MPT5PA6U.cjs');
-var chunkJ2JXUS4E_cjs = require('./chunk-J2JXUS4E.cjs');
-var chunk63K7XXRX_cjs = require('./chunk-63K7XXRX.cjs');
-var chunkBZC4FYW7_cjs = require('./chunk-BZC4FYW7.cjs');
-var chunkY72M3MVX_cjs = require('./chunk-Y72M3MVX.cjs');
+var chunkLJFH5V7G_cjs = require('./chunk-LJFH5V7G.cjs');
+var chunkAYPF6C4D_cjs = require('./chunk-AYPF6C4D.cjs');
+var chunkEHSZ6TAN_cjs = require('./chunk-EHSZ6TAN.cjs');
+var chunk3OW7IPTH_cjs = require('./chunk-3OW7IPTH.cjs');
 var chunkYHW27CBV_cjs = require('./chunk-YHW27CBV.cjs');
 var chunkYMTTGHEK_cjs = require('./chunk-YMTTGHEK.cjs');
 require('./chunk-P3XDZL6Q.cjs');
@@ -235,7 +235,7 @@ var DatabaseToolsService = class {
 };
 
 // src/templates/pages/admin-database-table.template.ts
-chunkBZC4FYW7_cjs.init_admin_layout_catalyst_template();
+chunkEHSZ6TAN_cjs.init_admin_layout_catalyst_template();
 function renderDatabaseTablePage(data) {
   const totalPages = Math.ceil(data.totalRows / data.pageSize);
   const startRow = (data.currentPage - 1) * data.pageSize + 1;
@@ -484,7 +484,7 @@ function renderDatabaseTablePage(data) {
     user: data.user,
     content: pageContent
   };
-  return chunkBZC4FYW7_cjs.renderAdminLayoutCatalyst(layoutData);
+  return chunkEHSZ6TAN_cjs.renderAdminLayoutCatalyst(layoutData);
 }
 function generatePageNumbers(currentPage, totalPages) {
   const pages = [];
@@ -559,7 +559,7 @@ function formatCellValue(value) {
 // src/plugins/core-plugins/database-tools-plugin/admin-routes.ts
 function createDatabaseToolsAdminRoutes() {
   const router2 = new hono.Hono();
-  router2.use("*", chunk4DRGQMTH_cjs.requireAuth());
+  router2.use("*", chunkGP4ZR3LD_cjs.requireAuth());
   router2.get("/api/stats", async (c) => {
     try {
       const user = c.get("user");
@@ -1324,10 +1324,10 @@ function createEmailPlugin() {
   emailRoutes.get("/settings", async (c) => {
     const user = c.get("user");
     const db = c.env.DB;
-    const plugin = await db.prepare(`
+    const plugin2 = await db.prepare(`
       SELECT settings FROM plugins WHERE id = 'email'
     `).first();
-    const settings = plugin?.settings ? JSON.parse(plugin.settings) : {};
+    const settings = plugin2?.settings ? JSON.parse(plugin2.settings) : {};
     const contentHTML = await html.html`
       <div class="p-8">
         <!-- Header -->
@@ -1560,7 +1560,7 @@ function createEmailPlugin() {
       role: user.role ?? "admin"
     } : void 0;
     return c.html(
-      chunkBZC4FYW7_cjs.renderAdminLayout({
+      chunkEHSZ6TAN_cjs.renderAdminLayout({
         title: "Email Settings",
         content: contentHTML,
         user: templateUser,
@@ -1588,16 +1588,16 @@ function createEmailPlugin() {
     try {
       const db = c.env.DB;
       const body = await c.req.json();
-      const plugin = await db.prepare(`
+      const plugin2 = await db.prepare(`
         SELECT settings FROM plugins WHERE id = 'email'
       `).first();
-      if (!plugin?.settings) {
+      if (!plugin2?.settings) {
         return c.json({
           success: false,
           error: "Email settings not configured. Please save your settings first."
         }, 400);
       }
-      const settings = JSON.parse(plugin.settings);
+      const settings = JSON.parse(plugin2.settings);
       if (!settings.apiKey || !settings.fromEmail || !settings.fromName) {
         return c.json({
           success: false,
@@ -2148,7 +2148,7 @@ function createOTPLoginPlugin() {
           error: "Account is deactivated"
         }, 403);
       }
-      const token = await chunk4DRGQMTH_cjs.AuthManager.generateToken(user.id, user.email, user.role);
+      const token = await chunkGP4ZR3LD_cjs.AuthManager.generateToken(user.id, user.email, user.role);
       cookie.setCookie(c, "auth_token", token, {
         httpOnly: true,
         secure: true,
@@ -2376,7 +2376,7 @@ function createOTPLoginPlugin() {
       role: user.role ?? "admin"
     } : void 0;
     return c.html(
-      chunkBZC4FYW7_cjs.adminLayoutV2({
+      chunkEHSZ6TAN_cjs.adminLayoutV2({
         title: "OTP Login Settings",
         content: contentHTML,
         user: templateUser,
@@ -2911,11 +2911,11 @@ var AISearchService = class {
    */
   async getSettings() {
     try {
-      const plugin = await this.db.prepare(`SELECT settings FROM plugins WHERE id = ? LIMIT 1`).bind("ai-search").first();
-      if (!plugin || !plugin.settings) {
+      const plugin2 = await this.db.prepare(`SELECT settings FROM plugins WHERE id = ? LIMIT 1`).bind("ai-search").first();
+      if (!plugin2 || !plugin2.settings) {
         return this.getDefaultSettings();
       }
-      return JSON.parse(plugin.settings);
+      return JSON.parse(plugin2.settings);
     } catch (error) {
       console.error("Error fetching AI Search settings:", error);
       return this.getDefaultSettings();
@@ -3973,7 +3973,7 @@ function renderSettingsPage(data) {
       }, 30000);
     </script>
   `;
-  return chunkBZC4FYW7_cjs.renderAdminLayout({
+  return chunkEHSZ6TAN_cjs.renderAdminLayout({
     title: "AI Search Settings",
     pageTitle: "AI Search Settings",
     currentPath: "/admin/plugins/ai-search/settings",
@@ -3984,7 +3984,7 @@ function renderSettingsPage(data) {
 
 // src/plugins/core-plugins/ai-search-plugin/routes/admin.ts
 var adminRoutes = new hono.Hono();
-adminRoutes.use("*", chunk4DRGQMTH_cjs.requireAuth());
+adminRoutes.use("*", chunkGP4ZR3LD_cjs.requireAuth());
 adminRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -4385,12 +4385,12 @@ function createMagicLinkAuthPlugin() {
         SET used = 1, used_at = ?
         WHERE id = ?
       `).bind(Date.now(), magicLink.id).run();
-      const jwtToken = await chunk4DRGQMTH_cjs.AuthManager.generateToken(
+      const jwtToken = await chunkGP4ZR3LD_cjs.AuthManager.generateToken(
         user.id,
         user.email,
         user.role
       );
-      chunk4DRGQMTH_cjs.AuthManager.setAuthCookie(c, jwtToken);
+      chunkGP4ZR3LD_cjs.AuthManager.setAuthCookie(c, jwtToken);
       await db.prepare(`
         UPDATE users SET last_login_at = ? WHERE id = ?
       `).bind(Date.now(), user.id).run();
@@ -4535,6 +4535,1823 @@ function renderMagicLinkEmail(magicLink, expiryMinutes) {
 }
 createMagicLinkAuthPlugin();
 
+// src/plugins/cache/services/cache-config.ts
+var CACHE_CONFIGS = {
+  // Content (high read, low write)
+  content: {
+    ttl: 3600,
+    // 1 hour
+    kvEnabled: true,
+    memoryEnabled: true,
+    namespace: "content",
+    invalidateOn: ["content.update", "content.delete", "content.publish"],
+    version: "v1"
+  },
+  // User data (medium read, medium write)
+  user: {
+    ttl: 900,
+    // 15 minutes
+    kvEnabled: true,
+    memoryEnabled: true,
+    namespace: "user",
+    invalidateOn: ["user.update", "user.delete", "auth.login"],
+    version: "v1"
+  },
+  // Configuration (high read, very low write)
+  config: {
+    ttl: 7200,
+    // 2 hours
+    kvEnabled: true,
+    memoryEnabled: true,
+    namespace: "config",
+    invalidateOn: ["config.update", "plugin.activate", "plugin.deactivate"],
+    version: "v1"
+  },
+  // Media metadata (high read, low write)
+  media: {
+    ttl: 3600,
+    // 1 hour
+    kvEnabled: true,
+    memoryEnabled: true,
+    namespace: "media",
+    invalidateOn: ["media.upload", "media.delete", "media.update"],
+    version: "v1"
+  },
+  // API responses (very high read, low write)
+  api: {
+    ttl: 300,
+    // 5 minutes
+    kvEnabled: true,
+    memoryEnabled: true,
+    namespace: "api",
+    invalidateOn: ["content.update", "content.publish"],
+    version: "v1"
+  },
+  // Session data (very high read, medium write)
+  session: {
+    ttl: 1800,
+    // 30 minutes
+    kvEnabled: false,
+    // Only in-memory for sessions
+    memoryEnabled: true,
+    namespace: "session",
+    invalidateOn: ["auth.logout"],
+    version: "v1"
+  },
+  // Plugin data
+  plugin: {
+    ttl: 3600,
+    // 1 hour
+    kvEnabled: true,
+    memoryEnabled: true,
+    namespace: "plugin",
+    invalidateOn: ["plugin.activate", "plugin.deactivate", "plugin.update"],
+    version: "v1"
+  },
+  // Collections/schema
+  collection: {
+    ttl: 7200,
+    // 2 hours
+    kvEnabled: true,
+    memoryEnabled: true,
+    namespace: "collection",
+    invalidateOn: ["collection.update", "collection.delete"],
+    version: "v1"
+  }
+};
+function getCacheConfig(namespace) {
+  return CACHE_CONFIGS[namespace] || {
+    ttl: 3600,
+    kvEnabled: true,
+    memoryEnabled: true,
+    namespace,
+    invalidateOn: [],
+    version: "v1"
+  };
+}
+function generateCacheKey(namespace, type, identifier, version) {
+  const v = version || getCacheConfig(namespace).version || "v1";
+  return `${namespace}:${type}:${identifier}:${v}`;
+}
+function parseCacheKey(key) {
+  const parts = key.split(":");
+  if (parts.length !== 4) {
+    return null;
+  }
+  return {
+    namespace: parts[0] || "",
+    type: parts[1] || "",
+    identifier: parts[2] || "",
+    version: parts[3] || ""
+  };
+}
+
+// src/plugins/cache/services/cache.ts
+var MemoryCache = class {
+  cache = /* @__PURE__ */ new Map();
+  maxSize = 50 * 1024 * 1024;
+  // 50MB
+  currentSize = 0;
+  /**
+   * Get item from memory cache
+   */
+  get(key) {
+    const entry = this.cache.get(key);
+    if (!entry) {
+      return null;
+    }
+    if (Date.now() > entry.expiresAt) {
+      this.delete(key);
+      return null;
+    }
+    return entry.data;
+  }
+  /**
+   * Set item in memory cache
+   */
+  set(key, value, ttl, version = "v1") {
+    const now = Date.now();
+    const entry = {
+      data: value,
+      timestamp: now,
+      expiresAt: now + ttl * 1e3,
+      version
+    };
+    const entrySize = JSON.stringify(entry).length * 2;
+    if (this.currentSize + entrySize > this.maxSize) {
+      this.evictLRU(entrySize);
+    }
+    if (this.cache.has(key)) {
+      this.delete(key);
+    }
+    this.cache.set(key, entry);
+    this.currentSize += entrySize;
+  }
+  /**
+   * Delete item from memory cache
+   */
+  delete(key) {
+    const entry = this.cache.get(key);
+    if (entry) {
+      const entrySize = JSON.stringify(entry).length * 2;
+      this.currentSize -= entrySize;
+      return this.cache.delete(key);
+    }
+    return false;
+  }
+  /**
+   * Clear all items from memory cache
+   */
+  clear() {
+    this.cache.clear();
+    this.currentSize = 0;
+  }
+  /**
+   * Get cache statistics
+   */
+  getStats() {
+    return {
+      size: this.currentSize,
+      count: this.cache.size
+    };
+  }
+  /**
+   * Evict least recently used items to make space
+   */
+  evictLRU(neededSpace) {
+    const entries = Array.from(this.cache.entries()).sort(
+      (a, b) => a[1].timestamp - b[1].timestamp
+    );
+    let freedSpace = 0;
+    for (const [key, entry] of entries) {
+      if (freedSpace >= neededSpace) break;
+      const entrySize = JSON.stringify(entry).length * 2;
+      this.delete(key);
+      freedSpace += entrySize;
+    }
+  }
+  /**
+   * Delete items matching a pattern
+   */
+  invalidatePattern(pattern) {
+    const regex = new RegExp(
+      "^" + pattern.replace(/\*/g, ".*").replace(/\?/g, ".") + "$"
+    );
+    let count = 0;
+    for (const key of this.cache.keys()) {
+      if (regex.test(key)) {
+        this.delete(key);
+        count++;
+      }
+    }
+    return count;
+  }
+};
+var CacheService = class {
+  memoryCache;
+  config;
+  stats;
+  kvNamespace;
+  constructor(config, kvNamespace) {
+    this.memoryCache = new MemoryCache();
+    this.config = config;
+    this.kvNamespace = kvNamespace;
+    this.stats = {
+      memoryHits: 0,
+      memoryMisses: 0,
+      kvHits: 0,
+      kvMisses: 0,
+      dbHits: 0,
+      totalRequests: 0,
+      hitRate: 0,
+      memorySize: 0,
+      entryCount: 0
+    };
+  }
+  /**
+   * Get value from cache (tries memory first, then KV)
+   */
+  async get(key) {
+    this.stats.totalRequests++;
+    if (this.config.memoryEnabled) {
+      const memoryValue = this.memoryCache.get(key);
+      if (memoryValue !== null) {
+        this.stats.memoryHits++;
+        this.updateHitRate();
+        return memoryValue;
+      }
+      this.stats.memoryMisses++;
+    }
+    if (this.config.kvEnabled && this.kvNamespace) {
+      try {
+        const kvValue = await this.kvNamespace.get(key, "json");
+        if (kvValue !== null) {
+          this.stats.kvHits++;
+          if (this.config.memoryEnabled) {
+            this.memoryCache.set(key, kvValue, this.config.ttl, this.config.version);
+          }
+          this.updateHitRate();
+          return kvValue;
+        }
+        this.stats.kvMisses++;
+      } catch (error) {
+        console.error("KV cache read error:", error);
+        this.stats.kvMisses++;
+      }
+    }
+    this.updateHitRate();
+    return null;
+  }
+  /**
+   * Get value from cache with source information
+   */
+  async getWithSource(key) {
+    this.stats.totalRequests++;
+    if (this.config.memoryEnabled) {
+      const memoryValue = this.memoryCache.get(key);
+      if (memoryValue !== null) {
+        this.stats.memoryHits++;
+        this.updateHitRate();
+        const entry = await this.getEntry(key);
+        return {
+          data: memoryValue,
+          source: "memory",
+          hit: true,
+          timestamp: entry?.timestamp,
+          ttl: entry?.ttl
+        };
+      }
+      this.stats.memoryMisses++;
+    }
+    if (this.config.kvEnabled && this.kvNamespace) {
+      try {
+        const kvValue = await this.kvNamespace.get(key, "json");
+        if (kvValue !== null) {
+          this.stats.kvHits++;
+          if (this.config.memoryEnabled) {
+            this.memoryCache.set(key, kvValue, this.config.ttl, this.config.version);
+          }
+          this.updateHitRate();
+          return {
+            data: kvValue,
+            source: "kv",
+            hit: true
+          };
+        }
+        this.stats.kvMisses++;
+      } catch (error) {
+        console.error("KV cache read error:", error);
+        this.stats.kvMisses++;
+      }
+    }
+    this.updateHitRate();
+    return {
+      data: null,
+      source: "miss",
+      hit: false
+    };
+  }
+  /**
+   * Set value in cache (stores in both memory and KV)
+   */
+  async set(key, value, customConfig) {
+    const config = { ...this.config, ...customConfig };
+    if (config.memoryEnabled) {
+      this.memoryCache.set(key, value, config.ttl, config.version);
+    }
+    if (config.kvEnabled && this.kvNamespace) {
+      try {
+        await this.kvNamespace.put(key, JSON.stringify(value), {
+          expirationTtl: config.ttl
+        });
+      } catch (error) {
+        console.error("KV cache write error:", error);
+      }
+    }
+  }
+  /**
+   * Delete value from cache (removes from both memory and KV)
+   */
+  async delete(key) {
+    if (this.config.memoryEnabled) {
+      this.memoryCache.delete(key);
+    }
+    if (this.config.kvEnabled && this.kvNamespace) {
+      try {
+        await this.kvNamespace.delete(key);
+      } catch (error) {
+        console.error("KV cache delete error:", error);
+      }
+    }
+  }
+  /**
+   * Clear all cache entries for this namespace
+   */
+  async clear() {
+    if (this.config.memoryEnabled) {
+      this.memoryCache.clear();
+    }
+    this.stats = {
+      memoryHits: 0,
+      memoryMisses: 0,
+      kvHits: 0,
+      kvMisses: 0,
+      dbHits: 0,
+      totalRequests: 0,
+      hitRate: 0,
+      memorySize: 0,
+      entryCount: 0
+    };
+  }
+  /**
+   * Invalidate cache entries matching a pattern
+   */
+  async invalidate(pattern) {
+    let count = 0;
+    if (this.config.memoryEnabled) {
+      count += this.memoryCache.invalidatePattern(pattern);
+    }
+    if (this.config.kvEnabled && this.kvNamespace) {
+      try {
+        const regex = new RegExp(
+          "^" + pattern.replace(/\*/g, ".*").replace(/\?/g, ".") + "$"
+        );
+        const prefix = this.config.namespace + ":";
+        const list = await this.kvNamespace.list({ prefix });
+        for (const key of list.keys) {
+          if (regex.test(key.name)) {
+            await this.kvNamespace.delete(key.name);
+            count++;
+          }
+        }
+      } catch (error) {
+        console.error("KV cache invalidation error:", error);
+      }
+    }
+    return count;
+  }
+  /**
+   * Invalidate cache entries matching a pattern (alias for invalidate)
+   */
+  async invalidatePattern(pattern) {
+    return this.invalidate(pattern);
+  }
+  /**
+   * Get cache statistics
+   */
+  getStats() {
+    const memStats = this.memoryCache.getStats();
+    return {
+      ...this.stats,
+      memorySize: memStats.size,
+      entryCount: memStats.count
+    };
+  }
+  /**
+   * Update hit rate calculation
+   */
+  updateHitRate() {
+    const totalHits = this.stats.memoryHits + this.stats.kvHits + this.stats.dbHits;
+    this.stats.hitRate = this.stats.totalRequests > 0 ? totalHits / this.stats.totalRequests * 100 : 0;
+  }
+  /**
+   * Generate a cache key using the configured namespace
+   */
+  generateKey(type, identifier) {
+    return generateCacheKey(
+      this.config.namespace,
+      type,
+      identifier,
+      this.config.version
+    );
+  }
+  /**
+   * Warm cache with multiple entries
+   */
+  async warmCache(entries) {
+    for (const entry of entries) {
+      await this.set(entry.key, entry.value);
+    }
+  }
+  /**
+   * Check if a key exists in cache
+   */
+  async has(key) {
+    const value = await this.get(key);
+    return value !== null;
+  }
+  /**
+   * Get multiple values at once
+   */
+  async getMany(keys) {
+    const results = /* @__PURE__ */ new Map();
+    for (const key of keys) {
+      const value = await this.get(key);
+      if (value !== null) {
+        results.set(key, value);
+      }
+    }
+    return results;
+  }
+  /**
+   * Set multiple values at once
+   */
+  async setMany(entries, customConfig) {
+    for (const entry of entries) {
+      await this.set(entry.key, entry.value, customConfig);
+    }
+  }
+  /**
+   * Delete multiple keys at once
+   */
+  async deleteMany(keys) {
+    for (const key of keys) {
+      await this.delete(key);
+    }
+  }
+  /**
+   * Get or set pattern - fetch from cache or compute if not found
+   */
+  async getOrSet(key, fetcher, customConfig) {
+    const cached = await this.get(key);
+    if (cached !== null) {
+      return cached;
+    }
+    const value = await fetcher();
+    await this.set(key, value, customConfig);
+    return value;
+  }
+  /**
+   * List all cache keys with metadata
+   */
+  async listKeys() {
+    const keys = [];
+    if (this.config.memoryEnabled) {
+      const cache = this.memoryCache.cache;
+      for (const [key, entry] of cache.entries()) {
+        const size = JSON.stringify(entry).length * 2;
+        const age = Date.now() - entry.timestamp;
+        keys.push({
+          key,
+          size,
+          expiresAt: entry.expiresAt,
+          age
+        });
+      }
+    }
+    return keys.sort((a, b) => a.age - b.age);
+  }
+  /**
+   * Get cache entry with full metadata
+   */
+  async getEntry(key) {
+    if (!this.config.memoryEnabled) {
+      return null;
+    }
+    const cache = this.memoryCache.cache;
+    const entry = cache.get(key);
+    if (!entry) {
+      return null;
+    }
+    if (Date.now() > entry.expiresAt) {
+      await this.delete(key);
+      return null;
+    }
+    const size = JSON.stringify(entry).length * 2;
+    const ttl = Math.max(0, entry.expiresAt - Date.now()) / 1e3;
+    return {
+      data: entry.data,
+      timestamp: entry.timestamp,
+      expiresAt: entry.expiresAt,
+      ttl,
+      size
+    };
+  }
+};
+var cacheInstances = /* @__PURE__ */ new Map();
+var globalKVNamespace;
+function getCacheService(config, kvNamespace) {
+  const key = config.namespace;
+  if (!cacheInstances.has(key)) {
+    const kv = globalKVNamespace;
+    cacheInstances.set(key, new CacheService(config, kv));
+  }
+  return cacheInstances.get(key);
+}
+async function clearAllCaches() {
+  for (const cache of cacheInstances.values()) {
+    await cache.clear();
+  }
+}
+function getAllCacheStats() {
+  const stats = {};
+  for (const [namespace, cache] of cacheInstances.entries()) {
+    stats[namespace] = cache.getStats();
+  }
+  return stats;
+}
+
+// src/plugins/cache/services/event-bus.ts
+var EventBus = class {
+  subscriptions = /* @__PURE__ */ new Map();
+  eventLog = [];
+  maxLogSize = 100;
+  /**
+   * Subscribe to an event
+   */
+  on(event, handler) {
+    if (!this.subscriptions.has(event)) {
+      this.subscriptions.set(event, []);
+    }
+    this.subscriptions.get(event).push(handler);
+    return () => {
+      const handlers = this.subscriptions.get(event);
+      if (handlers) {
+        const index = handlers.indexOf(handler);
+        if (index > -1) {
+          handlers.splice(index, 1);
+        }
+      }
+    };
+  }
+  /**
+   * Emit an event to all subscribers
+   */
+  async emit(event, data) {
+    this.logEvent(event, data);
+    const handlers = this.subscriptions.get(event) || [];
+    await Promise.all(
+      handlers.map(async (handler) => {
+        try {
+          await handler(data);
+        } catch (error) {
+          console.error(`Error in event handler for ${event}:`, error);
+        }
+      })
+    );
+    const wildcardHandlers = this.subscriptions.get("*") || [];
+    await Promise.all(
+      wildcardHandlers.map(async (handler) => {
+        try {
+          await handler({ event, data });
+        } catch (error) {
+          console.error(`Error in wildcard event handler for ${event}:`, error);
+        }
+      })
+    );
+  }
+  /**
+   * Remove all subscribers for an event
+   */
+  off(event) {
+    this.subscriptions.delete(event);
+  }
+  /**
+   * Get all registered events
+   */
+  getEvents() {
+    return Array.from(this.subscriptions.keys());
+  }
+  /**
+   * Get subscriber count for an event
+   */
+  getSubscriberCount(event) {
+    return this.subscriptions.get(event)?.length || 0;
+  }
+  /**
+   * Log an event for debugging
+   */
+  logEvent(event, data) {
+    this.eventLog.push({
+      event,
+      timestamp: Date.now(),
+      data
+    });
+    if (this.eventLog.length > this.maxLogSize) {
+      this.eventLog.shift();
+    }
+  }
+  /**
+   * Get recent event log
+   */
+  getEventLog(limit = 50) {
+    return this.eventLog.slice(-limit);
+  }
+  /**
+   * Clear event log
+   */
+  clearEventLog() {
+    this.eventLog = [];
+  }
+  /**
+   * Get statistics
+   */
+  getStats() {
+    const eventCounts = {};
+    for (const log of this.eventLog) {
+      eventCounts[log.event] = (eventCounts[log.event] || 0) + 1;
+    }
+    return {
+      totalEvents: this.eventLog.length,
+      totalSubscriptions: this.subscriptions.size,
+      eventCounts
+    };
+  }
+};
+var globalEventBus = null;
+function getEventBus() {
+  if (!globalEventBus) {
+    globalEventBus = new EventBus();
+  }
+  return globalEventBus;
+}
+function onEvent(event, handler) {
+  const bus = getEventBus();
+  return bus.on(event, handler);
+}
+
+// src/plugins/cache/services/cache-invalidation.ts
+function setupCacheInvalidation() {
+  getEventBus();
+  setupContentInvalidation();
+  setupUserInvalidation();
+  setupConfigInvalidation();
+  setupMediaInvalidation();
+  setupAPIInvalidation();
+  setupCollectionInvalidation();
+  console.log("Cache invalidation listeners registered");
+}
+function setupContentInvalidation() {
+  const config = CACHE_CONFIGS.content;
+  if (!config) return;
+  const contentCache = getCacheService(config);
+  onEvent("content.create", async (_data) => {
+    await contentCache.invalidate("content:*");
+    console.log("Cache invalidated: content.create");
+  });
+  onEvent("content.update", async (data) => {
+    if (data?.id) {
+      await contentCache.delete(contentCache.generateKey("item", data.id));
+    }
+    await contentCache.invalidate("content:list:*");
+    console.log("Cache invalidated: content.update", data?.id);
+  });
+  onEvent("content.delete", async (data) => {
+    if (data?.id) {
+      await contentCache.delete(contentCache.generateKey("item", data.id));
+    }
+    await contentCache.invalidate("content:*");
+    console.log("Cache invalidated: content.delete", data?.id);
+  });
+  onEvent("content.publish", async (_data) => {
+    await contentCache.invalidate("content:*");
+    console.log("Cache invalidated: content.publish");
+  });
+}
+function setupUserInvalidation() {
+  const config = CACHE_CONFIGS.user;
+  if (!config) return;
+  const userCache = getCacheService(config);
+  onEvent("user.update", async (data) => {
+    if (data?.id) {
+      await userCache.delete(userCache.generateKey("id", data.id));
+    }
+    if (data?.email) {
+      await userCache.delete(userCache.generateKey("email", data.email));
+    }
+    console.log("Cache invalidated: user.update", data?.id);
+  });
+  onEvent("user.delete", async (data) => {
+    if (data?.id) {
+      await userCache.delete(userCache.generateKey("id", data.id));
+    }
+    if (data?.email) {
+      await userCache.delete(userCache.generateKey("email", data.email));
+    }
+    console.log("Cache invalidated: user.delete", data?.id);
+  });
+  onEvent("auth.login", async (data) => {
+    if (data?.userId) {
+      await userCache.delete(userCache.generateKey("id", data.userId));
+    }
+    console.log("Cache invalidated: auth.login", data?.userId);
+  });
+  onEvent("auth.logout", async (data) => {
+    const sessionConfig = CACHE_CONFIGS.session;
+    if (sessionConfig) {
+      const sessionCache = getCacheService(sessionConfig);
+      if (data?.sessionId) {
+        await sessionCache.delete(sessionCache.generateKey("session", data.sessionId));
+      }
+    }
+    console.log("Cache invalidated: auth.logout");
+  });
+}
+function setupConfigInvalidation() {
+  const configConfig = CACHE_CONFIGS.config;
+  if (!configConfig) return;
+  const configCache = getCacheService(configConfig);
+  onEvent("config.update", async (_data) => {
+    await configCache.invalidate("config:*");
+    console.log("Cache invalidated: config.update");
+  });
+  onEvent("plugin.activate", async (data) => {
+    await configCache.invalidate("config:*");
+    const pluginConfig = CACHE_CONFIGS.plugin;
+    if (pluginConfig) {
+      const pluginCache = getCacheService(pluginConfig);
+      await pluginCache.invalidate("plugin:*");
+    }
+    console.log("Cache invalidated: plugin.activate", data?.pluginId);
+  });
+  onEvent("plugin.deactivate", async (data) => {
+    await configCache.invalidate("config:*");
+    const pluginConfig = CACHE_CONFIGS.plugin;
+    if (pluginConfig) {
+      const pluginCache = getCacheService(pluginConfig);
+      await pluginCache.invalidate("plugin:*");
+    }
+    console.log("Cache invalidated: plugin.deactivate", data?.pluginId);
+  });
+  onEvent("plugin.update", async (data) => {
+    const pluginConfig = CACHE_CONFIGS.plugin;
+    if (!pluginConfig) return;
+    const pluginCache = getCacheService(pluginConfig);
+    await pluginCache.invalidate("plugin:*");
+    console.log("Cache invalidated: plugin.update", data?.pluginId);
+  });
+}
+function setupMediaInvalidation() {
+  const config = CACHE_CONFIGS.media;
+  if (!config) return;
+  const mediaCache = getCacheService(config);
+  onEvent("media.upload", async (_data) => {
+    await mediaCache.invalidate("media:*");
+    console.log("Cache invalidated: media.upload");
+  });
+  onEvent("media.delete", async (data) => {
+    if (data?.id) {
+      await mediaCache.delete(mediaCache.generateKey("item", data.id));
+    }
+    await mediaCache.invalidate("media:list:*");
+    console.log("Cache invalidated: media.delete", data?.id);
+  });
+  onEvent("media.update", async (data) => {
+    if (data?.id) {
+      await mediaCache.delete(mediaCache.generateKey("item", data.id));
+    }
+    await mediaCache.invalidate("media:list:*");
+    console.log("Cache invalidated: media.update", data?.id);
+  });
+}
+function setupAPIInvalidation() {
+  const config = CACHE_CONFIGS.api;
+  if (!config) return;
+  const apiCache = getCacheService(config);
+  onEvent("content.update", async (_data) => {
+    await apiCache.invalidate("api:*");
+    console.log("Cache invalidated: api (content.update)");
+  });
+  onEvent("content.publish", async (_data) => {
+    await apiCache.invalidate("api:*");
+    console.log("Cache invalidated: api (content.publish)");
+  });
+  onEvent("content.create", async (_data) => {
+    await apiCache.invalidate("api:*");
+    console.log("Cache invalidated: api (content.create)");
+  });
+  onEvent("content.delete", async (_data) => {
+    await apiCache.invalidate("api:*");
+    console.log("Cache invalidated: api (content.delete)");
+  });
+  onEvent("collection.update", async (_data) => {
+    await apiCache.invalidate("api:*");
+    console.log("Cache invalidated: api (collection.update)");
+  });
+}
+function setupCollectionInvalidation() {
+  const config = CACHE_CONFIGS.collection;
+  if (!config) return;
+  const collectionCache = getCacheService(config);
+  onEvent("collection.create", async (_data) => {
+    await collectionCache.invalidate("collection:*");
+    console.log("Cache invalidated: collection.create");
+  });
+  onEvent("collection.update", async (data) => {
+    if (data?.id) {
+      await collectionCache.delete(collectionCache.generateKey("item", data.id));
+    }
+    await collectionCache.invalidate("collection:*");
+    console.log("Cache invalidated: collection.update", data?.id);
+  });
+  onEvent("collection.delete", async (data) => {
+    await collectionCache.invalidate("collection:*");
+    console.log("Cache invalidated: collection.delete", data?.id);
+  });
+}
+function getCacheInvalidationStats() {
+  const eventBus = getEventBus();
+  return eventBus.getStats();
+}
+function getRecentInvalidations(limit = 50) {
+  const eventBus = getEventBus();
+  return eventBus.getEventLog(limit);
+}
+
+// src/plugins/cache/services/cache-warming.ts
+async function warmCommonCaches(db) {
+  let totalWarmed = 0;
+  let totalErrors = 0;
+  const details = [];
+  try {
+    const collectionCount = await warmCollections(db);
+    totalWarmed += collectionCount;
+    details.push({ namespace: "collection", count: collectionCount });
+    const contentCount = await warmRecentContent(db);
+    totalWarmed += contentCount;
+    details.push({ namespace: "content", count: contentCount });
+    const mediaCount = await warmRecentMedia(db);
+    totalWarmed += mediaCount;
+    details.push({ namespace: "media", count: mediaCount });
+  } catch (error) {
+    console.error("Error warming caches:", error);
+    totalErrors++;
+  }
+  return {
+    warmed: totalWarmed,
+    errors: totalErrors,
+    details
+  };
+}
+async function warmCollections(db) {
+  const config = CACHE_CONFIGS.collection;
+  if (!config) return 0;
+  const collectionCache = getCacheService(config);
+  let count = 0;
+  try {
+    const stmt = db.prepare("SELECT * FROM collections WHERE is_active = 1");
+    const { results } = await stmt.all();
+    for (const collection of results) {
+      const key = collectionCache.generateKey("item", collection.id);
+      await collectionCache.set(key, collection);
+      count++;
+    }
+    const listKey = collectionCache.generateKey("list", "all");
+    await collectionCache.set(listKey, results);
+    count++;
+  } catch (error) {
+    console.error("Error warming collections cache:", error);
+  }
+  return count;
+}
+async function warmRecentContent(db, limit = 50) {
+  const config = CACHE_CONFIGS.content;
+  if (!config) return 0;
+  const contentCache = getCacheService(config);
+  let count = 0;
+  try {
+    const stmt = db.prepare(`SELECT * FROM content ORDER BY created_at DESC LIMIT ${limit}`);
+    const { results } = await stmt.all();
+    for (const content2 of results) {
+      const key = contentCache.generateKey("item", content2.id);
+      await contentCache.set(key, content2);
+      count++;
+    }
+    const listKey = contentCache.generateKey("list", "recent");
+    await contentCache.set(listKey, results);
+    count++;
+  } catch (error) {
+    console.error("Error warming content cache:", error);
+  }
+  return count;
+}
+async function warmRecentMedia(db, limit = 50) {
+  const config = CACHE_CONFIGS.media;
+  if (!config) return 0;
+  const mediaCache = getCacheService(config);
+  let count = 0;
+  try {
+    const stmt = db.prepare(`SELECT * FROM media WHERE deleted_at IS NULL ORDER BY uploaded_at DESC LIMIT ${limit}`);
+    const { results } = await stmt.all();
+    for (const media2 of results) {
+      const key = mediaCache.generateKey("item", media2.id);
+      await mediaCache.set(key, media2);
+      count++;
+    }
+    const listKey = mediaCache.generateKey("list", "recent");
+    await mediaCache.set(listKey, results);
+    count++;
+  } catch (error) {
+    console.error("Error warming media cache:", error);
+  }
+  return count;
+}
+async function warmNamespace(namespace, entries) {
+  const config = CACHE_CONFIGS[namespace];
+  if (!config) {
+    throw new Error(`Unknown namespace: ${namespace}`);
+  }
+  const cache = getCacheService(config);
+  await cache.setMany(entries);
+  return entries.length;
+}
+
+// src/templates/pages/admin-cache.template.ts
+chunkEHSZ6TAN_cjs.init_admin_layout_catalyst_template();
+function renderCacheDashboard(data) {
+  const pageContent = `
+    <div class="space-y-6">
+      <!-- Header -->
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-semibold text-zinc-950 dark:text-white">Cache System</h1>
+          <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            Monitor and manage cache performance across all namespaces
+          </p>
+        </div>
+        <div class="flex gap-3">
+          <button
+            onclick="refreshStats()"
+            class="inline-flex items-center gap-2 rounded-lg bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Refresh
+          </button>
+          <button
+            onclick="clearAllCaches()"
+            class="inline-flex items-center gap-2 rounded-lg bg-red-600 dark:bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 dark:hover:bg-red-600"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+            Clear All
+          </button>
+        </div>
+      </div>
+
+      <!-- Overall Stats Cards -->
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        ${renderStatCard("Total Requests", data.totals.requests.toLocaleString(), "lime", `
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+          </svg>
+        `)}
+
+        ${renderStatCard("Hit Rate", data.totals.hitRate + "%", "blue", `
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        `, parseFloat(data.totals.hitRate) > 70 ? "lime" : parseFloat(data.totals.hitRate) > 40 ? "amber" : "red")}
+
+        ${renderStatCard("Memory Usage", formatBytes(data.totals.memorySize), "purple", `
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+          </svg>
+        `)}
+
+        ${renderStatCard("Cached Entries", data.totals.entryCount.toLocaleString(), "sky", `
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+          </svg>
+        `)}
+      </div>
+
+      <!-- Namespace Statistics -->
+      <div class="overflow-hidden rounded-xl bg-white dark:bg-zinc-900 ring-1 ring-zinc-950/5 dark:ring-white/10">
+        <div class="px-6 py-4 border-b border-zinc-950/5 dark:border-white/10">
+          <h2 class="text-lg font-semibold text-zinc-950 dark:text-white">Cache Namespaces</h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-zinc-950/5 dark:divide-white/10">
+            <thead class="bg-zinc-50 dark:bg-zinc-800/50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                  Namespace
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                  Requests
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                  Hit Rate
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                  Memory Hits
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                  KV Hits
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                  Entries
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                  Size
+                </th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-zinc-950/5 dark:divide-white/10">
+              ${data.namespaces.map((namespace) => {
+    const stat = data.stats[namespace];
+    if (!stat) return "";
+    return renderNamespaceRow(namespace, stat);
+  }).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Performance Chart Placeholder -->
+      <div class="overflow-hidden rounded-xl bg-white dark:bg-zinc-900 ring-1 ring-zinc-950/5 dark:ring-white/10">
+        <div class="px-6 py-4 border-b border-zinc-950/5 dark:border-white/10">
+          <h2 class="text-lg font-semibold text-zinc-950 dark:text-white">Performance Overview</h2>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            ${renderPerformanceMetric("Memory Cache", data.totals.hits, data.totals.misses)}
+            ${renderHealthStatus(parseFloat(data.totals.hitRate))}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      async function refreshStats() {
+        window.location.reload()
+      }
+
+      async function clearAllCaches() {
+        showConfirmDialog('clear-all-cache-confirm')
+      }
+
+      async function performClearAllCaches() {
+        try {
+          const response = await fetch('/admin/cache/clear', {
+            method: 'POST'
+          })
+
+          const result = await response.json()
+          if (result.success) {
+            alert('All caches cleared successfully')
+            window.location.reload()
+          } else {
+            alert('Error clearing caches: ' + result.error)
+          }
+        } catch (error) {
+          alert('Error clearing caches: ' + error.message)
+        }
+      }
+
+      let namespaceToDelete = null
+
+      async function clearNamespaceCache(namespace) {
+        namespaceToDelete = namespace
+        showConfirmDialog('clear-namespace-cache-confirm')
+      }
+
+      async function performClearNamespaceCache() {
+        if (!namespaceToDelete) return
+
+        try {
+          const response = await fetch(\`/admin/cache/clear/\${namespaceToDelete}\`, {
+            method: 'POST'
+          })
+
+          const result = await response.json()
+          if (result.success) {
+            alert('Cache cleared successfully')
+            window.location.reload()
+          } else {
+            alert('Error clearing cache: ' + result.error)
+          }
+        } catch (error) {
+          alert('Error clearing cache: ' + error.message)
+        } finally {
+          namespaceToDelete = null
+        }
+      }
+    </script>
+
+    <!-- Confirmation Dialogs -->
+    ${chunkOWXQO4V7_cjs.renderConfirmationDialog({
+    id: "clear-all-cache-confirm",
+    title: "Clear All Cache",
+    message: "Are you sure you want to clear all cache entries? This cannot be undone.",
+    confirmText: "Clear All",
+    cancelText: "Cancel",
+    iconColor: "yellow",
+    confirmClass: "bg-yellow-500 hover:bg-yellow-400",
+    onConfirm: "performClearAllCaches()"
+  })}
+
+    ${chunkOWXQO4V7_cjs.renderConfirmationDialog({
+    id: "clear-namespace-cache-confirm",
+    title: "Clear Namespace Cache",
+    message: "Clear cache for this namespace?",
+    confirmText: "Clear",
+    cancelText: "Cancel",
+    iconColor: "yellow",
+    confirmClass: "bg-yellow-500 hover:bg-yellow-400",
+    onConfirm: "performClearNamespaceCache()"
+  })}
+
+    ${chunkOWXQO4V7_cjs.getConfirmationDialogScript()}
+  `;
+  const layoutData = {
+    title: "Cache System",
+    pageTitle: "Cache System",
+    currentPath: "/admin/cache",
+    user: data.user,
+    version: data.version,
+    content: pageContent
+  };
+  return chunkEHSZ6TAN_cjs.renderAdminLayoutCatalyst(layoutData);
+}
+function renderStatCard(label, value, color, icon, colorOverride) {
+  const finalColor = colorOverride || color;
+  const colorClasses = {
+    lime: "bg-lime-50 dark:bg-lime-500/10 text-lime-600 dark:text-lime-400 ring-lime-600/20 dark:ring-lime-500/20",
+    blue: "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 ring-blue-600/20 dark:ring-blue-500/20",
+    purple: "bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 ring-purple-600/20 dark:ring-purple-500/20",
+    sky: "bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400 ring-sky-600/20 dark:ring-sky-500/20",
+    amber: "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 ring-amber-600/20 dark:ring-amber-500/20",
+    red: "bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 ring-red-600/20 dark:ring-red-500/20"
+  };
+  return `
+    <div class="overflow-hidden rounded-xl bg-white dark:bg-zinc-900 ring-1 ring-zinc-950/5 dark:ring-white/10">
+      <div class="p-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="rounded-lg p-2 ring-1 ring-inset ${colorClasses[finalColor]}">
+              ${icon}
+            </div>
+            <div>
+              <p class="text-sm text-zinc-600 dark:text-zinc-400">${label}</p>
+              <p class="mt-1 text-2xl font-semibold text-zinc-950 dark:text-white">${value}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function renderNamespaceRow(namespace, stat) {
+  const hitRate = stat.hitRate.toFixed(1);
+  const hitRateColor = stat.hitRate > 70 ? "text-lime-600 dark:text-lime-400" : stat.hitRate > 40 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400";
+  return `
+    <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+      <td class="px-6 py-4 whitespace-nowrap">
+        <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 ring-1 ring-inset ring-zinc-200 dark:ring-zinc-700">
+          ${namespace}
+        </span>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-100">
+        ${stat.totalRequests.toLocaleString()}
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap">
+        <span class="text-sm font-medium ${hitRateColor}">
+          ${hitRate}%
+        </span>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-600 dark:text-zinc-400">
+        ${stat.memoryHits.toLocaleString()}
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-600 dark:text-zinc-400">
+        ${stat.kvHits.toLocaleString()}
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-600 dark:text-zinc-400">
+        ${stat.entryCount.toLocaleString()}
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-600 dark:text-zinc-400">
+        ${formatBytes(stat.memorySize)}
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+        <button
+          onclick="clearNamespaceCache('${namespace}')"
+          class="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
+        >
+          Clear
+        </button>
+      </td>
+    </tr>
+  `;
+}
+function renderPerformanceMetric(label, hits, misses) {
+  const total = hits + misses;
+  const hitPercentage = total > 0 ? hits / total * 100 : 0;
+  return `
+    <div>
+      <h3 class="text-sm font-medium text-zinc-900 dark:text-zinc-100 mb-3">${label}</h3>
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-zinc-600 dark:text-zinc-400">Hits</span>
+          <span class="font-medium text-zinc-900 dark:text-zinc-100">${hits.toLocaleString()}</span>
+        </div>
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-zinc-600 dark:text-zinc-400">Misses</span>
+          <span class="font-medium text-zinc-900 dark:text-zinc-100">${misses.toLocaleString()}</span>
+        </div>
+        <div class="mt-3">
+          <div class="flex items-center justify-between text-sm mb-1">
+            <span class="text-zinc-600 dark:text-zinc-400">Hit Rate</span>
+            <span class="font-medium text-zinc-900 dark:text-zinc-100">${hitPercentage.toFixed(1)}%</span>
+          </div>
+          <div class="h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+            <div class="h-full bg-lime-500 dark:bg-lime-400" style="width: ${hitPercentage}%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function renderHealthStatus(hitRate) {
+  const status = hitRate > 70 ? "healthy" : hitRate > 40 ? "warning" : "critical";
+  const statusConfig = {
+    healthy: {
+      label: "Healthy",
+      color: "lime",
+      icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>`
+    },
+    warning: {
+      label: "Needs Attention",
+      color: "amber",
+      icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>`
+    },
+    critical: {
+      label: "Critical",
+      color: "red",
+      icon: `<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>`
+    }
+  };
+  const config = statusConfig[status];
+  const colorClasses = {
+    lime: "bg-lime-50 dark:bg-lime-500/10 text-lime-600 dark:text-lime-400 ring-lime-600/20 dark:ring-lime-500/20",
+    amber: "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 ring-amber-600/20 dark:ring-amber-500/20",
+    red: "bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 ring-red-600/20 dark:ring-red-500/20"
+  };
+  return `
+    <div>
+      <h3 class="text-sm font-medium text-zinc-900 dark:text-zinc-100 mb-3">System Health</h3>
+      <div class="flex items-center gap-3 p-4 rounded-lg ring-1 ring-inset ${colorClasses[config.color]}">
+        ${config.icon}
+        <div>
+          <p class="text-sm font-medium">${config.label}</p>
+          <p class="text-xs mt-0.5 opacity-80">
+            ${status === "healthy" ? "Cache is performing well" : status === "warning" ? "Consider increasing cache TTL or capacity" : "Cache hit rate is too low"}
+          </p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function formatBytes(bytes) {
+  if (bytes === 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${(bytes / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`;
+}
+
+// src/plugins/cache/routes.ts
+var app = new hono.Hono();
+app.get("/", async (c) => {
+  const stats = getAllCacheStats();
+  const user = c.get("user");
+  let totalHits = 0;
+  let totalMisses = 0;
+  let totalSize = 0;
+  let totalEntries = 0;
+  Object.values(stats).forEach((stat) => {
+    totalHits += stat.memoryHits + stat.kvHits;
+    totalMisses += stat.memoryMisses + stat.kvMisses;
+    totalSize += stat.memorySize;
+    totalEntries += stat.entryCount;
+  });
+  const totalRequests = totalHits + totalMisses;
+  const overallHitRate = totalRequests > 0 ? totalHits / totalRequests * 100 : 0;
+  const dashboardData = {
+    stats,
+    totals: {
+      hits: totalHits,
+      misses: totalMisses,
+      requests: totalRequests,
+      hitRate: overallHitRate.toFixed(2),
+      memorySize: totalSize,
+      entryCount: totalEntries
+    },
+    namespaces: Object.keys(stats),
+    user: user ? {
+      name: user.email,
+      email: user.email,
+      role: user.role
+    } : void 0,
+    version: c.get("appVersion")
+  };
+  return c.html(renderCacheDashboard(dashboardData));
+});
+app.get("/stats", async (c) => {
+  const stats = getAllCacheStats();
+  return c.json({
+    success: true,
+    data: stats,
+    timestamp: (/* @__PURE__ */ new Date()).toISOString()
+  });
+});
+app.get("/stats/:namespace", async (c) => {
+  const namespace = c.req.param("namespace");
+  const config = CACHE_CONFIGS[namespace];
+  if (!config) {
+    return c.json({
+      success: false,
+      error: `Unknown namespace: ${namespace}`
+    }, 404);
+  }
+  const cache = getCacheService(config);
+  const stats = cache.getStats();
+  return c.json({
+    success: true,
+    data: {
+      namespace,
+      config,
+      stats
+    },
+    timestamp: (/* @__PURE__ */ new Date()).toISOString()
+  });
+});
+app.post("/clear", async (c) => {
+  await clearAllCaches();
+  return c.json({
+    success: true,
+    message: "All cache entries cleared",
+    timestamp: (/* @__PURE__ */ new Date()).toISOString()
+  });
+});
+app.post("/clear/:namespace", async (c) => {
+  const namespace = c.req.param("namespace");
+  const config = CACHE_CONFIGS[namespace];
+  if (!config) {
+    return c.json({
+      success: false,
+      error: `Unknown namespace: ${namespace}`
+    }, 404);
+  }
+  const cache = getCacheService(config);
+  await cache.clear();
+  return c.json({
+    success: true,
+    message: `Cache cleared for namespace: ${namespace}`,
+    namespace,
+    timestamp: (/* @__PURE__ */ new Date()).toISOString()
+  });
+});
+app.post("/invalidate", async (c) => {
+  const body = await c.req.json();
+  const { pattern, namespace } = body;
+  if (!pattern) {
+    return c.json({
+      success: false,
+      error: "Pattern is required"
+    }, 400);
+  }
+  let totalInvalidated = 0;
+  if (namespace) {
+    const config = CACHE_CONFIGS[namespace];
+    if (!config) {
+      return c.json({
+        success: false,
+        error: `Unknown namespace: ${namespace}`
+      }, 404);
+    }
+    const cache = getCacheService(config);
+    totalInvalidated = await cache.invalidate(pattern);
+  } else {
+    for (const config of Object.values(CACHE_CONFIGS)) {
+      const cache = getCacheService(config);
+      totalInvalidated += await cache.invalidate(pattern);
+    }
+  }
+  return c.json({
+    success: true,
+    invalidated: totalInvalidated,
+    pattern,
+    namespace: namespace || "all",
+    timestamp: (/* @__PURE__ */ new Date()).toISOString()
+  });
+});
+app.get("/health", async (c) => {
+  const stats = getAllCacheStats();
+  const namespaces = Object.entries(stats);
+  const healthChecks = namespaces.map(([name, stat]) => {
+    const hitRate = stat.hitRate;
+    const memoryUsage = stat.memorySize / (50 * 1024 * 1024);
+    return {
+      namespace: name,
+      status: hitRate > 70 ? "healthy" : hitRate > 40 ? "warning" : "unhealthy",
+      hitRate,
+      memoryUsage: (memoryUsage * 100).toFixed(2) + "%",
+      entryCount: stat.entryCount
+    };
+  });
+  const overallStatus = healthChecks.every((h) => h.status === "healthy") ? "healthy" : healthChecks.some((h) => h.status === "unhealthy") ? "unhealthy" : "warning";
+  return c.json({
+    success: true,
+    data: {
+      status: overallStatus,
+      namespaces: healthChecks,
+      timestamp: (/* @__PURE__ */ new Date()).toISOString()
+    }
+  });
+});
+app.get("/browser", async (c) => {
+  const namespace = c.req.query("namespace") || "all";
+  const search = c.req.query("search") || "";
+  const sortBy = c.req.query("sort") || "age";
+  const limit = parseInt(c.req.query("limit") || "100");
+  const entries = [];
+  const namespaces = namespace === "all" ? Object.keys(CACHE_CONFIGS) : [namespace];
+  for (const ns of namespaces) {
+    const config = CACHE_CONFIGS[ns];
+    if (!config) continue;
+    const cache = getCacheService(config);
+    const keys = await cache.listKeys();
+    for (const keyInfo of keys) {
+      if (search && !keyInfo.key.toLowerCase().includes(search.toLowerCase())) {
+        continue;
+      }
+      const parsed = parseCacheKey(keyInfo.key);
+      const ttl = Math.max(0, keyInfo.expiresAt - Date.now()) / 1e3;
+      entries.push({
+        namespace: ns,
+        key: keyInfo.key,
+        size: keyInfo.size,
+        age: keyInfo.age,
+        ttl,
+        expiresAt: keyInfo.expiresAt,
+        parsed
+      });
+    }
+  }
+  if (sortBy === "size") {
+    entries.sort((a, b) => b.size - a.size);
+  } else if (sortBy === "age") {
+    entries.sort((a, b) => a.age - b.age);
+  } else if (sortBy === "key") {
+    entries.sort((a, b) => a.key.localeCompare(b.key));
+  }
+  const limitedEntries = entries.slice(0, limit);
+  return c.json({
+    success: true,
+    data: {
+      entries: limitedEntries,
+      total: entries.length,
+      showing: limitedEntries.length,
+      namespace,
+      search,
+      sortBy
+    },
+    timestamp: (/* @__PURE__ */ new Date()).toISOString()
+  });
+});
+app.get("/browser/:namespace/:key", async (c) => {
+  const namespace = c.req.param("namespace");
+  const key = decodeURIComponent(c.req.param("key"));
+  const config = CACHE_CONFIGS[namespace];
+  if (!config) {
+    return c.json({
+      success: false,
+      error: `Unknown namespace: ${namespace}`
+    }, 404);
+  }
+  const cache = getCacheService(config);
+  const entry = await cache.getEntry(key);
+  if (!entry) {
+    return c.json({
+      success: false,
+      error: "Cache entry not found or expired"
+    }, 404);
+  }
+  const parsed = parseCacheKey(key);
+  return c.json({
+    success: true,
+    data: {
+      key,
+      namespace,
+      parsed,
+      ...entry,
+      createdAt: new Date(entry.timestamp).toISOString(),
+      expiresAt: new Date(entry.expiresAt).toISOString()
+    },
+    timestamp: (/* @__PURE__ */ new Date()).toISOString()
+  });
+});
+app.get("/analytics", async (c) => {
+  const stats = getAllCacheStats();
+  const invalidationStats = getCacheInvalidationStats();
+  const recentInvalidations = getRecentInvalidations(20);
+  let totalHits = 0;
+  let totalMisses = 0;
+  let totalSize = 0;
+  let totalEntries = 0;
+  const namespacesAnalytics = [];
+  for (const [namespace, stat] of Object.entries(stats)) {
+    totalHits += stat.memoryHits + stat.kvHits;
+    totalMisses += stat.memoryMisses + stat.kvMisses;
+    totalSize += stat.memorySize;
+    totalEntries += stat.entryCount;
+    const totalRequests2 = stat.memoryHits + stat.kvHits + stat.memoryMisses + stat.kvMisses;
+    const hitRate = totalRequests2 > 0 ? (stat.memoryHits + stat.kvHits) / totalRequests2 * 100 : 0;
+    const avgEntrySize = stat.entryCount > 0 ? stat.memorySize / stat.entryCount : 0;
+    namespacesAnalytics.push({
+      namespace,
+      hitRate: hitRate.toFixed(2),
+      totalRequests: totalRequests2,
+      memoryHitRate: totalRequests2 > 0 ? (stat.memoryHits / totalRequests2 * 100).toFixed(2) : "0",
+      kvHitRate: totalRequests2 > 0 ? (stat.kvHits / totalRequests2 * 100).toFixed(2) : "0",
+      avgEntrySize: Math.round(avgEntrySize),
+      totalSize: stat.memorySize,
+      entryCount: stat.entryCount,
+      efficiency: totalRequests2 > 0 ? ((stat.memoryHits + stat.kvHits) / (stat.memoryHits + stat.kvHits + stat.dbHits + 1)).toFixed(2) : "0"
+    });
+  }
+  namespacesAnalytics.sort((a, b) => parseFloat(b.hitRate) - parseFloat(a.hitRate));
+  const totalRequests = totalHits + totalMisses;
+  const overallHitRate = totalRequests > 0 ? totalHits / totalRequests * 100 : 0;
+  const dbQueriesAvoided = totalHits;
+  const timeSaved = dbQueriesAvoided * 48;
+  const estimatedCostSavings = dbQueriesAvoided / 1e6 * 0.5;
+  return c.json({
+    success: true,
+    data: {
+      overview: {
+        totalHits,
+        totalMisses,
+        totalRequests,
+        overallHitRate: overallHitRate.toFixed(2),
+        totalSize,
+        totalEntries,
+        avgEntrySize: totalEntries > 0 ? Math.round(totalSize / totalEntries) : 0
+      },
+      performance: {
+        dbQueriesAvoided,
+        timeSavedMs: timeSaved,
+        timeSavedMinutes: (timeSaved / 1e3 / 60).toFixed(2),
+        estimatedCostSavings: estimatedCostSavings.toFixed(4)
+      },
+      namespaces: namespacesAnalytics,
+      invalidation: {
+        ...invalidationStats,
+        recent: recentInvalidations
+      }
+    },
+    timestamp: (/* @__PURE__ */ new Date()).toISOString()
+  });
+});
+app.get("/analytics/trends", async (c) => {
+  const stats = getAllCacheStats();
+  const dataPoint = {
+    timestamp: Date.now(),
+    stats: Object.entries(stats).map(([namespace, stat]) => ({
+      namespace,
+      hitRate: stat.hitRate,
+      entryCount: stat.entryCount,
+      memorySize: stat.memorySize,
+      totalRequests: stat.totalRequests
+    }))
+  };
+  return c.json({
+    success: true,
+    data: {
+      trends: [dataPoint],
+      note: "Historical trends require persistent storage. This returns current snapshot only."
+    },
+    timestamp: (/* @__PURE__ */ new Date()).toISOString()
+  });
+});
+app.get("/analytics/top-keys", async (c) => {
+  c.req.query("namespace") || "all";
+  parseInt(c.req.query("limit") || "10");
+  return c.json({
+    success: true,
+    data: {
+      topKeys: [],
+      note: "Top keys tracking requires per-key hit counting. Feature not yet implemented."
+    },
+    timestamp: (/* @__PURE__ */ new Date()).toISOString()
+  });
+});
+app.post("/warm", async (c) => {
+  try {
+    const db = c.env.DB;
+    const result = await warmCommonCaches(db);
+    return c.json({
+      success: true,
+      message: "Cache warming completed",
+      ...result,
+      timestamp: (/* @__PURE__ */ new Date()).toISOString()
+    });
+  } catch (error) {
+    console.error("Cache warming error:", error);
+    return c.json({
+      success: false,
+      error: "Cache warming failed",
+      details: error instanceof Error ? error.message : "Unknown error"
+    }, 500);
+  }
+});
+app.post("/warm/:namespace", async (c) => {
+  try {
+    const namespace = c.req.param("namespace");
+    const body = await c.req.json();
+    const { entries } = body;
+    if (!entries || !Array.isArray(entries)) {
+      return c.json({
+        success: false,
+        error: "Entries array is required"
+      }, 400);
+    }
+    const count = await warmNamespace(namespace, entries);
+    return c.json({
+      success: true,
+      message: `Warmed ${count} entries in namespace: ${namespace}`,
+      namespace,
+      count,
+      timestamp: (/* @__PURE__ */ new Date()).toISOString()
+    });
+  } catch (error) {
+    console.error("Namespace warming error:", error);
+    return c.json({
+      success: false,
+      error: "Namespace warming failed",
+      details: error instanceof Error ? error.message : "Unknown error"
+    }, 500);
+  }
+});
+var routes_default = app;
+
+// src/plugins/cache/index.ts
+var CachePlugin = class {
+  _context = null;
+  /**
+   * Get plugin routes
+   */
+  getRoutes() {
+    return routes_default;
+  }
+  /**
+   * Activate the cache plugin
+   */
+  async activate(context) {
+    this._context = context;
+    const settings = context.config || {};
+    console.log("\u2705 Cache plugin activated", {
+      memoryEnabled: settings.memoryEnabled ?? true,
+      kvEnabled: settings.kvEnabled ?? false,
+      defaultTTL: settings.defaultTTL ?? 3600
+    });
+    for (const [_namespace, config] of Object.entries(CACHE_CONFIGS)) {
+      getCacheService({
+        ...config,
+        memoryEnabled: settings.memoryEnabled ?? config.memoryEnabled,
+        kvEnabled: settings.kvEnabled ?? config.kvEnabled,
+        ttl: settings.defaultTTL ?? config.ttl
+      });
+    }
+    setupCacheInvalidation();
+  }
+  /**
+   * Deactivate the cache plugin
+   */
+  async deactivate() {
+    console.log("\u274C Cache plugin deactivated - clearing all caches");
+    await clearAllCaches();
+    this._context = null;
+  }
+  /**
+   * Configure the cache plugin
+   */
+  async configure(settings) {
+    console.log("\u2699\uFE0F Cache plugin configured", settings);
+    for (const [_namespace, config] of Object.entries(CACHE_CONFIGS)) {
+      getCacheService({
+        ...config,
+        memoryEnabled: settings.memoryEnabled ?? config.memoryEnabled,
+        kvEnabled: settings.kvEnabled ?? config.kvEnabled,
+        ttl: settings.defaultTTL ?? config.ttl
+      });
+    }
+  }
+  /**
+   * Get cache statistics
+   */
+  async getStats(c) {
+    const stats = getAllCacheStats();
+    return c.json({
+      success: true,
+      data: stats,
+      timestamp: (/* @__PURE__ */ new Date()).toISOString()
+    });
+  }
+  /**
+   * Clear all cache entries
+   */
+  async clearCache(c) {
+    await clearAllCaches();
+    return c.json({
+      success: true,
+      message: "All cache entries cleared",
+      timestamp: (/* @__PURE__ */ new Date()).toISOString()
+    });
+  }
+  /**
+   * Invalidate cache entries matching pattern
+   */
+  async invalidatePattern(c) {
+    const body = await c.req.json();
+    const { pattern, namespace: _namespace } = body;
+    if (!pattern) {
+      return c.json({
+        success: false,
+        error: "Pattern is required"
+      }, 400);
+    }
+    let totalInvalidated = 0;
+    if (_namespace) {
+      const cache = getCacheService(CACHE_CONFIGS[_namespace] || {
+        ttl: 3600,
+        kvEnabled: false,
+        memoryEnabled: true,
+        namespace: _namespace,
+        invalidateOn: [],
+        version: "v1"
+      });
+      totalInvalidated = await cache.invalidate(pattern);
+    } else {
+      for (const config of Object.values(CACHE_CONFIGS)) {
+        const cache = getCacheService(config);
+        totalInvalidated += await cache.invalidate(pattern);
+      }
+    }
+    return c.json({
+      success: true,
+      invalidated: totalInvalidated,
+      pattern,
+      namespace: _namespace || "all",
+      timestamp: (/* @__PURE__ */ new Date()).toISOString()
+    });
+  }
+};
+var plugin = new CachePlugin();
+var cache_default = plugin;
+
 // src/assets/favicon.ts
 var faviconSvg = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
@@ -4566,69 +6383,70 @@ var faviconSvg = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
 // src/app.ts
 function createSonicJSApp(config = {}) {
-  const app = new hono.Hono();
+  const app2 = new hono.Hono();
   const appVersion = config.version || chunkYMTTGHEK_cjs.getCoreVersion();
   const appName = config.name || "SonicJS AI";
-  app.use("*", async (c, next) => {
+  app2.use("*", async (c, next) => {
     c.set("appVersion", appVersion);
     await next();
   });
-  app.use("*", chunk4DRGQMTH_cjs.metricsMiddleware());
-  app.use("*", chunk4DRGQMTH_cjs.bootstrapMiddleware(config));
+  app2.use("*", chunkGP4ZR3LD_cjs.metricsMiddleware());
+  app2.use("*", chunkGP4ZR3LD_cjs.bootstrapMiddleware(config));
   if (config.middleware?.beforeAuth) {
     for (const middleware of config.middleware.beforeAuth) {
-      app.use("*", middleware);
+      app2.use("*", middleware);
     }
   }
-  app.use("*", async (_c, next) => {
+  app2.use("*", async (_c, next) => {
     await next();
   });
-  app.use("*", async (_c, next) => {
+  app2.use("*", async (_c, next) => {
     await next();
   });
   if (config.middleware?.afterAuth) {
     for (const middleware of config.middleware.afterAuth) {
-      app.use("*", middleware);
+      app2.use("*", middleware);
     }
   }
-  app.route("/api", chunk56YVHBI5_cjs.api_default);
-  app.route("/api/media", chunk56YVHBI5_cjs.api_media_default);
-  app.route("/api/system", chunk56YVHBI5_cjs.api_system_default);
-  app.route("/admin/api", chunk56YVHBI5_cjs.admin_api_default);
-  app.route("/admin/dashboard", chunk56YVHBI5_cjs.router);
-  app.route("/admin/collections", chunk56YVHBI5_cjs.adminCollectionsRoutes);
-  app.route("/admin/settings", chunk56YVHBI5_cjs.adminSettingsRoutes);
-  app.route("/admin/database-tools", createDatabaseToolsAdminRoutes());
-  app.route("/admin/seed-data", createSeedDataAdminRoutes());
-  app.route("/admin/content", chunk56YVHBI5_cjs.admin_content_default);
-  app.route("/admin/media", chunk56YVHBI5_cjs.adminMediaRoutes);
+  app2.route("/api", chunkOWXQO4V7_cjs.api_default);
+  app2.route("/api/media", chunkOWXQO4V7_cjs.api_media_default);
+  app2.route("/api/system", chunkOWXQO4V7_cjs.api_system_default);
+  app2.route("/admin/api", chunkOWXQO4V7_cjs.admin_api_default);
+  app2.route("/admin/dashboard", chunkOWXQO4V7_cjs.router);
+  app2.route("/admin/collections", chunkOWXQO4V7_cjs.adminCollectionsRoutes);
+  app2.route("/admin/settings", chunkOWXQO4V7_cjs.adminSettingsRoutes);
+  app2.route("/admin/database-tools", createDatabaseToolsAdminRoutes());
+  app2.route("/admin/seed-data", createSeedDataAdminRoutes());
+  app2.route("/admin/content", chunkOWXQO4V7_cjs.admin_content_default);
+  app2.route("/admin/media", chunkOWXQO4V7_cjs.adminMediaRoutes);
   if (aiSearchPlugin.routes && aiSearchPlugin.routes.length > 0) {
     for (const route of aiSearchPlugin.routes) {
-      app.route(route.path, route.handler);
+      app2.route(route.path, route.handler);
     }
   }
-  app.route("/admin/plugins", chunk56YVHBI5_cjs.adminPluginRoutes);
-  app.route("/admin/logs", chunk56YVHBI5_cjs.adminLogsRoutes);
-  app.route("/admin", chunk56YVHBI5_cjs.userRoutes);
-  app.route("/auth", chunk56YVHBI5_cjs.auth_default);
-  app.route("/", chunk56YVHBI5_cjs.test_cleanup_default);
+  app2.route("/admin/cache", cache_default.getRoutes());
+  app2.route("/admin/plugins", chunkOWXQO4V7_cjs.adminPluginRoutes);
+  app2.route("/admin/logs", chunkOWXQO4V7_cjs.adminLogsRoutes);
+  app2.route("/admin", chunkOWXQO4V7_cjs.userRoutes);
+  app2.route("/auth", chunkOWXQO4V7_cjs.auth_default);
+  app2.route("/", chunkOWXQO4V7_cjs.test_cleanup_default);
   if (emailPlugin.routes && emailPlugin.routes.length > 0) {
     for (const route of emailPlugin.routes) {
-      app.route(route.path, route.handler);
+      app2.route(route.path, route.handler);
     }
   }
   if (otpLoginPlugin.routes && otpLoginPlugin.routes.length > 0) {
     for (const route of otpLoginPlugin.routes) {
-      app.route(route.path, route.handler);
+      app2.route(route.path, route.handler);
     }
   }
   const magicLinkPlugin = createMagicLinkAuthPlugin();
   if (magicLinkPlugin.routes && magicLinkPlugin.routes.length > 0) {
     for (const route of magicLinkPlugin.routes) {
-      app.route(route.path, route.handler);
+      app2.route(route.path, route.handler);
     }
   }
-  app.get("/favicon.svg", (c) => {
+  app2.get("/favicon.svg", (c) => {
     return new Response(faviconSvg, {
       headers: {
         "Content-Type": "image/svg+xml",
@@ -4636,7 +6454,7 @@ function createSonicJSApp(config = {}) {
       }
     });
   });
-  app.get("/files/*", async (c) => {
+  app2.get("/files/*", async (c) => {
     try {
       const url = new URL(c.req.url);
       const pathname = url.pathname;
@@ -4665,13 +6483,13 @@ function createSonicJSApp(config = {}) {
   });
   if (config.routes) {
     for (const route of config.routes) {
-      app.route(route.path, route.handler);
+      app2.route(route.path, route.handler);
     }
   }
-  app.get("/", (c) => {
+  app2.get("/", (c) => {
     return c.redirect("/auth/login");
   });
-  app.get("/health", (c) => {
+  app2.get("/health", (c) => {
     return c.json({
       name: appName,
       version: appVersion,
@@ -4679,14 +6497,14 @@ function createSonicJSApp(config = {}) {
       timestamp: (/* @__PURE__ */ new Date()).toISOString()
     });
   });
-  app.notFound((c) => {
+  app2.notFound((c) => {
     return c.json({ error: "Not Found", status: 404 }, 404);
   });
-  app.onError((err, c) => {
+  app2.onError((err, c) => {
     console.error(err);
     return c.json({ error: "Internal Server Error", status: 500 }, 500);
   });
-  return app;
+  return app2;
 }
 function setupCoreMiddleware(_app) {
   console.warn("setupCoreMiddleware is deprecated. Use createSonicJSApp() instead.");
@@ -4695,7 +6513,7 @@ function setupCoreRoutes(_app) {
   console.warn("setupCoreRoutes is deprecated. Use createSonicJSApp() instead.");
 }
 function createDb(d1$1) {
-  return d1.drizzle(d1$1, { schema: chunk7FOAMNTI_cjs.schema_exports });
+  return d1.drizzle(d1$1, { schema: chunkQCMSQFCP_cjs.schema_exports });
 }
 
 // src/index.ts
@@ -4703,323 +6521,323 @@ var VERSION = chunkYMTTGHEK_cjs.package_default.version;
 
 Object.defineProperty(exports, "ROUTES_INFO", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.ROUTES_INFO; }
+  get: function () { return chunkOWXQO4V7_cjs.ROUTES_INFO; }
 });
 Object.defineProperty(exports, "adminApiRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.admin_api_default; }
+  get: function () { return chunkOWXQO4V7_cjs.admin_api_default; }
 });
 Object.defineProperty(exports, "adminCheckboxRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.adminCheckboxRoutes; }
+  get: function () { return chunkOWXQO4V7_cjs.adminCheckboxRoutes; }
 });
 Object.defineProperty(exports, "adminCodeExamplesRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.admin_code_examples_default; }
+  get: function () { return chunkOWXQO4V7_cjs.admin_code_examples_default; }
 });
 Object.defineProperty(exports, "adminCollectionsRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.adminCollectionsRoutes; }
+  get: function () { return chunkOWXQO4V7_cjs.adminCollectionsRoutes; }
 });
 Object.defineProperty(exports, "adminContentRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.admin_content_default; }
+  get: function () { return chunkOWXQO4V7_cjs.admin_content_default; }
 });
 Object.defineProperty(exports, "adminDashboardRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.router; }
+  get: function () { return chunkOWXQO4V7_cjs.router; }
 });
 Object.defineProperty(exports, "adminDesignRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.adminDesignRoutes; }
+  get: function () { return chunkOWXQO4V7_cjs.adminDesignRoutes; }
 });
 Object.defineProperty(exports, "adminLogsRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.adminLogsRoutes; }
+  get: function () { return chunkOWXQO4V7_cjs.adminLogsRoutes; }
 });
 Object.defineProperty(exports, "adminMediaRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.adminMediaRoutes; }
+  get: function () { return chunkOWXQO4V7_cjs.adminMediaRoutes; }
 });
 Object.defineProperty(exports, "adminPluginRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.adminPluginRoutes; }
+  get: function () { return chunkOWXQO4V7_cjs.adminPluginRoutes; }
 });
 Object.defineProperty(exports, "adminSettingsRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.adminSettingsRoutes; }
+  get: function () { return chunkOWXQO4V7_cjs.adminSettingsRoutes; }
 });
 Object.defineProperty(exports, "adminTestimonialsRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.admin_testimonials_default; }
+  get: function () { return chunkOWXQO4V7_cjs.admin_testimonials_default; }
 });
 Object.defineProperty(exports, "adminUsersRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.userRoutes; }
+  get: function () { return chunkOWXQO4V7_cjs.userRoutes; }
 });
 Object.defineProperty(exports, "apiContentCrudRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.api_content_crud_default; }
+  get: function () { return chunkOWXQO4V7_cjs.api_content_crud_default; }
 });
 Object.defineProperty(exports, "apiMediaRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.api_media_default; }
+  get: function () { return chunkOWXQO4V7_cjs.api_media_default; }
 });
 Object.defineProperty(exports, "apiRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.api_default; }
+  get: function () { return chunkOWXQO4V7_cjs.api_default; }
 });
 Object.defineProperty(exports, "apiSystemRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.api_system_default; }
+  get: function () { return chunkOWXQO4V7_cjs.api_system_default; }
 });
 Object.defineProperty(exports, "authRoutes", {
   enumerable: true,
-  get: function () { return chunk56YVHBI5_cjs.auth_default; }
+  get: function () { return chunkOWXQO4V7_cjs.auth_default; }
 });
 Object.defineProperty(exports, "Logger", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.Logger; }
+  get: function () { return chunkQCMSQFCP_cjs.Logger; }
 });
 Object.defineProperty(exports, "apiTokens", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.apiTokens; }
+  get: function () { return chunkQCMSQFCP_cjs.apiTokens; }
 });
 Object.defineProperty(exports, "collections", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.collections; }
+  get: function () { return chunkQCMSQFCP_cjs.collections; }
 });
 Object.defineProperty(exports, "content", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.content; }
+  get: function () { return chunkQCMSQFCP_cjs.content; }
 });
 Object.defineProperty(exports, "contentVersions", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.contentVersions; }
+  get: function () { return chunkQCMSQFCP_cjs.contentVersions; }
 });
 Object.defineProperty(exports, "getLogger", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.getLogger; }
+  get: function () { return chunkQCMSQFCP_cjs.getLogger; }
 });
 Object.defineProperty(exports, "initLogger", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.initLogger; }
+  get: function () { return chunkQCMSQFCP_cjs.initLogger; }
 });
 Object.defineProperty(exports, "insertCollectionSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.insertCollectionSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.insertCollectionSchema; }
 });
 Object.defineProperty(exports, "insertContentSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.insertContentSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.insertContentSchema; }
 });
 Object.defineProperty(exports, "insertLogConfigSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.insertLogConfigSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.insertLogConfigSchema; }
 });
 Object.defineProperty(exports, "insertMediaSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.insertMediaSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.insertMediaSchema; }
 });
 Object.defineProperty(exports, "insertPluginActivityLogSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.insertPluginActivityLogSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.insertPluginActivityLogSchema; }
 });
 Object.defineProperty(exports, "insertPluginAssetSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.insertPluginAssetSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.insertPluginAssetSchema; }
 });
 Object.defineProperty(exports, "insertPluginHookSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.insertPluginHookSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.insertPluginHookSchema; }
 });
 Object.defineProperty(exports, "insertPluginRouteSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.insertPluginRouteSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.insertPluginRouteSchema; }
 });
 Object.defineProperty(exports, "insertPluginSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.insertPluginSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.insertPluginSchema; }
 });
 Object.defineProperty(exports, "insertSystemLogSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.insertSystemLogSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.insertSystemLogSchema; }
 });
 Object.defineProperty(exports, "insertUserSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.insertUserSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.insertUserSchema; }
 });
 Object.defineProperty(exports, "insertWorkflowHistorySchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.insertWorkflowHistorySchema; }
+  get: function () { return chunkQCMSQFCP_cjs.insertWorkflowHistorySchema; }
 });
 Object.defineProperty(exports, "logConfig", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.logConfig; }
+  get: function () { return chunkQCMSQFCP_cjs.logConfig; }
 });
 Object.defineProperty(exports, "media", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.media; }
+  get: function () { return chunkQCMSQFCP_cjs.media; }
 });
 Object.defineProperty(exports, "pluginActivityLog", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.pluginActivityLog; }
+  get: function () { return chunkQCMSQFCP_cjs.pluginActivityLog; }
 });
 Object.defineProperty(exports, "pluginAssets", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.pluginAssets; }
+  get: function () { return chunkQCMSQFCP_cjs.pluginAssets; }
 });
 Object.defineProperty(exports, "pluginHooks", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.pluginHooks; }
+  get: function () { return chunkQCMSQFCP_cjs.pluginHooks; }
 });
 Object.defineProperty(exports, "pluginRoutes", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.pluginRoutes; }
+  get: function () { return chunkQCMSQFCP_cjs.pluginRoutes; }
 });
 Object.defineProperty(exports, "plugins", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.plugins; }
+  get: function () { return chunkQCMSQFCP_cjs.plugins; }
 });
 Object.defineProperty(exports, "selectCollectionSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.selectCollectionSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.selectCollectionSchema; }
 });
 Object.defineProperty(exports, "selectContentSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.selectContentSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.selectContentSchema; }
 });
 Object.defineProperty(exports, "selectLogConfigSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.selectLogConfigSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.selectLogConfigSchema; }
 });
 Object.defineProperty(exports, "selectMediaSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.selectMediaSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.selectMediaSchema; }
 });
 Object.defineProperty(exports, "selectPluginActivityLogSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.selectPluginActivityLogSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.selectPluginActivityLogSchema; }
 });
 Object.defineProperty(exports, "selectPluginAssetSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.selectPluginAssetSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.selectPluginAssetSchema; }
 });
 Object.defineProperty(exports, "selectPluginHookSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.selectPluginHookSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.selectPluginHookSchema; }
 });
 Object.defineProperty(exports, "selectPluginRouteSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.selectPluginRouteSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.selectPluginRouteSchema; }
 });
 Object.defineProperty(exports, "selectPluginSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.selectPluginSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.selectPluginSchema; }
 });
 Object.defineProperty(exports, "selectSystemLogSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.selectSystemLogSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.selectSystemLogSchema; }
 });
 Object.defineProperty(exports, "selectUserSchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.selectUserSchema; }
+  get: function () { return chunkQCMSQFCP_cjs.selectUserSchema; }
 });
 Object.defineProperty(exports, "selectWorkflowHistorySchema", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.selectWorkflowHistorySchema; }
+  get: function () { return chunkQCMSQFCP_cjs.selectWorkflowHistorySchema; }
 });
 Object.defineProperty(exports, "systemLogs", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.systemLogs; }
+  get: function () { return chunkQCMSQFCP_cjs.systemLogs; }
 });
 Object.defineProperty(exports, "users", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.users; }
+  get: function () { return chunkQCMSQFCP_cjs.users; }
 });
 Object.defineProperty(exports, "workflowHistory", {
   enumerable: true,
-  get: function () { return chunk7FOAMNTI_cjs.workflowHistory; }
+  get: function () { return chunkQCMSQFCP_cjs.workflowHistory; }
 });
 Object.defineProperty(exports, "AuthManager", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.AuthManager; }
+  get: function () { return chunkGP4ZR3LD_cjs.AuthManager; }
 });
 Object.defineProperty(exports, "PermissionManager", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.PermissionManager; }
+  get: function () { return chunkGP4ZR3LD_cjs.PermissionManager; }
 });
 Object.defineProperty(exports, "bootstrapMiddleware", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.bootstrapMiddleware; }
+  get: function () { return chunkGP4ZR3LD_cjs.bootstrapMiddleware; }
 });
 Object.defineProperty(exports, "cacheHeaders", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.cacheHeaders; }
+  get: function () { return chunkGP4ZR3LD_cjs.cacheHeaders; }
 });
 Object.defineProperty(exports, "compressionMiddleware", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.compressionMiddleware; }
+  get: function () { return chunkGP4ZR3LD_cjs.compressionMiddleware; }
 });
 Object.defineProperty(exports, "detailedLoggingMiddleware", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.detailedLoggingMiddleware; }
+  get: function () { return chunkGP4ZR3LD_cjs.detailedLoggingMiddleware; }
 });
 Object.defineProperty(exports, "getActivePlugins", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.getActivePlugins; }
+  get: function () { return chunkGP4ZR3LD_cjs.getActivePlugins; }
 });
 Object.defineProperty(exports, "isPluginActive", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.isPluginActive; }
+  get: function () { return chunkGP4ZR3LD_cjs.isPluginActive; }
 });
 Object.defineProperty(exports, "logActivity", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.logActivity; }
+  get: function () { return chunkGP4ZR3LD_cjs.logActivity; }
 });
 Object.defineProperty(exports, "loggingMiddleware", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.loggingMiddleware; }
+  get: function () { return chunkGP4ZR3LD_cjs.loggingMiddleware; }
 });
 Object.defineProperty(exports, "optionalAuth", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.optionalAuth; }
+  get: function () { return chunkGP4ZR3LD_cjs.optionalAuth; }
 });
 Object.defineProperty(exports, "performanceLoggingMiddleware", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.performanceLoggingMiddleware; }
+  get: function () { return chunkGP4ZR3LD_cjs.performanceLoggingMiddleware; }
 });
 Object.defineProperty(exports, "requireActivePlugin", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.requireActivePlugin; }
+  get: function () { return chunkGP4ZR3LD_cjs.requireActivePlugin; }
 });
 Object.defineProperty(exports, "requireActivePlugins", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.requireActivePlugins; }
+  get: function () { return chunkGP4ZR3LD_cjs.requireActivePlugins; }
 });
 Object.defineProperty(exports, "requireAnyPermission", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.requireAnyPermission; }
+  get: function () { return chunkGP4ZR3LD_cjs.requireAnyPermission; }
 });
 Object.defineProperty(exports, "requireAuth", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.requireAuth; }
+  get: function () { return chunkGP4ZR3LD_cjs.requireAuth; }
 });
 Object.defineProperty(exports, "requirePermission", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.requirePermission; }
+  get: function () { return chunkGP4ZR3LD_cjs.requirePermission; }
 });
 Object.defineProperty(exports, "requireRole", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.requireRole; }
+  get: function () { return chunkGP4ZR3LD_cjs.requireRole; }
 });
 Object.defineProperty(exports, "securityHeaders", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.securityHeaders; }
+  get: function () { return chunkGP4ZR3LD_cjs.securityHeaders; }
 });
 Object.defineProperty(exports, "securityLoggingMiddleware", {
   enumerable: true,
-  get: function () { return chunk4DRGQMTH_cjs.securityLoggingMiddleware; }
+  get: function () { return chunkGP4ZR3LD_cjs.securityLoggingMiddleware; }
 });
 Object.defineProperty(exports, "PluginBootstrapService", {
   enumerable: true,
@@ -5075,63 +6893,63 @@ Object.defineProperty(exports, "validateCollectionConfig", {
 });
 Object.defineProperty(exports, "MigrationService", {
   enumerable: true,
-  get: function () { return chunkJ2JXUS4E_cjs.MigrationService; }
+  get: function () { return chunkLJFH5V7G_cjs.MigrationService; }
 });
 Object.defineProperty(exports, "renderFilterBar", {
   enumerable: true,
-  get: function () { return chunk63K7XXRX_cjs.renderFilterBar; }
+  get: function () { return chunkAYPF6C4D_cjs.renderFilterBar; }
 });
 Object.defineProperty(exports, "getConfirmationDialogScript", {
   enumerable: true,
-  get: function () { return chunkBZC4FYW7_cjs.getConfirmationDialogScript; }
+  get: function () { return chunkEHSZ6TAN_cjs.getConfirmationDialogScript; }
 });
 Object.defineProperty(exports, "renderAlert", {
   enumerable: true,
-  get: function () { return chunkBZC4FYW7_cjs.renderAlert; }
+  get: function () { return chunkEHSZ6TAN_cjs.renderAlert; }
 });
 Object.defineProperty(exports, "renderConfirmationDialog", {
   enumerable: true,
-  get: function () { return chunkBZC4FYW7_cjs.renderConfirmationDialog; }
+  get: function () { return chunkEHSZ6TAN_cjs.renderConfirmationDialog; }
 });
 Object.defineProperty(exports, "renderForm", {
   enumerable: true,
-  get: function () { return chunkBZC4FYW7_cjs.renderForm; }
+  get: function () { return chunkEHSZ6TAN_cjs.renderForm; }
 });
 Object.defineProperty(exports, "renderFormField", {
   enumerable: true,
-  get: function () { return chunkBZC4FYW7_cjs.renderFormField; }
+  get: function () { return chunkEHSZ6TAN_cjs.renderFormField; }
 });
 Object.defineProperty(exports, "renderPagination", {
   enumerable: true,
-  get: function () { return chunkBZC4FYW7_cjs.renderPagination; }
+  get: function () { return chunkEHSZ6TAN_cjs.renderPagination; }
 });
 Object.defineProperty(exports, "renderTable", {
   enumerable: true,
-  get: function () { return chunkBZC4FYW7_cjs.renderTable; }
+  get: function () { return chunkEHSZ6TAN_cjs.renderTable; }
 });
 Object.defineProperty(exports, "HookSystemImpl", {
   enumerable: true,
-  get: function () { return chunkY72M3MVX_cjs.HookSystemImpl; }
+  get: function () { return chunk3OW7IPTH_cjs.HookSystemImpl; }
 });
 Object.defineProperty(exports, "HookUtils", {
   enumerable: true,
-  get: function () { return chunkY72M3MVX_cjs.HookUtils; }
+  get: function () { return chunk3OW7IPTH_cjs.HookUtils; }
 });
 Object.defineProperty(exports, "PluginManagerClass", {
   enumerable: true,
-  get: function () { return chunkY72M3MVX_cjs.PluginManager; }
+  get: function () { return chunk3OW7IPTH_cjs.PluginManager; }
 });
 Object.defineProperty(exports, "PluginRegistryImpl", {
   enumerable: true,
-  get: function () { return chunkY72M3MVX_cjs.PluginRegistryImpl; }
+  get: function () { return chunk3OW7IPTH_cjs.PluginRegistryImpl; }
 });
 Object.defineProperty(exports, "PluginValidatorClass", {
   enumerable: true,
-  get: function () { return chunkY72M3MVX_cjs.PluginValidator; }
+  get: function () { return chunk3OW7IPTH_cjs.PluginValidator; }
 });
 Object.defineProperty(exports, "ScopedHookSystemClass", {
   enumerable: true,
-  get: function () { return chunkY72M3MVX_cjs.ScopedHookSystem; }
+  get: function () { return chunk3OW7IPTH_cjs.ScopedHookSystem; }
 });
 Object.defineProperty(exports, "PluginBuilder", {
   enumerable: true,
