@@ -204,14 +204,14 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   // Plugin routes - Email
   if (emailPlugin.routes && emailPlugin.routes.length > 0) {
     for (const route of emailPlugin.routes) {
-      app.route(route.path, route.handler)
+      app.route(route.path, route.handler as any)
     }
   }
 
   // Plugin routes - OTP Login (passwordless authentication via email codes)
   if (otpLoginPlugin.routes && otpLoginPlugin.routes.length > 0) {
     for (const route of otpLoginPlugin.routes) {
-      app.route(route.path, route.handler)
+      app.route(route.path, route.handler as any)
     }
   }
 
@@ -219,7 +219,7 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   const magicLinkPlugin = createMagicLinkAuthPlugin()
   if (magicLinkPlugin.routes && magicLinkPlugin.routes.length > 0) {
     for (const route of magicLinkPlugin.routes) {
-      app.route(route.path, route.handler)
+      app.route(route.path, route.handler as any)
     }
   }
 
