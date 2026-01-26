@@ -1,7 +1,7 @@
 import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-3YNNVSMC.js';
-import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-7VW3NOCL.js';
+import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-4OTTOPH5.js';
 import { PluginService } from './chunk-YFJJU26H.js';
-import { MigrationService } from './chunk-AJPHEO77.js';
+import { MigrationService } from './chunk-TUCJWH26.js';
 import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-GRN3GHUG.js';
 import { PluginBuilder } from './chunk-CLIH2T74.js';
 import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml, getBlocksFieldConfig, parseBlocksValue } from './chunk-DNHJS6RN.js';
@@ -1853,7 +1853,7 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
 });
 adminApiRoutes.get("/migrations/status", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-QEOTNERH.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-RQB2SKKW.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const status = await migrationService.getMigrationStatus();
@@ -1878,7 +1878,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const { MigrationService: MigrationService2 } = await import('./migrations-QEOTNERH.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-RQB2SKKW.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const result = await migrationService.runPendingMigrations();
@@ -1897,7 +1897,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
 });
 adminApiRoutes.get("/migrations/validate", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-QEOTNERH.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-RQB2SKKW.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const validation = await migrationService.validateSchema();
@@ -3627,7 +3627,15 @@ function getReadFieldValueScript() {
   `;
 }
 function renderDynamicField(field, options = {}) {
-  const { value = "", errors = [], disabled = false, className = "", pluginStatuses = {}, collectionId = "", contentId = "" } = options;
+  const {
+    value = "",
+    errors = [],
+    disabled = false,
+    className = "",
+    pluginStatuses = {},
+    collectionId = "",
+    contentId = ""
+  } = options;
   const opts = field.field_options || {};
   const required = field.is_required ? "required" : "";
   const baseClasses = `w-full rounded-lg px-3 py-2 text-sm text-zinc-950 dark:text-white bg-white dark:bg-zinc-800 shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow ${className}`;
@@ -4141,7 +4149,8 @@ function renderDynamicField(field, options = {}) {
 
           ${isMultiple ? `
             <div class="media-preview-grid grid grid-cols-4 gap-2 mb-2 ${mediaValues.length === 0 ? "hidden" : ""}" id="${fieldId}-preview">
-              ${mediaValues.map((url, idx) => `
+              ${mediaValues.map(
+        (url, idx) => `
                 <div class="relative media-preview-item" data-url="${url}">
                   ${renderMediaPreview(url, `Media ${idx + 1}`, "w-full h-24 object-cover rounded-lg border border-white/20")}
                   <button
@@ -4155,7 +4164,8 @@ function renderDynamicField(field, options = {}) {
                     </svg>
                   </button>
                 </div>
-              `).join("")}
+              `
+      ).join("")}
             </div>
           ` : `
             <div class="media-preview ${singleValue ? "" : "hidden"}" id="${fieldId}-preview">
@@ -5000,13 +5010,16 @@ function getBlocksFieldScript() {
 }
 function escapeHtml2(text) {
   if (typeof text !== "string") return String(text || "");
-  return text.replace(/[&<>"']/g, (char) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  })[char] || char);
+  return text.replace(
+    /[&<>"']/g,
+    (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[char] || char
+  );
 }
 
 // src/plugins/available/tinymce-plugin/index.ts
@@ -6124,10 +6137,12 @@ function renderContentFormPage(data) {
         titleEl.className = 'font-medium text-zinc-900 dark:text-white';
         titleEl.textContent = title;
 
-        display.appendChild(titleEl);
+        const row = document.createElement('div');
+        row.className = 'flex flex-wrap items-center justify-between gap-2';
+        row.appendChild(titleEl);
 
         const metaRow = document.createElement('div');
-        metaRow.className = 'mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400';
+        metaRow.className = 'flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400';
 
         if (item.collection?.display_name || item.collection?.name) {
           const collectionLabel = document.createElement('span');
@@ -6143,8 +6158,10 @@ function renderContentFormPage(data) {
         }
 
         if (metaRow.childElementCount > 0) {
-          display.appendChild(metaRow);
+          row.appendChild(metaRow);
         }
+
+        display.appendChild(row);
 
         if (removeButton) {
           removeButton.disabled = false;
@@ -23765,5 +23782,5 @@ var ROUTES_INFO = {
 };
 
 export { ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, getConfirmationDialogScript2 as getConfirmationDialogScript, renderConfirmationDialog2 as renderConfirmationDialog, router, test_cleanup_default, userRoutes };
-//# sourceMappingURL=chunk-IHN33EWK.js.map
-//# sourceMappingURL=chunk-IHN33EWK.js.map
+//# sourceMappingURL=chunk-P53GNRX7.js.map
+//# sourceMappingURL=chunk-P53GNRX7.js.map

@@ -90,12 +90,26 @@ export interface FieldRenderOptions {
   contentId?: string
 }
 
-export function renderDynamicField(field: FieldDefinition, options: FieldRenderOptions = {}): string {
-  const { value = '', errors = [], disabled = false, className = '', pluginStatuses = {}, collectionId = '', contentId = '' } = options
+export function renderDynamicField(
+  field: FieldDefinition,
+  options: FieldRenderOptions = {},
+): string {
+  const {
+    value = '',
+    errors = [],
+    disabled = false,
+    className = '',
+    pluginStatuses = {},
+    collectionId = '',
+    contentId = '',
+  } = options
   const opts = field.field_options || {}
   const required = field.is_required ? 'required' : ''
   const baseClasses = `w-full rounded-lg px-3 py-2 text-sm text-zinc-950 dark:text-white bg-white dark:bg-zinc-800 shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow ${className}`
-  const errorClasses = errors.length > 0 ? 'ring-pink-600 dark:ring-pink-500 focus:ring-pink-600 dark:focus:ring-pink-500' : ''
+  const errorClasses =
+    errors.length > 0
+      ? 'ring-pink-600 dark:ring-pink-500 focus:ring-pink-600 dark:focus:ring-pink-500'
+      : ''
 
   const fieldId = `field-${field.field_name}`
   const fieldName = field.field_name
@@ -141,14 +155,16 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
     case 'text':
       let patternHelp = ''
       let autoSlugScript = ''
-      
+
       if (opts.pattern) {
         if (opts.pattern === '^[a-z0-9-]+$' || opts.pattern === '^[a-zA-Z0-9_-]+$') {
-          patternHelp = '<p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Use letters, numbers, underscores, and hyphens only</p>'
+          patternHelp =
+            '<p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Use letters, numbers, underscores, and hyphens only</p>'
 
           // Add auto-slug generation for slug fields
           if (fieldName === 'slug') {
-            patternHelp += '<button type="button" class="mt-1 text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300" onclick="generateSlugFromTitle(\'${fieldId}\')">Generate from title</button>'
+            patternHelp +=
+              '<button type="button" class="mt-1 text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300" onclick="generateSlugFromTitle(\'${fieldId}\')">Generate from title</button>'
             autoSlugScript = `
               <script>
                 function generateSlugFromTitle(slugFieldId) {
@@ -181,10 +197,11 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
             `
           }
         } else {
-          patternHelp = '<p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Must match required format</p>'
+          patternHelp =
+            '<p class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Must match required format</p>'
         }
       }
-      
+
       fieldHTML = `
         <input 
           type="text" 
@@ -200,7 +217,9 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         >
         ${patternHelp}
         ${autoSlugScript}
-        ${opts.pattern ? `
+        ${
+          opts.pattern
+            ? `
         <script>
           (function() {
             const field = document.getElementById('${fieldId}');
@@ -223,7 +242,9 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
             });
           })();
         </script>
-        ` : ''}
+        `
+            : ''
+        }
       `
       break
 
@@ -314,7 +335,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         >
       `
       break
-      
+
     case 'boolean':
       const checked = value === true || value === 'true' || value === '1' ? 'checked' : ''
       fieldHTML = `
@@ -335,7 +356,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         <input type="hidden" name="${fieldName}_submitted" value="1">
       `
       break
-      
+
     case 'date':
       fieldHTML = `
         <input
@@ -374,7 +395,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
       const collectionIdValue = collectionId || opts.collectionId || ''
       const contentIdValue = contentId || opts.contentId || ''
       const isEditMode = !!value
-      
+
       fieldHTML = `
         <div class="slug-field-container">
           <input
@@ -555,14 +576,18 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
           ${disabled ? 'disabled' : ''}
         >
           ${!required && !opts.multiple ? '<option value="">Choose an option...</option>' : ''}
-          ${selectOptions.map((option: any) => {
-            const optionValue = typeof option === 'string' ? option : option.value
-            const optionLabel = typeof option === 'string' ? option : option.label
-            const selected = selectedValues.includes(optionValue) ? 'selected' : ''
-            return `<option value="${escapeHtml(optionValue)}" ${selected}>${escapeHtml(optionLabel)}</option>`
-          }).join('')}
+          ${selectOptions
+            .map((option: any) => {
+              const optionValue = typeof option === 'string' ? option : option.value
+              const optionLabel = typeof option === 'string' ? option : option.label
+              const selected = selectedValues.includes(optionValue) ? 'selected' : ''
+              return `<option value="${escapeHtml(optionValue)}" ${selected}>${escapeHtml(optionLabel)}</option>`
+            })
+            .join('')}
         </select>
-        ${opts.allowCustom ? `
+        ${
+          opts.allowCustom
+            ? `
           <div class="mt-2">
             <input 
               type="text" 
@@ -571,7 +596,9 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
               onkeypress="if(event.key==='Enter'){addCustomOption(this, '${fieldId}');event.preventDefault();}"
             >
           </div>
-        ` : ''}
+        `
+            : ''
+        }
       `
       break
 
@@ -619,13 +646,18 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
     case 'media':
       // Check if multiple selection is enabled
       const isMultiple = opts.multiple === true
-      const mediaValues = isMultiple && value ? (Array.isArray(value) ? value : String(value).split(',').filter(Boolean)) : []
+      const mediaValues =
+        isMultiple && value
+          ? Array.isArray(value)
+            ? value
+            : String(value).split(',').filter(Boolean)
+          : []
       const singleValue = !isMultiple ? value : ''
 
       // Helper to detect if URL is a video
       const isVideoUrl = (url: string) => {
         const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi']
-        return videoExtensions.some(ext => url.toLowerCase().endsWith(ext))
+        return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext))
       }
 
       // Helper to render media element
@@ -640,9 +672,13 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         <div class="media-field-container">
           <input type="hidden" id="${fieldId}" name="${fieldName}" value="${isMultiple ? mediaValues.join(',') : singleValue}" data-multiple="${isMultiple}">
 
-          ${isMultiple ? `
+          ${
+            isMultiple
+              ? `
             <div class="media-preview-grid grid grid-cols-4 gap-2 mb-2 ${mediaValues.length === 0 ? 'hidden' : ''}" id="${fieldId}-preview">
-              ${mediaValues.map((url: string, idx: number) => `
+              ${mediaValues
+                .map(
+                  (url: string, idx: number) => `
                 <div class="relative media-preview-item" data-url="${url}">
                   ${renderMediaPreview(url, `Media ${idx + 1}`, 'w-full h-24 object-cover rounded-lg border border-white/20')}
                   <button
@@ -656,13 +692,17 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
                     </svg>
                   </button>
                 </div>
-              `).join('')}
+              `,
+                )
+                .join('')}
             </div>
-          ` : `
+          `
+              : `
             <div class="media-preview ${singleValue ? '' : 'hidden'}" id="${fieldId}-preview">
               ${singleValue ? renderMediaPreview(singleValue, 'Selected media', 'w-32 h-32 object-cover rounded-lg border border-white/20') : ''}
             </div>
-          `}
+          `
+          }
 
           <div class="media-actions mt-2 space-x-2">
             <button
@@ -676,7 +716,9 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
               </svg>
               ${isMultiple ? 'Select Media (Multiple)' : 'Select Media'}
             </button>
-            ${(isMultiple ? mediaValues.length > 0 : singleValue) ? `
+            ${
+              (isMultiple ? mediaValues.length > 0 : singleValue)
+                ? `
               <button
                 type="button"
                 onclick="clearMediaField('${fieldId}')"
@@ -685,7 +727,9 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
               >
                 ${isMultiple ? 'Clear All' : 'Remove'}
               </button>
-            ` : ''}
+            `
+                : ''
+            }
           </div>
         </div>
       `
@@ -718,7 +762,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         >
       `
   }
-  
+
   return `
     <div class="form-group">
       <label for="${fieldId}" class="block text-sm/6 font-medium text-zinc-950 dark:text-white mb-2">
@@ -726,21 +770,33 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
         ${field.is_required ? '<span class="text-pink-600 dark:text-pink-400 ml-1">*</span>' : ''}
       </label>
       ${fieldHTML}
-      ${errors.length > 0 ? `
+      ${
+        errors.length > 0
+          ? `
         <div class="mt-2 text-sm text-pink-600 dark:text-pink-400">
-          ${errors.map(error => `<div>${escapeHtml(error)}</div>`).join('')}
+          ${errors.map((error) => `<div>${escapeHtml(error)}</div>`).join('')}
         </div>
-      ` : ''}
-      ${opts.helpText ? `
+      `
+          : ''
+      }
+      ${
+        opts.helpText
+          ? `
         <div class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
           ${escapeHtml(opts.helpText)}
         </div>
-      ` : ''}
+      `
+          : ''
+      }
     </div>
   `
 }
 
-export function renderFieldGroup(title: string, fields: string[], collapsible: boolean = false): string {
+export function renderFieldGroup(
+  title: string,
+  fields: string[],
+  collapsible: boolean = false,
+): string {
   const groupId = title.toLowerCase().replace(/\s+/g, '-')
 
   return `
@@ -748,11 +804,15 @@ export function renderFieldGroup(title: string, fields: string[], collapsible: b
       <div class="field-group-header border-b border-zinc-950/5 dark:border-white/10 px-6 py-4 ${collapsible ? 'cursor-pointer' : ''}" ${collapsible ? `onclick="toggleFieldGroup('${groupId}')"` : ''}>
         <h3 class="text-base/7 font-semibold text-zinc-950 dark:text-white flex items-center">
           ${escapeHtml(title)}
-          ${collapsible ? `
+          ${
+            collapsible
+              ? `
             <svg id="${groupId}-icon" class="w-5 h-5 ml-2 transform transition-transform text-zinc-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
             </svg>
-          ` : ''}
+          `
+              : ''
+          }
         </h3>
       </div>
       <div id="${groupId}-content" class="field-group-content px-6 py-6 space-y-6 ${collapsible ? 'collapsible' : ''}">
@@ -766,7 +826,7 @@ function renderBlocksField(
   field: FieldDefinition,
   options: FieldRenderOptions,
   baseClasses: string,
-  errorClasses: string
+  errorClasses: string,
 ): string {
   const { value = [], pluginStatuses = {} } = options
   const opts = field.field_options || {}
@@ -794,7 +854,7 @@ function renderBlocksField(
 
   const blockItems = blockValues
     .map((blockValue, index) =>
-      renderBlockItem(field, blockValue, blocks, discriminator, index, pluginStatuses)
+      renderBlockItem(field, blockValue, blocks, discriminator, index, pluginStatuses),
     )
     .join('')
 
@@ -845,7 +905,7 @@ function renderStructuredObjectField(
   field: FieldDefinition,
   options: FieldRenderOptions,
   baseClasses: string,
-  errorClasses: string
+  errorClasses: string,
 ): string {
   const { value = {}, pluginStatuses = {} } = options
   const opts = field.field_options || {}
@@ -862,8 +922,8 @@ function renderStructuredObjectField(
         propertyConfig,
         objectValue,
         pluginStatuses,
-        field.field_name
-      )
+        field.field_name,
+      ),
     )
     .join('')
 
@@ -882,7 +942,7 @@ function renderStructuredArrayField(
   field: FieldDefinition,
   options: FieldRenderOptions,
   baseClasses: string,
-  errorClasses: string
+  errorClasses: string,
 ): string {
   const { value = [], pluginStatuses = {} } = options
   const opts = field.field_options || {}
@@ -893,7 +953,7 @@ function renderStructuredArrayField(
 
   const items = arrayValue
     .map((itemValue, index) =>
-      renderStructuredArrayItem(field, itemsConfig, String(index), itemValue, pluginStatuses)
+      renderStructuredArrayItem(field, itemsConfig, String(index), itemValue, pluginStatuses),
     )
     .join('')
 
@@ -941,7 +1001,7 @@ function renderStructuredArrayItem(
   itemConfig: Record<string, any>,
   index: string,
   itemValue: any,
-  pluginStatuses: FieldRenderOptions['pluginStatuses']
+  pluginStatuses: FieldRenderOptions['pluginStatuses'],
 ): string {
   const itemFields = renderStructuredItemFields(field, itemConfig, index, itemValue, pluginStatuses)
 
@@ -989,10 +1049,14 @@ function renderStructuredItemFields(
   itemConfig: Record<string, any>,
   index: string,
   itemValue: any,
-  pluginStatuses: FieldRenderOptions['pluginStatuses']
+  pluginStatuses: FieldRenderOptions['pluginStatuses'],
 ): string {
   const itemType = itemConfig?.type || 'string'
-  if (itemType === 'object' && itemConfig?.properties && typeof itemConfig.properties === 'object') {
+  if (
+    itemType === 'object' &&
+    itemConfig?.properties &&
+    typeof itemConfig.properties === 'object'
+  ) {
     const fieldPrefix = `array-${field.field_name}-${index}`
     return Object.entries(itemConfig.properties)
       .map(([propertyName, propertyConfig]) =>
@@ -1002,8 +1066,8 @@ function renderStructuredItemFields(
           propertyConfig,
           itemValue || {},
           pluginStatuses,
-          fieldPrefix
-        )
+          fieldPrefix,
+        ),
       )
       .join('')
   }
@@ -1034,7 +1098,7 @@ function renderStructuredSubfield(
   propertyConfig: any,
   objectValue: Record<string, any>,
   pluginStatuses: FieldRenderOptions['pluginStatuses'],
-  fieldPrefix: string
+  fieldPrefix: string,
 ): string {
   const normalizedField = normalizeBlockField(propertyConfig, propertyName)
   const fieldValue = objectValue?.[propertyName] ?? normalizedField.defaultValue ?? ''
@@ -1085,7 +1149,7 @@ function normalizeStructuredArrayValue(value: any): any[] {
 }
 
 function normalizeBlockDefinitions(
-  rawBlocks: any
+  rawBlocks: any,
 ): Array<{ name: string; label: string; description?: string; properties: Record<string, any> }> {
   if (!rawBlocks || typeof rawBlocks !== 'object') return []
 
@@ -1128,7 +1192,7 @@ function renderBlockTemplate(
   field: FieldDefinition,
   block: { name: string; label: string; description?: string; properties: Record<string, any> },
   discriminator: string,
-  pluginStatuses: FieldRenderOptions['pluginStatuses']
+  pluginStatuses: FieldRenderOptions['pluginStatuses'],
 ): string {
   return `
     <template data-block-template="${escapeHtml(block.name)}">
@@ -1148,7 +1212,7 @@ function renderBlockItem(
   }>,
   discriminator: string,
   index: number,
-  pluginStatuses: FieldRenderOptions['pluginStatuses']
+  pluginStatuses: FieldRenderOptions['pluginStatuses'],
 ): string {
   const blockType = blockValue?.[discriminator] || blockValue?.blockType
   const blockDefinition = blocks.find((block) => block.name === blockType)
@@ -1175,7 +1239,7 @@ function renderBlockCard(
   discriminator: string,
   index: string,
   data: Record<string, any>,
-  pluginStatuses: FieldRenderOptions['pluginStatuses']
+  pluginStatuses: FieldRenderOptions['pluginStatuses'],
 ): string {
   const blockFields = Object.entries(block.properties)
     .map(([fieldName, fieldConfig]) => {
@@ -1651,11 +1715,15 @@ function getBlocksFieldScript(): string {
 
 function escapeHtml(text: string): string {
   if (typeof text !== 'string') return String(text || '')
-  return text.replace(/[&<>"']/g, (char) => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-  }[char] || char))
+  return text.replace(
+    /[&<>"']/g,
+    (char) =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      })[char] || char,
+  )
 }
