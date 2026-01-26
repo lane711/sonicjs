@@ -1,70 +1,78 @@
 'use strict';
 
-var chunkAYPF6C4D_cjs = require('./chunk-AYPF6C4D.cjs');
-var chunkEHSZ6TAN_cjs = require('./chunk-EHSZ6TAN.cjs');
+var chunkS6K2H2TS_cjs = require('./chunk-S6K2H2TS.cjs');
+var chunkSHCYIZAN_cjs = require('./chunk-SHCYIZAN.cjs');
 require('./chunk-IGJUBJBW.cjs');
 
 
 
 Object.defineProperty(exports, "renderFilterBar", {
   enumerable: true,
-  get: function () { return chunkAYPF6C4D_cjs.renderFilterBar; }
+  get: function () { return chunkS6K2H2TS_cjs.renderFilterBar; }
+});
+Object.defineProperty(exports, "renderFormsDocsPage", {
+  enumerable: true,
+  get: function () { return chunkS6K2H2TS_cjs.renderFormsDocsPage; }
+});
+Object.defineProperty(exports, "renderFormsExamplesPage", {
+  enumerable: true,
+  get: function () { return chunkS6K2H2TS_cjs.renderFormsExamplesPage; }
 });
 Object.defineProperty(exports, "getConfirmationDialogScript", {
   enumerable: true,
-  get: function () { return chunkEHSZ6TAN_cjs.getConfirmationDialogScript; }
+  get: function () { return chunkSHCYIZAN_cjs.getConfirmationDialogScript; }
 });
 Object.defineProperty(exports, "renderAdminLayout", {
   enumerable: true,
-  get: function () { return chunkEHSZ6TAN_cjs.renderAdminLayout; }
+  get: function () { return chunkSHCYIZAN_cjs.renderAdminLayout; }
 });
 Object.defineProperty(exports, "renderAdminLayoutCatalyst", {
   enumerable: true,
-  get: function () { return chunkEHSZ6TAN_cjs.renderAdminLayoutCatalyst; }
+  get: function () { return chunkSHCYIZAN_cjs.renderAdminLayoutCatalyst; }
 });
 Object.defineProperty(exports, "renderAlert", {
   enumerable: true,
-  get: function () { return chunkEHSZ6TAN_cjs.renderAlert; }
+  get: function () { return chunkSHCYIZAN_cjs.renderAlert; }
 });
 Object.defineProperty(exports, "renderCheckboxPage", {
   enumerable: true,
-  get: function () { return chunkEHSZ6TAN_cjs.renderCheckboxPage; }
+  get: function () { return chunkSHCYIZAN_cjs.renderCheckboxPage; }
 });
 Object.defineProperty(exports, "renderCodeExamplesList", {
   enumerable: true,
-  get: function () { return chunkEHSZ6TAN_cjs.renderCodeExamplesList; }
+  get: function () { return chunkSHCYIZAN_cjs.renderCodeExamplesList; }
 });
 Object.defineProperty(exports, "renderConfirmationDialog", {
   enumerable: true,
-  get: function () { return chunkEHSZ6TAN_cjs.renderConfirmationDialog; }
+  get: function () { return chunkSHCYIZAN_cjs.renderConfirmationDialog; }
 });
 Object.defineProperty(exports, "renderDesignPage", {
   enumerable: true,
-  get: function () { return chunkEHSZ6TAN_cjs.renderDesignPage; }
+  get: function () { return chunkSHCYIZAN_cjs.renderDesignPage; }
 });
 Object.defineProperty(exports, "renderForm", {
   enumerable: true,
-  get: function () { return chunkEHSZ6TAN_cjs.renderForm; }
+  get: function () { return chunkSHCYIZAN_cjs.renderForm; }
 });
 Object.defineProperty(exports, "renderFormField", {
   enumerable: true,
-  get: function () { return chunkEHSZ6TAN_cjs.renderFormField; }
+  get: function () { return chunkSHCYIZAN_cjs.renderFormField; }
 });
 Object.defineProperty(exports, "renderLogo", {
   enumerable: true,
-  get: function () { return chunkEHSZ6TAN_cjs.renderLogo; }
+  get: function () { return chunkSHCYIZAN_cjs.renderLogo; }
 });
 Object.defineProperty(exports, "renderPagination", {
   enumerable: true,
-  get: function () { return chunkEHSZ6TAN_cjs.renderPagination; }
+  get: function () { return chunkSHCYIZAN_cjs.renderPagination; }
 });
 Object.defineProperty(exports, "renderTable", {
   enumerable: true,
-  get: function () { return chunkEHSZ6TAN_cjs.renderTable; }
+  get: function () { return chunkSHCYIZAN_cjs.renderTable; }
 });
 Object.defineProperty(exports, "renderTestimonialsList", {
   enumerable: true,
-  get: function () { return chunkEHSZ6TAN_cjs.renderTestimonialsList; }
+  get: function () { return chunkSHCYIZAN_cjs.renderTestimonialsList; }
 });
 //# sourceMappingURL=templates.cjs.map
 //# sourceMappingURL=templates.cjs.map
