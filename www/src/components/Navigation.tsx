@@ -265,6 +265,7 @@ export const navigation: Array<NavGroup> = [
       { title: 'Development Guide', href: '/plugins/development' },
       { title: 'Core Plugins', href: '/plugins/core' },
       { title: 'AI Search', href: '/plugins/ai-search' },
+      { title: 'Analytics', href: '/plugins/analytics' },
       { title: 'Workflow', href: '/plugins/workflow' },
       { title: 'Turnstile (Bot Protection)', href: '/plugins/turnstile' },
       { title: 'Email Templates', href: '/plugins/email-templates' },
@@ -275,6 +276,7 @@ export const navigation: Array<NavGroup> = [
     links: [
       { title: 'Configuration', href: '/configuration' },
       { title: 'Hook Reference', href: '/hooks' },
+      { title: 'Field Types', href: '/field-types' },
       { title: 'Security', href: '/security' },
       { title: 'Troubleshooting', href: '/troubleshooting' },
     ],
