@@ -1,0 +1,924 @@
+export const metadata = {
+  title: 'Field Types Reference - SonicJS',
+  description:
+    'Complete reference for all SonicJS collection field types including text, number, boolean, date, select, media, richtext, and structured types.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Text Fields', id: 'text-fields' },
+  { title: 'Number Fields', id: 'number-fields' },
+  { title: 'Boolean Fields', id: 'boolean-fields' },
+  { title: 'Date Fields', id: 'date-fields' },
+  { title: 'Selection Fields', id: 'selection-fields' },
+  { title: 'Media Fields', id: 'media-fields' },
+  { title: 'Rich Text Fields', id: 'rich-text-fields' },
+  { title: 'Structured Fields', id: 'structured-fields' },
+  { title: 'Reference Fields', id: 'reference-fields' },
+  { title: 'Field Configuration', id: 'field-configuration' },
+]
+
+# Field Types Reference
+
+Complete reference for all available field types in SonicJS collection schemas. {{ className: 'lead' }}
+
+---
+
+## Overview
+
+Field types define the structure and validation of content in your collections. Each field type has specific rendering, storage, and validation behavior.
+
+### Common Properties
+
+All field types support these common properties:
+
+<CodeGroup title="Common Field Properties">
+
+```typescript
+interface FieldConfig {
+  type: FieldType           // Required: The field type
+  title?: string            // Display label
+  description?: string      // Help text shown below field
+  required?: boolean        // Is the field required (default: false)
+  default?: any            // Default value
+  placeholder?: string      // Placeholder text
+}
+```
+
+</CodeGroup>
+
+---
+
+## Text Fields
+
+### string
+
+Basic text input for short content.
+
+<CodeGroup title="String Field">
+
+```typescript
+{
+  type: 'string',
+  title: 'Title',
+  required: true,
+  maxLength: 200,
+  placeholder: 'Enter a title',
+  pattern: '^[a-zA-Z0-9 ]+$'  // Optional regex validation
+}
+```
+
+</CodeGroup>
+
+**Options:**
+| Option | Type | Description |
+|--------|------|-------------|
+| `maxLength` | number | Maximum characters allowed |
+| `minLength` | number | Minimum characters required |
+| `pattern` | string | Regex pattern for validation |
+| `placeholder` | string | Placeholder text |
+
+**Storage:** `VARCHAR(255)`
+
+---
+
+### textarea
+
+Multi-line text input for longer content.
+
+<CodeGroup title="Textarea Field">
+
+```typescript
+{
+  type: 'textarea',
+  title: 'Description',
+  required: true,
+  rows: 5,
+  maxLength: 1000,
+  placeholder: 'Enter a description'
+}
+```
+
+</CodeGroup>
+
+**Options:**
+| Option | Type | Description |
+|--------|------|-------------|
+| `rows` | number | Height in rows (default: 3) |
+| `maxLength` | number | Maximum characters |
+| `placeholder` | string | Placeholder text |
+
+**Storage:** `TEXT`
+
+---
+
+### slug
+
+URL-friendly identifier with auto-generation and uniqueness checking.
+
+<CodeGroup title="Slug Field">
+
+```typescript
+{
+  type: 'slug',
+  title: 'URL Slug',
+  required: true,
+  maxLength: 100
+}
+```
+
+</CodeGroup>
+
+**Features:**
+- Auto-generates from title field
+- Validates format (lowercase, numbers, hyphens only)
+- Checks for duplicates in collection
+- Regenerate button in admin UI
+
+**Options:**
+| Option | Type | Description |
+|--------|------|-------------|
+| `maxLength` | number | Maximum length (default: 100) |
+| `pattern` | string | Validation pattern (default: `^[a-z0-9-]+$`) |
+
+**Storage:** `VARCHAR(100)`
+
+---
+
+### email
+
+Email address field with validation.
+
+<CodeGroup title="Email Field">
+
+```typescript
+{
+  type: 'email',
+  title: 'Email Address',
+  required: true,
+  placeholder: 'user@example.com'
+}
+```
+
+</CodeGroup>
+
+**Storage:** `VARCHAR(255)`
+
+---
+
+### url
+
+URL field for links.
+
+<CodeGroup title="URL Field">
+
+```typescript
+{
+  type: 'url',
+  title: 'Website',
+  placeholder: 'https://example.com'
+}
+```
+
+</CodeGroup>
+
+**Storage:** `VARCHAR(500)`
+
+---
+
+## Number Fields
+
+### number
+
+Numeric input with optional min/max/step validation.
+
+<CodeGroup title="Number Field">
+
+```typescript
+{
+  type: 'number',
+  title: 'Price',
+  required: true,
+  min: 0,
+  max: 10000,
+  step: 0.01,
+  placeholder: '0.00'
+}
+```
+
+</CodeGroup>
+
+**Options:**
+| Option | Type | Description |
+|--------|------|-------------|
+| `min` | number | Minimum value |
+| `max` | number | Maximum value |
+| `step` | number | Increment step (default: 1) |
+
+**Storage:** `DECIMAL(10,2)`
+
+---
+
+## Boolean Fields
+
+### boolean / checkbox
+
+Toggle or checkbox for true/false values.
+
+<CodeGroup title="Boolean Field">
+
+```typescript
+{
+  type: 'boolean',
+  title: 'Published',
+  default: false,
+  checkboxLabel: 'Make this content public'
+}
+```
+
+</CodeGroup>
+
+**Options:**
+| Option | Type | Description |
+|--------|------|-------------|
+| `checkboxLabel` | string | Label next to checkbox |
+| `default` | boolean | Default value (default: false) |
+
+**Storage:** `BOOLEAN`
+
+---
+
+## Date Fields
+
+### date
+
+Date picker without time.
+
+<CodeGroup title="Date Field">
+
+```typescript
+{
+  type: 'date',
+  title: 'Publication Date',
+  min: '2024-01-01',
+  max: '2030-12-31'
+}
+```
+
+</CodeGroup>
+
+**Options:**
+| Option | Type | Description |
+|--------|------|-------------|
+| `min` | string | Minimum date (YYYY-MM-DD) |
+| `max` | string | Maximum date (YYYY-MM-DD) |
+| `defaultToday` | boolean | Default to current date |
+
+**Storage:** `DATE`
+
+---
+
+### datetime
+
+Date and time picker.
+
+<CodeGroup title="DateTime Field">
+
+```typescript
+{
+  type: 'datetime',
+  title: 'Event Start',
+  required: true
+}
+```
+
+</CodeGroup>
+
+**Options:**
+| Option | Type | Description |
+|--------|------|-------------|
+| `min` | string | Minimum datetime |
+| `max` | string | Maximum datetime |
+
+**Storage:** `DATETIME`
+
+---
+
+## Selection Fields
+
+### select
+
+Dropdown selection from predefined options.
+
+<CodeGroup title="Select Field">
+
+```typescript
+{
+  type: 'select',
+  title: 'Status',
+  required: true,
+  enum: ['draft', 'published', 'archived'],
+  enumLabels: ['Draft', 'Published', 'Archived'],
+  default: 'draft'
+}
+```
+
+</CodeGroup>
+
+**Options:**
+| Option | Type | Description |
+|--------|------|-------------|
+| `enum` | string[] | Option values |
+| `enumLabels` | string[] | Display labels for options |
+| `multiple` | boolean | Allow multiple selections |
+| `searchable` | boolean | Enable search/filter |
+| `allowCustom` | boolean | Allow user-entered values |
+
+**Storage:** `VARCHAR(255)` (single) or `JSON` (multiple)
+
+---
+
+### Multiselect
+
+Use select with `multiple: true` for multiple selection.
+
+<CodeGroup title="Multiselect Field">
+
+```typescript
+{
+  type: 'select',
+  title: 'Tags',
+  multiple: true,
+  enum: ['javascript', 'typescript', 'react', 'vue', 'angular'],
+  enumLabels: ['JavaScript', 'TypeScript', 'React', 'Vue', 'Angular']
+}
+```
+
+</CodeGroup>
+
+**Storage:** `JSON` (array of values)
+
+---
+
+### radio
+
+Radio button group for single selection.
+
+<CodeGroup title="Radio Field">
+
+```typescript
+{
+  type: 'radio',
+  title: 'Priority',
+  enum: ['low', 'medium', 'high'],
+  enumLabels: ['Low', 'Medium', 'High'],
+  default: 'medium'
+}
+```
+
+</CodeGroup>
+
+**Storage:** `VARCHAR(255)`
+
+---
+
+## Media Fields
+
+### media
+
+File upload with preview for images, videos, and documents.
+
+<CodeGroup title="Media Field">
+
+```typescript
+{
+  type: 'media',
+  title: 'Featured Image',
+  required: true,
+  allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
+  maxFileSize: 5242880  // 5MB
+}
+```
+
+</CodeGroup>
+
+**Options:**
+| Option | Type | Description |
+|--------|------|-------------|
+| `allowedTypes` | string[] | Allowed MIME types (default: `['image/*']`) |
+| `maxFileSize` | number | Max file size in bytes (default: 10MB) |
+| `multiple` | boolean | Allow multiple files |
+| `autoUpload` | boolean | Upload immediately on selection |
+
+**Common MIME Types:**
+- Images: `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`
+- Videos: `video/mp4`, `video/webm`
+- Documents: `application/pdf`, `application/msword`
+
+**Storage:** `VARCHAR(500)` (URL) or `JSON` (multiple)
+
+---
+
+### color
+
+Color picker with hex value.
+
+<CodeGroup title="Color Field">
+
+```typescript
+{
+  type: 'color',
+  title: 'Brand Color',
+  default: '#3B82F6'
+}
+```
+
+</CodeGroup>
+
+**Storage:** `VARCHAR(7)` (hex code)
+
+---
+
+## Rich Text Fields
+
+### richtext
+
+WYSIWYG editor for formatted content.
+
+<CodeGroup title="RichText Field">
+
+```typescript
+{
+  type: 'richtext',
+  title: 'Content',
+  required: true,
+  height: 400,
+  toolbar: 'full',
+  allowImages: true
+}
+```
+
+</CodeGroup>
+
+**Options:**
+| Option | Type | Description |
+|--------|------|-------------|
+| `height` | number | Editor height in pixels (default: 300) |
+| `toolbar` | string | `'simple'` or `'full'` (default: 'full') |
+| `allowImages` | boolean | Allow image insertion |
+
+**Storage:** `TEXT` (HTML)
+
+<Note>
+Falls back to textarea if no rich text editor plugin is active.
+</Note>
+
+---
+
+### quill
+
+Quill editor (requires Quill Editor Plugin).
+
+<CodeGroup title="Quill Field">
+
+```typescript
+{
+  type: 'quill',
+  title: 'Article Body',
+  required: true,
+  theme: 'snow',
+  height: 400,
+  toolbar: 'full'
+}
+```
+
+</CodeGroup>
+
+**Options:**
+| Option | Type | Description |
+|--------|------|-------------|
+| `theme` | string | `'snow'` or `'bubble'` (default: 'snow') |
+| `height` | number | Editor height |
+| `toolbar` | string | `'full'`, `'simple'`, or `'minimal'` |
+
+**Toolbar Presets:**
+- `full`: Headers, formatting, colors, lists, links, images
+- `simple`: Bold, italic, underline, lists, links
+- `minimal`: Bold, italic, links
+
+**Storage:** `TEXT` (HTML)
+
+---
+
+### mdxeditor / markdown
+
+Markdown editor (requires EasyMDE Plugin).
+
+<CodeGroup title="Markdown Field">
+
+```typescript
+{
+  type: 'mdxeditor',
+  title: 'Documentation',
+  height: 400
+}
+```
+
+</CodeGroup>
+
+**Storage:** `TEXT` (Markdown)
+
+---
+
+### tinymce
+
+TinyMCE editor (requires TinyMCE Plugin).
+
+<CodeGroup title="TinyMCE Field">
+
+```typescript
+{
+  type: 'tinymce',
+  title: 'Page Content',
+  required: true
+}
+```
+
+</CodeGroup>
+
+**Storage:** `TEXT` (HTML)
+
+---
+
+## Structured Fields
+
+### object
+
+Nested group of fields.
+
+<CodeGroup title="Object Field">
+
+```typescript
+{
+  type: 'object',
+  title: 'SEO Settings',
+  properties: {
+    metaTitle: {
+      type: 'string',
+      title: 'Meta Title',
+      maxLength: 60
+    },
+    metaDescription: {
+      type: 'textarea',
+      title: 'Meta Description',
+      maxLength: 160
+    },
+    keywords: {
+      type: 'string',
+      title: 'Keywords'
+    }
+  }
+}
+```
+
+</CodeGroup>
+
+**Options:**
+| Option | Type | Description |
+|--------|------|-------------|
+| `properties` | object | Nested field definitions |
+
+**Storage:** `JSON`
+
+---
+
+### array
+
+Repeatable list of items.
+
+<CodeGroup title="Array Field - Simple">
+
+```typescript
+{
+  type: 'array',
+  title: 'Tags',
+  items: {
+    type: 'string'
+  }
+}
+```
+
+</CodeGroup>
+
+<CodeGroup title="Array Field - Objects">
+
+```typescript
+{
+  type: 'array',
+  title: 'Team Members',
+  items: {
+    type: 'object',
+    properties: {
+      name: { type: 'string', title: 'Name', required: true },
+      role: { type: 'string', title: 'Role' },
+      photo: { type: 'media', title: 'Photo' }
+    }
+  }
+}
+```
+
+</CodeGroup>
+
+**Features:**
+- Add/remove items
+- Drag-to-reorder
+- Move up/down buttons
+
+**Storage:** `JSON`
+
+---
+
+### blocks
+
+Discriminated union for flexible content blocks (page builders).
+
+<CodeGroup title="Blocks Field">
+
+```typescript
+{
+  type: 'array',
+  title: 'Page Content',
+  items: {
+    type: 'object',
+    discriminator: 'blockType',
+    blocks: {
+      text: {
+        label: 'Text Block',
+        description: 'A heading with body text',
+        properties: {
+          heading: { type: 'string', title: 'Heading' },
+          body: { type: 'richtext', title: 'Body' }
+        }
+      },
+      image: {
+        label: 'Image Block',
+        description: 'Full-width image with caption',
+        properties: {
+          image: { type: 'media', title: 'Image', required: true },
+          caption: { type: 'string', title: 'Caption' },
+          alt: { type: 'string', title: 'Alt Text' }
+        }
+      },
+      cta: {
+        label: 'Call to Action',
+        description: 'Button with text',
+        properties: {
+          title: { type: 'string', title: 'Title' },
+          description: { type: 'textarea', title: 'Description' },
+          buttonText: { type: 'string', title: 'Button Text' },
+          buttonUrl: { type: 'url', title: 'Button URL' }
+        }
+      }
+    }
+  }
+}
+```
+
+</CodeGroup>
+
+**Options:**
+| Option | Type | Description |
+|--------|------|-------------|
+| `discriminator` | string | Field name for block type (default: 'blockType') |
+| `blocks` | object | Block type definitions |
+
+**Block Definition:**
+| Property | Type | Description |
+|----------|------|-------------|
+| `label` | string | Display name in selector |
+| `description` | string | Help text |
+| `properties` | object | Field definitions for this block |
+
+**Features:**
+- Block type selector dropdown
+- Add any block type
+- Reorder blocks
+- Type-specific fields
+
+**Storage:** `JSON`
+
+---
+
+## Reference Fields
+
+### reference
+
+Link to content from another collection.
+
+<CodeGroup title="Reference Field - Single Collection">
+
+```typescript
+{
+  type: 'reference',
+  title: 'Author',
+  collection: 'users',
+  required: true
+}
+```
+
+</CodeGroup>
+
+<CodeGroup title="Reference Field - Multiple Collections">
+
+```typescript
+{
+  type: 'reference',
+  title: 'Related Content',
+  collection: ['blog_posts', 'pages', 'products']
+}
+```
+
+</CodeGroup>
+
+**Options:**
+| Option | Type | Description |
+|--------|------|-------------|
+| `collection` | string or string[] | Collection(s) to reference |
+
+**Storage:** `VARCHAR(255)` (content ID)
+
+---
+
+### json
+
+Raw JSON data field.
+
+<CodeGroup title="JSON Field">
+
+```typescript
+{
+  type: 'json',
+  title: 'Custom Data',
+  default: {}
+}
+```
+
+</CodeGroup>
+
+**Storage:** `JSON`
+
+---
+
+## Field Configuration
+
+### Complete Example
+
+<CodeGroup title="Full Collection Example">
+
+```typescript
+import { defineCollection } from '@sonicjs-cms/core'
+
+export default defineCollection({
+  name: 'blog_posts',
+  displayName: 'Blog Posts',
+  description: 'Blog articles and news',
+  schema: {
+    // Text fields
+    title: {
+      type: 'string',
+      title: 'Title',
+      required: true,
+      maxLength: 200
+    },
+    slug: {
+      type: 'slug',
+      title: 'URL Slug',
+      required: true
+    },
+    excerpt: {
+      type: 'textarea',
+      title: 'Excerpt',
+      maxLength: 300,
+      description: 'Short summary for listings'
+    },
+
+    // Rich content
+    content: {
+      type: 'richtext',
+      title: 'Content',
+      required: true
+    },
+
+    // Media
+    featuredImage: {
+      type: 'media',
+      title: 'Featured Image',
+      allowedTypes: ['image/*']
+    },
+
+    // Selection
+    status: {
+      type: 'select',
+      title: 'Status',
+      enum: ['draft', 'published', 'archived'],
+      enumLabels: ['Draft', 'Published', 'Archived'],
+      default: 'draft'
+    },
+    category: {
+      type: 'select',
+      title: 'Category',
+      enum: ['news', 'tutorial', 'announcement'],
+      enumLabels: ['News', 'Tutorial', 'Announcement']
+    },
+    tags: {
+      type: 'select',
+      title: 'Tags',
+      multiple: true,
+      enum: ['javascript', 'react', 'nodejs', 'cloudflare']
+    },
+
+    // Date
+    publishedAt: {
+      type: 'datetime',
+      title: 'Publish Date'
+    },
+
+    // Boolean
+    featured: {
+      type: 'boolean',
+      title: 'Featured',
+      checkboxLabel: 'Show on homepage',
+      default: false
+    },
+
+    // Reference
+    author: {
+      type: 'reference',
+      title: 'Author',
+      collection: 'users',
+      required: true
+    },
+
+    // Structured
+    seo: {
+      type: 'object',
+      title: 'SEO',
+      properties: {
+        metaTitle: { type: 'string', title: 'Meta Title' },
+        metaDescription: { type: 'textarea', title: 'Meta Description' }
+      }
+    },
+
+    // Array
+    relatedPosts: {
+      type: 'array',
+      title: 'Related Posts',
+      items: {
+        type: 'reference',
+        collection: 'blog_posts'
+      }
+    }
+  }
+})
+```
+
+</CodeGroup>
+
+### Validation Summary
+
+| Field Type | Client Validation | Server Validation |
+|------------|-------------------|-------------------|
+| string | HTML5 + pattern | Zod schema |
+| textarea | HTML5 + maxLength | Zod schema |
+| slug | Format + uniqueness API | Uniqueness check |
+| number | HTML5 min/max/step | Zod schema |
+| boolean | - | Zod schema |
+| date/datetime | HTML5 min/max | Zod schema |
+| select | Valid option check | Enum validation |
+| media | File type/size | MIME validation |
+| richtext | - | HTML sanitization |
+| object | Nested validation | Zod schema |
+| array | Item validation | Zod schema |
+| reference | - | Exists check |
+
+---
+
+## Next Steps
+
+<div className="not-prose">
+  <Button href="/collections" variant="text" arrow="right">
+    <>Learn about collections</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/api" variant="text" arrow="right">
+    <>Content API reference</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/plugins/core" variant="text" arrow="right">
+    <>Rich text editor plugins</>
+  </Button>
+</div>
