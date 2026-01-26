@@ -770,12 +770,20 @@ export function renderDynamicField(
       `
   }
 
+  const showLabel = field.field_type !== 'boolean'
+
   return `
     <div class="form-group">
+      ${
+        showLabel
+          ? `
       <label for="${fieldId}" class="block text-sm/6 font-medium text-zinc-950 dark:text-white mb-2">
         ${escapeHtml(field.field_label)}
         ${field.is_required ? '<span class="text-pink-600 dark:text-pink-400 ml-1">*</span>' : ''}
       </label>
+      `
+          : ''
+      }
       ${fieldHTML}
       ${
         errors.length > 0
