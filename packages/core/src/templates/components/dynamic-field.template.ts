@@ -613,10 +613,17 @@ export function renderDynamicField(
       const hasReferenceCollection = referenceCollections.length > 0
       const hasReferenceValue = Boolean(value)
       fieldHTML = `
-        <div class="reference-field-container" data-reference-field data-field-name="${escapeHtml(fieldName)}" data-reference-collection="${escapeHtml(referenceCollections[0] || '')}" data-reference-collections="${escapeHtml(referenceCollectionsAttr)}">
+        <div class="reference-field-container" data-reference-field data-field-name="${escapeHtml(fieldName)}" data-reference-collection="${escapeHtml(referenceCollections[0] || '')}" data-reference-collections="${escapeHtml(referenceCollectionsAttr)}" data-reference-enabled="${hasReferenceCollection ? 'true' : 'false'}">
           <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml(value)}">
           <div class="flex flex-wrap items-start gap-2">
-            <div class="min-w-[220px] flex-1 rounded-lg border border-zinc-200 bg-white/60 px-3 py-2 text-sm text-zinc-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300" data-reference-display>
+            <div
+              class="min-w-[220px] flex-1 rounded-lg border border-zinc-200 bg-white/60 px-3 py-2 text-sm text-zinc-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 ${hasReferenceCollection ? 'cursor-pointer hover:border-zinc-300 dark:hover:border-white/20' : 'cursor-not-allowed opacity-80'}"
+              data-reference-display
+              data-reference-trigger
+              role="button"
+              tabindex="${hasReferenceCollection ? '0' : '-1'}"
+              aria-disabled="${hasReferenceCollection ? 'false' : 'true'}"
+            >
               ${hasReferenceCollection ? (hasReferenceValue ? 'Loading selection...' : 'No reference selected.') : 'Reference collection not configured.'}
             </div>
             <div class="flex flex-wrap items-center gap-2">

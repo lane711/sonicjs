@@ -860,6 +860,20 @@ export function renderContentFormPage(data: ContentFormData): string {
           const input = container.querySelector('input[type="hidden"]');
           const collections = getReferenceCollections(container);
           if (!input || collections.length === 0) return;
+          const trigger = container.querySelector('[data-reference-trigger]');
+          if (trigger) {
+            const openSelector = (event) => {
+              if (container.dataset.referenceEnabled !== 'true') return;
+              if (event?.type === 'keydown') {
+                const key = event.key;
+                if (key !== 'Enter' && key !== ' ') return;
+                event.preventDefault();
+              }
+              openReferenceSelector(input.id);
+            };
+            trigger.addEventListener('click', openSelector);
+            trigger.addEventListener('keydown', openSelector);
+          }
 
           if (!input.value) {
             renderReferenceDisplay(container, null, 'No reference selected.');
