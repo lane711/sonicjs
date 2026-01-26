@@ -586,29 +586,31 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
       const hasReferenceCollection = referenceCollections.length > 0
       const hasReferenceValue = Boolean(value)
       fieldHTML = `
-        <div class="reference-field-container space-y-3" data-reference-field data-field-name="${escapeHtml(fieldName)}" data-reference-collection="${escapeHtml(referenceCollections[0] || '')}" data-reference-collections="${escapeHtml(referenceCollectionsAttr)}">
+        <div class="reference-field-container" data-reference-field data-field-name="${escapeHtml(fieldName)}" data-reference-collection="${escapeHtml(referenceCollections[0] || '')}" data-reference-collections="${escapeHtml(referenceCollectionsAttr)}">
           <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml(value)}">
-          <div class="rounded-lg border border-zinc-200 bg-white/60 px-3 py-2 text-sm text-zinc-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300" data-reference-display>
-            ${hasReferenceCollection ? (hasReferenceValue ? 'Loading selection...' : 'No reference selected.') : 'Reference collection not configured.'}
-          </div>
-          <div class="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onclick="openReferenceSelector('${fieldId}')"
-              class="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-white/10 dark:hover:bg-white/20"
-              ${hasReferenceCollection ? '' : 'disabled'}
-            >
-              Select reference
-            </button>
-            <button
-              type="button"
-              onclick="clearReferenceField('${fieldId}')"
-              class="inline-flex items-center justify-center rounded-lg border border-zinc-200 px-3 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/10"
-              data-reference-clear
-              ${hasReferenceValue ? '' : 'disabled'}
-            >
-              Remove
-            </button>
+          <div class="flex flex-wrap items-start gap-2">
+            <div class="min-w-[220px] flex-1 rounded-lg border border-zinc-200 bg-white/60 px-3 py-2 text-sm text-zinc-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300" data-reference-display>
+              ${hasReferenceCollection ? (hasReferenceValue ? 'Loading selection...' : 'No reference selected.') : 'Reference collection not configured.'}
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onclick="openReferenceSelector('${fieldId}')"
+                class="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-white/10 dark:hover:bg-white/20"
+                ${hasReferenceCollection ? '' : 'disabled'}
+              >
+                Select reference
+              </button>
+              <button
+                type="button"
+                onclick="clearReferenceField('${fieldId}')"
+                class="inline-flex items-center justify-center rounded-lg border border-zinc-200 px-3 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/10"
+                data-reference-clear
+                ${hasReferenceValue ? '' : 'disabled'}
+              >
+                Remove
+              </button>
+            </div>
           </div>
         </div>
       `
