@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Super Simple Form.io Test</title>
+  <link rel="stylesheet" href="https://cdn.form.io/formiojs/formio.full.min.css">
+</head>
+<body>
+  <h1>Super Simple Form.io Builder Test</h1>
+  <div id="version"></div>
+  <div id="builder" style="height: 600px; border: 2px solid #ccc; margin: 20px; padding: 10px;"></div>
+
+  <script src="https://cdn.form.io/formiojs/formio.full.min.js"></script>
+  <script>
+    // Log version
+    document.getElementById('version').textContent = 'Form.io version: ' + (Formio.version || 'unknown');
+    console.log('Form.io version:', Formio.version);
+    
+    // Simplest possible builder initialization
+    Formio.builder(document.getElementById('builder'), {
+      components: []
+    }).then(function(builder) {
+      console.log('✅ SUCCESS! Builder loaded');
+      console.log('Builder groups:', Object.keys(builder.groups || {}));
+      
+      // Count components in each group
+      if (builder.groups) {
+        Object.keys(builder.groups).forEach(function(groupKey) {
+          var group = builder.groups[groupKey];
+          var count = group.components ? Object.keys(group.components).length : 0;
+          console.log('Group "' + groupKey + '": ' + count + ' components');
+          
+          // List first 5 components in each group
+          if (group.components && count > 0) {
+            var compNames = Object.keys(group.components).slice(0, 5);
+            console.log('  - Sample components:', compNames.join(', '));
+          }
+        });
+      }
+    }).catch(function(err) {
+      console.error('❌ ERROR:', err);
+      alert('Builder failed to load: ' + err.message);
+    });
+  </script>
+</body>
+</html>

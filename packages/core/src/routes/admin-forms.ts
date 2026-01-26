@@ -3,6 +3,7 @@ import { requireAuth } from '../middleware'
 import { renderFormsListPage } from '../templates/pages/admin-forms-list.template'
 import { renderFormBuilderPage, type FormBuilderPageData } from '../templates/pages/admin-forms-builder.template'
 import { renderFormCreatePage } from '../templates/pages/admin-forms-create.template'
+import { TurnstileService } from '../plugins/core-plugins/turnstile-plugin/services/turnstile'
 
 // Type definitions for forms
 interface Form {
@@ -29,6 +30,8 @@ interface FormData {
   settings?: any
   is_active?: boolean
   is_public?: boolean
+  google_maps_api_key?: string
+  turnstile_site_key?: string
   error?: string
   success?: string
   user?: {
@@ -60,6 +63,7 @@ type Bindings = {
   SENDGRID_API_KEY?: string
   DEFAULT_FROM_EMAIL?: string
   ENVIRONMENT?: string
+  GOOGLE_MAPS_API_KEY?: string
 }
 
 type Variables = {
@@ -156,6 +160,50 @@ adminFormsRoutes.get('/new', async (c) => {
   }
 })
 
+// Show docs page
+adminFormsRoutes.get('/docs', async (c) => {
+  try {
+    const user = c.get('user')
+    const { renderFormsDocsPage } = await import('../templates/index.js')
+
+    const pageData = {
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : undefined,
+      version: c.get('appVersion')
+    }
+
+    return c.html(renderFormsDocsPage(pageData))
+  } catch (error: any) {
+    console.error('Error showing forms docs page:', error)
+    return c.html('<p>Error loading documentation</p>', 500)
+  }
+})
+
+// Show examples page
+adminFormsRoutes.get('/examples', async (c) => {
+  try {
+    const user = c.get('user')
+    const { renderFormsExamplesPage } = await import('../templates/index.js')
+
+    const pageData = {
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : undefined,
+      version: c.get('appVersion')
+    }
+
+    return c.html(renderFormsExamplesPage(pageData))
+  } catch (error: any) {
+    console.error('Error showing forms examples page:', error)
+    return c.html('<p>Error loading examples</p>', 500)
+  }
+})
+
 // Create new form
 adminFormsRoutes.post('/', async (c) => {
   try {
@@ -234,6 +282,7 @@ adminFormsRoutes.get('/:id/builder', async (c) => {
     const user = c.get('user')
     const db = c.env.DB
     const formId = c.req.param('id')
+    const googleMapsApiKey = c.env.GOOGLE_MAPS_API_KEY || ''
 
     // Get form
     const form = await db.prepare('SELECT * FROM forms WHERE id = ?')
@@ -243,6 +292,10 @@ adminFormsRoutes.get('/:id/builder', async (c) => {
     if (!form) {
       return c.html('<p>Form not found</p>', 404)
     }
+
+    // Get Turnstile configuration
+    const turnstileService = new TurnstileService(db)
+    const turnstileSettings = await turnstileService.getSettings()
 
     const pageData: FormData = {
       id: form.id as string,
@@ -254,6 +307,8 @@ adminFormsRoutes.get('/:id/builder', async (c) => {
       settings: form.settings ? JSON.parse(form.settings as string) : {},
       is_active: Boolean(form.is_active),
       is_public: Boolean(form.is_public),
+      google_maps_api_key: googleMapsApiKey,
+      turnstile_site_key: turnstileSettings?.siteKey || '',
       user: user ? {
         name: user.email,
         email: user.email,
@@ -339,6 +394,78 @@ adminFormsRoutes.delete('/:id', async (c) => {
   } catch (error: any) {
     console.error('Error deleting form:', error)
     return c.json({ error: 'Failed to delete form' }, 500)
+  }
+})
+
+// View form submissions
+adminFormsRoutes.get('/:id/submissions', async (c) => {
+  try {
+    const user = c.get('user')
+    const db = c.env.DB
+    const formId = c.req.param('id')
+
+    // Get form
+    const form = await db.prepare('SELECT * FROM forms WHERE id = ?')
+      .bind(formId)
+      .first()
+
+    if (!form) {
+      return c.html('<p>Form not found</p>', 404)
+    }
+
+    // Get submissions
+    const submissions = await db.prepare(
+      'SELECT * FROM form_submissions WHERE form_id = ? ORDER BY submitted_at DESC'
+    ).bind(formId).all()
+
+    // Simple submissions page for now
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Submissions - ${form.display_name}</title>
+        <style>
+          body { font-family: system-ui; padding: 20px; }
+          h1 { margin-bottom: 20px; }
+          table { width: 100%; border-collapse: collapse; }
+          th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+          th { background: #f5f5f5; font-weight: 600; }
+          .back-link { display: inline-block; margin-bottom: 20px; color: #0066cc; text-decoration: none; }
+          .back-link:hover { text-decoration: underline; }
+        </style>
+      </head>
+      <body>
+        <a href="/admin/forms" class="back-link">← Back to Forms</a>
+        <h1>Submissions: ${form.display_name}</h1>
+        <p>Total submissions: ${submissions.results.length}</p>
+        ${submissions.results.length > 0 ? `
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Submitted</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${submissions.results.map((sub: any) => `
+                <tr>
+                  <td>${sub.id.substring(0, 8)}</td>
+                  <td>${new Date(sub.submitted_at).toLocaleString()}</td>
+                  <td><pre>${JSON.stringify(JSON.parse(sub.submission_data), null, 2)}</pre></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        ` : '<p>No submissions yet.</p>'}
+      </body>
+      </html>
+    `
+    
+    return c.html(html)
+  } catch (error: any) {
+    console.error('Error loading submissions:', error)
+    return c.html('<p>Error loading submissions</p>', 500)
   }
 })
 

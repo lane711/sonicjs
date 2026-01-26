@@ -32,6 +32,7 @@ export { adminDashboardRoutes } from './admin-dashboard'
 export { adminCollectionsRoutes } from './admin-collections'
 export { adminSettingsRoutes } from './admin-settings'
 export { adminFormsRoutes } from './admin-forms'
+export { default as publicFormsRoutes } from './public-forms'
 
 export const ROUTES_INFO = {
   message: 'Core routes available',
@@ -55,7 +56,8 @@ export const ROUTES_INFO = {
     'adminDashboardRoutes',
     'adminCollectionsRoutes',
     'adminSettingsRoutes',
-    'adminFormsRoutes'
+    'adminFormsRoutes',
+    'publicFormsRoutes'
   ],
   status: 'Core package routes ready',
   reference: 'https://github.com/sonicjs/sonicjs'

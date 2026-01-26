@@ -1,6 +1,6 @@
 'use strict';
 
-var chunkHFKYG5VF_cjs = require('./chunk-HFKYG5VF.cjs');
+var chunkEMPHFHKE_cjs = require('./chunk-EMPHFHKE.cjs');
 var chunk6PWC6FWU_cjs = require('./chunk-6PWC6FWU.cjs');
 require('./chunk-IGJUBJBW.cjs');
 
@@ -8,7 +8,15 @@ require('./chunk-IGJUBJBW.cjs');
 
 Object.defineProperty(exports, "renderFilterBar", {
   enumerable: true,
-  get: function () { return chunkHFKYG5VF_cjs.renderFilterBar; }
+  get: function () { return chunkEMPHFHKE_cjs.renderFilterBar; }
+});
+Object.defineProperty(exports, "renderFormsDocsPage", {
+  enumerable: true,
+  get: function () { return chunkEMPHFHKE_cjs.renderFormsDocsPage; }
+});
+Object.defineProperty(exports, "renderFormsExamplesPage", {
+  enumerable: true,
+  get: function () { return chunkEMPHFHKE_cjs.renderFormsExamplesPage; }
 });
 Object.defineProperty(exports, "getConfirmationDialogScript", {
   enumerable: true,

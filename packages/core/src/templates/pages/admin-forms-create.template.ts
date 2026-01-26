@@ -121,8 +121,8 @@ export function renderFormCreatePage(data: FormCreatePageData): string {
                 name="category"
                 class="block w-full rounded-lg border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               >
-                <option value="general">General</option>
-                <option value="contact" selected>Contact</option>
+                <option value="general" selected>General</option>
+                <option value="contact">Contact</option>
                 <option value="survey">Survey</option>
                 <option value="registration">Registration</option>
                 <option value="feedback">Feedback</option>

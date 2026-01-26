@@ -62,6 +62,9 @@
     "**/*.test.ts",
     "**/*.spec.ts",
     "src/plugins/available/email-templates-plugin/fix-email-case.ts",
-    "src/plugins/available/email-templates-plugin/initialize-email-system.ts"
+    "src/plugins/available/email-templates-plugin/initialize-email-system.ts",
+    "src/plugins/core-plugins/turnstile-plugin/headless-helpers.ts",
+    "src/plugins/core-plugins/turnstile-plugin/react-hooks.tsx",
+    "src/plugins/core-plugins/turnstile-plugin/formio-component-client.js"
   ]
 }

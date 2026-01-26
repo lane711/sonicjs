@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Form.io Test - Minimal Builder</title>
+  <link rel="stylesheet" href="https://unpkg.com/formiojs@4.14.12/dist/formio.full.min.css">
+  <style>
+    body {
+      margin: 20px;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    #builder {
+      min-height: 600px;
+      border: 2px solid #ccc;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+    }
+    .status {
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      background: #e3f2fd;
+      border: 1px solid #2196F3;
+      color: #1565C0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔧 Form.io Builder Test</h1>
+  <div class="status" id="status">Initializing...</div>
+  <div id="builder"></div>
+
+  <script src="https://unpkg.com/formiojs@4.14.12/dist/formio.full.min.js"></script>
+  <script>
+    const statusEl = document.getElementById('status');
+    
+    console.log('🚀 Starting Form.io initialization...');
+    console.log('Form.io version:', Formio.version || 'unknown');
+    
+    statusEl.textContent = 'Loading Form.io builder...';
+    
+    // Use exact same pattern as working CodePen
+    Formio.builder(document.getElementById('builder'), {
+      components: []
+    }).then(function(builder) {
+      statusEl.textContent = '✅ Builder loaded successfully!';
+      statusEl.style.background = '#e8f5e9';
+      statusEl.style.borderColor = '#4CAF50';
+      statusEl.style.color = '#2E7D32';
+      
+      console.log('✅ Builder loaded!');
+      console.log('Builder object:', builder);
+      console.log('Builder groups:', builder.groups);
+      console.log('Builder schemas:', builder.schemas);
+      
+      // Log component counts
+      if (builder.groups) {
+        Object.keys(builder.groups).forEach(function(groupKey) {
+          const group = builder.groups[groupKey];
+          const componentCount = group.components ? Object.keys(group.components).length : 0;
+          console.log(`📦 Group "${groupKey}": ${componentCount} components`);
+        });
+      }
+    }).catch(function(err) {
+      statusEl.textContent = '❌ Error: ' + err.message;
+      statusEl.style.background = '#ffebee';
+      statusEl.style.borderColor = '#f44336';
+      statusEl.style.color = '#c62828';
+      
+      console.error('❌ Builder error:', err);
+    });
+  </script>
+</body>
+</html>

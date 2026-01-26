@@ -30,6 +30,7 @@ id = "a16f8246fc294d809c90b0fb2df6d363"
 # Environment variables
 [vars]
 ENVIRONMENT = "development"
+GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY_HERE"  # Replace with your actual key
 
 # Observability
 [observability]

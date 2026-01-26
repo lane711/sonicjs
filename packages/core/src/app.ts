@@ -22,7 +22,8 @@ import {
   adminDashboardRoutes,
   adminCollectionsRoutes,
   adminSettingsRoutes,
-  adminFormsRoutes
+  adminFormsRoutes,
+  publicFormsRoutes
 } from './routes'
 import { getCoreVersion } from './utils/version'
 import { bootstrapMiddleware } from './middleware/bootstrap'
@@ -51,6 +52,7 @@ export interface Bindings {
   IMAGES_API_TOKEN?: string
   ENVIRONMENT?: string
   BUCKET_NAME?: string
+  GOOGLE_MAPS_API_KEY?: string
 }
 
 export interface Variables {
@@ -183,6 +185,8 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   app.route('/admin/collections', adminCollectionsRoutes)
   app.route('/admin/forms', adminFormsRoutes)
   app.route('/admin/settings', adminSettingsRoutes)
+  app.route('/forms', publicFormsRoutes)
+  app.route('/api/forms', publicFormsRoutes) // API endpoint for form submissions
   app.route('/admin/database-tools', createDatabaseToolsAdminRoutes())
   app.route('/admin/seed-data', createSeedDataAdminRoutes())
   app.route('/admin/content', adminContentRoutes)
