@@ -1,0 +1,784 @@
+export const metadata = {
+  title: 'Security Best Practices - SonicJS',
+  description:
+    'Security guide for SonicJS applications covering authentication, authorization, input validation, SQL injection prevention, and production hardening.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Authentication', id: 'authentication' },
+  { title: 'Authorization', id: 'authorization' },
+  { title: 'Input Validation', id: 'input-validation' },
+  { title: 'SQL Injection Prevention', id: 'sql-injection' },
+  { title: 'XSS Prevention', id: 'xss-prevention' },
+  { title: 'CSRF Protection', id: 'csrf-protection' },
+  { title: 'Secret Management', id: 'secret-management' },
+  { title: 'Rate Limiting', id: 'rate-limiting' },
+  { title: 'Production Checklist', id: 'production-checklist' },
+]
+
+# Security Best Practices
+
+Comprehensive security guide for building secure SonicJS applications. Learn how to protect your API, users, and data. {{ className: 'lead' }}
+
+---
+
+## Overview
+
+SonicJS is built with security in mind, implementing industry best practices out of the box. This guide covers the security features available and how to configure them properly for production use.
+
+<FeatureGrid
+  features={[
+    {
+      icon: '🔐',
+      title: 'JWT Authentication',
+      description: 'Secure token-based authentication with automatic expiration',
+    },
+    {
+      icon: '🛡️',
+      title: 'SQL Injection Protection',
+      description: 'All queries use parameterized statements',
+    },
+    {
+      icon: '✅',
+      title: 'Input Validation',
+      description: 'Zod-based schema validation on all inputs',
+    },
+    {
+      icon: '🔒',
+      title: 'HTTPS Cookies',
+      description: 'Secure, HttpOnly, SameSite cookies by default',
+    },
+  ]}
+  columns={2}
+/>
+
+---
+
+## Authentication
+
+### JWT Token Security
+
+SonicJS uses JWT (JSON Web Tokens) for authentication with these security features:
+
+- **HS256 Algorithm**: HMAC-SHA256 for token signing
+- **24-hour Expiration**: Tokens automatically expire
+- **Secure Storage**: Tokens stored in HttpOnly cookies
+
+<CodeGroup title="Token Payload Structure">
+
+```typescript
+interface JWTPayload {
+  userId: string    // User identifier
+  email: string     // User email
+  role: string      // User role for authorization
+  exp: number       // Expiration timestamp
+  iat: number       // Issued at timestamp
+}
+```
+
+</CodeGroup>
+
+### Cookie Security
+
+Authentication cookies are configured with maximum security:
+
+<CodeGroup title="Cookie Configuration">
+
+```typescript
+// Default cookie settings (set automatically)
+{
+  httpOnly: true,   // Prevents JavaScript access
+  secure: true,     // HTTPS only
+  sameSite: 'Strict', // Prevents CSRF
+  maxAge: 86400,    // 24 hours
+  path: '/'
+}
+```
+
+</CodeGroup>
+
+### Password Security
+
+Passwords are hashed using the Web Crypto API:
+
+<CodeGroup title="Password Hashing">
+
+```typescript
+// SonicJS hashes passwords automatically
+// Using SHA-256 with salt
+
+// Registration - password is hashed before storage
+const hashedPassword = await hashPassword(plainPassword)
+
+// Login - compare hashed values
+const isValid = await verifyPassword(plainPassword, storedHash)
+```
+
+</CodeGroup>
+
+<Note>
+Always use a unique, strong JWT secret in production. Never use the default secret.
+</Note>
+
+### Multi-Factor Authentication
+
+For enhanced security, use the OTP Login plugin:
+
+<CodeGroup title="Enable OTP">
+
+```typescript
+// OTP provides additional verification
+// 1. User enters email
+// 2. Receives one-time code
+// 3. Enters code to complete login
+
+// OTP security features:
+// - Rate limiting per hour
+// - Maximum attempt limits
+// - Short expiration time
+// - IP and user agent tracking
+```
+
+</CodeGroup>
+
+---
+
+## Authorization
+
+### Role-Based Access Control
+
+SonicJS implements RBAC with four built-in roles:
+
+| Role | Permissions |
+|------|-------------|
+| `admin` | Full access to all features |
+| `editor` | Create, edit, publish content |
+| `author` | Create and edit own content |
+| `viewer` | Read-only access |
+
+### Protecting Routes
+
+<CodeGroup title="Route Protection">
+
+```typescript
+import { requireAuth, requireRole } from '@sonicjs-cms/core'
+
+// Require authentication
+app.get('/api/profile', requireAuth(), async (c) => {
+  const user = c.get('user')
+  return c.json(user)
+})
+
+// Require specific role
+app.delete('/api/users/:id', requireRole('admin'), async (c) => {
+  // Only admins can delete users
+})
+
+// Require one of multiple roles
+app.post('/api/content', requireRole(['admin', 'editor']), async (c) => {
+  // Admins and editors can create content
+})
+```
+
+</CodeGroup>
+
+### Permission Checking
+
+<CodeGroup title="Manual Permission Check">
+
+```typescript
+app.get('/api/content/:id', requireAuth(), async (c) => {
+  const user = c.get('user')
+  const content = await getContent(c.req.param('id'))
+
+  // Authors can only edit their own content
+  if (user.role === 'author' && content.authorId !== user.userId) {
+    return c.json({ error: 'Not authorized' }, 403)
+  }
+
+  return c.json(content)
+})
+```
+
+</CodeGroup>
+
+---
+
+## Input Validation
+
+### Schema Validation with Zod
+
+All user input should be validated before processing:
+
+<CodeGroup title="Request Validation">
+
+```typescript
+import { z } from 'zod'
+
+// Define validation schema
+const createPostSchema = z.object({
+  title: z.string()
+    .min(1, 'Title is required')
+    .max(200, 'Title too long'),
+  content: z.string()
+    .min(1, 'Content is required'),
+  slug: z.string()
+    .regex(/^[a-z0-9-]+$/, 'Invalid slug format')
+    .optional(),
+  publishedAt: z.string()
+    .datetime()
+    .optional()
+})
+
+// Use in route
+app.post('/api/posts', requireAuth(), async (c) => {
+  const body = await c.req.json()
+
+  // Validate input
+  const result = createPostSchema.safeParse(body)
+
+  if (!result.success) {
+    return c.json({
+      error: 'Validation failed',
+      details: result.error.issues
+    }, 400)
+  }
+
+  // Use validated data
+  const post = await createPost(result.data)
+  return c.json(post, 201)
+})
+```
+
+</CodeGroup>
+
+### Email Validation
+
+<CodeGroup title="Email Handling">
+
+```typescript
+import { z } from 'zod'
+
+const emailSchema = z.string()
+  .email('Valid email is required')
+  .transform(email => email.toLowerCase().trim())
+
+// Always normalize emails
+const normalizedEmail = emailSchema.parse(input.email)
+```
+
+</CodeGroup>
+
+### File Upload Validation
+
+<CodeGroup title="Upload Validation">
+
+```typescript
+// Validate file uploads
+const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf']
+const maxSize = 10 * 1024 * 1024  // 10MB
+
+app.post('/api/upload', async (c) => {
+  const formData = await c.req.formData()
+  const file = formData.get('file') as File
+
+  // Check file type
+  if (!allowedTypes.includes(file.type)) {
+    return c.json({ error: 'Invalid file type' }, 400)
+  }
+
+  // Check file size
+  if (file.size > maxSize) {
+    return c.json({ error: 'File too large' }, 400)
+  }
+
+  // Process file...
+})
+```
+
+</CodeGroup>
+
+---
+
+## SQL Injection Prevention
+
+### Parameterized Queries
+
+SonicJS uses Cloudflare D1 with parameterized queries to prevent SQL injection:
+
+<CodeGroup title="Safe Query Pattern">
+
+```typescript
+// SAFE - Using parameterized queries
+const user = await db
+  .prepare('SELECT * FROM users WHERE email = ?')
+  .bind(email)
+  .first()
+
+// SAFE - Multiple parameters
+const content = await db
+  .prepare('SELECT * FROM content WHERE collection_id = ? AND status = ?')
+  .bind(collectionId, status)
+  .all()
+
+// DANGEROUS - Never do this!
+// const user = await db.prepare(`SELECT * FROM users WHERE email = '${email}'`).first()
+```
+
+</CodeGroup>
+
+### Query Filter Builder
+
+Use the built-in QueryFilterBuilder for complex queries:
+
+<CodeGroup title="QueryFilterBuilder">
+
+```typescript
+import { QueryFilterBuilder } from '@sonicjs-cms/core'
+
+// Builds safe parameterized queries
+const builder = new QueryFilterBuilder()
+
+builder
+  .where('status', '=', 'published')
+  .where('category', '=', categoryId)
+  .orderBy('created_at', 'desc')
+  .limit(10)
+
+const { sql, params } = builder.build()
+
+// sql: "WHERE status = ? AND category = ? ORDER BY created_at DESC LIMIT 10"
+// params: ['published', categoryId]
+
+const results = await db.prepare(`SELECT * FROM content ${sql}`).bind(...params).all()
+```
+
+</CodeGroup>
+
+### Field Name Sanitization
+
+Field names are automatically sanitized:
+
+<CodeGroup title="Field Sanitization">
+
+```typescript
+// QueryFilterBuilder sanitizes field names
+// Only allows: a-z, A-Z, 0-9, _, ., $
+
+// This prevents injection through field names:
+// sanitize('user; DROP TABLE users--') => 'userDROPTABLEusers'
+```
+
+</CodeGroup>
+
+---
+
+## XSS Prevention
+
+### HTML Escaping
+
+SonicJS provides utilities for escaping HTML output:
+
+<CodeGroup title="HTML Escaping">
+
+```typescript
+import { escapeHtml, sanitizeInput } from '@sonicjs-cms/core'
+
+// Escape HTML entities
+const safe = escapeHtml('<script>alert("xss")</script>')
+// Result: &lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;
+
+// Sanitize and trim input
+const cleanInput = sanitizeInput(userInput)
+
+// Sanitize specific object fields
+const cleanUser = sanitizeObject(userData, ['name', 'bio'])
+```
+
+</CodeGroup>
+
+### Characters Escaped
+
+| Character | Entity |
+|-----------|--------|
+| `&` | `&amp;` |
+| `<` | `&lt;` |
+| `>` | `&gt;` |
+| `"` | `&quot;` |
+| `'` | `&#039;` |
+
+### Content Security
+
+<CodeGroup title="Safe Content Rendering">
+
+```typescript
+// When rendering user content
+app.get('/api/preview/:id', async (c) => {
+  const content = await getContent(c.req.param('id'))
+
+  // Escape user-generated content before rendering
+  return c.html(`
+    <h1>${escapeHtml(content.title)}</h1>
+    <div>${content.sanitizedHtml}</div>
+  `)
+})
+```
+
+</CodeGroup>
+
+---
+
+## CSRF Protection
+
+### SameSite Cookies
+
+SonicJS uses `SameSite: Strict` cookies by default, which provides strong CSRF protection:
+
+<CodeGroup title="CSRF Protection">
+
+```typescript
+// Cookies are automatically set with:
+// SameSite: 'Strict'
+
+// This means:
+// - Cookie only sent on same-origin requests
+// - Not sent on cross-site form submissions
+// - Not sent when following external links
+
+// Additional protection for sensitive operations:
+app.post('/api/sensitive', requireAuth(), async (c) => {
+  // Verify origin header for extra security
+  const origin = c.req.header('origin')
+  const allowedOrigins = ['https://your-domain.com']
+
+  if (!allowedOrigins.includes(origin)) {
+    return c.json({ error: 'Invalid origin' }, 403)
+  }
+
+  // Process request...
+})
+```
+
+</CodeGroup>
+
+---
+
+## Secret Management
+
+### Environment Variables
+
+Never commit secrets to version control:
+
+<CodeGroup title="wrangler.toml">
+
+```toml
+# wrangler.toml
+name = "my-sonicjs-app"
+
+[vars]
+# Non-sensitive configuration
+ENVIRONMENT = "production"
+DEFAULT_FROM_EMAIL = "noreply@example.com"
+
+# Sensitive values - use secrets instead!
+# JWT_SECRET = "..."  # NEVER DO THIS
+```
+
+</CodeGroup>
+
+### Cloudflare Secrets
+
+Use Wrangler to manage secrets:
+
+<CodeGroup title="Setting Secrets">
+
+```bash
+# Set JWT secret
+npx wrangler secret put JWT_SECRET
+# Enter your secret when prompted
+
+# Set SendGrid API key
+npx wrangler secret put SENDGRID_API_KEY
+
+# Set admin password
+npx wrangler secret put ADMIN_PASSWORD
+
+# For specific environment
+npx wrangler secret put JWT_SECRET --env production
+```
+
+</CodeGroup>
+
+### Required Secrets
+
+| Secret | Purpose |
+|--------|---------|
+| `JWT_SECRET` | Token signing key |
+| `SENDGRID_API_KEY` | Email delivery |
+| `ADMIN_PASSWORD` | Initial admin user |
+
+### Secret Rotation
+
+<CodeGroup title="JWT Secret Rotation">
+
+```typescript
+// When rotating JWT secret:
+// 1. Add new secret
+// 2. Update verification to accept both
+// 3. Wait for old tokens to expire (24h)
+// 4. Remove old secret
+
+// Example: Accept multiple secrets during rotation
+const secrets = [env.JWT_SECRET, env.JWT_SECRET_OLD].filter(Boolean)
+
+for (const secret of secrets) {
+  const payload = await verify(token, secret)
+  if (payload) return payload
+}
+```
+
+</CodeGroup>
+
+---
+
+## Rate Limiting
+
+### OTP Rate Limiting
+
+The OTP plugin includes built-in rate limiting:
+
+<CodeGroup title="OTP Rate Limits">
+
+```typescript
+// OTP rate limiting configuration
+{
+  rateLimitPerHour: 5,    // Max OTP requests per hour
+  maxAttempts: 3,         // Max verification attempts
+  expirationMinutes: 10   // OTP code lifetime
+}
+
+// Rate limit check
+const recentRequests = await db
+  .prepare(`
+    SELECT COUNT(*) as count FROM otp_codes
+    WHERE email = ? AND created_at > datetime('now', '-1 hour')
+  `)
+  .bind(email)
+  .first()
+
+if (recentRequests.count >= settings.rateLimitPerHour) {
+  return c.json({ error: 'Too many requests' }, 429)
+}
+```
+
+</CodeGroup>
+
+### Custom Rate Limiting
+
+Implement rate limiting for your endpoints:
+
+<CodeGroup title="Rate Limit Middleware">
+
+```typescript
+import { RateLimiter } from '@sonicjs-cms/core'
+
+// Create rate limiter with KV storage
+const limiter = new RateLimiter(env.CACHE_KV, {
+  windowMs: 60000,    // 1 minute window
+  maxRequests: 100    // Max 100 requests per window
+})
+
+// Apply to routes
+app.use('/api/*', async (c, next) => {
+  const ip = c.req.header('cf-connecting-ip') || 'unknown'
+  const key = `rate:${ip}`
+
+  const allowed = await limiter.check(key)
+
+  if (!allowed) {
+    return c.json({ error: 'Rate limit exceeded' }, 429)
+  }
+
+  await next()
+})
+```
+
+</CodeGroup>
+
+### Brute Force Protection
+
+<CodeGroup title="Login Attempt Limiting">
+
+```typescript
+// Track failed login attempts
+const MAX_ATTEMPTS = 5
+const LOCKOUT_MINUTES = 15
+
+app.post('/auth/login', async (c) => {
+  const { email, password } = await c.req.json()
+
+  // Check if locked out
+  const attempts = await getFailedAttempts(email)
+
+  if (attempts >= MAX_ATTEMPTS) {
+    const lockoutEnd = await getLockoutTime(email)
+    if (lockoutEnd > Date.now()) {
+      return c.json({
+        error: 'Account temporarily locked',
+        retryAfter: Math.ceil((lockoutEnd - Date.now()) / 1000)
+      }, 429)
+    }
+  }
+
+  const user = await verifyCredentials(email, password)
+
+  if (!user) {
+    await recordFailedAttempt(email)
+    return c.json({ error: 'Invalid credentials' }, 401)
+  }
+
+  // Clear failed attempts on success
+  await clearFailedAttempts(email)
+  return c.json({ token: generateToken(user) })
+})
+```
+
+</CodeGroup>
+
+---
+
+## Production Checklist
+
+Before deploying to production, verify:
+
+### Authentication & Secrets
+
+- [ ] **JWT_SECRET** is set as a Wrangler secret (not default)
+- [ ] **Strong admin password** is configured
+- [ ] **API keys** (SendGrid, etc.) are stored as secrets
+- [ ] **HTTPS** is enforced for all traffic
+
+### Configuration
+
+- [ ] **ENVIRONMENT** is set to `production`
+- [ ] **Debug mode** is disabled
+- [ ] **Error details** are not exposed in responses
+- [ ] **CORS** is configured correctly for your domains
+
+### Database
+
+- [ ] **All queries** use parameterized statements
+- [ ] **Backups** are configured and tested
+- [ ] **Migrations** run successfully before deployment
+
+### Monitoring
+
+- [ ] **Logging** is enabled for security events
+- [ ] **Failed login attempts** are tracked
+- [ ] **Error monitoring** is configured
+- [ ] **Rate limiting** is enabled
+
+### Testing
+
+- [ ] **Penetration testing** completed
+- [ ] **Input validation** tested with edge cases
+- [ ] **Authentication flows** tested thoroughly
+- [ ] **Authorization** tested for each role
+
+<CodeGroup title="Security Verification Script">
+
+```typescript
+// Run before deployment
+async function verifySecurityConfig(env: Bindings) {
+  const issues: string[] = []
+
+  // Check JWT secret
+  if (!env.JWT_SECRET || env.JWT_SECRET.includes('change-in-production')) {
+    issues.push('JWT_SECRET not properly configured')
+  }
+
+  // Check environment
+  if (env.ENVIRONMENT !== 'production') {
+    issues.push('ENVIRONMENT should be "production"')
+  }
+
+  // Check for debug mode
+  if (env.DEBUG === 'true') {
+    issues.push('DEBUG mode should be disabled')
+  }
+
+  if (issues.length > 0) {
+    console.error('Security issues found:', issues)
+    return false
+  }
+
+  console.log('Security configuration verified')
+  return true
+}
+```
+
+</CodeGroup>
+
+---
+
+## Security Headers
+
+Configure security headers for additional protection:
+
+<CodeGroup title="Security Headers">
+
+```typescript
+// Add security headers middleware
+app.use('*', async (c, next) => {
+  await next()
+
+  // Security headers
+  c.header('X-Content-Type-Options', 'nosniff')
+  c.header('X-Frame-Options', 'DENY')
+  c.header('X-XSS-Protection', '1; mode=block')
+  c.header('Referrer-Policy', 'strict-origin-when-cross-origin')
+  c.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+
+  // Content Security Policy
+  c.header('Content-Security-Policy',
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline'; " +
+    "style-src 'self' 'unsafe-inline'; " +
+    "img-src 'self' data: https:; " +
+    "font-src 'self' https:; " +
+    "connect-src 'self'"
+  )
+})
+```
+
+</CodeGroup>
+
+---
+
+## Reporting Security Issues
+
+If you discover a security vulnerability in SonicJS:
+
+1. **Do not** open a public issue
+2. Email security concerns to the maintainers
+3. Include detailed reproduction steps
+4. Allow time for a fix before disclosure
+
+<div className="not-prose">
+  <Button href="/troubleshooting" variant="text" arrow="right">
+    <>Troubleshooting guide</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/authentication" variant="text" arrow="right">
+    <>Authentication documentation</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/plugins/turnstile" variant="text" arrow="right">
+    <>Bot protection with Turnstile</>
+  </Button>
+</div>

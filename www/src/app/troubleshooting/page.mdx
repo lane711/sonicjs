@@ -1,0 +1,806 @@
+export const metadata = {
+  title: 'Troubleshooting Guide - SonicJS',
+  description:
+    'Common issues, error codes, and solutions for SonicJS. Debug authentication, database, cache, email, and plugin problems.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Authentication Errors', id: 'authentication-errors' },
+  { title: 'Database Errors', id: 'database-errors' },
+  { title: 'Cache Issues', id: 'cache-issues' },
+  { title: 'Email & Notification Errors', id: 'email-errors' },
+  { title: 'Plugin Errors', id: 'plugin-errors' },
+  { title: 'Collection Errors', id: 'collection-errors' },
+  { title: 'Bootstrap & Startup', id: 'bootstrap-startup' },
+  { title: 'Debug Tools', id: 'debug-tools' },
+  { title: 'Error Reference', id: 'error-reference' },
+]
+
+# Troubleshooting Guide
+
+Diagnose and resolve common issues in SonicJS applications with this comprehensive troubleshooting guide. {{ className: 'lead' }}
+
+---
+
+## Overview
+
+This guide covers the most common issues developers encounter when working with SonicJS, organized by category with specific error messages and solutions.
+
+<Note>
+When debugging issues, check the console logs first. SonicJS logs detailed error information that can help identify the root cause quickly.
+</Note>
+
+---
+
+## Authentication Errors
+
+### 401 - Authentication Required
+
+**Error Message:** `"Authentication required"` or `"Invalid or expired token"`
+
+**Causes:**
+- Missing JWT token in request
+- Token not in Authorization header or auth_token cookie
+- Malformed Bearer token format
+
+**Solutions:**
+
+<CodeGroup title="Check Token Format">
+
+```typescript
+// Correct format - Authorization header
+fetch('/api/content', {
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+  }
+})
+
+// Or use cookies (set by login endpoint)
+fetch('/api/content', {
+  credentials: 'include'  // Include cookies in request
+})
+```
+
+</CodeGroup>
+
+### 401 - Expired Token
+
+**Error Message:** `"Your session has expired, please login again"`
+
+**Causes:**
+- Token's `exp` timestamp has passed
+- Default token lifetime is 24 hours
+
+**Solutions:**
+
+<CodeGroup title="Refresh Token">
+
+```typescript
+// Call refresh endpoint before token expires
+const response = await fetch('/auth/refresh', {
+  method: 'POST',
+  credentials: 'include'
+})
+
+if (response.ok) {
+  // New token automatically set in cookie
+  console.log('Token refreshed')
+} else {
+  // Redirect to login
+  window.location.href = '/admin/login'
+}
+```
+
+</CodeGroup>
+
+### 403 - Insufficient Permissions
+
+**Error Message:** `"Insufficient permissions"`
+
+**Causes:**
+- User role doesn't match required role for endpoint
+- Trying to access admin endpoints without admin role
+
+**Solutions:**
+
+1. Verify the user has the correct role assigned
+2. Check the endpoint's required role in the route definition
+3. Use the correct role when creating users:
+
+<CodeGroup title="User Roles">
+
+```typescript
+// Available roles (most to least privileged)
+const roles = ['admin', 'editor', 'author', 'viewer']
+
+// Create user with specific role
+await db.prepare(`
+  INSERT INTO users (email, password, role)
+  VALUES (?, ?, ?)
+`).bind(email, hashedPassword, 'editor').run()
+```
+
+</CodeGroup>
+
+### Login Failures
+
+**Error Message:** `"Invalid email or password"`
+
+**Causes:**
+- Incorrect password
+- Email not found in database
+- Email case sensitivity issues
+
+**Solutions:**
+
+1. Verify email is normalized to lowercase
+2. Check password meets minimum requirements (8+ characters)
+3. Use password reset if credentials are lost
+
+<CodeGroup title="Email Normalization">
+
+```typescript
+// SonicJS normalizes emails to lowercase
+const normalizedEmail = email.toLowerCase().trim()
+
+// Ensure consistency when checking credentials
+```
+
+</CodeGroup>
+
+---
+
+## Database Errors
+
+### 409 - Duplicate Content Slug
+
+**Error Message:** `"A content item with this slug already exists in this collection"`
+
+**Causes:**
+- Attempting to create content with a slug that already exists
+- Slug uniqueness is enforced per collection
+
+**Solutions:**
+
+<CodeGroup title="Generate Unique Slug">
+
+```typescript
+// Auto-generate unique slug
+function generateUniqueSlug(title: string, existingSlugs: string[]): string {
+  let slug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+
+  let counter = 1
+  let uniqueSlug = slug
+
+  while (existingSlugs.includes(uniqueSlug)) {
+    uniqueSlug = `${slug}-${counter}`
+    counter++
+  }
+
+  return uniqueSlug
+}
+```
+
+</CodeGroup>
+
+### 400 - Duplicate User
+
+**Error Message:** `"User with this email or username already exists"`
+
+**Causes:**
+- Email already registered
+- Username already taken
+
+**Solutions:**
+
+1. Check if user exists before registration
+2. Provide clear feedback to users about which field is duplicate
+
+<CodeGroup title="Check Existing User">
+
+```typescript
+// Check before registration
+const existing = await db
+  .prepare('SELECT id FROM users WHERE email = ? OR username = ?')
+  .bind(email.toLowerCase(), username)
+  .first()
+
+if (existing) {
+  return c.json({ error: 'User already exists' }, 400)
+}
+```
+
+</CodeGroup>
+
+### 404 - Content Not Found
+
+**Error Message:** `"Content not found"`
+
+**Causes:**
+- Invalid content ID
+- Content was deleted
+- Looking in wrong collection
+
+**Solutions:**
+
+1. Verify the content ID is correct
+2. Check that content hasn't been soft-deleted
+3. Ensure you're querying the correct collection
+
+### UNIQUE Constraint Failed
+
+**Error Message:** `"UNIQUE constraint failed: [table].[column]"`
+
+**Causes:**
+- Database-level uniqueness violation
+- Migration re-running with existing data
+
+**Solutions:**
+
+<CodeGroup title="Handle Constraint Errors">
+
+```typescript
+try {
+  await db.prepare('INSERT INTO users (email) VALUES (?)').bind(email).run()
+} catch (error) {
+  if (error.message.includes('UNIQUE constraint failed')) {
+    // Handle duplicate gracefully
+    return c.json({ error: 'Email already exists' }, 400)
+  }
+  throw error
+}
+```
+
+</CodeGroup>
+
+---
+
+## Cache Issues
+
+### Cache Not Working
+
+**Symptoms:**
+- Data not being cached
+- Stale data being served
+- High database load
+
+**Causes:**
+- KV binding not configured
+- Cache disabled in settings
+- Cache keys not matching
+
+**Solutions:**
+
+<CodeGroup title="Verify Cache Configuration">
+
+```toml
+# wrangler.toml - Ensure KV binding exists
+[[kv_namespaces]]
+binding = "CACHE_KV"
+id = "your-kv-namespace-id"
+```
+
+</CodeGroup>
+
+<CodeGroup title="Check Cache Status">
+
+```typescript
+// Verify cache is working
+const cacheService = new CacheService(env.CACHE_KV)
+
+// Test cache operations
+await cacheService.set('test-key', { value: 'test' }, 60)
+const result = await cacheService.get('test-key')
+
+if (!result) {
+  console.error('Cache write/read failed')
+}
+```
+
+</CodeGroup>
+
+### Cache Invalidation Issues
+
+**Symptoms:**
+- Old data persists after updates
+- Changes not reflected immediately
+
+**Solutions:**
+
+1. Content updates automatically invalidate related cache keys
+2. Force invalidation after custom operations:
+
+<CodeGroup title="Manual Cache Invalidation">
+
+```typescript
+import { CacheInvalidationService } from '@sonicjs-cms/core/plugins'
+
+const invalidation = new CacheInvalidationService(env.CACHE_KV)
+
+// Invalidate content cache
+await invalidation.invalidateContent(contentId)
+
+// Invalidate user cache
+await invalidation.invalidateUser(userId)
+
+// Invalidate collection cache
+await invalidation.invalidateCollection(collectionId)
+```
+
+</CodeGroup>
+
+### Memory Cache Overflow
+
+**Symptoms:**
+- Memory usage increasing
+- Worker crashes on memory limits
+
+**Solutions:**
+
+- Memory cache defaults to 50MB limit with LRU eviction
+- Use KV cache for production workloads
+- Configure appropriate TTLs:
+
+<CodeGroup title="Cache TTL Configuration">
+
+```typescript
+// Short TTL for frequently changing data
+await cache.set('user-session', data, 300)  // 5 minutes
+
+// Longer TTL for stable content
+await cache.set('collection-schema', schema, 3600)  // 1 hour
+
+// Very long TTL for static assets
+await cache.set('site-config', config, 86400)  // 24 hours
+```
+
+</CodeGroup>
+
+---
+
+## Email & Notification Errors
+
+### Email Plugin Not Available
+
+**Error Message:** `"Email plugin not available"`
+
+**Causes:**
+- Email plugin not enabled
+- SendGrid API key not configured
+
+**Solutions:**
+
+<CodeGroup title="Configure Email">
+
+```toml
+# wrangler.toml
+[vars]
+DEFAULT_FROM_EMAIL = "noreply@yourdomain.com"
+DEFAULT_FROM_NAME = "Your App"
+
+# Set API key as secret
+# npx wrangler secret put SENDGRID_API_KEY
+```
+
+</CodeGroup>
+
+### OTP Email Failed
+
+**Error Message:** `"Failed to send OTP email"` or `"Error sending OTP email"`
+
+**Causes:**
+- Email service not configured
+- SendGrid API key invalid
+- From email not verified in SendGrid
+
+**Solutions:**
+
+1. Verify SendGrid API key has Mail Send permission
+2. Verify sender domain/email in SendGrid
+3. Check email plugin is enabled:
+
+<CodeGroup title="Enable Email Plugin">
+
+```typescript
+// In admin: Plugins > Enable Email Templates
+// Or programmatically:
+const settings = await getPluginSettings('email-templates')
+console.log('Email enabled:', settings.enabled)
+```
+
+</CodeGroup>
+
+### Email Template Not Found
+
+**Causes:**
+- Template slug doesn't exist
+- Template is inactive
+
+**Solutions:**
+
+<CodeGroup title="Check Template">
+
+```typescript
+// List available templates
+const templates = await db
+  .prepare('SELECT slug, name, is_active FROM email_templates')
+  .all()
+
+console.log('Available templates:', templates.results)
+
+// Ensure template is active
+await db
+  .prepare('UPDATE email_templates SET is_active = 1 WHERE slug = ?')
+  .bind('welcome-email')
+  .run()
+```
+
+</CodeGroup>
+
+---
+
+## Plugin Errors
+
+### Plugin Installation Failed
+
+**Error Message:** `"Failed to install plugin [name]"`
+
+**Causes:**
+- Invalid plugin configuration
+- Conflicting table names
+- Reserved plugin name used
+
+**Solutions:**
+
+<CodeGroup title="Validate Plugin">
+
+```typescript
+import { PluginValidator } from '@sonicjs-cms/core/plugins'
+
+const validation = PluginValidator.validate(myPlugin)
+
+if (!validation.valid) {
+  console.error('Plugin validation errors:', validation.errors)
+  // Fix issues before installing
+}
+```
+
+</CodeGroup>
+
+### Reserved Names
+
+**Reserved plugin names (cannot be used):**
+- `core`, `system`, `admin`, `api`, `auth`, `content`, `media`, `users`, `collections`
+
+**Reserved table names (cannot be used by plugins):**
+- `users`, `collections`, `content`, `content_versions`, `media`, `api_tokens`
+
+### Plugin Name Validation
+
+**Error Message:** `"Invalid plugin name"`
+
+**Requirements:**
+- Must match pattern: `/^[a-z0-9-]+$/`
+- Lowercase letters, numbers, and hyphens only
+- No spaces or special characters
+
+<CodeGroup title="Valid Plugin Names">
+
+```typescript
+// Valid
+'my-plugin'
+'analytics-v2'
+'custom-auth'
+
+// Invalid
+'MyPlugin'      // No uppercase
+'my plugin'     // No spaces
+'my_plugin'     // No underscores
+```
+
+</CodeGroup>
+
+### Hook Recursion Detected
+
+**Error Message:** `"Hook recursion detected"`
+
+**Causes:**
+- Hook handler triggers the same hook
+- Circular hook dependencies
+
+**Solutions:**
+
+<CodeGroup title="Prevent Recursion">
+
+```typescript
+// Bad - causes recursion
+hooks.register('content:save', async (data) => {
+  // This triggers content:save again!
+  await db.prepare('UPDATE content SET ...').run()
+  return data
+})
+
+// Good - use flag to prevent recursion
+hooks.register('content:save', async (data, context) => {
+  if (context.fromHook) return data
+
+  // Safe to update with flag
+  await db.prepare('UPDATE content SET ...').run()
+  return data
+})
+```
+
+</CodeGroup>
+
+---
+
+## Collection Errors
+
+### Invalid Collection Config
+
+**Error Message:** `"Invalid collection config: missing required fields"`
+
+**Required fields:**
+- `name` - Collection identifier
+- `displayName` - Human-readable name
+- `schema` - Field definitions
+
+<CodeGroup title="Valid Collection Config">
+
+```typescript
+import { defineCollection } from '@sonicjs-cms/core'
+
+export default defineCollection({
+  name: 'blog_posts',          // Required
+  displayName: 'Blog Posts',   // Required
+  schema: {                    // Required
+    title: { type: 'string', required: true },
+    content: { type: 'richtext' }
+  }
+})
+```
+
+</CodeGroup>
+
+### Collection Name Validation
+
+**Error Message:** `"Collection name must contain only lowercase letters, numbers, underscores, and hyphens"`
+
+**Requirements:**
+- Must match pattern: `/^[a-z0-9_-]+$/`
+- No uppercase letters
+- No spaces
+
+<CodeGroup title="Valid Collection Names">
+
+```typescript
+// Valid
+'blog_posts'
+'user-profiles'
+'faq'
+
+// Invalid
+'BlogPosts'      // No uppercase
+'blog posts'     // No spaces
+'blog.posts'     // No dots
+```
+
+</CodeGroup>
+
+---
+
+## Bootstrap & Startup
+
+### Bootstrap Errors
+
+**Symptoms:**
+- App starts but features don't work
+- Collections not synced
+- Migrations not applied
+
+**Solutions:**
+
+Bootstrap errors are caught but logged. Check console for:
+- Collection sync failures
+- Migration errors
+- Plugin initialization failures
+
+<CodeGroup title="Manual Bootstrap">
+
+```typescript
+// Force re-bootstrap on specific errors
+import { runMigrations } from '@sonicjs-cms/core'
+
+// Re-run migrations
+await runMigrations(db)
+
+// Re-sync collections
+await collectionSync.syncAll()
+```
+
+</CodeGroup>
+
+### First Admin User
+
+**Issue:** Cannot log in, no admin user exists
+
+**Solutions:**
+
+<CodeGroup title="Create Admin User">
+
+```bash
+# Set initial admin via environment
+# wrangler.toml or secrets
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=your-secure-password
+```
+
+</CodeGroup>
+
+Or create via API (if registration is enabled):
+
+<CodeGroup title="Create Admin via API">
+
+```bash
+curl -X POST https://your-app.workers.dev/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@example.com",
+    "password": "your-secure-password",
+    "username": "admin"
+  }'
+```
+
+</CodeGroup>
+
+---
+
+## Debug Tools
+
+### Logging Service
+
+SonicJS includes a comprehensive logging service:
+
+<CodeGroup title="Using the Logger">
+
+```typescript
+import { Logger } from '@sonicjs-cms/core'
+
+const logger = new Logger(db, {
+  level: 'debug',  // debug, info, warn, error, fatal
+  category: 'my-feature'
+})
+
+// Log with context
+logger.debug('Processing request', { userId, action })
+logger.info('Operation completed', { duration: Date.now() - start })
+logger.error('Operation failed', { error: error.message })
+```
+
+</CodeGroup>
+
+### View Logs
+
+<CodeGroup title="Query Logs">
+
+```typescript
+// Get recent logs
+const logs = await db
+  .prepare(`
+    SELECT * FROM logs
+    WHERE created_at > datetime('now', '-1 hour')
+    ORDER BY created_at DESC
+    LIMIT 100
+  `)
+  .all()
+
+// Filter by category
+const authLogs = await db
+  .prepare(`
+    SELECT * FROM logs
+    WHERE category = 'auth'
+    ORDER BY created_at DESC
+  `)
+  .all()
+```
+
+</CodeGroup>
+
+### Debug Mode
+
+Enable debug mode for verbose logging:
+
+<CodeGroup title="Enable Debug">
+
+```toml
+# wrangler.toml
+[env.development.vars]
+ENVIRONMENT = "development"
+DEBUG = "true"
+```
+
+</CodeGroup>
+
+### Plugin Debugging
+
+Each plugin gets a namespaced logger:
+
+<CodeGroup title="Plugin Logging">
+
+```typescript
+// In your plugin
+builder.setLogger((msg, level) => {
+  console.log(`[Plugin:my-plugin] [${level}] ${msg}`)
+})
+```
+
+</CodeGroup>
+
+---
+
+## Error Reference
+
+### HTTP Status Codes
+
+| Code | Meaning | Common Causes |
+|------|---------|---------------|
+| 400 | Bad Request | Validation failed, missing fields, invalid JSON |
+| 401 | Unauthorized | No token, invalid token, expired token |
+| 403 | Forbidden | Insufficient role/permissions |
+| 404 | Not Found | Resource doesn't exist |
+| 409 | Conflict | Duplicate slug, unique constraint violation |
+| 500 | Server Error | Unhandled exception, database error |
+
+### Error Response Format
+
+All API errors return a consistent format:
+
+<CodeGroup title="Error Response">
+
+```json
+{
+  "error": "Human-readable error message",
+  "details": "Technical details (in development)",
+  "code": "ERROR_CODE"
+}
+```
+
+</CodeGroup>
+
+### Common Error Codes
+
+| Code | Message | Solution |
+|------|---------|----------|
+| `AUTH_REQUIRED` | Authentication required | Add valid JWT token |
+| `AUTH_EXPIRED` | Token expired | Refresh or re-login |
+| `AUTH_INVALID` | Invalid credentials | Check email/password |
+| `PERM_DENIED` | Insufficient permissions | Check user role |
+| `NOT_FOUND` | Resource not found | Verify ID/slug |
+| `DUPLICATE` | Already exists | Use unique value |
+| `VALIDATION` | Validation failed | Check required fields |
+
+---
+
+## Getting Help
+
+If you're still stuck:
+
+1. **Check GitHub Issues**: Search for similar problems at [github.com/lane711/sonicjs/issues](https://github.com/lane711/sonicjs/issues)
+2. **Join Discord**: Get help from the community
+3. **Open an Issue**: Report bugs with reproduction steps
+
+<div className="not-prose">
+  <Button href="/community" variant="text" arrow="right">
+    <>Join the community</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/faq" variant="text" arrow="right">
+    <>View FAQ</>
+  </Button>
+</div>

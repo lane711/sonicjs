@@ -275,6 +275,8 @@ export const navigation: Array<NavGroup> = [
     links: [
       { title: 'Configuration', href: '/configuration' },
       { title: 'Hook Reference', href: '/hooks' },
+      { title: 'Security', href: '/security' },
+      { title: 'Troubleshooting', href: '/troubleshooting' },
     ],
   },
   {
