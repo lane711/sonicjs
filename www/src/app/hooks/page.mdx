@@ -1,0 +1,1041 @@
+export const metadata = {
+  title: 'Hook Reference - SonicJS',
+  description:
+    'Complete reference for SonicJS hooks - event-driven extensibility points for customizing application behavior, content lifecycle, authentication, and more.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Using Hooks', id: 'using-hooks' },
+  { title: 'Application Hooks', id: 'application-hooks' },
+  { title: 'Request Hooks', id: 'request-hooks' },
+  { title: 'Authentication Hooks', id: 'authentication-hooks' },
+  { title: 'Content Hooks', id: 'content-hooks' },
+  { title: 'Media Hooks', id: 'media-hooks' },
+  { title: 'Plugin Hooks', id: 'plugin-hooks' },
+  { title: 'Admin Hooks', id: 'admin-hooks' },
+  { title: 'Database Hooks', id: 'database-hooks' },
+  { title: 'Custom Hooks', id: 'custom-hooks' },
+  { title: 'Best Practices', id: 'best-practices' },
+]
+
+# Hook Reference
+
+Complete reference for SonicJS hooks - the event-driven system that lets you extend and customize application behavior at key points in the lifecycle. {{ className: 'lead' }}
+
+---
+
+## Overview
+
+Hooks are named events that fire at specific points in the application lifecycle. By registering handlers for these hooks, plugins and custom code can:
+
+- Modify data before or after operations
+- Add side effects (logging, notifications, analytics)
+- Validate or transform inputs
+- Cancel operations when needed
+
+<FeatureGrid
+  features={[
+    {
+      icon: '🪝',
+      title: 'Event-Driven',
+      description: 'React to events throughout the application lifecycle',
+    },
+    {
+      icon: '⚡',
+      title: 'Priority System',
+      description: 'Control execution order with numeric priorities',
+    },
+    {
+      icon: '🔒',
+      title: 'Scoped Isolation',
+      description: 'Plugin hooks are automatically cleaned up',
+    },
+    {
+      icon: '🛡️',
+      title: 'Error Handling',
+      description: 'Graceful error handling with recursion protection',
+    },
+  ]}
+  columns={2}
+/>
+
+### Hook Constants
+
+All standard hooks are available as constants:
+
+<CodeGroup title="HOOKS Constant">
+
+```typescript
+import { HOOKS } from '@sonicjs-cms/core'
+
+// Use constants for type safety
+hooks.register(HOOKS.CONTENT_SAVE, handler)
+hooks.register(HOOKS.AUTH_LOGIN, handler)
+hooks.register(HOOKS.MEDIA_UPLOAD, handler)
+```
+
+</CodeGroup>
+
+---
+
+## Using Hooks
+
+### Registering Hooks
+
+<CodeGroup title="Hook Registration">
+
+```typescript
+import { HOOKS } from '@sonicjs-cms/core'
+
+// Basic registration
+hooks.register('content:save', async (data, context) => {
+  console.log('Content saved:', data.id)
+  return data
+})
+
+// With priority (lower = earlier)
+hooks.register('content:save', handler, 5)  // Runs before default
+hooks.register('content:save', handler, 10) // Default priority
+hooks.register('content:save', handler, 20) // Runs after default
+
+// Using constants
+hooks.register(HOOKS.CONTENT_SAVE, async (data, context) => {
+  // Handler code
+  return data
+})
+```
+
+</CodeGroup>
+
+### Hook Handler Signature
+
+<CodeGroup title="Handler Interface">
+
+```typescript
+type HookHandler = (data: any, context: HookContext) => Promise<any>
+
+interface HookContext {
+  plugin: string        // Plugin that registered the hook
+  context: any          // Request context or custom data
+  cancel: () => void    // Cancel further execution
+}
+
+// Example handler
+const myHandler: HookHandler = async (data, context) => {
+  // Modify data
+  data.processedAt = Date.now()
+
+  // Access context
+  console.log('Plugin:', context.plugin)
+
+  // Optionally cancel
+  if (data.invalid) {
+    context.cancel()
+  }
+
+  // Always return data (modified or not)
+  return data
+}
+```
+
+</CodeGroup>
+
+### In Plugins
+
+<CodeGroup title="Plugin Hooks">
+
+```typescript
+import { PluginBuilder, HOOKS } from '@sonicjs-cms/core'
+
+const myPlugin = new PluginBuilder({
+  name: 'my-plugin',
+  version: '1.0.0'
+})
+  // Using builder API
+  .addHook(HOOKS.CONTENT_SAVE, async (data) => {
+    data.lastModified = Date.now()
+    return data
+  }, { priority: 5 })
+
+  // Or in lifecycle
+  .lifecycle({
+    activate: async (context) => {
+      context.hooks.register(HOOKS.AUTH_LOGIN, loginHandler)
+    },
+    deactivate: async (context) => {
+      // Hooks are auto-cleaned up for plugins
+    }
+  })
+  .build()
+```
+
+</CodeGroup>
+
+### Executing Hooks
+
+<CodeGroup title="Hook Execution">
+
+```typescript
+// Execute a hook
+const result = await hooks.execute('my:event', data, context)
+
+// Result contains the final data after all handlers ran
+console.log(result)
+
+// Custom hooks
+await hooks.execute('my-plugin:data-processed', {
+  itemId: 123,
+  status: 'complete'
+})
+```
+
+</CodeGroup>
+
+---
+
+## Application Hooks
+
+Hooks for application lifecycle events.
+
+### app:init
+
+Fired when the application initializes, before routes are registered.
+
+<CodeGroup title="app:init">
+
+```typescript
+hooks.register(HOOKS.APP_INIT, async (data, context) => {
+  console.log('Application initializing...')
+
+  // Initialize services, load configuration
+  await loadGlobalConfig()
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | Application startup |
+| **Data** | `{ app: Hono, env: Bindings }` |
+| **Use Cases** | Service initialization, config loading |
+
+### app:ready
+
+Fired when the application is fully initialized and ready to receive requests.
+
+<CodeGroup title="app:ready">
+
+```typescript
+hooks.register(HOOKS.APP_READY, async (data, context) => {
+  console.log('Application ready!')
+
+  // Start background tasks, warm caches
+  await warmCache()
+  startHealthCheck()
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | After all plugins loaded |
+| **Data** | `{ app: Hono, env: Bindings }` |
+| **Use Cases** | Cache warming, background tasks |
+
+### app:shutdown
+
+Fired when the application is shutting down.
+
+<CodeGroup title="app:shutdown">
+
+```typescript
+hooks.register(HOOKS.APP_SHUTDOWN, async (data, context) => {
+  console.log('Application shutting down...')
+
+  // Cleanup resources
+  await closeConnections()
+  clearTimers()
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | Graceful shutdown |
+| **Data** | `{ reason?: string }` |
+| **Use Cases** | Cleanup, connection closing |
+
+---
+
+## Request Hooks
+
+Hooks for HTTP request lifecycle.
+
+### request:start
+
+Fired at the beginning of every request.
+
+<CodeGroup title="request:start">
+
+```typescript
+hooks.register(HOOKS.REQUEST_START, async (data, context) => {
+  // Add request tracking
+  data.requestId = crypto.randomUUID()
+  data.startTime = Date.now()
+
+  // Log request
+  console.log(`[${data.requestId}] ${data.method} ${data.path}`)
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | Request received |
+| **Data** | `{ request: Request, method: string, path: string }` |
+| **Use Cases** | Logging, tracking, rate limiting |
+
+### request:end
+
+Fired after a request completes successfully.
+
+<CodeGroup title="request:end">
+
+```typescript
+hooks.register(HOOKS.REQUEST_END, async (data, context) => {
+  const duration = Date.now() - data.startTime
+
+  // Log response
+  console.log(`[${data.requestId}] Completed in ${duration}ms`)
+
+  // Track metrics
+  metrics.record('request_duration', duration)
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | Response sent |
+| **Data** | `{ request: Request, response: Response, startTime: number }` |
+| **Use Cases** | Logging, metrics, analytics |
+
+### request:error
+
+Fired when a request results in an error.
+
+<CodeGroup title="request:error">
+
+```typescript
+hooks.register(HOOKS.REQUEST_ERROR, async (data, context) => {
+  // Log error
+  console.error(`Request error: ${data.error.message}`)
+
+  // Send to error tracking
+  await errorTracker.capture(data.error, {
+    path: data.path,
+    method: data.method
+  })
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | Unhandled error |
+| **Data** | `{ error: Error, request: Request, path: string }` |
+| **Use Cases** | Error tracking, alerting |
+
+---
+
+## Authentication Hooks
+
+Hooks for authentication events.
+
+### auth:login
+
+Fired when a user attempts to log in.
+
+<CodeGroup title="auth:login">
+
+```typescript
+hooks.register(HOOKS.AUTH_LOGIN, async (data, context) => {
+  // Validate additional requirements
+  if (data.user.requiresMfa && !data.mfaVerified) {
+    throw new Error('MFA required')
+  }
+
+  // Log login
+  await auditLog.record('login', {
+    userId: data.user.id,
+    ip: data.ip,
+    userAgent: data.userAgent
+  })
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | Login attempt |
+| **Data** | `{ user: User, email: string, ip?: string }` |
+| **Use Cases** | MFA, audit logging, notifications |
+
+### auth:logout
+
+Fired when a user logs out.
+
+<CodeGroup title="auth:logout">
+
+```typescript
+hooks.register(HOOKS.AUTH_LOGOUT, async (data, context) => {
+  // Clear user sessions
+  await sessionStore.clearUserSessions(data.userId)
+
+  // Log logout
+  await auditLog.record('logout', { userId: data.userId })
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | Logout request |
+| **Data** | `{ userId: number, token?: string }` |
+| **Use Cases** | Session cleanup, audit logging |
+
+### auth:register
+
+Fired when a new user registers.
+
+<CodeGroup title="auth:register">
+
+```typescript
+hooks.register(HOOKS.AUTH_REGISTER, async (data, context) => {
+  // Send welcome email
+  await emailService.sendWelcome(data.user.email)
+
+  // Create default preferences
+  await createUserPreferences(data.user.id)
+
+  // Track signup
+  analytics.track('user_registered', { userId: data.user.id })
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | User registration |
+| **Data** | `{ user: User, email: string }` |
+| **Use Cases** | Welcome emails, default setup, analytics |
+
+### user:login / user:logout
+
+Aliases for `auth:login` and `auth:logout` for backward compatibility.
+
+---
+
+## Content Hooks
+
+Hooks for content lifecycle events.
+
+### content:create
+
+Fired when new content is created.
+
+<CodeGroup title="content:create">
+
+```typescript
+hooks.register(HOOKS.CONTENT_CREATE, async (data, context) => {
+  // Generate slug if not provided
+  if (!data.slug) {
+    data.slug = generateSlug(data.title)
+  }
+
+  // Set defaults
+  data.status = data.status || 'draft'
+  data.createdAt = Date.now()
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | Content creation |
+| **Data** | Content object being created |
+| **Use Cases** | Slug generation, defaults, validation |
+
+### content:update
+
+Fired when existing content is updated.
+
+<CodeGroup title="content:update">
+
+```typescript
+hooks.register(HOOKS.CONTENT_UPDATE, async (data, context) => {
+  // Track changes
+  data.updatedAt = Date.now()
+  data.version = (data.version || 0) + 1
+
+  // Create revision
+  await createContentRevision(data.id, data)
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | Content update |
+| **Data** | Updated content object |
+| **Use Cases** | Versioning, audit trail, timestamps |
+
+### content:delete
+
+Fired when content is deleted.
+
+<CodeGroup title="content:delete">
+
+```typescript
+hooks.register(HOOKS.CONTENT_DELETE, async (data, context) => {
+  // Soft delete instead of hard delete
+  data.status = 'deleted'
+  data.deletedAt = Date.now()
+
+  // Clean up references
+  await removeContentReferences(data.id)
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | Content deletion |
+| **Data** | Content being deleted |
+| **Use Cases** | Soft delete, cleanup, archiving |
+
+### content:publish
+
+Fired when content is published.
+
+<CodeGroup title="content:publish">
+
+```typescript
+hooks.register(HOOKS.CONTENT_PUBLISH, async (data, context) => {
+  // Set publish timestamp
+  data.publishedAt = Date.now()
+  data.status = 'published'
+
+  // Invalidate cache
+  await cache.invalidate(`content:${data.id}`)
+
+  // Notify subscribers
+  await notifySubscribers(data)
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | Content publication |
+| **Data** | Content being published |
+| **Use Cases** | Cache invalidation, notifications |
+
+### content:save
+
+Fired on any content save (create or update).
+
+<CodeGroup title="content:save">
+
+```typescript
+hooks.register(HOOKS.CONTENT_SAVE, async (data, context) => {
+  // Validate content
+  const errors = await validateContent(data)
+  if (errors.length > 0) {
+    throw new Error(`Validation failed: ${errors.join(', ')}`)
+  }
+
+  // Process media references
+  await processMediaReferences(data)
+
+  // Update search index
+  await searchIndex.update(data)
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | Any content save |
+| **Data** | Content being saved |
+| **Use Cases** | Validation, indexing, media processing |
+
+---
+
+## Media Hooks
+
+Hooks for media/file operations.
+
+### media:upload
+
+Fired when a file is uploaded.
+
+<CodeGroup title="media:upload">
+
+```typescript
+hooks.register(HOOKS.MEDIA_UPLOAD, async (data, context) => {
+  // Generate thumbnail
+  if (isImage(data.mimeType)) {
+    data.thumbnail = await generateThumbnail(data.file)
+  }
+
+  // Extract metadata
+  data.metadata = await extractMetadata(data.file)
+
+  // Scan for viruses
+  await virusScan(data.file)
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | File upload |
+| **Data** | `{ file: File, filename: string, mimeType: string }` |
+| **Use Cases** | Thumbnails, metadata, virus scanning |
+
+### media:delete
+
+Fired when a file is deleted.
+
+<CodeGroup title="media:delete">
+
+```typescript
+hooks.register(HOOKS.MEDIA_DELETE, async (data, context) => {
+  // Delete thumbnail
+  await deleteThumbnail(data.id)
+
+  // Remove from CDN cache
+  await cdnPurge(data.url)
+
+  // Update content references
+  await removeMediaReferences(data.id)
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | File deletion |
+| **Data** | Media file being deleted |
+| **Use Cases** | Cleanup, cache purging |
+
+### media:transform
+
+Fired when media is transformed (resize, compress, etc.).
+
+<CodeGroup title="media:transform">
+
+```typescript
+hooks.register(HOOKS.MEDIA_TRANSFORM, async (data, context) => {
+  // Log transformation
+  console.log(`Transforming ${data.id}: ${data.operations.join(', ')}`)
+
+  // Track usage
+  await recordTransformUsage(data.id, data.operations)
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | Media transformation |
+| **Data** | `{ id: string, operations: string[], result: File }` |
+| **Use Cases** | Logging, usage tracking |
+
+---
+
+## Plugin Hooks
+
+Hooks for plugin lifecycle events.
+
+### plugin:install
+
+Fired when a plugin is installed.
+
+<CodeGroup title="plugin:install">
+
+```typescript
+hooks.register(HOOKS.PLUGIN_INSTALL, async (data, context) => {
+  console.log(`Plugin installed: ${data.plugin.name}`)
+
+  // Run migrations
+  if (data.plugin.migrations) {
+    await runMigrations(data.plugin.migrations)
+  }
+
+  return data
+})
+```
+
+</CodeGroup>
+
+| Property | Description |
+|----------|-------------|
+| **Trigger** | Plugin installation |
+| **Data** | `{ plugin: Plugin }` |
+| **Use Cases** | Migrations, setup tasks |
+
+### plugin:uninstall
+
+Fired when a plugin is uninstalled.
+
+<CodeGroup title="plugin:uninstall">
+
+```typescript
+hooks.register(HOOKS.PLUGIN_UNINSTALL, async (data, context) => {
+  console.log(`Plugin uninstalled: ${data.plugin.name}`)
+
+  // Clean up plugin data
+  await cleanupPluginData(data.plugin.name)
+
+  return data
+})
+```
+
+</CodeGroup>
+
+### plugin:activate / plugin:deactivate
+
+Fired when plugins are enabled or disabled.
+
+---
+
+## Admin Hooks
+
+Hooks for admin interface customization.
+
+### admin:menu:render
+
+Fired when the admin menu is rendered.
+
+<CodeGroup title="admin:menu:render">
+
+```typescript
+hooks.register(HOOKS.ADMIN_MENU_RENDER, async (data, context) => {
+  // Add custom menu item
+  data.items.push({
+    label: 'Custom Page',
+    path: '/admin/custom',
+    icon: 'star',
+    order: 50
+  })
+
+  // Conditionally show items
+  if (context.user?.role === 'admin') {
+    data.items.push({
+      label: 'Admin Only',
+      path: '/admin/secret',
+      icon: 'lock'
+    })
+  }
+
+  return data
+})
+```
+
+</CodeGroup>
+
+### admin:page:render
+
+Fired when an admin page is rendered.
+
+<CodeGroup title="admin:page:render">
+
+```typescript
+hooks.register(HOOKS.ADMIN_PAGE_RENDER, async (data, context) => {
+  // Add custom scripts
+  data.scripts.push('/custom/admin.js')
+
+  // Add custom styles
+  data.styles.push('/custom/admin.css')
+
+  return data
+})
+```
+
+</CodeGroup>
+
+---
+
+## Database Hooks
+
+Hooks for database operations.
+
+### db:migrate
+
+Fired when database migrations run.
+
+<CodeGroup title="db:migrate">
+
+```typescript
+hooks.register(HOOKS.DB_MIGRATE, async (data, context) => {
+  console.log(`Running migration: ${data.migration.name}`)
+
+  // Backup before migration
+  await createBackup()
+
+  return data
+})
+```
+
+</CodeGroup>
+
+### db:seed
+
+Fired when database seeding runs.
+
+<CodeGroup title="db:seed">
+
+```typescript
+hooks.register(HOOKS.DB_SEED, async (data, context) => {
+  console.log('Seeding database...')
+
+  // Add custom seed data
+  await seedCustomData()
+
+  return data
+})
+```
+
+</CodeGroup>
+
+---
+
+## Custom Hooks
+
+Create your own hooks for plugin-to-plugin communication.
+
+### Naming Convention
+
+Use namespaced names: `plugin-name:event-name`
+
+<CodeGroup title="Custom Hook Names">
+
+```typescript
+// Good naming
+'my-plugin:data-processed'
+'analytics:event-tracked'
+'workflow:status-changed'
+
+// Bad naming (avoid)
+'dataProcessed'  // No namespace
+'my-plugin'      // No event name
+```
+
+</CodeGroup>
+
+### Creating Custom Hooks
+
+<CodeGroup title="Custom Hooks">
+
+```typescript
+// In your plugin
+const myPlugin = new PluginBuilder({ name: 'my-plugin', version: '1.0.0' })
+  .lifecycle({
+    activate: async (context) => {
+      // Register handler for your custom hook
+      context.hooks.register('my-plugin:item-processed', async (data) => {
+        console.log('Item processed:', data.itemId)
+        return data
+      })
+    }
+  })
+  .build()
+
+// In your service/route
+async function processItem(itemId: number, hooks: HookSystem) {
+  // Do processing...
+  const result = { itemId, status: 'complete' }
+
+  // Execute custom hook
+  await hooks.execute('my-plugin:item-processed', result)
+
+  return result
+}
+```
+
+</CodeGroup>
+
+---
+
+## Best Practices
+
+### 1. Always Return Data
+
+Hooks should always return the data object, even if unmodified:
+
+<CodeGroup title="Return Data">
+
+```typescript
+// Good
+hooks.register('content:save', async (data) => {
+  console.log('Content saved')
+  return data  // Always return
+})
+
+// Bad
+hooks.register('content:save', async (data) => {
+  console.log('Content saved')
+  // Missing return breaks the chain!
+})
+```
+
+</CodeGroup>
+
+### 2. Use Appropriate Priorities
+
+| Priority | Use Case |
+|----------|----------|
+| 1-5 | Validation, authentication checks |
+| 6-9 | Data transformation, normalization |
+| 10 | Default - general processing |
+| 11-15 | Side effects, logging |
+| 16-20 | Cleanup, finalization |
+
+### 3. Handle Errors Gracefully
+
+<CodeGroup title="Error Handling">
+
+```typescript
+hooks.register('content:save', async (data, context) => {
+  try {
+    await riskyOperation(data)
+  } catch (error) {
+    // Log but don't break the chain for non-critical errors
+    console.error('Non-critical error:', error)
+  }
+
+  return data
+})
+```
+
+</CodeGroup>
+
+### 4. Avoid Side Effects in Validation Hooks
+
+<CodeGroup title="Validation Hooks">
+
+```typescript
+// Good - validation only
+hooks.register('content:save', async (data) => {
+  if (!data.title) {
+    throw new Error('Title is required')
+  }
+  return data
+}, 5)
+
+// Bad - mixing validation with side effects
+hooks.register('content:save', async (data) => {
+  if (!data.title) {
+    throw new Error('Title is required')
+  }
+  await sendNotification(data) // Don't do this in validation!
+  return data
+}, 5)
+```
+
+</CodeGroup>
+
+### 5. Use Constants for Hook Names
+
+<CodeGroup title="Use Constants">
+
+```typescript
+import { HOOKS } from '@sonicjs-cms/core'
+
+// Good - type safe, autocomplete
+hooks.register(HOOKS.CONTENT_SAVE, handler)
+
+// Acceptable - string literal
+hooks.register('content:save', handler)
+
+// Bad - typo risk
+hooks.register('content:savee', handler)  // Typo!
+```
+
+</CodeGroup>
+
+---
+
+## Next Steps
+
+<div className="not-prose">
+  <Button href="/plugins/development" variant="text" arrow="right">
+    <>Build plugins with hooks</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/plugins" variant="text" arrow="right">
+    <>Plugin system overview</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/architecture" variant="text" arrow="right">
+    <>Understand SonicJS architecture</>
+  </Button>
+</div>

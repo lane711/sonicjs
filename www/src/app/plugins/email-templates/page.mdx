@@ -1,0 +1,744 @@
+export const metadata = {
+  title: 'Email Templates Plugin - SonicJS',
+  description:
+    'Comprehensive email template management for SonicJS with themes, Markdown content, variable substitution, delivery tracking, and SendGrid integration.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Features', id: 'features' },
+  { title: 'Setup', id: 'setup' },
+  { title: 'Configuration', id: 'configuration' },
+  { title: 'Creating Templates', id: 'creating-templates' },
+  { title: 'Sending Emails', id: 'sending-emails' },
+  { title: 'Email Themes', id: 'email-themes' },
+  { title: 'Variable System', id: 'variable-system' },
+  { title: 'Delivery Tracking', id: 'delivery-tracking' },
+  { title: 'Admin Interface', id: 'admin-interface' },
+]
+
+# Email Templates Plugin
+
+Professional email template management with themes, Markdown content, variable substitution, and comprehensive delivery tracking via SendGrid. {{ className: 'lead' }}
+
+---
+
+## Overview
+
+The Email Templates plugin provides a complete email system for SonicJS applications. Create beautiful, responsive email templates with custom themes, track delivery status, and manage all email communications from a central admin interface.
+
+<FeatureGrid
+  features={[
+    {
+      icon: '📧',
+      title: 'Template Management',
+      description: 'Create and manage email templates with Markdown content',
+    },
+    {
+      icon: '🎨',
+      title: 'Custom Themes',
+      description: 'Design consistent email branding with CSS themes',
+    },
+    {
+      icon: '📊',
+      title: 'Delivery Tracking',
+      description: 'Track sent, delivered, opened, and clicked status',
+    },
+    {
+      icon: '🔗',
+      title: 'SendGrid Integration',
+      description: 'Reliable email delivery via SendGrid API',
+    },
+  ]}
+  columns={2}
+/>
+
+---
+
+## Features
+
+### Template System
+- Markdown-based email content
+- Variable substitution with `{{variable}}` syntax
+- Template preview before sending
+- Version history and rollback
+
+### Theme System
+- Global CSS styling for all emails
+- Custom header and footer sections
+- Responsive design support
+- Multiple themes per application
+
+### Delivery Management
+- Queue-based email processing
+- Delivery status tracking
+- Error logging and retry logic
+- Comprehensive email logs
+
+### Administration
+- Visual template editor
+- Send test emails
+- Email log viewer
+- Theme customization
+
+---
+
+## Setup
+
+### Prerequisites
+
+The Email Templates plugin requires:
+- SendGrid account with API key
+- Cloudflare D1 database (included with SonicJS)
+
+### Step 1: Get SendGrid API Key
+
+1. Sign up for [SendGrid](https://sendgrid.com)
+2. Navigate to **Settings > API Keys**
+3. Create an API key with "Mail Send" permissions
+4. Copy the key (you won't see it again)
+
+### Step 2: Configure Environment
+
+Add SendGrid credentials to your environment:
+
+<CodeGroup title="wrangler.toml">
+
+```toml
+[vars]
+DEFAULT_FROM_EMAIL = "noreply@yourdomain.com"
+
+# In your secrets (don't commit!)
+# wrangler secret put SENDGRID_API_KEY
+```
+
+</CodeGroup>
+
+<CodeGroup title="Set Secret">
+
+```bash
+# Add SendGrid API key as a secret
+npx wrangler secret put SENDGRID_API_KEY
+# Paste your API key when prompted
+```
+
+</CodeGroup>
+
+### Step 3: Enable the Plugin
+
+1. Navigate to **Admin > Plugins**
+2. Find "Email Templates" and click **Enable**
+3. The plugin will run migrations automatically
+4. Configure settings in the plugin settings page
+
+<Note>
+This is an optional plugin that must be manually enabled. It's separate from the core Email plugin which provides basic email functionality.
+</Note>
+
+---
+
+## Configuration
+
+<CodeGroup title="Plugin Configuration">
+
+```typescript
+interface EmailTemplatesConfig {
+  // SendGrid settings
+  sendgridApiKey: string       // SendGrid API key
+  defaultFromEmail: string     // Default "from" address
+  defaultReplyTo?: string      // Default reply-to address
+
+  // Feature flags
+  trackOpens: boolean          // Track email opens
+  trackClicks: boolean         // Track link clicks
+  enableQueue: boolean         // Use queue for sending
+
+  // Limits
+  maxRecipientsPerEmail: number  // Max recipients (default: 50)
+  retryAttempts: number          // Retry failed sends (default: 3)
+}
+```
+
+</CodeGroup>
+
+### Database Tables
+
+The plugin creates these tables:
+
+| Table | Description |
+|-------|-------------|
+| `email_themes` | Theme definitions with CSS |
+| `email_templates` | Template content and metadata |
+| `email_logs` | Delivery tracking records |
+| `email_variables` | Reusable variable definitions |
+
+---
+
+## Creating Templates
+
+### Template Structure
+
+Templates consist of:
+- **Subject** - Email subject line (supports variables)
+- **Content** - Markdown body content
+- **Theme** - Applied CSS theme
+- **Variables** - Required variables for the template
+
+<CodeGroup title="Template Example">
+
+```typescript
+// Template definition
+{
+  slug: 'welcome-email',
+  name: 'Welcome Email',
+  subject: 'Welcome to {{appName}}, {{userName}}!',
+  content: `
+# Welcome to {{appName}}!
+
+Hi {{userName}},
+
+Thank you for joining us. We're excited to have you on board.
+
+## Getting Started
+
+Here are some things you can do:
+
+1. Complete your profile
+2. Explore our features
+3. Connect with other users
+
+If you have any questions, just reply to this email.
+
+Best regards,
+The {{appName}} Team
+  `,
+  themeId: 'default',
+  variables: ['appName', 'userName'],
+  isActive: true
+}
+```
+
+</CodeGroup>
+
+### Admin Interface
+
+Create templates through the admin UI:
+
+1. Go to **Admin > Email Templates**
+2. Click **New Template**
+3. Enter template details:
+   - Name and slug
+   - Subject line
+   - Markdown content
+   - Select theme
+   - Define variables
+4. Preview the template
+5. Save and activate
+
+### Variable Syntax
+
+Use double curly braces for variables:
+
+<CodeGroup title="Variable Syntax">
+
+```markdown
+# Order Confirmation
+
+Hi {{customerName}},
+
+Your order **#{{orderId}}** has been confirmed.
+
+**Order Details:**
+- Total: ${{orderTotal}}
+- Items: {{itemCount}}
+- Shipping: {{shippingMethod}}
+
+Track your order: [Click here]({{trackingUrl}})
+
+Thank you for shopping with {{storeName}}!
+```
+
+</CodeGroup>
+
+---
+
+## Sending Emails
+
+### Using the Email Service
+
+<CodeGroup title="Send Email">
+
+```typescript
+import { createEmailService } from '@sonicjs-cms/core/plugins'
+
+// Create service instance
+const emailService = createEmailService({
+  SENDGRID_API_KEY: env.SENDGRID_API_KEY,
+  DEFAULT_FROM_EMAIL: env.DEFAULT_FROM_EMAIL,
+  DB: env.DB
+})
+
+// Send raw email
+const result = await emailService.sendEmail({
+  to: 'user@example.com',
+  subject: 'Hello from SonicJS',
+  html: '<h1>Hello!</h1><p>This is a test email.</p>',
+  text: 'Hello! This is a test email.'
+})
+
+if (result.success) {
+  console.log('Email sent:', result.messageId)
+} else {
+  console.error('Email failed:', result.error)
+}
+```
+
+</CodeGroup>
+
+### Sending Templated Emails
+
+<CodeGroup title="Send Templated Email">
+
+```typescript
+// Send using a template
+const result = await emailService.sendTemplatedEmail({
+  to: 'user@example.com',
+  templateSlug: 'welcome-email',
+  variables: {
+    appName: 'My App',
+    userName: 'John Doe'
+  },
+  metadata: {
+    userId: '123',
+    source: 'registration'
+  }
+})
+
+console.log('Email log ID:', result.emailLogId)
+```
+
+</CodeGroup>
+
+### Sending Options
+
+<CodeGroup title="Send Options">
+
+```typescript
+interface SendEmailOptions {
+  to: string           // Recipient email address
+  subject: string      // Email subject
+  html: string         // HTML content
+  text?: string        // Plain text content (optional)
+  from?: string        // Override default from address
+  replyTo?: string     // Reply-to address
+  metadata?: Record<string, any>  // Custom metadata for logging
+}
+
+interface SendTemplatedEmailOptions {
+  to: string                    // Recipient email
+  templateSlug: string          // Template identifier
+  variables: Record<string, any> // Template variables
+  from?: string                 // Override from address
+  replyTo?: string              // Reply-to address
+  metadata?: Record<string, any> // Custom metadata
+}
+```
+
+</CodeGroup>
+
+### Result Handling
+
+<CodeGroup title="Email Result">
+
+```typescript
+interface EmailResult {
+  success: boolean     // Whether email was sent
+  messageId?: string   // SendGrid message ID
+  error?: string       // Error message if failed
+  emailLogId: string   // Log entry ID for tracking
+}
+
+// Example usage
+const result = await emailService.sendTemplatedEmail({
+  to: 'user@example.com',
+  templateSlug: 'order-confirmation',
+  variables: { orderId: '12345' }
+})
+
+if (result.success) {
+  // Store emailLogId for later status checks
+  await saveEmailReference(orderId, result.emailLogId)
+} else {
+  // Handle failure
+  await logEmailFailure(result.error)
+}
+```
+
+</CodeGroup>
+
+---
+
+## Email Themes
+
+### Theme Structure
+
+Themes define the visual wrapper for all emails:
+
+<CodeGroup title="Theme Definition">
+
+```typescript
+interface EmailTheme {
+  id: string
+  name: string
+  css: string           // CSS styles
+  headerHtml?: string   // Optional header HTML
+  footerHtml?: string   // Optional footer HTML
+  isDefault: boolean
+}
+
+// Example theme
+{
+  id: 'modern-dark',
+  name: 'Modern Dark',
+  css: `
+    body {
+      background-color: #1a1a2e;
+      color: #eaeaea;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      color: #00d4ff;
+    }
+    a {
+      color: #00d4ff;
+    }
+    .button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 6px;
+      text-decoration: none;
+      display: inline-block;
+    }
+  `,
+  headerHtml: '<div class="header"><img src="{{logoUrl}}" alt="Logo"></div>',
+  footerHtml: '<div class="footer">© {{year}} {{companyName}}</div>',
+  isDefault: false
+}
+```
+
+</CodeGroup>
+
+### Default Theme
+
+SonicJS includes a default theme with:
+- Clean, modern design
+- Responsive layout
+- Light and dark mode support
+- Pre-styled buttons and links
+
+<CodeGroup title="Default Theme CSS">
+
+```css
+/* Default Email Theme */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f5f5f5;
+  margin: 0;
+  padding: 0;
+}
+
+.email-container {
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.email-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 30px;
+  text-align: center;
+}
+
+.email-body {
+  padding: 30px;
+}
+
+.email-footer {
+  background-color: #f9f9f9;
+  padding: 20px;
+  text-align: center;
+  font-size: 12px;
+  color: #666;
+}
+
+.button {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #667eea;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+h1, h2, h3 {
+  margin-top: 0;
+}
+
+a {
+  color: #667eea;
+}
+```
+
+</CodeGroup>
+
+---
+
+## Variable System
+
+### Built-in Variables
+
+These variables are automatically available:
+
+| Variable | Description |
+|----------|-------------|
+| `{{year}}` | Current year |
+| `{{date}}` | Current date |
+| `{{appName}}` | Application name |
+| `{{appUrl}}` | Application URL |
+| `{{supportEmail}}` | Support email address |
+
+### Custom Variables
+
+Define reusable variables in the admin:
+
+<CodeGroup title="Variable Management">
+
+```typescript
+// Define global variables
+await emailVariables.create({
+  key: 'companyAddress',
+  value: '123 Main St, City, Country',
+  description: 'Company physical address for footers'
+})
+
+// Variables are automatically substituted in templates
+// Use: {{companyAddress}} in any template
+```
+
+</CodeGroup>
+
+### Conditional Content
+
+Use variables for conditional rendering:
+
+<CodeGroup title="Conditional Variables">
+
+```markdown
+# Order Update
+
+{{#if hasTracking}}
+Your order is on its way! Track it here: [Track Order]({{trackingUrl}})
+{{/if}}
+
+{{#unless isPaid}}
+**Payment Pending**: Please complete your payment to ship your order.
+{{/unless}}
+```
+
+</CodeGroup>
+
+---
+
+## Delivery Tracking
+
+### Email Status
+
+Track emails through their lifecycle:
+
+| Status | Description |
+|--------|-------------|
+| `pending` | Email queued for sending |
+| `sent` | Successfully sent to SendGrid |
+| `delivered` | Delivered to recipient |
+| `failed` | Sending failed |
+
+### Email Logs
+
+Query email logs programmatically:
+
+<CodeGroup title="Query Email Logs">
+
+```typescript
+// Get email status by log ID
+const log = await db
+  .prepare('SELECT * FROM email_logs WHERE id = ?')
+  .bind(emailLogId)
+  .first()
+
+console.log({
+  status: log.status,
+  sentAt: log.sent_at,
+  deliveredAt: log.delivered_at,
+  error: log.error_message
+})
+
+// Get recent failed emails
+const failed = await db
+  .prepare(`
+    SELECT * FROM email_logs
+    WHERE status = 'failed'
+    ORDER BY created_at DESC
+    LIMIT 50
+  `)
+  .all()
+```
+
+</CodeGroup>
+
+### Log Schema
+
+<CodeGroup title="Email Log Structure">
+
+```typescript
+interface EmailLog {
+  id: string              // Unique log ID
+  templateId: string | null  // Template used (if any)
+  recipientEmail: string  // Recipient address
+  subject: string         // Email subject
+  status: EmailStatus     // Current status
+  providerId?: string     // SendGrid message ID
+  errorMessage?: string   // Error details if failed
+  sentAt?: Date           // When sent
+  deliveredAt?: Date      // When delivered
+  openedAt?: Date         // When opened (if tracking)
+  clickedAt?: Date        // When clicked (if tracking)
+  metadata: object        // Custom metadata
+  createdAt: Date         // Record creation time
+}
+```
+
+</CodeGroup>
+
+---
+
+## Admin Interface
+
+### Template Manager
+
+The admin interface provides:
+
+- **Template List** - View all templates with status
+- **Template Editor** - Create and edit templates
+- **Preview** - See how templates will render
+- **Test Send** - Send test emails to verify
+
+### Email Logs
+
+View and manage sent emails:
+
+- Search by recipient or subject
+- Filter by status and date
+- View detailed send information
+- Resend failed emails
+
+### Theme Editor
+
+Customize email appearance:
+
+- Edit CSS styles
+- Modify header/footer HTML
+- Preview changes instantly
+- Set default theme
+
+---
+
+## Best Practices
+
+### Template Design
+
+1. **Keep it simple** - Avoid complex layouts that break in email clients
+2. **Use inline styles** - Email clients strip `<style>` tags
+3. **Test across clients** - Gmail, Outlook, Apple Mail all render differently
+4. **Include plain text** - Always provide a text alternative
+
+### Delivery
+
+1. **Verify your domain** - Set up SPF, DKIM, and DMARC records
+2. **Warm up IP** - Start with low volume and increase gradually
+3. **Monitor bounces** - Remove invalid addresses promptly
+4. **Handle errors** - Implement retry logic for transient failures
+
+### Security
+
+1. **Sanitize variables** - Prevent injection attacks
+2. **Validate recipients** - Check email format before sending
+3. **Rate limit** - Prevent abuse of email functionality
+4. **Audit logs** - Keep records of all sent emails
+
+---
+
+## Troubleshooting
+
+### Emails Not Sending
+
+**Check SendGrid API key:**
+- Verify the key has "Mail Send" permission
+- Ensure it's properly set as a secret
+
+**Check from address:**
+- Domain must be verified in SendGrid
+- Use a consistent from address
+
+### Template Not Rendering
+
+**Check variable names:**
+- Variables are case-sensitive
+- Ensure all required variables are provided
+
+**Check Markdown syntax:**
+- Invalid Markdown can break rendering
+- Preview template before sending
+
+### Delivery Issues
+
+**Check SendGrid dashboard:**
+- Review activity feed for errors
+- Check for blocked recipients
+
+**Verify DNS records:**
+- SPF, DKIM, and DMARC should be configured
+- Use SendGrid's domain authentication
+
+---
+
+## Next Steps
+
+<div className="not-prose">
+  <Button href="/plugins/core" variant="text" arrow="right">
+    <>Core Email Plugin (simpler option)</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/authentication" variant="text" arrow="right">
+    <>Authentication emails</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/plugins/development" variant="text" arrow="right">
+    <>Build custom plugins</>
+  </Button>
+</div>
