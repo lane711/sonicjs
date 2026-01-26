@@ -1,0 +1,687 @@
+export const metadata = {
+  title: 'AI Search Plugin - SonicJS',
+  description:
+    'AI-powered semantic search for your SonicJS content using Cloudflare Vectorize and Workers AI for natural language queries and intelligent search.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Features', id: 'features' },
+  { title: 'Setup', id: 'setup' },
+  { title: 'Configuration', id: 'configuration' },
+  { title: 'API Reference', id: 'api-reference' },
+  { title: 'Search Modes', id: 'search-modes' },
+  { title: 'Collection Indexing', id: 'collection-indexing' },
+  { title: 'Frontend Integration', id: 'frontend-integration' },
+  { title: 'Analytics', id: 'analytics' },
+  { title: 'Admin Interface', id: 'admin-interface' },
+]
+
+# AI Search Plugin
+
+AI-powered semantic search that understands natural language queries and finds relevant content based on meaning, not just keywords. {{ className: 'lead' }}
+
+---
+
+## Overview
+
+The AI Search plugin transforms how users find content in your SonicJS application. Instead of relying solely on keyword matching, it uses vector embeddings and semantic search to understand the intent behind queries and return the most relevant results.
+
+Built on Cloudflare's edge infrastructure, it delivers fast, intelligent search experiences without sending data to external services.
+
+<FeatureGrid
+  features={[
+    {
+      icon: '🧠',
+      title: 'Semantic Understanding',
+      description: 'Understands natural language queries and finds content by meaning',
+    },
+    {
+      icon: '⚡',
+      title: 'Edge-Powered',
+      description: 'Runs on Cloudflare Workers AI and Vectorize for low latency',
+    },
+    {
+      icon: '🔍',
+      title: 'Hybrid Search',
+      description: 'Combines AI search with keyword fallback for best results',
+    },
+    {
+      icon: '📊',
+      title: 'Analytics',
+      description: 'Track search patterns, popular queries, and usage metrics',
+    },
+  ]}
+  columns={2}
+/>
+
+---
+
+## Features
+
+### Semantic Search
+- Natural language query understanding
+- Context-aware results based on content meaning
+- Relevance scoring for better ranking
+- Works across all content types
+
+### Keyword Search
+- Traditional text matching as fallback
+- Full-text search across titles, slugs, and content
+- Supports filtering by collection, date, status, and author
+
+### Smart Autocomplete
+- AI-powered search suggestions
+- History-based suggestions as fallback
+- Configurable suggestion count
+
+### Content Indexing
+- Automatic collection discovery
+- Selective collection indexing
+- Real-time index updates
+- Index status monitoring
+
+---
+
+## Setup
+
+### Prerequisites
+
+The AI Search plugin requires Cloudflare Workers AI and Vectorize bindings:
+
+<CodeGroup title="wrangler.toml">
+
+```toml
+# Add AI binding for embeddings
+[ai]
+binding = "AI"
+
+# Add Vectorize index for vector search
+[[vectorize]]
+binding = "VECTORIZE_INDEX"
+index_name = "sonicjs-content"
+```
+
+</CodeGroup>
+
+### Create Vectorize Index
+
+Create a Vectorize index in your Cloudflare account:
+
+<CodeGroup title="Create Index">
+
+```bash {{ title: 'CLI' }}
+# Create a new Vectorize index
+npx wrangler vectorize create sonicjs-content --dimensions=768 --metric=cosine
+```
+
+</CodeGroup>
+
+<Note>
+The dimensions must match the embedding model used by Workers AI. The default model uses 768 dimensions.
+</Note>
+
+### Enable the Plugin
+
+The AI Search plugin is included in SonicJS core. Navigate to the admin panel to configure it:
+
+1. Go to **Admin > Plugins > AI Search**
+2. Enable AI mode for semantic search
+3. Select collections to index
+4. Save settings
+
+---
+
+## Configuration
+
+<CodeGroup title="Plugin Settings">
+
+```typescript
+interface AISearchSettings {
+  enabled: boolean              // Enable/disable search functionality
+  ai_mode_enabled: boolean      // Enable semantic AI search
+  selected_collections: string[] // Collection IDs to index
+  dismissed_collections: string[] // Collections user chose not to index
+  autocomplete_enabled: boolean // Enable search suggestions
+  cache_duration: number        // Cache duration in hours
+  results_limit: number         // Max results per query (default: 20)
+  index_media: boolean          // Index media file metadata
+}
+```
+
+</CodeGroup>
+
+### Default Settings
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enabled` | `true` | Search functionality active |
+| `ai_mode_enabled` | `true` | Use AI for semantic search |
+| `autocomplete_enabled` | `true` | Show search suggestions |
+| `cache_duration` | `1` | Cache results for 1 hour |
+| `results_limit` | `20` | Return up to 20 results |
+| `index_media` | `false` | Don't index media by default |
+
+---
+
+## API Reference
+
+### POST /api/search
+
+Execute a search query with optional filters.
+
+<CodeGroup title="Search Request">
+
+```bash {{ title: 'cURL' }}
+curl -X POST http://localhost:8787/api/search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "blog posts about security best practices",
+    "mode": "ai",
+    "filters": {
+      "collections": ["1", "2"],
+      "status": ["published"]
+    },
+    "limit": 10
+  }'
+```
+
+```javascript
+const response = await fetch('/api/search', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    query: 'blog posts about security best practices',
+    mode: 'ai',
+    filters: {
+      collections: ['1', '2'],
+      status: ['published']
+    },
+    limit: 10
+  })
+})
+
+const { data } = await response.json()
+// data.results - Array of search results
+// data.total - Total matching items
+// data.query_time_ms - Search duration
+// data.mode - Search mode used
+```
+
+```json {{ title: 'Response' }}
+{
+  "success": true,
+  "data": {
+    "results": [
+      {
+        "id": "123",
+        "title": "Security Best Practices for Web Apps",
+        "slug": "security-best-practices",
+        "collection_id": "1",
+        "collection_name": "Blog Posts",
+        "snippet": "...implementing security best practices is essential...",
+        "relevance_score": 0.92,
+        "status": "published",
+        "created_at": 1706227200000,
+        "updated_at": 1706313600000,
+        "author_name": "admin@example.com"
+      }
+    ],
+    "total": 15,
+    "query_time_ms": 45,
+    "mode": "ai"
+  }
+}
+```
+
+</CodeGroup>
+
+### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | `string` | Yes | Search query text |
+| `mode` | `'ai' \| 'keyword'` | No | Search mode (default: 'keyword') |
+| `filters` | `object` | No | Filter options |
+| `limit` | `number` | No | Max results (default: 20) |
+| `offset` | `number` | No | Pagination offset |
+
+### Filter Options
+
+<CodeGroup title="Filter Types">
+
+```typescript
+interface SearchFilters {
+  collections?: string[]       // Filter by collection IDs
+  dateRange?: {
+    start: Date               // Start date
+    end: Date                 // End date
+    field?: 'created_at' | 'updated_at'
+  }
+  status?: string[]           // Filter by status (draft, published, etc.)
+  tags?: string[]             // Filter by tags
+  author?: string             // Filter by author ID
+  custom?: Record<string, any> // Custom metadata filters
+}
+```
+
+</CodeGroup>
+
+### GET /api/search/suggest
+
+Get autocomplete suggestions for partial queries.
+
+<CodeGroup title="Suggestions Request">
+
+```bash {{ title: 'cURL' }}
+curl "http://localhost:8787/api/search/suggest?q=sec"
+```
+
+```javascript
+const response = await fetch('/api/search/suggest?q=sec')
+const { data } = await response.json()
+// data: ['security', 'secure login', 'security audit']
+```
+
+```json {{ title: 'Response' }}
+{
+  "success": true,
+  "data": ["security", "secure login", "security audit"]
+}
+```
+
+</CodeGroup>
+
+### GET /api/search/analytics
+
+Get search usage analytics (requires authentication).
+
+<CodeGroup title="Analytics Request">
+
+```bash {{ title: 'cURL' }}
+curl http://localhost:8787/api/search/analytics \
+  -H "Authorization: Bearer ${token}"
+```
+
+```json {{ title: 'Response' }}
+{
+  "success": true,
+  "data": {
+    "total_queries": 1524,
+    "ai_queries": 892,
+    "keyword_queries": 632,
+    "popular_queries": [
+      { "query": "how to deploy", "count": 45 },
+      { "query": "authentication", "count": 38 }
+    ],
+    "average_query_time": 42
+  }
+}
+```
+
+</CodeGroup>
+
+---
+
+## Search Modes
+
+### AI Mode (Semantic Search)
+
+When AI mode is enabled and Vectorize is configured, queries are processed using vector embeddings:
+
+1. Query text is converted to a vector embedding using Workers AI
+2. Vectorize finds similar content vectors
+3. Results are ranked by semantic relevance
+4. Content snippets highlight relevant sections
+
+**Best for:**
+- Natural language queries ("how do I set up authentication?")
+- Concept-based searches ("articles about performance")
+- Finding related content
+
+### Keyword Mode
+
+Traditional text-based search using SQL LIKE queries:
+
+1. Query is matched against title, slug, and content fields
+2. Results are ordered by update date
+3. Exact and partial matches are found
+
+**Best for:**
+- Specific term searches ("JWT token")
+- Known titles or slugs
+- When AI bindings aren't available
+
+### Automatic Fallback
+
+If AI search fails or isn't available, the system automatically falls back to keyword search:
+
+<CodeGroup title="Fallback Logic">
+
+```typescript
+// Automatic fallback in the service
+if (query.mode === 'ai' && settings.ai_mode_enabled && this.customRAG?.isAvailable()) {
+  return this.searchAI(query, settings)
+}
+// Fallback to keyword search
+return this.searchKeyword(query, settings)
+```
+
+</CodeGroup>
+
+---
+
+## Collection Indexing
+
+### Selecting Collections
+
+Not all collections need to be searchable. The admin interface lets you:
+
+- **Index** - Include collection in search results
+- **Dismiss** - Hide collection from indexing prompts
+- **New** - Unreviewed collections awaiting decision
+
+### Index Management
+
+<CodeGroup title="Collection Info">
+
+```typescript
+interface CollectionInfo {
+  id: string              // Collection ID
+  name: string            // Internal name
+  display_name: string    // Human-readable name
+  description?: string    // Collection description
+  item_count?: number     // Number of items
+  is_indexed: boolean     // Currently indexed
+  is_dismissed: boolean   // User dismissed
+  is_new?: boolean        // Awaiting decision
+}
+```
+
+</CodeGroup>
+
+### New Collection Detection
+
+The plugin automatically detects new collections and prompts you to decide whether to index them:
+
+<CodeGroup title="Detection API">
+
+```typescript
+// Detect collections not yet indexed or dismissed
+const notifications = await aiSearchService.detectNewCollections()
+
+// Returns array of new collection notifications
+// [{
+//   collection: { id: '5', name: 'faqs', ... },
+//   message: 'New collection "FAQs" with 25 items available for indexing'
+// }]
+```
+
+</CodeGroup>
+
+---
+
+## Frontend Integration
+
+### Basic Search Form
+
+<CodeGroup title="Search Component">
+
+```html
+<form id="searchForm">
+  <input
+    type="text"
+    name="query"
+    placeholder="Search..."
+    autocomplete="off"
+  />
+  <select name="mode">
+    <option value="ai">AI Search</option>
+    <option value="keyword">Keyword</option>
+  </select>
+  <button type="submit">Search</button>
+</form>
+
+<div id="results"></div>
+
+<script>
+document.getElementById('searchForm').addEventListener('submit', async (e) => {
+  e.preventDefault()
+  const formData = new FormData(e.target)
+
+  const response = await fetch('/api/search', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      query: formData.get('query'),
+      mode: formData.get('mode')
+    })
+  })
+
+  const { data } = await response.json()
+
+  document.getElementById('results').innerHTML = data.results
+    .map(r => `
+      <div class="result">
+        <h3><a href="/content/${r.slug}">${r.title}</a></h3>
+        <p>${r.snippet}</p>
+        <small>${r.collection_name} - ${r.relevance_score?.toFixed(2) || 'N/A'}</small>
+      </div>
+    `)
+    .join('')
+})
+</script>
+```
+
+</CodeGroup>
+
+### With Autocomplete
+
+<CodeGroup title="Autocomplete Integration">
+
+```javascript
+const searchInput = document.getElementById('searchInput')
+const suggestionsDiv = document.getElementById('suggestions')
+
+let debounceTimer
+
+searchInput.addEventListener('input', async (e) => {
+  clearTimeout(debounceTimer)
+
+  const query = e.target.value
+  if (query.length < 2) {
+    suggestionsDiv.innerHTML = ''
+    return
+  }
+
+  debounceTimer = setTimeout(async () => {
+    const response = await fetch(`/api/search/suggest?q=${encodeURIComponent(query)}`)
+    const { data } = await response.json()
+
+    suggestionsDiv.innerHTML = data
+      .map(s => `<div class="suggestion" data-value="${s}">${s}</div>`)
+      .join('')
+  }, 300)
+})
+
+suggestionsDiv.addEventListener('click', (e) => {
+  if (e.target.classList.contains('suggestion')) {
+    searchInput.value = e.target.dataset.value
+    suggestionsDiv.innerHTML = ''
+    // Trigger search
+  }
+})
+```
+
+</CodeGroup>
+
+### React Example
+
+<CodeGroup title="React Hook">
+
+```tsx
+import { useState, useCallback } from 'react'
+
+interface SearchResult {
+  id: string
+  title: string
+  slug: string
+  snippet?: string
+  relevance_score?: number
+}
+
+export function useAISearch() {
+  const [results, setResults] = useState<SearchResult[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const search = useCallback(async (query: string, mode: 'ai' | 'keyword' = 'ai') => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, mode })
+      })
+
+      const { data, success, error } = await response.json()
+
+      if (!success) throw new Error(error)
+
+      setResults(data.results)
+      return data
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Search failed')
+      return null
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  return { results, loading, error, search }
+}
+```
+
+</CodeGroup>
+
+---
+
+## Analytics
+
+The plugin tracks search patterns to help you understand user behavior:
+
+### Tracked Metrics
+
+- **Total queries** - Number of searches in the last 30 days
+- **AI vs Keyword** - Breakdown by search mode
+- **Popular queries** - Most common search terms
+- **Query timing** - Average search duration
+
+### Using Analytics Data
+
+<CodeGroup title="Analytics Integration">
+
+```typescript
+// Fetch analytics data
+const analytics = await aiSearchService.getSearchAnalytics()
+
+// Use for dashboard
+console.log(`Total searches: ${analytics.total_queries}`)
+console.log(`AI usage: ${(analytics.ai_queries / analytics.total_queries * 100).toFixed(1)}%`)
+
+// Top searches
+analytics.popular_queries.forEach(({ query, count }) => {
+  console.log(`"${query}" - ${count} searches`)
+})
+```
+
+</CodeGroup>
+
+---
+
+## Admin Interface
+
+### Settings Page
+
+Navigate to **Admin > Plugins > AI Search** to access:
+
+- **Enable/Disable** - Toggle search functionality
+- **AI Mode** - Enable semantic search (requires Vectorize)
+- **Collection Management** - Select which collections to index
+- **Autocomplete** - Toggle search suggestions
+- **Cache Settings** - Configure result caching
+
+### Collection Manager
+
+The collection manager shows:
+
+- All available collections
+- Indexing status for each
+- Item counts
+- Actions to index or dismiss
+
+### Search Testing
+
+Test search directly from the admin interface:
+
+1. Enter a test query
+2. Select search mode (AI or Keyword)
+3. View results with relevance scores
+4. Check query timing
+
+---
+
+## Troubleshooting
+
+### AI Search Not Working
+
+**Check Vectorize binding:**
+- Ensure `VECTORIZE_INDEX` is configured in `wrangler.toml`
+- Verify the index was created with correct dimensions (768)
+
+**Check AI binding:**
+- Ensure `AI` binding is configured
+- Verify Workers AI is available in your plan
+
+### No Results Returned
+
+**Check collection indexing:**
+- Ensure collections are selected for indexing
+- Verify content exists in indexed collections
+
+**Check filters:**
+- Ensure status filter includes your content status
+- Verify date range includes your content
+
+### Slow Search Performance
+
+**Enable caching:**
+- Set `cache_duration` to cache frequent queries
+
+**Reduce index size:**
+- Only index collections that need search
+- Disable media indexing if not needed
+
+---
+
+## Next Steps
+
+<div className="not-prose">
+  <Button href="/plugins/core" variant="text" arrow="right">
+    <>Explore other core plugins</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/api" variant="text" arrow="right">
+    <>Full API reference</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/caching" variant="text" arrow="right">
+    <>Learn about caching</>
+  </Button>
+</div>

@@ -1,0 +1,644 @@
+export const metadata = {
+  title: 'Turnstile Plugin (Bot Protection) - SonicJS',
+  description:
+    'Protect your forms and APIs from bots using Cloudflare Turnstile - a CAPTCHA-free, privacy-preserving bot protection solution.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Setup', id: 'setup' },
+  { title: 'Configuration', id: 'configuration' },
+  { title: 'Widget Integration', id: 'widget-integration' },
+  { title: 'Server Verification', id: 'server-verification' },
+  { title: 'Middleware', id: 'middleware' },
+  { title: 'Advanced Usage', id: 'advanced-usage' },
+  { title: 'Troubleshooting', id: 'troubleshooting' },
+]
+
+# Turnstile Plugin (Bot Protection)
+
+Protect your forms and APIs from bots using Cloudflare Turnstile - a privacy-friendly, CAPTCHA-free alternative that verifies users without annoying puzzles. {{ className: 'lead' }}
+
+---
+
+## Overview
+
+Turnstile is Cloudflare's smart CAPTCHA alternative. Unlike traditional CAPTCHAs that interrupt users with puzzles, Turnstile runs silently in the background and only challenges users when suspicious behavior is detected.
+
+<FeatureGrid
+  features={[
+    {
+      icon: '🛡️',
+      title: 'Bot Protection',
+      description: 'Blocks automated attacks, scrapers, and spam bots',
+    },
+    {
+      icon: '🔒',
+      title: 'Privacy-First',
+      description: 'No tracking, no cookies, GDPR compliant',
+    },
+    {
+      icon: '⚡',
+      title: 'Invisible Mode',
+      description: 'Verify users without showing any widget',
+    },
+    {
+      icon: '🎨',
+      title: 'Customizable',
+      description: 'Multiple themes, sizes, and interaction modes',
+    },
+  ]}
+  columns={2}
+/>
+
+### Use Cases
+
+- **Contact forms** - Prevent spam submissions
+- **Registration** - Block automated account creation
+- **Login forms** - Protect against credential stuffing
+- **API endpoints** - Rate limit with verification
+- **Comments** - Stop spam comments on blogs
+
+---
+
+## Setup
+
+### Step 1: Get Turnstile Keys
+
+1. Log in to [Cloudflare Dashboard](https://dash.cloudflare.com)
+2. Navigate to **Turnstile** in the sidebar
+3. Click **Add Site**
+4. Enter your domain and select widget type
+5. Copy your **Site Key** and **Secret Key**
+
+### Step 2: Configure in Admin
+
+1. Go to **Admin > Plugins > Turnstile**
+2. Enter your Site Key and Secret Key
+3. Configure widget options
+4. Enable the plugin
+5. Save settings
+
+### Step 3: Add Widget to Forms
+
+Add the Turnstile widget to any form you want to protect:
+
+<CodeGroup title="Basic Integration">
+
+```html
+<form action="/api/contact" method="POST">
+  <input type="text" name="name" placeholder="Name" />
+  <input type="email" name="email" placeholder="Email" />
+  <textarea name="message" placeholder="Message"></textarea>
+
+  <!-- Turnstile widget -->
+  <div
+    class="cf-turnstile"
+    data-sitekey="YOUR_SITE_KEY"
+    data-theme="auto"
+  ></div>
+
+  <button type="submit">Send</button>
+</form>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+```
+
+</CodeGroup>
+
+---
+
+## Configuration
+
+<CodeGroup title="Plugin Settings">
+
+```typescript
+interface TurnstileSettings {
+  siteKey: string           // Public site key (shown in widget)
+  secretKey: string         // Secret key (server-side verification)
+  theme?: 'light' | 'dark' | 'auto'  // Widget theme
+  size?: 'normal' | 'compact'        // Widget size
+  mode?: 'managed' | 'non-interactive' | 'invisible'
+  appearance?: 'always' | 'execute' | 'interaction-only'
+  enabled: boolean          // Enable/disable verification
+}
+```
+
+</CodeGroup>
+
+### Widget Modes
+
+| Mode | Description | Best For |
+|------|-------------|----------|
+| `managed` | Cloudflare decides when to show challenge | General use, recommended |
+| `non-interactive` | Never shows interactive challenge | Low-risk forms |
+| `invisible` | Completely hidden, automatic verification | Seamless UX |
+
+### Appearance Options
+
+| Appearance | Description |
+|------------|-------------|
+| `always` | Always show the widget |
+| `execute` | Show only when verification runs |
+| `interaction-only` | Show only if user interaction needed |
+
+### Theme Options
+
+- `light` - Light background theme
+- `dark` - Dark background theme
+- `auto` - Match user's system preference
+
+---
+
+## Widget Integration
+
+### Using SonicJS Helpers
+
+SonicJS provides helper functions to render Turnstile widgets:
+
+<CodeGroup title="Widget Helpers">
+
+```typescript
+import {
+  renderTurnstileWidget,
+  renderInlineTurnstile,
+  renderExplicitTurnstile,
+  getTurnstileScript
+} from '@sonicjs-cms/core/plugins'
+
+// Full widget with settings from database
+const widget = renderTurnstileWidget(settings, 'my-form-turnstile')
+
+// Simple inline widget
+const inline = renderInlineTurnstile('YOUR_SITE_KEY', {
+  theme: 'dark',
+  size: 'compact'
+})
+
+// Explicit rendering (more control)
+const explicit = renderExplicitTurnstile('YOUR_SITE_KEY', {
+  callback: 'onVerificationComplete'
+})
+
+// Just the script tag
+const script = getTurnstileScript()
+```
+
+</CodeGroup>
+
+### Full Widget Example
+
+<CodeGroup title="renderTurnstileWidget">
+
+```typescript
+// In your route handler
+import { renderTurnstileWidget } from '@sonicjs-cms/core/plugins'
+import { TurnstileService } from '@sonicjs-cms/core/plugins'
+
+app.get('/contact', async (c) => {
+  const turnstile = new TurnstileService(c.env.DB)
+  const settings = await turnstile.getSettings()
+
+  const widgetHtml = settings ? renderTurnstileWidget(settings) : ''
+
+  return c.html(`
+    <form method="POST" action="/api/contact">
+      <input name="email" type="email" required />
+      <textarea name="message" required></textarea>
+      ${widgetHtml}
+      <button type="submit">Send</button>
+    </form>
+  `)
+})
+```
+
+</CodeGroup>
+
+### Inline Widget
+
+For simple cases where you just need a widget with a site key:
+
+<CodeGroup title="renderInlineTurnstile">
+
+```typescript
+import { renderInlineTurnstile } from '@sonicjs-cms/core/plugins'
+
+const widget = renderInlineTurnstile('YOUR_SITE_KEY', {
+  theme: 'auto',
+  size: 'normal',
+  containerId: 'contact-turnstile'
+})
+
+// Output:
+// <div id="contact-turnstile" class="cf-turnstile mb-3"
+//      data-sitekey="YOUR_SITE_KEY"
+//      data-theme="auto"
+//      data-size="normal"></div>
+// <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+```
+
+</CodeGroup>
+
+### Explicit Rendering
+
+For full control over when the widget renders:
+
+<CodeGroup title="renderExplicitTurnstile">
+
+```typescript
+import { renderExplicitTurnstile } from '@sonicjs-cms/core/plugins'
+
+const widget = renderExplicitTurnstile('YOUR_SITE_KEY', {
+  theme: 'dark',
+  callback: 'handleTurnstileSuccess'
+})
+
+// In your page:
+// <script>
+// function handleTurnstileSuccess(token) {
+//   console.log('Verified:', token)
+//   document.getElementById('submitBtn').disabled = false
+// }
+// </script>
+```
+
+</CodeGroup>
+
+---
+
+## Server Verification
+
+### Using the Service
+
+Verify tokens server-side before processing form submissions:
+
+<CodeGroup title="Manual Verification">
+
+```typescript
+import { TurnstileService } from '@sonicjs-cms/core/plugins'
+
+app.post('/api/contact', async (c) => {
+  const body = await c.req.parseBody()
+  const token = body['cf-turnstile-response'] as string
+
+  // Initialize service
+  const turnstile = new TurnstileService(c.env.DB)
+
+  // Verify token
+  const result = await turnstile.verifyToken(
+    token,
+    c.req.header('CF-Connecting-IP') // Optional: pass user IP
+  )
+
+  if (!result.success) {
+    return c.json({ error: result.error || 'Verification failed' }, 403)
+  }
+
+  // Token valid - process form
+  // ...
+
+  return c.json({ success: true })
+})
+```
+
+</CodeGroup>
+
+### Verification Response
+
+<CodeGroup title="Response Types">
+
+```typescript
+// Success response
+{
+  success: true
+}
+
+// Failure response
+{
+  success: false,
+  error: 'Turnstile verification failed: invalid-input-response'
+}
+
+// Not configured
+{
+  success: false,
+  error: 'Turnstile not configured'
+}
+
+// Disabled (passes through)
+{
+  success: true  // When plugin is disabled, verification passes
+}
+```
+
+</CodeGroup>
+
+---
+
+## Middleware
+
+### Built-in Middleware
+
+Use the `verifyTurnstile` middleware to automatically verify requests:
+
+<CodeGroup title="Middleware Usage">
+
+```typescript
+import { verifyTurnstile } from '@sonicjs-cms/core/plugins'
+import { Hono } from 'hono'
+
+const app = new Hono()
+
+// Protect a route with Turnstile
+app.post('/api/contact', verifyTurnstile, async (c) => {
+  // Only reaches here if Turnstile verification passed
+  const body = await c.req.parseBody()
+
+  // Process form...
+
+  return c.json({ success: true })
+})
+
+// Protect multiple routes
+const protectedRoutes = new Hono()
+protectedRoutes.use('*', verifyTurnstile)
+protectedRoutes.post('/submit', async (c) => { /* ... */ })
+protectedRoutes.post('/register', async (c) => { /* ... */ })
+
+app.route('/api/protected', protectedRoutes)
+```
+
+</CodeGroup>
+
+### Custom Middleware
+
+Create custom middleware with additional options:
+
+<CodeGroup title="Custom Middleware">
+
+```typescript
+import { createTurnstileMiddleware } from '@sonicjs-cms/core/plugins'
+
+// Custom middleware with options
+const customTurnstile = createTurnstileMiddleware({
+  errorResponse: (c, error) => {
+    return c.html(`
+      <div class="error">
+        Verification failed: ${error}
+        <a href="javascript:history.back()">Go back</a>
+      </div>
+    `)
+  },
+  skipRoutes: ['/api/health', '/api/public']
+})
+
+app.use('/api/*', customTurnstile)
+```
+
+</CodeGroup>
+
+### Plugin Integration
+
+When building plugins, use the middleware factory:
+
+<CodeGroup title="Plugin Usage">
+
+```typescript
+import { PluginBuilder } from '@sonicjs-cms/core'
+import { verifyTurnstile } from '@sonicjs-cms/core/plugins'
+
+const myPlugin = new PluginBuilder({
+  name: 'my-plugin',
+  version: '1.0.0'
+})
+  .addRoute('/api/my-plugin/submit', submitRoutes)
+  .addMiddleware('turnstile', verifyTurnstile, {
+    description: 'Verify bot protection',
+    routes: ['/api/my-plugin/submit']
+  })
+  .build()
+```
+
+</CodeGroup>
+
+---
+
+## Advanced Usage
+
+### Conditional Verification
+
+Skip verification for authenticated users:
+
+<CodeGroup title="Conditional Verification">
+
+```typescript
+app.post('/api/comment', async (c, next) => {
+  const user = c.get('user')
+
+  // Skip Turnstile for logged-in users
+  if (user) {
+    return next()
+  }
+
+  // Verify Turnstile for anonymous users
+  const turnstile = new TurnstileService(c.env.DB)
+  const token = (await c.req.parseBody())['cf-turnstile-response'] as string
+
+  const result = await turnstile.verifyToken(token)
+  if (!result.success) {
+    return c.json({ error: 'Verification required' }, 403)
+  }
+
+  return next()
+})
+```
+
+</CodeGroup>
+
+### JavaScript Callback Handling
+
+Handle verification events in JavaScript:
+
+<CodeGroup title="JavaScript Callbacks">
+
+```html
+<div
+  class="cf-turnstile"
+  data-sitekey="YOUR_SITE_KEY"
+  data-callback="onTurnstileSuccess"
+  data-error-callback="onTurnstileError"
+  data-expired-callback="onTurnstileExpired"
+></div>
+
+<script>
+function onTurnstileSuccess(token) {
+  console.log('Turnstile verified successfully')
+  document.getElementById('submitBtn').disabled = false
+
+  // Optionally store token for AJAX submission
+  document.getElementById('turnstileToken').value = token
+}
+
+function onTurnstileError(error) {
+  console.error('Turnstile error:', error)
+  alert('Verification failed. Please refresh and try again.')
+}
+
+function onTurnstileExpired() {
+  console.warn('Turnstile token expired')
+  document.getElementById('submitBtn').disabled = true
+  // Optionally trigger refresh
+  turnstile.reset()
+}
+</script>
+```
+
+</CodeGroup>
+
+### AJAX Form Submission
+
+Submit forms with Turnstile via AJAX:
+
+<CodeGroup title="AJAX Integration">
+
+```javascript
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
+  e.preventDefault()
+
+  const formData = new FormData(e.target)
+
+  // Token is automatically included in FormData from the widget
+  const response = await fetch('/api/contact', {
+    method: 'POST',
+    body: formData
+  })
+
+  const result = await response.json()
+
+  if (result.success) {
+    alert('Message sent!')
+    e.target.reset()
+    turnstile.reset() // Reset widget for next submission
+  } else {
+    alert(result.error || 'Submission failed')
+  }
+})
+```
+
+</CodeGroup>
+
+### Pre-Clearance Mode
+
+For high-traffic sites, use pre-clearance to reduce verification overhead:
+
+<CodeGroup title="Pre-Clearance">
+
+```typescript
+// In plugin settings
+{
+  preClearance: true,
+  preClearanceLevel: 'managed'  // or 'interactive', 'non-interactive'
+}
+```
+
+</CodeGroup>
+
+Pre-clearance levels:
+- `interactive` - Always show challenge first
+- `managed` - Let Cloudflare decide
+- `non-interactive` - Never show initial challenge
+
+---
+
+## Troubleshooting
+
+### Widget Not Appearing
+
+**Check site key:**
+- Ensure site key is correct and matches your domain
+- Verify the domain is added to your Turnstile site
+
+**Check script loading:**
+```html
+<!-- Ensure script is loaded -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+```
+
+**Check container:**
+```html
+<!-- Ensure container has correct class or data-sitekey -->
+<div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY"></div>
+```
+
+### Verification Failing
+
+**Check secret key:**
+- Ensure secret key is configured in admin settings
+- Verify it matches the site key's secret
+
+**Check token:**
+- Token is in `cf-turnstile-response` form field
+- Token hasn't expired (valid for ~300 seconds)
+
+**Check IP:**
+- Optional but helps with accuracy
+- Pass `CF-Connecting-IP` header
+
+### Testing Locally
+
+For local development, Cloudflare provides test keys:
+
+<CodeGroup title="Test Keys">
+
+```typescript
+// Test keys that always pass
+const TEST_SITE_KEY = '1x00000000000000000000AA'
+const TEST_SECRET_KEY = '1x0000000000000000000000000000000AA'
+
+// Test keys that always fail
+const FAIL_SITE_KEY = '2x00000000000000000000AB'
+const FAIL_SECRET_KEY = '2x0000000000000000000000000000000AB'
+
+// Test keys that force interactive challenge
+const CHALLENGE_SITE_KEY = '3x00000000000000000000FF'
+```
+
+</CodeGroup>
+
+<Note>
+Never use test keys in production. They're only for development and testing.
+</Note>
+
+### Error Codes
+
+| Code | Description |
+|------|-------------|
+| `missing-input-secret` | Secret key not provided |
+| `invalid-input-secret` | Secret key is malformed |
+| `missing-input-response` | Token not provided |
+| `invalid-input-response` | Token is malformed or expired |
+| `bad-request` | Request was malformed |
+| `timeout-or-duplicate` | Token already used or timed out |
+| `internal-error` | Cloudflare internal error |
+
+---
+
+## Next Steps
+
+<div className="not-prose">
+  <Button href="/plugins/core" variant="text" arrow="right">
+    <>Explore other core plugins</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/authentication" variant="text" arrow="right">
+    <>Learn about authentication</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/plugins/development" variant="text" arrow="right">
+    <>Build custom plugins</>
+  </Button>
+</div>
