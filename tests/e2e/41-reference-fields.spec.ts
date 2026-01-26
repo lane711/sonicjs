@@ -107,9 +107,9 @@ test.describe('Reference Fields', () => {
     // Look for the reference field picker button
     const refButton = page.locator('button:has-text("Select Reference")')
 
-    // If reference field exists, button should be visible
+    // If reference field exists, at least one button should be visible
     if (await refButton.count() > 0) {
-      await expect(refButton).toBeVisible()
+      await expect(refButton.first()).toBeVisible()
     }
   })
 
