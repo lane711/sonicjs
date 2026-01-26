@@ -289,6 +289,12 @@ export const navigation: Array<NavGroup> = [
     ],
   },
   {
+    title: 'Integrations',
+    links: [
+      { title: 'Astro', href: '/integrations/astro' },
+    ],
+  },
+  {
     title: 'Resources',
     links: [
       { title: 'Blog', href: '/blog' },
