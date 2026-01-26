@@ -1,0 +1,703 @@
+export const metadata = {
+  title: 'Workflow Plugin - SonicJS',
+  description:
+    'Content workflow management for SonicJS with approval chains, scheduled publishing, state transitions, and role-based permissions.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Features', id: 'features' },
+  { title: 'Content States', id: 'content-states' },
+  { title: 'Workflow Actions', id: 'workflow-actions' },
+  { title: 'Scheduled Publishing', id: 'scheduled-publishing' },
+  { title: 'Permissions', id: 'permissions' },
+  { title: 'Services', id: 'services' },
+  { title: 'Admin Interface', id: 'admin-interface' },
+  { title: 'Integration', id: 'integration' },
+]
+
+# Workflow Plugin
+
+Content workflow management with approval chains, scheduled publishing, state transitions, and comprehensive audit trails. {{ className: 'lead' }}
+
+---
+
+## Overview
+
+The Workflow plugin provides enterprise-grade content lifecycle management for SonicJS. Control how content moves from draft to publication with configurable approval workflows, scheduled publishing, and detailed audit trails.
+
+<FeatureGrid
+  features={[
+    {
+      icon: '🔄',
+      title: 'State Management',
+      description: 'Track content through draft, review, scheduled, and published states',
+    },
+    {
+      icon: '⏰',
+      title: 'Scheduled Publishing',
+      description: 'Schedule content to publish, unpublish, or archive automatically',
+    },
+    {
+      icon: '👥',
+      title: 'Approval Chains',
+      description: 'Configure multi-level approval workflows for content review',
+    },
+    {
+      icon: '📜',
+      title: 'Audit Trail',
+      description: 'Complete history of all workflow transitions and actions',
+    },
+  ]}
+  columns={2}
+/>
+
+---
+
+## Features
+
+### Content Lifecycle
+- Six distinct content states (draft, review, scheduled, published, archived, deleted)
+- Configurable state transitions
+- Automatic workflow initialization for new content
+
+### Scheduled Publishing
+- Schedule content to publish at specific times
+- Schedule unpublishing for time-sensitive content
+- Automatic archival scheduling
+- Timezone-aware scheduling
+
+### Approval Workflows
+- Multi-level approval chains
+- Role-based transition permissions
+- Review assignment with due dates
+- Approval/rejection with comments
+
+### Audit & History
+- Complete state transition history
+- User action tracking
+- Comment logging on transitions
+- Metadata preservation
+
+---
+
+## Content States
+
+Content moves through these states during its lifecycle:
+
+<CodeGroup title="Content States">
+
+```typescript
+enum ContentStatus {
+  DRAFT = 'draft',         // Work in progress
+  REVIEW = 'review',       // Awaiting approval
+  SCHEDULED = 'scheduled', // Approved, waiting to publish
+  PUBLISHED = 'published', // Live and visible
+  ARCHIVED = 'archived',   // Hidden but preserved
+  DELETED = 'deleted'      // Soft-deleted
+}
+```
+
+</CodeGroup>
+
+### State Diagram
+
+```
+                    ┌──────────────────────┐
+                    │                      │
+                    ▼                      │
+┌─────────┐   Submit   ┌─────────┐   Approve   ┌───────────┐
+│  DRAFT  │──────────▶│ REVIEW  │──────────▶│ SCHEDULED │
+└─────────┘            └─────────┘            └───────────┘
+     │                      │                      │
+     │ Publish              │ Reject               │ Publish
+     │ (direct)             │                      │ (auto)
+     ▼                      ▼                      ▼
+┌───────────┐          ┌─────────┐          ┌───────────┐
+│ PUBLISHED │◀─────────│  DRAFT  │          │ PUBLISHED │
+└───────────┘  restore └─────────┘          └───────────┘
+     │                                            │
+     │ Archive                                    │
+     ▼                                            │
+┌──────────┐                                      │
+│ ARCHIVED │◀─────────────────────────────────────┘
+└──────────┘
+     │
+     │ Delete
+     ▼
+┌─────────┐
+│ DELETED │ ──▶ Restore ──▶ DRAFT
+└─────────┘
+```
+
+### State Descriptions
+
+| State | Description | Visible To |
+|-------|-------------|------------|
+| `draft` | Work in progress, can be edited | Author, Editor, Admin |
+| `review` | Submitted for approval | Editor, Admin |
+| `scheduled` | Approved, waiting for publish time | Editor, Admin |
+| `published` | Live and publicly visible | Everyone |
+| `archived` | Hidden but preserved | Editor, Admin |
+| `deleted` | Soft-deleted, can be restored | Admin only |
+
+---
+
+## Workflow Actions
+
+Actions that can be performed on content:
+
+<CodeGroup title="Workflow Actions">
+
+```typescript
+enum WorkflowAction {
+  SAVE_DRAFT = 'save_draft',           // Save changes to draft
+  SUBMIT_FOR_REVIEW = 'submit_for_review', // Send to reviewers
+  APPROVE = 'approve',                 // Approve for publishing
+  REJECT = 'reject',                   // Reject and return to draft
+  PUBLISH = 'publish',                 // Publish immediately
+  UNPUBLISH = 'unpublish',             // Return to draft
+  SCHEDULE = 'schedule',               // Schedule for future publishing
+  ARCHIVE = 'archive',                 // Archive content
+  DELETE = 'delete',                   // Soft delete
+  RESTORE = 'restore'                  // Restore from deleted/archived
+}
+```
+
+</CodeGroup>
+
+### Available Actions by State
+
+| Current State | Available Actions |
+|---------------|-------------------|
+| `draft` | Save Draft, Submit for Review, Publish, Schedule, Delete |
+| `review` | Approve, Reject, Publish, Schedule |
+| `scheduled` | Publish, Save Draft, Delete |
+| `published` | Unpublish, Archive, Delete |
+| `archived` | Publish, Save Draft, Delete |
+| `deleted` | Restore |
+
+### Performing Actions
+
+<CodeGroup title="Perform Workflow Action">
+
+```typescript
+import { WorkflowManager, WorkflowAction, ContentStatus } from '@sonicjs-cms/core/plugins'
+
+// Initialize manager
+const workflowManager = new WorkflowManager(db)
+
+// Check if action is allowed
+const canPublish = await workflowManager.canPerformAction(
+  contentId,
+  WorkflowAction.PUBLISH,
+  userId,
+  userRole // 'admin', 'editor', 'author'
+)
+
+// Perform the action
+const result = await workflowManager.performAction(
+  contentId,
+  WorkflowAction.PUBLISH,
+  userId,
+  userRole,
+  { comment: 'Approved after review' }
+)
+
+if (result.success) {
+  console.log('New status:', result.newStatus) // 'published'
+} else {
+  console.error('Error:', result.error)
+}
+```
+
+</CodeGroup>
+
+### Get Available Actions
+
+<CodeGroup title="Get Available Actions">
+
+```typescript
+// Get actions the current user can perform
+const actions = await workflowManager.getAvailableActions(
+  contentId,
+  userId,
+  userRole
+)
+
+// Returns: ['publish', 'unpublish', 'archive', 'delete']
+console.log('Available actions:', actions)
+
+// Use static method for known status
+const actionsForDraft = ContentWorkflow.getAvailableActions(
+  ContentStatus.DRAFT,
+  'editor',
+  false // isAuthor
+)
+```
+
+</CodeGroup>
+
+---
+
+## Scheduled Publishing
+
+Schedule content to publish, unpublish, or archive at specific times.
+
+### Schedule Content
+
+<CodeGroup title="Schedule Publishing">
+
+```typescript
+import { SchedulerService } from '@sonicjs-cms/core/plugins'
+
+const scheduler = new SchedulerService(db)
+
+// Schedule content to publish
+const scheduleId = await scheduler.scheduleContent(
+  contentId,
+  'publish',           // action: 'publish' | 'unpublish' | 'archive'
+  new Date('2024-12-25T00:00:00Z'), // scheduled time
+  'America/New_York',  // timezone
+  userId
+)
+
+console.log('Scheduled:', scheduleId)
+```
+
+</CodeGroup>
+
+### Update Schedule
+
+<CodeGroup title="Update Schedule">
+
+```typescript
+// Reschedule to a new time
+await scheduler.updateScheduledContent(
+  scheduleId,
+  new Date('2024-12-26T00:00:00Z'),
+  'Europe/London' // optional new timezone
+)
+
+// Cancel scheduled action
+await scheduler.cancelScheduledContent(scheduleId)
+```
+
+</CodeGroup>
+
+### View Scheduled Content
+
+<CodeGroup title="Query Scheduled Content">
+
+```typescript
+// Get all scheduled content for a user
+const myScheduled = await scheduler.getScheduledContentForUser(userId)
+
+// Get scheduled actions for specific content
+const contentSchedule = await scheduler.getScheduledContentForContent(contentId)
+
+// Get statistics
+const stats = await scheduler.getScheduledContentStats()
+console.log(stats)
+// { pending: 5, completed: 120, failed: 2, cancelled: 3 }
+```
+
+</CodeGroup>
+
+### Process Scheduled Content
+
+Scheduled content is processed automatically or via a cron trigger:
+
+<CodeGroup title="Process Scheduled Content">
+
+```typescript
+// Process all due scheduled content (call from cron)
+const result = await scheduler.processScheduledContent()
+console.log(`Processed: ${result.processed}, Errors: ${result.errors}`)
+
+// Or process a specific scheduled action
+const success = await scheduler.executeScheduledAction(scheduleId)
+```
+
+</CodeGroup>
+
+### Scheduled Content Schema
+
+<CodeGroup title="Scheduled Content Structure">
+
+```typescript
+interface ScheduledContent {
+  id: string                          // Unique schedule ID
+  content_id: string                  // Content being scheduled
+  action: 'publish' | 'unpublish' | 'archive'
+  scheduled_at: string                // ISO timestamp
+  timezone: string                    // Timezone for scheduling
+  user_id: string                     // Who scheduled it
+  status: 'pending' | 'completed' | 'failed' | 'cancelled'
+  executed_at?: string                // When it was processed
+  error_message?: string              // Error if failed
+}
+```
+
+</CodeGroup>
+
+---
+
+## Permissions
+
+Role-based permissions control who can perform which actions.
+
+### Default Permissions
+
+<CodeGroup title="Default Workflow Permissions">
+
+```typescript
+const defaultWorkflowPermissions = {
+  draft: ['admin', 'editor', 'author'],    // Who can work on drafts
+  review: ['admin', 'editor'],              // Who can review
+  scheduled: ['admin', 'editor'],           // Who can manage scheduled
+  published: ['admin', 'editor'],           // Who can unpublish
+  archived: ['admin', 'editor'],            // Who can manage archives
+  deleted: ['admin']                        // Only admins can restore
+}
+```
+
+</CodeGroup>
+
+### Author Permissions
+
+Authors have special permissions for their own content:
+
+- Can edit their own drafts
+- Can submit their drafts for review
+- Cannot publish directly (unless also an editor)
+- Cannot see other users' drafts
+
+### Custom Permissions
+
+<CodeGroup title="Custom Permissions">
+
+```typescript
+import { WorkflowManager, WorkflowPermissions } from '@sonicjs-cms/core/plugins'
+
+// Define custom permissions
+const customPermissions: WorkflowPermissions = {
+  draft: ['admin', 'editor', 'author', 'contributor'],
+  review: ['admin', 'editor', 'senior-editor'],
+  scheduled: ['admin', 'editor'],
+  published: ['admin'],  // Only admins can unpublish
+  archived: ['admin'],
+  deleted: ['admin']
+}
+
+// Use with workflow manager
+const manager = new WorkflowManager(db, customPermissions)
+```
+
+</CodeGroup>
+
+### Check Permissions
+
+<CodeGroup title="Check Permissions">
+
+```typescript
+import { ContentWorkflow, WorkflowAction, ContentStatus } from '@sonicjs-cms/core/plugins'
+
+// Check if user can perform action
+const canPublish = ContentWorkflow.canPerformAction(
+  WorkflowAction.PUBLISH,
+  ContentStatus.REVIEW,  // current status
+  'editor',              // user role
+  false                  // isAuthor
+)
+
+// Get all statuses visible to user
+const visibleStatuses = ContentWorkflow.getContentVisibility('author')
+// ['draft', 'review', 'published', 'scheduled']
+
+// Filter content by permissions
+const filteredContent = ContentWorkflow.filterContentByPermissions(
+  allContent,
+  userRole,
+  userId
+)
+```
+
+</CodeGroup>
+
+---
+
+## Services
+
+The plugin provides several services for workflow management.
+
+### WorkflowEngine
+
+Core workflow state management:
+
+<CodeGroup title="WorkflowEngine">
+
+```typescript
+import { WorkflowEngine } from '@sonicjs-cms/core/plugins'
+
+const engine = new WorkflowEngine(db)
+
+// Get all workflow states
+const states = await engine.getWorkflowStates()
+
+// Get workflow for a collection
+const workflow = await engine.getWorkflowByCollection(collectionId)
+
+// Get available transitions
+const transitions = await engine.getAvailableTransitions(
+  workflowId,
+  currentStateId,
+  userId
+)
+
+// Transition content to new state
+await engine.transitionContent(
+  contentId,
+  'published',  // target state
+  userId,
+  'Approved for publication'  // comment
+)
+
+// Get workflow history
+const history = await engine.getWorkflowHistory(contentId)
+
+// Assign content to user
+await engine.assignContentToUser(contentId, assigneeId, dueDate)
+
+// Get content assigned to user
+const assigned = await engine.getAssignedContent(userId)
+
+// Get content by state
+const inReview = await engine.getContentByState('review')
+```
+
+</CodeGroup>
+
+### SchedulerService
+
+Content scheduling:
+
+<CodeGroup title="SchedulerService">
+
+```typescript
+import { SchedulerService } from '@sonicjs-cms/core/plugins'
+
+const scheduler = new SchedulerService(db)
+
+// Schedule actions
+await scheduler.scheduleContent(contentId, 'publish', date, timezone, userId)
+
+// Manage schedules
+await scheduler.updateScheduledContent(scheduleId, newDate)
+await scheduler.cancelScheduledContent(scheduleId)
+
+// Query schedules
+const pending = await scheduler.getPendingScheduledContent()
+const userSchedules = await scheduler.getScheduledContentForUser(userId)
+
+// Process scheduled content
+await scheduler.processScheduledContent()
+```
+
+</CodeGroup>
+
+### WorkflowManager
+
+High-level workflow operations with permission checking:
+
+<CodeGroup title="WorkflowManager">
+
+```typescript
+import { WorkflowManager } from '@sonicjs-cms/core/plugins'
+
+const manager = new WorkflowManager(db)
+
+// Check and perform actions
+const canDo = await manager.canPerformAction(contentId, action, userId, role)
+const result = await manager.performAction(contentId, action, userId, role, metadata)
+
+// Get available actions
+const actions = await manager.getAvailableActions(contentId, userId, role)
+
+// Get history
+const history = await manager.getWorkflowHistory(contentId)
+
+// Bulk operations
+await manager.bulkUpdateStatus(contentIds, 'published', userId, role)
+```
+
+</CodeGroup>
+
+---
+
+## Admin Interface
+
+The plugin adds admin pages for workflow management.
+
+### Workflow Dashboard
+
+**Path:** `/admin/workflow/dashboard`
+
+View and manage all content workflows:
+- Content grouped by state
+- Quick actions on content items
+- Filter by collection, author, date
+- Assignment overview
+
+### Content Workflow Detail
+
+**Path:** `/admin/workflow/content/:contentId`
+
+Manage workflow for specific content:
+- Current state and available actions
+- Action buttons with confirmation
+- Workflow history timeline
+- Assignment and due date management
+
+### Scheduled Content
+
+**Path:** `/admin/workflow/scheduled`
+
+Manage scheduled publishing:
+- View all pending schedules
+- Edit or cancel schedules
+- View completed and failed schedules
+- Schedule statistics
+
+### Menu Items
+
+The plugin adds these menu items:
+- **Workflow** - Dashboard (order: 30)
+- **Scheduled** - Scheduled content (order: 31, under Workflow)
+
+---
+
+## Integration
+
+### Automatic Workflow Initialization
+
+When content is created, the plugin automatically initializes its workflow status:
+
+<CodeGroup title="Auto-initialization">
+
+```typescript
+// This happens automatically via the content:create hook
+builder.addHook('content:create', async (data, context) => {
+  if (context?.db) {
+    const workflowEngine = new WorkflowEngine(context.db)
+    await workflowEngine.initializeContentWorkflow(
+      data.id,
+      data.collectionId
+    )
+  }
+  return data
+})
+```
+
+</CodeGroup>
+
+### Using in Custom Routes
+
+<CodeGroup title="Custom Route Integration">
+
+```typescript
+import { Hono } from 'hono'
+import { WorkflowManager, WorkflowAction } from '@sonicjs-cms/core/plugins'
+
+const app = new Hono()
+
+app.post('/api/content/:id/publish', async (c) => {
+  const contentId = c.req.param('id')
+  const user = c.get('user')
+
+  const manager = new WorkflowManager(c.env.DB)
+
+  // Check permission
+  const canPublish = await manager.canPerformAction(
+    contentId,
+    WorkflowAction.PUBLISH,
+    user.id,
+    user.role
+  )
+
+  if (!canPublish) {
+    return c.json({ error: 'Not authorized to publish' }, 403)
+  }
+
+  // Perform action
+  const result = await manager.performAction(
+    contentId,
+    WorkflowAction.PUBLISH,
+    user.id,
+    user.role,
+    { comment: 'Published via API' }
+  )
+
+  return c.json(result)
+})
+```
+
+</CodeGroup>
+
+### Generating UI Components
+
+<CodeGroup title="Generate Status Badge">
+
+```typescript
+import { ContentWorkflow, ContentStatus } from '@sonicjs-cms/core/plugins'
+
+// Generate status badge HTML
+const badge = ContentWorkflow.generateStatusBadge(ContentStatus.REVIEW)
+// Returns: <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Under Review</span>
+
+// Generate action buttons
+const buttons = ContentWorkflow.generateActionButtons(
+  contentId,
+  ContentStatus.DRAFT,
+  [WorkflowAction.SUBMIT_FOR_REVIEW, WorkflowAction.PUBLISH]
+)
+```
+
+</CodeGroup>
+
+---
+
+## Database Schema
+
+The plugin creates these tables:
+
+| Table | Description |
+|-------|-------------|
+| `workflows` | Workflow definitions per collection |
+| `workflow_states` | Available states (draft, review, etc.) |
+| `workflow_transitions` | Allowed state transitions |
+| `content_workflow_status` | Current status per content item |
+| `workflow_history` | Transition audit trail |
+| `scheduled_content` | Scheduled publishing queue |
+
+---
+
+## Next Steps
+
+<div className="not-prose">
+  <Button href="/collections" variant="text" arrow="right">
+    <>Learn about collections</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/authentication" variant="text" arrow="right">
+    <>User authentication and roles</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/hooks" variant="text" arrow="right">
+    <>Hook into workflow events</>
+  </Button>
+</div>

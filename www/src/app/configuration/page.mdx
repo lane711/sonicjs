@@ -1,0 +1,635 @@
+export const metadata = {
+  title: 'Configuration Reference - SonicJS',
+  description:
+    'Complete configuration reference for SonicJS including application settings, environment variables, bindings, and plugin configuration.',
+}
+
+export const sections = [
+  { title: 'Overview', id: 'overview' },
+  { title: 'Application Config', id: 'application-config' },
+  { title: 'Environment Bindings', id: 'environment-bindings' },
+  { title: 'Environment Variables', id: 'environment-variables' },
+  { title: 'Collections Config', id: 'collections-config' },
+  { title: 'Plugin Config', id: 'plugin-config' },
+  { title: 'Middleware Config', id: 'middleware-config' },
+  { title: 'wrangler.toml', id: 'wrangler-toml' },
+]
+
+# Configuration Reference
+
+Complete reference for all SonicJS configuration options including application settings, Cloudflare bindings, environment variables, and plugin configuration. {{ className: 'lead' }}
+
+---
+
+## Overview
+
+SonicJS configuration happens at multiple levels:
+
+1. **Application Config** - TypeScript configuration passed to `createSonicJSApp()`
+2. **Environment Bindings** - Cloudflare Workers bindings (D1, KV, R2)
+3. **Environment Variables** - Runtime configuration via `wrangler.toml` or secrets
+4. **Plugin Config** - Individual plugin settings
+
+---
+
+## Application Config
+
+The main configuration object passed when creating your SonicJS application.
+
+<CodeGroup title="SonicJSConfig Interface">
+
+```typescript
+interface SonicJSConfig {
+  // Collections configuration
+  collections?: {
+    directory?: string     // Path to collection definitions
+    autoSync?: boolean     // Auto-sync collections on startup
+  }
+
+  // Plugins configuration
+  plugins?: {
+    directory?: string     // Path to custom plugins
+    autoLoad?: boolean     // Auto-load plugins from directory
+    disableAll?: boolean   // Disable all plugins (including core)
+  }
+
+  // Custom routes
+  routes?: Array<{
+    path: string           // Route path prefix
+    handler: Hono          // Hono router instance
+  }>
+
+  // Custom middleware
+  middleware?: {
+    beforeAuth?: Middleware[]   // Run before authentication
+    afterAuth?: Middleware[]    // Run after authentication
+  }
+
+  // App metadata
+  version?: string         // Application version
+  name?: string            // Application name
+}
+```
+
+</CodeGroup>
+
+### Basic Usage
+
+<CodeGroup title="Basic Configuration">
+
+```typescript
+import { createSonicJSApp } from '@sonicjs-cms/core'
+
+const app = createSonicJSApp({
+  name: 'My CMS',
+  version: '1.0.0',
+  collections: {
+    directory: './src/collections',
+    autoSync: true
+  },
+  plugins: {
+    directory: './src/plugins',
+    autoLoad: true
+  }
+})
+
+export default app
+```
+
+</CodeGroup>
+
+### With Custom Routes
+
+<CodeGroup title="Custom Routes">
+
+```typescript
+import { createSonicJSApp } from '@sonicjs-cms/core'
+import { Hono } from 'hono'
+
+// Custom API routes
+const customApi = new Hono()
+customApi.get('/hello', (c) => c.json({ message: 'Hello!' }))
+customApi.post('/webhook', async (c) => {
+  const body = await c.req.json()
+  // Handle webhook
+  return c.json({ success: true })
+})
+
+const app = createSonicJSApp({
+  routes: [
+    { path: '/api/custom', handler: customApi }
+  ]
+})
+
+export default app
+```
+
+</CodeGroup>
+
+### With Custom Middleware
+
+<CodeGroup title="Custom Middleware">
+
+```typescript
+import { createSonicJSApp } from '@sonicjs-cms/core'
+
+const app = createSonicJSApp({
+  middleware: {
+    beforeAuth: [
+      // Rate limiting middleware
+      async (c, next) => {
+        // Check rate limits
+        await next()
+      },
+      // Request logging
+      async (c, next) => {
+        console.log(`${c.req.method} ${c.req.url}`)
+        await next()
+      }
+    ],
+    afterAuth: [
+      // Audit logging (after user is known)
+      async (c, next) => {
+        const user = c.get('user')
+        console.log(`User ${user?.email} accessing ${c.req.url}`)
+        await next()
+      }
+    ]
+  }
+})
+
+export default app
+```
+
+</CodeGroup>
+
+---
+
+## Environment Bindings
+
+Cloudflare Workers bindings required by SonicJS.
+
+<CodeGroup title="Bindings Interface">
+
+```typescript
+interface Bindings {
+  // Required bindings
+  DB: D1Database              // Cloudflare D1 database
+  CACHE_KV: KVNamespace       // Cloudflare KV for caching
+  MEDIA_BUCKET: R2Bucket      // Cloudflare R2 for media storage
+  ASSETS: Fetcher             // Static assets fetcher
+
+  // Optional bindings
+  EMAIL_QUEUE?: Queue         // Queue for email processing
+  SENDGRID_API_KEY?: string   // SendGrid API key
+  DEFAULT_FROM_EMAIL?: string // Default email sender
+  IMAGES_ACCOUNT_ID?: string  // Cloudflare Images account
+  IMAGES_API_TOKEN?: string   // Cloudflare Images token
+  ENVIRONMENT?: string        // Environment name (dev, staging, prod)
+  BUCKET_NAME?: string        // R2 bucket name
+
+  // AI Search bindings (optional)
+  AI?: any                    // Workers AI binding
+  VECTORIZE_INDEX?: any       // Vectorize index binding
+}
+```
+
+</CodeGroup>
+
+### Binding Descriptions
+
+| Binding | Required | Description |
+|---------|----------|-------------|
+| `DB` | Yes | Cloudflare D1 SQLite database |
+| `CACHE_KV` | Yes | KV namespace for caching |
+| `MEDIA_BUCKET` | Yes | R2 bucket for media files |
+| `ASSETS` | Yes | Static assets binding |
+| `EMAIL_QUEUE` | No | Queue for async email sending |
+| `SENDGRID_API_KEY` | No | API key for email sending |
+| `DEFAULT_FROM_EMAIL` | No | Default sender address |
+| `AI` | No | Workers AI for embeddings |
+| `VECTORIZE_INDEX` | No | Vectorize for semantic search |
+
+---
+
+## Environment Variables
+
+Runtime configuration via environment variables.
+
+### Core Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `ENVIRONMENT` | `development` | Environment name |
+| `JWT_SECRET` | - | Secret for JWT signing |
+| `ADMIN_EMAIL` | - | Initial admin email |
+| `ADMIN_PASSWORD` | - | Initial admin password |
+
+### Email Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SENDGRID_API_KEY` | - | SendGrid API key |
+| `DEFAULT_FROM_EMAIL` | - | Default sender address |
+| `DEFAULT_FROM_NAME` | `SonicJS` | Default sender name |
+
+### Media Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `BUCKET_NAME` | - | R2 bucket name |
+| `MAX_FILE_SIZE` | `10485760` | Max upload size (bytes) |
+| `ALLOWED_FILE_TYPES` | `image/*,video/*,application/pdf` | Allowed MIME types |
+
+### Caching Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CACHE_ENABLED` | `true` | Enable caching |
+| `CACHE_TTL` | `3600` | Default cache TTL (seconds) |
+| `CACHE_VERSION` | `v1` | Cache version for invalidation |
+
+### AI Search Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `AI_SEARCH_ENABLED` | `true` | Enable AI search |
+| `VECTORIZE_INDEX_NAME` | `sonicjs-content` | Vectorize index name |
+
+---
+
+## Collections Config
+
+Configuration for content collections.
+
+<CodeGroup title="Collections Configuration">
+
+```typescript
+const app = createSonicJSApp({
+  collections: {
+    // Directory containing collection definition files
+    directory: './src/collections',
+
+    // Automatically sync collection schemas on startup
+    autoSync: true
+  }
+})
+```
+
+</CodeGroup>
+
+### Collection File Structure
+
+<CodeGroup title="Collection Definition">
+
+```typescript
+// src/collections/blog-posts.ts
+import { defineCollection } from '@sonicjs-cms/core'
+
+export default defineCollection({
+  name: 'blog_posts',
+  displayName: 'Blog Posts',
+  description: 'Blog articles and posts',
+
+  // Schema definition
+  schema: {
+    title: {
+      type: 'string',
+      required: true,
+      maxLength: 200
+    },
+    slug: {
+      type: 'slug',
+      from: 'title'
+    },
+    content: {
+      type: 'richtext',
+      required: true
+    },
+    publishedAt: {
+      type: 'datetime'
+    },
+    featured: {
+      type: 'boolean',
+      default: false
+    },
+    category: {
+      type: 'reference',
+      collection: 'categories'
+    },
+    tags: {
+      type: 'array',
+      items: { type: 'string' }
+    }
+  },
+
+  // Workflow settings
+  workflow: {
+    enabled: true,
+    requireApproval: true
+  },
+
+  // API settings
+  api: {
+    enabled: true,
+    publicRead: true,
+    publicCreate: false
+  }
+})
+```
+
+</CodeGroup>
+
+---
+
+## Plugin Config
+
+Configuration for SonicJS plugins.
+
+### Global Plugin Settings
+
+<CodeGroup title="Plugin Configuration">
+
+```typescript
+const app = createSonicJSApp({
+  plugins: {
+    // Directory for custom plugins
+    directory: './src/plugins',
+
+    // Auto-load plugins from directory
+    autoLoad: true,
+
+    // Disable all plugins (useful for testing)
+    disableAll: false
+  }
+})
+```
+
+</CodeGroup>
+
+### Individual Plugin Settings
+
+Each plugin has its own settings stored in the database:
+
+<CodeGroup title="Plugin Settings Storage">
+
+```sql
+-- Plugin settings are stored in the plugins table
+SELECT id, settings FROM plugins WHERE id = 'ai-search';
+
+-- Settings are JSON:
+-- {
+--   "enabled": true,
+--   "ai_mode_enabled": true,
+--   "selected_collections": ["1", "2"],
+--   "autocomplete_enabled": true,
+--   "cache_duration": 1,
+--   "results_limit": 20
+-- }
+```
+
+</CodeGroup>
+
+### Common Plugin Configurations
+
+**AI Search Plugin:**
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `enabled` | boolean | `true` | Enable search |
+| `ai_mode_enabled` | boolean | `true` | Enable semantic search |
+| `selected_collections` | string[] | `[]` | Collections to index |
+| `autocomplete_enabled` | boolean | `true` | Enable suggestions |
+| `cache_duration` | number | `1` | Cache hours |
+| `results_limit` | number | `20` | Max results |
+
+**Turnstile Plugin:**
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `siteKey` | string | - | Turnstile site key |
+| `secretKey` | string | - | Turnstile secret key |
+| `theme` | string | `auto` | Widget theme |
+| `size` | string | `normal` | Widget size |
+| `enabled` | boolean | `false` | Enable verification |
+
+**Cache Plugin:**
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `memoryEnabled` | boolean | `true` | Enable memory cache |
+| `kvEnabled` | boolean | `false` | Enable KV cache |
+| `defaultTTL` | number | `3600` | Default TTL |
+| `maxMemorySize` | number | `50` | Max memory (MB) |
+
+---
+
+## Middleware Config
+
+Configure custom middleware for request processing.
+
+### Middleware Execution Order
+
+```
+Request
+   │
+   ├─▶ Metrics Middleware
+   │
+   ├─▶ Bootstrap Middleware (migrations, init)
+   │
+   ├─▶ beforeAuth Middleware (your custom)
+   │
+   ├─▶ Auth Middleware
+   │
+   ├─▶ afterAuth Middleware (your custom)
+   │
+   ├─▶ Route Handler
+   │
+   └─▶ Response
+```
+
+### Middleware Types
+
+<CodeGroup title="Middleware Definition">
+
+```typescript
+type Middleware = (
+  c: Context,
+  next: () => Promise<void>
+) => Promise<void>
+
+// Example middleware
+const loggingMiddleware: Middleware = async (c, next) => {
+  const start = Date.now()
+  await next()
+  const duration = Date.now() - start
+  console.log(`${c.req.method} ${c.req.url} - ${duration}ms`)
+}
+
+const authCheckMiddleware: Middleware = async (c, next) => {
+  const user = c.get('user')
+  if (!user) {
+    return c.json({ error: 'Unauthorized' }, 401)
+  }
+  await next()
+}
+```
+
+</CodeGroup>
+
+---
+
+## wrangler.toml
+
+Complete example of Cloudflare Worker configuration.
+
+<CodeGroup title="wrangler.toml">
+
+```toml
+name = "my-sonicjs-app"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+# Environment variables
+[vars]
+ENVIRONMENT = "production"
+DEFAULT_FROM_EMAIL = "noreply@myapp.com"
+DEFAULT_FROM_NAME = "My App"
+CACHE_ENABLED = "true"
+CACHE_TTL = "3600"
+
+# D1 Database
+[[d1_databases]]
+binding = "DB"
+database_name = "my-app-db"
+database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# KV Namespace for caching
+[[kv_namespaces]]
+binding = "CACHE_KV"
+id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# R2 Bucket for media
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "my-app-media"
+
+# Workers AI (for AI Search)
+[ai]
+binding = "AI"
+
+# Vectorize (for AI Search)
+[[vectorize]]
+binding = "VECTORIZE_INDEX"
+index_name = "sonicjs-content"
+
+# Queue for email processing (optional)
+[[queues.producers]]
+queue = "email-queue"
+binding = "EMAIL_QUEUE"
+
+# Static assets
+[assets]
+binding = "ASSETS"
+directory = "./public"
+
+# Development environment
+[env.development]
+[env.development.vars]
+ENVIRONMENT = "development"
+
+# Staging environment
+[env.staging]
+[env.staging.vars]
+ENVIRONMENT = "staging"
+
+# Production secrets (set via wrangler secret)
+# wrangler secret put JWT_SECRET
+# wrangler secret put SENDGRID_API_KEY
+# wrangler secret put ADMIN_PASSWORD
+```
+
+</CodeGroup>
+
+### Setting Secrets
+
+<CodeGroup title="Set Secrets">
+
+```bash
+# Set JWT secret
+npx wrangler secret put JWT_SECRET
+# Enter your secret when prompted
+
+# Set SendGrid API key
+npx wrangler secret put SENDGRID_API_KEY
+
+# Set initial admin password
+npx wrangler secret put ADMIN_PASSWORD
+
+# For specific environment
+npx wrangler secret put JWT_SECRET --env production
+```
+
+</CodeGroup>
+
+---
+
+## Request Context Variables
+
+Variables available in request context via `c.get()` / `c.set()`.
+
+<CodeGroup title="Variables Interface">
+
+```typescript
+interface Variables {
+  // User information (set by auth middleware)
+  user?: {
+    userId: string
+    email: string
+    role: string
+    exp: number    // Token expiration
+    iat: number    // Token issued at
+  }
+
+  // Request metadata
+  requestId?: string   // Unique request ID
+  startTime?: number   // Request start timestamp
+  appVersion?: string  // Application version
+}
+
+// Usage in routes
+app.get('/api/me', (c) => {
+  const user = c.get('user')
+  const requestId = c.get('requestId')
+
+  return c.json({
+    user,
+    requestId,
+    version: c.get('appVersion')
+  })
+})
+```
+
+</CodeGroup>
+
+---
+
+## Next Steps
+
+<div className="not-prose">
+  <Button href="/quickstart" variant="text" arrow="right">
+    <>Get started with SonicJS</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/deployment" variant="text" arrow="right">
+    <>Deploy to production</>
+  </Button>
+</div>
+
+<div className="not-prose mt-4">
+  <Button href="/plugins" variant="text" arrow="right">
+    <>Explore plugins</>
+  </Button>
+</div>
