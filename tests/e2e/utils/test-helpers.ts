@@ -373,7 +373,7 @@ export async function loginAsAdmin(page: Page) {
 /**
  * Navigate to a specific admin section
  */
-export async function navigateToAdminSection(page: Page, section: 'collections' | 'content' | 'media' | 'users') {
+export async function navigateToAdminSection(page: Page, section: 'collections' | 'content' | 'media' | 'users' | 'forms' | 'plugins') {
   // Navigate directly instead of clicking navigation links
   // This is more reliable as admin navigation may vary
   await page.goto(`/admin/${section}`);

@@ -329,3 +329,107 @@ export type SystemLog = typeof systemLogs.$inferSelect;
 export type NewSystemLog = typeof systemLogs.$inferInsert;
 export type LogConfig = typeof logConfig.$inferSelect;
 export type NewLogConfig = typeof logConfig.$inferInsert;
+
+// =====================================================
+// Form.io Integration Tables
+// =====================================================
+
+// Forms table - stores Form.io form definitions
+export const forms = sqliteTable('forms', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull().unique(), // Machine name (e.g., "contact-form")
+  displayName: text('display_name').notNull(), // Human name (e.g., "Contact Form")
+  description: text('description'),
+  category: text('category').notNull().default('general'), // contact, survey, registration, etc.
+  
+  // Form.io schema (JSON)
+  formioSchema: text('formio_schema', { mode: 'json' }).notNull(), // Complete Form.io JSON schema
+  
+  // Settings (JSON)
+  settings: text('settings', { mode: 'json' }), // emailNotifications, successMessage, etc.
+  
+  // Status & Management
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  isPublic: integer('is_public', { mode: 'boolean' }).notNull().default(true),
+  managed: integer('managed', { mode: 'boolean' }).notNull().default(false),
+  
+  // Metadata
+  icon: text('icon'),
+  color: text('color'),
+  tags: text('tags', { mode: 'json' }), // JSON array
+  
+  // Stats
+  submissionCount: integer('submission_count').notNull().default(0),
+  viewCount: integer('view_count').notNull().default(0),
+  
+  // Ownership
+  createdBy: text('created_by').references(() => users.id),
+  updatedBy: text('updated_by').references(() => users.id),
+  
+  // Timestamps
+  createdAt: integer('created_at').notNull(),
+  updatedAt: integer('updated_at').notNull(),
+});
+
+// Form submissions table
+export const formSubmissions = sqliteTable('form_submissions', {
+  id: text('id').primaryKey(),
+  formId: text('form_id').notNull().references(() => forms.id, { onDelete: 'cascade' }),
+  
+  // Submission data
+  submissionData: text('submission_data', { mode: 'json' }).notNull(), // The actual form data
+  
+  // Submission metadata
+  status: text('status').notNull().default('pending'), // pending, reviewed, approved, rejected, spam
+  submissionNumber: integer('submission_number'),
+  
+  // User information
+  userId: text('user_id').references(() => users.id),
+  userEmail: text('user_email'),
+  
+  // Tracking
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  referrer: text('referrer'),
+  utmSource: text('utm_source'),
+  utmMedium: text('utm_medium'),
+  utmCampaign: text('utm_campaign'),
+  
+  // Review/Processing
+  reviewedBy: text('reviewed_by').references(() => users.id),
+  reviewedAt: integer('reviewed_at'),
+  reviewNotes: text('review_notes'),
+  
+  // Flags
+  isSpam: integer('is_spam', { mode: 'boolean' }).notNull().default(false),
+  isArchived: integer('is_archived', { mode: 'boolean' }).notNull().default(false),
+  
+  // Timestamps
+  submittedAt: integer('submitted_at').notNull(),
+  updatedAt: integer('updated_at').notNull(),
+});
+
+// Form files table - links submissions to uploaded files
+export const formFiles = sqliteTable('form_files', {
+  id: text('id').primaryKey(),
+  submissionId: text('submission_id').notNull().references(() => formSubmissions.id, { onDelete: 'cascade' }),
+  mediaId: text('media_id').notNull().references(() => media.id, { onDelete: 'cascade' }),
+  fieldName: text('field_name').notNull(), // Form field that uploaded this file
+  uploadedAt: integer('uploaded_at').notNull(),
+});
+
+// Zod schemas for validation
+export const insertFormSchema = createInsertSchema(forms);
+export const selectFormSchema = createSelectSchema(forms);
+export const insertFormSubmissionSchema = createInsertSchema(formSubmissions);
+export const selectFormSubmissionSchema = createSelectSchema(formSubmissions);
+export const insertFormFileSchema = createInsertSchema(formFiles);
+export const selectFormFileSchema = createSelectSchema(formFiles);
+
+// TypeScript types
+export type Form = typeof forms.$inferSelect;
+export type NewForm = typeof forms.$inferInsert;
+export type FormSubmission = typeof formSubmissions.$inferSelect;
+export type NewFormSubmission = typeof formSubmissions.$inferInsert;
+export type FormFile = typeof formFiles.$inferSelect;
+export type NewFormFile = typeof formFiles.$inferInsert;
