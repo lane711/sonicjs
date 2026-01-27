@@ -90,12 +90,12 @@ echo "Local database cleared."
 # Run migrations on remote
 echo ""
 echo "Running migrations on remote database..."
-npx wrangler d1 migrations apply "$DB_NAME" --remote
+npx wrangler d1 migrations apply "$DB_NAME" --remote --yes
 
 # Run migrations on local
 echo ""
 echo "Running migrations on local database..."
-npx wrangler d1 migrations apply "$DB_NAME" --local
+npx wrangler d1 migrations apply "$DB_NAME" --local --yes
 
 # Seed admin user
 echo ""
