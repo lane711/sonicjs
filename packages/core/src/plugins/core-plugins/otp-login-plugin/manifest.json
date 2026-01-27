@@ -7,7 +7,7 @@
   "homepage": "https://sonicjs.com/plugins/otp-login",
   "repository": "https://github.com/lane711/sonicjs/tree/main/src/plugins/core-plugins/otp-login-plugin",
   "license": "MIT",
-  "category": "authentication",
+  "category": "security",
   "tags": ["otp", "passwordless", "authentication", "email", "2fa"],
   "dependencies": ["email"],
   "settings": {
@@ -52,13 +52,6 @@
       "label": "Allow New User Registration",
       "default": false,
       "description": "Allow new users to register via OTP",
-      "required": false
-    },
-    "appName": {
-      "type": "string",
-      "label": "Application Name",
-      "default": "SonicJS",
-      "description": "App name shown in emails",
       "required": false
     }
   },

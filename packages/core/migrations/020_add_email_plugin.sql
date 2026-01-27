@@ -12,7 +12,7 @@ INSERT OR IGNORE INTO plugins (
     'Send transactional emails using Resend',
     '1.0.0-beta.1',
     'SonicJS Team',
-    'communication',
+    'utilities',
     '📧',
     'inactive',
     TRUE,

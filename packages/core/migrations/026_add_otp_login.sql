@@ -32,7 +32,7 @@ INSERT OR IGNORE INTO plugins (
     'Passwordless authentication via email one-time codes',
     '1.0.0-beta.1',
     'SonicJS Team',
-    'authentication',
+    'security',
     '🔢',
     'inactive',
     TRUE,

@@ -7,7 +7,7 @@
   "homepage": "https://sonicjs.com/plugins/design",
   "repository": "https://github.com/lane711/sonicjs-ai/tree/main/src/plugins/design",
   "license": "MIT",
-  "category": "ui",
+  "category": "utilities",
   "tags": ["design", "ui", "themes", "components", "customization"],
   "dependencies": [],
   "settings": {

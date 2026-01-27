@@ -42,7 +42,6 @@ function createTestSettings(overrides: Partial<OTPSettings> = {}): OTPSettings {
     maxAttempts: 3,
     rateLimitPerHour: 5,
     allowNewUserRegistration: true,
-    appName: 'Test App',
     ...overrides
   }
 }

@@ -234,28 +234,67 @@ adminPluginRoutes.get('/:id', async (c) => {
     const user = c.get('user')
     const db = c.env.DB
     const pluginId = c.req.param('id')
-    
-    // Skip AI Search - it has its own custom settings page
-    if (pluginId === 'ai-search') {
+
+    // Skip plugins that have their own custom settings pages (not using component system)
+    const pluginsWithCustomPages = ['ai-search']
+    if (pluginsWithCustomPages.includes(pluginId)) {
       // Let the plugin's own route handle this
       return c.text('', 404) // Return 404 so Hono continues to next route
     }
-    
+
     // Check authorization
     if (user?.role !== 'admin') {
       return c.redirect('/admin/plugins')
     }
-    
+
     const pluginService = new PluginService(db)
     const plugin = await pluginService.getPlugin(pluginId)
-    
+
     if (!plugin) {
       return c.text('Plugin not found', 404)
     }
-    
+
     // Get activity log
     const activity = await pluginService.getPluginActivity(pluginId, 20)
-    
+
+    // Load additional context for plugins with custom settings components
+    let enrichedSettings = plugin.settings || {}
+
+    // For OTP Login plugin, add site name and email config status
+    if (pluginId === 'otp-login') {
+      // Get site name from general settings
+      const generalSettings = await db.prepare(`
+        SELECT value FROM settings WHERE key = 'general'
+      `).first() as { value: string } | null
+
+      let siteName = 'SonicJS'
+      if (generalSettings?.value) {
+        try {
+          const parsed = JSON.parse(generalSettings.value)
+          siteName = parsed.siteName || 'SonicJS'
+        } catch (e) { /* ignore */ }
+      }
+
+      // Check if email plugin is configured
+      const emailPlugin = await db.prepare(`
+        SELECT settings FROM plugins WHERE id = 'email'
+      `).first() as { settings: string | null } | null
+
+      let emailConfigured = false
+      if (emailPlugin?.settings) {
+        try {
+          const emailSettings = JSON.parse(emailPlugin.settings)
+          emailConfigured = !!(emailSettings.apiKey && emailSettings.fromEmail && emailSettings.fromName)
+        } catch (e) { /* ignore */ }
+      }
+
+      enrichedSettings = {
+        ...enrichedSettings,
+        siteName,
+        _emailConfigured: emailConfigured
+      }
+    }
+
     // Map plugin data to template format
     const templatePlugin = {
       id: plugin.id,
@@ -273,7 +312,7 @@ adminPluginRoutes.get('/:id', async (c) => {
       dependencies: plugin.dependencies,
       permissions: plugin.permissions,
       isCore: plugin.is_core,
-      settings: plugin.settings
+      settings: enrichedSettings
     }
     
     // Map activity data

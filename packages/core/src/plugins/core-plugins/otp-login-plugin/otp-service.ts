@@ -11,7 +11,6 @@ export interface OTPSettings {
   maxAttempts: number
   rateLimitPerHour: number
   allowNewUserRegistration: boolean
-  appName: string
 }
 
 export interface OTPCode {
