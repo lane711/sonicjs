@@ -492,3 +492,425 @@ describe('Global Cache Management', () => {
     expect(stats.user!.entryCount).toBe(1)
   })
 })
+
+describe('CacheService - KV Operations', () => {
+  let cache: CacheService
+  let mockKv: any
+
+  beforeEach(async () => {
+    await clearAllCaches()
+
+    mockKv = {
+      get: vi.fn(),
+      put: vi.fn(),
+      delete: vi.fn(),
+      list: vi.fn()
+    }
+
+    const config: CacheConfig = {
+      ttl: 60,
+      kvEnabled: true,
+      memoryEnabled: true,
+      namespace: 'kv-test',
+      invalidateOn: [],
+      version: 'v1'
+    }
+    cache = createCacheService(config, mockKv)
+  })
+
+  it('should get value from KV when not in memory', async () => {
+    const testValue = { id: 1, name: 'test' }
+    mockKv.get.mockResolvedValue(testValue)
+
+    // First get will miss memory, hit KV
+    const result = await cache.get('test:key')
+
+    expect(mockKv.get).toHaveBeenCalledWith('test:key', 'json')
+    expect(result).toEqual(testValue)
+  })
+
+  it('should populate memory cache after KV hit', async () => {
+    const testValue = { id: 1, name: 'test' }
+    mockKv.get.mockResolvedValue(testValue)
+
+    // First get - from KV
+    await cache.get('test:key')
+
+    // Second get - should be from memory, not KV
+    mockKv.get.mockClear()
+    const result = await cache.get('test:key')
+
+    expect(mockKv.get).not.toHaveBeenCalled()
+    expect(result).toEqual(testValue)
+  })
+
+  it('should store value in both memory and KV', async () => {
+    const testValue = { id: 1, name: 'test' }
+
+    await cache.set('test:key', testValue)
+
+    expect(mockKv.put).toHaveBeenCalledWith(
+      'test:key',
+      JSON.stringify(testValue),
+      { expirationTtl: 60 }
+    )
+  })
+
+  it('should delete from both memory and KV', async () => {
+    await cache.set('test:key', 'value')
+
+    await cache.delete('test:key')
+
+    expect(mockKv.delete).toHaveBeenCalledWith('test:key')
+
+    // Memory should also be cleared
+    mockKv.get.mockResolvedValue(null)
+    const result = await cache.get('test:key')
+    expect(result).toBeNull()
+  })
+
+  it('should handle KV read errors gracefully', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    mockKv.get.mockRejectedValue(new Error('KV read error'))
+
+    const result = await cache.get('test:key')
+
+    expect(result).toBeNull()
+    expect(consoleSpy).toHaveBeenCalledWith('KV cache read error:', expect.any(Error))
+
+    consoleSpy.mockRestore()
+  })
+
+  it('should handle KV write errors gracefully', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    mockKv.put.mockRejectedValue(new Error('KV write error'))
+
+    // Should not throw
+    await expect(cache.set('test:key', 'value')).resolves.not.toThrow()
+
+    expect(consoleSpy).toHaveBeenCalledWith('KV cache write error:', expect.any(Error))
+
+    consoleSpy.mockRestore()
+  })
+
+  it('should handle KV delete errors gracefully', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    mockKv.delete.mockRejectedValue(new Error('KV delete error'))
+
+    // Should not throw
+    await expect(cache.delete('test:key')).resolves.not.toThrow()
+
+    expect(consoleSpy).toHaveBeenCalledWith('KV cache delete error:', expect.any(Error))
+
+    consoleSpy.mockRestore()
+  })
+
+  it('should invalidate pattern in KV', async () => {
+    mockKv.list.mockResolvedValue({
+      keys: [
+        { name: 'kv-test:post:1' },
+        { name: 'kv-test:post:2' },
+        { name: 'kv-test:page:1' }
+      ]
+    })
+
+    const count = await cache.invalidate('kv-test:post:*')
+
+    expect(mockKv.list).toHaveBeenCalledWith({ prefix: 'kv-test:' })
+    expect(mockKv.delete).toHaveBeenCalledWith('kv-test:post:1')
+    expect(mockKv.delete).toHaveBeenCalledWith('kv-test:post:2')
+    expect(count).toBeGreaterThanOrEqual(2)
+  })
+
+  it('should handle KV invalidation errors gracefully', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    mockKv.list.mockRejectedValue(new Error('KV list error'))
+
+    // Should not throw
+    await expect(cache.invalidate('kv-test:*')).resolves.not.toThrow()
+
+    expect(consoleSpy).toHaveBeenCalledWith('KV cache invalidation error:', expect.any(Error))
+
+    consoleSpy.mockRestore()
+  })
+
+  it('should track KV hits and misses', async () => {
+    // KV hit
+    mockKv.get.mockResolvedValue({ data: 'value' })
+    await cache.get('hit:key')
+
+    // KV miss
+    mockKv.get.mockResolvedValue(null)
+    await cache.get('miss:key')
+
+    const stats = cache.getStats()
+    expect(stats.kvHits).toBe(1)
+    expect(stats.kvMisses).toBe(1)
+  })
+})
+
+describe('CacheService - getWithSource', () => {
+  let cache: CacheService
+  let mockKv: any
+
+  beforeEach(async () => {
+    await clearAllCaches()
+
+    mockKv = {
+      get: vi.fn(),
+      put: vi.fn(),
+      delete: vi.fn(),
+      list: vi.fn()
+    }
+
+    const config: CacheConfig = {
+      ttl: 60,
+      kvEnabled: true,
+      memoryEnabled: true,
+      namespace: 'source-test',
+      invalidateOn: [],
+      version: 'v1'
+    }
+    cache = createCacheService(config, mockKv)
+  })
+
+  it('should return memory source when hit in memory', async () => {
+    await cache.set('test:key', 'memory-value')
+
+    const result = await cache.getWithSource('test:key')
+
+    expect(result.hit).toBe(true)
+    expect(result.source).toBe('memory')
+    expect(result.data).toBe('memory-value')
+  })
+
+  it('should return kv source when hit in KV', async () => {
+    mockKv.get.mockResolvedValue('kv-value')
+
+    const result = await cache.getWithSource('test:key')
+
+    expect(result.hit).toBe(true)
+    expect(result.source).toBe('kv')
+    expect(result.data).toBe('kv-value')
+  })
+
+  it('should return miss source when not found', async () => {
+    mockKv.get.mockResolvedValue(null)
+
+    const result = await cache.getWithSource('test:key')
+
+    expect(result.hit).toBe(false)
+    expect(result.source).toBe('miss')
+    expect(result.data).toBeNull()
+  })
+
+  it('should populate memory after KV hit in getWithSource', async () => {
+    mockKv.get.mockResolvedValue('kv-value')
+
+    // First call hits KV
+    await cache.getWithSource('test:key')
+
+    // Second call should hit memory
+    mockKv.get.mockClear()
+    const result = await cache.getWithSource('test:key')
+
+    expect(mockKv.get).not.toHaveBeenCalled()
+    expect(result.source).toBe('memory')
+  })
+
+  it('should handle KV errors in getWithSource', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    mockKv.get.mockRejectedValue(new Error('KV error'))
+
+    const result = await cache.getWithSource('test:key')
+
+    expect(result.hit).toBe(false)
+    expect(result.source).toBe('miss')
+
+    consoleSpy.mockRestore()
+  })
+})
+
+describe('CacheService - listKeys and getEntry', () => {
+  let cache: CacheService
+
+  beforeEach(async () => {
+    await clearAllCaches()
+    cache = createCacheService(CACHE_CONFIGS.content!)
+  })
+
+  it('should list all cache keys with metadata', async () => {
+    await cache.set('key1', 'value1')
+    await cache.set('key2', { nested: 'value2' })
+
+    const keys = await cache.listKeys()
+
+    expect(keys.length).toBe(2)
+    expect(keys[0].key).toBeDefined()
+    expect(keys[0].size).toBeGreaterThan(0)
+    expect(keys[0].expiresAt).toBeGreaterThan(Date.now())
+    expect(keys[0].age).toBeGreaterThanOrEqual(0)
+  })
+
+  it('should sort keys by age (newest first)', async () => {
+    await cache.set('old:key', 'old')
+    await new Promise(resolve => setTimeout(resolve, 10))
+    await cache.set('new:key', 'new')
+
+    const keys = await cache.listKeys()
+
+    // Newest (smallest age) should be first
+    expect(keys[0].key).toBe('new:key')
+  })
+
+  it('should get cache entry with full metadata', async () => {
+    await cache.set('test:key', { data: 'test' })
+
+    const entry = await cache.getEntry('test:key')
+
+    expect(entry).not.toBeNull()
+    expect(entry?.data).toEqual({ data: 'test' })
+    expect(entry?.timestamp).toBeLessThanOrEqual(Date.now())
+    expect(entry?.expiresAt).toBeGreaterThan(Date.now())
+    expect(entry?.ttl).toBeGreaterThan(0)
+    expect(entry?.size).toBeGreaterThan(0)
+  })
+
+  it('should return null for non-existent entry', async () => {
+    const entry = await cache.getEntry('non-existent')
+
+    expect(entry).toBeNull()
+  })
+
+  it('should return null for expired entry in getEntry', async () => {
+    const shortTtlConfig: CacheConfig = {
+      ttl: 1, // 1 second
+      kvEnabled: false,
+      memoryEnabled: true,
+      namespace: 'short-ttl',
+      invalidateOn: [],
+      version: 'v1'
+    }
+    const shortCache = createCacheService(shortTtlConfig)
+    await shortCache.set('test:key', 'value')
+
+    // Wait for expiration
+    await new Promise(resolve => setTimeout(resolve, 1100))
+
+    const entry = await shortCache.getEntry('test:key')
+
+    expect(entry).toBeNull()
+  })
+
+  it('should return null when memory is disabled', async () => {
+    const noMemoryConfig: CacheConfig = {
+      ttl: 60,
+      kvEnabled: false,
+      memoryEnabled: false,
+      namespace: 'no-memory',
+      invalidateOn: [],
+      version: 'v1'
+    }
+    const noMemoryCache = createCacheService(noMemoryConfig)
+
+    const entry = await noMemoryCache.getEntry('test:key')
+
+    expect(entry).toBeNull()
+  })
+})
+
+describe('CacheService - Memory Eviction', () => {
+  it('should evict LRU entries when cache is full', async () => {
+    // Create a small cache that will fill up quickly
+    const smallConfig: CacheConfig = {
+      ttl: 3600,
+      kvEnabled: false,
+      memoryEnabled: true,
+      namespace: 'eviction-test',
+      invalidateOn: [],
+      version: 'v1'
+    }
+    const cache = createCacheService(smallConfig)
+
+    // Add many entries to trigger eviction
+    for (let i = 0; i < 100; i++) {
+      await cache.set(`key${i}`, { data: 'x'.repeat(100000) }) // ~100KB each
+    }
+
+    // Some early entries should have been evicted
+    const stats = cache.getStats()
+    expect(stats.memorySize).toBeLessThan(50 * 1024 * 1024) // Less than 50MB
+  })
+})
+
+describe('CacheService - Memory Disabled', () => {
+  let cache: CacheService
+  let mockKv: any
+
+  beforeEach(async () => {
+    await clearAllCaches()
+
+    mockKv = {
+      get: vi.fn(),
+      put: vi.fn(),
+      delete: vi.fn(),
+      list: vi.fn()
+    }
+
+    const config: CacheConfig = {
+      ttl: 60,
+      kvEnabled: true,
+      memoryEnabled: false,
+      namespace: 'no-memory-test',
+      invalidateOn: [],
+      version: 'v1'
+    }
+    cache = createCacheService(config, mockKv)
+  })
+
+  it('should go directly to KV when memory is disabled', async () => {
+    mockKv.get.mockResolvedValue('kv-value')
+
+    const result = await cache.get('test:key')
+
+    expect(mockKv.get).toHaveBeenCalledWith('test:key', 'json')
+    expect(result).toBe('kv-value')
+  })
+
+  it('should only write to KV when memory is disabled', async () => {
+    await cache.set('test:key', 'value')
+
+    expect(mockKv.put).toHaveBeenCalled()
+
+    // Verify memory stats are 0
+    const stats = cache.getStats()
+    expect(stats.entryCount).toBe(0)
+  })
+})
+
+describe('CacheService - invalidatePattern alias', () => {
+  let cache: CacheService
+
+  beforeEach(async () => {
+    await clearAllCaches()
+    cache = createCacheService(CACHE_CONFIGS.content!)
+  })
+
+  it('should work the same as invalidate', async () => {
+    await cache.set('test:item:1', 'value1')
+    await cache.set('test:item:2', 'value2')
+    await cache.set('test:other:1', 'value3')
+
+    const count = await cache.invalidatePattern('test:item:*')
+
+    expect(count).toBe(2)
+
+    const item1 = await cache.get('test:item:1')
+    const item2 = await cache.get('test:item:2')
+    const other = await cache.get('test:other:1')
+
+    expect(item1).toBeNull()
+    expect(item2).toBeNull()
+    expect(other).toBe('value3')
+  })
+})
