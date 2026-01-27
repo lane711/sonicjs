@@ -1,10 +1,10 @@
 'use strict';
 
-var chunk44352UON_cjs = require('./chunk-44352UON.cjs');
+var chunkMEA7RQ3A_cjs = require('./chunk-MEA7RQ3A.cjs');
 var chunkVNLR35GO_cjs = require('./chunk-VNLR35GO.cjs');
-var chunkMBA5RSTS_cjs = require('./chunk-MBA5RSTS.cjs');
+var chunk7G7TWEQK_cjs = require('./chunk-7G7TWEQK.cjs');
 var chunkMPT5PA6U_cjs = require('./chunk-MPT5PA6U.cjs');
-var chunkS3JQRRXY_cjs = require('./chunk-S3JQRRXY.cjs');
+var chunkJXL6VIHY_cjs = require('./chunk-JXL6VIHY.cjs');
 var chunkS6K2H2TS_cjs = require('./chunk-S6K2H2TS.cjs');
 var chunkSHCYIZAN_cjs = require('./chunk-SHCYIZAN.cjs');
 var chunkMNFY6DWY_cjs = require('./chunk-MNFY6DWY.cjs');
@@ -559,7 +559,7 @@ function formatCellValue(value) {
 // src/plugins/core-plugins/database-tools-plugin/admin-routes.ts
 function createDatabaseToolsAdminRoutes() {
   const router2 = new hono.Hono();
-  router2.use("*", chunkMBA5RSTS_cjs.requireAuth());
+  router2.use("*", chunk7G7TWEQK_cjs.requireAuth());
   router2.get("/api/stats", async (c) => {
     try {
       const user = c.get("user");
@@ -2148,7 +2148,7 @@ function createOTPLoginPlugin() {
           error: "Account is deactivated"
         }, 403);
       }
-      const token = await chunkMBA5RSTS_cjs.AuthManager.generateToken(user.id, user.email, user.role);
+      const token = await chunk7G7TWEQK_cjs.AuthManager.generateToken(user.id, user.email, user.role);
       cookie.setCookie(c, "auth_token", token, {
         httpOnly: true,
         secure: true,
@@ -3984,7 +3984,7 @@ function renderSettingsPage(data) {
 
 // src/plugins/core-plugins/ai-search-plugin/routes/admin.ts
 var adminRoutes = new hono.Hono();
-adminRoutes.use("*", chunkMBA5RSTS_cjs.requireAuth());
+adminRoutes.use("*", chunk7G7TWEQK_cjs.requireAuth());
 adminRoutes.get("/", async (c) => {
   try {
     const user = c.get("user");
@@ -4385,12 +4385,12 @@ function createMagicLinkAuthPlugin() {
         SET used = 1, used_at = ?
         WHERE id = ?
       `).bind(Date.now(), magicLink.id).run();
-      const jwtToken = await chunkMBA5RSTS_cjs.AuthManager.generateToken(
+      const jwtToken = await chunk7G7TWEQK_cjs.AuthManager.generateToken(
         user.id,
         user.email,
         user.role
       );
-      chunkMBA5RSTS_cjs.AuthManager.setAuthCookie(c, jwtToken);
+      chunk7G7TWEQK_cjs.AuthManager.setAuthCookie(c, jwtToken);
       await db.prepare(`
         UPDATE users SET last_login_at = ? WHERE id = ?
       `).bind(Date.now(), user.id).run();
@@ -5676,7 +5676,7 @@ function renderCacheDashboard(data) {
     </script>
 
     <!-- Confirmation Dialogs -->
-    ${chunk44352UON_cjs.renderConfirmationDialog({
+    ${chunkMEA7RQ3A_cjs.renderConfirmationDialog({
     id: "clear-all-cache-confirm",
     title: "Clear All Cache",
     message: "Are you sure you want to clear all cache entries? This cannot be undone.",
@@ -5687,7 +5687,7 @@ function renderCacheDashboard(data) {
     onConfirm: "performClearAllCaches()"
   })}
 
-    ${chunk44352UON_cjs.renderConfirmationDialog({
+    ${chunkMEA7RQ3A_cjs.renderConfirmationDialog({
     id: "clear-namespace-cache-confirm",
     title: "Clear Namespace Cache",
     message: "Clear cache for this namespace?",
@@ -5698,7 +5698,7 @@ function renderCacheDashboard(data) {
     onConfirm: "performClearNamespaceCache()"
   })}
 
-    ${chunk44352UON_cjs.getConfirmationDialogScript()}
+    ${chunkMEA7RQ3A_cjs.getConfirmationDialogScript()}
   `;
   const layoutData = {
     title: "Cache System",
@@ -6390,8 +6390,8 @@ function createSonicJSApp(config = {}) {
     c.set("appVersion", appVersion);
     await next();
   });
-  app2.use("*", chunkMBA5RSTS_cjs.metricsMiddleware());
-  app2.use("*", chunkMBA5RSTS_cjs.bootstrapMiddleware(config));
+  app2.use("*", chunk7G7TWEQK_cjs.metricsMiddleware());
+  app2.use("*", chunk7G7TWEQK_cjs.bootstrapMiddleware(config));
   if (config.middleware?.beforeAuth) {
     for (const middleware of config.middleware.beforeAuth) {
       app2.use("*", middleware);
@@ -6408,31 +6408,31 @@ function createSonicJSApp(config = {}) {
       app2.use("*", middleware);
     }
   }
-  app2.route("/api", chunk44352UON_cjs.api_default);
-  app2.route("/api/media", chunk44352UON_cjs.api_media_default);
-  app2.route("/api/system", chunk44352UON_cjs.api_system_default);
-  app2.route("/admin/api", chunk44352UON_cjs.admin_api_default);
-  app2.route("/admin/dashboard", chunk44352UON_cjs.router);
-  app2.route("/admin/collections", chunk44352UON_cjs.adminCollectionsRoutes);
-  app2.route("/admin/forms", chunk44352UON_cjs.adminFormsRoutes);
-  app2.route("/admin/settings", chunk44352UON_cjs.adminSettingsRoutes);
-  app2.route("/forms", chunk44352UON_cjs.public_forms_default);
-  app2.route("/api/forms", chunk44352UON_cjs.public_forms_default);
+  app2.route("/api", chunkMEA7RQ3A_cjs.api_default);
+  app2.route("/api/media", chunkMEA7RQ3A_cjs.api_media_default);
+  app2.route("/api/system", chunkMEA7RQ3A_cjs.api_system_default);
+  app2.route("/admin/api", chunkMEA7RQ3A_cjs.admin_api_default);
+  app2.route("/admin/dashboard", chunkMEA7RQ3A_cjs.router);
+  app2.route("/admin/collections", chunkMEA7RQ3A_cjs.adminCollectionsRoutes);
+  app2.route("/admin/forms", chunkMEA7RQ3A_cjs.adminFormsRoutes);
+  app2.route("/admin/settings", chunkMEA7RQ3A_cjs.adminSettingsRoutes);
+  app2.route("/forms", chunkMEA7RQ3A_cjs.public_forms_default);
+  app2.route("/api/forms", chunkMEA7RQ3A_cjs.public_forms_default);
   app2.route("/admin/database-tools", createDatabaseToolsAdminRoutes());
   app2.route("/admin/seed-data", createSeedDataAdminRoutes());
-  app2.route("/admin/content", chunk44352UON_cjs.admin_content_default);
-  app2.route("/admin/media", chunk44352UON_cjs.adminMediaRoutes);
+  app2.route("/admin/content", chunkMEA7RQ3A_cjs.admin_content_default);
+  app2.route("/admin/media", chunkMEA7RQ3A_cjs.adminMediaRoutes);
   if (aiSearchPlugin.routes && aiSearchPlugin.routes.length > 0) {
     for (const route of aiSearchPlugin.routes) {
       app2.route(route.path, route.handler);
     }
   }
   app2.route("/admin/cache", cache_default.getRoutes());
-  app2.route("/admin/plugins", chunk44352UON_cjs.adminPluginRoutes);
-  app2.route("/admin/logs", chunk44352UON_cjs.adminLogsRoutes);
-  app2.route("/admin", chunk44352UON_cjs.userRoutes);
-  app2.route("/auth", chunk44352UON_cjs.auth_default);
-  app2.route("/", chunk44352UON_cjs.test_cleanup_default);
+  app2.route("/admin/plugins", chunkMEA7RQ3A_cjs.adminPluginRoutes);
+  app2.route("/admin/logs", chunkMEA7RQ3A_cjs.adminLogsRoutes);
+  app2.route("/admin", chunkMEA7RQ3A_cjs.userRoutes);
+  app2.route("/auth", chunkMEA7RQ3A_cjs.auth_default);
+  app2.route("/", chunkMEA7RQ3A_cjs.test_cleanup_default);
   if (emailPlugin.routes && emailPlugin.routes.length > 0) {
     for (const route of emailPlugin.routes) {
       app2.route(route.path, route.handler);
@@ -6524,79 +6524,79 @@ var VERSION = chunkMYB5RY7H_cjs.package_default.version;
 
 Object.defineProperty(exports, "ROUTES_INFO", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.ROUTES_INFO; }
+  get: function () { return chunkMEA7RQ3A_cjs.ROUTES_INFO; }
 });
 Object.defineProperty(exports, "adminApiRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.admin_api_default; }
+  get: function () { return chunkMEA7RQ3A_cjs.admin_api_default; }
 });
 Object.defineProperty(exports, "adminCheckboxRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.adminCheckboxRoutes; }
+  get: function () { return chunkMEA7RQ3A_cjs.adminCheckboxRoutes; }
 });
 Object.defineProperty(exports, "adminCodeExamplesRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.admin_code_examples_default; }
+  get: function () { return chunkMEA7RQ3A_cjs.admin_code_examples_default; }
 });
 Object.defineProperty(exports, "adminCollectionsRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.adminCollectionsRoutes; }
+  get: function () { return chunkMEA7RQ3A_cjs.adminCollectionsRoutes; }
 });
 Object.defineProperty(exports, "adminContentRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.admin_content_default; }
+  get: function () { return chunkMEA7RQ3A_cjs.admin_content_default; }
 });
 Object.defineProperty(exports, "adminDashboardRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.router; }
+  get: function () { return chunkMEA7RQ3A_cjs.router; }
 });
 Object.defineProperty(exports, "adminDesignRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.adminDesignRoutes; }
+  get: function () { return chunkMEA7RQ3A_cjs.adminDesignRoutes; }
 });
 Object.defineProperty(exports, "adminLogsRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.adminLogsRoutes; }
+  get: function () { return chunkMEA7RQ3A_cjs.adminLogsRoutes; }
 });
 Object.defineProperty(exports, "adminMediaRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.adminMediaRoutes; }
+  get: function () { return chunkMEA7RQ3A_cjs.adminMediaRoutes; }
 });
 Object.defineProperty(exports, "adminPluginRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.adminPluginRoutes; }
+  get: function () { return chunkMEA7RQ3A_cjs.adminPluginRoutes; }
 });
 Object.defineProperty(exports, "adminSettingsRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.adminSettingsRoutes; }
+  get: function () { return chunkMEA7RQ3A_cjs.adminSettingsRoutes; }
 });
 Object.defineProperty(exports, "adminTestimonialsRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.admin_testimonials_default; }
+  get: function () { return chunkMEA7RQ3A_cjs.admin_testimonials_default; }
 });
 Object.defineProperty(exports, "adminUsersRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.userRoutes; }
+  get: function () { return chunkMEA7RQ3A_cjs.userRoutes; }
 });
 Object.defineProperty(exports, "apiContentCrudRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.api_content_crud_default; }
+  get: function () { return chunkMEA7RQ3A_cjs.api_content_crud_default; }
 });
 Object.defineProperty(exports, "apiMediaRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.api_media_default; }
+  get: function () { return chunkMEA7RQ3A_cjs.api_media_default; }
 });
 Object.defineProperty(exports, "apiRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.api_default; }
+  get: function () { return chunkMEA7RQ3A_cjs.api_default; }
 });
 Object.defineProperty(exports, "apiSystemRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.api_system_default; }
+  get: function () { return chunkMEA7RQ3A_cjs.api_system_default; }
 });
 Object.defineProperty(exports, "authRoutes", {
   enumerable: true,
-  get: function () { return chunk44352UON_cjs.auth_default; }
+  get: function () { return chunkMEA7RQ3A_cjs.auth_default; }
 });
 Object.defineProperty(exports, "Logger", {
   enumerable: true,
@@ -6764,83 +6764,83 @@ Object.defineProperty(exports, "workflowHistory", {
 });
 Object.defineProperty(exports, "AuthManager", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.AuthManager; }
+  get: function () { return chunk7G7TWEQK_cjs.AuthManager; }
 });
 Object.defineProperty(exports, "PermissionManager", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.PermissionManager; }
+  get: function () { return chunk7G7TWEQK_cjs.PermissionManager; }
 });
 Object.defineProperty(exports, "bootstrapMiddleware", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.bootstrapMiddleware; }
+  get: function () { return chunk7G7TWEQK_cjs.bootstrapMiddleware; }
 });
 Object.defineProperty(exports, "cacheHeaders", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.cacheHeaders; }
+  get: function () { return chunk7G7TWEQK_cjs.cacheHeaders; }
 });
 Object.defineProperty(exports, "compressionMiddleware", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.compressionMiddleware; }
+  get: function () { return chunk7G7TWEQK_cjs.compressionMiddleware; }
 });
 Object.defineProperty(exports, "detailedLoggingMiddleware", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.detailedLoggingMiddleware; }
+  get: function () { return chunk7G7TWEQK_cjs.detailedLoggingMiddleware; }
 });
 Object.defineProperty(exports, "getActivePlugins", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.getActivePlugins; }
+  get: function () { return chunk7G7TWEQK_cjs.getActivePlugins; }
 });
 Object.defineProperty(exports, "isPluginActive", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.isPluginActive; }
+  get: function () { return chunk7G7TWEQK_cjs.isPluginActive; }
 });
 Object.defineProperty(exports, "logActivity", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.logActivity; }
+  get: function () { return chunk7G7TWEQK_cjs.logActivity; }
 });
 Object.defineProperty(exports, "loggingMiddleware", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.loggingMiddleware; }
+  get: function () { return chunk7G7TWEQK_cjs.loggingMiddleware; }
 });
 Object.defineProperty(exports, "optionalAuth", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.optionalAuth; }
+  get: function () { return chunk7G7TWEQK_cjs.optionalAuth; }
 });
 Object.defineProperty(exports, "performanceLoggingMiddleware", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.performanceLoggingMiddleware; }
+  get: function () { return chunk7G7TWEQK_cjs.performanceLoggingMiddleware; }
 });
 Object.defineProperty(exports, "requireActivePlugin", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.requireActivePlugin; }
+  get: function () { return chunk7G7TWEQK_cjs.requireActivePlugin; }
 });
 Object.defineProperty(exports, "requireActivePlugins", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.requireActivePlugins; }
+  get: function () { return chunk7G7TWEQK_cjs.requireActivePlugins; }
 });
 Object.defineProperty(exports, "requireAnyPermission", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.requireAnyPermission; }
+  get: function () { return chunk7G7TWEQK_cjs.requireAnyPermission; }
 });
 Object.defineProperty(exports, "requireAuth", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.requireAuth; }
+  get: function () { return chunk7G7TWEQK_cjs.requireAuth; }
 });
 Object.defineProperty(exports, "requirePermission", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.requirePermission; }
+  get: function () { return chunk7G7TWEQK_cjs.requirePermission; }
 });
 Object.defineProperty(exports, "requireRole", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.requireRole; }
+  get: function () { return chunk7G7TWEQK_cjs.requireRole; }
 });
 Object.defineProperty(exports, "securityHeaders", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.securityHeaders; }
+  get: function () { return chunk7G7TWEQK_cjs.securityHeaders; }
 });
 Object.defineProperty(exports, "securityLoggingMiddleware", {
   enumerable: true,
-  get: function () { return chunkMBA5RSTS_cjs.securityLoggingMiddleware; }
+  get: function () { return chunk7G7TWEQK_cjs.securityLoggingMiddleware; }
 });
 Object.defineProperty(exports, "PluginBootstrapService", {
   enumerable: true,
@@ -6896,7 +6896,7 @@ Object.defineProperty(exports, "validateCollectionConfig", {
 });
 Object.defineProperty(exports, "MigrationService", {
   enumerable: true,
-  get: function () { return chunkS3JQRRXY_cjs.MigrationService; }
+  get: function () { return chunkJXL6VIHY_cjs.MigrationService; }
 });
 Object.defineProperty(exports, "renderFilterBar", {
   enumerable: true,
