@@ -1,7 +1,7 @@
 import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-3YNNVSMC.js';
-import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-Y3EWJQ4D.js';
+import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-BDFGMK2P.js';
 import { PluginService } from './chunk-YFJJU26H.js';
-import { MigrationService } from './chunk-L2IDZI7F.js';
+import { MigrationService } from './chunk-LBLWTCFB.js';
 import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-GRN3GHUG.js';
 import { PluginBuilder } from './chunk-CLIH2T74.js';
 import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml, getBlocksFieldConfig, parseBlocksValue } from './chunk-DNHJS6RN.js';
@@ -1853,7 +1853,7 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
 });
 adminApiRoutes.get("/migrations/status", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-RKQES6XY.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-UXPJQ3IY.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const status = await migrationService.getMigrationStatus();
@@ -1878,7 +1878,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const { MigrationService: MigrationService2 } = await import('./migrations-RKQES6XY.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-UXPJQ3IY.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const result = await migrationService.runPendingMigrations();
@@ -1897,7 +1897,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
 });
 adminApiRoutes.get("/migrations/validate", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-RKQES6XY.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-UXPJQ3IY.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const validation = await migrationService.validateSchema();
@@ -3639,9 +3639,9 @@ function renderDynamicField(field, options = {}) {
   if (field.field_type === "quill" && !pluginStatuses.quillEnabled) {
     fallbackToTextarea = true;
     fallbackWarning = "\u26A0\uFE0F Quill Editor plugin is inactive. Using textarea fallback.";
-  } else if (field.field_type === "mdxeditor" && !pluginStatuses.mdxeditorEnabled) {
+  } else if ((field.field_type === "mdxeditor" || field.field_type === "easymde" || field.field_type === "markdown") && !pluginStatuses.mdxeditorEnabled) {
     fallbackToTextarea = true;
-    fallbackWarning = "\u26A0\uFE0F MDXEditor plugin is inactive. Using textarea fallback.";
+    fallbackWarning = "\u26A0\uFE0F EasyMDE plugin is inactive. Using textarea fallback.";
   } else if (field.field_type === "tinymce" && !pluginStatuses.tinymceEnabled) {
     fallbackToTextarea = true;
     fallbackWarning = "\u26A0\uFE0F TinyMCE plugin is inactive. Using textarea fallback.";
@@ -3800,6 +3800,9 @@ function renderDynamicField(field, options = {}) {
       `;
       break;
     case "mdxeditor":
+    case "tinymce":
+    case "easymde":
+    case "markdown":
       fieldHTML = `
         <div class="richtext-container" data-height="${opts.height || 300}" data-toolbar="${opts.toolbar || "full"}">
           <textarea
@@ -21640,6 +21643,12 @@ adminCollectionsRoutes.post("/:id/fields", async (c) => {
         fieldConfig.type = "quill";
       } else if (fieldType === "mdxeditor") {
         fieldConfig.type = "mdxeditor";
+      } else if (fieldType === "tinymce") {
+        fieldConfig.type = "tinymce";
+      } else if (fieldType === "easymde") {
+        fieldConfig.type = "easymde";
+      } else if (fieldType === "markdown") {
+        fieldConfig.type = "markdown";
       } else if (fieldType === "reference") {
         fieldConfig.type = "reference";
       }
@@ -23763,5 +23772,5 @@ var ROUTES_INFO = {
 };
 
 export { ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, getConfirmationDialogScript2 as getConfirmationDialogScript, renderConfirmationDialog2 as renderConfirmationDialog, router, test_cleanup_default, userRoutes };
-//# sourceMappingURL=chunk-UISZ2MBW.js.map
-//# sourceMappingURL=chunk-UISZ2MBW.js.map
+//# sourceMappingURL=chunk-4EMJPBHA.js.map
+//# sourceMappingURL=chunk-4EMJPBHA.js.map
