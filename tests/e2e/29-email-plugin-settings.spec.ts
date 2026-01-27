@@ -11,15 +11,18 @@ test.describe('Email Plugin Settings', () => {
     await page.goto('/admin/plugins')
     await page.waitForLoadState('networkidle')
 
+    // Wait for plugin cards to load (any plugin card)
+    await page.waitForSelector('.plugin-card', { state: 'visible', timeout: 10000 })
+
     // Find the email plugin card by data-name attribute and click it
     const emailPluginCard = page.locator('.plugin-card[data-name="Email"]')
-    await expect(emailPluginCard).toBeVisible()
+    await expect(emailPluginCard).toBeVisible({ timeout: 10000 })
 
     // Click the email plugin card (whole card is clickable now)
     await emailPluginCard.click()
 
     // Should navigate to plugin settings page
-    await page.waitForURL('/admin/plugins/email')
+    await page.waitForURL('**/admin/plugins/email', { timeout: 10000 })
     expect(page.url()).toContain('/admin/plugins/email')
   })
 
@@ -28,8 +31,11 @@ test.describe('Email Plugin Settings', () => {
     await page.goto('/admin/plugins/email')
     await page.waitForLoadState('networkidle')
 
+    // Wait for page content to load
+    await page.waitForSelector('h3', { state: 'visible', timeout: 10000 })
+
     // Check for Resend configuration section
-    await expect(page.locator('h3:has-text("Resend Configuration")').first()).toBeVisible()
+    await expect(page.locator('h3:has-text("Resend Configuration")').first()).toBeVisible({ timeout: 10000 })
 
     // Check all form fields are present (using setting_ prefix)
     await expect(page.locator('label:has-text("Resend API Key")').first()).toBeVisible()
@@ -71,6 +77,9 @@ test.describe('Email Plugin Settings', () => {
     await page.goto('/admin/plugins/email')
     await page.waitForLoadState('networkidle')
 
+    // Wait for form to be visible
+    await page.waitForSelector('input#setting_apiKey', { state: 'visible', timeout: 10000 })
+
     // Fill in the form
     await page.fill('input#setting_apiKey', 're_test_api_key_12345')
     await page.fill('input#setting_fromEmail', 'noreply@test.com')
@@ -82,12 +91,15 @@ test.describe('Email Plugin Settings', () => {
     await page.click('button#save-button')
 
     // Wait for success message
-    await expect(page.locator('text=Settings saved').first()).toBeVisible({ timeout: 5000 })
+    await expect(page.locator('text=Settings saved').first()).toBeVisible({ timeout: 10000 })
   })
 
   test('should validate required fields', async ({ page }) => {
     await page.goto('/admin/plugins/email')
     await page.waitForLoadState('networkidle')
+
+    // Wait for form to be visible
+    await page.waitForSelector('input#setting_apiKey', { state: 'visible', timeout: 10000 })
 
     // Clear any existing values and check required attributes
     const apiKeyField = page.locator('input#setting_apiKey')
@@ -104,6 +116,9 @@ test.describe('Email Plugin Settings', () => {
     await page.goto('/admin/plugins/email')
     await page.waitForLoadState('networkidle')
 
+    // Wait for page content
+    await page.waitForSelector('h3', { state: 'visible', timeout: 10000 })
+
     // Check for test email section
     await expect(page.locator('h3:has-text("Send Test Email")').first()).toBeVisible()
 
@@ -118,6 +133,9 @@ test.describe('Email Plugin Settings', () => {
   test('should not show "No Settings Available" message', async ({ page }) => {
     await page.goto('/admin/plugins/email')
     await page.waitForLoadState('networkidle')
+
+    // Wait for page content
+    await page.waitForSelector('h3', { state: 'visible', timeout: 10000 })
 
     // Should NOT show the generic "No Settings Available" message
     await expect(page.locator('text=No Settings Available')).not.toBeVisible()

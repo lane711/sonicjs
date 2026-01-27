@@ -11,6 +11,9 @@ test.describe('OTP Login Plugin Admin Page', () => {
       await page.goto('/admin/plugins/otp-login')
       await page.waitForLoadState('networkidle')
 
+      // Wait for page content to load
+      await page.waitForSelector('h1, h2, h3', { state: 'visible', timeout: 10000 })
+
       // Should show the plugin settings page with OTP Login content
       // The page title in the header should contain OTP Login
       await expect(page.locator('h1, h2').first()).toBeVisible()
@@ -19,6 +22,9 @@ test.describe('OTP Login Plugin Admin Page', () => {
     test('should display test email form', async ({ page }) => {
       await page.goto('/admin/plugins/otp-login')
       await page.waitForLoadState('networkidle')
+
+      // Wait for page content
+      await page.waitForSelector('h3', { state: 'visible', timeout: 10000 })
 
       // Check for Test OTP Email section
       await expect(page.locator('text=Test OTP Email').first()).toBeVisible()
@@ -35,6 +41,9 @@ test.describe('OTP Login Plugin Admin Page', () => {
       await page.goto('/admin/plugins/otp-login')
       await page.waitForLoadState('networkidle')
 
+      // Wait for page content
+      await page.waitForSelector('h3', { state: 'visible', timeout: 10000 })
+
       // Check for Email Preview section
       await expect(page.locator('text=Email Preview').first()).toBeVisible()
 
@@ -47,6 +56,9 @@ test.describe('OTP Login Plugin Admin Page', () => {
     test('should display code settings form', async ({ page }) => {
       await page.goto('/admin/plugins/otp-login')
       await page.waitForLoadState('networkidle')
+
+      // Wait for page content
+      await page.waitForSelector('h3', { state: 'visible', timeout: 10000 })
 
       // Check for Code Settings section
       await expect(page.locator('text=Code Settings').first()).toBeVisible()
@@ -63,6 +75,9 @@ test.describe('OTP Login Plugin Admin Page', () => {
       await page.goto('/admin/plugins/otp-login')
       await page.waitForLoadState('networkidle')
 
+      // Wait for page content
+      await page.waitForSelector('h3', { state: 'visible', timeout: 10000 })
+
       // Check quick links (use .first() since links may appear multiple times)
       await expect(page.locator('a[href="/admin/plugins/email"]').first()).toBeVisible()
       await expect(page.locator('a[href="/admin/settings/general"]').first()).toBeVisible()
@@ -71,6 +86,9 @@ test.describe('OTP Login Plugin Admin Page', () => {
     test('should show email configuration status', async ({ page }) => {
       await page.goto('/admin/plugins/otp-login')
       await page.waitForLoadState('networkidle')
+
+      // Wait for page content
+      await page.waitForSelector('h3', { state: 'visible', timeout: 10000 })
 
       // Should show either configured or not configured status
       // (one of these should be visible depending on email plugin config)
@@ -88,6 +106,9 @@ test.describe('OTP Login Plugin Admin Page', () => {
       await page.goto('/admin/plugins/otp-login')
       await page.waitForLoadState('networkidle')
 
+      // Wait for page content
+      await page.waitForSelector('h3', { state: 'visible', timeout: 10000 })
+
       // Check features section (use .first() since text may appear multiple times)
       await expect(page.locator('text=Passwordless authentication').first()).toBeVisible()
       await expect(page.locator('text=Rate limiting protection').first()).toBeVisible()
@@ -98,6 +119,9 @@ test.describe('OTP Login Plugin Admin Page', () => {
       await page.goto('/admin/plugins/otp-login')
       await page.waitForLoadState('networkidle')
 
+      // Wait for page content
+      await page.waitForSelector('h3', { state: 'visible', timeout: 10000 })
+
       // Check save button
       await expect(page.locator('button#save-button')).toBeVisible()
     })
@@ -105,6 +129,9 @@ test.describe('OTP Login Plugin Admin Page', () => {
     test('should send test code and show result', async ({ page }) => {
       await page.goto('/admin/plugins/otp-login')
       await page.waitForLoadState('networkidle')
+
+      // Wait for form to be visible
+      await page.waitForSelector('input#testEmail', { state: 'visible', timeout: 10000 })
 
       // Fill in email
       await page.fill('input#testEmail', 'test@example.com')
