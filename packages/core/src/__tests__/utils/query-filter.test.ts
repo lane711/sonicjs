@@ -347,3 +347,556 @@ describe('buildQuery helper', () => {
     expect(filter.sort).toEqual([{ field: 'id', order: 'asc' }])
   })
 })
+
+describe('QueryFilterBuilder - Additional Operators', () => {
+  it('should support less_than operator', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'price', operator: 'less_than', value: 100 }
+        ]
+      }
+    }
+
+    const result = builder.build('products', filter)
+
+    expect(result.sql).toBe('SELECT * FROM products WHERE (price < ?)')
+    expect(result.params).toEqual([100])
+  })
+
+  it('should support less_than_equal operator', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'quantity', operator: 'less_than_equal', value: 50 }
+        ]
+      }
+    }
+
+    const result = builder.build('inventory', filter)
+
+    expect(result.sql).toBe('SELECT * FROM inventory WHERE (quantity <= ?)')
+    expect(result.params).toEqual([50])
+  })
+
+  it('should support greater_than_equal operator', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'score', operator: 'greater_than_equal', value: 90 }
+        ]
+      }
+    }
+
+    const result = builder.build('grades', filter)
+
+    expect(result.sql).toBe('SELECT * FROM grades WHERE (score >= ?)')
+    expect(result.params).toEqual([90])
+  })
+
+  it('should support not_equals with non-null value', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'status', operator: 'not_equals', value: 'archived' }
+        ]
+      }
+    }
+
+    const result = builder.build('posts', filter)
+
+    expect(result.sql).toBe('SELECT * FROM posts WHERE (status != ?)')
+    expect(result.params).toEqual(['archived'])
+  })
+
+  it('should support exists operator with false value', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'avatar', operator: 'exists', value: false }
+        ]
+      }
+    }
+
+    const result = builder.build('users', filter)
+
+    expect(result.sql).toBe('SELECT * FROM users WHERE ((avatar IS NULL OR avatar = \'\'))')
+  })
+
+  it('should support all operator with array', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'tags', operator: 'all', value: ['tech', 'news'] }
+        ]
+      }
+    }
+
+    const result = builder.build('posts', filter)
+
+    expect(result.sql).toContain('tags LIKE ?')
+    expect(result.params).toContain('%tech%')
+    expect(result.params).toContain('%news%')
+  })
+
+  it('should support all operator with comma-separated string', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'categories', operator: 'all', value: 'a, b, c' }
+        ]
+      }
+    }
+
+    const result = builder.build('articles', filter)
+
+    expect(result.params).toContain('%a%')
+    expect(result.params).toContain('%b%')
+    expect(result.params).toContain('%c%')
+  })
+
+  it('should support all operator with single value', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'tag', operator: 'all', value: 42 }
+        ]
+      }
+    }
+
+    const result = builder.build('items', filter)
+
+    expect(result.params).toContain('%42%')
+  })
+
+  it('should handle all operator with empty values', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'tags', operator: 'all', value: [] }
+        ]
+      }
+    }
+
+    const result = builder.build('posts', filter)
+
+    expect(result.sql).toContain('1=1')
+  })
+
+  it('should report error for within operator', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'location', operator: 'within', value: { bounds: [] } }
+        ]
+      }
+    }
+
+    const result = builder.build('places', filter)
+
+    expect(result.errors.length).toBeGreaterThan(0)
+    expect(result.errors[0]).toContain('within')
+  })
+
+  it('should report error for intersects operator', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'area', operator: 'intersects', value: { polygon: [] } }
+        ]
+      }
+    }
+
+    const result = builder.build('regions', filter)
+
+    expect(result.errors.length).toBeGreaterThan(0)
+    expect(result.errors[0]).toContain('intersects')
+  })
+
+  it('should report error for unknown operator', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'data', operator: 'unknown_op' as any, value: 'test' }
+        ]
+      }
+    }
+
+    const result = builder.build('items', filter)
+
+    expect(result.errors.length).toBeGreaterThan(0)
+    expect(result.errors[0]).toContain('Unknown operator')
+  })
+})
+
+describe('QueryFilterBuilder - IN/NOT IN Edge Cases', () => {
+  it('should handle IN with comma-separated string', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'status', operator: 'in', value: 'active, pending, draft' }
+        ]
+      }
+    }
+
+    const result = builder.build('posts', filter)
+
+    expect(result.sql).toBe('SELECT * FROM posts WHERE (status IN (?, ?, ?))')
+    expect(result.params).toEqual(['active', 'pending', 'draft'])
+  })
+
+  it('should handle IN with single non-array value', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'id', operator: 'in', value: 123 }
+        ]
+      }
+    }
+
+    const result = builder.build('items', filter)
+
+    expect(result.sql).toBe('SELECT * FROM items WHERE (id IN (?))')
+    expect(result.params).toEqual([123])
+  })
+
+  it('should handle IN with empty array', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'id', operator: 'in', value: [] }
+        ]
+      }
+    }
+
+    const result = builder.build('items', filter)
+
+    expect(result.sql).toContain('1=0')
+  })
+
+  it('should handle NOT IN with comma-separated string', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'role', operator: 'not_in', value: 'admin, superadmin' }
+        ]
+      }
+    }
+
+    const result = builder.build('users', filter)
+
+    expect(result.sql).toBe('SELECT * FROM users WHERE (role NOT IN (?, ?))')
+    expect(result.params).toEqual(['admin', 'superadmin'])
+  })
+
+  it('should handle NOT IN with single non-array value', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'id', operator: 'not_in', value: 999 }
+        ]
+      }
+    }
+
+    const result = builder.build('items', filter)
+
+    expect(result.sql).toBe('SELECT * FROM items WHERE (id NOT IN (?))')
+    expect(result.params).toEqual([999])
+  })
+
+  it('should handle NOT IN with empty array', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'id', operator: 'not_in', value: [] }
+        ]
+      }
+    }
+
+    const result = builder.build('items', filter)
+
+    expect(result.sql).toContain('1=1')
+  })
+})
+
+describe('QueryFilterBuilder - LIKE Edge Cases', () => {
+  it('should handle LIKE with empty string', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'title', operator: 'like', value: '' }
+        ]
+      }
+    }
+
+    const result = builder.build('posts', filter)
+
+    expect(result.sql).toContain('1=1')
+  })
+
+  it('should handle LIKE with whitespace only', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'title', operator: 'like', value: '   ' }
+        ]
+      }
+    }
+
+    const result = builder.build('posts', filter)
+
+    expect(result.sql).toContain('1=1')
+  })
+
+  it('should handle LIKE with single word', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'name', operator: 'like', value: 'test' }
+        ]
+      }
+    }
+
+    const result = builder.build('users', filter)
+
+    expect(result.sql).toBe('SELECT * FROM users WHERE ((name LIKE ?))')
+    expect(result.params).toEqual(['%test%'])
+  })
+})
+
+describe('QueryFilterBuilder - Combined AND/OR', () => {
+  it('should combine AND and OR groups', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'status', operator: 'equals', value: 'active' }
+        ],
+        or: [
+          { field: 'role', operator: 'equals', value: 'admin' },
+          { field: 'role', operator: 'equals', value: 'editor' }
+        ]
+      }
+    }
+
+    const result = builder.build('users', filter)
+
+    expect(result.sql).toBe('SELECT * FROM users WHERE (status = ?) AND (role = ? OR role = ?)')
+    expect(result.params).toEqual(['active', 'admin', 'editor'])
+  })
+
+  it('should handle empty AND array', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [],
+        or: [
+          { field: 'active', operator: 'equals', value: true }
+        ]
+      }
+    }
+
+    const result = builder.build('items', filter)
+
+    expect(result.sql).toBe('SELECT * FROM items WHERE (active = ?)')
+  })
+
+  it('should handle empty OR array', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'published', operator: 'equals', value: true }
+        ],
+        or: []
+      }
+    }
+
+    const result = builder.build('posts', filter)
+
+    expect(result.sql).toBe('SELECT * FROM posts WHERE (published = ?)')
+  })
+})
+
+describe('QueryFilterBuilder.parseFromQuery - Edge Cases', () => {
+  it('should parse where clause as JSON string', () => {
+    const query = {
+      where: JSON.stringify({
+        and: [{ field: 'name', operator: 'equals', value: 'test' }]
+      })
+    }
+
+    const filter = QueryFilterBuilder.parseFromQuery(query)
+
+    expect(filter.where?.and).toContainEqual({
+      field: 'name',
+      operator: 'equals',
+      value: 'test'
+    })
+  })
+
+  it('should parse where clause as object', () => {
+    const query = {
+      where: {
+        and: [{ field: 'status', operator: 'equals', value: 'active' }]
+      }
+    }
+
+    const filter = QueryFilterBuilder.parseFromQuery(query)
+
+    expect(filter.where?.and).toContainEqual({
+      field: 'status',
+      operator: 'equals',
+      value: 'active'
+    })
+  })
+
+  it('should handle invalid JSON in where clause', () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const query = {
+      where: 'invalid json {'
+    }
+
+    const filter = QueryFilterBuilder.parseFromQuery(query)
+
+    expect(consoleSpy).toHaveBeenCalledWith('Failed to parse where clause:', expect.any(Error))
+    expect(filter.where).toEqual({ and: [] })
+
+    consoleSpy.mockRestore()
+  })
+
+  it('should handle invalid JSON in sort clause', () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const query = {
+      sort: 'invalid json ['
+    }
+
+    const filter = QueryFilterBuilder.parseFromQuery(query)
+
+    expect(consoleSpy).toHaveBeenCalledWith('Failed to parse sort clause:', expect.any(Error))
+    expect(filter.sort).toBeUndefined()
+
+    consoleSpy.mockRestore()
+  })
+
+  it('should parse sort clause as object', () => {
+    const query = {
+      sort: [{ field: 'created_at', order: 'desc' }]
+    }
+
+    const filter = QueryFilterBuilder.parseFromQuery(query)
+
+    expect(filter.sort).toEqual([{ field: 'created_at', order: 'desc' }])
+  })
+
+  it('should limit max to 1000', () => {
+    const query = {
+      limit: '5000'
+    }
+
+    const filter = QueryFilterBuilder.parseFromQuery(query)
+
+    expect(filter.limit).toBe(1000)
+  })
+
+  it('should parse collection_id simple field', () => {
+    const query = {
+      collection_id: 'posts'
+    }
+
+    const filter = QueryFilterBuilder.parseFromQuery(query)
+
+    expect(filter.where?.and).toContainEqual({
+      field: 'collection_id',
+      operator: 'equals',
+      value: 'posts'
+    })
+  })
+
+  it('should initialize where.and if where exists but and is missing', () => {
+    const query = {
+      where: { or: [{ field: 'test', operator: 'equals', value: 1 }] }
+    }
+
+    const filter = QueryFilterBuilder.parseFromQuery(query)
+
+    expect(filter.where?.and).toEqual([])
+    expect(filter.where?.or).toEqual([{ field: 'test', operator: 'equals', value: 1 }])
+  })
+
+  it('should handle empty query', () => {
+    const query = {}
+
+    const filter = QueryFilterBuilder.parseFromQuery(query)
+
+    expect(filter.where).toEqual({ and: [] })
+  })
+})
+
+describe('QueryFilterBuilder - Field Sanitization', () => {
+  it('should remove special characters from field names', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'user@name!', operator: 'equals', value: 'test' }
+        ]
+      }
+    }
+
+    const result = builder.build('users', filter)
+
+    expect(result.sql).toBe('SELECT * FROM users WHERE (username = ?)')
+  })
+
+  it('should handle nested JSON paths', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      where: {
+        and: [
+          { field: 'data.user.name', operator: 'equals', value: 'John' }
+        ]
+      }
+    }
+
+    const result = builder.build('records', filter)
+
+    expect(result.sql).toContain("json_extract(data, '$.user.name')")
+  })
+
+  it('should sanitize field names in sort clause', () => {
+    const builder = new QueryFilterBuilder()
+    const filter: QueryFilter = {
+      sort: [
+        { field: 'created@at!', order: 'desc' }
+      ]
+    }
+
+    const result = builder.build('posts', filter)
+
+    expect(result.sql).toBe('SELECT * FROM posts ORDER BY createdat DESC')
+  })
+})
