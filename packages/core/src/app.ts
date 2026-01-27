@@ -23,7 +23,8 @@ import {
   adminCollectionsRoutes,
   adminSettingsRoutes,
   adminFormsRoutes,
-  publicFormsRoutes
+  publicFormsRoutes,
+  adminApiReferenceRoutes
 } from './routes'
 import { getCoreVersion } from './utils/version'
 import { bootstrapMiddleware } from './middleware/bootstrap'
@@ -188,6 +189,7 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   app.route('/admin/settings', adminSettingsRoutes)
   app.route('/forms', publicFormsRoutes)
   app.route('/api/forms', publicFormsRoutes) // API endpoint for form submissions
+  app.route('/admin/api-reference', adminApiReferenceRoutes)
   app.route('/admin/database-tools', createDatabaseToolsAdminRoutes())
   app.route('/admin/seed-data', createSeedDataAdminRoutes())
   app.route('/admin/content', adminContentRoutes)
