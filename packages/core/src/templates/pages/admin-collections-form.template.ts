@@ -41,6 +41,7 @@ export interface CollectionFormData {
 function getFieldTypeBadge(fieldType: string): string {
   const typeLabels: Record<string, string> = {
     'text': 'Text',
+    'slug': 'URL Slug',
     'richtext': 'Rich Text (TinyMCE)',
     'quill': 'Rich Text (Quill)',
     'mdxeditor': 'EasyMDX',
@@ -53,6 +54,7 @@ function getFieldTypeBadge(fieldType: string): string {
   }
   const typeColors: Record<string, string> = {
     'text': 'bg-blue-500/10 dark:bg-blue-400/10 text-blue-700 dark:text-blue-300 ring-blue-500/20 dark:ring-blue-400/20',
+    'slug': 'bg-sky-500/10 dark:bg-sky-400/10 text-sky-700 dark:text-sky-300 ring-sky-500/20 dark:ring-sky-400/20',
     'richtext': 'bg-purple-500/10 dark:bg-purple-400/10 text-purple-700 dark:text-purple-300 ring-purple-500/20 dark:ring-purple-400/20',
     'quill': 'bg-purple-500/10 dark:bg-purple-400/10 text-purple-700 dark:text-purple-300 ring-purple-500/20 dark:ring-purple-400/20',
     'mdxeditor': 'bg-purple-500/10 dark:bg-purple-400/10 text-purple-700 dark:text-purple-300 ring-purple-500/20 dark:ring-purple-400/20',
@@ -546,6 +548,7 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
               >
                 <option value="">Select field type...</option>
                 <option value="text">Text</option>
+                <option value="slug">URL Slug</option>
                 ${data.editorPlugins?.tinymce ? '<option value="richtext">Rich Text (TinyMCE)</option>' : ''}
                 ${data.editorPlugins?.quill ? '<option value="quill">Rich Text (Quill)</option>' : ''}
                 ${data.editorPlugins?.easyMdx ? '<option value="mdxeditor">EasyMDX</option>' : ''}
@@ -905,6 +908,9 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
             case 'text':
               helpText.textContent = 'Single-line text input for short content';
               break;
+            case 'slug':
+              helpText.textContent = 'URL-friendly slug field, auto-generated from title';
+              break;
             case 'number':
               helpText.textContent = 'Numeric input field for integers or decimals';
               break;
@@ -1060,6 +1066,9 @@ export function renderCollectionFormPage(data: CollectionFormData): string {
           switch (this.value) {
             case 'text':
               helpText.textContent = 'Single-line text input for short content';
+              break;
+            case 'slug':
+              helpText.textContent = 'URL-friendly slug field, auto-generated from title';
               break;
             case 'number':
               helpText.textContent = 'Numeric input field for integers or decimals';
