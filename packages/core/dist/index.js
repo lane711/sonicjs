@@ -1,25 +1,24 @@
-import { renderConfirmationDialog, getConfirmationDialogScript, api_default, api_media_default, api_system_default, admin_api_default, router, adminCollectionsRoutes, adminFormsRoutes, adminSettingsRoutes, public_forms_default, admin_content_default, adminMediaRoutes, adminPluginRoutes, adminLogsRoutes, userRoutes, auth_default, test_cleanup_default } from './chunk-4LTRAQHZ.js';
-export { ROUTES_INFO, admin_api_default as adminApiRoutes, adminCheckboxRoutes, admin_code_examples_default as adminCodeExamplesRoutes, adminCollectionsRoutes, admin_content_default as adminContentRoutes, router as adminDashboardRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_testimonials_default as adminTestimonialsRoutes, userRoutes as adminUsersRoutes, api_content_crud_default as apiContentCrudRoutes, api_media_default as apiMediaRoutes, api_default as apiRoutes, api_system_default as apiSystemRoutes, auth_default as authRoutes } from './chunk-4LTRAQHZ.js';
-import { schema_exports } from './chunk-G44QUVNM.js';
+import { renderConfirmationDialog, getConfirmationDialogScript, api_default, api_media_default, api_system_default, admin_api_default, router, adminCollectionsRoutes, adminFormsRoutes, adminSettingsRoutes, public_forms_default, router2, admin_content_default, adminMediaRoutes, adminPluginRoutes, adminLogsRoutes, userRoutes, auth_default, test_cleanup_default } from './chunk-7Y2MKZTE.js';
+export { ROUTES_INFO, admin_api_default as adminApiRoutes, adminCheckboxRoutes, admin_code_examples_default as adminCodeExamplesRoutes, adminCollectionsRoutes, admin_content_default as adminContentRoutes, router as adminDashboardRoutes, adminDesignRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_testimonials_default as adminTestimonialsRoutes, userRoutes as adminUsersRoutes, api_content_crud_default as apiContentCrudRoutes, api_media_default as apiMediaRoutes, api_default as apiRoutes, api_system_default as apiSystemRoutes, auth_default as authRoutes } from './chunk-7Y2MKZTE.js';
+import { SettingsService, schema_exports } from './chunk-G44QUVNM.js';
 export { Logger, apiTokens, collections, content, contentVersions, getLogger, initLogger, insertCollectionSchema, insertContentSchema, insertLogConfigSchema, insertMediaSchema, insertPluginActivityLogSchema, insertPluginAssetSchema, insertPluginHookSchema, insertPluginRouteSchema, insertPluginSchema, insertSystemLogSchema, insertUserSchema, insertWorkflowHistorySchema, logConfig, media, pluginActivityLog, pluginAssets, pluginHooks, pluginRoutes, plugins, selectCollectionSchema, selectContentSchema, selectLogConfigSchema, selectMediaSchema, selectPluginActivityLogSchema, selectPluginAssetSchema, selectPluginHookSchema, selectPluginRouteSchema, selectPluginSchema, selectSystemLogSchema, selectUserSchema, selectWorkflowHistorySchema, systemLogs, users, workflowHistory } from './chunk-G44QUVNM.js';
-import { requireAuth, AuthManager, metricsMiddleware, bootstrapMiddleware } from './chunk-2OA7IJW4.js';
-export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware } from './chunk-2OA7IJW4.js';
+import { requireAuth, AuthManager, metricsMiddleware, bootstrapMiddleware } from './chunk-VOP6XUFL.js';
+export { AuthManager, PermissionManager, bootstrapMiddleware, cacheHeaders, compressionMiddleware, detailedLoggingMiddleware, getActivePlugins, isPluginActive, logActivity, loggingMiddleware, optionalAuth, performanceLoggingMiddleware, requireActivePlugin, requireActivePlugins, requireAnyPermission, requireAuth, requirePermission, requireRole, securityHeaders, securityLoggingMiddleware } from './chunk-VOP6XUFL.js';
 export { PluginBootstrapService, PluginService as PluginServiceClass, cleanupRemovedCollections, fullCollectionSync, getAvailableCollectionNames, getManagedCollections, isCollectionManaged, loadCollectionConfig, loadCollectionConfigs, registerCollections, syncCollection, syncCollections, validateCollectionConfig } from './chunk-YFJJU26H.js';
-export { MigrationService } from './chunk-YXFF3EMH.js';
+export { MigrationService } from './chunk-NATWDP7Q.js';
 export { renderFilterBar } from './chunk-H7AMQWVI.js';
-import { init_admin_layout_catalyst_template, renderAdminLayout, adminLayoutV2, renderAdminLayoutCatalyst } from './chunk-VCH6HXVP.js';
+import { init_admin_layout_catalyst_template, renderAdminLayout, renderAdminLayoutCatalyst } from './chunk-VCH6HXVP.js';
 export { getConfirmationDialogScript, renderAlert, renderConfirmationDialog, renderForm, renderFormField, renderPagination, renderTable } from './chunk-VCH6HXVP.js';
 export { HookSystemImpl, HookUtils, PluginManager as PluginManagerClass, PluginRegistryImpl, PluginValidator as PluginValidatorClass, ScopedHookSystem as ScopedHookSystemClass } from './chunk-CJYFSKH7.js';
 import { PluginBuilder } from './chunk-J5WGMRSU.js';
 export { PluginBuilder, PluginHelpers } from './chunk-J5WGMRSU.js';
-import { package_default, getCoreVersion } from './chunk-DNHJS6RN.js';
-export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer } from './chunk-DNHJS6RN.js';
+import { package_default, getCoreVersion } from './chunk-PSRPBW3W.js';
+export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, getCoreVersion, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer } from './chunk-PSRPBW3W.js';
 import './chunk-X7ZAEI5S.js';
 export { metricsTracker } from './chunk-FICTAGD4.js';
 export { HOOKS } from './chunk-LOUJRBXV.js';
 import './chunk-V4OQ3NZ2.js';
 import { Hono } from 'hono';
-import { html } from 'hono/html';
 import { setCookie } from 'hono/cookie';
 import { z } from 'zod';
 import { drizzle } from 'drizzle-orm/d1';
@@ -562,9 +561,9 @@ function formatCellValue(value) {
 
 // src/plugins/core-plugins/database-tools-plugin/admin-routes.ts
 function createDatabaseToolsAdminRoutes() {
-  const router2 = new Hono();
-  router2.use("*", requireAuth());
-  router2.get("/api/stats", async (c) => {
+  const router3 = new Hono();
+  router3.use("*", requireAuth());
+  router3.get("/api/stats", async (c) => {
     try {
       const user = c.get("user");
       if (!user || user.role !== "admin") {
@@ -588,7 +587,7 @@ function createDatabaseToolsAdminRoutes() {
       }, 500);
     }
   });
-  router2.post("/api/truncate", async (c) => {
+  router3.post("/api/truncate", async (c) => {
     try {
       const user = c.get("user");
       if (!user || user.role !== "admin") {
@@ -625,7 +624,7 @@ function createDatabaseToolsAdminRoutes() {
       }, 500);
     }
   });
-  router2.post("/api/backup", async (c) => {
+  router3.post("/api/backup", async (c) => {
     try {
       const user = c.get("user");
       if (!user || user.role !== "admin") {
@@ -652,7 +651,7 @@ function createDatabaseToolsAdminRoutes() {
       }, 500);
     }
   });
-  router2.get("/api/validate", async (c) => {
+  router3.get("/api/validate", async (c) => {
     try {
       const user = c.get("user");
       if (!user || user.role !== "admin") {
@@ -676,7 +675,7 @@ function createDatabaseToolsAdminRoutes() {
       }, 500);
     }
   });
-  router2.get("/api/tables/:tableName", async (c) => {
+  router3.get("/api/tables/:tableName", async (c) => {
     try {
       const user = c.get("user");
       if (!user || user.role !== "admin") {
@@ -705,7 +704,7 @@ function createDatabaseToolsAdminRoutes() {
       }, 500);
     }
   });
-  router2.get("/tables/:tableName", async (c) => {
+  router3.get("/tables/:tableName", async (c) => {
     try {
       const user = c.get("user");
       if (!user || user.role !== "admin") {
@@ -741,7 +740,7 @@ function createDatabaseToolsAdminRoutes() {
       return c.text(`Error: ${error}`, 500);
     }
   });
-  return router2;
+  return router3;
 }
 
 // src/plugins/core-plugins/seed-data-plugin/services/seed-data-service.ts
@@ -1031,7 +1030,7 @@ var SeedDataService = class {
 function createSeedDataAdminRoutes() {
   const routes = new Hono();
   routes.get("/", async (c) => {
-    const html3 = `
+    const html = `
       <!DOCTYPE html>
       <html>
         <head>
@@ -1274,7 +1273,7 @@ function createSeedDataAdminRoutes() {
         </body>
       </html>
     `;
-    return c.html(html3);
+    return c.html(html);
   });
   routes.post("/generate", async (c) => {
     try {
@@ -1325,253 +1324,6 @@ function createEmailPlugin() {
     compatibility: "^2.0.0"
   });
   const emailRoutes = new Hono();
-  emailRoutes.get("/settings", async (c) => {
-    const user = c.get("user");
-    const db = c.env.DB;
-    const plugin2 = await db.prepare(`
-      SELECT settings FROM plugins WHERE id = 'email'
-    `).first();
-    const settings = plugin2?.settings ? JSON.parse(plugin2.settings) : {};
-    const contentHTML = await html`
-      <div class="p-8">
-        <!-- Header -->
-        <div class="mb-8">
-          <h1 class="text-3xl font-bold text-zinc-950 dark:text-white mb-2">Email Settings</h1>
-          <p class="text-zinc-600 dark:text-zinc-400">Configure Resend API for sending transactional emails</p>
-        </div>
-
-        <!-- Settings Form -->
-        <div class="max-w-3xl">
-          <!-- Main Settings Card -->
-          <div class="rounded-xl bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-6 mb-6">
-            <h2 class="text-xl font-semibold text-zinc-950 dark:text-white mb-4">Resend Configuration</h2>
-
-            <form id="emailSettingsForm" class="space-y-6">
-              <!-- API Key -->
-              <div>
-                <label for="apiKey" class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
-                  Resend API Key <span class="text-red-500">*</span>
-                </label>
-                <input
-                  type="password"
-                  id="apiKey"
-                  name="apiKey"
-                  value="${settings.apiKey || ""}"
-                  class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:focus:ring-indigo-400"
-                  placeholder="re_..."
-                  required
-                />
-                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                  Get your API key from <a href="https://resend.com/api-keys" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">resend.com/api-keys</a>
-                </p>
-              </div>
-
-              <!-- From Email -->
-              <div>
-                <label for="fromEmail" class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
-                  From Email <span class="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  id="fromEmail"
-                  name="fromEmail"
-                  value="${settings.fromEmail || ""}"
-                  class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:focus:ring-indigo-400"
-                  placeholder="noreply@yourdomain.com"
-                  required
-                />
-                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                  Must be a verified domain in Resend
-                </p>
-              </div>
-
-              <!-- From Name -->
-              <div>
-                <label for="fromName" class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
-                  From Name <span class="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="fromName"
-                  name="fromName"
-                  value="${settings.fromName || ""}"
-                  class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:focus:ring-indigo-400"
-                  placeholder="Your App Name"
-                  required
-                />
-              </div>
-
-              <!-- Reply To -->
-              <div>
-                <label for="replyTo" class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
-                  Reply-To Email
-                </label>
-                <input
-                  type="email"
-                  id="replyTo"
-                  name="replyTo"
-                  value="${settings.replyTo || ""}"
-                  class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:focus:ring-indigo-400"
-                  placeholder="support@yourdomain.com"
-                />
-              </div>
-
-              <!-- Logo URL -->
-              <div>
-                <label for="logoUrl" class="block text-sm font-medium text-zinc-950 dark:text-white mb-2">
-                  Logo URL
-                </label>
-                <input
-                  type="url"
-                  id="logoUrl"
-                  name="logoUrl"
-                  value="${settings.logoUrl || ""}"
-                  class="w-full rounded-lg bg-white dark:bg-white/5 px-3 py-2 text-sm text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:focus:ring-indigo-400"
-                  placeholder="https://yourdomain.com/logo.png"
-                />
-                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                  Logo to display in email templates
-                </p>
-              </div>
-
-              <!-- Action Buttons -->
-              <div class="flex gap-3 pt-4">
-                <button
-                  type="submit"
-                  class="inline-flex items-center justify-center rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
-                >
-                  Save Settings
-                </button>
-                <button
-                  type="button"
-                  id="testEmailBtn"
-                  class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
-                >
-                  Send Test Email
-                </button>
-                <button
-                  type="button"
-                  id="resetBtn"
-                  class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
-                >
-                  Reset
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <!-- Status Message -->
-          <div id="statusMessage" class="hidden rounded-xl p-4 mb-6"></div>
-
-          <!-- Info Card -->
-          <div class="rounded-xl bg-indigo-50 dark:bg-indigo-950/30 ring-1 ring-indigo-100 dark:ring-indigo-900/50 p-6">
-            <h3 class="font-semibold text-indigo-900 dark:text-indigo-300 mb-3">
-              📧 Email Templates Included
-            </h3>
-            <ul class="text-sm text-indigo-800 dark:text-indigo-200 space-y-2">
-              <li>✓ Registration confirmation</li>
-              <li>✓ Email verification</li>
-              <li>✓ Password reset</li>
-              <li>✓ One-time code (2FA)</li>
-            </ul>
-            <p class="text-xs text-indigo-700 dark:text-indigo-300 mt-4">
-              Templates are code-based and can be customized by editing the plugin files.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <script>
-        // Form submission handler
-        document.getElementById('emailSettingsForm').addEventListener('submit', async (e) => {
-          e.preventDefault()
-          const formData = new FormData(e.target)
-          const data = Object.fromEntries(formData.entries())
-
-          const statusEl = document.getElementById('statusMessage')
-
-          try {
-            const response = await fetch('/admin/plugins/email/settings', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(data)
-            })
-
-            if (response.ok) {
-              statusEl.className = 'rounded-xl bg-green-50 dark:bg-green-950/30 ring-1 ring-green-100 dark:ring-green-900/50 p-4 mb-6 text-green-900 dark:text-green-200'
-              statusEl.innerHTML = '✅ Settings saved successfully!'
-              statusEl.classList.remove('hidden')
-              setTimeout(() => statusEl.classList.add('hidden'), 3000)
-            } else {
-              throw new Error('Failed to save settings')
-            }
-          } catch (error) {
-            statusEl.className = 'rounded-xl bg-red-50 dark:bg-red-950/30 ring-1 ring-red-100 dark:ring-red-900/50 p-4 mb-6 text-red-900 dark:text-red-200'
-            statusEl.innerHTML = '❌ Failed to save settings. Please try again.'
-            statusEl.classList.remove('hidden')
-          }
-        })
-
-        // Test email handler
-        document.getElementById('testEmailBtn').addEventListener('click', async () => {
-          // Prompt for destination email
-          const toEmail = prompt('Enter destination email address for test:')
-          if (!toEmail) return
-
-          // Basic email validation
-          if (!toEmail.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/)) {
-            alert('Please enter a valid email address')
-            return
-          }
-
-          const statusEl = document.getElementById('statusMessage')
-
-          statusEl.className = 'rounded-xl bg-indigo-50 dark:bg-indigo-950/30 ring-1 ring-indigo-100 dark:ring-indigo-900/50 p-4 mb-6 text-indigo-900 dark:text-indigo-200'
-          statusEl.innerHTML = \`📧 Sending test email to \${toEmail}...\`
-          statusEl.classList.remove('hidden')
-
-          try {
-            const response = await fetch('/admin/plugins/email/test', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ toEmail })
-            })
-
-            const data = await response.json()
-
-            if (response.ok) {
-              statusEl.className = 'rounded-xl bg-green-50 dark:bg-green-950/30 ring-1 ring-green-100 dark:ring-green-900/50 p-4 mb-6 text-green-900 dark:text-green-200'
-              statusEl.innerHTML = \`✅ \${data.message || 'Test email sent! Check your inbox.'}\`
-            } else {
-              statusEl.className = 'rounded-xl bg-red-50 dark:bg-red-950/30 ring-1 ring-red-100 dark:ring-red-900/50 p-4 mb-6 text-red-900 dark:text-red-200'
-              statusEl.innerHTML = \`❌ \${data.error || 'Failed to send test email. Check your settings.'}\`
-            }
-          } catch (error) {
-            statusEl.className = 'rounded-xl bg-red-50 dark:bg-red-950/30 ring-1 ring-red-100 dark:ring-red-900/50 p-4 mb-6 text-red-900 dark:text-red-200'
-            statusEl.innerHTML = '❌ Network error. Please try again.'
-          }
-        })
-
-        // Reset button handler
-        document.getElementById('resetBtn').addEventListener('click', () => {
-          document.getElementById('emailSettingsForm').reset()
-        })
-      </script>
-    `;
-    const templateUser = user ? {
-      name: user.name ?? user.email ?? "Admin",
-      email: user.email ?? "admin@sonicjs.com",
-      role: user.role ?? "admin"
-    } : void 0;
-    return c.html(
-      renderAdminLayout({
-        title: "Email Settings",
-        content: contentHTML,
-        user: templateUser,
-        currentPath: "/admin/plugins/email/settings"
-      })
-    );
-  });
   emailRoutes.post("/settings", async (c) => {
     try {
       const body = await c.req.json();
@@ -1667,7 +1419,7 @@ function createEmailPlugin() {
     requiresAuth: true,
     priority: 80
   });
-  builder.addMenuItem("Email", "/admin/plugins/email/settings", {
+  builder.addMenuItem("Email", "/admin/plugins/email", {
     icon: "envelope",
     order: 80,
     permissions: ["email:manage"]
@@ -1984,8 +1736,7 @@ var DEFAULT_SETTINGS = {
   codeExpiryMinutes: 10,
   maxAttempts: 3,
   rateLimitPerHour: 5,
-  allowNewUserRegistration: false,
-  appName: "SonicJS"
+  allowNewUserRegistration: false
 };
 function createOTPLoginPlugin() {
   const builder = PluginBuilder.create({
@@ -2016,7 +1767,21 @@ function createOTPLoginPlugin() {
       const normalizedEmail = email.toLowerCase();
       const db = c.env.DB;
       const otpService = new OTPService(db);
-      const settings = { ...DEFAULT_SETTINGS };
+      let settings = { ...DEFAULT_SETTINGS };
+      const pluginRow = await db.prepare(`
+        SELECT settings FROM plugins WHERE id = 'otp-login'
+      `).first();
+      if (pluginRow?.settings) {
+        try {
+          const savedSettings = JSON.parse(pluginRow.settings);
+          settings = { ...DEFAULT_SETTINGS, ...savedSettings };
+        } catch (e) {
+          console.warn("Failed to parse OTP plugin settings, using defaults");
+        }
+      }
+      const settingsService = new SettingsService(db);
+      const generalSettings = await settingsService.getGeneralSettings();
+      const siteName = generalSettings.siteName;
       const canRequest = await otpService.checkRateLimit(normalizedEmail, settings);
       if (!canRequest) {
         return c.json({
@@ -2060,7 +1825,7 @@ function createOTPLoginPlugin() {
           email: normalizedEmail,
           ipAddress,
           timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-          appName: settings.appName
+          appName: siteName
         });
         const emailPlugin2 = await db.prepare(`
           SELECT settings FROM plugins WHERE id = 'email'
@@ -2077,7 +1842,7 @@ function createOTPLoginPlugin() {
               body: JSON.stringify({
                 from: `${emailSettings.fromName} <${emailSettings.fromEmail}>`,
                 to: [normalizedEmail],
-                subject: `Your login code for ${settings.appName}`,
+                subject: `Your login code for ${siteName}`,
                 html: emailContent.html,
                 text: emailContent.text,
                 reply_to: emailSettings.replyTo || emailSettings.fromEmail
@@ -2128,7 +1893,18 @@ function createOTPLoginPlugin() {
       const normalizedEmail = email.toLowerCase();
       const db = c.env.DB;
       const otpService = new OTPService(db);
-      const settings = { ...DEFAULT_SETTINGS };
+      let settings = { ...DEFAULT_SETTINGS };
+      const pluginRow = await db.prepare(`
+        SELECT settings FROM plugins WHERE id = 'otp-login'
+      `).first();
+      if (pluginRow?.settings) {
+        try {
+          const savedSettings = JSON.parse(pluginRow.settings);
+          settings = { ...DEFAULT_SETTINGS, ...savedSettings };
+        } catch (e) {
+          console.warn("Failed to parse OTP plugin settings, using defaults");
+        }
+      }
       const verification = await otpService.verifyCode(normalizedEmail, code, settings);
       if (!verification.valid) {
         await otpService.incrementAttempts(normalizedEmail, code);
@@ -2207,193 +1983,7 @@ function createOTPLoginPlugin() {
     requiresAuth: false,
     priority: 100
   });
-  const adminRoutes2 = new Hono();
-  adminRoutes2.get("/settings", async (c) => {
-    const user = c.get("user");
-    const contentHTML = await html`
-      <div class="p-8">
-        <div class="mb-8">
-          <h1 class="text-3xl font-bold mb-2">OTP Login Settings</h1>
-          <p class="text-zinc-600 dark:text-zinc-400">Configure passwordless authentication via email codes</p>
-        </div>
-
-        <div class="max-w-3xl">
-          <div class="backdrop-blur-md bg-black/20 border border-white/10 shadow-xl rounded-xl p-6 mb-6">
-            <h2 class="text-xl font-semibold mb-4">Code Settings</h2>
-
-            <form id="otpSettingsForm" class="space-y-6">
-              <div>
-                <label for="codeLength" class="block text-sm font-medium mb-2">
-                  Code Length
-                </label>
-                <input
-                  type="number"
-                  id="codeLength"
-                  name="codeLength"
-                  min="4"
-                  max="8"
-                  value="6"
-                  class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
-                />
-                <p class="text-xs text-zinc-500 mt-1">Number of digits in OTP code (4-8)</p>
-              </div>
-
-              <div>
-                <label for="codeExpiryMinutes" class="block text-sm font-medium mb-2">
-                  Code Expiry (minutes)
-                </label>
-                <input
-                  type="number"
-                  id="codeExpiryMinutes"
-                  name="codeExpiryMinutes"
-                  min="5"
-                  max="60"
-                  value="10"
-                  class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
-                />
-                <p class="text-xs text-zinc-500 mt-1">How long codes remain valid (5-60 minutes)</p>
-              </div>
-
-              <div>
-                <label for="maxAttempts" class="block text-sm font-medium mb-2">
-                  Maximum Attempts
-                </label>
-                <input
-                  type="number"
-                  id="maxAttempts"
-                  name="maxAttempts"
-                  min="3"
-                  max="10"
-                  value="3"
-                  class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
-                />
-                <p class="text-xs text-zinc-500 mt-1">Max verification attempts before invalidation</p>
-              </div>
-
-              <div>
-                <label for="rateLimitPerHour" class="block text-sm font-medium mb-2">
-                  Rate Limit (per hour)
-                </label>
-                <input
-                  type="number"
-                  id="rateLimitPerHour"
-                  name="rateLimitPerHour"
-                  min="3"
-                  max="20"
-                  value="5"
-                  class="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none"
-                />
-                <p class="text-xs text-zinc-500 mt-1">Max code requests per email per hour</p>
-              </div>
-
-              <div class="flex items-center">
-                <input
-                  type="checkbox"
-                  id="allowNewUserRegistration"
-                  name="allowNewUserRegistration"
-                  class="w-4 h-4 rounded border-white/10"
-                />
-                <label for="allowNewUserRegistration" class="ml-2 text-sm">
-                  Allow new user registration via OTP
-                </label>
-              </div>
-
-              <div class="flex gap-3 pt-4">
-                <button
-                  type="submit"
-                  class="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all"
-                >
-                  Save Settings
-                </button>
-                <button
-                  type="button"
-                  id="testOTPBtn"
-                  class="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-all"
-                >
-                  Send Test Code
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <div id="statusMessage" class="hidden backdrop-blur-md bg-black/20 border border-white/10 rounded-xl p-4 mb-6"></div>
-
-          <div class="backdrop-blur-md bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
-            <h3 class="font-semibold text-blue-400 mb-3">
-              🔢 Features
-            </h3>
-            <ul class="text-sm text-blue-200 space-y-2">
-              <li>✓ Passwordless authentication</li>
-              <li>✓ Secure random code generation</li>
-              <li>✓ Rate limiting protection</li>
-              <li>✓ Brute force prevention</li>
-              <li>✓ Mobile-friendly UX</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <script>
-        document.getElementById('otpSettingsForm').addEventListener('submit', async (e) => {
-          e.preventDefault()
-          const statusEl = document.getElementById('statusMessage')
-          statusEl.className = 'backdrop-blur-md bg-green-500/20 border border-green-500/30 rounded-xl p-4 mb-6'
-          statusEl.innerHTML = '✅ Settings saved successfully!'
-          statusEl.classList.remove('hidden')
-          setTimeout(() => statusEl.classList.add('hidden'), 3000)
-        })
-
-        document.getElementById('testOTPBtn').addEventListener('click', async () => {
-          const email = prompt('Enter email address for test:')
-          if (!email) return
-
-          const statusEl = document.getElementById('statusMessage')
-          statusEl.className = 'backdrop-blur-md bg-blue-500/20 border border-blue-500/30 rounded-xl p-4 mb-6'
-          statusEl.innerHTML = '📧 Sending test code...'
-          statusEl.classList.remove('hidden')
-
-          try {
-            const response = await fetch('/auth/otp/request', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email })
-            })
-
-            const data = await response.json()
-
-            if (response.ok) {
-              statusEl.className = 'backdrop-blur-md bg-green-500/20 border border-green-500/30 rounded-xl p-4 mb-6'
-              statusEl.innerHTML = '✅ Test code sent!' + (data.dev_code ? \` Code: <strong>\${data.dev_code}</strong>\` : '')
-            } else {
-              throw new Error(data.error || 'Failed')
-            }
-          } catch (error) {
-            statusEl.className = 'backdrop-blur-md bg-red-500/20 border border-red-500/30 rounded-xl p-4 mb-6'
-            statusEl.innerHTML = '❌ Failed to send test code'
-          }
-        })
-      </script>
-    `;
-    const templateUser = user ? {
-      name: user.name ?? user.email ?? "Admin",
-      email: user.email ?? "admin@sonicjs.com",
-      role: user.role ?? "admin"
-    } : void 0;
-    return c.html(
-      adminLayoutV2({
-        title: "OTP Login Settings",
-        content: contentHTML,
-        user: templateUser,
-        currentPath: "/admin/plugins/otp-login/settings"
-      })
-    );
-  });
-  builder.addRoute("/admin/plugins/otp-login", adminRoutes2, {
-    description: "OTP login admin interface",
-    requiresAuth: true,
-    priority: 85
-  });
-  builder.addMenuItem("OTP Login", "/admin/plugins/otp-login/settings", {
+  builder.addMenuItem("OTP Login", "/admin/plugins/otp-login", {
     icon: "key",
     order: 85,
     permissions: ["otp:manage"]
@@ -6422,6 +6012,7 @@ function createSonicJSApp(config = {}) {
   app2.route("/admin/settings", adminSettingsRoutes);
   app2.route("/forms", public_forms_default);
   app2.route("/api/forms", public_forms_default);
+  app2.route("/admin/api-reference", router2);
   app2.route("/admin/database-tools", createDatabaseToolsAdminRoutes());
   app2.route("/admin/seed-data", createSeedDataAdminRoutes());
   app2.route("/admin/content", admin_content_default);
@@ -6432,6 +6023,11 @@ function createSonicJSApp(config = {}) {
     }
   }
   app2.route("/admin/cache", cache_default.getRoutes());
+  if (otpLoginPlugin.routes && otpLoginPlugin.routes.length > 0) {
+    for (const route of otpLoginPlugin.routes) {
+      app2.route(route.path, route.handler);
+    }
+  }
   app2.route("/admin/plugins", adminPluginRoutes);
   app2.route("/admin/logs", adminLogsRoutes);
   app2.route("/admin", userRoutes);
@@ -6439,11 +6035,6 @@ function createSonicJSApp(config = {}) {
   app2.route("/", test_cleanup_default);
   if (emailPlugin.routes && emailPlugin.routes.length > 0) {
     for (const route of emailPlugin.routes) {
-      app2.route(route.path, route.handler);
-    }
-  }
-  if (otpLoginPlugin.routes && otpLoginPlugin.routes.length > 0) {
-    for (const route of otpLoginPlugin.routes) {
       app2.route(route.path, route.handler);
     }
   }

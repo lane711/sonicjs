@@ -1,10 +1,10 @@
 import { getCacheService, CACHE_CONFIGS, getLogger, SettingsService } from './chunk-G44QUVNM.js';
-import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-2OA7IJW4.js';
+import { requireAuth, isPluginActive, requireRole, AuthManager, logActivity } from './chunk-VOP6XUFL.js';
 import { PluginService } from './chunk-YFJJU26H.js';
-import { MigrationService } from './chunk-YXFF3EMH.js';
+import { MigrationService } from './chunk-NATWDP7Q.js';
 import { init_admin_layout_catalyst_template, renderDesignPage, renderCheckboxPage, renderTestimonialsList, renderCodeExamplesList, renderAlert, renderTable, renderPagination, renderConfirmationDialog, getConfirmationDialogScript, renderAdminLayoutCatalyst, renderAdminLayout, adminLayoutV2, renderForm } from './chunk-VCH6HXVP.js';
 import { PluginBuilder, TurnstileService } from './chunk-J5WGMRSU.js';
-import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml, getBlocksFieldConfig, parseBlocksValue } from './chunk-DNHJS6RN.js';
+import { QueryFilterBuilder, sanitizeInput, getCoreVersion, escapeHtml, getBlocksFieldConfig, parseBlocksValue } from './chunk-PSRPBW3W.js';
 import { metricsTracker } from './chunk-FICTAGD4.js';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
@@ -262,18 +262,396 @@ function addTimingMeta(c, meta = {}, executionStartTime) {
   };
 }
 apiRoutes.get("/", (c) => {
+  const baseUrl = new URL(c.req.url);
+  const serverUrl = `${baseUrl.protocol}//${baseUrl.host}`;
   return c.json({
-    name: "SonicJS API",
-    version: "2.0.0",
-    description: "RESTful API for SonicJS headless CMS",
-    endpoints: {
-      health: "/api/health",
-      collections: "/api/collections",
-      content: "/api/content",
-      contentById: "/api/content/:id",
-      collectionContent: "/api/collections/:collection/content"
+    openapi: "3.0.0",
+    info: {
+      title: "SonicJS AI API",
+      version: "0.1.0",
+      description: "RESTful API for SonicJS headless CMS - a modern, AI-powered content management system built on Cloudflare Workers",
+      contact: {
+        name: "SonicJS Support",
+        url: `${serverUrl}/docs`,
+        email: "support@sonicjs.com"
+      },
+      license: {
+        name: "MIT",
+        url: "https://opensource.org/licenses/MIT"
+      }
     },
-    documentation: "/docs"
+    servers: [
+      {
+        url: serverUrl,
+        description: "Current server"
+      }
+    ],
+    paths: {
+      "/api/": {
+        get: {
+          summary: "API Information",
+          description: "Returns OpenAPI specification for the SonicJS API",
+          operationId: "getApiInfo",
+          tags: ["System"],
+          responses: {
+            "200": {
+              description: "OpenAPI specification",
+              content: {
+                "application/json": {
+                  schema: { type: "object" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/health": {
+        get: {
+          summary: "Health Check",
+          description: "Returns API health status and available schemas",
+          operationId: "getHealth",
+          tags: ["System"],
+          responses: {
+            "200": {
+              description: "Health status",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      status: { type: "string", example: "healthy" },
+                      timestamp: { type: "string", format: "date-time" },
+                      schemas: { type: "array", items: { type: "string" } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/collections": {
+        get: {
+          summary: "List Collections",
+          description: "Returns all active collections with their schemas",
+          operationId: "getCollections",
+          tags: ["Content"],
+          responses: {
+            "200": {
+              description: "List of collections",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      data: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            id: { type: "string" },
+                            name: { type: "string" },
+                            display_name: { type: "string" },
+                            schema: { type: "object" },
+                            is_active: { type: "integer" }
+                          }
+                        }
+                      },
+                      meta: { type: "object" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/collections/{collection}/content": {
+        get: {
+          summary: "Get Collection Content",
+          description: "Returns content items from a specific collection with filtering support",
+          operationId: "getCollectionContent",
+          tags: ["Content"],
+          parameters: [
+            {
+              name: "collection",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+              description: "Collection name"
+            },
+            {
+              name: "limit",
+              in: "query",
+              schema: { type: "integer", default: 50, maximum: 1e3 },
+              description: "Maximum number of items to return"
+            },
+            {
+              name: "offset",
+              in: "query",
+              schema: { type: "integer", default: 0 },
+              description: "Number of items to skip"
+            },
+            {
+              name: "status",
+              in: "query",
+              schema: { type: "string", enum: ["draft", "published", "archived"] },
+              description: "Filter by content status"
+            }
+          ],
+          responses: {
+            "200": {
+              description: "List of content items",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      data: { type: "array", items: { type: "object" } },
+                      meta: { type: "object" }
+                    }
+                  }
+                }
+              }
+            },
+            "404": {
+              description: "Collection not found"
+            }
+          }
+        }
+      },
+      "/api/content": {
+        get: {
+          summary: "List Content",
+          description: "Returns content items with advanced filtering support",
+          operationId: "getContent",
+          tags: ["Content"],
+          parameters: [
+            {
+              name: "collection",
+              in: "query",
+              schema: { type: "string" },
+              description: "Filter by collection name"
+            },
+            {
+              name: "limit",
+              in: "query",
+              schema: { type: "integer", default: 50, maximum: 1e3 },
+              description: "Maximum number of items to return"
+            },
+            {
+              name: "offset",
+              in: "query",
+              schema: { type: "integer", default: 0 },
+              description: "Number of items to skip"
+            }
+          ],
+          responses: {
+            "200": {
+              description: "List of content items",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      data: { type: "array", items: { type: "object" } },
+                      meta: { type: "object" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        post: {
+          summary: "Create Content",
+          description: "Creates a new content item",
+          operationId: "createContent",
+          tags: ["Content"],
+          security: [{ bearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["collection_id", "title"],
+                  properties: {
+                    collection_id: { type: "string" },
+                    title: { type: "string" },
+                    slug: { type: "string" },
+                    status: { type: "string", enum: ["draft", "published", "archived"] },
+                    data: { type: "object" }
+                  }
+                }
+              }
+            }
+          },
+          responses: {
+            "201": { description: "Content created successfully" },
+            "400": { description: "Invalid request body" },
+            "401": { description: "Unauthorized" }
+          }
+        }
+      },
+      "/api/content/{id}": {
+        get: {
+          summary: "Get Content by ID",
+          description: "Returns a specific content item by ID",
+          operationId: "getContentById",
+          tags: ["Content"],
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+              description: "Content item ID"
+            }
+          ],
+          responses: {
+            "200": { description: "Content item" },
+            "404": { description: "Content not found" }
+          }
+        },
+        put: {
+          summary: "Update Content",
+          description: "Updates an existing content item",
+          operationId: "updateContent",
+          tags: ["Content"],
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+              description: "Content item ID"
+            }
+          ],
+          responses: {
+            "200": { description: "Content updated successfully" },
+            "401": { description: "Unauthorized" },
+            "404": { description: "Content not found" }
+          }
+        },
+        delete: {
+          summary: "Delete Content",
+          description: "Deletes a content item",
+          operationId: "deleteContent",
+          tags: ["Content"],
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              required: true,
+              schema: { type: "string" },
+              description: "Content item ID"
+            }
+          ],
+          responses: {
+            "200": { description: "Content deleted successfully" },
+            "401": { description: "Unauthorized" },
+            "404": { description: "Content not found" }
+          }
+        }
+      },
+      "/api/media": {
+        get: {
+          summary: "List Media",
+          description: "Returns all media files with pagination",
+          operationId: "getMedia",
+          tags: ["Media"],
+          responses: {
+            "200": { description: "List of media files" }
+          }
+        }
+      },
+      "/api/media/upload": {
+        post: {
+          summary: "Upload Media",
+          description: "Uploads a new media file to R2 storage",
+          operationId: "uploadMedia",
+          tags: ["Media"],
+          security: [{ bearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              "multipart/form-data": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    file: { type: "string", format: "binary" }
+                  }
+                }
+              }
+            }
+          },
+          responses: {
+            "201": { description: "Media uploaded successfully" },
+            "401": { description: "Unauthorized" }
+          }
+        }
+      }
+    },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT"
+        }
+      },
+      schemas: {
+        Content: {
+          type: "object",
+          properties: {
+            id: { type: "string", format: "uuid" },
+            title: { type: "string" },
+            slug: { type: "string" },
+            status: { type: "string", enum: ["draft", "published", "archived"] },
+            collectionId: { type: "string", format: "uuid" },
+            data: { type: "object" },
+            created_at: { type: "integer" },
+            updated_at: { type: "integer" }
+          }
+        },
+        Collection: {
+          type: "object",
+          properties: {
+            id: { type: "string", format: "uuid" },
+            name: { type: "string" },
+            display_name: { type: "string" },
+            description: { type: "string" },
+            schema: { type: "object" },
+            is_active: { type: "integer" }
+          }
+        },
+        Media: {
+          type: "object",
+          properties: {
+            id: { type: "string", format: "uuid" },
+            filename: { type: "string" },
+            mimetype: { type: "string" },
+            size: { type: "integer" },
+            url: { type: "string" }
+          }
+        },
+        Error: {
+          type: "object",
+          properties: {
+            error: { type: "string" },
+            details: { type: "string" }
+          }
+        }
+      }
+    },
+    tags: [
+      { name: "System", description: "System and health endpoints" },
+      { name: "Content", description: "Content management operations" },
+      { name: "Media", description: "Media file operations" }
+    ]
   });
 });
 apiRoutes.get("/health", (c) => {
@@ -1853,7 +2231,7 @@ adminApiRoutes.delete("/collections/:id", async (c) => {
 });
 adminApiRoutes.get("/migrations/status", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-R5YZZKZG.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-NFYQCIMJ.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const status = await migrationService.getMigrationStatus();
@@ -1878,7 +2256,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
         error: "Unauthorized. Admin access required."
       }, 403);
     }
-    const { MigrationService: MigrationService2 } = await import('./migrations-R5YZZKZG.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-NFYQCIMJ.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const result = await migrationService.runPendingMigrations();
@@ -1897,7 +2275,7 @@ adminApiRoutes.post("/migrations/run", async (c) => {
 });
 adminApiRoutes.get("/migrations/validate", async (c) => {
   try {
-    const { MigrationService: MigrationService2 } = await import('./migrations-R5YZZKZG.js');
+    const { MigrationService: MigrationService2 } = await import('./migrations-NFYQCIMJ.js');
     const db = c.env.DB;
     const migrationService = new MigrationService2(db);
     const validation = await migrationService.validateSchema();
@@ -4416,7 +4794,7 @@ function renderStructuredArrayItem(field, itemConfig, index, itemValue, pluginSt
           </button>
           <button type="button" data-action="remove-item" class="inline-flex items-center gap-x-1 px-2.5 py-1.5 text-xs font-medium text-pink-700 dark:text-pink-300 hover:bg-pink-50 dark:hover:bg-pink-900/20 rounded-lg transition-colors">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 0 00-7.5 0"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
             </svg>
             Delete item
           </button>
@@ -14581,17 +14959,7 @@ function renderPluginsListPage(data) {
       }
       
       function openPluginSettings(pluginId) {
-        // Email plugin has a custom settings page
-        if (pluginId === 'email') {
-          window.location.href = '/admin/plugins/email/settings';
-        } else {
-          window.location.href = \`/admin/plugins/\${pluginId}\`;
-        }
-      }
-      
-      function showPluginDetails(pluginId) {
-        // TODO: Implement plugin details modal
-        showNotification('Plugin details coming soon!', 'info');
+        window.location.href = \`/admin/plugins/\${pluginId}\`;
       }
       
       function filterAndSortPlugins() {
@@ -14725,7 +15093,7 @@ function renderPluginCard(plugin) {
   const canToggle = !criticalCorePlugins.includes(plugin.id);
   let actionButton = "";
   if (plugin.status === "uninstalled") {
-    actionButton = `<button onclick="installPlugin('${plugin.name}')" class="w-full sm:w-auto bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 px-3 py-1.5 rounded-md text-xs font-medium transition-colors shadow-sm">Install</button>`;
+    actionButton = `<button onclick="event.stopPropagation(); installPlugin('${plugin.name}')" class="w-full sm:w-auto bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 px-3 py-1.5 rounded-md text-xs font-medium transition-colors shadow-sm">Install</button>`;
   } else {
     const isActive = plugin.status === "active";
     const action = isActive ? "deactivate" : "activate";
@@ -14733,7 +15101,7 @@ function renderPluginCard(plugin) {
     const translateClass = isActive ? "translate-x-5" : "translate-x-0";
     if (canToggle) {
       actionButton = `
-      <button onclick="togglePlugin('${plugin.id}', '${action}', event)" type="button" class="${bgClass} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 toggle-button" role="switch" aria-checked="${isActive}">
+      <button onclick="event.stopPropagation(); togglePlugin('${plugin.id}', '${action}', event)" type="button" class="${bgClass} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 toggle-button" role="switch" aria-checked="${isActive}">
         <span class="sr-only">Toggle plugin</span>
         <span aria-hidden="true" class="${translateClass} pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out toggle-knob"></span>
       </button>
@@ -14747,10 +15115,11 @@ function renderPluginCard(plugin) {
     }
   }
   return `
-    <div class="plugin-card flex flex-col h-full rounded-md bg-white dark:bg-zinc-900 ring-1 ring-zinc-950/10 dark:ring-white/10 p-5 transition-all hover:shadow-md" 
-      data-category="${plugin.category}" 
-      data-status="${plugin.status}" 
-      data-name="${plugin.displayName}" 
+    <div class="plugin-card flex flex-col h-full rounded-md bg-white dark:bg-zinc-900 ring-1 ring-zinc-950/10 dark:ring-white/10 p-5 transition-all hover:shadow-md cursor-pointer"
+      onclick="openPluginSettings('${plugin.id}')"
+      data-category="${plugin.category}"
+      data-status="${plugin.status}"
+      data-name="${plugin.displayName}"
       data-description="${plugin.description}"
       data-downloads="${plugin.downloadCount || 0}"
       data-rating="${plugin.rating || 0}">
@@ -14771,16 +15140,8 @@ function renderPluginCard(plugin) {
         </div>
         
         <div class="flex items-center gap-1">
-          ${plugin.status !== "uninstalled" ? `
-          <button onclick="showPluginDetails('${plugin.id}')" class="text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Plugin Details">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-          </button>
-          ` : ""}
-
           ${!plugin.isCore && plugin.status !== "uninstalled" ? `
-          <button onclick="uninstallPlugin('${plugin.id}')" class="text-zinc-400 hover:text-red-600 dark:text-zinc-500 dark:hover:text-red-400 p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Uninstall Plugin">
+          <button onclick="event.stopPropagation(); uninstallPlugin('${plugin.id}')" class="text-zinc-400 hover:text-red-600 dark:text-zinc-500 dark:hover:text-red-400 p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Uninstall Plugin">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
             </svg>
@@ -14807,17 +15168,6 @@ function renderPluginCard(plugin) {
       <div class="flex items-center justify-between pt-4 border-t border-zinc-100 dark:border-zinc-800 mt-auto">
         <div class="flex gap-2">
           ${actionButton}
-        </div>
-
-        <div class="flex items-center gap-2">
-          ${plugin.status !== "uninstalled" ? `
-          <button onclick="openPluginSettings('${plugin.id}')" class="text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Settings">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-          </button>
-          ` : ""}
         </div>
       </div>
     </div>
@@ -15388,6 +15738,26 @@ function renderToggleButton(plugin) {
 }
 function renderSettingsTab(plugin) {
   const settings = plugin.settings || {};
+  const pluginId = plugin.id || plugin.name;
+  const customRenderer = pluginSettingsComponents[pluginId];
+  if (customRenderer) {
+    return `
+      <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
+        ${customRenderer(plugin, settings)}
+
+        <div class="flex items-center justify-end pt-6 border-t border-white/10 mt-6">
+          <button
+            type="button"
+            id="save-button"
+            onclick="saveSettings()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+          >
+            Save Settings
+          </button>
+        </div>
+      </div>
+    `;
+  }
   const isSeedDataPlugin = plugin.id === "seed-data" || plugin.name === "seed-data";
   const isAuthPlugin = plugin.id === "core-auth" || plugin.name === "core-auth";
   const isTurnstilePlugin = plugin.id === "turnstile" || plugin.name === "turnstile";
@@ -15699,6 +16069,511 @@ function formatTimestamp(timestamp) {
   const date = new Date(timestamp * 1e3);
   return date.toLocaleString();
 }
+var pluginSettingsComponents = {
+  "otp-login": renderOTPLoginSettingsContent,
+  "email": renderEmailSettingsContent
+};
+function renderOTPLoginSettingsContent(plugin, settings) {
+  const siteName = settings.siteName || "SonicJS";
+  const emailConfigured = settings._emailConfigured || false;
+  const codeLength = settings.codeLength || 6;
+  const codeExpiryMinutes = settings.codeExpiryMinutes || 10;
+  const maxAttempts = settings.maxAttempts || 3;
+  const rateLimitPerHour = settings.rateLimitPerHour || 5;
+  const allowNewUserRegistration = settings.allowNewUserRegistration || false;
+  return `
+    <div class="space-y-6">
+      <!-- Test OTP Section -->
+      <div class="backdrop-blur-md bg-white/5 rounded-xl border border-white/10 p-6">
+        <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <span>\u{1F4E7}</span> Test OTP Email
+        </h3>
+
+        ${!emailConfigured ? `
+          <div class="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-4 mb-4">
+            <p class="text-yellow-200 text-sm">
+              <strong>\u26A0\uFE0F Email not configured.</strong>
+              <a href="/admin/plugins/email" class="underline hover:text-yellow-100">Configure the Email plugin</a>
+              to send real emails. Dev mode will show codes in the response.
+            </p>
+          </div>
+        ` : `
+          <div class="bg-green-500/20 border border-green-500/30 rounded-lg p-4 mb-4">
+            <p class="text-green-200 text-sm">
+              <strong>\u2705 Email configured.</strong> Test emails will be sent via Resend.
+            </p>
+          </div>
+        `}
+
+        <form id="testOtpForm" class="space-y-4">
+          <div>
+            <label for="testEmail" class="block text-sm font-medium text-gray-300 mb-2">
+              Email Address
+            </label>
+            <input
+              type="email"
+              id="testEmail"
+              name="email"
+              placeholder="Enter your email to receive a test code"
+              class="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white placeholder-zinc-500"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            id="sendTestBtn"
+            class="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all flex items-center justify-center gap-2"
+          >
+            <span id="sendBtnText">Send Test Code</span>
+            <span id="sendBtnSpinner" class="hidden">
+              <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+            </span>
+          </button>
+        </form>
+
+        <div id="testResult" class="hidden mt-4 rounded-lg p-4"></div>
+
+        <!-- Verify Code Section -->
+        <div id="verifySection" class="hidden mt-6 pt-6 border-t border-white/10">
+          <h4 class="text-md font-semibold text-white mb-3">Verify Code</h4>
+          <form id="verifyForm" class="space-y-4">
+            <div>
+              <label for="otpCode" class="block text-sm font-medium text-gray-300 mb-2">
+                Enter the code you received
+              </label>
+              <input
+                type="text"
+                id="otpCode"
+                name="code"
+                placeholder="000000"
+                maxlength="8"
+                class="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white text-center text-2xl tracking-widest font-mono"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              class="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all"
+            >
+              Verify Code
+            </button>
+          </form>
+          <div id="verifyResult" class="hidden mt-4 rounded-lg p-4"></div>
+        </div>
+      </div>
+
+      <!-- Configuration Section -->
+      <div class="backdrop-blur-md bg-white/5 rounded-xl border border-white/10 p-6">
+        <h3 class="text-lg font-semibold text-white mb-4">Code Settings</h3>
+
+        <form id="settings-form" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="setting_codeLength" class="block text-sm font-medium text-gray-300 mb-2">
+                Code Length
+              </label>
+              <input
+                type="number"
+                id="setting_codeLength"
+                name="setting_codeLength"
+                min="4"
+                max="8"
+                value="${codeLength}"
+                class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              />
+              <p class="text-xs text-gray-500 mt-1">Number of digits (4-8)</p>
+            </div>
+
+            <div>
+              <label for="setting_codeExpiryMinutes" class="block text-sm font-medium text-gray-300 mb-2">
+                Code Expiry (minutes)
+              </label>
+              <input
+                type="number"
+                id="setting_codeExpiryMinutes"
+                name="setting_codeExpiryMinutes"
+                min="5"
+                max="60"
+                value="${codeExpiryMinutes}"
+                class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              />
+              <p class="text-xs text-gray-500 mt-1">How long codes remain valid</p>
+            </div>
+
+            <div>
+              <label for="setting_maxAttempts" class="block text-sm font-medium text-gray-300 mb-2">
+                Maximum Attempts
+              </label>
+              <input
+                type="number"
+                id="setting_maxAttempts"
+                name="setting_maxAttempts"
+                min="3"
+                max="10"
+                value="${maxAttempts}"
+                class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              />
+              <p class="text-xs text-gray-500 mt-1">Max verification attempts</p>
+            </div>
+
+            <div>
+              <label for="setting_rateLimitPerHour" class="block text-sm font-medium text-gray-300 mb-2">
+                Rate Limit (per hour)
+              </label>
+              <input
+                type="number"
+                id="setting_rateLimitPerHour"
+                name="setting_rateLimitPerHour"
+                min="3"
+                max="20"
+                value="${rateLimitPerHour}"
+                class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              />
+              <p class="text-xs text-gray-500 mt-1">Max requests per email per hour</p>
+            </div>
+          </div>
+
+          <div class="flex items-center pt-2">
+            <input
+              type="checkbox"
+              id="setting_allowNewUserRegistration"
+              name="setting_allowNewUserRegistration"
+              ${allowNewUserRegistration ? "checked" : ""}
+              class="w-4 h-4 rounded border-white/10"
+            />
+            <label for="setting_allowNewUserRegistration" class="ml-2 text-sm text-gray-300">
+              Allow new user registration via OTP
+            </label>
+          </div>
+        </form>
+      </div>
+
+      <!-- Email Preview Section -->
+      <div class="backdrop-blur-md bg-white/5 rounded-xl border border-white/10 p-6">
+        <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <span>\u{1F441}\uFE0F</span> Email Preview
+        </h3>
+        <p class="text-gray-400 text-sm mb-4">
+          This is how the OTP email will appear to users. The site name "<strong class="text-white">${siteName}</strong>" is configured in
+          <a href="/admin/settings/general" class="text-blue-400 hover:text-blue-300 underline">General Settings</a>.
+        </p>
+
+        <div class="bg-white rounded-lg overflow-hidden shadow-lg">
+          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px 20px; text-align: center;">
+            <h3 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 600;">Your Login Code</h3>
+            <p style="margin: 0; opacity: 0.95; font-size: 14px;">Enter this code to sign in to ${siteName}</p>
+          </div>
+
+          <div style="padding: 30px 20px;">
+            <div style="background: #f8f9fa; border: 2px dashed #667eea; border-radius: 12px; padding: 20px; text-align: center; margin: 0 0 20px 0;">
+              <div style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #667eea; font-family: monospace;">
+                123456
+              </div>
+            </div>
+
+            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px 16px; margin: 0 0 20px 0; border-radius: 4px;">
+              <p style="margin: 0; font-size: 13px; color: #856404;">
+                <strong>\u26A0\uFE0F This code expires in ${codeExpiryMinutes} minutes</strong>
+              </p>
+            </div>
+
+            <div style="background: #e8f4ff; border-radius: 8px; padding: 16px; margin: 0;">
+              <p style="margin: 0 0 8px 0; font-size: 13px; color: #0066cc; font-weight: 600;">
+                \u{1F512} Security Notice
+              </p>
+              <p style="margin: 0; font-size: 12px; color: #004080; line-height: 1.5;">
+                Never share this code with anyone. ${siteName} will never ask you for this code via phone, email, or social media.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div class="backdrop-blur-md bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
+        <h3 class="font-semibold text-blue-400 mb-3">\u{1F522} Features</h3>
+        <ul class="text-sm text-blue-200 space-y-2">
+          <li>\u2713 Passwordless authentication</li>
+          <li>\u2713 Secure random code generation</li>
+          <li>\u2713 Rate limiting protection</li>
+          <li>\u2713 Brute force prevention</li>
+          <li>\u2713 Mobile-friendly UX</li>
+        </ul>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <a href="/admin/plugins/email" class="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all flex items-center gap-3">
+          <span class="text-2xl">\u{1F4EC}</span>
+          <div>
+            <div class="font-medium text-white">Email Settings</div>
+            <div class="text-sm text-zinc-400">Configure Resend API</div>
+          </div>
+        </a>
+        <a href="/admin/settings/general" class="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all flex items-center gap-3">
+          <span class="text-2xl">\u{1F3F7}\uFE0F</span>
+          <div>
+            <div class="font-medium text-white">Site Name</div>
+            <div class="text-sm text-zinc-400">Change "${siteName}"</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <script>
+      let testEmail = '';
+
+      document.getElementById('testOtpForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('testEmail').value;
+        testEmail = email;
+        const btn = document.getElementById('sendTestBtn');
+        const btnText = document.getElementById('sendBtnText');
+        const spinner = document.getElementById('sendBtnSpinner');
+        const result = document.getElementById('testResult');
+        const verifySection = document.getElementById('verifySection');
+
+        btn.disabled = true;
+        btnText.textContent = 'Sending...';
+        spinner.classList.remove('hidden');
+        result.classList.add('hidden');
+
+        try {
+          const response = await fetch('/auth/otp/request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            result.className = 'mt-4 rounded-lg p-4 bg-green-500/20 border border-green-500/30';
+            let html = '<p class="text-green-200"><strong>\u2705 Code sent!</strong> Check your inbox.</p>';
+            if (data.dev_code) {
+              html += '<p class="text-green-300 mt-2 font-mono text-lg">Dev code: <strong>' + data.dev_code + '</strong></p>';
+            }
+            result.innerHTML = html;
+            verifySection.classList.remove('hidden');
+          } else {
+            throw new Error(data.error || 'Failed to send code');
+          }
+        } catch (error) {
+          result.className = 'mt-4 rounded-lg p-4 bg-red-500/20 border border-red-500/30';
+          result.innerHTML = '<p class="text-red-200"><strong>\u274C Error:</strong> ' + error.message + '</p>';
+        } finally {
+          btn.disabled = false;
+          btnText.textContent = 'Send Test Code';
+          spinner.classList.add('hidden');
+          result.classList.remove('hidden');
+        }
+      });
+
+      document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const code = document.getElementById('otpCode').value;
+        const result = document.getElementById('verifyResult');
+
+        try {
+          const response = await fetch('/auth/otp/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: testEmail, code })
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            result.className = 'mt-4 rounded-lg p-4 bg-green-500/20 border border-green-500/30';
+            result.innerHTML = '<p class="text-green-200"><strong>\u2705 Verification successful!</strong> The OTP flow is working correctly.</p>';
+          } else {
+            throw new Error(data.error || 'Verification failed');
+          }
+        } catch (error) {
+          result.className = 'mt-4 rounded-lg p-4 bg-red-500/20 border border-red-500/30';
+          result.innerHTML = '<p class="text-red-200"><strong>\u274C Error:</strong> ' + error.message + '</p>';
+        } finally {
+          result.classList.remove('hidden');
+        }
+      });
+    </script>
+  `;
+}
+function renderEmailSettingsContent(plugin, settings) {
+  const apiKey = settings.apiKey || "";
+  const fromEmail = settings.fromEmail || "";
+  const fromName = settings.fromName || "";
+  const replyTo = settings.replyTo || "";
+  const logoUrl = settings.logoUrl || "";
+  return `
+    <div class="space-y-6">
+      <!-- Resend Configuration -->
+      <div class="backdrop-blur-md bg-white/5 rounded-xl border border-white/10 p-6">
+        <h3 class="text-lg font-semibold text-white mb-4">Resend Configuration</h3>
+
+        <form id="settings-form" class="space-y-4">
+          <!-- API Key -->
+          <div>
+            <label for="setting_apiKey" class="block text-sm font-medium text-gray-300 mb-2">
+              Resend API Key <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="password"
+              id="setting_apiKey"
+              name="setting_apiKey"
+              value="${escapeHtmlAttr(apiKey)}"
+              class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              placeholder="re_..."
+              required
+            />
+            <p class="text-xs text-gray-500 mt-1">
+              Get your API key from <a href="https://resend.com/api-keys" target="_blank" class="text-blue-400 hover:underline">resend.com/api-keys</a>
+            </p>
+          </div>
+
+          <!-- From Email -->
+          <div>
+            <label for="setting_fromEmail" class="block text-sm font-medium text-gray-300 mb-2">
+              From Email <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="email"
+              id="setting_fromEmail"
+              name="setting_fromEmail"
+              value="${escapeHtmlAttr(fromEmail)}"
+              class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              placeholder="noreply@yourdomain.com"
+              required
+            />
+            <p class="text-xs text-gray-500 mt-1">Must be a verified domain in Resend</p>
+          </div>
+
+          <!-- From Name -->
+          <div>
+            <label for="setting_fromName" class="block text-sm font-medium text-gray-300 mb-2">
+              From Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="setting_fromName"
+              name="setting_fromName"
+              value="${escapeHtmlAttr(fromName)}"
+              class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              placeholder="Your App Name"
+              required
+            />
+          </div>
+
+          <!-- Reply To -->
+          <div>
+            <label for="setting_replyTo" class="block text-sm font-medium text-gray-300 mb-2">
+              Reply-To Email
+            </label>
+            <input
+              type="email"
+              id="setting_replyTo"
+              name="setting_replyTo"
+              value="${escapeHtmlAttr(replyTo)}"
+              class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              placeholder="support@yourdomain.com"
+            />
+          </div>
+
+          <!-- Logo URL -->
+          <div>
+            <label for="setting_logoUrl" class="block text-sm font-medium text-gray-300 mb-2">
+              Logo URL
+            </label>
+            <input
+              type="url"
+              id="setting_logoUrl"
+              name="setting_logoUrl"
+              value="${escapeHtmlAttr(logoUrl)}"
+              class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              placeholder="https://yourdomain.com/logo.png"
+            />
+            <p class="text-xs text-gray-500 mt-1">Logo to display in email templates</p>
+          </div>
+        </form>
+      </div>
+
+      <!-- Test Email Section -->
+      <div class="backdrop-blur-md bg-white/5 rounded-xl border border-white/10 p-6">
+        <h3 class="text-lg font-semibold text-white mb-4">Send Test Email</h3>
+        <div class="flex gap-3">
+          <input
+            type="email"
+            id="testEmailAddress"
+            placeholder="Enter email address"
+            class="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+          />
+          <button
+            type="button"
+            id="testEmailBtn"
+            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all"
+          >
+            Send Test
+          </button>
+        </div>
+        <div id="testEmailResult" class="hidden mt-4 rounded-lg p-4"></div>
+      </div>
+
+      <!-- Info Card -->
+      <div class="backdrop-blur-md bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
+        <h3 class="font-semibold text-blue-400 mb-3">\u{1F4E7} Email Templates Included</h3>
+        <ul class="text-sm text-blue-200 space-y-2">
+          <li>\u2713 Registration confirmation</li>
+          <li>\u2713 Email verification</li>
+          <li>\u2713 Password reset</li>
+          <li>\u2713 One-time code (2FA)</li>
+        </ul>
+        <p class="text-xs text-blue-300 mt-4">
+          Templates are code-based and can be customized by editing the plugin files.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById('testEmailBtn').addEventListener('click', async () => {
+        const email = document.getElementById('testEmailAddress').value;
+        if (!email) {
+          alert('Please enter an email address');
+          return;
+        }
+
+        const resultEl = document.getElementById('testEmailResult');
+        resultEl.className = 'mt-4 rounded-lg p-4 bg-blue-500/20 border border-blue-500/30';
+        resultEl.innerHTML = '\u{1F4E7} Sending test email...';
+        resultEl.classList.remove('hidden');
+
+        try {
+          const response = await fetch('/admin/plugins/email/test', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ toEmail: email })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            resultEl.className = 'mt-4 rounded-lg p-4 bg-green-500/20 border border-green-500/30';
+            resultEl.innerHTML = '<p class="text-green-200">\u2705 ' + (data.message || 'Test email sent! Check your inbox.') + '</p>';
+          } else {
+            resultEl.className = 'mt-4 rounded-lg p-4 bg-red-500/20 border border-red-500/30';
+            resultEl.innerHTML = '<p class="text-red-200">\u274C ' + (data.error || 'Failed to send test email.') + '</p>';
+          }
+        } catch (error) {
+          resultEl.className = 'mt-4 rounded-lg p-4 bg-red-500/20 border border-red-500/30';
+          resultEl.innerHTML = '<p class="text-red-200">\u274C Network error. Please try again.</p>';
+        }
+      });
+    </script>
+  `;
+}
 
 // src/routes/admin-plugins.ts
 var adminPluginRoutes = new Hono();
@@ -15898,7 +16773,8 @@ adminPluginRoutes.get("/:id", async (c) => {
     const user = c.get("user");
     const db = c.env.DB;
     const pluginId = c.req.param("id");
-    if (pluginId === "ai-search") {
+    const pluginsWithCustomPages = ["ai-search"];
+    if (pluginsWithCustomPages.includes(pluginId)) {
       return c.text("", 404);
     }
     if (user?.role !== "admin") {
@@ -15910,6 +16786,36 @@ adminPluginRoutes.get("/:id", async (c) => {
       return c.text("Plugin not found", 404);
     }
     const activity = await pluginService.getPluginActivity(pluginId, 20);
+    let enrichedSettings = plugin.settings || {};
+    if (pluginId === "otp-login") {
+      const generalSettings = await db.prepare(`
+        SELECT value FROM settings WHERE key = 'general'
+      `).first();
+      let siteName = "SonicJS";
+      if (generalSettings?.value) {
+        try {
+          const parsed = JSON.parse(generalSettings.value);
+          siteName = parsed.siteName || "SonicJS";
+        } catch (e) {
+        }
+      }
+      const emailPlugin = await db.prepare(`
+        SELECT settings FROM plugins WHERE id = 'email'
+      `).first();
+      let emailConfigured = false;
+      if (emailPlugin?.settings) {
+        try {
+          const emailSettings = JSON.parse(emailPlugin.settings);
+          emailConfigured = !!(emailSettings.apiKey && emailSettings.fromEmail && emailSettings.fromName);
+        } catch (e) {
+        }
+      }
+      enrichedSettings = {
+        ...enrichedSettings,
+        siteName,
+        _emailConfigured: emailConfigured
+      };
+    }
     const templatePlugin = {
       id: plugin.id,
       name: plugin.name,
@@ -15926,7 +16832,7 @@ adminPluginRoutes.get("/:id", async (c) => {
       dependencies: plugin.dependencies,
       permissions: plugin.permissions,
       isCore: plugin.is_core,
-      settings: plugin.settings
+      settings: enrichedSettings
     };
     const templateActivity = (activity || []).map((item) => ({
       id: item.id,
@@ -18776,7 +19682,7 @@ function renderDashboardPage(data) {
         <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Welcome to your SonicJS AI admin dashboard</p>
       </div>
       <div class="mt-4 sm:mt-0 flex items-center gap-x-3">
-        <a href="https://sonicjs.com/installation" target="_blank" class="inline-flex items-center justify-center gap-x-1.5 rounded-lg bg-lime-600 dark:bg-lime-700 px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-lime-700 dark:hover:bg-lime-600 transition-colors shadow-sm">
+        <a href="https://sonicjs.com" target="_blank" class="inline-flex items-center justify-center gap-x-1.5 rounded-lg bg-lime-600 dark:bg-lime-700 px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-lime-700 dark:hover:bg-lime-600 transition-colors shadow-sm">
           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"/>
           </svg>
@@ -20113,6 +21019,7 @@ init_admin_layout_catalyst_template();
 function getFieldTypeBadge(fieldType) {
   const typeLabels = {
     "text": "Text",
+    "slug": "URL Slug",
     "richtext": "Rich Text (TinyMCE)",
     "quill": "Rich Text (Quill)",
     "mdxeditor": "EasyMDX",
@@ -20125,6 +21032,7 @@ function getFieldTypeBadge(fieldType) {
   };
   const typeColors = {
     "text": "bg-blue-500/10 dark:bg-blue-400/10 text-blue-700 dark:text-blue-300 ring-blue-500/20 dark:ring-blue-400/20",
+    "slug": "bg-sky-500/10 dark:bg-sky-400/10 text-sky-700 dark:text-sky-300 ring-sky-500/20 dark:ring-sky-400/20",
     "richtext": "bg-purple-500/10 dark:bg-purple-400/10 text-purple-700 dark:text-purple-300 ring-purple-500/20 dark:ring-purple-400/20",
     "quill": "bg-purple-500/10 dark:bg-purple-400/10 text-purple-700 dark:text-purple-300 ring-purple-500/20 dark:ring-purple-400/20",
     "mdxeditor": "bg-purple-500/10 dark:bg-purple-400/10 text-purple-700 dark:text-purple-300 ring-purple-500/20 dark:ring-purple-400/20",
@@ -20605,6 +21513,7 @@ function renderCollectionFormPage(data) {
               >
                 <option value="">Select field type...</option>
                 <option value="text">Text</option>
+                <option value="slug">URL Slug</option>
                 ${data.editorPlugins?.tinymce ? '<option value="richtext">Rich Text (TinyMCE)</option>' : ""}
                 ${data.editorPlugins?.quill ? '<option value="quill">Rich Text (Quill)</option>' : ""}
                 ${data.editorPlugins?.easyMdx ? '<option value="mdxeditor">EasyMDX</option>' : ""}
@@ -20964,6 +21873,9 @@ function renderCollectionFormPage(data) {
             case 'text':
               helpText.textContent = 'Single-line text input for short content';
               break;
+            case 'slug':
+              helpText.textContent = 'URL-friendly slug field, auto-generated from title';
+              break;
             case 'number':
               helpText.textContent = 'Numeric input field for integers or decimals';
               break;
@@ -21119,6 +22031,9 @@ function renderCollectionFormPage(data) {
           switch (this.value) {
             case 'text':
               helpText.textContent = 'Single-line text input for short content';
+              break;
+            case 'slug':
+              helpText.textContent = 'URL-friendly slug field, auto-generated from title';
               break;
             case 'number':
               helpText.textContent = 'Numeric input field for integers or decimals';
@@ -26252,6 +27167,565 @@ publicFormsRoutes.post("/:identifier/submit", async (c) => {
 });
 var public_forms_default = publicFormsRoutes;
 
+// src/templates/pages/admin-api-reference.template.ts
+init_admin_layout_catalyst_template();
+function renderAPIReferencePage(data) {
+  const endpointsByCategory = data.endpoints.reduce((acc, endpoint) => {
+    if (!acc[endpoint.category]) {
+      acc[endpoint.category] = [];
+    }
+    acc[endpoint.category].push(endpoint);
+    return acc;
+  }, {});
+  const categoryInfo = {
+    "Auth": {
+      title: "Authentication",
+      description: "User authentication and authorization endpoints",
+      icon: "\u{1F510}"
+    },
+    "Content": {
+      title: "Content Management",
+      description: "Content creation, retrieval, and management",
+      icon: "\u{1F4DD}"
+    },
+    "Media": {
+      title: "Media Management",
+      description: "File upload, storage, and media operations",
+      icon: "\u{1F5BC}\uFE0F"
+    },
+    "Admin": {
+      title: "Admin Interface",
+      description: "Administrative panel and management features",
+      icon: "\u2699\uFE0F"
+    },
+    "System": {
+      title: "System",
+      description: "Health checks and system information",
+      icon: "\u{1F527}"
+    }
+  };
+  const pageContent = `
+    <div class="space-y-6">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-2xl/8 font-semibold text-zinc-950 dark:text-white sm:text-xl/8">API Reference</h1>
+          <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Complete documentation of all available API endpoints</p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <a href="/api" target="_blank" class="inline-flex items-center justify-center gap-x-1.5 rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+            </svg>
+            OpenAPI Spec
+          </a>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 px-6 py-5">
+          <dt class="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">Total Endpoints</dt>
+          <dd class="mt-2 flex items-baseline gap-x-2">
+            <span class="text-4xl font-semibold tracking-tight text-zinc-950 dark:text-white">${data.endpoints.length}</span>
+          </dd>
+        </div>
+        <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 px-6 py-5">
+          <dt class="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">Public Endpoints</dt>
+          <dd class="mt-2 flex items-baseline gap-x-2">
+            <span class="text-4xl font-semibold tracking-tight text-lime-600 dark:text-lime-400">${data.endpoints.filter((e) => !e.authentication).length}</span>
+          </dd>
+        </div>
+        <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 px-6 py-5">
+          <dt class="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">Protected Endpoints</dt>
+          <dd class="mt-2 flex items-baseline gap-x-2">
+            <span class="text-4xl font-semibold tracking-tight text-amber-600 dark:text-amber-400">${data.endpoints.filter((e) => e.authentication).length}</span>
+          </dd>
+        </div>
+        <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 px-6 py-5">
+          <dt class="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">Categories</dt>
+          <dd class="mt-2 flex items-baseline gap-x-2">
+            <span class="text-4xl font-semibold tracking-tight text-cyan-600 dark:text-cyan-400">${Object.keys(endpointsByCategory).length}</span>
+          </dd>
+        </div>
+      </dl>
+
+      <!-- Filters -->
+      <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 overflow-hidden">
+        <div class="px-6 py-5">
+          <div class="flex flex-col sm:flex-row sm:items-end gap-4">
+            <div class="flex-1">
+              <label class="block text-sm/6 font-medium text-zinc-950 dark:text-white mb-2">Search</label>
+              <div class="relative">
+                <div class="absolute left-3 top-1/2 -translate-y-1/2">
+                  <svg class="h-5 w-5 text-zinc-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  id="endpoint-search"
+                  placeholder="Search by path or description..."
+                  class="w-full rounded-lg bg-white dark:bg-zinc-800 pl-10 pr-3 py-2 text-sm text-zinc-950 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-950 dark:focus:ring-white transition-shadow"
+                />
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm/6 font-medium text-zinc-950 dark:text-white mb-2">Method</label>
+              <div class="grid grid-cols-1">
+                <select
+                  id="method-filter"
+                  class="col-start-1 row-start-1 w-full appearance-none rounded-lg bg-white dark:bg-zinc-800 py-2 pl-3 pr-8 text-sm text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-zinc-950/10 dark:outline-white/10 *:bg-white dark:*:bg-zinc-800 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-950 dark:focus:outline-white min-w-[180px]"
+                >
+                  <option value="">All Methods</option>
+                  <option value="GET">GET</option>
+                  <option value="POST">POST</option>
+                  <option value="PUT">PUT</option>
+                  <option value="PATCH">PATCH</option>
+                  <option value="DELETE">DELETE</option>
+                </select>
+                <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-zinc-500 dark:text-zinc-400 sm:size-4">
+                  <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+                </svg>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm/6 font-medium text-zinc-950 dark:text-white mb-2">Category</label>
+              <div class="grid grid-cols-1">
+                <select
+                  id="category-filter"
+                  class="col-start-1 row-start-1 w-full appearance-none rounded-lg bg-white dark:bg-zinc-800 py-2 pl-3 pr-8 text-sm text-zinc-950 dark:text-white outline outline-1 -outline-offset-1 outline-zinc-950/10 dark:outline-white/10 *:bg-white dark:*:bg-zinc-800 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-950 dark:focus:outline-white min-w-[200px]"
+                >
+                  <option value="">All Categories</option>
+                  ${Object.keys(categoryInfo).map((category) => `
+                    <option value="${category}">${categoryInfo[category].title}</option>
+                  `).join("")}
+                </select>
+                <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-zinc-500 dark:text-zinc-400 sm:size-4">
+                  <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Categories -->
+      <div class="space-y-6">
+        ${Object.entries(endpointsByCategory).map(([category, endpoints]) => {
+    const info = categoryInfo[category] || { title: category, description: "", icon: "\u{1F4CB}" };
+    return `
+            <div class="api-category" data-category="${category}">
+              <div class="rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 overflow-hidden">
+                <!-- Category Header -->
+                <div class="bg-zinc-50 dark:bg-zinc-800/50 px-6 py-4 border-b border-zinc-950/5 dark:border-white/10">
+                  <div class="flex items-center">
+                    <span class="text-2xl mr-3">${info.icon}</span>
+                    <div>
+                      <h2 class="text-lg font-semibold text-zinc-950 dark:text-white">${info.title}</h2>
+                      <p class="text-sm text-zinc-500 dark:text-zinc-400">${info.description}</p>
+                    </div>
+                    <div class="ml-auto">
+                      <span class="inline-flex items-center rounded-md bg-cyan-50 dark:bg-cyan-500/10 px-2.5 py-1 text-sm font-medium text-cyan-700 dark:text-cyan-300 ring-1 ring-inset ring-cyan-700/10 dark:ring-cyan-400/20">
+                        ${endpoints.length} endpoint${endpoints.length !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Endpoints List -->
+                <div class="divide-y divide-zinc-950/5 dark:divide-white/10">
+                  ${endpoints.map((endpoint) => `
+                    <div class="api-endpoint p-6 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer"
+                         data-method="${endpoint.method}"
+                         data-path="${endpoint.path}"
+                         data-description="${endpoint.description}">
+                      <div class="flex items-start gap-x-4">
+                        <span class="method-badge method-${endpoint.method.toLowerCase()} shrink-0 px-3 py-1 rounded-md text-xs font-mono font-bold uppercase">
+                          ${endpoint.method}
+                        </span>
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center gap-x-2 mb-2">
+                            <code class="text-zinc-950 dark:text-white text-sm font-mono font-medium break-all">${endpoint.path}</code>
+                            ${endpoint.authentication ? `
+                              <span class="shrink-0 inline-flex items-center gap-x-1 rounded-md bg-amber-50 dark:bg-amber-500/10 px-2 py-1 text-xs font-medium text-amber-700 dark:text-amber-300 ring-1 ring-inset ring-amber-700/10 dark:ring-amber-400/20">
+                                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                                Auth
+                              </span>
+                            ` : `
+                              <span class="shrink-0 inline-flex items-center gap-x-1 rounded-md bg-lime-50 dark:bg-lime-500/10 px-2 py-1 text-xs font-medium text-lime-700 dark:text-lime-300 ring-1 ring-inset ring-lime-700/10 dark:ring-lime-400/20">
+                                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Public
+                              </span>
+                            `}
+                          </div>
+                          <p class="text-zinc-600 dark:text-zinc-400 text-sm leading-6">${endpoint.description}</p>
+                        </div>
+                      </div>
+                    </div>
+                  `).join("")}
+                </div>
+              </div>
+            </div>
+          `;
+  }).join("")}
+      </div>
+
+      <!-- No Results Message -->
+      <div id="no-results" class="hidden rounded-lg bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-950/5 dark:ring-white/10 p-12 text-center">
+        <svg class="mx-auto h-12 w-12 text-zinc-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <h3 class="mt-4 text-base/7 font-semibold text-zinc-950 dark:text-white">No endpoints found</h3>
+        <p class="mt-2 text-sm/6 text-zinc-500 dark:text-zinc-400">Try adjusting your search or filter criteria</p>
+      </div>
+    </div>
+
+    <style>
+      .method-badge {
+        min-width: 60px;
+        text-align: center;
+      }
+      .method-get {
+        background-color: rgb(34 197 94);
+        color: white;
+      }
+      .method-post {
+        background-color: rgb(59 130 246);
+        color: white;
+      }
+      .method-put {
+        background-color: rgb(251 146 60);
+        color: white;
+      }
+      .method-patch {
+        background-color: rgb(168 85 247);
+        color: white;
+      }
+      .method-delete {
+        background-color: rgb(244 63 94);
+        color: white;
+      }
+    </style>
+
+    <script>
+      // Filter functionality
+      const searchInput = document.getElementById('endpoint-search');
+      const methodFilter = document.getElementById('method-filter');
+      const categoryFilter = document.getElementById('category-filter');
+      const noResultsDiv = document.getElementById('no-results');
+
+      function filterEndpoints() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedMethod = methodFilter.value;
+        const selectedCategory = categoryFilter.value;
+
+        const categories = document.querySelectorAll('.api-category');
+        let visibleEndpoints = 0;
+
+        categories.forEach(category => {
+          const categoryName = category.dataset.category;
+          const endpoints = category.querySelectorAll('.api-endpoint');
+          let visibleInCategory = 0;
+
+          // Check if category should be visible
+          const categoryVisible = !selectedCategory || categoryName === selectedCategory;
+
+          if (categoryVisible) {
+            endpoints.forEach(endpoint => {
+              const method = endpoint.dataset.method;
+              const path = endpoint.dataset.path.toLowerCase();
+              const description = endpoint.dataset.description.toLowerCase();
+
+              const matchesSearch = !searchTerm || 
+                path.includes(searchTerm) || 
+                description.includes(searchTerm);
+              const matchesMethod = !selectedMethod || method === selectedMethod;
+
+              if (matchesSearch && matchesMethod) {
+                endpoint.style.display = 'block';
+                visibleInCategory++;
+                visibleEndpoints++;
+              } else {
+                endpoint.style.display = 'none';
+              }
+            });
+
+            category.style.display = visibleInCategory > 0 ? 'block' : 'none';
+          } else {
+            category.style.display = 'none';
+          }
+        });
+
+        // Show/hide no results message
+        noResultsDiv.style.display = visibleEndpoints === 0 ? 'block' : 'none';
+      }
+
+      // Attach event listeners
+      searchInput.addEventListener('input', filterEndpoints);
+      methodFilter.addEventListener('change', filterEndpoints);
+      categoryFilter.addEventListener('change', filterEndpoints);
+
+      // Copy endpoint path to clipboard
+      document.addEventListener('click', function(e) {
+        const endpoint = e.target.closest('.api-endpoint');
+        if (endpoint && e.target.tagName === 'CODE') {
+          const path = endpoint.dataset.path;
+          navigator.clipboard.writeText(path).then(() => {
+            // Show temporary notification
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 rounded-lg bg-lime-500 px-4 py-3 shadow-lg ring-1 ring-lime-600/20 z-50';
+            notification.innerHTML = '<div class="flex items-center gap-x-2"><svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p class="text-sm font-medium text-white">Path copied to clipboard!</p></div>';
+            document.body.appendChild(notification);
+            setTimeout(() => document.body.removeChild(notification), 2000);
+          });
+        }
+      });
+    </script>
+  `;
+  const layoutData = {
+    title: "API Reference",
+    pageTitle: "API Reference",
+    currentPath: "/admin/api-reference",
+    user: data.user,
+    version: data.version,
+    content: pageContent
+  };
+  return renderAdminLayoutCatalyst(layoutData);
+}
+
+// src/routes/admin-api-reference.ts
+var VERSION2 = getCoreVersion();
+var router2 = new Hono();
+router2.use("*", requireAuth());
+var apiEndpoints = [
+  // Auth endpoints
+  {
+    method: "POST",
+    path: "/auth/login",
+    description: "Authenticate user with email and password",
+    authentication: false,
+    category: "Auth"
+  },
+  {
+    method: "POST",
+    path: "/auth/register",
+    description: "Register a new user account",
+    authentication: false,
+    category: "Auth"
+  },
+  {
+    method: "POST",
+    path: "/auth/logout",
+    description: "Log out the current user and invalidate session",
+    authentication: true,
+    category: "Auth"
+  },
+  {
+    method: "GET",
+    path: "/auth/me",
+    description: "Get current authenticated user information",
+    authentication: true,
+    category: "Auth"
+  },
+  {
+    method: "POST",
+    path: "/auth/refresh",
+    description: "Refresh authentication token",
+    authentication: true,
+    category: "Auth"
+  },
+  // Content endpoints
+  {
+    method: "GET",
+    path: "/api/collections",
+    description: "List all available collections",
+    authentication: false,
+    category: "Content"
+  },
+  {
+    method: "GET",
+    path: "/api/collections/:collection/content",
+    description: "Get all content items from a specific collection",
+    authentication: false,
+    category: "Content"
+  },
+  {
+    method: "GET",
+    path: "/api/content/:id",
+    description: "Get a specific content item by ID",
+    authentication: false,
+    category: "Content"
+  },
+  {
+    method: "POST",
+    path: "/api/content",
+    description: "Create a new content item",
+    authentication: true,
+    category: "Content"
+  },
+  {
+    method: "PUT",
+    path: "/api/content/:id",
+    description: "Update an existing content item",
+    authentication: true,
+    category: "Content"
+  },
+  {
+    method: "DELETE",
+    path: "/api/content/:id",
+    description: "Delete a content item",
+    authentication: true,
+    category: "Content"
+  },
+  // Media endpoints
+  {
+    method: "GET",
+    path: "/api/media",
+    description: "List all media files with pagination",
+    authentication: false,
+    category: "Media"
+  },
+  {
+    method: "GET",
+    path: "/api/media/:id",
+    description: "Get a specific media file by ID",
+    authentication: false,
+    category: "Media"
+  },
+  {
+    method: "POST",
+    path: "/api/media/upload",
+    description: "Upload a new media file to R2 storage",
+    authentication: true,
+    category: "Media"
+  },
+  {
+    method: "DELETE",
+    path: "/api/media/:id",
+    description: "Delete a media file from storage",
+    authentication: true,
+    category: "Media"
+  },
+  // Admin endpoints
+  {
+    method: "GET",
+    path: "/admin/api/stats",
+    description: "Get dashboard statistics (collections, content, media, users)",
+    authentication: true,
+    category: "Admin"
+  },
+  {
+    method: "GET",
+    path: "/admin/api/storage",
+    description: "Get storage usage information",
+    authentication: true,
+    category: "Admin"
+  },
+  {
+    method: "GET",
+    path: "/admin/api/activity",
+    description: "Get recent activity logs",
+    authentication: true,
+    category: "Admin"
+  },
+  {
+    method: "GET",
+    path: "/admin/api/collections",
+    description: "List all collections with field counts",
+    authentication: true,
+    category: "Admin"
+  },
+  {
+    method: "POST",
+    path: "/admin/api/collections",
+    description: "Create a new collection",
+    authentication: true,
+    category: "Admin"
+  },
+  {
+    method: "PATCH",
+    path: "/admin/api/collections/:id",
+    description: "Update an existing collection",
+    authentication: true,
+    category: "Admin"
+  },
+  {
+    method: "DELETE",
+    path: "/admin/api/collections/:id",
+    description: "Delete a collection (must be empty)",
+    authentication: true,
+    category: "Admin"
+  },
+  {
+    method: "GET",
+    path: "/admin/api/migrations/status",
+    description: "Get database migration status",
+    authentication: true,
+    category: "Admin"
+  },
+  {
+    method: "POST",
+    path: "/admin/api/migrations/run",
+    description: "Run pending database migrations",
+    authentication: true,
+    category: "Admin"
+  },
+  // System endpoints
+  {
+    method: "GET",
+    path: "/health",
+    description: "Health check endpoint for monitoring",
+    authentication: false,
+    category: "System"
+  },
+  {
+    method: "GET",
+    path: "/api/health",
+    description: "API health check with schema information",
+    authentication: false,
+    category: "System"
+  },
+  {
+    method: "GET",
+    path: "/api",
+    description: "API root - returns API information and OpenAPI spec",
+    authentication: false,
+    category: "System"
+  }
+];
+router2.get("/", async (c) => {
+  const user = c.get("user");
+  try {
+    const pageData = {
+      endpoints: apiEndpoints,
+      user: user ? {
+        name: user.email.split("@")[0] || user.email,
+        email: user.email,
+        role: user.role
+      } : void 0,
+      version: VERSION2
+    };
+    return c.html(renderAPIReferencePage(pageData));
+  } catch (error) {
+    console.error("API Reference page error:", error);
+    const pageData = {
+      endpoints: [],
+      user: user ? {
+        name: user.email,
+        email: user.email,
+        role: user.role
+      } : void 0,
+      version: VERSION2
+    };
+    return c.html(renderAPIReferencePage(pageData));
+  }
+});
+
 // src/routes/index.ts
 var ROUTES_INFO = {
   message: "Core routes available",
@@ -26276,12 +27750,13 @@ var ROUTES_INFO = {
     "adminCollectionsRoutes",
     "adminSettingsRoutes",
     "adminFormsRoutes",
-    "publicFormsRoutes"
+    "publicFormsRoutes",
+    "adminApiReferenceRoutes"
   ],
   status: "Core package routes ready",
   reference: "https://github.com/sonicjs/sonicjs"
 };
 
-export { ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminFormsRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, getConfirmationDialogScript2 as getConfirmationDialogScript, public_forms_default, renderConfirmationDialog2 as renderConfirmationDialog, router, test_cleanup_default, userRoutes };
-//# sourceMappingURL=chunk-4LTRAQHZ.js.map
-//# sourceMappingURL=chunk-4LTRAQHZ.js.map
+export { ROUTES_INFO, adminCheckboxRoutes, adminCollectionsRoutes, adminDesignRoutes, adminFormsRoutes, adminLogsRoutes, adminMediaRoutes, adminPluginRoutes, adminSettingsRoutes, admin_api_default, admin_code_examples_default, admin_content_default, admin_testimonials_default, api_content_crud_default, api_default, api_media_default, api_system_default, auth_default, getConfirmationDialogScript2 as getConfirmationDialogScript, public_forms_default, renderConfirmationDialog2 as renderConfirmationDialog, router, router2, test_cleanup_default, userRoutes };
+//# sourceMappingURL=chunk-7Y2MKZTE.js.map
+//# sourceMappingURL=chunk-7Y2MKZTE.js.map
