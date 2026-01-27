@@ -21,13 +21,16 @@ test.describe('API Endpoints', () => {
     expect(response.ok()).toBeTruthy();
 
     const apiInfo = await response.json();
-    expect(apiInfo).toHaveProperty('name', 'SonicJS API');
-    expect(apiInfo).toHaveProperty('version');
-    expect(apiInfo).toHaveProperty('description');
-    expect(apiInfo).toHaveProperty('endpoints');
-    expect(apiInfo.endpoints).toHaveProperty('health');
-    expect(apiInfo.endpoints).toHaveProperty('collections');
-    expect(apiInfo.endpoints).toHaveProperty('content');
+    // API returns OpenAPI 3.0.0 specification
+    expect(apiInfo).toHaveProperty('openapi', '3.0.0');
+    expect(apiInfo).toHaveProperty('info');
+    expect(apiInfo.info).toHaveProperty('title', 'SonicJS AI API');
+    expect(apiInfo.info).toHaveProperty('version');
+    expect(apiInfo.info).toHaveProperty('description');
+    expect(apiInfo).toHaveProperty('paths');
+    expect(apiInfo.paths).toHaveProperty('/api/health');
+    expect(apiInfo.paths).toHaveProperty('/api/collections');
+    expect(apiInfo.paths).toHaveProperty('/api/content');
   });
 
   test('should require authentication for admin API', async ({ request }) => {
