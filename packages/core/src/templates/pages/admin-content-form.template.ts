@@ -860,20 +860,6 @@ export function renderContentFormPage(data: ContentFormData): string {
           const input = container.querySelector('input[type="hidden"]');
           const collections = getReferenceCollections(container);
           if (!input || collections.length === 0) return;
-          const trigger = container.querySelector('[data-reference-trigger]');
-          if (trigger) {
-            const openSelector = (event) => {
-              if (container.dataset.referenceEnabled !== 'true') return;
-              if (event?.type === 'keydown') {
-                const key = event.key;
-                if (key !== 'Enter' && key !== ' ') return;
-                event.preventDefault();
-              }
-              openReferenceSelector(input.id);
-            };
-            trigger.addEventListener('click', openSelector);
-            trigger.addEventListener('keydown', openSelector);
-          }
 
           if (!input.value) {
             renderReferenceDisplay(container, null, 'No reference selected.');
@@ -887,6 +873,28 @@ export function renderContentFormPage(data: ContentFormData): string {
             renderReferenceDisplay(container, null, 'Reference not found.');
           }
         });
+      });
+
+      document.addEventListener('click', (event) => {
+        const trigger = event.target.closest('[data-reference-trigger]');
+        if (!trigger) return;
+        const container = trigger.closest('[data-reference-field]');
+        if (!container || container.dataset.referenceEnabled !== 'true') return;
+        const input = container.querySelector('input[type="hidden"]');
+        if (!input) return;
+        openReferenceSelector(input.id);
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        const trigger = event.target.closest('[data-reference-trigger]');
+        if (!trigger) return;
+        const container = trigger.closest('[data-reference-field]');
+        if (!container || container.dataset.referenceEnabled !== 'true') return;
+        const input = container.querySelector('input[type="hidden"]');
+        if (!input) return;
+        event.preventDefault();
+        openReferenceSelector(input.id);
       });
 
       // Custom select options
