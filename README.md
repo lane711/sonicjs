@@ -3,7 +3,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/lane711/sonicjs?style=social)](https://github.com/lane711/sonicjs)
 [![npm downloads](https://img.shields.io/npm/dm/@sonicjs-cms/core.svg)](https://www.npmjs.com/package/@sonicjs-cms/core)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/m/lane711/sonicjs)](https://github.com/lane711/sonicjs/commits)
-[![Discord](https://img.shields.io/discord/1149853789832142908?label=Discord&logo=discord)](https://discord.gg/8bMy6bv3sZ)
+[![Discord](https://img.shields.io/badge/Discord-Join%20Us-5865F2?logo=discord&logoColor=white)](https://discord.gg/8bMy6bv3sZ)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
