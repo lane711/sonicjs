@@ -646,29 +646,27 @@ export const productsCollection: CollectionConfig = {
 ```bash
 # Collections are auto-synced on server restart
 npm run dev
-
-# Or manually sync
-npm run sync-collections
 ```
 
 ## Available Scripts
+
+These are the scripts available in your SonicJS application.
 
 ### Development
 
 | Command | Description |
 |---------|-------------|
 | `npm run dev` | Start development server with Wrangler |
-| `npm run build` | TypeScript compilation + dry-run deploy |
 | `npm run deploy` | Deploy to Cloudflare Workers |
-| `npm run predeploy` | Run tests + build before deploy |
+| `npm run type-check` | Run TypeScript type checking |
 
 ### Database
 
 | Command | Description |
 |---------|-------------|
-| `npm run db:generate` | Generate migration files from schema changes |
-| `npm run db:migrate` | Apply migrations to local D1 database |
-| `npm run db:migrate:prod` | Apply migrations to production database |
+| `npm run db:migrate:local` | Apply migrations to local D1 database |
+| `npm run db:migrate` | Apply migrations to remote D1 database |
+| `npm run db:reset` | Reset and reinitialize local database |
 | `npm run db:studio` | Open Drizzle Studio (database GUI) |
 
 ### Testing
@@ -677,18 +675,69 @@ npm run sync-collections
 |---------|-------------|
 | `npm test` | Run Vitest unit tests |
 | `npm run test:watch` | Run tests in watch mode |
-| `npm run test:cov` | Run tests with coverage report |
-| `npm run test:cov:ui` | Run tests with coverage UI |
-| `npm run test:e2e` | Run Playwright E2E tests |
-| `npm run test:e2e:ui` | Run E2E tests with UI mode |
 
-### Utilities
+### Updates
 
 | Command | Description |
 |---------|-------------|
-| `npm run plugins:generate` | Regenerate plugin registry from manifests |
-| `npm run plugins:watch` | Watch plugin manifests and auto-regenerate |
-| `npm run sonicjs` | Run SonicJS CLI commands |
+| `npm run update` | Update @sonicjs-cms/core to latest version |
+| `npm run update:beta` | Update to latest beta version |
+
+## Monorepo Scripts (Contributors)
+
+If you're contributing to SonicJS and working in the monorepo, these additional scripts are available at the root level.
+
+### Setup
+
+| Command | Description |
+|---------|-------------|
+| `npm run workspace` | Fresh workspace setup (install deps + reset database) |
+| `npm run db:reset` | Reset the local development database |
+| `npm run kill` | Kill workerd process and restart dev server |
+
+### Development
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Run the demo app (my-sonicjs-app) |
+| `npm run dev:www` | Run the documentation website locally |
+| `npm run build` | Build core package and demo app |
+| `npm run build:core` | Build only the core package |
+| `npm run build:www` | Build the documentation website |
+
+### Testing
+
+| Command | Description |
+|---------|-------------|
+| `npm test` | Run unit tests |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:cov` | Run tests with coverage report |
+| `npm run e2e` | Run Playwright E2E tests |
+| `npm run e2e:ui` | Run E2E tests with UI mode |
+| `npm run e2e:smoke` | Run smoke tests |
+| `npm run type-check` | Run TypeScript type checking |
+| `npm run lint` | Run linting (alias for type-check) |
+
+### Publishing
+
+| Command | Description |
+|---------|-------------|
+| `npm run version:patch` | Bump patch version |
+| `npm run version:minor` | Bump minor version |
+| `npm run version:major` | Bump major version |
+| `npm run publish:core` | Build and publish core package |
+| `npm run publish:create-app` | Publish create-sonicjs CLI |
+| `npm run publish:all` | Publish all packages |
+| `npm run release:patch` | Version bump + publish + announce |
+| `npm run release:minor` | Version bump + publish + announce |
+| `npm run release:major` | Version bump + publish + announce |
+
+### Deployment
+
+| Command | Description |
+|---------|-------------|
+| `npm run deploy` | Deploy demo app to Cloudflare Workers |
+| `npm run deploy:www` | Deploy documentation website |
 
 ## Troubleshooting
 
