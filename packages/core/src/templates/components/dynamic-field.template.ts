@@ -586,29 +586,38 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
       const hasReferenceCollection = referenceCollections.length > 0
       const hasReferenceValue = Boolean(value)
       fieldHTML = `
-        <div class="reference-field-container space-y-3" data-reference-field data-field-name="${escapeHtml(fieldName)}" data-reference-collection="${escapeHtml(referenceCollections[0] || '')}" data-reference-collections="${escapeHtml(referenceCollectionsAttr)}">
+        <div class="reference-field-container" data-reference-field data-field-name="${escapeHtml(fieldName)}" data-reference-collection="${escapeHtml(referenceCollections[0] || '')}" data-reference-collections="${escapeHtml(referenceCollectionsAttr)}" data-reference-enabled="${hasReferenceCollection ? 'true' : 'false'}">
           <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml(value)}">
-          <div class="rounded-lg border border-zinc-200 bg-white/60 px-3 py-2 text-sm text-zinc-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300" data-reference-display>
-            ${hasReferenceCollection ? (hasReferenceValue ? 'Loading selection...' : 'No reference selected.') : 'Reference collection not configured.'}
-          </div>
-          <div class="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onclick="openReferenceSelector('${fieldId}')"
-              class="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-white/10 dark:hover:bg-white/20"
-              ${hasReferenceCollection ? '' : 'disabled'}
+          <div class="flex flex-wrap items-start gap-2">
+            <div
+              class="min-w-[220px] flex-1 rounded-lg border border-zinc-200 bg-white/60 px-3 py-2 text-sm text-zinc-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 ${hasReferenceCollection ? 'cursor-pointer hover:border-zinc-300 dark:hover:border-white/20' : 'cursor-not-allowed opacity-80'}"
+              data-reference-display
+              data-reference-trigger
+              role="button"
+              tabindex="${hasReferenceCollection ? '0' : '-1'}"
+              aria-disabled="${hasReferenceCollection ? 'false' : 'true'}"
             >
-              Select reference
-            </button>
-            <button
-              type="button"
-              onclick="clearReferenceField('${fieldId}')"
-              class="inline-flex items-center justify-center rounded-lg border border-zinc-200 px-3 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/10"
-              data-reference-clear
-              ${hasReferenceValue ? '' : 'disabled'}
-            >
-              Remove
-            </button>
+              ${hasReferenceCollection ? (hasReferenceValue ? 'Loading selection...' : 'No reference selected.') : 'Reference collection not configured.'}
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onclick="openReferenceSelector('${fieldId}')"
+                class="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-white/10 dark:hover:bg-white/20"
+                ${hasReferenceCollection ? '' : 'disabled'}
+              >
+                Select reference
+              </button>
+              <button
+                type="button"
+                onclick="clearReferenceField('${fieldId}')"
+                class="inline-flex items-center justify-center rounded-lg border border-zinc-200 px-3 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 dark:border-white/10 dark:text-zinc-200 dark:hover:bg-white/10"
+                data-reference-clear
+                ${hasReferenceValue ? '' : 'disabled'}
+              >
+                Remove
+              </button>
+            </div>
           </div>
         </div>
       `
@@ -717,12 +726,16 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
       `
   }
   
+  const showLabel = field.field_type !== 'boolean'
+
   return `
     <div class="form-group">
+      ${showLabel ? `
       <label for="${fieldId}" class="block text-sm/6 font-medium text-zinc-950 dark:text-white mb-2">
         ${escapeHtml(field.field_label)}
         ${field.is_required ? '<span class="text-pink-600 dark:text-pink-400 ml-1">*</span>' : ''}
       </label>
+      ` : ''}
       ${fieldHTML}
       ${errors.length > 0 ? `
         <div class="mt-2 text-sm text-pink-600 dark:text-pink-400">
@@ -969,7 +982,7 @@ function renderStructuredArrayItem(
           </button>
           <button type="button" data-action="remove-item" class="inline-flex items-center gap-x-1 px-2.5 py-1.5 text-xs font-medium text-pink-700 dark:text-pink-300 hover:bg-pink-50 dark:hover:bg-pink-900/20 rounded-lg transition-colors">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 0 00-7.5 0"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
             </svg>
             Delete item
           </button>
