@@ -53,20 +53,399 @@ function addTimingMeta(c: any, meta: any = {}, executionStartTime?: number) {
   }
 }
 
-// Root endpoint - API info
+// Root endpoint - OpenAPI 3.0.0 specification
 apiRoutes.get('/', (c) => {
+  const baseUrl = new URL(c.req.url)
+  const serverUrl = `${baseUrl.protocol}//${baseUrl.host}`
+
   return c.json({
-    name: 'SonicJS API',
-    version: '2.0.0',
-    description: 'RESTful API for SonicJS headless CMS',
-    endpoints: {
-      health: '/api/health',
-      collections: '/api/collections',
-      content: '/api/content',
-      contentById: '/api/content/:id',
-      collectionContent: '/api/collections/:collection/content'
+    openapi: '3.0.0',
+    info: {
+      title: 'SonicJS AI API',
+      version: '0.1.0',
+      description: 'RESTful API for SonicJS headless CMS - a modern, AI-powered content management system built on Cloudflare Workers',
+      contact: {
+        name: 'SonicJS Support',
+        url: `${serverUrl}/docs`,
+        email: 'support@sonicjs.com'
+      },
+      license: {
+        name: 'MIT',
+        url: 'https://opensource.org/licenses/MIT'
+      }
     },
-    documentation: '/docs'
+    servers: [
+      {
+        url: serverUrl,
+        description: 'Current server'
+      }
+    ],
+    paths: {
+      '/api/': {
+        get: {
+          summary: 'API Information',
+          description: 'Returns OpenAPI specification for the SonicJS API',
+          operationId: 'getApiInfo',
+          tags: ['System'],
+          responses: {
+            '200': {
+              description: 'OpenAPI specification',
+              content: {
+                'application/json': {
+                  schema: { type: 'object' }
+                }
+              }
+            }
+          }
+        }
+      },
+      '/api/health': {
+        get: {
+          summary: 'Health Check',
+          description: 'Returns API health status and available schemas',
+          operationId: 'getHealth',
+          tags: ['System'],
+          responses: {
+            '200': {
+              description: 'Health status',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      status: { type: 'string', example: 'healthy' },
+                      timestamp: { type: 'string', format: 'date-time' },
+                      schemas: { type: 'array', items: { type: 'string' } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      '/api/collections': {
+        get: {
+          summary: 'List Collections',
+          description: 'Returns all active collections with their schemas',
+          operationId: 'getCollections',
+          tags: ['Content'],
+          responses: {
+            '200': {
+              description: 'List of collections',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      data: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            id: { type: 'string' },
+                            name: { type: 'string' },
+                            display_name: { type: 'string' },
+                            schema: { type: 'object' },
+                            is_active: { type: 'integer' }
+                          }
+                        }
+                      },
+                      meta: { type: 'object' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      '/api/collections/{collection}/content': {
+        get: {
+          summary: 'Get Collection Content',
+          description: 'Returns content items from a specific collection with filtering support',
+          operationId: 'getCollectionContent',
+          tags: ['Content'],
+          parameters: [
+            {
+              name: 'collection',
+              in: 'path',
+              required: true,
+              schema: { type: 'string' },
+              description: 'Collection name'
+            },
+            {
+              name: 'limit',
+              in: 'query',
+              schema: { type: 'integer', default: 50, maximum: 1000 },
+              description: 'Maximum number of items to return'
+            },
+            {
+              name: 'offset',
+              in: 'query',
+              schema: { type: 'integer', default: 0 },
+              description: 'Number of items to skip'
+            },
+            {
+              name: 'status',
+              in: 'query',
+              schema: { type: 'string', enum: ['draft', 'published', 'archived'] },
+              description: 'Filter by content status'
+            }
+          ],
+          responses: {
+            '200': {
+              description: 'List of content items',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      data: { type: 'array', items: { type: 'object' } },
+                      meta: { type: 'object' }
+                    }
+                  }
+                }
+              }
+            },
+            '404': {
+              description: 'Collection not found'
+            }
+          }
+        }
+      },
+      '/api/content': {
+        get: {
+          summary: 'List Content',
+          description: 'Returns content items with advanced filtering support',
+          operationId: 'getContent',
+          tags: ['Content'],
+          parameters: [
+            {
+              name: 'collection',
+              in: 'query',
+              schema: { type: 'string' },
+              description: 'Filter by collection name'
+            },
+            {
+              name: 'limit',
+              in: 'query',
+              schema: { type: 'integer', default: 50, maximum: 1000 },
+              description: 'Maximum number of items to return'
+            },
+            {
+              name: 'offset',
+              in: 'query',
+              schema: { type: 'integer', default: 0 },
+              description: 'Number of items to skip'
+            }
+          ],
+          responses: {
+            '200': {
+              description: 'List of content items',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      data: { type: 'array', items: { type: 'object' } },
+                      meta: { type: 'object' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        post: {
+          summary: 'Create Content',
+          description: 'Creates a new content item',
+          operationId: 'createContent',
+          tags: ['Content'],
+          security: [{ bearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['collection_id', 'title'],
+                  properties: {
+                    collection_id: { type: 'string' },
+                    title: { type: 'string' },
+                    slug: { type: 'string' },
+                    status: { type: 'string', enum: ['draft', 'published', 'archived'] },
+                    data: { type: 'object' }
+                  }
+                }
+              }
+            }
+          },
+          responses: {
+            '201': { description: 'Content created successfully' },
+            '400': { description: 'Invalid request body' },
+            '401': { description: 'Unauthorized' }
+          }
+        }
+      },
+      '/api/content/{id}': {
+        get: {
+          summary: 'Get Content by ID',
+          description: 'Returns a specific content item by ID',
+          operationId: 'getContentById',
+          tags: ['Content'],
+          parameters: [
+            {
+              name: 'id',
+              in: 'path',
+              required: true,
+              schema: { type: 'string' },
+              description: 'Content item ID'
+            }
+          ],
+          responses: {
+            '200': { description: 'Content item' },
+            '404': { description: 'Content not found' }
+          }
+        },
+        put: {
+          summary: 'Update Content',
+          description: 'Updates an existing content item',
+          operationId: 'updateContent',
+          tags: ['Content'],
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            {
+              name: 'id',
+              in: 'path',
+              required: true,
+              schema: { type: 'string' },
+              description: 'Content item ID'
+            }
+          ],
+          responses: {
+            '200': { description: 'Content updated successfully' },
+            '401': { description: 'Unauthorized' },
+            '404': { description: 'Content not found' }
+          }
+        },
+        delete: {
+          summary: 'Delete Content',
+          description: 'Deletes a content item',
+          operationId: 'deleteContent',
+          tags: ['Content'],
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            {
+              name: 'id',
+              in: 'path',
+              required: true,
+              schema: { type: 'string' },
+              description: 'Content item ID'
+            }
+          ],
+          responses: {
+            '200': { description: 'Content deleted successfully' },
+            '401': { description: 'Unauthorized' },
+            '404': { description: 'Content not found' }
+          }
+        }
+      },
+      '/api/media': {
+        get: {
+          summary: 'List Media',
+          description: 'Returns all media files with pagination',
+          operationId: 'getMedia',
+          tags: ['Media'],
+          responses: {
+            '200': { description: 'List of media files' }
+          }
+        }
+      },
+      '/api/media/upload': {
+        post: {
+          summary: 'Upload Media',
+          description: 'Uploads a new media file to R2 storage',
+          operationId: 'uploadMedia',
+          tags: ['Media'],
+          security: [{ bearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              'multipart/form-data': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    file: { type: 'string', format: 'binary' }
+                  }
+                }
+              }
+            }
+          },
+          responses: {
+            '201': { description: 'Media uploaded successfully' },
+            '401': { description: 'Unauthorized' }
+          }
+        }
+      }
+    },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      },
+      schemas: {
+        Content: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            title: { type: 'string' },
+            slug: { type: 'string' },
+            status: { type: 'string', enum: ['draft', 'published', 'archived'] },
+            collectionId: { type: 'string', format: 'uuid' },
+            data: { type: 'object' },
+            created_at: { type: 'integer' },
+            updated_at: { type: 'integer' }
+          }
+        },
+        Collection: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            name: { type: 'string' },
+            display_name: { type: 'string' },
+            description: { type: 'string' },
+            schema: { type: 'object' },
+            is_active: { type: 'integer' }
+          }
+        },
+        Media: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            filename: { type: 'string' },
+            mimetype: { type: 'string' },
+            size: { type: 'integer' },
+            url: { type: 'string' }
+          }
+        },
+        Error: {
+          type: 'object',
+          properties: {
+            error: { type: 'string' },
+            details: { type: 'string' }
+          }
+        }
+      }
+    },
+    tags: [
+      { name: 'System', description: 'System and health endpoints' },
+      { name: 'Content', description: 'Content management operations' },
+      { name: 'Media', description: 'Media file operations' }
+    ]
   })
 })
 
