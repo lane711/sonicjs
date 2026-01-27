@@ -675,10 +675,12 @@ export function renderContentFormPage(data: ContentFormData): string {
         titleEl.className = 'font-medium text-zinc-900 dark:text-white';
         titleEl.textContent = title;
 
-        display.appendChild(titleEl);
+        const row = document.createElement('div');
+        row.className = 'flex flex-wrap items-center justify-between gap-2';
+        row.appendChild(titleEl);
 
         const metaRow = document.createElement('div');
-        metaRow.className = 'mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400';
+        metaRow.className = 'flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400';
 
         if (item.collection?.display_name || item.collection?.name) {
           const collectionLabel = document.createElement('span');
@@ -694,8 +696,10 @@ export function renderContentFormPage(data: ContentFormData): string {
         }
 
         if (metaRow.childElementCount > 0) {
-          display.appendChild(metaRow);
+          row.appendChild(metaRow);
         }
+
+        display.appendChild(row);
 
         if (removeButton) {
           removeButton.disabled = false;
@@ -869,6 +873,28 @@ export function renderContentFormPage(data: ContentFormData): string {
             renderReferenceDisplay(container, null, 'Reference not found.');
           }
         });
+      });
+
+      document.addEventListener('click', (event) => {
+        const trigger = event.target.closest('[data-reference-trigger]');
+        if (!trigger) return;
+        const container = trigger.closest('[data-reference-field]');
+        if (!container || container.dataset.referenceEnabled !== 'true') return;
+        const input = container.querySelector('input[type="hidden"]');
+        if (!input) return;
+        openReferenceSelector(input.id);
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        const trigger = event.target.closest('[data-reference-trigger]');
+        if (!trigger) return;
+        const container = trigger.closest('[data-reference-field]');
+        if (!container || container.dataset.referenceEnabled !== 'true') return;
+        const input = container.querySelector('input[type="hidden"]');
+        if (!input) return;
+        event.preventDefault();
+        openReferenceSelector(input.id);
       });
 
       // Custom select options
