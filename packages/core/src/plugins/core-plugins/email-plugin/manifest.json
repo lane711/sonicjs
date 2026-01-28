@@ -7,7 +7,7 @@
   "homepage": "https://sonicjs.com/plugins/email",
   "repository": "https://github.com/lane711/sonicjs-ai/tree/main/src/plugins/core-plugins/email-plugin",
   "license": "MIT",
-  "category": "communication",
+  "category": "utilities",
   "tags": ["email", "resend", "transactional", "notifications"],
   "dependencies": [],
   "settings": {

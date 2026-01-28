@@ -7,7 +7,7 @@
   "homepage": "https://sonicjs.com/plugins/core-analytics",
   "repository": "https://github.com/lane711/sonicjs-ai/tree/main/src/plugins/core-plugins",
   "license": "MIT",
-  "category": "analytics",
+  "category": "seo",
   "tags": ["analytics", "metrics", "tracking", "insights", "dashboard"],
   "dependencies": [],
   "settings": {

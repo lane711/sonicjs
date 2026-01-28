@@ -537,7 +537,7 @@ var package_default = {
     "drizzle-orm": "^0.44.7",
     eslint: "^9.39.2",
     glob: "^10.5.0",
-    hono: "^4.11.4",
+    hono: "^4.11.7",
     tsup: "^8.5.0",
     typescript: "^5.9.3",
     vitest: "^4.0.5",
@@ -617,5 +617,5 @@ exports.renderTemplate = renderTemplate;
 exports.sanitizeInput = sanitizeInput;
 exports.sanitizeObject = sanitizeObject;
 exports.templateRenderer = templateRenderer;
-//# sourceMappingURL=chunk-MYB5RY7H.cjs.map
-//# sourceMappingURL=chunk-MYB5RY7H.cjs.map
+//# sourceMappingURL=chunk-DMZI7OU3.cjs.map
+//# sourceMappingURL=chunk-DMZI7OU3.cjs.map

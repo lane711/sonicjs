@@ -206,6 +206,14 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   // Fixes GitHub Issue #461: Cache routes were not registered
   app.route('/admin/cache', cachePlugin.getRoutes())
 
+  // Plugin routes - OTP Login (MUST be registered BEFORE admin/plugins to avoid route conflict)
+  // Register OTP Login routes first so they take precedence over the generic /:id handler
+  if (otpLoginPlugin.routes && otpLoginPlugin.routes.length > 0) {
+    for (const route of otpLoginPlugin.routes) {
+      app.route(route.path, route.handler as any)
+    }
+  }
+
   app.route('/admin/plugins', adminPluginRoutes)
   app.route('/admin/logs', adminLogsRoutes)
   app.route('/admin', adminUsersRoutes)
@@ -217,13 +225,6 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   // Plugin routes - Email
   if (emailPlugin.routes && emailPlugin.routes.length > 0) {
     for (const route of emailPlugin.routes) {
-      app.route(route.path, route.handler as any)
-    }
-  }
-
-  // Plugin routes - OTP Login (passwordless authentication via email codes)
-  if (otpLoginPlugin.routes && otpLoginPlugin.routes.length > 0) {
-    for (const route of otpLoginPlugin.routes) {
       app.route(route.path, route.handler as any)
     }
   }

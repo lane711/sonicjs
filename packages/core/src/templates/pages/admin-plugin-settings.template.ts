@@ -339,6 +339,29 @@ function renderToggleButton(plugin: any): string {
 
 function renderSettingsTab(plugin: any): string {
   const settings = plugin.settings || {}
+  const pluginId = plugin.id || plugin.name
+
+  // Check for custom settings component first
+  const customRenderer = pluginSettingsComponents[pluginId]
+  if (customRenderer) {
+    return `
+      <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 shadow-xl p-6">
+        ${customRenderer(plugin, settings)}
+
+        <div class="flex items-center justify-end pt-6 border-t border-white/10 mt-6">
+          <button
+            type="button"
+            id="save-button"
+            onclick="saveSettings()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+          >
+            Save Settings
+          </button>
+        </div>
+      </div>
+    `
+  }
+
   const isSeedDataPlugin = plugin.id === 'seed-data' || plugin.name === 'seed-data'
   const isAuthPlugin = plugin.id === 'core-auth' || plugin.name === 'core-auth'
   const isTurnstilePlugin = plugin.id === 'turnstile' || plugin.name === 'turnstile'
@@ -667,4 +690,543 @@ function renderInformationTab(plugin: any): string {
 function formatTimestamp(timestamp: number): string {
   const date = new Date(timestamp * 1000)
   return date.toLocaleString()
+}
+
+// ==================== Plugin Settings Components ====================
+// These render just the settings content, embedded within the shared layout
+
+/**
+ * Registry of custom plugin settings components
+ * Plugins with custom settings UI register their render functions here
+ */
+type PluginSettingsRenderer = (plugin: any, settings: PluginSettings) => string
+
+const pluginSettingsComponents: Record<string, PluginSettingsRenderer> = {
+  'otp-login': renderOTPLoginSettingsContent,
+  'email': renderEmailSettingsContent,
+}
+
+/**
+ * OTP Login plugin settings content
+ */
+function renderOTPLoginSettingsContent(plugin: any, settings: PluginSettings): string {
+  const siteName = settings.siteName || 'SonicJS'
+  const emailConfigured = settings._emailConfigured || false
+  const codeLength = settings.codeLength || 6
+  const codeExpiryMinutes = settings.codeExpiryMinutes || 10
+  const maxAttempts = settings.maxAttempts || 3
+  const rateLimitPerHour = settings.rateLimitPerHour || 5
+  const allowNewUserRegistration = settings.allowNewUserRegistration || false
+
+  return `
+    <div class="space-y-6">
+      <!-- Test OTP Section -->
+      <div class="backdrop-blur-md bg-white/5 rounded-xl border border-white/10 p-6">
+        <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <span>📧</span> Test OTP Email
+        </h3>
+
+        ${!emailConfigured ? `
+          <div class="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-4 mb-4">
+            <p class="text-yellow-200 text-sm">
+              <strong>⚠️ Email not configured.</strong>
+              <a href="/admin/plugins/email" class="underline hover:text-yellow-100">Configure the Email plugin</a>
+              to send real emails. Dev mode will show codes in the response.
+            </p>
+          </div>
+        ` : `
+          <div class="bg-green-500/20 border border-green-500/30 rounded-lg p-4 mb-4">
+            <p class="text-green-200 text-sm">
+              <strong>✅ Email configured.</strong> Test emails will be sent via Resend.
+            </p>
+          </div>
+        `}
+
+        <form id="testOtpForm" class="space-y-4">
+          <div>
+            <label for="testEmail" class="block text-sm font-medium text-gray-300 mb-2">
+              Email Address
+            </label>
+            <input
+              type="email"
+              id="testEmail"
+              name="email"
+              placeholder="Enter your email to receive a test code"
+              class="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white placeholder-zinc-500"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            id="sendTestBtn"
+            class="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all flex items-center justify-center gap-2"
+          >
+            <span id="sendBtnText">Send Test Code</span>
+            <span id="sendBtnSpinner" class="hidden">
+              <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+            </span>
+          </button>
+        </form>
+
+        <div id="testResult" class="hidden mt-4 rounded-lg p-4"></div>
+
+        <!-- Verify Code Section -->
+        <div id="verifySection" class="hidden mt-6 pt-6 border-t border-white/10">
+          <h4 class="text-md font-semibold text-white mb-3">Verify Code</h4>
+          <form id="verifyForm" class="space-y-4">
+            <div>
+              <label for="otpCode" class="block text-sm font-medium text-gray-300 mb-2">
+                Enter the code you received
+              </label>
+              <input
+                type="text"
+                id="otpCode"
+                name="code"
+                placeholder="000000"
+                maxlength="8"
+                class="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white text-center text-2xl tracking-widest font-mono"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              class="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all"
+            >
+              Verify Code
+            </button>
+          </form>
+          <div id="verifyResult" class="hidden mt-4 rounded-lg p-4"></div>
+        </div>
+      </div>
+
+      <!-- Configuration Section -->
+      <div class="backdrop-blur-md bg-white/5 rounded-xl border border-white/10 p-6">
+        <h3 class="text-lg font-semibold text-white mb-4">Code Settings</h3>
+
+        <form id="settings-form" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="setting_codeLength" class="block text-sm font-medium text-gray-300 mb-2">
+                Code Length
+              </label>
+              <input
+                type="number"
+                id="setting_codeLength"
+                name="setting_codeLength"
+                min="4"
+                max="8"
+                value="${codeLength}"
+                class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              />
+              <p class="text-xs text-gray-500 mt-1">Number of digits (4-8)</p>
+            </div>
+
+            <div>
+              <label for="setting_codeExpiryMinutes" class="block text-sm font-medium text-gray-300 mb-2">
+                Code Expiry (minutes)
+              </label>
+              <input
+                type="number"
+                id="setting_codeExpiryMinutes"
+                name="setting_codeExpiryMinutes"
+                min="5"
+                max="60"
+                value="${codeExpiryMinutes}"
+                class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              />
+              <p class="text-xs text-gray-500 mt-1">How long codes remain valid</p>
+            </div>
+
+            <div>
+              <label for="setting_maxAttempts" class="block text-sm font-medium text-gray-300 mb-2">
+                Maximum Attempts
+              </label>
+              <input
+                type="number"
+                id="setting_maxAttempts"
+                name="setting_maxAttempts"
+                min="3"
+                max="10"
+                value="${maxAttempts}"
+                class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              />
+              <p class="text-xs text-gray-500 mt-1">Max verification attempts</p>
+            </div>
+
+            <div>
+              <label for="setting_rateLimitPerHour" class="block text-sm font-medium text-gray-300 mb-2">
+                Rate Limit (per hour)
+              </label>
+              <input
+                type="number"
+                id="setting_rateLimitPerHour"
+                name="setting_rateLimitPerHour"
+                min="3"
+                max="20"
+                value="${rateLimitPerHour}"
+                class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              />
+              <p class="text-xs text-gray-500 mt-1">Max requests per email per hour</p>
+            </div>
+          </div>
+
+          <div class="flex items-center pt-2">
+            <input
+              type="checkbox"
+              id="setting_allowNewUserRegistration"
+              name="setting_allowNewUserRegistration"
+              ${allowNewUserRegistration ? 'checked' : ''}
+              class="w-4 h-4 rounded border-white/10"
+            />
+            <label for="setting_allowNewUserRegistration" class="ml-2 text-sm text-gray-300">
+              Allow new user registration via OTP
+            </label>
+          </div>
+        </form>
+      </div>
+
+      <!-- Email Preview Section -->
+      <div class="backdrop-blur-md bg-white/5 rounded-xl border border-white/10 p-6">
+        <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <span>👁️</span> Email Preview
+        </h3>
+        <p class="text-gray-400 text-sm mb-4">
+          This is how the OTP email will appear to users. The site name "<strong class="text-white">${siteName}</strong>" is configured in
+          <a href="/admin/settings/general" class="text-blue-400 hover:text-blue-300 underline">General Settings</a>.
+        </p>
+
+        <div class="bg-white rounded-lg overflow-hidden shadow-lg">
+          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px 20px; text-align: center;">
+            <h3 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 600;">Your Login Code</h3>
+            <p style="margin: 0; opacity: 0.95; font-size: 14px;">Enter this code to sign in to ${siteName}</p>
+          </div>
+
+          <div style="padding: 30px 20px;">
+            <div style="background: #f8f9fa; border: 2px dashed #667eea; border-radius: 12px; padding: 20px; text-align: center; margin: 0 0 20px 0;">
+              <div style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #667eea; font-family: monospace;">
+                123456
+              </div>
+            </div>
+
+            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px 16px; margin: 0 0 20px 0; border-radius: 4px;">
+              <p style="margin: 0; font-size: 13px; color: #856404;">
+                <strong>⚠️ This code expires in ${codeExpiryMinutes} minutes</strong>
+              </p>
+            </div>
+
+            <div style="background: #e8f4ff; border-radius: 8px; padding: 16px; margin: 0;">
+              <p style="margin: 0 0 8px 0; font-size: 13px; color: #0066cc; font-weight: 600;">
+                🔒 Security Notice
+              </p>
+              <p style="margin: 0; font-size: 12px; color: #004080; line-height: 1.5;">
+                Never share this code with anyone. ${siteName} will never ask you for this code via phone, email, or social media.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div class="backdrop-blur-md bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
+        <h3 class="font-semibold text-blue-400 mb-3">🔢 Features</h3>
+        <ul class="text-sm text-blue-200 space-y-2">
+          <li>✓ Passwordless authentication</li>
+          <li>✓ Secure random code generation</li>
+          <li>✓ Rate limiting protection</li>
+          <li>✓ Brute force prevention</li>
+          <li>✓ Mobile-friendly UX</li>
+        </ul>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <a href="/admin/plugins/email" class="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all flex items-center gap-3">
+          <span class="text-2xl">📬</span>
+          <div>
+            <div class="font-medium text-white">Email Settings</div>
+            <div class="text-sm text-zinc-400">Configure Resend API</div>
+          </div>
+        </a>
+        <a href="/admin/settings/general" class="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all flex items-center gap-3">
+          <span class="text-2xl">🏷️</span>
+          <div>
+            <div class="font-medium text-white">Site Name</div>
+            <div class="text-sm text-zinc-400">Change "${siteName}"</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <script>
+      let testEmail = '';
+
+      document.getElementById('testOtpForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('testEmail').value;
+        testEmail = email;
+        const btn = document.getElementById('sendTestBtn');
+        const btnText = document.getElementById('sendBtnText');
+        const spinner = document.getElementById('sendBtnSpinner');
+        const result = document.getElementById('testResult');
+        const verifySection = document.getElementById('verifySection');
+
+        btn.disabled = true;
+        btnText.textContent = 'Sending...';
+        spinner.classList.remove('hidden');
+        result.classList.add('hidden');
+
+        try {
+          const response = await fetch('/auth/otp/request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            result.className = 'mt-4 rounded-lg p-4 bg-green-500/20 border border-green-500/30';
+            let html = '<p class="text-green-200"><strong>✅ Code sent!</strong> Check your inbox.</p>';
+            if (data.dev_code) {
+              html += '<p class="text-green-300 mt-2 font-mono text-lg">Dev code: <strong>' + data.dev_code + '</strong></p>';
+            }
+            result.innerHTML = html;
+            verifySection.classList.remove('hidden');
+          } else {
+            throw new Error(data.error || 'Failed to send code');
+          }
+        } catch (error) {
+          result.className = 'mt-4 rounded-lg p-4 bg-red-500/20 border border-red-500/30';
+          result.innerHTML = '<p class="text-red-200"><strong>❌ Error:</strong> ' + error.message + '</p>';
+        } finally {
+          btn.disabled = false;
+          btnText.textContent = 'Send Test Code';
+          spinner.classList.add('hidden');
+          result.classList.remove('hidden');
+        }
+      });
+
+      document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const code = document.getElementById('otpCode').value;
+        const result = document.getElementById('verifyResult');
+
+        try {
+          const response = await fetch('/auth/otp/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: testEmail, code })
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            result.className = 'mt-4 rounded-lg p-4 bg-green-500/20 border border-green-500/30';
+            result.innerHTML = '<p class="text-green-200"><strong>✅ Verification successful!</strong> The OTP flow is working correctly.</p>';
+          } else {
+            throw new Error(data.error || 'Verification failed');
+          }
+        } catch (error) {
+          result.className = 'mt-4 rounded-lg p-4 bg-red-500/20 border border-red-500/30';
+          result.innerHTML = '<p class="text-red-200"><strong>❌ Error:</strong> ' + error.message + '</p>';
+        } finally {
+          result.classList.remove('hidden');
+        }
+      });
+    </script>
+  `
+}
+
+/**
+ * Email plugin settings content
+ */
+function renderEmailSettingsContent(plugin: any, settings: PluginSettings): string {
+  const apiKey = settings.apiKey || ''
+  const fromEmail = settings.fromEmail || ''
+  const fromName = settings.fromName || ''
+  const replyTo = settings.replyTo || ''
+  const logoUrl = settings.logoUrl || ''
+
+  return `
+    <div class="space-y-6">
+      <!-- Resend Configuration -->
+      <div class="backdrop-blur-md bg-white/5 rounded-xl border border-white/10 p-6">
+        <h3 class="text-lg font-semibold text-white mb-4">Resend Configuration</h3>
+
+        <form id="settings-form" class="space-y-4">
+          <!-- API Key -->
+          <div>
+            <label for="setting_apiKey" class="block text-sm font-medium text-gray-300 mb-2">
+              Resend API Key <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="password"
+              id="setting_apiKey"
+              name="setting_apiKey"
+              value="${escapeHtmlAttr(apiKey)}"
+              class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              placeholder="re_..."
+              required
+            />
+            <p class="text-xs text-gray-500 mt-1">
+              Get your API key from <a href="https://resend.com/api-keys" target="_blank" class="text-blue-400 hover:underline">resend.com/api-keys</a>
+            </p>
+          </div>
+
+          <!-- From Email -->
+          <div>
+            <label for="setting_fromEmail" class="block text-sm font-medium text-gray-300 mb-2">
+              From Email <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="email"
+              id="setting_fromEmail"
+              name="setting_fromEmail"
+              value="${escapeHtmlAttr(fromEmail)}"
+              class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              placeholder="noreply@yourdomain.com"
+              required
+            />
+            <p class="text-xs text-gray-500 mt-1">Must be a verified domain in Resend</p>
+          </div>
+
+          <!-- From Name -->
+          <div>
+            <label for="setting_fromName" class="block text-sm font-medium text-gray-300 mb-2">
+              From Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="setting_fromName"
+              name="setting_fromName"
+              value="${escapeHtmlAttr(fromName)}"
+              class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              placeholder="Your App Name"
+              required
+            />
+          </div>
+
+          <!-- Reply To -->
+          <div>
+            <label for="setting_replyTo" class="block text-sm font-medium text-gray-300 mb-2">
+              Reply-To Email
+            </label>
+            <input
+              type="email"
+              id="setting_replyTo"
+              name="setting_replyTo"
+              value="${escapeHtmlAttr(replyTo)}"
+              class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              placeholder="support@yourdomain.com"
+            />
+          </div>
+
+          <!-- Logo URL -->
+          <div>
+            <label for="setting_logoUrl" class="block text-sm font-medium text-gray-300 mb-2">
+              Logo URL
+            </label>
+            <input
+              type="url"
+              id="setting_logoUrl"
+              name="setting_logoUrl"
+              value="${escapeHtmlAttr(logoUrl)}"
+              class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+              placeholder="https://yourdomain.com/logo.png"
+            />
+            <p class="text-xs text-gray-500 mt-1">Logo to display in email templates</p>
+          </div>
+        </form>
+      </div>
+
+      <!-- Test Email Section -->
+      <div class="backdrop-blur-md bg-white/5 rounded-xl border border-white/10 p-6">
+        <h3 class="text-lg font-semibold text-white mb-4">Send Test Email</h3>
+        <div class="flex gap-3">
+          <input
+            type="email"
+            id="testEmailAddress"
+            placeholder="Enter email address"
+            class="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none text-white"
+          />
+          <button
+            type="button"
+            id="testEmailBtn"
+            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all"
+          >
+            Send Test
+          </button>
+        </div>
+        <div id="testEmailResult" class="hidden mt-4 rounded-lg p-4"></div>
+      </div>
+
+      <!-- Info Card -->
+      <div class="backdrop-blur-md bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
+        <h3 class="font-semibold text-blue-400 mb-3">📧 Email Templates Included</h3>
+        <ul class="text-sm text-blue-200 space-y-2">
+          <li>✓ Registration confirmation</li>
+          <li>✓ Email verification</li>
+          <li>✓ Password reset</li>
+          <li>✓ One-time code (2FA)</li>
+        </ul>
+        <p class="text-xs text-blue-300 mt-4">
+          Templates are code-based and can be customized by editing the plugin files.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById('testEmailBtn').addEventListener('click', async () => {
+        const email = document.getElementById('testEmailAddress').value;
+        if (!email) {
+          alert('Please enter an email address');
+          return;
+        }
+
+        const resultEl = document.getElementById('testEmailResult');
+        resultEl.className = 'mt-4 rounded-lg p-4 bg-blue-500/20 border border-blue-500/30';
+        resultEl.innerHTML = '📧 Sending test email...';
+        resultEl.classList.remove('hidden');
+
+        try {
+          const response = await fetch('/admin/plugins/email/test', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ toEmail: email })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            resultEl.className = 'mt-4 rounded-lg p-4 bg-green-500/20 border border-green-500/30';
+            resultEl.innerHTML = '<p class="text-green-200">✅ ' + (data.message || 'Test email sent! Check your inbox.') + '</p>';
+          } else {
+            resultEl.className = 'mt-4 rounded-lg p-4 bg-red-500/20 border border-red-500/30';
+            resultEl.innerHTML = '<p class="text-red-200">❌ ' + (data.error || 'Failed to send test email.') + '</p>';
+          }
+        } catch (error) {
+          resultEl.className = 'mt-4 rounded-lg p-4 bg-red-500/20 border border-red-500/30';
+          resultEl.innerHTML = '<p class="text-red-200">❌ Network error. Please try again.</p>';
+        }
+      });
+    </script>
+  `
+}
+
+/**
+ * Check if a plugin has a custom settings component
+ */
+export function hasCustomSettingsComponent(pluginId: string): boolean {
+  return pluginId in pluginSettingsComponents
+}
+
+/**
+ * Get the custom settings component for a plugin
+ */
+export function getCustomSettingsComponent(pluginId: string): PluginSettingsRenderer | undefined {
+  return pluginSettingsComponents[pluginId]
 }

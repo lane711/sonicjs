@@ -4,7 +4,7 @@
   "description": "Advanced search with Cloudflare AI Search. Full-text search, semantic search, and advanced filtering across all content collections.",
   "version": "1.0.0",
   "author": "SonicJS",
-  "category": "search",
+  "category": "content",
   "icon": "magnifying-glass",
   "homepage": "https://developers.cloudflare.com/ai-search/",
   "repository": "https://github.com/sonicjs/sonicjs",

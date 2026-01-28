@@ -18,7 +18,7 @@ INSERT OR IGNORE INTO plugins (
     'Core analytics tracking and reporting plugin with page views and event tracking',
     '1.0.0',
     'SonicJS Team',
-    'analytics',
+    'seo',
     '📊',
     'active',
     TRUE,

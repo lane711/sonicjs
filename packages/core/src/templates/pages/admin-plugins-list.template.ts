@@ -399,17 +399,7 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
       }
       
       function openPluginSettings(pluginId) {
-        // Email plugin has a custom settings page
-        if (pluginId === 'email') {
-          window.location.href = '/admin/plugins/email/settings';
-        } else {
-          window.location.href = \`/admin/plugins/\${pluginId}\`;
-        }
-      }
-      
-      function showPluginDetails(pluginId) {
-        // TODO: Implement plugin details modal
-        showNotification('Plugin details coming soon!', 'info');
+        window.location.href = \`/admin/plugins/\${pluginId}\`;
       }
       
       function filterAndSortPlugins() {
@@ -550,7 +540,7 @@ function renderPluginCard(plugin: Plugin): string {
 
   let actionButton = ''
   if (plugin.status === 'uninstalled') {
-    actionButton = `<button onclick="installPlugin('${plugin.name}')" class="w-full sm:w-auto bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 px-3 py-1.5 rounded-md text-xs font-medium transition-colors shadow-sm">Install</button>`
+    actionButton = `<button onclick="event.stopPropagation(); installPlugin('${plugin.name}')" class="w-full sm:w-auto bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 px-3 py-1.5 rounded-md text-xs font-medium transition-colors shadow-sm">Install</button>`
   } else {
     const isActive = plugin.status === 'active';
     const action = isActive ? 'deactivate' : 'activate';
@@ -560,7 +550,7 @@ function renderPluginCard(plugin: Plugin): string {
      
     if (canToggle) {
       actionButton = `
-      <button onclick="togglePlugin('${plugin.id}', '${action}', event)" type="button" class="${bgClass} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 toggle-button" role="switch" aria-checked="${isActive}">
+      <button onclick="event.stopPropagation(); togglePlugin('${plugin.id}', '${action}', event)" type="button" class="${bgClass} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 toggle-button" role="switch" aria-checked="${isActive}">
         <span class="sr-only">Toggle plugin</span>
         <span aria-hidden="true" class="${translateClass} pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out toggle-knob"></span>
       </button>
@@ -576,10 +566,11 @@ function renderPluginCard(plugin: Plugin): string {
   }
 
   return `
-    <div class="plugin-card flex flex-col h-full rounded-md bg-white dark:bg-zinc-900 ring-1 ring-zinc-950/10 dark:ring-white/10 p-5 transition-all hover:shadow-md" 
-      data-category="${plugin.category}" 
-      data-status="${plugin.status}" 
-      data-name="${plugin.displayName}" 
+    <div class="plugin-card flex flex-col h-full rounded-md bg-white dark:bg-zinc-900 ring-1 ring-zinc-950/10 dark:ring-white/10 p-5 transition-all hover:shadow-md cursor-pointer"
+      onclick="openPluginSettings('${plugin.id}')"
+      data-category="${plugin.category}"
+      data-status="${plugin.status}"
+      data-name="${plugin.displayName}"
       data-description="${plugin.description}"
       data-downloads="${plugin.downloadCount || 0}"
       data-rating="${plugin.rating || 0}">
@@ -600,16 +591,8 @@ function renderPluginCard(plugin: Plugin): string {
         </div>
         
         <div class="flex items-center gap-1">
-          ${plugin.status !== 'uninstalled' ? `
-          <button onclick="showPluginDetails('${plugin.id}')" class="text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Plugin Details">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-          </button>
-          ` : ''}
-
           ${!plugin.isCore && plugin.status !== 'uninstalled' ? `
-          <button onclick="uninstallPlugin('${plugin.id}')" class="text-zinc-400 hover:text-red-600 dark:text-zinc-500 dark:hover:text-red-400 p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Uninstall Plugin">
+          <button onclick="event.stopPropagation(); uninstallPlugin('${plugin.id}')" class="text-zinc-400 hover:text-red-600 dark:text-zinc-500 dark:hover:text-red-400 p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Uninstall Plugin">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
             </svg>
@@ -636,17 +619,6 @@ function renderPluginCard(plugin: Plugin): string {
       <div class="flex items-center justify-between pt-4 border-t border-zinc-100 dark:border-zinc-800 mt-auto">
         <div class="flex gap-2">
           ${actionButton}
-        </div>
-
-        <div class="flex items-center gap-2">
-          ${plugin.status !== 'uninstalled' ? `
-          <button onclick="openPluginSettings('${plugin.id}')" class="text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Settings">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-          </button>
-          ` : ''}
         </div>
       </div>
     </div>
