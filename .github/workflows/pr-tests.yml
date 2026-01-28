@@ -84,19 +84,21 @@ jobs:
 
           if [ -n "$EXISTING_DB" ]; then
             echo "Database $DB_NAME already exists with ID: $EXISTING_DB"
-            DB_ID="$EXISTING_DB"
-          else
-            # Create new database
-            CREATE_OUTPUT=$(npx wrangler d1 create "$DB_NAME" 2>&1)
-            echo "$CREATE_OUTPUT"
+            echo "Deleting existing database to ensure fresh migrations..."
+            npx wrangler d1 delete "$DB_NAME" --yes || true
+            sleep 2
+          fi
 
-            # Extract database ID from creation output
-            DB_ID=$(echo "$CREATE_OUTPUT" | grep -oP 'database_id\s*=\s*"\K[^"]+' || echo "")
+          # Create new database (always fresh)
+          CREATE_OUTPUT=$(npx wrangler d1 create "$DB_NAME" 2>&1)
+          echo "$CREATE_OUTPUT"
 
-            if [ -z "$DB_ID" ]; then
-              # Try alternative extraction method
-              DB_ID=$(npx wrangler d1 list --json | jq -r ".[] | select(.name == \"$DB_NAME\") | .uuid")
-            fi
+          # Extract database ID from creation output
+          DB_ID=$(echo "$CREATE_OUTPUT" | grep -oP 'database_id\s*=\s*"\K[^"]+' || echo "")
+
+          if [ -z "$DB_ID" ]; then
+            # Try alternative extraction method
+            DB_ID=$(npx wrangler d1 list --json | jq -r ".[] | select(.name == \"$DB_NAME\") | .uuid")
           fi
 
           if [ -z "$DB_ID" ]; then
