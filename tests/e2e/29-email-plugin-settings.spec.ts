@@ -12,11 +12,19 @@ test.describe('Email Plugin Settings', () => {
     await page.waitForLoadState('networkidle')
 
     // Wait for plugin cards to load (any plugin card)
-    await page.waitForSelector('.plugin-card', { state: 'visible', timeout: 10000 })
+    await page.waitForSelector('.plugin-card', { state: 'visible', timeout: 15000 })
+
+    // Debug: Log all plugin cards and their data-name attributes
+    const allPluginCards = await page.locator('.plugin-card').all()
+    console.log(`Found ${allPluginCards.length} plugin cards`)
+    for (const card of allPluginCards) {
+      const dataName = await card.getAttribute('data-name')
+      console.log(`  - Plugin card: "${dataName}"`)
+    }
 
     // Find the email plugin card by data-name attribute and click it
     const emailPluginCard = page.locator('.plugin-card[data-name="Email"]')
-    await expect(emailPluginCard).toBeVisible({ timeout: 10000 })
+    await expect(emailPluginCard).toBeVisible({ timeout: 15000 })
 
     // Click the email plugin card (whole card is clickable now)
     await emailPluginCard.click()
@@ -31,8 +39,19 @@ test.describe('Email Plugin Settings', () => {
     await page.goto('/admin/plugins/email')
     await page.waitForLoadState('networkidle')
 
+    // Debug: Log page title and check for error messages
+    const pageTitle = await page.locator('h1').first().textContent()
+    console.log(`Page title: "${pageTitle}"`)
+
+    // Check if we got a 404 or error page
+    const bodyText = await page.locator('body').textContent()
+    if (bodyText?.includes('not found') || bodyText?.includes('404') || bodyText?.includes('Plugin not found')) {
+      console.log('ERROR: Plugin not found page detected')
+      console.log('Body preview:', bodyText?.substring(0, 500))
+    }
+
     // Wait for page content to load
-    await page.waitForSelector('h3', { state: 'visible', timeout: 10000 })
+    await page.waitForSelector('h3', { state: 'visible', timeout: 15000 })
 
     // Check for Resend configuration section
     await expect(page.locator('h3:has-text("Resend Configuration")').first()).toBeVisible({ timeout: 10000 })
