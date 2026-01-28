@@ -193,5 +193,167 @@ describe('Auth Validation Service', () => {
       const result = await isRegistrationEnabled(db)
       expect(result).toBe(true)
     })
+
+    it('should return true when no plugin settings exist', async () => {
+      const db = {
+        prepare: vi.fn(() => ({
+          bind: vi.fn(() => ({
+            first: vi.fn(async () => null) // No plugin found
+          }))
+        }))
+      } as any
+
+      const result = await isRegistrationEnabled(db)
+      expect(result).toBe(true)
+    })
+
+    it('should return false when registration.enabled is 0 (SQLite boolean)', async () => {
+      const db = {
+        prepare: vi.fn(() => ({
+          bind: vi.fn(() => ({
+            first: vi.fn(async () => ({
+              settings: JSON.stringify({ registration: { enabled: 0 } })
+            }))
+          }))
+        }))
+      } as any
+
+      const result = await isRegistrationEnabled(db)
+      expect(result).toBe(false)
+    })
+  })
+})
+
+describe('authValidationService', () => {
+  describe('buildRegistrationSchema', () => {
+    it('should return a registration schema', async () => {
+      const { authValidationService } = await import('./auth-validation')
+      const db = createMockDb()
+
+      const schema = await authValidationService.buildRegistrationSchema(db)
+
+      expect(schema).toBeDefined()
+      // The schema should be a zod schema that we can use to parse data
+      const validData = {
+        email: 'test@example.com',
+        password: 'password123'
+      }
+      const result = schema.safeParse(validData)
+      expect(result.success).toBe(true)
+    })
+
+    it('should reject invalid email', async () => {
+      const { authValidationService } = await import('./auth-validation')
+      const db = createMockDb()
+
+      const schema = await authValidationService.buildRegistrationSchema(db)
+
+      const invalidData = {
+        email: 'not-an-email',
+        password: 'password123'
+      }
+      const result = schema.safeParse(invalidData)
+      expect(result.success).toBe(false)
+    })
+
+    it('should reject short password', async () => {
+      const { authValidationService } = await import('./auth-validation')
+      const db = createMockDb()
+
+      const schema = await authValidationService.buildRegistrationSchema(db)
+
+      const invalidData = {
+        email: 'test@example.com',
+        password: 'short'
+      }
+      const result = schema.safeParse(invalidData)
+      expect(result.success).toBe(false)
+    })
+
+    it('should accept optional username', async () => {
+      const { authValidationService } = await import('./auth-validation')
+      const db = createMockDb()
+
+      const schema = await authValidationService.buildRegistrationSchema(db)
+
+      const validData = {
+        email: 'test@example.com',
+        password: 'password123',
+        username: 'testuser'
+      }
+      const result = schema.safeParse(validData)
+      expect(result.success).toBe(true)
+    })
+
+    it('should reject short username', async () => {
+      const { authValidationService } = await import('./auth-validation')
+      const db = createMockDb()
+
+      const schema = await authValidationService.buildRegistrationSchema(db)
+
+      const invalidData = {
+        email: 'test@example.com',
+        password: 'password123',
+        username: 'ab' // Too short, min 3
+      }
+      const result = schema.safeParse(invalidData)
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe('generateDefaultValue', () => {
+    it('should generate username from email', async () => {
+      const { authValidationService } = await import('./auth-validation')
+
+      const result = authValidationService.generateDefaultValue('username', {
+        email: 'john.doe@example.com'
+      })
+
+      expect(result).toBe('john.doe')
+    })
+
+    it('should generate fallback username when no email', async () => {
+      const { authValidationService } = await import('./auth-validation')
+
+      const result = authValidationService.generateDefaultValue('username', {})
+
+      expect(result).toMatch(/^user\d+$/)
+    })
+
+    it('should generate default firstName', async () => {
+      const { authValidationService } = await import('./auth-validation')
+
+      const result = authValidationService.generateDefaultValue('firstName', {})
+
+      expect(result).toBe('User')
+    })
+
+    it('should generate lastName from email', async () => {
+      const { authValidationService } = await import('./auth-validation')
+
+      const result = authValidationService.generateDefaultValue('lastName', {
+        email: 'john.doe@example.com'
+      })
+
+      expect(result).toBe('john.doe')
+    })
+
+    it('should generate fallback lastName when no email', async () => {
+      const { authValidationService } = await import('./auth-validation')
+
+      const result = authValidationService.generateDefaultValue('lastName', {})
+
+      expect(result).toBe('Account')
+    })
+
+    it('should return empty string for unknown field', async () => {
+      const { authValidationService } = await import('./auth-validation')
+
+      const result = authValidationService.generateDefaultValue('unknownField', {
+        email: 'test@example.com'
+      })
+
+      expect(result).toBe('')
+    })
   })
 })
