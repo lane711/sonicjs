@@ -85,7 +85,7 @@ jobs:
           if [ -n "$EXISTING_DB" ]; then
             echo "Database $DB_NAME already exists with ID: $EXISTING_DB"
             echo "Deleting existing database to ensure fresh migrations..."
-            npx wrangler d1 delete "$DB_NAME" --yes || true
+            npx wrangler d1 delete "$DB_NAME" -y || true
             sleep 2
           fi
 
