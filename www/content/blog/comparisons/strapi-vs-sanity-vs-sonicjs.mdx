@@ -67,6 +67,15 @@ Strapi's upgrade paths have become notorious in the developer community. The v4 
 
 > "40+ hours converting our project from v4 to v5. 50+ breaking changes, countless undocumented gotchas."
 
+**Documented Performance Issues from GitHub:**
+
+| Issue | Scenario | Reported Time | Notes |
+|-------|----------|---------------|-------|
+| [#5374](https://github.com/strapi/strapi/issues/5374) | 67 items with relations | 9-12s | Complex queries |
+| [#13288](https://github.com/strapi/strapi/issues/13288) | populate=* | 20s | Deep population |
+| [#8553](https://github.com/strapi/strapi/issues/8553) | Large collections | 14s | Pagination issues |
+| [#21924](https://github.com/strapi/strapi/issues/21924) | PostgreSQL queries | 10s | Database specific |
+
 The migration documentation often lags behind releases, leaving developers to discover issues through trial and error. Database structure changes between versions require careful manual intervention.
 
 **Common Strapi frustrations:**
@@ -416,3 +425,19 @@ For teams prioritizing global performance, cost predictability, and modern TypeS
 - Predictable pricing prevents budget surprises
 
 Ready to experience edge-first content management? [Get started with SonicJS](/quickstart) in under 5 minutes.
+
+---
+
+## Sources & References
+
+### Strapi
+- [Strapi Forum: An Honest Review](https://forum.strapi.io/t/an-honest-review-of-strapi/20602)
+- [Strapi v5 Breaking Changes](https://docs.strapi.io/cms/migration/v4-to-v5/breaking-changes)
+- [GitHub Issue #5374: Complex Query Performance (9-12s)](https://github.com/strapi/strapi/issues/5374)
+- [GitHub Issue #13288: Deep Population (20s)](https://github.com/strapi/strapi/issues/13288)
+- [GitHub Issue #8553: Large Collection Performance (14s)](https://github.com/strapi/strapi/issues/8553)
+- [GitHub Issue #21924: PostgreSQL Query Performance](https://github.com/strapi/strapi/issues/21924)
+
+### Sanity
+- [Studio Performance (GitHub #7456)](https://github.com/sanity-io/sanity/issues/7456)
+- [Sanity Pricing](https://www.sanity.io/pricing)

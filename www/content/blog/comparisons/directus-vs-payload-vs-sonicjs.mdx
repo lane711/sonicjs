@@ -65,7 +65,17 @@ Looking for an open source headless CMS? Directus, Payload, and SonicJS represen
 
 ### Directus: Performance at Scale
 
-Directus's strength—wrapping existing databases—becomes its weakness with complex queries:
+Directus's strength—wrapping existing databases—becomes its weakness with complex queries.
+
+**Documented Performance Issues from GitHub:**
+
+| Issue | Scenario | Reported Time | Notes |
+|-------|----------|---------------|-------|
+| [#11766](https://github.com/directus/directus/issues/11766) | 500 items with relations | 1,500ms | runAST bottleneck |
+| [#7783](https://github.com/directus/directus/issues/7783) | 400k files | 45,000ms+ | Heap out of memory |
+| [#1575](https://github.com/directus/directus/issues/1575) | Simple queries | 4,000ms | Cold query performance |
+| [#2020](https://github.com/directus/directus/issues/2020) | 1,000 items | 5,500ms | Collection listing |
+| [#10034](https://github.com/directus/directus/issues/10034) | 200 row inserts | Connection crashes | Pool exhaustion |
 
 > "With a lot of items linked to other items, Directus becomes slow. For only 500 items, Directus took 1.5 seconds to load all of them."
 > — GitHub Issue #11766
@@ -83,7 +93,16 @@ The file system performance is particularly concerning:
 
 ### Payload: Resource Hunger
 
-Payload's TypeScript-first approach is excellent, but the development experience has issues:
+Payload's TypeScript-first approach is excellent, but the development experience has issues.
+
+**Documented Performance Issues from GitHub:**
+
+| Issue | Scenario | Reported Time | Notes |
+|-------|----------|---------------|-------|
+| [#11325](https://github.com/payloadcms/payload/issues/11325) | 1,000 docs with populate | 4,000ms | 15x slower than Mongoose |
+| [#7505](https://github.com/payloadcms/payload/issues/7505) | Query with joins | 5,734ms | vs 23ms raw Mongoose (249x slower) |
+| [Discussion #14230](https://github.com/payloadcms/payload/discussions/14230) | Dev server | 10-60s per call | 13GB RAM consumption |
+| [Discussion #2413](https://github.com/payloadcms/payload/discussions/2413) | Production page loads | 20,000ms | With ~10 concurrent users |
 
 > "Dev server needs 13GB of RAM just to start."
 > — GitHub Discussion #14230
@@ -373,10 +392,14 @@ Ready to try edge-first CMS? [Get started with SonicJS](/quickstart) in under 5 
 ## Sources & References
 
 ### Directus Issues
-- [Performance with Relations (Issue #11766)](https://github.com/directus/directus/issues/11766)
-- [File Loading Slowdowns (Issue #7783)](https://github.com/directus/directus/issues/7783)
-- [Connection Pool Crashes (Issue #10034)](https://github.com/directus/directus/issues/10034)
+- [Performance with Relations (Issue #11766)](https://github.com/directus/directus/issues/11766) — 1.5s with 500 items
+- [File Loading Slowdowns (Issue #7783)](https://github.com/directus/directus/issues/7783) — 45s+ with 400k files
+- [Cold Query Performance (Issue #1575)](https://github.com/directus/directus/issues/1575) — 4s simple queries
+- [Collection Listing Performance (Issue #2020)](https://github.com/directus/directus/issues/2020) — 5.5s for 1k items
+- [Connection Pool Crashes (Issue #10034)](https://github.com/directus/directus/issues/10034) — Pool exhaustion
 
 ### Payload Issues
-- [Dev Server Memory Usage (Discussion #14230)](https://github.com/payloadcms/payload/discussions/14230)
-- [Populated Query Performance (Issue #11325)](https://github.com/payloadcms/payload/issues/11325)
+- [Query Performance (Issue #11325)](https://github.com/payloadcms/payload/issues/11325) — 15x slower than Mongoose
+- [Query Overhead (Issue #7505)](https://github.com/payloadcms/payload/issues/7505) — 249x slower with joins
+- [Dev Server Memory (Discussion #14230)](https://github.com/payloadcms/payload/discussions/14230) — 13GB RAM
+- [Production Performance (Discussion #2413)](https://github.com/payloadcms/payload/discussions/2413) — 20s page loads
