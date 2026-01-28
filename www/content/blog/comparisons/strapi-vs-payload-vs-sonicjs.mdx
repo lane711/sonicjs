@@ -107,8 +107,18 @@ This is a significant shift from the "open-source" ethos many developers expecte
 
 ### Performance at Scale
 
-Community reports highlight several performance issues:
+Multiple GitHub issues and community reports highlight performance concerns:
 
+**Documented Performance Issues from GitHub:**
+
+| Issue | Scenario | Reported Time | Notes |
+|-------|----------|---------------|-------|
+| [#5374](https://github.com/strapi/strapi/issues/5374) | 67 items with relations | 9-12s | Complex queries |
+| [#13288](https://github.com/strapi/strapi/issues/13288) | populate=* | 20s | Deep population |
+| [#8553](https://github.com/strapi/strapi/issues/8553) | Large collections | 14s | Pagination issues |
+| [#21924](https://github.com/strapi/strapi/issues/21924) | PostgreSQL queries | 10s | Database specific |
+
+Additional community reports:
 - **GraphQL performance is "extremely slow"** according to forum discussions
 - **Docker image exceeds 1GB** in size
 - Data transfer between environments fails with large file volumes
@@ -142,10 +152,24 @@ But it's not without issues.
 
 ### Performance Challenges
 
-Several GitHub issues highlight significant performance concerns:
+Multiple GitHub issues document significant performance concerns in production environments:
+
+**Documented Performance Issues from GitHub:**
+
+| Issue | Scenario | Reported Time | Notes |
+|-------|----------|---------------|-------|
+| [#11325](https://github.com/payloadcms/payload/issues/11325) | 1,000 docs with populate | 4,000ms | 15x slower than Mongoose |
+| [#7505](https://github.com/payloadcms/payload/issues/7505) | Query with joins | 5,734ms | vs 23ms with raw Mongoose (249x slower) |
+| [#2227](https://github.com/payloadcms/payload/issues/2227) | 30k documents | 10,000ms+ | Pagination performance |
+| [Discussion #2413](https://github.com/payloadcms/payload/discussions/2413) | Production page loads | 20,000ms | With ~10 concurrent users |
+| [Discussion #12713](https://github.com/payloadcms/payload/discussions/12713) | Queries with joins | 1,300-1,600ms | Relationship overhead |
+| [Discussion #14230](https://github.com/payloadcms/payload/discussions/14230) | Dev server | 10-60s per call | 13GB RAM consumption |
 
 **Query Performance (Issue #11325):**
 > "Fetching 1,000 documents using `payload.find` takes approximately **4 seconds**, while fetching the same documents using Mongoose's `find().populate()` takes only about **600ms**. That's **15x slower**."
+
+**Extreme Query Overhead (Issue #7505):**
+> "A query that takes **5,734ms** in Payload takes only **23ms** with raw Mongoose—that's **249x slower**."
 
 **Dev Server Performance (Discussion #14230):**
 > "The speed is incredibly slow... loading times ranging from **10 to 60 seconds** for a single call. RAM consumption jumps by approximately 40%... needing around **13GB of RAM**."
@@ -155,6 +179,9 @@ Several GitHub issues highlight significant performance concerns:
 
 **Production Issues (Discussion #2413):**
 > "Extreme issues with speed after taking the site live, with pages taking up to **20 seconds to load** and CPU maxing out with only about 10 simultaneous users."
+
+**Join Performance (Discussion #12713):**
+> "Queries with joins are taking **1.3-1.6 seconds**—significant overhead from relationship resolution."
 
 ### Memory Leaks
 
@@ -664,11 +691,19 @@ SonicJS is optimized for Cloudflare D1 (SQLite at the edge). This is by design�
 - [Strapi Forum: An Honest Review](https://forum.strapi.io/t/an-honest-review-of-strapi/20602)
 - [Strapi v5 Breaking Changes Documentation](https://docs.strapi.io/cms/migration/v4-to-v5/breaking-changes)
 - [Strapi v5 Migration: Lessons & Pain Points](https://medium.com/@notum/strapi-v5-migration-lessons-wins-pain-points-d0afbf9253a8)
+- [GitHub Issue #5374: Complex Query Performance (9-12s)](https://github.com/strapi/strapi/issues/5374)
+- [GitHub Issue #13288: Deep Population (20s)](https://github.com/strapi/strapi/issues/13288)
+- [GitHub Issue #8553: Large Collection Performance (14s)](https://github.com/strapi/strapi/issues/8553)
+- [GitHub Issue #21924: PostgreSQL Query Performance](https://github.com/strapi/strapi/issues/21924)
 - [Capterra: Strapi Reviews](https://www.capterra.com/p/170599/Strapi/reviews/)
 
 ### Payload CMS Community Feedback
 - [GitHub Discussion: Strapi vs Payload DX](https://github.com/payloadcms/payload/discussions/7468)
-- [GitHub Issue #11325: Critical Performance Issue](https://github.com/payloadcms/payload/issues/11325)
+- [GitHub Issue #11325: Query Performance (15x slower than Mongoose)](https://github.com/payloadcms/payload/issues/11325)
+- [GitHub Issue #7505: Query Overhead (249x slower with joins)](https://github.com/payloadcms/payload/issues/7505)
+- [GitHub Issue #2227: Large Dataset Performance](https://github.com/payloadcms/payload/issues/2227)
+- [GitHub Discussion #2413: Production Performance Issues](https://github.com/payloadcms/payload/discussions/2413)
+- [GitHub Discussion #12713: Join Query Performance](https://github.com/payloadcms/payload/discussions/12713)
 - [GitHub Discussion #14230: Dev Server Performance](https://github.com/payloadcms/payload/discussions/14230)
 - [G2: Payload CMS Reviews](https://www.g2.com/products/payload-cms/reviews)
 

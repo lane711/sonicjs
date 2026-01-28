@@ -137,7 +137,19 @@ Developers report Directus's Vue-based admin offers "better customization, speed
 
 ### Directus Pain Points
 
-Our research uncovered significant performance and stability concerns:
+Our research uncovered significant performance and stability concerns documented across multiple GitHub issues:
+
+**Documented Performance Issues from GitHub:**
+
+| Issue | Scenario | Reported Time | Notes |
+|-------|----------|---------------|-------|
+| [#11766](https://github.com/directus/directus/issues/11766) | 15 relations, 10 req/s | 1,500ms avg | runAST bottleneck |
+| [#7783](https://github.com/directus/directus/issues/7783) | 400k files | 45,000ms+ | Heap out of memory |
+| [#1575](https://github.com/directus/directus/issues/1575) | Simple queries | 4,000ms | Cold query performance |
+| [#2020](https://github.com/directus/directus/issues/2020) | 1,000 items | 5,500ms | Collection listing |
+| [#1743](https://github.com/directus/v8-archive/issues/1743) | Basic API calls | 150-1000ms | SSR unusable |
+| [#26153](https://github.com/directus/directus/issues/26153) | Admin app after upgrade | 300-900ms delay | v11.13.1 regression |
+| [#10034](https://github.com/directus/directus/issues/10034) | 200 row inserts | Connection crashes | Pool exhaustion |
 
 **Severe Performance Issues at Scale**:
 
@@ -146,6 +158,9 @@ From GitHub Issue #11766:
 
 From GitHub Issue #7783:
 > "The response time for data seems related to the amount of files stored with Directus, getting slower as more files are created. With nearly 400,000 files, the response time reaches about **45 seconds or more**. The app started crashing with a JavaScript heap out of memory error."
+
+**Additional Performance Reports** (Issues #1575, #2020):
+> "Simple queries taking **4 seconds**. Listing 1,000 items takes **5.5 seconds**."
 
 **Connection Pool Crashes** (Issue #10034):
 > "When inserting up to 200 rows, Directus starts after few minutes to slow down and crash. Users encounter 'KnexTimeoutError: Knex: Timeout acquiring a connection. The pool is probably full.'"
@@ -509,13 +524,18 @@ If you don't need to wrap existing databases, SonicJS offers better performance 
 ### Strapi Resources
 - [Strapi Official Comparison: Strapi vs Directus](https://strapi.io/headless-cms/comparison/strapi-vs-directus)
 - [Strapi vs Directus 2024 Comparison (WeframeTech)](https://medium.com/@weframe.tech/strapi-vs-directus-a-2024-comparison-b3a6f40bd916)
+- [GitHub Issue #5374: Complex Query Performance (9-12s)](https://github.com/strapi/strapi/issues/5374)
+- [GitHub Issue #13288: Deep Population (20s)](https://github.com/strapi/strapi/issues/13288)
+- [Strapi v5 Migration: Lessons & Pain Points](https://medium.com/@notum/strapi-v5-migration-lessons-wins-pain-points-d0afbf9253a8)
 
 ### Directus GitHub Issues
-- [Performance and Scaling (Issue #11766)](https://github.com/directus/directus/issues/11766)
-- [File-Related Slowdowns (Issue #7783)](https://github.com/directus/directus/issues/7783)
-- [Connection Pool Crashes (Issue #10034)](https://github.com/directus/directus/issues/10034)
-- [API Response Time Issues (Issue #1743)](https://github.com/directus/v8-archive/issues/1743)
-- [Performance Regression v11.13.1 (Issue #26153)](https://github.com/directus/directus/issues/26153)
+- [Performance and Scaling (Issue #11766)](https://github.com/directus/directus/issues/11766) — 1.5s average with relations
+- [File-Related Slowdowns (Issue #7783)](https://github.com/directus/directus/issues/7783) — 45s+ with 400k files
+- [Cold Query Performance (Issue #1575)](https://github.com/directus/directus/issues/1575) — 4s simple queries
+- [Collection Listing Performance (Issue #2020)](https://github.com/directus/directus/issues/2020) — 5.5s for 1k items
+- [Connection Pool Crashes (Issue #10034)](https://github.com/directus/directus/issues/10034) — Pool exhaustion with bulk inserts
+- [API Response Time Issues (Issue #1743)](https://github.com/directus/v8-archive/issues/1743) — 150ms-1s basic calls
+- [Performance Regression v11.13.1 (Issue #26153)](https://github.com/directus/directus/issues/26153) — 300-900ms admin delay
 
 ### Industry Analysis
 - [2025 Headless CMS Analysis (OneSeven Tech)](https://www.oneseventech.com/blog/headless-cms-comparison-2025)
