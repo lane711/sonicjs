@@ -15,17 +15,16 @@ export const metadata = {
     Deliver APIs at Warp Speed
   </h1>
 
-  <div className="text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-    <span className="font-bold text-gray-900 dark:text-white">6x faster</span> than Node/Express.
-    Deploy globally in <span className="font-bold text-gray-900 dark:text-white">seconds</span>.
-    Built on Cloudflare Workers.
-  </div>
+<div className="mx-auto mb-8 max-w-2xl text-xl text-gray-700 dark:text-gray-300">
+  <span className="font-bold text-gray-900 dark:text-white">6x faster</span>{' '}
+  than Node/Express. Deploy globally in{' '}
+  <span className="font-bold text-gray-900 dark:text-white">seconds</span>.
+  Built on Cloudflare Workers.
+</div>
 
-  <div className="mb-8 max-w-md mx-auto">
-    ```bash
-    npx create-sonicjs my-app
-    ```
-  </div>
+<div className="mx-auto mb-8 max-w-md">
+  ```bash npx create-sonicjs my-app ```
+</div>
 
   <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
     <Button href="/quickstart" arrow="right">
@@ -76,21 +75,39 @@ export const metadata = {
 
 ## Performance That Speaks for Itself
 
-<div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-12">
-  <div className="text-center p-8 rounded-xl bg-gradient-to-br from-blue-500/10 via-blue-400/5 to-cyan-500/10 dark:from-blue-500/20 dark:via-blue-400/10 dark:to-cyan-500/20 border border-blue-200/50 dark:border-blue-700/50 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-    <div className="text-6xl font-black bg-gradient-to-br from-blue-600 to-cyan-500 dark:from-blue-400 dark:to-cyan-300 bg-clip-text text-transparent mb-3">6x</div>
-    <div className="text-lg font-bold mb-1 text-gray-900 dark:text-white">Faster than Node</div>
-    <div className="text-sm text-gray-600 dark:text-gray-400">Blazing fast API responses</div>
+<div className="my-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+  <div className="rounded-xl border border-blue-200/50 bg-gradient-to-br from-blue-500/10 via-blue-400/5 to-cyan-500/10 p-8 text-center shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl dark:border-blue-700/50 dark:from-blue-500/20 dark:via-blue-400/10 dark:to-cyan-500/20">
+    <div className="mb-3 bg-gradient-to-br from-blue-600 to-cyan-500 bg-clip-text text-6xl font-black text-transparent dark:from-blue-400 dark:to-cyan-300">
+      6x
+    </div>
+    <div className="mb-1 text-lg font-bold text-gray-900 dark:text-white">
+      Faster than Node
+    </div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">
+      Blazing fast API responses
+    </div>
   </div>
-  <div className="text-center p-8 rounded-xl bg-gradient-to-br from-purple-500/10 via-purple-400/5 to-pink-500/10 dark:from-purple-500/20 dark:via-purple-400/10 dark:to-pink-500/20 border border-purple-200/50 dark:border-purple-700/50 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-    <div className="text-6xl font-black bg-gradient-to-br from-purple-600 to-pink-500 dark:from-purple-400 dark:to-pink-300 bg-clip-text text-transparent mb-3">200+</div>
-    <div className="text-lg font-bold mb-1 text-gray-900 dark:text-white">Global Edge Locations</div>
-    <div className="text-sm text-gray-600 dark:text-gray-400">Deploy everywhere instantly</div>
+  <div className="rounded-xl border border-purple-200/50 bg-gradient-to-br from-purple-500/10 via-purple-400/5 to-pink-500/10 p-8 text-center shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl dark:border-purple-700/50 dark:from-purple-500/20 dark:via-purple-400/10 dark:to-pink-500/20">
+    <div className="mb-3 bg-gradient-to-br from-purple-600 to-pink-500 bg-clip-text text-6xl font-black text-transparent dark:from-purple-400 dark:to-pink-300">
+      200+
+    </div>
+    <div className="mb-1 text-lg font-bold text-gray-900 dark:text-white">
+      Global Edge Locations
+    </div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">
+      Deploy everywhere instantly
+    </div>
   </div>
-  <div className="text-center p-8 rounded-xl bg-gradient-to-br from-pink-500/10 via-rose-400/5 to-orange-500/10 dark:from-pink-500/20 dark:via-rose-400/10 dark:to-orange-500/20 border border-pink-200/50 dark:border-pink-700/50 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-    <div className="text-6xl font-black bg-gradient-to-br from-pink-600 to-orange-500 dark:from-pink-400 dark:to-orange-300 bg-clip-text text-transparent mb-3">100k</div>
-    <div className="text-lg font-bold mb-1 text-gray-900 dark:text-white">Free Daily Requests</div>
-    <div className="text-sm text-gray-600 dark:text-gray-400">Generous free tier</div>
+  <div className="rounded-xl border border-pink-200/50 bg-gradient-to-br from-pink-500/10 via-rose-400/5 to-orange-500/10 p-8 text-center shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl dark:border-pink-700/50 dark:from-pink-500/20 dark:via-rose-400/10 dark:to-orange-500/20">
+    <div className="mb-3 bg-gradient-to-br from-pink-600 to-orange-500 bg-clip-text text-6xl font-black text-transparent dark:from-pink-400 dark:to-orange-300">
+      100k
+    </div>
+    <div className="mb-1 text-lg font-bold text-gray-900 dark:text-white">
+      Free Daily Requests
+    </div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">
+      Generous free tier
+    </div>
   </div>
 </div>
 
@@ -106,33 +123,57 @@ export const metadata = {
     <div className="absolute top-0 right-0 w-20 h-20 bg-yellow-400/10 dark:bg-yellow-400/5 rounded-full -mr-10 -mt-10"></div>
   </div>
 
-  <div className="group relative overflow-hidden border border-green-200/50 dark:border-green-700/50 bg-gradient-to-br from-green-50/50 via-emerald-50/30 to-teal-50/50 dark:from-green-900/20 dark:via-emerald-900/10 dark:to-teal-900/20 rounded-xl p-6 hover:shadow-xl hover:scale-105 transition-all duration-300">
-    <div className="text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">🔒</div>
-    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">Built-in Auth</h3>
-    <p className="text-gray-600 dark:text-gray-300 text-sm">JWT authentication and role-based access control out of the box</p>
-    <div className="absolute top-0 right-0 w-20 h-20 bg-green-400/10 dark:bg-green-400/5 rounded-full -mr-10 -mt-10"></div>
+<div className="group relative overflow-hidden rounded-xl border border-green-200/50 bg-gradient-to-br from-green-50/50 via-emerald-50/30 to-teal-50/50 p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl dark:border-green-700/50 dark:from-green-900/20 dark:via-emerald-900/10 dark:to-teal-900/20">
+  <div className="mb-4 transform text-5xl transition-transform duration-300 group-hover:scale-110">
+    🔒
   </div>
+  <h3 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">
+    Built-in Auth
+  </h3>
+  <p className="text-sm text-gray-600 dark:text-gray-300">
+    JWT authentication and role-based access control out of the box
+  </p>
+  <div className="absolute top-0 right-0 -mt-10 -mr-10 h-20 w-20 rounded-full bg-green-400/10 dark:bg-green-400/5"></div>
+</div>
 
-  <div className="group relative overflow-hidden border border-purple-200/50 dark:border-purple-700/50 bg-gradient-to-br from-purple-50/50 via-violet-50/30 to-indigo-50/50 dark:from-purple-900/20 dark:via-violet-900/10 dark:to-indigo-900/20 rounded-xl p-6 hover:shadow-xl hover:scale-105 transition-all duration-300">
-    <div className="text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">🎨</div>
-    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">Modern Admin UI</h3>
-    <p className="text-gray-600 dark:text-gray-300 text-sm">Beautiful, intuitive interface for content management</p>
-    <div className="absolute top-0 right-0 w-20 h-20 bg-purple-400/10 dark:bg-purple-400/5 rounded-full -mr-10 -mt-10"></div>
+<div className="group relative overflow-hidden rounded-xl border border-purple-200/50 bg-gradient-to-br from-purple-50/50 via-violet-50/30 to-indigo-50/50 p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl dark:border-purple-700/50 dark:from-purple-900/20 dark:via-violet-900/10 dark:to-indigo-900/20">
+  <div className="mb-4 transform text-5xl transition-transform duration-300 group-hover:scale-110">
+    🎨
   </div>
+  <h3 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">
+    Modern Admin UI
+  </h3>
+  <p className="text-sm text-gray-600 dark:text-gray-300">
+    Beautiful, intuitive interface for content management
+  </p>
+  <div className="absolute top-0 right-0 -mt-10 -mr-10 h-20 w-20 rounded-full bg-purple-400/10 dark:bg-purple-400/5"></div>
+</div>
 
-  <div className="group relative overflow-hidden border border-blue-200/50 dark:border-blue-700/50 bg-gradient-to-br from-blue-50/50 via-sky-50/30 to-cyan-50/50 dark:from-blue-900/20 dark:via-sky-900/10 dark:to-cyan-900/20 rounded-xl p-6 hover:shadow-xl hover:scale-105 transition-all duration-300">
-    <div className="text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">📘</div>
-    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">100% TypeScript</h3>
-    <p className="text-gray-600 dark:text-gray-300 text-sm">Type-safe from database to API responses</p>
-    <div className="absolute top-0 right-0 w-20 h-20 bg-blue-400/10 dark:bg-blue-400/5 rounded-full -mr-10 -mt-10"></div>
+<div className="group relative overflow-hidden rounded-xl border border-blue-200/50 bg-gradient-to-br from-blue-50/50 via-sky-50/30 to-cyan-50/50 p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl dark:border-blue-700/50 dark:from-blue-900/20 dark:via-sky-900/10 dark:to-cyan-900/20">
+  <div className="mb-4 transform text-5xl transition-transform duration-300 group-hover:scale-110">
+    📘
   </div>
+  <h3 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">
+    100% TypeScript
+  </h3>
+  <p className="text-sm text-gray-600 dark:text-gray-300">
+    Type-safe from database to API responses
+  </p>
+  <div className="absolute top-0 right-0 -mt-10 -mr-10 h-20 w-20 rounded-full bg-blue-400/10 dark:bg-blue-400/5"></div>
+</div>
 
-  <div className="group relative overflow-hidden border border-pink-200/50 dark:border-pink-700/50 bg-gradient-to-br from-pink-50/50 via-rose-50/30 to-red-50/50 dark:from-pink-900/20 dark:via-rose-900/10 dark:to-red-900/20 rounded-xl p-6 hover:shadow-xl hover:scale-105 transition-all duration-300">
-    <div className="text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">🔌</div>
-    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">Powerful Hooks</h3>
-    <p className="text-gray-600 dark:text-gray-300 text-sm">Extend and customize with lifecycle hooks</p>
-    <div className="absolute top-0 right-0 w-20 h-20 bg-pink-400/10 dark:bg-pink-400/5 rounded-full -mr-10 -mt-10"></div>
+<div className="group relative overflow-hidden rounded-xl border border-pink-200/50 bg-gradient-to-br from-pink-50/50 via-rose-50/30 to-red-50/50 p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl dark:border-pink-700/50 dark:from-pink-900/20 dark:via-rose-900/10 dark:to-red-900/20">
+  <div className="mb-4 transform text-5xl transition-transform duration-300 group-hover:scale-110">
+    🔌
   </div>
+  <h3 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">
+    Powerful Hooks
+  </h3>
+  <p className="text-sm text-gray-600 dark:text-gray-300">
+    Extend and customize with lifecycle hooks
+  </p>
+  <div className="absolute top-0 right-0 -mt-10 -mr-10 h-20 w-20 rounded-full bg-pink-400/10 dark:bg-pink-400/5"></div>
+</div>
 
   <div className="group relative overflow-hidden border border-orange-200/50 dark:border-orange-700/50 bg-gradient-to-br from-orange-50/50 via-amber-50/30 to-yellow-50/50 dark:from-orange-900/20 dark:via-amber-900/10 dark:to-yellow-900/20 rounded-xl p-6 hover:shadow-xl hover:scale-105 transition-all duration-300">
     <div className="text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">🚀</div>
@@ -156,17 +197,17 @@ const schema = {
     title: { type: 'string', required: true },
     price: { type: 'number' },
     inStock: { type: 'boolean', default: true },
-    category: { type: 'reference', table: 'categories' }
-  }
+    category: { type: 'reference', table: 'categories' },
+  },
 }
 ```
 
 <div className="my-6 p-6 border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20 rounded-xl">
-  <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-900 dark:text-white">
+  <span className="text-lg font-semibold mb-4 flex items-center text-gray-900 dark:text-white">
     <span className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-xs font-bold px-2 py-1 rounded mr-2">RESULT</span>
     Instant REST API
-  </h3>
-  <pre className="text-sm text-gray-800 dark:text-gray-200 overflow-x-auto">
+  </span>
+  <pre className="mt-0 text-sm text-gray-800 dark:text-gray-200 overflow-x-auto">
 {`// Auto-generated endpoints
 GET    /api/products
 GET    /api/products/:id
@@ -176,6 +217,7 @@ DELETE /api/products/:id
 
 // With filtering, sorting, pagination
 GET /api/products?category=electronics&sort=-price`}
+
   </pre>
 </div>
 
@@ -206,34 +248,41 @@ Visit the [Quickstart guide](/quickstart) for detailed instructions.
 
 ## Perfect For
 
-<div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-12">
-  <div className="text-center p-6 border border-gray-200 dark:border-gray-700 rounded-xl">
-    <div className="text-4xl mb-2">🚀</div>
-    <div className="font-semibold mb-1">Startups</div>
-    <div className="text-sm text-gray-600 dark:text-gray-400">Ship MVPs fast</div>
+<div className="my-12 grid grid-cols-2 gap-4 md:grid-cols-4">
+  <div className="rounded-xl border border-gray-200 p-6 text-center dark:border-gray-700">
+    <div className="mb-2 text-4xl">🚀</div>
+    <div className="mb-1 font-semibold">Startups</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">
+      Ship MVPs fast
+    </div>
   </div>
-  <div className="text-center p-6 border border-gray-200 dark:border-gray-700 rounded-xl">
-    <div className="text-4xl mb-2">🏢</div>
-    <div className="font-semibold mb-1">Enterprise</div>
-    <div className="text-sm text-gray-600 dark:text-gray-400">Scale globally</div>
+  <div className="rounded-xl border border-gray-200 p-6 text-center dark:border-gray-700">
+    <div className="mb-2 text-4xl">🏢</div>
+    <div className="mb-1 font-semibold">Enterprise</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">
+      Scale globally
+    </div>
   </div>
-  <div className="text-center p-6 border border-gray-200 dark:border-gray-700 rounded-xl">
-    <div className="text-4xl mb-2">📱</div>
-    <div className="font-semibold mb-1">Mobile Apps</div>
-    <div className="text-sm text-gray-600 dark:text-gray-400">Lightning APIs</div>
+  <div className="rounded-xl border border-gray-200 p-6 text-center dark:border-gray-700">
+    <div className="mb-2 text-4xl">📱</div>
+    <div className="mb-1 font-semibold">Mobile Apps</div>
+    <div className="text-sm text-gray-600 dark:text-gray-400">
+      Lightning APIs
+    </div>
   </div>
-  <div className="text-center p-6 border border-gray-200 dark:border-gray-700 rounded-xl">
-    <div className="text-4xl mb-2">🎮</div>
-    <div className="font-semibold mb-1">Gaming</div>
+  <div className="rounded-xl border border-gray-200 p-6 text-center dark:border-gray-700">
+    <div className="mb-2 text-4xl">🎮</div>
+    <div className="mb-1 font-semibold">Gaming</div>
     <div className="text-sm text-gray-600 dark:text-gray-400">Low latency</div>
   </div>
 </div>
 
 {/* Testimonial */}
 
-<div className="my-12 p-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-  <div className="text-xl italic text-gray-700 dark:text-gray-300 mb-4">
-    "SonicJS cut our API response times by 80%. We're now serving millions of requests daily without breaking a sweat."
+<div className="my-12 rounded-xl border border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50 p-8 dark:border-blue-800 dark:from-blue-900/20 dark:to-purple-900/20">
+  <div className="mb-4 text-xl text-gray-700 italic dark:text-gray-300">
+    "SonicJS cut our API response times by 80%. We're now serving millions of
+    requests daily without breaking a sweat."
   </div>
   <div className="text-sm text-gray-600 dark:text-gray-400">
     - Engineering Team at Streamline Analytics
@@ -246,7 +295,7 @@ Visit the [Quickstart guide](/quickstart) for detailed instructions.
 
 Join thousands of developers building the future of web APIs
 
-<div className="flex flex-col sm:flex-row gap-4 justify-center my-8">
+<div className="my-8 flex flex-col justify-center gap-4 sm:flex-row">
   <Button href="/quickstart" arrow="right">
     <>Getting Started</>
   </Button>
@@ -304,7 +353,7 @@ Join thousands of developers building the future of web APIs
     <div className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 py-1">
       <div className="flex items-center gap-2 mb-2">
         <span className="text-xs font-bold px-2 py-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">v2.7.0</span>
-        
+
         <span className="text-sm text-gray-500 dark:text-gray-400">2026-01-23</span>
       </div>
       <div className="text-sm space-y-1">
@@ -403,6 +452,7 @@ Join thousands of developers building the future of web APIs
         </div>
       </div>
     </div>
+
   </div>
 
   <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
