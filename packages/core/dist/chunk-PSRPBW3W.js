@@ -535,7 +535,7 @@ var package_default = {
     "drizzle-orm": "^0.44.7",
     eslint: "^9.39.2",
     glob: "^10.5.0",
-    hono: "^4.11.4",
+    hono: "^4.11.7",
     tsup: "^8.5.0",
     typescript: "^5.9.3",
     vitest: "^4.0.5",
@@ -602,5 +602,5 @@ function parseBlocksValue(value, config) {
 }
 
 export { QueryFilterBuilder, SONICJS_VERSION, TemplateRenderer, buildQuery, escapeHtml, generateSlug, getBlocksFieldConfig, getCoreVersion, package_default, parseBlocksValue, renderTemplate, sanitizeInput, sanitizeObject, templateRenderer };
-//# sourceMappingURL=chunk-DNHJS6RN.js.map
-//# sourceMappingURL=chunk-DNHJS6RN.js.map
+//# sourceMappingURL=chunk-PSRPBW3W.js.map
+//# sourceMappingURL=chunk-PSRPBW3W.js.map

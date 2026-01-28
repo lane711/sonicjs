@@ -7,7 +7,7 @@
   "homepage": "https://sonicjs.com/plugins/cache",
   "repository": "https://github.com/lane711/sonicjs-ai/tree/main/src/plugins/cache",
   "license": "MIT",
-  "category": "performance",
+  "category": "system",
   "tags": ["cache", "performance", "optimization", "kv", "memory"],
   "dependencies": [],
   "settings": {

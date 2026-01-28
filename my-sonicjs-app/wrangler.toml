@@ -13,8 +13,8 @@ workers_dev = true
 # Note: database_name and database_id are automatically updated by GitHub Actions
 [[d1_databases]]
 binding = "DB"
-database_name = "temp-will-be-replaced-by-ci"
-database_id = "temp-will-be-replaced-by-ci"
+database_name = "sonicjs-worktree-lane711-otp-email-branding"
+database_id = "68223153-215a-4c8f-a9bf-797f11236758"
 migrations_dir = "./migrations"
 
 # R2 Bucket for media storage (using CI bucket)
