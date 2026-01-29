@@ -321,12 +321,11 @@ const schema = {
 ```
 
 <div className="my-6 p-6 border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20 rounded-xl">
-  <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-900 dark:text-white">
+  <h3 className="text-lg font-semibold mb-2 flex items-center text-gray-900 dark:text-white">
     <span className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-xs font-bold px-2 py-1 rounded mr-2">RESULT</span>
     Instant REST API
   </h3>
-  <pre className="text-sm text-gray-800 dark:text-gray-200 overflow-x-auto">
-{`// Auto-generated endpoints
+  <pre className="text-sm text-gray-800 dark:text-gray-200 overflow-x-auto m-0">{`// Auto-generated endpoints
 GET    /api/products
 GET    /api/products/:id
 POST   /api/products
@@ -334,8 +333,7 @@ PUT    /api/products/:id
 DELETE /api/products/:id
 
 // With filtering, sorting, pagination
-GET /api/products?category=electronics&sort=-price`}
-  </pre>
+GET /api/products?category=electronics&sort=-price`}</pre>
 </div>
 
 {/* Quick Start */}
