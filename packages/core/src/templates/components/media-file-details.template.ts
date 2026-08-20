@@ -1,5 +1,6 @@
 import { escapeHtml } from '../../utils/sanitize'
 import { MediaFile } from './media-grid.template'
+import { escapeHtml } from '../../utils/sanitize'
 
 export interface MediaFileDetailsData {
   file: MediaFile & {
