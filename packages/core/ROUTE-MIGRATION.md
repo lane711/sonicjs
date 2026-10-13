@@ -180,7 +180,7 @@ curl http://localhost:8787/api/collections/blog-posts/content
 - `GET /auth/reset-password` - Password reset form
 - `POST /auth/reset-password` - Process password reset
 - `POST /auth/request-password-reset` - Request password reset
-- `POST /auth/seed-admin` - Create admin user (development only; needs `ENABLE_SEED_ADMIN = "true"` and a non-production `ENVIRONMENT`)
+- `POST /auth/seed-admin` - Create admin user (development only; needs `ENABLE_SEED_ADMIN = "true"` and `ENVIRONMENT` one of `development`, `test`, `e2e`, `preview`, `local`)
 
 **Dependencies Created**:
 - `AuthValidationService` - Dynamic validation based on plugin settings
