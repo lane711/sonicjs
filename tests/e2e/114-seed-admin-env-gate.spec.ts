@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
-// The seed-admin endpoint is now gated fail-closed to non-production environments.
-// The E2E preview runs with ENVIRONMENT=development (an allowed value), so this
+// The seed-admin endpoint is gated fail-closed: ENABLE_SEED_ADMIN="true" plus a non-production ENVIRONMENT.
+// The E2E preview runs with both set (my-sonicjs-app/wrangler.toml), so this
 // spec is a regression guard: the gate must NOT break the seeding path that the
 // rest of the suite (and first-boot login) depends on. The denied path
 // (production/unset → 403) is covered by the unit test seed-admin-gate.test.ts,

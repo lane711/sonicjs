@@ -2,9 +2,9 @@ import { describe, it, expect, vi } from 'vitest'
 import { Hono } from 'hono'
 
 // The seed-admin endpoint mints a fixed-credential admin. These tests pin the
-// fail-closed environment gate that keeps it off real deployments: only explicit
-// non-production ENVIRONMENT values may reach the handler; 'production' and an
-// unset value are denied with 403.
+// fail-closed gate that keeps it off real deployments: it needs the explicit
+// ENABLE_SEED_ADMIN="true" opt-in AND a non-production ENVIRONMENT. Anything
+// else is denied with 403.
 
 vi.mock('../../middleware', () => ({
   requireAuth: () => async (_c: any, next: any) => { await next() },
@@ -63,7 +63,7 @@ const app = new Hono()
 app.route('/auth', authRoutes)
 
 const post = (env: Record<string, unknown>) =>
-  app.request('/auth/seed-admin', { method: 'POST' }, env as any)
+  app.request('/auth/seed-admin', { method: 'POST' }, { ENABLE_SEED_ADMIN: 'true', ...env } as any)
 
 describe('POST /auth/seed-admin environment gate @auth', () => {
   it('denies (403) when ENVIRONMENT is production', async () => {
@@ -96,5 +96,21 @@ describe('POST /auth/seed-admin environment gate @auth', () => {
   it.each(['test', 'e2e', 'preview', 'local'])('allows the seed to run in %s', async (env) => {
     const res = await post({ DB: makeDb(), ENVIRONMENT: env })
     expect(res.status).not.toBe(403)
+  })
+
+  // The create-sonicjs starter deploys with ENVIRONMENT=development (top-level [vars]),
+  // so the environment alone must not open the endpoint.
+  it.each([
+    ['unset', undefined],
+    ['false', 'false'],
+    ['empty', ''],
+  ])('denies (403) in development when ENABLE_SEED_ADMIN is %s', async (_label, flag) => {
+    const res = await post({ DB: makeDb(), ENVIRONMENT: 'development', ENABLE_SEED_ADMIN: flag })
+    expect(res.status).toBe(403)
+  })
+
+  it('still denies production when the opt-in is set', async () => {
+    const res = await post({ DB: makeDb(), ENVIRONMENT: 'production', ENABLE_SEED_ADMIN: 'true' })
+    expect(res.status).toBe(403)
   })
 })
