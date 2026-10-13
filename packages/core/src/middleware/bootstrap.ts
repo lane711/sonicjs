@@ -385,7 +385,10 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
           if (await bootstrapService.isBootstrapNeeded()) {
             console.log("[Bootstrap] Bootstrapping core plugins...");
             // bootstrapCorePlugins keeps going past a failed plugin; report the failures
-            // here so a missing core plugin keeps the KV marker unwritten.
+            // here so this run does not write the KV marker. Limit: isBootstrapNeeded() only
+            // looks at the `core-*` plugins, so a later run that finds those present skips this
+            // step and can write the marker while another bootstrapped plugin is still missing.
+            // Widening that check would also reinstall plugins a user uninstalled (soft delete).
             const failed = await bootstrapService.bootstrapCorePlugins();
             if (failed.length) throw new Error(`core plugin(s) not installed: ${failed.join(", ")}`);
           }
