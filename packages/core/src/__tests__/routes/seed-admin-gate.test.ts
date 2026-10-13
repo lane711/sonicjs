@@ -104,13 +104,17 @@ describe('POST /auth/seed-admin environment gate @auth', () => {
     ['unset', undefined],
     ['false', 'false'],
     ['empty', ''],
-  ])('denies (403) in development when ENABLE_SEED_ADMIN is %s', async (_label, flag) => {
+  ])('denies (403) in development when ENABLE_SEED_ADMIN is %s, naming the flag', async (_label, flag) => {
     const res = await post({ DB: makeDb(), ENVIRONMENT: 'development', ENABLE_SEED_ADMIN: flag })
     expect(res.status).toBe(403)
+    const body = await res.json() as { error: string }
+    expect(body.error).toContain('ENABLE_SEED_ADMIN')
   })
 
-  it('still denies production when the opt-in is set', async () => {
+  it('still denies production when the opt-in is set, without naming the flag', async () => {
     const res = await post({ DB: makeDb(), ENVIRONMENT: 'production', ENABLE_SEED_ADMIN: 'true' })
     expect(res.status).toBe(403)
+    const body = await res.json() as { error: string }
+    expect(body.error).not.toContain('ENABLE_SEED_ADMIN')
   })
 })

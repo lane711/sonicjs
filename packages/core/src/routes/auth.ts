@@ -763,8 +763,11 @@ authRoutes.post('/seed-admin',
   async (c) => {
   const environment = (c.env?.ENVIRONMENT ?? '').toString().toLowerCase()
   const enabled = (c.env as { ENABLE_SEED_ADMIN?: unknown } | undefined)?.ENABLE_SEED_ADMIN
-  if (String(enabled).toLowerCase() !== 'true' || !SEED_ADMIN_ALLOWED_ENVIRONMENTS.has(environment)) {
+  if (!SEED_ADMIN_ALLOWED_ENVIRONMENTS.has(environment)) {
     return c.json({ error: 'Seed endpoint not available in this environment' }, 403)
+  }
+  if (String(enabled).toLowerCase() !== 'true') {
+    return c.json({ error: 'Seed endpoint is disabled. Set ENABLE_SEED_ADMIN = "true" to use it in development.' }, 403)
   }
   try {
     const db = c.env.DB
