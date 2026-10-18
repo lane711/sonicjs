@@ -1,11 +1,5 @@
 import { test, expect } from '@playwright/test'
 
-// A4 — hardening the anonymous public surface:
-//  - /api/system/stats and /api/system/env now require authentication
-//    (they leaked user counts and infrastructure configuration)
-//  - the public form-submit endpoint bounds the request body
-// These run unauthenticated against the deployed preview.
-
 test.describe('public surface hardening @smoke @api', () => {
   test('GET /api/system/stats requires auth', async ({ request }) => {
     const res = await request.get('/api/system/stats')
@@ -19,7 +13,6 @@ test.describe('public surface hardening @smoke @api', () => {
 
   test('GET /api/system/health stays public', async ({ request }) => {
     const res = await request.get('/api/system/health')
-    // Health probe must remain reachable without auth.
     expect(res.status()).not.toBe(401)
   })
 

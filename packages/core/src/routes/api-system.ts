@@ -128,10 +128,6 @@ apiSystemRoutes.get('/info', (c) => {
 /**
  * System stats
  * GET /api/system/stats
- *
- * Requires authentication — exposes aggregate content/media/user counts
- * (including the total user count), which is business-intelligence recon for an
- * anonymous caller.
  */
 apiSystemRoutes.get('/stats', requireAuth(), async (c) => {
   try {
@@ -215,11 +211,7 @@ apiSystemRoutes.get('/ping', async (c) => {
 
 /**
  * Environment check
- * GET /api/system/env
- *
- * Requires authentication — reveals which bindings/integrations are configured
- * (DB, cache, R2, email queue, SendGrid, Cloudflare Images), an infrastructure
- * fingerprint that should not be exposed to anonymous callers.
+ * GET /api/system/env — auth required: it reveals which bindings are configured.
  */
 apiSystemRoutes.get('/env', requireAuth(), (c) => {
   return c.json({

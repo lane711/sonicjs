@@ -237,7 +237,7 @@ describe('POST /api/forms/:identifier/submit — payload DoS guards', () => {
     })
 
     expect(res.status).toBe(413)
-    expect(capturedSubmissionData).toBeNull() // nothing persisted
+    expect(capturedSubmissionData).toBeNull()
   })
 
   it('rejects a payload with too many fields with 413', async () => {

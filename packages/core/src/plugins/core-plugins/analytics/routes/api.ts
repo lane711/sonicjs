@@ -5,8 +5,7 @@ import { rateLimit } from '../../../../middleware'
 
 const apiRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
-// POST /api/events - Track a single event or batch of events. Public + unauthenticated
-// ingest, so it is rate-limited per IP to bound anonymous write amplification.
+// POST /api/events - Track a single event or batch of events
 apiRoutes.post('/', rateLimit({ max: 60, windowMs: 60 * 1000, keyPrefix: 'events-ingest' }), async (c) => {
   const db = c.env.DB
   const service = new EventTrackingService(db)
