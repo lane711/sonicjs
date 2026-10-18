@@ -31,9 +31,7 @@ function createMockEnv(overrides: Partial<{
   }
 }
 
-// Create test app with mock environment. By default a signed-in user is set so
-// the auth-gated routes (/stats, /env) are reachable; pass `{ user: null }` to
-// simulate an anonymous caller.
+// Create test app with mock environment (signed in unless `{ user: null }`)
 function createTestApp(env: any = createMockEnv(), opts: { user?: any | null } = {}) {
   const app = new Hono()
   const user = opts.user === undefined

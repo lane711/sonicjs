@@ -3,32 +3,22 @@ import { TurnstileService } from '../plugins/core-plugins/turnstile-plugin/servi
 import { sanitizeInput } from '../utils/sanitize'
 import { rateLimit } from '../middleware'
 
-// Reject oversized submission bodies before parsing — a form submission is small
-// JSON, so anything past this ceiling is abuse (memory pressure on JSON.parse).
 const MAX_SUBMISSION_BODY_BYTES = 512 * 1024
 // Note: form-collection-sync was removed in the drop-db-collections plan (PR 4).
 // Form submissions are still persisted to `form_submissions`; the legacy dual-write
 // to the `content` table is gone — content created by submissions will move to the
 // document model in a follow-up.
 
-// Bounds on the recursive sanitizer below. Public, unauthenticated submissions
-// are attacker-controlled, so unbounded recursion is a stack-exhaustion DoS and
-// an unbounded node count is a CPU DoS. A real form is shallow and small; these
-// ceilings are far above any legitimate submission.
+// Submissions are anonymous: bound recursion depth (stack) and node count (CPU).
 const MAX_SANITIZE_DEPTH = 32
 const MAX_SANITIZE_NODES = 10_000
 
-/** Thrown when a submission exceeds the structural limits above. */
 class PayloadTooComplexError extends Error {}
 
 /**
  * Recursively sanitize all string values in arbitrary JSON data.
  * HTML-encodes entities (e.g., < becomes &lt;) to prevent stored XSS
  * when form submission data is rendered in admin templates.
- *
- * Guarded against hostile payloads: throws PayloadTooComplexError if the data
- * nests deeper than MAX_SANITIZE_DEPTH or contains more than MAX_SANITIZE_NODES
- * values.
  */
 function sanitizeDeep(value: unknown, depth = 0, counter = { n: 0 }): unknown {
   if (depth > MAX_SANITIZE_DEPTH) {
@@ -538,8 +528,7 @@ publicFormsRoutes.get('/:name', async (c) => {
   }
 })
 
-// Handle form submission (accepts either name or ID). Public + unauthenticated,
-// so it is rate-limited per IP and bounds the request body.
+// Handle form submission (accepts either name or ID)
 publicFormsRoutes.post(
   '/:identifier/submit',
   rateLimit({ max: 20, windowMs: 60 * 1000, keyPrefix: 'form-submit' }),
@@ -548,7 +537,6 @@ publicFormsRoutes.post(
     const db = c.env.DB
     const identifier = c.req.param('identifier')
 
-    // Reject oversized bodies before parsing.
     const declaredLength = Number(c.req.header('content-length') || 0)
     if (declaredLength > MAX_SUBMISSION_BODY_BYTES) {
       return c.json({ error: 'Submission too large' }, 413)
@@ -607,8 +595,7 @@ publicFormsRoutes.post(
     }
 
     // Sanitize all string values in submission data to prevent stored XSS.
-    // HTML-encodes entities (e.g., < becomes &lt;) before storage. Bounded to
-    // reject hostile deeply-nested / oversized payloads.
+    // HTML-encodes entities (e.g., < becomes &lt;) before storage.
     let sanitizedData: Record<string, unknown>
     try {
       sanitizedData = sanitizeDeep(body.data) as Record<string, unknown>
