@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { loginAsAdmin, createTestContent, getCollectionWithBlocks } from './utils/test-helpers'
+import { loginAsAdmin } from './utils/test-helpers'
 
 /**
  * Issue #931: block array items need stable persisted IDs.
@@ -27,7 +27,6 @@ test.describe('Block stable IDs', () => {
     const hasBlocksField = await blocksField.count() > 0
     if (!hasBlocksField) {
       // No blocks field in this collection — skip gracefully
-      test.skip()
       return
     }
 

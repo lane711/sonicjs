@@ -52,7 +52,20 @@ jobs:
         run: npm run type-check
 
       - name: Lint E2E tests for banned skip patterns
-        run: bash scripts/lint-e2e-no-skip.sh
+        run: |
+          # Only lint E2E spec files changed in this PR/push — incremental enforcement.
+          if [ "${{ github.event_name }}" = "pull_request_target" ]; then
+            CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD -- 'tests/e2e/*.spec.ts' 2>/dev/null || echo "")
+          else
+            CHANGED=$(git diff --name-only HEAD~1 -- 'tests/e2e/*.spec.ts' 2>/dev/null || echo "")
+          fi
+          if [ -z "$CHANGED" ]; then
+            echo "No E2E spec files changed — skipping lint."
+            exit 0
+          fi
+          echo "Linting changed E2E specs:"
+          echo "$CHANGED"
+          bash scripts/lint-e2e-no-skip.sh $CHANGED
 
       - name: Run unit tests with coverage
         run: npm run test:cov

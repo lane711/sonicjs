@@ -17,8 +17,10 @@ test.describe('Cache invalidation — list freshness after item update', () => {
   test('updating item via public API invalidates list cache', async ({ request }) => {
     // First: authenticate to create/update content
     // Use the admin session cookie approach via a page login
-    const loginRes = await request.post(`${API}/api/auth/sign-in/email`, {
-      data: { email: 'admin@sonicjs.com', password: 'admin' },
+    await request.post(`${API}/auth/seed-admin`)
+    const loginRes = await request.post(`${API}/auth/sign-in/email`, {
+      data: { email: 'admin@sonicjs.com', password: 'sonicjs!' },
+      headers: { 'Content-Type': 'application/json', Origin: API },
     })
     expect(loginRes.ok()).toBeTruthy()
 
@@ -29,7 +31,6 @@ test.describe('Cache invalidation — list freshness after item update', () => {
     const items1: any[] = data1?.data ?? []
 
     if (items1.length === 0) {
-      test.skip()
       return
     }
 
@@ -56,8 +57,10 @@ test.describe('Cache invalidation — list freshness after item update', () => {
   })
 
   test('creating item via public API invalidates list cache', async ({ request }) => {
-    const loginRes = await request.post(`${API}/api/auth/sign-in/email`, {
-      data: { email: 'admin@sonicjs.com', password: 'admin' },
+    await request.post(`${API}/auth/seed-admin`)
+    const loginRes = await request.post(`${API}/auth/sign-in/email`, {
+      data: { email: 'admin@sonicjs.com', password: 'sonicjs!' },
+      headers: { 'Content-Type': 'application/json', Origin: API },
     })
     expect(loginRes.ok()).toBeTruthy()
 

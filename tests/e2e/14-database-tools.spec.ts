@@ -1,8 +1,15 @@
 import { test, expect } from '@playwright/test';
-import { loginAsAdmin, getCsrfTokenFromPage } from './utils/test-helpers';
+import { loginAsAdmin, getCsrfTokenFromPage, isFeatureAvailable } from './utils/test-helpers';
 
-test.describe.skip('Database Tools', () => {
+let featureAvailable = false;
+
+test.describe('Database Tools', () => {
+  test.beforeAll(async ({ request }) => {
+    featureAvailable = await isFeatureAvailable(request, '/admin/settings');
+  });
+
   test.beforeEach(async ({ page }) => {
+    if (!featureAvailable) { test.skip(); return; }
     await loginAsAdmin(page);
   });
 
@@ -360,22 +367,15 @@ test.describe('Database Tools API Endpoints @database', () => {
     }
   });
 
-  test('should require admin role for truncate endpoint', async ({ page }) => {
+  test('should reject truncate without correct confirmation text', async ({ page }) => {
     const csrfToken = await getCsrfTokenFromPage(page);
     const response = await page.request.post('/admin/database-tools/api/truncate', {
       headers: { ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}) },
-      data: { confirmText: 'TRUNCATE ALL DATA' }
+      data: { confirmText: 'WRONG TEXT' }
     });
-    
-    // Should either succeed (if user is admin) or return 403
-    expect([200, 400, 403]).toContain(response.status());
-    
-    const data = await response.json();
-    
-    if (response.status() === 403) {
-      expect(data).toHaveProperty('success', false);
-      expect(data.error).toContain('Unauthorized');
-    }
+
+    // Wrong confirmation text should return 400, not actually truncate
+    expect([400, 403]).toContain(response.status());
   });
 
   test('should handle malformed API requests gracefully', async ({ page }) => {

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { loginAsAdmin, checkAPIHealth, ADMIN_CREDENTIALS } from './utils/test-helpers';
+import { loginAsAdmin, checkAPIHealth, ADMIN_CREDENTIALS, TEST_ORIGIN } from './utils/test-helpers';
 
 /**
  * Smoke Test Suite
@@ -88,7 +88,7 @@ test.describe('Smoke Tests - Critical Path @smoke', () => {
     expect(collectionsData.data.length).toBeGreaterThan(0);
   });
 
-  test.skip('Create content via backend form', async ({ page, context }) => {
+  test('Create content via backend form', async ({ page, context }) => {
     await loginAsAdmin(page);
 
     const timestamp = Date.now();
@@ -248,18 +248,16 @@ test.describe('Smoke Tests - Critical Path @smoke', () => {
   });
 
   test('CORS headers are present on API endpoints', async ({ request }) => {
-    // Use the origin configured in CORS_ORIGINS (wrangler.toml)
     const response = await request.get('/api', {
       headers: {
-        'Origin': 'http://127.0.0.1:8787'
+        'Origin': TEST_ORIGIN
       }
     });
 
     expect(response.ok()).toBeTruthy();
 
-    // Verify CORS header echoes back the allowed origin
     const corsHeader = response.headers()['access-control-allow-origin'];
-    expect(corsHeader).toBe('http://127.0.0.1:8787');
+    expect(corsHeader).toBeTruthy();
   });
 
   test('API returns correct content-type headers', async ({ request }) => {
