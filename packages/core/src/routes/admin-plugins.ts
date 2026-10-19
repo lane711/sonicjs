@@ -138,17 +138,20 @@ adminPluginRoutes.get('/', async (c) => {
     // Find uninstalled plugins
     const uninstalledPlugins = AVAILABLE_PLUGINS.filter(p => !installedPluginIds.has(p.id))
 
-    // Map installed plugins to template format
+    // Map installed plugins to template format. The DB row owns state (status, settings,
+    // counters) but not presentation: a row written before its manifest existed stores the slug
+    // as display_name, so prefer the registry's label/category/icon whenever one is available.
+    const availableById = new Map(AVAILABLE_PLUGINS.map(p => [p.id, p]))
     const templatePlugins: Plugin[] = validInstalledPlugins.map(p => ({
       id: p.id,
       name: p.name,
-      displayName: p.display_name,
+      displayName: availableById.get(p.id)?.display_name || p.display_name,
       description: p.description,
       version: p.version,
       author: p.author,
       status: p.status,
-      category: p.category,
-      icon: p.icon,
+      category: availableById.get(p.id)?.category || p.category,
+      icon: availableById.get(p.id)?.icon || p.icon,
       downloadCount: p.download_count,
       rating: p.rating,
       lastUpdated: formatLastUpdated(p.last_updated),

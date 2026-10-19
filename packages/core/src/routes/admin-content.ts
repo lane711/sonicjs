@@ -443,7 +443,10 @@ adminContentRoutes.get('/', async (c) => {
     // Get query parameters
     const page = parseInt(url.searchParams.get('page') || '1')
     const limit = parseInt(url.searchParams.get('limit') || '20')
-    const modelName = url.searchParams.get('model') || 'all'
+    // The filter dropdown posts `model`, but the content form's cancel link and the
+    // post-save redirects below send `collection` instead. Accept both, or saving an item
+    // drops the user on an unfiltered list rather than the collection they were editing.
+    const modelName = url.searchParams.get('model') || url.searchParams.get('collection') || 'all'
     const status = url.searchParams.get('status') || 'all'
     const search = url.searchParams.get('search') || ''
     const offset = (page - 1) * limit

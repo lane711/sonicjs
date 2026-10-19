@@ -55,7 +55,11 @@ test.describe('Email Plugin Settings @plugins', () => {
     await expect(provider).toBeVisible()
     await expect(provider.locator('option')).toHaveText(['Cloudflare Email Service', 'Resend'])
 
-    // Cloudflare is the default transport, so its fields are the visible ones
+    // The form renders whichever transport is currently saved, and the sibling "should save
+    // email settings successfully" test persists Resend — so select the transport explicitly
+    // rather than assuming a default. What is under test is that the selector drives which
+    // transport-specific block is shown.
+    await provider.selectOption('cloudflare')
     await expect(page.locator('input#setting_cfAccountId')).toBeVisible()
     await expect(page.locator('input#setting_cfEmailApiToken')).toBeVisible()
     await expect(page.locator('input#setting_cfEmailApiToken')).toHaveAttribute('type', 'password')
