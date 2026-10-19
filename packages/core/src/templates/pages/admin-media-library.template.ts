@@ -552,6 +552,40 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
     <script>
       let selectedFiles = new Set();
       let dragDropFiles = [];
+
+      // display:none for the bulk-actions menu is deferred so the close transition can play.
+      // Track the timer so reopening cancels it — otherwise a pending hide from an earlier close
+      // (e.g. the outside-click that lands on a file checkbox) blanks a menu the user just opened.
+      let bulkActionsHideTimer = null;
+
+      function showBulkActionsMenu() {
+        const menu = document.getElementById('bulk-actions-menu');
+        if (!menu) return;
+        clearTimeout(bulkActionsHideTimer);
+        bulkActionsHideTimer = null;
+        menu.classList.remove('hidden');
+        setTimeout(() => {
+          menu.classList.remove('scale-95', 'opacity-0');
+          menu.classList.add('scale-100', 'opacity-100');
+        }, 10);
+      }
+
+      function hideBulkActionsMenu(immediate) {
+        const menu = document.getElementById('bulk-actions-menu');
+        if (!menu) return;
+        menu.classList.remove('scale-100', 'opacity-100');
+        menu.classList.add('scale-95', 'opacity-0');
+        clearTimeout(bulkActionsHideTimer);
+        bulkActionsHideTimer = null;
+        if (immediate) {
+          menu.classList.add('hidden');
+          return;
+        }
+        bulkActionsHideTimer = setTimeout(() => {
+          bulkActionsHideTimer = null;
+          menu.classList.add('hidden');
+        }, 100);
+      }
       
       // File selection handling
       function toggleFileSelection(fileId) {
@@ -598,28 +632,16 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
           btn.innerHTML = \`Bulk Actions <svg viewBox="0 0 20 20" fill="currentColor" class="size-4"><path d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" /></svg>\`;
           btn.onclick = null; // Remove handler when disabled
           // Hide menu when no files selected
-          const menu = document.getElementById('bulk-actions-menu');
-          menu.classList.remove('scale-100', 'opacity-100');
-          menu.classList.add('scale-95', 'opacity-0', 'hidden');
+          hideBulkActionsMenu(true);
         }
       }
 
       function toggleBulkActionsDropdown() {
         const menu = document.getElementById('bulk-actions-menu');
-        const isHidden = menu.classList.contains('hidden');
-
-        if (isHidden) {
-          menu.classList.remove('hidden');
-          setTimeout(() => {
-            menu.classList.remove('scale-95', 'opacity-0');
-            menu.classList.add('scale-100', 'opacity-100');
-          }, 10);
+        if (menu.classList.contains('hidden')) {
+          showBulkActionsMenu();
         } else {
-          menu.classList.remove('scale-100', 'opacity-100');
-          menu.classList.add('scale-95', 'opacity-0');
-          setTimeout(() => {
-            menu.classList.add('hidden');
-          }, 100);
+          hideBulkActionsMenu();
         }
       }
       
@@ -639,10 +661,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
           btn.disabled = true;
 
           // Hide menu
-          const menu = document.getElementById('bulk-actions-menu');
-          menu.classList.remove('scale-100', 'opacity-100');
-          menu.classList.add('scale-95', 'opacity-0');
-          setTimeout(() => menu.classList.add('hidden'), 100);
+          hideBulkActionsMenu();
           
           const response = await fetch('/api/media/bulk-delete', {
             method: 'POST',
@@ -700,10 +719,7 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
         document.getElementById('move-to-folder-modal').classList.remove('hidden');
 
         // Hide bulk actions menu
-        const menu = document.getElementById('bulk-actions-menu');
-        menu.classList.remove('scale-100', 'opacity-100');
-        menu.classList.add('scale-95', 'opacity-0');
-        setTimeout(() => menu.classList.add('hidden'), 100);
+        hideBulkActionsMenu();
       }
 
       function closeMoveToFolderModal() {
@@ -980,12 +996,8 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
       document.addEventListener('click', function(e) {
         const dropdown = document.getElementById('bulk-actions-dropdown');
         const menu = document.getElementById('bulk-actions-menu');
-        if (dropdown && menu && !dropdown.contains(e.target)) {
-          menu.classList.remove('scale-100', 'opacity-100');
-          menu.classList.add('scale-95', 'opacity-0');
-          setTimeout(() => {
-            menu.classList.add('hidden');
-          }, 100);
+        if (dropdown && menu && !dropdown.contains(e.target) && !menu.classList.contains('hidden')) {
+          hideBulkActionsMenu();
         }
       });
     </script>

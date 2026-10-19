@@ -31,8 +31,9 @@ test.describe('Marketing Home Page', () => {
     const discordHref = await discordLink.getAttribute('href')
     expect(discordHref).toContain('discord.gg')
 
-    // Secondary: Quickstart button at bottom
-    const quickstartLink = page.getByRole('link', { name: /Quickstart/i })
+    // Secondary: Quickstart button at bottom. The footer carries its own Quickstart link, so
+    // scope to <main> to keep this on the CTA band rather than tripping strict mode.
+    const quickstartLink = page.getByRole('main').getByRole('link', { name: /Quickstart/i }).last()
     await expect(quickstartLink).toBeVisible()
     const quickstartHref = await quickstartLink.getAttribute('href')
     expect(quickstartHref).toBe('/quickstart')

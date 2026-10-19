@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Reject skipped E2E tests — only runtime feature-detection guards are allowed.
 # Usage: scripts/lint-e2e-no-skip.sh [files...]
-# With no args, scans all tests/e2e/*.spec.ts files.
+# With no args, scans all tests/e2e/*.spec.ts and tests/www/*.spec.ts files.
 
 set -euo pipefail
 
@@ -10,7 +10,7 @@ NC='\033[0m'
 
 files=("$@")
 if [ ${#files[@]} -eq 0 ]; then
-  files=(tests/e2e/*.spec.ts)
+  files=(tests/e2e/*.spec.ts tests/www/*.spec.ts)
 fi
 
 violations=0

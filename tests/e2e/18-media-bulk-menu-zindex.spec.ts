@@ -34,7 +34,7 @@ test.describe('Media Bulk Actions Menu Z-Index @media', () => {
     formData.append('files', blob2, `test-zindex-${timestamp}-${randomSuffix}-2.jpg`);
     formData.append('folder', 'uploads');
 
-    const uploadResponse = await context.request.post('http://localhost:8787/api/media/upload-multiple', {
+    const uploadResponse = await context.request.post('/api/media/upload-multiple', {
       multipart: formData
     });
 
@@ -54,7 +54,7 @@ test.describe('Media Bulk Actions Menu Z-Index @media', () => {
   test.afterEach(async ({ context }) => {
     if (uploadedFileIds.length > 0) {
       try {
-        await context.request.post('http://localhost:8787/api/media/bulk-delete', {
+        await context.request.post('/api/media/bulk-delete', {
           data: { fileIds: uploadedFileIds }
         });
         uploadedFileIds = [];

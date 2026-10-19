@@ -36,7 +36,7 @@ test.describe('Media Bulk Actions @media', () => {
     formData.append('folder', 'uploads');
 
     // Use context.request to maintain cookies from browser login
-    const uploadResponse = await context.request.post('http://localhost:8787/api/media/upload-multiple', {
+    const uploadResponse = await context.request.post('/api/media/upload-multiple', {
       multipart: formData
     });
 
@@ -81,7 +81,7 @@ test.describe('Media Bulk Actions @media', () => {
     // Clean up uploaded test files
     if (uploadedFileIds.length > 0) {
       try {
-        await context.request.post('http://localhost:8787/api/media/bulk-delete', {
+        await context.request.post('/api/media/bulk-delete', {
           data: {
             fileIds: uploadedFileIds
           }
