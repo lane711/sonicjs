@@ -138,20 +138,26 @@ adminPluginRoutes.get('/', async (c) => {
     // Find uninstalled plugins
     const uninstalledPlugins = AVAILABLE_PLUGINS.filter(p => !installedPluginIds.has(p.id))
 
-    // Map installed plugins to template format. The DB row owns state (status, settings,
-    // counters) but not presentation: a row written before its manifest existed stores the slug
-    // as display_name, so prefer the registry's label/category/icon whenever one is available.
+    // `ensurePlugin` falls back to `display_name: id` when it installs a plugin without a
+    // display name, so rows written that way show the raw slug on their card forever. Fall back
+    // to the registry's label in exactly that case — a row with a real label still wins, since
+    // the DB is where an operator-edited name would live.
     const availableById = new Map(AVAILABLE_PLUGINS.map(p => [p.id, p]))
+    const resolveDisplayName = (p: { id: string; name: string; display_name: string }) =>
+      p.display_name && p.display_name !== p.id && p.display_name !== p.name
+        ? p.display_name
+        : availableById.get(p.id)?.display_name || p.display_name
+
     const templatePlugins: Plugin[] = validInstalledPlugins.map(p => ({
       id: p.id,
       name: p.name,
-      displayName: availableById.get(p.id)?.display_name || p.display_name,
+      displayName: resolveDisplayName(p),
       description: p.description,
       version: p.version,
       author: p.author,
       status: p.status,
-      category: availableById.get(p.id)?.category || p.category,
-      icon: availableById.get(p.id)?.icon || p.icon,
+      category: p.category,
+      icon: p.icon,
       downloadCount: p.download_count,
       rating: p.rating,
       lastUpdated: formatLastUpdated(p.last_updated),
