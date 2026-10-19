@@ -51,6 +51,9 @@ jobs:
       - name: Type check
         run: npm run type-check
 
+      - name: Lint E2E tests for banned skip patterns
+        run: bash scripts/lint-e2e-no-skip.sh
+
       - name: Run unit tests with coverage
         run: npm run test:cov
 
