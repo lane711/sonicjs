@@ -55,14 +55,14 @@ test.describe('Smoke Tests - Critical Path @smoke', () => {
     await expect(page).toHaveURL(/\/admin/);
 
     // Verify we can see admin UI elements
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await expect(page.locator('h1')).toContainText('Dashboard');
   });
 
   test('Dashboard loads with stats and recent activity', async ({ page }) => {
     await loginAsAdmin(page);
     await page.goto('/admin');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Verify stats container loads
     const statsContainer = page.locator('#stats-container');
@@ -139,7 +139,7 @@ test.describe('Smoke Tests - Critical Path @smoke', () => {
 
     // Navigate to admin dashboard
     await page.goto('/admin');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Wait for stats to load (requires DB connection)
     await page.waitForSelector('#stats-container', { timeout: 10000 });
@@ -159,7 +159,7 @@ test.describe('Smoke Tests - Critical Path @smoke', () => {
   test('Recent activity displays content changes', async ({ page }) => {
     await loginAsAdmin(page);
     await page.goto('/admin');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Wait for recent activity section to load via HTMX
     await page.waitForSelector('#recent-activity-container', { timeout: 10000 });

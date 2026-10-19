@@ -14,7 +14,7 @@ test.describe('Plugin Install Click Behavior @smoke @plugins', () => {
 
     // Navigate directly to the uninstalled plugin's detail page
     await page.goto('/admin/plugins/hello-world')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     // Should show Install button — NOT auto-install the plugin
     const installButton = page.locator('button', { hasText: 'Install' })
@@ -26,7 +26,7 @@ test.describe('Plugin Install Click Behavior @smoke @plugins', () => {
 
     // Verify plugin still shows as uninstalled on list page
     await page.goto('/admin/plugins')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     const helloWorldCard = page.locator('.plugin-card').filter({
       has: page.locator('h3', { hasText: 'Hello World' })
@@ -43,7 +43,7 @@ test.describe('Plugin Install Click Behavior @smoke @plugins', () => {
 
     // Navigate to detail page
     await page.goto('/admin/plugins/hello-world')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     // Click Install — JS does fetch + setTimeout(reload, 1500)
     const installButton = page.locator('button', { hasText: 'Install' })
