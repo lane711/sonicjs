@@ -42,7 +42,14 @@ async function gotoPageBlocksNewForm(page: Page) {
 }
 
 async function saveAndCaptureEditUrl(page: Page): Promise<string> {
-  await page.click('button[name="action"][value="save_and_publish"]')
+  await page.click('button[name="action"][value="save"]')
+  // A new-document save answers the HTMX request with `HX-Redirect: /admin/content/<id>/edit`,
+  // and htmx sets location *after* that response — networkidle can therefore resolve while the
+  // URL is still /admin/content/new. Wait for the edit URL instead of racing it.
+  await page
+    .waitForURL(/\/admin\/content\/[^/]+\/edit/, { timeout: 15000 })
+    // An edit-page save is a PUT that stays put, so no navigation is expected there.
+    .catch(() => {})
   await page.waitForLoadState('networkidle', { timeout: 15000 })
   const currentUrl = page.url()
   if (/\/admin\/content\/[^/]+\/edit/.test(currentUrl)) {
@@ -68,6 +75,10 @@ test.describe('Collapsible State Persistence @content', () => {
     await loginAsAdmin(page)
   })
 
+  // Structured arrays and blocks each ship an inert <template> holding a prototype item, and
+  // Playwright's selector engine looks inside template content. Every item/control locator below
+  // is therefore anchored with `:scope >` (or `.first()` inside an item) so it cannot match the
+  // prototype — an unanchored `.structured-array-item` counts the template copy too.
   test('should persist object/repeater/block collapsed state per document in session', async ({
     page,
   }) => {
@@ -96,33 +107,42 @@ test.describe('Collapsible State Persistence @content', () => {
 
     const membersField = page.locator('[data-structured-array][data-field-name="team__members"]').first()
     await expect(membersField).toBeVisible()
-    await membersField.locator('[data-action="add-item"]').click()
-    await membersField.locator('[data-action="add-item"]').click()
+    const addMember = membersField.locator(':scope > div > [data-action="add-item"]')
+    await addMember.click()
+    await addMember.click()
 
-    const memberItems = membersField.locator('.structured-array-item')
+    const memberItems = membersField.locator(
+      ':scope > [data-structured-array-list] > .structured-array-item'
+    )
     await expect(memberItems).toHaveCount(2)
-    await expect(memberItems.nth(0).locator('[data-array-item-fields]')).not.toHaveClass(/hidden/)
-    await expect(memberItems.nth(1).locator('[data-array-item-fields]')).not.toHaveClass(/hidden/)
-    await memberItems.nth(0).locator('input[type="text"]').first().fill('Member One')
-    await memberItems.nth(1).locator('input[type="text"]').first().fill('Member Two')
+    const memberFields = (index: number) =>
+      memberItems.nth(index).locator('[data-array-item-fields]').first()
+    await expect(memberFields(0)).not.toHaveClass(/hidden/)
+    await expect(memberFields(1)).not.toHaveClass(/hidden/)
+    await memberFields(0).locator('input[type="text"]').first().fill('Member One')
+    await memberFields(1).locator('input[type="text"]').first().fill('Member Two')
     await memberItems.nth(0).locator('[data-action="toggle-item"]').first().click()
-    await expect(memberItems.nth(0).locator('[data-array-item-fields]')).toHaveClass(/hidden/)
-    await expect(memberItems.nth(1).locator('[data-array-item-fields]')).not.toHaveClass(/hidden/)
+    await expect(memberFields(0)).toHaveClass(/hidden/)
+    await expect(memberFields(1)).not.toHaveClass(/hidden/)
 
-    const blocksField = page.locator('[data-field-name="body"]')
+    const blocksField = page.locator('[data-blocks-discriminator][data-field-name="body"]')
     await expect(blocksField).toBeVisible()
-    await blocksField.locator('[data-role="block-type-select"]').selectOption('hero')
-    await blocksField.locator('[data-action="add-block"]').click()
-    await blocksField.locator('[data-role="block-type-select"]').selectOption('text')
-    await blocksField.locator('[data-action="add-block"]').click()
+    const blockTypeSelect = blocksField.locator('[data-role="block-type-select"]').first()
+    const addBlock = blocksField.locator('[data-action="add-block"]').first()
+    await blockTypeSelect.selectOption('hero')
+    await addBlock.click()
+    await blockTypeSelect.selectOption('text')
+    await addBlock.click()
 
-    const blockItems = blocksField.locator('.blocks-item')
+    const blockItems = blocksField.locator(':scope > [data-blocks-list] > .blocks-item')
+    const blockContent = (index: number) =>
+      blockItems.nth(index).locator('[data-block-content]').first()
     await expect(blockItems).toHaveCount(2)
-    await expect(blockItems.nth(0).locator('[data-block-content]')).not.toHaveClass(/hidden/)
-    await expect(blockItems.nth(1).locator('[data-block-content]')).not.toHaveClass(/hidden/)
-    await blockItems.nth(0).locator('input[type="text"]').first().fill('Hero Heading')
-    await blockItems.nth(1).locator('input[type="text"]').first().fill('Text Heading')
-    await blockItems.nth(1).locator('textarea').first().fill('Text body content')
+    await expect(blockContent(0)).not.toHaveClass(/hidden/)
+    await expect(blockContent(1)).not.toHaveClass(/hidden/)
+    await blockContent(0).locator('input[type="text"]').first().fill('Hero Heading')
+    await blockContent(1).locator('input[type="text"]').first().fill('Text Heading')
+    await blockContent(1).locator('textarea').first().fill('Text body content')
 
     const docAEditUrl = await saveAndCaptureEditUrl(page)
 
@@ -140,22 +160,28 @@ test.describe('Collapsible State Persistence @content', () => {
     const editMembersField = page
       .locator('[data-structured-array][data-field-name="team__members"]')
       .first()
-    const editMemberItems = editMembersField.locator('.structured-array-item')
+    const editMemberItems = editMembersField.locator(
+      ':scope > [data-structured-array-list] > .structured-array-item'
+    )
+    const editMemberFields = (index: number) =>
+      editMemberItems.nth(index).locator('[data-array-item-fields]').first()
     await expect(editMemberItems).toHaveCount(2)
-    await expect(editMemberItems.nth(0).locator('[data-array-item-fields]')).toHaveClass(/hidden/)
-    await expect(editMemberItems.nth(1).locator('[data-array-item-fields]')).toHaveClass(/hidden/)
+    await expect(editMemberFields(0)).toHaveClass(/hidden/)
+    await expect(editMemberFields(1)).toHaveClass(/hidden/)
     await editMemberItems.nth(1).locator('[data-action="toggle-item"]').first().click()
-    await expect(editMemberItems.nth(1).locator('[data-array-item-fields]')).not.toHaveClass(/hidden/)
+    await expect(editMemberFields(1)).not.toHaveClass(/hidden/)
 
-    const editBlocksField = page.locator('[data-field-name="body"]')
-    const editBlockItems = editBlocksField.locator('.blocks-item')
+    const editBlocksField = page.locator('[data-blocks-discriminator][data-field-name="body"]')
+    const editBlockItems = editBlocksField.locator(':scope > [data-blocks-list] > .blocks-item')
+    const editBlockContent = (index: number) =>
+      editBlockItems.nth(index).locator('[data-block-content]').first()
     await expect(editBlockItems).toHaveCount(2)
-    await expect(editBlockItems.nth(0).locator('[data-block-content]')).toHaveClass(/hidden/)
-    await expect(editBlockItems.nth(1).locator('[data-block-content]')).toHaveClass(/hidden/)
+    await expect(editBlockContent(0)).toHaveClass(/hidden/)
+    await expect(editBlockContent(1)).toHaveClass(/hidden/)
     await editBlockItems.nth(1).locator('[data-action="toggle-block"]').first().click()
-    await expect(editBlockItems.nth(1).locator('[data-block-content]')).not.toHaveClass(/hidden/)
-    await expect(editBlockItems.nth(0).locator('[data-block-content]')).toHaveClass(/hidden/)
-    await expect(editBlockItems.nth(1).locator('[data-block-content]')).not.toHaveClass(/hidden/)
+    await expect(editBlockContent(1)).not.toHaveClass(/hidden/)
+    await expect(editBlockContent(0)).toHaveClass(/hidden/)
+    await expect(editBlockContent(1)).not.toHaveClass(/hidden/)
 
     // Create document B without toggling grouped fields so defaults are used.
     await page.goto('/admin/content/new?collection=' + encodeURIComponent(collectionKey))
@@ -178,25 +204,32 @@ test.describe('Collapsible State Persistence @content', () => {
     const restoredTeamContent = restoredTeamGroup.locator(':scope > .field-group-content')
     await expect(restoredTeamContent).not.toHaveClass(/hidden/)
 
-    const restoredMembers = page
-      .locator('[data-structured-array][data-field-name="team__members"] .structured-array-item')
+    const restoredMembers = page.locator(
+      '[data-structured-array][data-field-name="team__members"] > [data-structured-array-list] > .structured-array-item'
+    )
+    const restoredMemberFields = (index: number) =>
+      restoredMembers.nth(index).locator('[data-array-item-fields]').first()
     await expect(restoredMembers).toHaveCount(2)
-    await expect(restoredMembers.nth(0).locator('[data-array-item-fields]')).toHaveClass(/hidden/)
-    await expect(restoredMembers.nth(1).locator('[data-array-item-fields]')).not.toHaveClass(/hidden/)
+    await expect(restoredMemberFields(0)).toHaveClass(/hidden/)
+    await expect(restoredMemberFields(1)).not.toHaveClass(/hidden/)
 
-    const restoredBlocks = page.locator('[data-field-name="body"] .blocks-item')
+    const restoredBlocks = page.locator(
+      '[data-blocks-discriminator][data-field-name="body"] > [data-blocks-list] > .blocks-item'
+    )
+    const restoredBlockContent = (index: number) =>
+      restoredBlocks.nth(index).locator('[data-block-content]').first()
     await expect(restoredBlocks).toHaveCount(2)
-    await expect(restoredBlocks.nth(0).locator('[data-block-content]')).toHaveClass(/hidden/)
-    await expect(restoredBlocks.nth(1).locator('[data-block-content]')).not.toHaveClass(/hidden/)
+    await expect(restoredBlockContent(0)).toHaveClass(/hidden/)
+    await expect(restoredBlockContent(1)).not.toHaveClass(/hidden/)
 
     // Reorder should keep each item's expanded/collapsed state.
-    await restoredMembers.nth(0).locator('[data-action="move-down"]').click()
-    await expect(restoredMembers.nth(0).locator('[data-array-item-fields]')).not.toHaveClass(/hidden/)
-    await expect(restoredMembers.nth(1).locator('[data-array-item-fields]')).toHaveClass(/hidden/)
+    await restoredMembers.nth(0).locator('[data-action="move-down"]').first().click()
+    await expect(restoredMemberFields(0)).not.toHaveClass(/hidden/)
+    await expect(restoredMemberFields(1)).toHaveClass(/hidden/)
 
-    await restoredBlocks.nth(0).locator('[data-action="move-down"]').click()
-    await expect(restoredBlocks.nth(0).locator('[data-block-content]')).not.toHaveClass(/hidden/)
-    await expect(restoredBlocks.nth(1).locator('[data-block-content]')).toHaveClass(/hidden/)
+    await restoredBlocks.nth(0).locator('[data-action="move-down"]').first().click()
+    await expect(restoredBlockContent(0)).not.toHaveClass(/hidden/)
+    await expect(restoredBlockContent(1)).toHaveClass(/hidden/)
 
     // Open different document and confirm defaults still apply there.
     await page.goto(docBEditUrl)

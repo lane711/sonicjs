@@ -100,11 +100,12 @@ test.describe('Plugin Version Display @plugins', () => {
 
     // The "Information" tab carries a Plugin Details block with a Version row
     await page.locator('#info-tab').click();
-    const versionRow = page
-      .locator('#info-content div')
-      .filter({ hasText: /^Version:/ })
-      .first();
-    await expect(versionRow).toContainText(listVersion!);
+    const infoPanel = page.locator('#info-content');
+    await expect(infoPanel).toBeVisible();
+    const detailVersion =
+      (await infoPanel.innerText()).match(/Version:\s*v?(\d+(?:\.\d+)*(?:-[a-z0-9.]+)?)/i)?.[1] ??
+      null;
+    expect(detailVersion).toBe(listVersion);
   });
 
   test('should show consistent version across plugin list and plugin detail page', async ({
@@ -127,11 +128,11 @@ test.describe('Plugin Version Display @plugins', () => {
     await page.waitForLoadState('domcontentloaded');
     await page.locator('#info-tab').click();
 
-    const detailRow = page
-      .locator('#info-content div')
-      .filter({ hasText: /^Version:/ })
-      .first();
-    const detailVersion = parseVersion(await detailRow.textContent());
+    const infoPanel = page.locator('#info-content');
+    await expect(infoPanel).toBeVisible();
+    const detailVersion =
+      (await infoPanel.innerText()).match(/Version:\s*v?(\d+(?:\.\d+)*(?:-[a-z0-9.]+)?)/i)?.[1] ??
+      null;
 
     console.log(`  Detail page version: ${detailVersion}`);
     expect(detailVersion).toBe(versionUI);

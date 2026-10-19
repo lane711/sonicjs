@@ -9,9 +9,15 @@ import {
 // `input[name="status"]`) plus a `#search-input` text box. Clearing every filter
 // is the equivalent of the old "All Categories" / "All Status" select options.
 async function clearFilters(page: Page) {
-  const checked = await page.locator('input[name="category"]:checked, input[name="status"]:checked').all()
-  for (const cb of checked) {
-    await cb.uncheck()
+  // Index over ALL filter checkboxes, not over `:checked` — unchecking one shrinks
+  // the `:checked` set and invalidates the remaining nth() locators.
+  const boxes = page.locator('input[name="category"], input[name="status"]')
+  const total = await boxes.count()
+  for (let i = 0; i < total; i++) {
+    const cb = boxes.nth(i)
+    if (await cb.isChecked()) {
+      await cb.uncheck()
+    }
   }
   await page.fill('#search-input', '')
 }
@@ -328,9 +334,15 @@ test.describe('Plugin Filters and Search @plugins', () => {
       await expect(page.locator('#category-utilities')).toBeChecked()
       expect(await page.locator('.plugin-card:visible').count()).toBe(initialCount)
     } finally {
-      // Restore the plugin to its original state
-      await toggle.click()
-      await expect(toggle).toHaveAttribute('aria-checked', wasChecked, { timeout: 10000 })
+      // Restore the plugin to its original state. This goes through the API rather
+      // than a second toggle click because togglePlugin() rebinds button.onclick
+      // WITHOUT event.stopPropagation(), so the second click bubbles to the card's
+      // openPluginSettings() handler and navigates away (product bug — see report).
+      const restoreAction = wasChecked === 'true' ? 'activate' : 'deactivate'
+      const res = await page.request.post(`/admin/plugins/hello-world/${restoreAction}`, {
+        headers: { 'Content-Type': 'application/json' },
+      })
+      expect(res.ok()).toBe(true)
     }
 
     // Reset filter

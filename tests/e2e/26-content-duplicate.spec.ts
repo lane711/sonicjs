@@ -112,8 +112,11 @@ test.describe('Content Duplicate Functionality @content', () => {
       await contentItems.first().click();
       await page.waitForLoadState('networkidle');
 
-      // Get original URL to compare later
+      // Get original URL + title to compare later. The exact title is captured up
+      // front because the row picked here may be a leftover duplicate from an earlier
+      // run whose title already contains a "- Modified" marker.
       const originalUrl = page.url();
+      const originalTitleBefore = await page.locator('input[name="title"]').inputValue();
 
       // Click duplicate button
       const duplicateButton = page.locator('button').filter({ hasText: 'Duplicate Content' });
@@ -132,10 +135,11 @@ test.describe('Content Duplicate Functionality @content', () => {
       expect(newUrl).not.toBe(originalUrl);
       expect(newUrl).toContain('/edit');
 
-      // Modify the duplicate
+      // Modify the duplicate with a marker unique to this run
+      const modifiedMarker = ` - Modified ${Date.now()}`;
       const titleInput = page.locator('input[name="title"]');
       const currentTitle = await titleInput.inputValue();
-      await titleInput.fill(currentTitle + ' - Modified');
+      await titleInput.fill(currentTitle + modifiedMarker);
 
       // Save the duplicate
       const saveButton = page.locator('button[type="submit"]').filter({ hasText: /Update|Save/ }).first();
@@ -149,7 +153,8 @@ test.describe('Content Duplicate Functionality @content', () => {
       // Verify original content is unchanged
       const originalTitleInput = page.locator('input[name="title"]');
       const originalTitle = await originalTitleInput.inputValue();
-      expect(originalTitle).not.toContain('- Modified');
+      expect(originalTitle).not.toContain(modifiedMarker);
+      expect(originalTitle).toBe(originalTitleBefore);
     }
   });
 

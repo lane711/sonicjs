@@ -79,11 +79,12 @@ test.describe('Plugin Management @plugins', () => {
 
   test('should install a catalog plugin if not present', async ({ page }) => {
     // The "FAQ System" demo plugin and the global "Install Plugin" dropdown it was
-    // reached through are both gone. Install is now a per-card button. "Versioning"
-    // is an inert core plugin (no menu entries, no hooks) so installing it has no
-    // side effects on the rest of the suite; it is uninstalled again at the end.
-    const PLUGIN_ID = 'versioning'
-    const PLUGIN_NAME = 'Versioning'
+    // reached through are both gone. Install is now a per-card button.
+    // "Magic Link Authentication" is a non-core plugin with no admin menu entry
+    // (adminMenu: null), so installing it has no side effects on the rest of the
+    // suite; it is uninstalled again at the end.
+    const PLUGIN_ID = 'magic-link-auth'
+    const PLUGIN_NAME = 'Magic Link Authentication'
     const card = page.locator(`.plugin-card[data-name="${PLUGIN_NAME}"]`)
 
     await page.goto(`${BASE_URL}/admin/plugins`)

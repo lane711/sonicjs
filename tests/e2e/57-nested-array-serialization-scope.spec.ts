@@ -37,7 +37,7 @@ async function addRootMemberAndWaitForCount(
   await expect(membersField).toHaveAttribute('data-structured-initialized', 'true')
 
   const addButton = membersField
-    .locator(':scope > .flex.items-center.justify-between.gap-3 button[data-action="add-item"]')
+    .locator(':scope > .flex.items-center.justify-between.gap-3 > [data-action="add-item"]')
     .first()
   await expect(addButton).toBeVisible()
 
@@ -65,6 +65,25 @@ async function addRootMemberAndWaitForCount(
   await expect(topLevelMembers).toHaveCount(expectedCount)
 }
 
+async function confirmRepeaterDelete(page: Page) {
+  const dialog = page.locator('#delete-repeater-item-confirm')
+  await expect(dialog).toHaveJSProperty('open', true)
+  // el-dialog swallows dialog.close() while its enter transition is still running, so a confirm
+  // click landing within ~300ms of the dialog opening removes the item but leaves the modal up,
+  // blocking every later interaction. Re-click until the dialog actually reports closed —
+  // performRepeaterDelete nulls its pending callback, so extra clicks are no-ops.
+  await expect(async () => {
+    await dialog.locator('.confirm-button').click()
+    await expect(dialog).toHaveJSProperty('open', false, { timeout: 1000 })
+  }).toPass({ timeout: 15000 })
+}
+
+/**
+ * Structured arrays ship an inert <template> holding a prototype item, and Playwright's selector
+ * engine looks inside template content. Item/control locators are therefore anchored with
+ * `:scope >` so they cannot match the prototype — an unanchored `.structured-array-item` counts
+ * the template copy too (that is what made the post-remove `toHaveCount(0)` see 1).
+ */
 test.describe('Nested Array Serialization Scope @content', () => {
   const getEditUrlFromPage = async (page: Page): Promise<string | null> => {
     const editMatch = page.url().match(/\/admin\/content\/([^/]+)\/edit/)
@@ -109,7 +128,7 @@ test.describe('Nested Array Serialization Scope @content', () => {
     const topLevelMembers = membersField.locator(':scope > [data-structured-array-list] > .structured-array-item')
     await expect(membersField).toBeVisible()
     await membersField
-      .locator(':scope > .flex.items-center.justify-between.gap-3 button[data-action="add-item"]')
+      .locator(':scope > .flex.items-center.justify-between.gap-3 > [data-action="add-item"]')
       .click()
 
     const firstMember = topLevelMembers.first()
@@ -120,9 +139,9 @@ test.describe('Nested Array Serialization Scope @content', () => {
       .locator('[data-structured-array][data-field-name$="__children"]')
       .first()
     await expect(childrenField).toBeVisible()
-    await childrenField.locator('[data-action="add-item"]').click()
+    await childrenField.locator(':scope > .flex.items-center.justify-between.gap-3 > [data-action="add-item"]').click()
 
-    const firstChild = childrenField.locator('.structured-array-item').first()
+    const firstChild = childrenField.locator(':scope > [data-structured-array-list] > .structured-array-item').first()
     await expect(firstChild).toBeVisible()
     const firstChildFields = firstChild.locator('[data-array-item-fields]').first()
     if ((await firstChildFields.getAttribute('class'))?.includes('hidden')) {
@@ -130,9 +149,9 @@ test.describe('Nested Array Serialization Scope @content', () => {
       await expect(firstChildFields).not.toHaveClass(/hidden/)
     }
     await firstChild.locator('input[name$="__name"]').first().fill('Nested Child')
-    await childrenField.locator('[data-action="add-item"]').click()
+    await childrenField.locator(':scope > .flex.items-center.justify-between.gap-3 > [data-action="add-item"]').click()
 
-    const secondChild = childrenField.locator('.structured-array-item').nth(1)
+    const secondChild = childrenField.locator(':scope > [data-structured-array-list] > .structured-array-item').nth(1)
     await expect(secondChild).toBeVisible()
     const secondChildFields = secondChild.locator('[data-array-item-fields]').first()
     if ((await secondChildFields.getAttribute('class'))?.includes('hidden')) {
@@ -143,7 +162,7 @@ test.describe('Nested Array Serialization Scope @content', () => {
     await expect(topLevelMembers).toHaveCount(1)
 
     await membersField
-      .locator(':scope > .flex.items-center.justify-between.gap-3 button[data-action="add-item"]')
+      .locator(':scope > .flex.items-center.justify-between.gap-3 > [data-action="add-item"]')
       .click()
     await expect(topLevelMembers).toHaveCount(2)
     const secondMember = topLevelMembers.nth(1)
@@ -152,8 +171,8 @@ test.describe('Nested Array Serialization Scope @content', () => {
       .locator('[data-structured-array][data-field-name$="__children"]')
       .first()
     await expect(secondMemberChildrenField).toBeVisible()
-    await secondMemberChildrenField.locator('[data-action="add-item"]').click()
-    const secondMemberFirstChild = secondMemberChildrenField.locator('.structured-array-item').first()
+    await secondMemberChildrenField.locator(':scope > .flex.items-center.justify-between.gap-3 > [data-action="add-item"]').click()
+    const secondMemberFirstChild = secondMemberChildrenField.locator(':scope > [data-structured-array-list] > .structured-array-item').first()
     await expect(secondMemberFirstChild).toBeVisible()
     const secondMemberFirstChildFields = secondMemberFirstChild.locator('[data-array-item-fields]').first()
     if ((await secondMemberFirstChildFields.getAttribute('class'))?.includes('hidden')) {
@@ -164,7 +183,7 @@ test.describe('Nested Array Serialization Scope @content', () => {
     await expect(topLevelMembers).toHaveCount(2)
 
     await membersField
-      .locator(':scope > .flex.items-center.justify-between.gap-3 button[data-action="add-item"]')
+      .locator(':scope > .flex.items-center.justify-between.gap-3 > [data-action="add-item"]')
       .click()
     await expect(topLevelMembers).toHaveCount(3)
     const thirdMember = topLevelMembers.nth(2)
@@ -173,8 +192,8 @@ test.describe('Nested Array Serialization Scope @content', () => {
       .locator('[data-structured-array][data-field-name$="__children"]')
       .first()
     await expect(thirdMemberChildrenField).toBeVisible()
-    await thirdMemberChildrenField.locator('[data-action="add-item"]').click()
-    const thirdMemberFirstChild = thirdMemberChildrenField.locator('.structured-array-item').first()
+    await thirdMemberChildrenField.locator(':scope > .flex.items-center.justify-between.gap-3 > [data-action="add-item"]').click()
+    const thirdMemberFirstChild = thirdMemberChildrenField.locator(':scope > [data-structured-array-list] > .structured-array-item').first()
     await expect(thirdMemberFirstChild).toBeVisible()
     const thirdMemberFirstChildFields = thirdMemberFirstChild.locator('[data-array-item-fields]').first()
     if ((await thirdMemberFirstChildFields.getAttribute('class'))?.includes('hidden')) {
@@ -184,7 +203,11 @@ test.describe('Nested Array Serialization Scope @content', () => {
     await thirdMemberFirstChild.locator('input[name$="__name"]').first().fill('Third Parent Child')
     await expect(topLevelMembers).toHaveCount(3)
 
-    await page.click('button[name="action"][value="save_and_publish"]')
+    await page.click('button[name="action"][value="save"]')
+    // A new-document save answers the HTMX request with `HX-Redirect: /admin/content/<id>/edit`,
+    // and htmx sets location *after* that response — networkidle can therefore resolve while the
+    // URL is still /admin/content/new. Wait for the edit URL instead of racing it.
+    await page.waitForURL(/\/admin\/content\/[^/]+\/edit/, { timeout: 15000 })
     await page.waitForLoadState('networkidle', { timeout: 15000 })
 
     const editMatch = page.url().match(/\/admin\/content\/([^/]+)\/edit/)
@@ -251,7 +274,7 @@ test.describe('Nested Array Serialization Scope @content', () => {
     const topLevelMembers = membersField.locator(':scope > [data-structured-array-list] > .structured-array-item')
     await expect(membersField).toBeVisible()
     await membersField
-      .locator(':scope > .flex.items-center.justify-between.gap-3 button[data-action="add-item"]')
+      .locator(':scope > .flex.items-center.justify-between.gap-3 > [data-action="add-item"]')
       .click()
 
     const firstMember = topLevelMembers.first()
@@ -262,14 +285,21 @@ test.describe('Nested Array Serialization Scope @content', () => {
       .locator('[data-structured-array][data-field-name$="__children"]')
       .first()
     await expect(childrenField).toBeVisible()
-    await childrenField.locator('[data-action="add-item"]').click()
-    const firstChild = childrenField.locator('.structured-array-item').first()
+    await childrenField.locator(':scope > .flex.items-center.justify-between.gap-3 > [data-action="add-item"]').click()
+    const firstChild = childrenField.locator(':scope > [data-structured-array-list] > .structured-array-item').first()
     await expect(firstChild).toBeVisible()
 
+    // Removing a repeater item opens the shared confirmation dialog (requestRepeaterDelete →
+    // showConfirmDialog('delete-repeater-item-confirm')); the item is only detached on confirm.
     await firstChild.locator('[data-action="remove-item"]').first().click()
-    await expect(childrenField.locator('.structured-array-item')).toHaveCount(0)
+    await confirmRepeaterDelete(page)
+    await expect(childrenField.locator(':scope > [data-structured-array-list] > .structured-array-item')).toHaveCount(0)
 
-    await page.click('button[name="action"][value="save_and_publish"]')
+    await page.click('button[name="action"][value="save"]')
+    // A new-document save answers the HTMX request with `HX-Redirect: /admin/content/<id>/edit`,
+    // and htmx sets location *after* that response — networkidle can therefore resolve while the
+    // URL is still /admin/content/new. Wait for the edit URL instead of racing it.
+    await page.waitForURL(/\/admin\/content\/[^/]+\/edit/, { timeout: 15000 })
     await page.waitForLoadState('networkidle', { timeout: 15000 })
 
     const editMatch = page.url().match(/\/admin\/content\/([^/]+)\/edit/)
@@ -327,7 +357,11 @@ test.describe('Nested Array Serialization Scope @content', () => {
     await expect(topLevelMembers).toHaveCount(1)
     await topLevelMembers.nth(0).locator('input[name$="__name"]').first().fill('Initial Parent')
 
-    await page.click('button[name="action"][value="save_and_publish"]')
+    await page.click('button[name="action"][value="save"]')
+    // A new-document save answers the HTMX request with `HX-Redirect: /admin/content/<id>/edit`,
+    // and htmx sets location *after* that response — networkidle can therefore resolve while the
+    // URL is still /admin/content/new. Wait for the edit URL instead of racing it.
+    await page.waitForURL(/\/admin\/content\/[^/]+\/edit/, { timeout: 15000 })
     await page.waitForLoadState('networkidle', { timeout: 15000 })
 
     const firstSaveEditUrl = await getEditUrlFromPage(page)
@@ -380,9 +414,9 @@ test.describe('Nested Array Serialization Scope @content', () => {
       .locator('[data-structured-array][data-field-name$="__children"]')
       .first()
     await expect(newMemberChildrenField).toBeVisible()
-    await newMemberChildrenField.locator('[data-action="add-item"]').click()
+    await newMemberChildrenField.locator(':scope > .flex.items-center.justify-between.gap-3 > [data-action="add-item"]').click()
 
-    const newMemberFirstChild = newMemberChildrenField.locator('.structured-array-item').first()
+    const newMemberFirstChild = newMemberChildrenField.locator(':scope > [data-structured-array-list] > .structured-array-item').first()
     await expect(newMemberFirstChild).toBeVisible()
     const newMemberFirstChildFields = newMemberFirstChild.locator('[data-array-item-fields]').first()
     if ((await newMemberFirstChildFields.getAttribute('class'))?.includes('hidden')) {
@@ -391,7 +425,7 @@ test.describe('Nested Array Serialization Scope @content', () => {
     }
     await newMemberFirstChild.locator('input[name$="__name"]').first().fill('Child After Return')
 
-    await page.click('button[name="action"][value="save_and_publish"]')
+    await page.click('button[name="action"][value="save"]')
     await page.waitForLoadState('networkidle', { timeout: 15000 })
 
     const secondSaveEditUrl = await getEditUrlFromPage(page)

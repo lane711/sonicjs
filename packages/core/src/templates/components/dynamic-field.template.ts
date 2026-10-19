@@ -2170,6 +2170,18 @@ function getStructuredFieldScript(): string {
                 updateOrderLabels();
               };
 
+              // updateHiddenInput re-dispatches a bubbling change event from this container's
+              // own hidden input so ancestor containers re-serialize. A nested array's hidden
+              // input lives inside the PARENT's [data-structured-array-list], so the unscoped
+              // target.closest('[data-structured-array-list]') test below also matched this
+              // container's own synthetic event and re-entered updateHiddenInput until the stack
+              // blew ("Maximum call stack size exceeded" on every nested add/remove/edit).
+              const isOwnListMutation = (target) => {
+                if (target === getLiveHiddenInput()) return false;
+                const liveList = getLiveList();
+                return !!liveList && liveList.contains(target);
+              };
+
               const addArrayItem = () => {
                 const liveList = getLiveList();
                 if (!liveList) return;
@@ -2299,7 +2311,7 @@ function getStructuredFieldScript(): string {
               container.addEventListener('input', (event) => {
               const target = event.target;
               if (!(target instanceof Element)) return;
-              if (target.closest('[data-structured-array-list]')) {
+              if (isOwnListMutation(target)) {
                 updateHiddenInput();
               }
               });
@@ -2307,7 +2319,7 @@ function getStructuredFieldScript(): string {
               container.addEventListener('change', (event) => {
               const target = event.target;
               if (!(target instanceof Element)) return;
-              if (target.closest('[data-structured-array-list]')) {
+              if (isOwnListMutation(target)) {
                 updateHiddenInput();
               }
               });
