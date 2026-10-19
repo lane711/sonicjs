@@ -25,16 +25,16 @@ test.describe('Lexical Rich Text Editor Plugin @content', () => {
 
   test('richtext field renders Lexical editor when plugin is active', async ({ page }) => {
     // Navigate to a content form that has a richtext field
-    await page.goto('/admin/content?collection=blog_posts')
+    await page.goto('/admin/content?collection=blog_post')
     const newButton = page.getByRole('link', { name: /new|add/i }).first()
     if (await newButton.count() > 0) {
       await newButton.click()
     } else {
-      await page.goto('/admin/content/new?collection=blog_posts')
+      await page.goto('/admin/content/new?collection=blog_post')
     }
 
     // If the collection doesn't exist, skip gracefully
-    if (page.url().includes('/admin/content/new') || page.url().includes('collection=blog_posts')) {
+    if (page.url().includes('/admin/content/new') || page.url().includes('collection=blog_post')) {
       const lexicalWrapper = page.locator('.lexical-editor-wrapper').first()
       if (await lexicalWrapper.count() > 0) {
         await expect(lexicalWrapper).toBeVisible()
@@ -42,6 +42,53 @@ test.describe('Lexical Rich Text Editor Plugin @content', () => {
         await expect(lexicalWrapper.locator('.lexical-toolbar')).toBeVisible()
         // Content editable area should be present
         await expect(lexicalWrapper.locator('.lexical-content-editable')).toBeVisible()
+      }
+    }
+  })
+
+  test('Lexical toolbar has formatting buttons', async ({ page }) => {
+    await page.goto('/admin/content/new?collection=blog_post')
+    const lexicalWrapper = page.locator('.lexical-editor-wrapper').first()
+
+    if (await lexicalWrapper.count() === 0) return
+
+    await expect(lexicalWrapper).toBeVisible()
+    const toolbar = lexicalWrapper.locator('.lexical-toolbar')
+    await expect(toolbar).toBeVisible()
+
+    // Standard toolbar should have at least bold, italic, link buttons
+    const boldBtn = toolbar.locator('[data-action="bold"]')
+    const italicBtn = toolbar.locator('[data-action="italic"]')
+    await expect(boldBtn).toBeVisible()
+    await expect(italicBtn).toBeVisible()
+  })
+
+  test('Lexical editor accepts typed content', async ({ page }) => {
+    await page.goto('/admin/content/new?collection=blog_post')
+    const contentEditable = page.locator('.lexical-content-editable').first()
+
+    if (await contentEditable.count() === 0) return
+
+    // Wait for Lexical to initialize
+    await page.waitForFunction(() => {
+      const el = document.querySelector('.lexical-editor-wrapper')
+      return el && el.getAttribute('data-lexical-initialized') === 'true'
+    }, { timeout: 10000 }).catch(() => {
+      // Lexical may not have loaded (e.g. no network for CDN); skip gracefully
+    })
+
+    await contentEditable.click()
+    await contentEditable.type('Hello Lexical Editor')
+
+    // Check that the hidden input was updated
+    const fieldId = await contentEditable.closest('.lexical-editor-wrapper').then(
+      w => w?.getAttribute('data-field-id')
+    )
+    if (fieldId) {
+      const hiddenInput = page.locator(`#${fieldId}[type="hidden"]`)
+      if (await hiddenInput.count() > 0) {
+        const value = await hiddenInput.inputValue()
+        expect(value).toBeTruthy()
       }
     }
   })

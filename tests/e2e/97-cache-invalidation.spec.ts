@@ -50,6 +50,43 @@ test.describe('Cache invalidation — list freshness after item update', () => {
     expect(countAfter).toBeGreaterThan(countBefore)
   })
 
+  test('updating item via public API invalidates list cache', async ({ request }) => {
+    const loginRes = await request.post(`${API}/auth/sign-in/email`, {
+      data: { email: ADMIN_CREDENTIALS.email, password: ADMIN_CREDENTIALS.password },
+      headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
+    })
+    expect(loginRes.ok()).toBeTruthy()
+
+    // Create the item this test will edit, so it never depends on seeded content.
+    const stamp = Date.now()
+    const createRes = await request.post(`${API}/api/${COLLECTION}`, {
+      data: { title: `Cache update target ${stamp}`, slug: `cache-update-${stamp}`, data: {} },
+      headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
+    })
+    expect(createRes.ok()).toBeTruthy()
+    const created = (await createRes.json())?.data
+    expect(created?.id).toBeTruthy()
+
+    // Prime the list cache with the pre-update title.
+    const list1 = await request.get(`${API}/api/${COLLECTION}`)
+    expect(list1.status()).toBe(200)
+    expect(((await list1.json())?.data ?? []).some((i: any) => i.id === created.id)).toBe(true)
+
+    const newTitle = `Cache update target ${stamp} (updated)`
+    const updateRes = await request.put(`${API}/api/${COLLECTION}/${created.id}`, {
+      data: { title: newTitle },
+      headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
+    })
+    expect(updateRes.ok()).toBeTruthy()
+
+    // The very next read must be fresh — no stale-while-revalidate serve of the old title.
+    const list2 = await request.get(`${API}/api/${COLLECTION}`)
+    expect(list2.status()).toBe(200)
+    const updated = ((await list2.json())?.data ?? []).find((i: any) => i.id === created.id)
+    expect(updated).toBeDefined()
+    expect(updated?.title).toBe(newTitle)
+  })
+
   test('admin clear cache endpoint restores fresh list', async ({ page }) => {
     await loginAsAdmin(page)
 

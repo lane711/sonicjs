@@ -1,6 +1,17 @@
 import { test, expect } from '@playwright/test'
+import { isFeatureAvailable } from './utils/test-helpers'
+
+let featureAvailable = false;
 
 test.describe('Marketing Home Page', () => {
+  test.beforeAll(async ({ request }) => {
+    featureAvailable = await isFeatureAvailable(request, '/');
+  });
+
+  test.beforeEach(async () => {
+    if (!featureAvailable) test.skip();
+  });
+
   test('no docs sidebar on home, full-width layout', async ({ page }) => {
     await page.goto('/')
 

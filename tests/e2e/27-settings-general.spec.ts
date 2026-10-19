@@ -37,21 +37,61 @@ test.describe('Settings - General Tab @auth', () => {
     expect(siteDescription).toBeTruthy(); // Should have a value
   });
 
+  test('should save general settings successfully', async ({ page }) => {
+    await page.goto('/admin/settings/general');
+    await page.waitForLoadState('networkidle');
+
+    // Fill in new values
+    const uniqueSiteName = `SonicJS Test ${Date.now()}`;
+    const uniqueDescription = `Test description ${Date.now()}`;
+
+    await page.locator('input[name="siteName"]').fill(uniqueSiteName);
+    await page.locator('textarea[name="siteDescription"]').fill(uniqueDescription);
+    await page.locator('select[name="timezone"]').selectOption('America/New_York');
+    await page.locator('select[name="language"]').selectOption('en');
+
+    // Wait for the response to complete
+    const responsePromise = page.waitForResponse(response =>
+      response.url().includes('/admin/settings/general') && response.request().method() === 'POST'
+    );
+
+    // Click save button
+    await page.locator('button:has-text("Save Changes")').click();
+
+    // Wait for the save to complete
+    const response = await responsePromise;
+    expect(response.status()).toBe(200);
+
+    // Wait a bit for database to be updated
+    await page.waitForTimeout(1000);
+
+    // Reload page and verify values persisted
+    await page.reload();
+    await page.waitForLoadState('networkidle');
+
+    // Wait for form to be populated
+    await page.waitForTimeout(500);
+
+    const savedSiteName = await page.locator('input[name="siteName"]').inputValue();
+    const savedDescription = await page.locator('textarea[name="siteDescription"]').inputValue();
+    const savedTimezone = await page.locator('select[name="timezone"]').inputValue();
+
+    expect(savedSiteName).toBe(uniqueSiteName);
+    expect(savedDescription).toBe(uniqueDescription);
+    expect(savedTimezone).toBe('America/New_York');
+  });
+
   test('should toggle maintenance mode', async ({ page }) => {
     await page.goto('/admin/settings/general');
     await page.waitForLoadState('networkidle');
 
-    // Find the maintenance mode checkbox
     const maintenanceModeCheckbox = page.locator('input[name="maintenanceMode"]');
     await expect(maintenanceModeCheckbox).toBeVisible();
 
-    // Get current state
     const initialState = await maintenanceModeCheckbox.isChecked();
 
     // Toggle it
     await maintenanceModeCheckbox.click();
-
-    // Save settings
     await page.locator('button:has-text("Save Changes")').click();
     await page.waitForTimeout(1000);
 
@@ -61,6 +101,13 @@ test.describe('Settings - General Tab @auth', () => {
 
     const newState = await page.locator('input[name="maintenanceMode"]').isChecked();
     expect(newState).toBe(!initialState);
+
+    // Restore original state to avoid leaking into other tests
+    if (newState !== initialState) {
+      await page.locator('input[name="maintenanceMode"]').click();
+      await page.locator('button:has-text("Save Changes")').click();
+      await page.waitForTimeout(1000);
+    }
   });
 
   test('should validate required fields', async ({ page }) => {
@@ -92,6 +139,8 @@ test.describe('Settings - General Tab @auth', () => {
     await page.goto('/admin/settings/general');
     await page.waitForLoadState('networkidle');
 
+    // Capture original to restore after test
+    const originalEmail = await page.locator('input[name="adminEmail"]').inputValue();
     const newAdminEmail = `admin-${Date.now()}@example.com`;
 
     await page.locator('input[name="adminEmail"]').fill(newAdminEmail);
@@ -104,6 +153,11 @@ test.describe('Settings - General Tab @auth', () => {
 
     const savedEmail = await page.locator('input[name="adminEmail"]').inputValue();
     expect(savedEmail).toBe(newAdminEmail);
+
+    // Restore original email
+    await page.locator('input[name="adminEmail"]').fill(originalEmail);
+    await page.locator('button:has-text("Save Changes")').click();
+    await page.waitForTimeout(1000);
   });
 
   test('should switch between settings tabs', async ({ page }) => {

@@ -12,6 +12,13 @@ test.describe('Disabled plugin hidden from sidebar (#971)', () => {
     await loginAsAdmin(page)
   })
 
+  // Always re-enable core-media in case the test fails mid-execution
+  test.afterEach(async ({ page }) => {
+    await page.request.post('/admin/plugins/core-media/enable', {
+      headers: { 'Content-Type': 'application/json' },
+    }).catch(() => {})
+  })
+
   test('disabling a plugin removes it from the sidebar', async ({ page }) => {
     // Find an installed, non-core plugin that has an admin sidebar entry.
     // hello-world is a demo plugin, so toggling it has no functional side effects.
