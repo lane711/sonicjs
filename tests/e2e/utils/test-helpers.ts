@@ -145,6 +145,55 @@ export async function ensureWorkflowPluginActive(page: Page) {
 }
 
 /**
+ * Install + activate a plugin so its admin menu entry is rendered.
+ *
+ * Only `core-auth`, `core-media` and `lexical-editor` are bootstrapped on a greenfield install
+ * (`PluginBootstrapService.BOOTSTRAP_PLUGIN_IDS`), and `reconcileMenuFromPlugins` hides the
+ * `menu_item` row of every plugin that is not active. So a spec that asserts on a plugin's
+ * sidebar link has to put the plugin in that state itself rather than inheriting it from a
+ * long-lived dev database.
+ *
+ * Caller must already be logged in as admin — `page.request` shares the page's cookie jar.
+ */
+export async function ensurePluginActive(page: Page, pluginId: string): Promise<boolean> {
+  return setPluginStatus(page, pluginId, 'active')
+}
+
+/**
+ * Install a plugin, then leave it in the requested status.
+ *
+ * Counterpart of {@link ensurePluginActive} — `'inactive'` is what a spec needs when it
+ * asserts on the "Inactive" status filter, whose checkbox renders `disabled` while the
+ * count for that status is zero.
+ */
+export async function setPluginStatus(
+  page: Page,
+  pluginId: string,
+  status: 'active' | 'inactive'
+): Promise<boolean> {
+  try {
+    // Install first. This 200s on a fresh install and on a re-install; a non-ok response
+    // only means the plugin isn't in the registry, in which case the status call below
+    // fails too and the helper reports false.
+    await page.request.post('/admin/plugins/install', {
+      data: { name: pluginId, id: pluginId },
+      headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
+    })
+
+    // Always run the status call even when the row already existed — it is also what
+    // refreshes the plugin's `menu_item` visibility via reconcileMenuFromPlugins().
+    const action = status === 'active' ? 'activate' : 'deactivate'
+    const res = await page.request.post(
+      `/admin/plugins/${encodeURIComponent(pluginId)}/${action}`,
+      { headers: { Origin: TEST_ORIGIN } }
+    )
+    return res.ok()
+  } catch {
+    return false
+  }
+}
+
+/**
  * Create test workflow content (assumes user is already logged in)
  */
 export async function createTestWorkflowContent(page: Page) {

@@ -1,6 +1,11 @@
 import { test, expect } from '@playwright/test'
 import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers'
 
+// Tests below that actually save content need a name no earlier run has already used: a
+// repeated slug is rejected by the duplicate check and the form never submits. The `Test `
+// prefix is what the cleanup endpoint matches on, so these rows do not pile up either.
+const RUN = Date.now()
+
 test.describe('Slug Generation @content', () => {
   test.beforeEach(async ({ page }) => {
     await ensureAdminUserExists(page)
@@ -192,10 +197,10 @@ test.describe('Slug Generation @content', () => {
     await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
-    await page.fill('input[name="title"]', 'Edit Mode Test Page')
+    await page.fill('input[name="title"]', `Test Edit Mode ${RUN}`)
     await page.waitForTimeout(1000)
 
-    const originalSlug = 'edit-mode-test-page'
+    const originalSlug = `test-edit-mode-${RUN}`
     await expect(page.locator('input[name="slug"]')).toHaveValue(originalSlug)
 
     // Fill required fields before saving
@@ -227,7 +232,7 @@ test.describe('Slug Generation @content', () => {
     await page.waitForTimeout(1000)
     
     // Click on the content to edit it
-    const contentLink = page.locator(`a:has-text("Edit Mode Test Page")`).first()
+    const contentLink = page.locator(`a:has-text("Test Edit Mode ${RUN}")`).first()
     await contentLink.click()
     await page.waitForTimeout(1000)
     
@@ -252,7 +257,7 @@ test.describe('Slug Generation @content', () => {
     await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
-    await page.fill('input[name="title"]', 'Regen Test Page')
+    await page.fill('input[name="title"]', `Test Regen Page ${RUN}`)
     await page.waitForTimeout(1000)
 
     // Fill required fields before saving
@@ -283,7 +288,7 @@ test.describe('Slug Generation @content', () => {
     await page.goto('/admin/content?collection=blog_post')
     await page.waitForTimeout(1000)
     
-    const contentLink = page.locator(`a:has-text("Regen Test Page")`).first()
+    const contentLink = page.locator(`a:has-text("Test Regen Page ${RUN}")`).first()
     await contentLink.click()
     await page.waitForTimeout(1000)
     
@@ -297,7 +302,7 @@ test.describe('Slug Generation @content', () => {
     await page.waitForTimeout(1500)
     
     // Slug still shows old value
-    await expect(slugField).toHaveValue('regen-test-page')
+    await expect(slugField).toHaveValue(`test-regen-page-${RUN}`)
     
     // Click regenerate
     await regenerateBtn.click()
@@ -340,7 +345,7 @@ test.describe('Slug Generation @content', () => {
     await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
-    await page.fill('input[name="title"]', 'Submission Test Original')
+    await page.fill('input[name="title"]', `Test Submission ${RUN}`)
     await page.waitForTimeout(1000)
 
     // Fill required fields before saving
@@ -376,7 +381,7 @@ test.describe('Slug Generation @content', () => {
     await page.waitForTimeout(500)
     
     // Set duplicate slug
-    await page.fill('input[name="slug"]', 'submission-test-original')
+    await page.fill('input[name="slug"]', `test-submission-${RUN}`)
     await page.waitForTimeout(1500)
     
     // Should show error

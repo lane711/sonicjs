@@ -3,6 +3,16 @@ import { loginAsAdmin, getCsrfTokenFromPage, isFeatureAvailable } from './utils/
 
 let featureAvailable = false;
 
+/**
+ * The settings page's buttons call `/admin/settings/api/database-tools/<op>`; the same handlers
+ * are also mounted at `/admin/database-tools/api/<op>`, which is what the direct-request tests
+ * further down use. Match either so a wait follows whichever path the UI is wired to.
+ */
+const dbToolsApiCall = (op: string) => (response: { url(): string; status(): number }) =>
+  new RegExp(`/(?:settings/api/database-tools|database-tools/api)/${op}$`).test(
+    new URL(response.url()).pathname,
+  ) && response.status() === 200;
+
 test.describe('Database Tools', () => {
   test.beforeAll(async ({ request }) => {
     featureAvailable = await isFeatureAvailable(request, '/admin/settings');
@@ -85,9 +95,7 @@ test.describe('Database Tools', () => {
     await page.waitForTimeout(1000);
 
     // Now listen for the NEXT API call (triggered by button click)
-    const responsePromise = page.waitForResponse(response =>
-      response.url().includes('/admin/database-tools/api/stats') && response.status() === 200
-    );
+    const responsePromise = page.waitForResponse(dbToolsApiCall('stats'));
 
     // Click refresh button
     await page.click('button:has-text("Refresh Stats")');
@@ -113,9 +121,7 @@ test.describe('Database Tools', () => {
     await page.waitForTimeout(1000);
 
     // Listen for validation API call
-    const responsePromise = page.waitForResponse(response =>
-      response.url().includes('/admin/database-tools/api/validate') && response.status() === 200
-    );
+    const responsePromise = page.waitForResponse(dbToolsApiCall('validate'));
 
     // Click validate database button
     await page.click('button:has-text("Validate Database")');
@@ -141,9 +147,7 @@ test.describe('Database Tools', () => {
     await page.waitForTimeout(1000);
 
     // Listen for backup API call
-    const responsePromise = page.waitForResponse(response =>
-      response.url().includes('/admin/database-tools/api/backup') && response.status() === 200
-    );
+    const responsePromise = page.waitForResponse(dbToolsApiCall('backup'));
 
     // Click create backup button
     await page.click('button:has-text("Create Backup")');
@@ -256,7 +260,7 @@ test.describe('Database Tools', () => {
     await page.click('[data-tab="database-tools"]');
     
     // Mock a failed API response for stats
-    await page.route('**/admin/database-tools/api/stats', route => {
+    await page.route('**/api/database-tools/stats', route => {
       route.fulfill({
         status: 500,
         contentType: 'application/json',

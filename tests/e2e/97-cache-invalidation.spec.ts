@@ -27,7 +27,7 @@ test.describe('Cache invalidation — list freshness after item update', () => {
     const list1 = await request.get(`${API}/api/${COLLECTION}`)
     expect(list1.status()).toBe(200)
     const data1 = await list1.json()
-    const countBefore: number = (data1?.data ?? []).length
+    const idsBefore: string[] = (data1?.data ?? []).map((i: any) => i.id)
 
     // Create new item
     const stamp = Date.now()
@@ -40,14 +40,19 @@ test.describe('Cache invalidation — list freshness after item update', () => {
       headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
     })
     expect(createRes.ok()).toBeTruthy()
+    const createdId = (await createRes.json())?.data?.id
+    expect(createdId).toBeTruthy()
+    expect(idsBefore).not.toContain(createdId)
 
-    // Fetch list again — must reflect new item, not return stale cached count
+    // Fetch list again — must contain the new item, not a stale cached page.
+    // Checked by id rather than by row count: the list is capped at 50 per page, so once the
+    // collection holds a full page the count stops growing and a count assertion passes or
+    // fails on how much seed data happens to exist. The item is on page one because document
+    // lists are ordered newest-first.
     const list2 = await request.get(`${API}/api/${COLLECTION}`)
     expect(list2.status()).toBe(200)
     const data2 = await list2.json()
-    const countAfter: number = (data2?.data ?? []).length
-
-    expect(countAfter).toBeGreaterThan(countBefore)
+    expect((data2?.data ?? []).map((i: any) => i.id)).toContain(createdId)
   })
 
   test('updating item via public API invalidates list cache', async ({ request }) => {

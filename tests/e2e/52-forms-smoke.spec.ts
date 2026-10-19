@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { loginAsAdmin, ADMIN_CREDENTIALS, isFeatureAvailable } from './utils/test-helpers';
+import { ensurePluginActive, loginAsAdmin, ADMIN_CREDENTIALS, isFeatureAvailable } from './utils/test-helpers';
 
 /**
  * Forms Smoke Test
@@ -51,6 +51,10 @@ test.describe('Forms Smoke Test @forms', () => {
 
   test('should show Forms in sidebar menu', async ({ page }) => {
     await loginAsAdmin(page);
+    // `forms` is not bootstrapped on a greenfield install, and `reconcileMenuFromPlugins` keeps
+    // the menu_item hidden until the plugin is active — so install + activate it here.
+    await ensurePluginActive(page, 'forms');
+    await page.goto('/admin');
 
     // Wait for navigation to render
     await page.waitForSelector('nav', { timeout: 5000 });
@@ -73,6 +77,8 @@ test.describe('Forms Smoke Test @forms', () => {
 
   test('should navigate to forms via sidebar', async ({ page }) => {
     await loginAsAdmin(page);
+    await ensurePluginActive(page, 'forms');
+    await page.goto('/admin');
 
     // Click Forms in sidebar
     await page.click('a[href="/admin/forms"]');

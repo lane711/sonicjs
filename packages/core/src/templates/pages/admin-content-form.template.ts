@@ -188,6 +188,9 @@ export function renderContentFormPage(data: ContentFormData, opts?: { partialOnl
             ${isEdit ? `hx-put="/admin/content/${data.id}"` : `hx-post="/admin/content"`}
             hx-target="#form-messages"
             hx-encoding="multipart/form-data"
+            method="post"
+            action="${isEdit ? `/admin/content/${data.id}` : '/admin/content'}"
+            enctype="multipart/form-data"
             data-has-validation-errors="${hasValidationErrors ? 'true' : 'false'}"
             class="space-y-6"
             novalidate

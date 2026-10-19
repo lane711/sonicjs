@@ -6,7 +6,7 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { loginAsAdmin, waitForHTMX, isFeatureAvailable } from './utils/test-helpers';
+import { ensurePluginActive, loginAsAdmin, waitForHTMX, isFeatureAvailable } from './utils/test-helpers';
 
 test.describe('Cache Plugin Dashboard @plugins', () => {
   let featureAvailable = false
@@ -17,6 +17,9 @@ test.describe('Cache Plugin Dashboard @plugins', () => {
 
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
+    // The sidebar entry only exists while `core-cache` is active, and it is not one of the
+    // plugins bootstrapped on a greenfield install.
+    await ensurePluginActive(page, 'core-cache');
   });
 
   test('should navigate to cache dashboard from admin menu', async ({ page }) => {
@@ -339,6 +342,9 @@ test.describe('Cache Management Workflow', () => {
 test.describe('Cache Dashboard Navigation', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
+    // Both tests below assert on the sidebar link, which `reconcileMenuFromPlugins` hides
+    // unless `core-cache` is installed and active.
+    await ensurePluginActive(page, 'core-cache');
   });
 
   test('should have Cache link in admin navigation', async ({ page }) => {

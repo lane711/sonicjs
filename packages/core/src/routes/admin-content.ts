@@ -1,5 +1,6 @@
 import type { D1Database } from '@cloudflare/workers-types'
 import { Hono } from 'hono'
+import type { Context } from 'hono'
 import { html } from 'hono/html'
 import type { Bindings, Variables } from '../app'
 import { requireAuth, requireRole } from '../middleware'
@@ -19,6 +20,8 @@ import type { QueryableField } from '../schemas/document'
 import { loadCollectionConfigs, getVisibleCollections } from '../services/collection-loader'
 
 const adminContentRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
+
+type ContentRouteContext<P extends string = string> = Context<{ Bindings: Bindings; Variables: Variables }, P>
 
 // Field definition type for form processing
 interface FieldDefinition {
@@ -1393,8 +1396,13 @@ adminContentRoutes.post('/', async (c) => {
   }
 })
 
-// Update content
-adminContentRoutes.put('/:id', async (c) => {
+// Update content.
+//
+// Registered for PUT here and for POST at the bottom of this file (after the static POST
+// paths, so /preview, /duplicate and /bulk-action still win): a plain <form> can only GET
+// or POST, so without the POST alias an edit submitted before htmx has booted falls back to
+// a native GET and the user's changes are silently dropped.
+const handleContentUpdate = async (c: ContentRouteContext<'/:id'>) => {
   try {
     const id = c.req.param('id')
     const user = c.get('user')
@@ -1653,7 +1661,9 @@ adminContentRoutes.put('/:id', async (c) => {
       </div>
     `)
   }
-})
+}
+
+adminContentRoutes.put('/:id', handleContentUpdate)
 
 // Content preview
 adminContentRoutes.post('/preview', requireRole(['admin', 'editor', 'author']), async (c) => {
@@ -2343,5 +2353,10 @@ adminContentRoutes.get('/documents/:typeId/:rootId/versions', async (c) => {
 // The content list sets item.id = "documents/:typeId/:rootId", so the rendered edit link is
 // /admin/content/documents/:typeId/:rootId/edit — served by the GET handler above. No catch-all is
 // needed here (removed a stale comment that promised one but defined nothing — D14).
+
+// POST alias for the update handler. It has to sit below every static POST path above,
+// because the router runs matching handlers in registration order and '/:id' would
+// otherwise swallow /preview, /duplicate and /bulk-action.
+adminContentRoutes.post('/:id', handleContentUpdate)
 
 export default adminContentRoutes

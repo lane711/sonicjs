@@ -11,13 +11,19 @@ test.describe('Block stable IDs', () => {
   })
 
   test('saved blocks include blockId in fetched JSON', async ({ page }) => {
-    // Find a collection that uses blocks field type
+    // Find a collection that uses blocks field type. The collections list links to the
+    // content list with `?model=`; `?collection=` is only an accepted alias on the
+    // receiving route, so match either.
     await page.goto('/admin/collections')
-    const collectionLink = page.locator('a[href*="/admin/content?collection="]').first()
+    const collectionLink = page
+      .locator('a[href*="/admin/content?model="], a[href*="/admin/content?collection="]')
+      .first()
+    await expect(collectionLink).toHaveAttribute('href', /.+/, { timeout: 15000 })
     const collectionHref = await collectionLink.getAttribute('href')
     if (!collectionHref) test.skip()
 
-    const collectionId = new URL(`http://x${collectionHref}`).searchParams.get('collection')
+    const linkParams = new URL(`http://x${collectionHref}`).searchParams
+    const collectionId = linkParams.get('collection') || linkParams.get('model')
     if (!collectionId) test.skip()
 
     await page.goto(`/admin/content/new?collection=${collectionId}`)

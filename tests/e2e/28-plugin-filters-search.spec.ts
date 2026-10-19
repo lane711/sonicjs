@@ -2,7 +2,9 @@ import { test, expect, type Page } from '@playwright/test'
 import {
   loginAsAdmin,
   ensureAdminUserExists,
-  ensureWorkflowTablesExist
+  ensureWorkflowTablesExist,
+  ensurePluginActive,
+  setPluginStatus
 } from './utils/test-helpers'
 
 // The /admin/plugins filter UI is a checkbox group (`input[name="category"]` /
@@ -85,6 +87,13 @@ test.describe('Plugin Filters and Search @plugins', () => {
   })
 
   test('should filter plugins by status', async ({ page }) => {
+    // The "Inactive" checkbox renders `disabled` whenever no plugin has that status
+    // (admin-plugins-list.template.ts: `isDisabled = count === 0`), so the inactive half
+    // of this test needs a plugin parked there. multi-tenant is non-core and inert while
+    // inactive, which makes it the safe one to hold in that state.
+    expect(await setPluginStatus(page, 'multi-tenant', 'inactive')).toBe(true)
+    await page.reload()
+
     // Get total plugin count
     const totalPlugins = await page.locator('.plugin-card').count()
 
@@ -310,6 +319,11 @@ test.describe('Plugin Filters and Search @plugins', () => {
   })
 
   test('should maintain filter state when toggling plugin status', async ({ page }) => {
+    // The card only renders a switch once the plugin is installed — an uninstalled card
+    // just gets an Install button — so put Hello World in a known installed+active state.
+    expect(await ensurePluginActive(page, 'hello-world')).toBe(true)
+    await page.reload()
+
     // Apply a filter first. "utilities" contains the Hello World demo plugin, which
     // is safe to toggle (it only contributes a demo page).
     await page.check('#category-utilities')

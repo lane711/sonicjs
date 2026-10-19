@@ -999,13 +999,21 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
             hx-swap="innerHTML"
             hx-include="this"
             ${disabled ? 'disabled' : ''}
+            ${required}
           >
+          <!--
+            The required flag belongs on the visible search box, not on the hidden input
+            below:
+            a hidden control that fails validation is not focusable, so Chrome aborts the
+            submit without reporting anything and the Save button looks dead. The submit
+            handler further down copies the display value into the hidden input whenever
+            no user is linked, so validating the visible field is equivalent.
+          -->
           <input
             type="hidden"
             id="${fieldId}"
             name="${fieldName}"
             value="${escapeHtml(idValue)}"
-            ${required}
           >
           <div
             id="${fieldId}-dropdown"

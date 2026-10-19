@@ -451,6 +451,16 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   // Supports wildcard prefix: "*.example.com" matches any subdomain of example.com.
   app.use('*', cors({
     origin: (origin, c) => {
+      // The app's own origin is always allowed. A same-origin request is not subject to CORS in
+      // the first place, so echoing the header back grants nothing — but it does mean the app
+      // keeps working wherever it happens to be served from (a dev port, a preview deployment)
+      // without every host having to be enumerated in CORS_ORIGINS.
+      try {
+        if (origin && origin === new URL(c.req.url).origin) return origin
+      } catch {
+        // Non-absolute request URL — fall through to the allowlist.
+      }
+
       const allowed = (c.env as any)?.CORS_ORIGINS as string | undefined
       if (!allowed) return null
       const list = allowed.split(',').map((s: string) => s.trim())

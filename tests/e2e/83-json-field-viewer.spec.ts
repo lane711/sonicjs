@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test'
 import { loginAsAdmin, TEST_ORIGIN } from './utils/test-helpers'
 
-const COLLECTION = 'blog_post'
+// `e2e_test` is the only collection with a `json`-typed field (`metadata`), which is the field
+// this spec is about — `blog_post` has no json field, so its edit form renders no viewer at all.
+const COLLECTION = 'e2e_test'
 const SAMPLE_JSON = { version: 1, tags: ['a', 'b'], nested: { active: true } }
 
 test.describe('JSON field viewer @database', () => {

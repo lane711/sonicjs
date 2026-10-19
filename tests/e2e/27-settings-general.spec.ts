@@ -90,23 +90,29 @@ test.describe('Settings - General Tab @auth', () => {
 
     const initialState = await maintenanceModeCheckbox.isChecked();
 
-    // Toggle it
-    await maintenanceModeCheckbox.click();
-    await page.locator('button:has-text("Save Changes")').click();
-    await page.waitForTimeout(1000);
-
-    // Reload and verify
-    await page.reload();
-    await page.waitForLoadState('networkidle');
-
-    const newState = await page.locator('input[name="maintenanceMode"]').isChecked();
-    expect(newState).toBe(!initialState);
-
-    // Restore original state to avoid leaking into other tests
-    if (newState !== initialState) {
-      await page.locator('input[name="maintenanceMode"]').click();
+    try {
+      // Toggle it
+      await maintenanceModeCheckbox.click();
       await page.locator('button:has-text("Save Changes")').click();
       await page.waitForTimeout(1000);
+
+      // Reload and verify
+      await page.reload();
+      await page.waitForLoadState('networkidle');
+
+      const newState = await page.locator('input[name="maintenanceMode"]').isChecked();
+      expect(newState).toBe(!initialState);
+    } finally {
+      // Restore the original state even when the assertion above fails — settings are a single
+      // shared row, so a leaked "on" here is inherited by every later run of this spec.
+      await page.reload();
+      await page.waitForLoadState('networkidle');
+      const checkbox = page.locator('input[name="maintenanceMode"]');
+      if ((await checkbox.isChecked()) !== initialState) {
+        await checkbox.click();
+        await page.locator('button:has-text("Save Changes")').click();
+        await page.waitForTimeout(1000);
+      }
     }
   });
 

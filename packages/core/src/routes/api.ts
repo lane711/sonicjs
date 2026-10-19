@@ -81,12 +81,21 @@ function stripFields(group: { and?: any[]; or?: any[] } | undefined, fields: Set
 
 // D31/D44: translate `collection_id` sort → `type_id` and drop sort fields that aren't real document
 // columns (a raw `collection_id` sort 500s). JSON-path sorts pass through unchanged.
-function sanitizeDocSort(sort?: QueryFilter['sort']): QueryFilter['sort'] | undefined {
-  if (!sort) return undefined
+// Leaving a list query without an ORDER BY lets SQLite hand back rows in storage order, so
+// `?limit=N` quietly drops the newest documents once a collection grows past N and two reads of
+// the same page can disagree. Default to the keyset order the rest of the document layer
+// paginates on: newest first, id as the tie-break.
+const DEFAULT_DOC_SORT: NonNullable<QueryFilter['sort']> = [
+  { field: 'updated_at', order: 'desc' },
+  { field: 'id', order: 'desc' },
+]
+
+function sanitizeDocSort(sort?: QueryFilter['sort']): NonNullable<QueryFilter['sort']> {
+  if (!sort) return DEFAULT_DOC_SORT
   const out = sort
     .map(s => ({ field: s.field === 'collection_id' ? 'type_id' : s.field, order: s.order }))
     .filter(s => s.field.includes('.') || DOC_SORTABLE_COLUMNS.has(s.field))
-  return out.length ? out : undefined
+  return out.length ? out : DEFAULT_DOC_SORT
 }
 
 // ─── Public content reads are document-backed (legacy `content` decommission, step 2) ────────────
