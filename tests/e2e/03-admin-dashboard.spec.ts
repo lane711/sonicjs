@@ -1,24 +1,9 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin, navigateToAdminSection } from './utils/test-helpers';
-import corePackageJson from '../../packages/core/package.json' with { type: 'json' };
 
 test.describe('Admin Dashboard @smoke', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
-  });
-
-  test.skip('should display correct version from package.json', async ({ page }) => {
-    // The version should be displayed in the layout (usually in the sidebar or footer)
-    // Version comes from @sonicjs-cms/core package and is shown without 'v' prefix in badge
-    const expectedVersion = corePackageJson.version;
-
-    // Look for the version badge (it displays just the version number like "2.0.3")
-    const versionElement = page.getByText(expectedVersion, { exact: true }).first();
-    await expect(versionElement).toBeVisible({ timeout: 10000 });
-
-    // Make sure it's not showing the old hardcoded version
-    const oldVersion = page.getByText('0.1.0', { exact: true });
-    await expect(oldVersion).not.toBeVisible();
   });
 
   test('should land on the admin shell with sidebar navigation', async ({ page }) => {
@@ -55,13 +40,6 @@ test.describe('Admin Dashboard @smoke', () => {
   // NOTE: the standalone dashboard was removed — the Storage Usage / System Status / Recent Activity
   // widgets moved to /admin/analytics (or were dropped). Their old /admin dashboard tests were deleted
   // here; analytics has its own coverage. /admin now lands on the content list.
-
-  test.skip('should navigate to collections page', async ({ page }) => {
-    await navigateToAdminSection(page, 'collections');
-    
-    await expect(page.locator('h1')).toContainText('Collections');
-    await expect(page.locator('a[href="/admin/collections/new"]')).toBeVisible();
-  });
 
   test('should navigate to content page', async ({ page }) => {
     await navigateToAdminSection(page, 'content');

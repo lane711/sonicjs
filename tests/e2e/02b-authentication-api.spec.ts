@@ -160,11 +160,6 @@ test.describe('Authentication API @auth @api', () => {
       expect(data.error).toContain('already exists');
     });
 
-    test.skip('should prevent duplicate username registration', async ({ request }) => {
-      // BA does not enforce unique usernames — the /auth/register endpoint
-      // does not carry a uniqueness constraint on the username field.
-    });
-
     test('should set auth cookie on registration', async ({ request }) => {
       const uniqueUser = {
         ...testUser,

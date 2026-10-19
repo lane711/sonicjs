@@ -186,46 +186,6 @@ test.describe('Slug Generation @content', () => {
     expect(isInvalid).toBe(true)
   })
 
-  test.skip('should allow same slug in different collections', async ({ page }) => {
-    // NOTE: Skipping because blog_post doesn't have a slug field in the database
-    // Only blog_post has a slug field defined in migration 003
-    // This test would need another collection with a slug field to work properly
-    
-    // Create in blog_post collection
-    await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
-    await page.waitForSelector('input[name="title"]', { timeout: 10000 })
-    
-    await page.fill('input[name="title"]', 'Test Cross Collection')
-    await page.waitForTimeout(1000)
-    
-    const slugValue = 'test-cross-collection'
-    await expect(page.locator('input[name="slug"]')).toHaveValue(slugValue)
-    
-    await page.click('button[name="action"][value="save_and_publish"]')
-    await page.waitForTimeout(2000)
-    
-    // Try to use same slug in blog_post collection
-    await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
-    
-    // Wait for the form to load
-    const titleField = page.locator('input[name="title"]')
-    await expect(titleField).toBeVisible({ timeout: 10000 })
-    
-    await titleField.fill('Different Content Same Slug')
-    await page.waitForTimeout(500)
-    
-    // Use same slug
-    const slugField = page.locator('input[name="slug"]')
-    await slugField.fill(slugValue)
-    await page.waitForTimeout(1500)
-    
-    // Should show as available (different collection)
-    const statusDiv = page.locator('#field-slug-status')
-    await expect(statusDiv).toContainText('Available', { timeout: 5000 })
-  })
-
   test('should not auto-change slug when editing existing content', async ({ page }) => {
     // Create content first
     await page.goto('/admin/content/new?collection=blog_post')

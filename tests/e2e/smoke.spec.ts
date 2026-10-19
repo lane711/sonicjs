@@ -88,67 +88,6 @@ test.describe('Smoke Tests - Critical Path @smoke', () => {
     expect(collectionsData.data.length).toBeGreaterThan(0);
   });
 
-  test.skip('Create content via backend form', async ({ page, context }) => {
-    await loginAsAdmin(page);
-
-    const timestamp = Date.now();
-    const testTitle = `Smoke Test ${timestamp}`;
-
-    // Navigate to create content page
-    await page.goto('/admin/content/new');
-    await page.waitForSelector('h1', { timeout: 5000 });
-
-    // Select the first available collection
-    const collectionLink = page.locator('a[href*="/admin/content/new?collection="]').first();
-    await expect(collectionLink).toBeVisible({ timeout: 5000 });
-
-    // Get the collection ID from the URL for cleanup later
-    const href = await collectionLink.getAttribute('href');
-    const collectionIdMatch = href?.match(/collection=([^&]+)/);
-    const collectionId = collectionIdMatch ? collectionIdMatch[1] : null;
-
-    await collectionLink.click();
-
-    // Wait for form to load
-    await page.waitForSelector('form#content-form', { timeout: 10000 });
-
-    // Fill title field
-    const titleField = page.locator('input[name="title"], input[id="title"]').first();
-    await expect(titleField).toBeVisible();
-    await titleField.fill(testTitle);
-
-    // Get the Save button that's actually inside (or references) the form
-    const saveButton = page.locator('button[name="action"][value="save"]').first();
-    await expect(saveButton).toBeVisible({ timeout: 5000 });
-
-    // Click the save button and wait for network activity
-    await Promise.all([
-      page.waitForResponse(resp => resp.url().includes('/admin/content') && resp.request().method() === 'POST'),
-      saveButton.click()
-    ]);
-
-    // Wait for response to be processed
-    await page.waitForTimeout(2000);
-
-    // Verify content was created via API
-    if (collectionId) {
-      const contentResponse = await context.request.get(`/api/content?collection=${collectionId}&limit=20`);
-      expect(contentResponse.ok()).toBeTruthy();
-      const contentData = await contentResponse.json();
-
-      // Find the content we just created
-      const createdContent = contentData.data?.find((c: any) => c.data?.title === testTitle);
-
-      // Content should have been created
-      expect(createdContent).toBeTruthy();
-
-      // Cleanup: delete the created content
-      if (createdContent) {
-        await context.request.delete(`/api/content/${createdContent.id}`);
-      }
-    }
-  });
-
   test('Media upload and cleanup works', async ({ page, context }) => {
     await loginAsAdmin(page);
 
