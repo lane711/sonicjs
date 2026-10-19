@@ -224,6 +224,22 @@ test.describe('Feature Name @feature-tag', () => {
 
 Cover: user interactions, data persistence, UI state, error/validation paths, integration points.
 
+### No skipped tests (non-negotiable)
+
+**Never use `test.skip`, `test.describe.skip`, `test.fixme`, or `test.todo` in E2E specs.** If a test can't pass, **don't write it**. A skipped test is worse than no test — it inflates count, gives false confidence, and never gets unskipped.
+
+| Pattern | Rule |
+|---|---|
+| Feature doesn't exist yet | Don't write the test. Write it when the feature ships. |
+| Test depends on external service (email, Turnstile, AI) | Use `featureAvailable` guard from `test-helpers.ts` — this is the ONLY acceptable conditional skip. |
+| Test is flaky | Fix it or delete it. Don't skip it. |
+| Test was generated alongside code but fails | The code or the test is wrong. Fix whichever is broken. |
+| Aspirational/placeholder test | Delete it. Tests are for working code, not wishlists. |
+
+**The only acceptable `test.skip` is a runtime feature-detection guard** (e.g., `test.skip(!featureAvailable, 'reason')`). Everything else is a bug.
+
+CI will enforce this: a pre-commit lint rejects `describe.skip`, `test.skip('`, bare `test.skip()`, `test.fixme`, and `test.todo` in `tests/e2e/`.
+
 ## Verification commands
 
 ```bash
