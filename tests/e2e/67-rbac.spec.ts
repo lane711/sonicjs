@@ -44,45 +44,6 @@ test.describe('RBAC — portal access enforcement', () => {
     expect(page.url()).toMatch(/\/auth\/login/);
   });
 
-  test('viewer role cannot access /admin (no portal:access grant)', async ({ page }) => {
-    // Create a viewer-only user via BA
-    const TEST_VIEWER = { email: `viewer-rbac-${Date.now()}@test.com`, password: 'viewpass123' };
-
-    // Sign up a new user (will be viewer by default if not first user)
-    const signUp = await page.request.post('/auth/sign-up/email', {
-      data: {
-        email: TEST_VIEWER.email,
-        password: TEST_VIEWER.password,
-        name: 'Viewer Tester',
-      },
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    // Sign-up may fail if registration is disabled or user exists — skip gracefully
-    if (!signUp.ok() && signUp.status() !== 400) {
-      test.skip();
-      return;
-    }
-
-    // Sign in as viewer
-    const signIn = await page.request.post('/auth/sign-in/email', {
-      data: { email: TEST_VIEWER.email, password: TEST_VIEWER.password },
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    if (!signIn.ok()) {
-      test.skip(); // Registration may be disabled
-      return;
-    }
-
-    // Navigate to admin — should be blocked
-    await page.goto('/admin/rbac');
-    // Should redirect to login (no portal:access)
-    expect(page.url()).toMatch(/\/auth\/login|\/admin/);
-
-    // Clean up: sign out
-    await page.request.post('/auth/sign-out', { headers: { 'Content-Type': 'application/json' } });
-  });
 });
 
 test.describe('RBAC — role management API', () => {

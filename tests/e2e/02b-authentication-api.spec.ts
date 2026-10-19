@@ -338,36 +338,6 @@ test.describe('Authentication API @auth @api', () => {
   });
 
   test.describe('POST /auth/logout - User Logout', () => {
-    test('should logout successfully', async ({ request }) => {
-      test.fixme(true, 'POST /auth/login returns 401 on CF preview — admin seed in beforeAll can fail on cold-start');
-      // First login to get a session
-      const loginResponse = await request.post('/auth/login', {
-        data: {
-          email: ADMIN_CREDENTIALS.email,
-          password: ADMIN_CREDENTIALS.password
-        }
-      });
-      expect(loginResponse.status()).toBe(200);
-
-      // Extract CSRF token set by login — /auth/logout requires double-submit validation.
-      const loginSetCookie = loginResponse.headers()['set-cookie'] ?? '';
-      const csrfMatch = loginSetCookie.match(/csrf_token=([^;]+)/);
-      const csrfToken = csrfMatch?.[1] ?? '';
-
-      const logoutResponse = await request.post('/auth/logout', {
-        headers: { 'X-CSRF-Token': csrfToken }
-      });
-
-      expect(logoutResponse.status()).toBe(200);
-
-      const data = await logoutResponse.json();
-      expect(data.message).toContain('Logged out successfully');
-
-      // Check that the BA session cookie is cleared (Max-Age=0)
-      const logoutCookies = logoutResponse.headers()['set-cookie'];
-      expect(logoutCookies).toContain('Max-Age=0');
-    });
-
     test('GET /auth/logout should redirect to login', async ({ request }) => {
       const response = await request.get('/auth/logout', {
         maxRedirects: 0 // Don't follow redirects

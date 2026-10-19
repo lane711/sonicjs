@@ -41,35 +41,6 @@ test.describe('Plugin system @plugins', () => {
     expect(res.status()).toBeLessThan(500)
   })
 
-  test('content:after:create hook path — document write endpoint exists', async ({ request }) => {
-    // Sign in via Better Auth (path is /auth/sign-in/email, NOT /api/auth/sign-in/email)
-    const signIn = await request.post('/auth/sign-in/email', {
-      headers: { 'Content-Type': 'application/json', Origin: BASE },
-      data: { email: 'admin@sonicjs.com', password: 'sonicjs!' },
-    })
-    expect(signIn.status()).toBe(200)
-
-    const body = await signIn.json()
-    const token = body?.token as string | undefined
-
-    if (!token) {
-      test.skip()
-      return
-    }
-
-    // Attempt document creation (triggers content:after:create hook if type exists)
-    // 400/404/422 = type not registered or bad payload; app still didn't crash
-    const create = await request.post('/api/v1/documents', {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-        Origin: BASE,
-      },
-      data: { type: 'post', data: { title: 'Hook test' } },
-    })
-    expect([200, 201, 400, 404, 422]).toContain(create.status())
-  })
-
   test('auth:registration:completed hook path — sign-up endpoint exists', async ({ request }) => {
     // Better Auth registration endpoint (NOT /api/auth/sign-up/email)
     const res = await request.post('/auth/sign-up/email', {

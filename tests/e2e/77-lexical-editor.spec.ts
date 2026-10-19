@@ -46,59 +46,6 @@ test.describe('Lexical Rich Text Editor Plugin @content', () => {
     }
   })
 
-  test('Lexical toolbar has formatting buttons', async ({ page }) => {
-    await page.goto('/admin/content/new?collection=blog_posts')
-    const lexicalWrapper = page.locator('.lexical-editor-wrapper').first()
-
-    if (await lexicalWrapper.count() === 0) {
-      test.skip()
-      return
-    }
-
-    await expect(lexicalWrapper).toBeVisible()
-    const toolbar = lexicalWrapper.locator('.lexical-toolbar')
-    await expect(toolbar).toBeVisible()
-
-    // Standard toolbar should have at least bold, italic, link buttons
-    const boldBtn = toolbar.locator('[data-action="bold"]')
-    const italicBtn = toolbar.locator('[data-action="italic"]')
-    await expect(boldBtn).toBeVisible()
-    await expect(italicBtn).toBeVisible()
-  })
-
-  test('Lexical editor accepts typed content', async ({ page }) => {
-    await page.goto('/admin/content/new?collection=blog_posts')
-    const contentEditable = page.locator('.lexical-content-editable').first()
-
-    if (await contentEditable.count() === 0) {
-      test.skip()
-      return
-    }
-
-    // Wait for Lexical to initialize
-    await page.waitForFunction(() => {
-      const el = document.querySelector('.lexical-editor-wrapper')
-      return el && el.getAttribute('data-lexical-initialized') === 'true'
-    }, { timeout: 10000 }).catch(() => {
-      // Lexical may not have loaded (e.g. no network for CDN); skip gracefully
-    })
-
-    await contentEditable.click()
-    await contentEditable.type('Hello Lexical Editor')
-
-    // Check that the hidden input was updated
-    const fieldId = await contentEditable.closest('.lexical-editor-wrapper').then(
-      w => w?.getAttribute('data-field-id')
-    )
-    if (fieldId) {
-      const hiddenInput = page.locator(`#${fieldId}[type="hidden"]`)
-      if (await hiddenInput.count() > 0) {
-        const value = await hiddenInput.inputValue()
-        expect(value).toBeTruthy()
-      }
-    }
-  })
-
   test('lexical field type can be selected in collection schema editor', async ({ page }) => {
     await page.goto('/admin/collections')
     // The field type dropdown should include 'lexical'

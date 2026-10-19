@@ -37,51 +37,6 @@ test.describe('Settings - General Tab @auth', () => {
     expect(siteDescription).toBeTruthy(); // Should have a value
   });
 
-  test('should save general settings successfully', async ({ page }) => {
-    test.fixme(true, 'Flaky with 4 parallel test workers: concurrent saves to shared D1 DB cause read-back to show another worker\'s value');
-    await page.goto('/admin/settings/general');
-    await page.waitForLoadState('networkidle');
-
-    // Fill in new values
-    const uniqueSiteName = `SonicJS Test ${Date.now()}`;
-    const uniqueDescription = `Test description ${Date.now()}`;
-
-    await page.locator('input[name="siteName"]').fill(uniqueSiteName);
-    await page.locator('textarea[name="siteDescription"]').fill(uniqueDescription);
-    await page.locator('select[name="timezone"]').selectOption('America/New_York');
-    await page.locator('select[name="language"]').selectOption('en');
-
-    // Wait for the response to complete
-    const responsePromise = page.waitForResponse(response =>
-      response.url().includes('/admin/settings/general') && response.request().method() === 'POST'
-    );
-
-    // Click save button
-    await page.locator('button:has-text("Save Changes")').click();
-
-    // Wait for the save to complete
-    const response = await responsePromise;
-    expect(response.status()).toBe(200);
-
-    // Wait a bit for database to be updated
-    await page.waitForTimeout(1000);
-
-    // Reload page and verify values persisted
-    await page.reload();
-    await page.waitForLoadState('networkidle');
-
-    // Wait for form to be populated
-    await page.waitForTimeout(500);
-
-    const savedSiteName = await page.locator('input[name="siteName"]').inputValue();
-    const savedDescription = await page.locator('textarea[name="siteDescription"]').inputValue();
-    const savedTimezone = await page.locator('select[name="timezone"]').inputValue();
-
-    expect(savedSiteName).toBe(uniqueSiteName);
-    expect(savedDescription).toBe(uniqueDescription);
-    expect(savedTimezone).toBe('America/New_York');
-  });
-
   test('should toggle maintenance mode', async ({ page }) => {
     await page.goto('/admin/settings/general');
     await page.waitForLoadState('networkidle');

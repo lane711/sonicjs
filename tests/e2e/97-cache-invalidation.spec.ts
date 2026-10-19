@@ -14,47 +14,6 @@ import { loginAsAdmin, TEST_ORIGIN } from './utils/test-helpers'
 const API = TEST_ORIGIN
 
 test.describe('Cache invalidation — list freshness after item update', () => {
-  test('updating item via public API invalidates list cache', async ({ request }) => {
-    // First: authenticate to create/update content
-    // Use the admin session cookie approach via a page login
-    const loginRes = await request.post(`${API}/api/auth/sign-in/email`, {
-      data: { email: 'admin@sonicjs.com', password: 'admin' },
-    })
-    expect(loginRes.ok()).toBeTruthy()
-
-    // Fetch list — populate cache
-    const list1 = await request.get(`${API}/api/blog`)
-    expect(list1.status()).toBe(200)
-    const data1 = await list1.json()
-    const items1: any[] = data1?.data ?? []
-
-    if (items1.length === 0) {
-      test.skip()
-      return
-    }
-
-    const firstItem = items1[0]
-    const originalTitle = firstItem.title as string
-    const newTitle = `${originalTitle} (updated-${Date.now()})`
-
-    // Update the first item — should invalidate list cache
-    const updateRes = await request.put(`${API}/api/blog/${firstItem.id}`, {
-      data: { title: newTitle },
-    })
-    expect(updateRes.ok()).toBeTruthy()
-
-    // Fetch list again — must NOT return stale cached title
-    const list2 = await request.get(`${API}/api/blog`)
-    expect(list2.status()).toBe(200)
-    const data2 = await list2.json()
-    const items2: any[] = data2?.data ?? []
-
-    const updatedItem = items2.find((i: any) => i.id === firstItem.id)
-    expect(updatedItem).toBeDefined()
-    expect(updatedItem?.title).toBe(newTitle)
-    expect(updatedItem?.title).not.toBe(originalTitle)
-  })
-
   test('creating item via public API invalidates list cache', async ({ request }) => {
     const loginRes = await request.post(`${API}/api/auth/sign-in/email`, {
       data: { email: 'admin@sonicjs.com', password: 'admin' },

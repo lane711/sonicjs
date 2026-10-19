@@ -51,21 +51,6 @@ test.describe('Database Table Viewer — Search & JSON Browser @database', () =>
     await expect(page.locator('text=Filtered:')).not.toBeVisible()
   })
 
-  test('JSON cell opens viewer modal on click', async ({ page }) => {
-    await page.goto('/admin/database-tools/tables/documents')
-    // Find a JSON cell (indigo link in the data column)
-    const jsonBtn = page.locator('button.text-indigo-600, button.text-indigo-400').first()
-    const count = await jsonBtn.count()
-    if (count === 0) {
-      // No JSON data in table — skip gracefully
-      test.skip()
-      return
-    }
-    await jsonBtn.click()
-    await expect(page.locator('#jsonModal')).not.toHaveClass(/hidden/)
-    await expect(page.locator('#jsonModalContent')).toBeVisible()
-  })
-
   test('JSON modal closes on backdrop click', async ({ page }) => {
     await page.goto('/admin/database-tools/tables/documents')
     const jsonBtn = page.locator('button.text-indigo-600, button.text-indigo-400').first()

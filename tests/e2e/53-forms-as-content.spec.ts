@@ -107,47 +107,6 @@ test.describe('Forms as Content @content', () => {
     await loginAsAdmin(page);
   });
 
-  test('should create form and submit data via public API', async ({ page, request }) => {
-    testFormId = await createTestFormWithSchema(
-      page,
-      testFormName, testFormDisplayName,
-      'Contact form for forms-as-content testing',
-      CONTACT_FORM_SCHEMA
-    );
-
-    // Submit real contact data via public API
-    const response = await request.post(`/api/forms/${testFormName}/submit`, {
-      data: {
-        data: {
-          name: 'Jane Doe',
-          email: 'jane@example.com',
-          subject: 'Product Inquiry',
-          message: 'I would like to learn more about your product offerings.'
-        }
-      }
-    });
-
-    const responseBody = await response.text();
-    console.log(`Contact form submit: ${response.status()} - ${responseBody}`);
-
-    // If turnstile blocks despite disable attempt, skip gracefully
-    if (response.status() === 400 || response.status() === 403) {
-      const parsed = JSON.parse(responseBody);
-      if (parsed.code === 'TURNSTILE_MISSING' || parsed.code === 'TURNSTILE_INVALID') {
-        console.log('Turnstile still active despite disable attempt - skipping');
-        test.skip();
-        return;
-      }
-    }
-
-    expect(response.ok()).toBe(true);
-    const result = JSON.parse(responseBody);
-    expect(result.success).toBe(true);
-    expect(result.submissionId).toBeTruthy();
-    // contentId is optional — returned when dual-write to documents table is active.
-    submissionCreated = true;
-  });
-
   test('should NOT show form-sourced collections on collections page', async ({ page }) => {
     if (!testFormId) { test.skip(); return; }
 

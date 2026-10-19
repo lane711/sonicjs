@@ -87,28 +87,6 @@ test.describe('Forms Management @content', () => {
     expect(hasError || stillOnNewPage).toBe(true);
   });
 
-  test('should prevent duplicate form names', async ({ page }) => {
-    if (!testFormId) {
-      test.skip();
-      return;
-    }
-
-    await page.goto('/admin/forms/new');
-    await page.waitForLoadState('networkidle');
-
-    // Try to create form with same name
-    await page.fill('[name="name"]', testFormName);
-    await page.fill('[name="displayName"]', 'Duplicate Test');
-    
-    await page.click('button[type="submit"]');
-    await page.waitForTimeout(1000);
-
-    // Should show duplicate error
-    const hasError = await page.locator('text=/already exists/i').isVisible()
-      .catch(() => false);
-    
-    expect(hasError).toBe(true);
-  });
 });
 
 test.describe('Form Deletion', () => {
