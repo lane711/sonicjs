@@ -1,7 +1,19 @@
 import { test, expect } from '@playwright/test'
 import { loginAsAdmin } from './utils/test-helpers'
 
+// The telemetry ingest endpoint (`POST /v1/events`) and the install/snapshot dashboard cards are
+// served by the separate `sonicjs-stats` worker (packages/stats, deployed to stats.sonicjs.com,
+// with its own wrangler.toml and D1 database). The CMS app under test never registers
+// `statsDashboardPlugin`, so those surfaces only exist when the stats worker is the deployment
+// being pointed at. Detected at run time via its health endpoint.
 test.describe('Stats dashboard data parsing', () => {
+  let statsWorker = false
+
+  test.beforeAll(async ({ request }) => {
+    const res = await request.get('/stats-health').catch(() => null)
+    statsWorker = !!res && res.ok()
+  })
+
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })
@@ -17,6 +29,7 @@ test.describe('Stats dashboard data parsing', () => {
   })
 
   test('install failures table has Step and Version columns', async ({ page }) => {
+    test.skip(!statsWorker, 'Stats surfaces live in the separate sonicjs-stats worker (packages/stats)')
     await page.goto('/admin/dashboard')
     await page.waitForLoadState('networkidle')
 
@@ -33,6 +46,7 @@ test.describe('Stats dashboard data parsing', () => {
   })
 
   test('What People Build section renders when snapshot data exists', async ({ page }) => {
+    test.skip(!statsWorker, 'Stats surfaces live in the separate sonicjs-stats worker (packages/stats)')
     await page.goto('/admin/dashboard')
     await page.waitForLoadState('networkidle')
 
@@ -43,6 +57,7 @@ test.describe('Stats dashboard data parsing', () => {
   })
 
   test('/v1/events accepts project_snapshot payload', async ({ request }) => {
+    test.skip(!statsWorker, 'Stats surfaces live in the separate sonicjs-stats worker (packages/stats)')
     const res = await request.post('/v1/events', {
       data: {
         data: {
@@ -66,6 +81,7 @@ test.describe('Stats dashboard data parsing', () => {
   })
 
   test('/v1/events accepts installation_failed with step', async ({ request }) => {
+    test.skip(!statsWorker, 'Stats surfaces live in the separate sonicjs-stats worker (packages/stats)')
     const res = await request.post('/v1/events', {
       data: {
         data: {

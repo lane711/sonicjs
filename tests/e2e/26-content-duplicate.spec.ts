@@ -93,7 +93,8 @@ test.describe('Content Duplicate Functionality @content', () => {
       // Verify the title has "Copy of" prefix
       const newTitleInput = page.locator('input[name="title"]');
       const newTitle = await newTitleInput.inputValue();
-      expect(newTitle).toContain('Copy of');
+      // Core appends a " (Copy)" suffix (admin-content.ts duplicate handler).
+      expect(newTitle).toContain('(Copy)');
       expect(newTitle).toContain(originalTitle);
     }
   });
@@ -181,7 +182,7 @@ test.describe('Content Duplicate Functionality @content', () => {
       // Verify duplicated content has all fields
       const dupTitleInput = page.locator('input[name="title"]');
       const dupTitle = await dupTitleInput.inputValue();
-      expect(dupTitle).toContain('Copy of');
+      expect(dupTitle).toContain('(Copy)');
     }
   });
 
@@ -276,7 +277,7 @@ test.describe('Content Duplicate Functionality @content', () => {
       // Should see the duplicated title
       const titleInput = page.locator('input[name="title"]');
       const title = await titleInput.inputValue();
-      expect(title).toContain('Copy of');
+      expect(title).toContain('(Copy)');
     }
   });
 });

@@ -40,6 +40,53 @@ function json(data: unknown) {
   return { headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN }, data }
 }
 
+const TWO_FACTOR_PLUGIN_ID = 'two-factor-auth'
+
+/**
+ * Put the plugin into the state every test below assumes: installed and ACTIVE.
+ *
+ * The enrolment surface sits behind a deactivate→404 gate — `twoFactorAdminRoutes` calls
+ * `isPluginActive()` and answers `c.notFound()` when it is false (plugins/core-plugins/
+ * two-factor-auth/routes.ts). That lookup is memoised per server isolate with no TTL and is only
+ * busted by the isolate that toggled the plugin, so an isolate that resolved it once before the
+ * plugin row was seeded keeps 404ing `/admin/two-factor` and `/admin/two-factor/qr` for the rest
+ * of its life even though the row now reads `active`. The same memo is consulted by
+ * `enforceTwoFactorEnrolment()`, so a stale `false` silently un-gates the API too.
+ *
+ * `POST /admin/plugins/:id/activate` is idempotent and calls `invalidatePluginStatusCache()`, so
+ * this pins the real precondition instead of inheriting whatever the isolate happened to cache.
+ *
+ * Requires an admin session on `page` — every caller runs after `loginAsAdmin`.
+ */
+async function ensureTwoFactorPluginActive(page: Page) {
+  const csrf = await getCsrfTokenFromPage(page)
+  const headers = {
+    'Content-Type': 'application/json',
+    Origin: TEST_ORIGIN,
+    ...(csrf ? { 'X-CSRF-Token': csrf } : {}),
+  }
+  const activate = () =>
+    page.request.post(`${TEST_ORIGIN}/admin/plugins/${TWO_FACTOR_PLUGIN_ID}/activate`, {
+      headers,
+      data: {},
+    })
+
+  let res = await activate()
+  if (!res.ok()) {
+    // Nothing to activate yet (greenfield DB whose bootstrap has not registered the row).
+    // Install first — the generic installer resolves the id straight out of the plugin registry.
+    await page.request.post(`${TEST_ORIGIN}/admin/plugins/install`, {
+      headers,
+      data: { id: TWO_FACTOR_PLUGIN_ID, name: TWO_FACTOR_PLUGIN_ID },
+    })
+    res = await activate()
+  }
+  expect(
+    res.ok(),
+    `could not activate the ${TWO_FACTOR_PLUGIN_ID} plugin: ${res.status()} ${await res.text()}`,
+  ).toBeTruthy()
+}
+
 /**
  * Create a throwaway account and take it all the way to a VERIFIED enrolment, using the same
  * Better Auth endpoints the enrolment page's JS calls.
@@ -111,6 +158,7 @@ test.describe('Two-Factor Authentication @auth', () => {
   test.describe('enrolment page', () => {
     test.beforeEach(async ({ page }) => {
       await loginAsAdmin(page)
+      await ensureTwoFactorPluginActive(page)
     })
 
     test('is reachable from the sidebar and renders the disabled state @smoke', async ({ page }) => {
@@ -282,6 +330,7 @@ test.describe('Two-Factor Authentication @auth', () => {
 
     test.beforeEach(async ({ page }) => {
       await loginAsAdmin(page)
+      await ensureTwoFactorPluginActive(page)
     })
 
     test('renders a QR big enough to scan, for any issuer length', async ({ page }) => {

@@ -1,9 +1,20 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 import {
   loginAsAdmin,
   ensureAdminUserExists,
   ensureWorkflowTablesExist
 } from './utils/test-helpers'
+
+// The /admin/plugins filter UI is a checkbox group (`input[name="category"]` /
+// `input[name="status"]`) plus a `#search-input` text box. Clearing every filter
+// is the equivalent of the old "All Categories" / "All Status" select options.
+async function clearFilters(page: Page) {
+  const checked = await page.locator('input[name="category"]:checked, input[name="status"]:checked').all()
+  for (const cb of checked) {
+    await cb.uncheck()
+  }
+  await page.fill('#search-input', '')
+}
 
 // Use environment variable for port or default to 8787
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8787'
@@ -17,13 +28,15 @@ test.describe('Plugin Filters and Search @plugins', () => {
   })
 
   test('should have filter controls', async ({ page }) => {
-    // Check for category filter
-    const categoryFilter = page.locator('#category-filter')
-    await expect(categoryFilter).toBeVisible()
+    // Category filter: a checkbox per category
+    const categoryFilters = page.locator('input[name="category"]')
+    expect(await categoryFilters.count()).toBeGreaterThan(0)
+    await expect(page.locator('#category-security')).toBeVisible()
 
-    // Check for status filter
-    const statusFilter = page.locator('#status-filter')
-    await expect(statusFilter).toBeVisible()
+    // Status filter: a checkbox per status
+    const statusFilters = page.locator('input[name="status"]')
+    expect(await statusFilters.count()).toBeGreaterThan(0)
+    await expect(page.locator('#status-active')).toBeVisible()
 
     // Check for search input
     const searchInput = page.locator('#search-input')
@@ -40,7 +53,7 @@ test.describe('Plugin Filters and Search @plugins', () => {
     }
 
     // Select security category
-    await page.selectOption('#category-filter', 'security')
+    await page.check('#category-security')
     await page.waitForTimeout(500) // Allow filter to apply
 
     // Check that only security plugins are visible
@@ -57,7 +70,7 @@ test.describe('Plugin Filters and Search @plugins', () => {
     }
 
     // Reset filter
-    await page.selectOption('#category-filter', '')
+    await clearFilters(page)
     await page.waitForTimeout(500)
 
     // Should show all plugins again
@@ -75,7 +88,7 @@ test.describe('Plugin Filters and Search @plugins', () => {
     }
 
     // Select active status
-    await page.selectOption('#status-filter', 'active')
+    await page.check('#status-active')
     await page.waitForTimeout(500) // Allow filter to apply
 
     // Check that only active plugins are visible
@@ -92,7 +105,8 @@ test.describe('Plugin Filters and Search @plugins', () => {
     }
 
     // Try inactive status
-    await page.selectOption('#status-filter', 'inactive')
+    await page.uncheck('#status-active')
+    await page.check('#status-inactive')
     await page.waitForTimeout(500)
 
     const inactivePlugins = await page.locator('.plugin-card:visible').count()
@@ -101,7 +115,7 @@ test.describe('Plugin Filters and Search @plugins', () => {
     // expect(visiblePlugins + inactivePlugins).toBeLessThanOrEqual(totalPlugins)
 
     // Reset filter
-    await page.selectOption('#status-filter', '')
+    await clearFilters(page)
     await page.waitForTimeout(500)
 
     // Should show all plugins again
@@ -189,8 +203,8 @@ test.describe('Plugin Filters and Search @plugins', () => {
     }
 
     // Select security category AND active status
-    await page.selectOption('#category-filter', 'security')
-    await page.selectOption('#status-filter', 'active')
+    await page.check('#category-security')
+    await page.check('#status-active')
     await page.waitForTimeout(500) // Allow filter to apply
 
     // Should show filtered results
@@ -207,8 +221,7 @@ test.describe('Plugin Filters and Search @plugins', () => {
     }
 
     // Reset filters
-    await page.selectOption('#category-filter', '')
-    await page.selectOption('#status-filter', '')
+    await clearFilters(page)
     await page.waitForTimeout(500)
   })
 
@@ -222,8 +235,8 @@ test.describe('Plugin Filters and Search @plugins', () => {
     }
 
     // Apply all three filters
-    await page.selectOption('#category-filter', 'security')
-    await page.selectOption('#status-filter', 'active')
+    await page.check('#category-security')
+    await page.check('#status-active')
     await page.fill('#search-input', 'auth')
     await page.waitForTimeout(500) // Allow filter to apply
 
@@ -252,9 +265,7 @@ test.describe('Plugin Filters and Search @plugins', () => {
     }
 
     // Reset all filters
-    await page.selectOption('#category-filter', '')
-    await page.selectOption('#status-filter', '')
-    await page.fill('#search-input', '')
+    await clearFilters(page)
     await page.waitForTimeout(500)
   })
 
@@ -293,67 +304,73 @@ test.describe('Plugin Filters and Search @plugins', () => {
   })
 
   test('should maintain filter state when toggling plugin status', async ({ page }) => {
-    // Apply a filter first
-    await page.selectOption('#category-filter', 'security')
+    // Apply a filter first. "utilities" contains the Hello World demo plugin, which
+    // is safe to toggle (it only contributes a demo page).
+    await page.check('#category-utilities')
     await page.waitForTimeout(500)
 
     const initialCount = await page.locator('.plugin-card:visible').count()
+    expect(initialCount).toBeGreaterThan(0)
 
-    if (initialCount === 0) {
-      console.log('No security plugins - skipping')
-      return
+    // Toggle an installed plugin in the filtered set. Installed cards expose a
+    // switch (role="switch"); uninstalled ones only expose an Install button.
+    const toggleCard = page.locator('.plugin-card[data-name="Hello World"]')
+    await expect(toggleCard).toBeVisible()
+    const toggle = toggleCard.locator('button[role="switch"]')
+    const wasChecked = (await toggle.getAttribute('aria-checked')) ?? 'true'
+    const flipped = wasChecked === 'true' ? 'false' : 'true'
+
+    try {
+      await toggle.click()
+      await expect(toggle).toHaveAttribute('aria-checked', flipped, { timeout: 10000 })
+
+      // Verify category filter is still applied after the toggle
+      await expect(page.locator('#category-utilities')).toBeChecked()
+      expect(await page.locator('.plugin-card:visible').count()).toBe(initialCount)
+    } finally {
+      // Restore the plugin to its original state
+      await toggle.click()
+      await expect(toggle).toHaveAttribute('aria-checked', wasChecked, { timeout: 10000 })
     }
-
-    // Try to toggle a plugin
-    const firstCard = page.locator('.plugin-card:visible').first()
-    const activateBtn = firstCard.locator('button:has-text("Activate")')
-    const deactivateBtn = firstCard.locator('button:has-text("Deactivate")')
-
-    const hasActivate = await activateBtn.count()
-    const hasDeactivate = await deactivateBtn.count()
-
-    if (hasActivate > 0) {
-      await activateBtn.click()
-      await page.waitForTimeout(1000)
-    } else if (hasDeactivate > 0) {
-      await deactivateBtn.click()
-      await page.waitForTimeout(1000)
-    }
-
-    // Verify category filter is still applied
-    const selectedCategory = await page.locator('#category-filter').inputValue()
-    expect(selectedCategory).toBe('security')
 
     // Reset filter
-    await page.selectOption('#category-filter', '')
+    await clearFilters(page)
     await page.waitForTimeout(500)
   })
 
   test('should have correct category options', async ({ page }) => {
-    const categoryFilter = page.locator('#category-filter')
+    // Each category is a labelled checkbox; the label carries the display name
+    // plus a count, e.g. "Security (7)".
+    const labels = await page.locator('aside label[for^="category-"]').allTextContents()
+    const names = labels.map((l) => l.replace(/\s*\(\d+\)\s*$/, '').trim())
 
-    // Check that all expected category options exist
-    const options = await categoryFilter.locator('option').allTextContents()
+    expect(names).toContain('Content Management')
+    expect(names).toContain('Media')
+    expect(names).toContain('SEO & Analytics')
+    expect(names).toContain('Security')
+    expect(names).toContain('Utilities')
+    expect(names).toContain('System')
+    expect(names).toContain('Development')
 
-    expect(options).toContain('All Categories')
-    expect(options).toContain('Content Management')
-    expect(options).toContain('Media')
-    expect(options).toContain('SEO & Analytics')
-    expect(options).toContain('Security')
-    expect(options).toContain('Utilities')
-    expect(options).toContain('System')
-    expect(options).toContain('Development')
+    // "All Categories" is now expressed as "no category checked" — every card shows.
+    const total = await page.locator('.plugin-card').count()
+    expect(await page.locator('input[name="category"]:checked').count()).toBe(0)
+    expect(await page.locator('.plugin-card:visible').count()).toBe(total)
   })
 
   test('should have correct status options', async ({ page }) => {
-    const statusFilter = page.locator('#status-filter')
+    // Each status is a labelled checkbox; the label carries the status name plus a count.
+    const labels = await page.locator('aside label[for^="status-"]').allTextContents()
+    const names = labels.map((l) => l.replace(/\s*\(\d+\)\s*$/, '').trim())
 
-    // Check that all expected status options exist
-    const options = await statusFilter.locator('option').allTextContents()
+    expect(names).toContain('Active')
+    expect(names).toContain('Inactive')
+    expect(names).toContain('Error')
+    expect(names).toContain('Available to Install')
 
-    expect(options).toContain('All Status')
-    expect(options).toContain('Active')
-    expect(options).toContain('Inactive')
-    expect(options).toContain('Error')
+    // "All Status" is now expressed as "no status checked" — every card shows.
+    const total = await page.locator('.plugin-card').count()
+    expect(await page.locator('input[name="status"]:checked').count()).toBe(0)
+    expect(await page.locator('.plugin-card:visible').count()).toBe(total)
   })
 })

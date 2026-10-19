@@ -95,20 +95,30 @@ test.describe('Plugin Filter URL Persistence @plugins', () => {
     expect(params.length).toBe(2)
   })
 
-  test('sort selection is reflected in URL', async ({ page }) => {
+  // The sort <select> was removed from /admin/plugins in "fix(plugins): remove
+  // non-functional sort dropdown (#1007)". The remaining non-default-able control
+  // that participates in URL state is the search box, so the two cases below cover
+  // the same contract: a non-default value lands in the URL, the default does not.
+  test('search text is reflected in URL', async ({ page }) => {
     await page.goto('/admin/plugins')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
+    await expect(page.locator('#search-input')).toBeVisible()
 
-    await page.selectOption('#sort-filter', 'name-desc')
-    await expect(page).toHaveURL(/sort=name-desc/)
+    await page.fill('#search-input', 'turnstile')
+    await expect(page).toHaveURL(/search=turnstile/)
   })
 
-  test('default sort (name-asc) is not added to URL', async ({ page }) => {
+  test('default (empty) search is not added to URL', async ({ page }) => {
     await page.goto('/admin/plugins')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
+    await expect(page.locator('#search-input')).toBeVisible()
 
-    await page.selectOption('#sort-filter', 'name-asc')
-    const url = page.url()
-    expect(url).not.toContain('sort=')
+    // Type then clear — back at the default the param must be gone again
+    await page.fill('#search-input', 'turnstile')
+    await expect(page).toHaveURL(/search=turnstile/)
+
+    await page.fill('#search-input', '')
+    await expect(page).not.toHaveURL(/search=/)
+    expect(page.url()).not.toContain('search=')
   })
 })

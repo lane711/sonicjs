@@ -38,7 +38,7 @@ import { emailReconciliationPlugin } from './plugins/core-plugins/email-reconcil
 import { otpLoginPlugin } from './plugins/core-plugins/otp-login-plugin'
 import { oauthProvidersPlugin } from './plugins/core-plugins/oauth-providers'
 import { userProfilesPlugin } from './plugins/core-plugins/user-profiles'
-import { aiSearchPlugin } from './plugins/core-plugins/ai-search-plugin'
+import { aiSearchPlugin, aiSearchApiRoutes } from './plugins/core-plugins/ai-search-plugin'
 import { securityAuditPlugin } from './plugins/core-plugins/security-audit-plugin'
 import { securityAuditMiddleware, securityAuditApiRoutes, securityAuditAdminRoutes } from './plugins/core-plugins/security-audit-plugin'
 import {
@@ -662,6 +662,11 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   // /api/:collection/:id catch-all must be mounted BEFORE app.route('/api', apiRoutes).
   app.route('/api/security-audit', securityAuditApiRoutes as any)
   app.route('/admin/plugins/security-audit', securityAuditAdminRoutes as any)
+  // Same shadowing problem: the AI Search plugin registers /api/search in its own
+  // register(), but that runs with corePluginsBeforeCatchAll — i.e. after the bare
+  // app.route('/api', apiRoutes) below, whose /:collection wildcard swallowed every
+  // /api/search request ('Collection not found' on GET, 'title is required' on POST).
+  app.route('/api/search', aiSearchApiRoutes as any)
 
   // Core routes
   // Routes are being imported incrementally from routes/*

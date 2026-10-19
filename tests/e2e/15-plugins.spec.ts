@@ -22,35 +22,36 @@ test.describe('Plugin Management @plugins', () => {
     // Check page title
     await expect(page.locator('h1')).toContainText('Plugins')
     
-    // Check for install plugin button
-    await expect(page.locator('button:has-text("Install Plugin")')).toBeVisible()
-    
-    // Install FAQ plugin if no plugins exist
+    // Check for the install affordance. The old global "Install Plugin" dropdown was
+    // replaced by a per-card Install button on every uninstalled catalog plugin.
+    const installButtons = page.locator('.plugin-card[data-status="uninstalled"] button:has-text("Install")')
+    expect(await installButtons.count()).toBeGreaterThan(0)
+    await expect(installButtons.first()).toBeVisible()
+
+    // The catalog is code-defined, so cards are always rendered
     const pluginCount = await page.locator('.plugin-card').count()
-    if (pluginCount === 0) {
-      // Click install plugin button
-      await page.click('button:has-text("Install Plugin")')
-      await expect(page.locator('#plugin-dropdown')).toBeVisible()
-      
-      // Install FAQ System
-      await page.click('button:has-text("FAQ System")')
-      await page.waitForTimeout(2000) // Wait for installation
-      await page.reload()
-    }
-    
-    // Check for at least one plugin card after installation
+    expect(pluginCount).toBeGreaterThan(0)
+
+    // Check for at least one plugin card
     await expect(page.locator('.plugin-card').first()).toBeVisible()
   })
 
   test('should show plugin stats', async ({ page }) => {
     await page.goto(`${BASE_URL}/admin/plugins`)
 
-    // Check for stats cards (at least total plugins)
-    await expect(page.locator('text=Total Plugins').first()).toBeVisible()
+    // Check for stats tiles. The tile is a label div followed by a value div;
+    // the label reads "Total" (it used to read "Total Plugins").
+    const totalLabel = page.getByText('Total', { exact: true }).first()
+    await expect(totalLabel).toBeVisible()
 
-    // Look for plugin count in stats cards - the number is in a div with text-2xl class
-    const statsCards = page.locator('div').filter({ hasText: 'Total Plugins' }).locator('div.text-2xl')
-    await expect(statsCards.first()).toBeVisible()
+    // The count sits in the sibling div right after the label
+    const totalValue = totalLabel.locator('xpath=following-sibling::div[1]')
+    await expect(totalValue).toBeVisible()
+    await expect(totalValue).toHaveText(/^\d+$/)
+
+    // The remaining tiles should be present too
+    await expect(page.getByText('Active', { exact: true }).first()).toBeVisible()
+    await expect(page.getByText('Errors', { exact: true }).first()).toBeVisible()
   })
 
   test('should display existing plugins', async ({ page }) => {
@@ -76,65 +77,64 @@ test.describe('Plugin Management @plugins', () => {
     await expect(firstPlugin.locator('.status-badge')).toBeVisible() // Status
   })
 
-  test('should install FAQ plugin if not present', async ({ page }) => {
+  test('should install a catalog plugin if not present', async ({ page }) => {
+    // The "FAQ System" demo plugin and the global "Install Plugin" dropdown it was
+    // reached through are both gone. Install is now a per-card button. "Versioning"
+    // is an inert core plugin (no menu entries, no hooks) so installing it has no
+    // side effects on the rest of the suite; it is uninstalled again at the end.
+    const PLUGIN_ID = 'versioning'
+    const PLUGIN_NAME = 'Versioning'
+    const card = page.locator(`.plugin-card[data-name="${PLUGIN_NAME}"]`)
+
     await page.goto(`${BASE_URL}/admin/plugins`)
-    
-    // Check if FAQ plugin exists
-    const faqExists = await page.locator('.plugin-card:has-text("FAQ System")').count()
-    
-    if (faqExists === 0) {
-      // Try to install FAQ plugin
-      await page.click('button:has-text("Install Plugin")')
-      
-      // Wait for dropdown and check if FAQ option exists
-      const dropdownVisible = await page.locator('#plugin-dropdown').isVisible()
-      if (dropdownVisible) {
-        const faqOption = page.locator('button:has-text("FAQ System")')
-        const optionExists = await faqOption.count()
-        
-        if (optionExists > 0) {
-          await faqOption.click()
-          
-          // Wait for installation success
-          await expect(page.locator('text=success')).toBeVisible({ timeout: 10000 })
-          
-          // Reload and verify FAQ plugin appears
-          await page.reload()
-          await expect(page.locator('.plugin-card:has-text("FAQ System")')).toBeVisible()
-        }
+
+    // Check if the plugin is installed already
+    await expect(card).toBeVisible()
+    const wasUninstalled = (await card.getAttribute('data-status')) === 'uninstalled'
+
+    try {
+      if (wasUninstalled) {
+        // Install it from its card
+        await card.locator('button:has-text("Install")').click()
+
+        // Wait for installation success (the page reloads ~1.5s afterwards)
+        await expect(page.locator('text=installed successfully')).toBeVisible({ timeout: 10000 })
+        await expect(
+          page.locator(`.plugin-card[data-name="${PLUGIN_NAME}"][data-status="active"]`)
+        ).toBeVisible({ timeout: 20000 })
       }
-    } else {
-      // FAQ plugin already exists
-      await expect(page.locator('.plugin-card:has-text("FAQ System")')).toBeVisible()
+
+      // Either way the plugin is now present and no longer uninstalled
+      await expect(card).toBeVisible()
+      await expect(card).not.toHaveAttribute('data-status', 'uninstalled')
+    } finally {
+      // Restore the catalog to the state the rest of the suite expects
+      if (wasUninstalled) {
+        const res = await page.request.post(`${BASE_URL}/admin/plugins/${PLUGIN_ID}/uninstall`, {
+          headers: { 'Content-Type': 'application/json' },
+        })
+        expect(res.ok()).toBe(true)
+      }
     }
   })
 
   test('should show plugin actions', async ({ page }) => {
     await page.goto(`${BASE_URL}/admin/plugins`)
     
-    // Ensure at least one plugin exists
-    let pluginCount = await page.locator('.plugin-card').count()
-    if (pluginCount === 0) {
-      // Install FAQ plugin
-      await page.click('button:has-text("Install Plugin")')
-      await expect(page.locator('#plugin-dropdown')).toBeVisible()
-      await page.click('button:has-text("FAQ System")')
-      await page.waitForTimeout(2000)
-      await page.reload()
-      pluginCount = await page.locator('.plugin-card').count()
-    }
-    
+    // The catalog is code-defined, so cards are always rendered
+    const pluginCount = await page.locator('.plugin-card').count()
     expect(pluginCount).toBeGreaterThan(0)
     
     // Find any plugin card
     const pluginCard = page.locator('.plugin-card').first()
     
-    // Should have either activate or deactivate button or settings button
-    const hasActivate = await pluginCard.locator('button:has-text("Activate")').count()
-    const hasDeactivate = await pluginCard.locator('button:has-text("Deactivate")').count()
-    const hasSettings = await pluginCard.locator('button:has-text("Settings")').count()
+    // Should have an action: installed plugins render an activate/deactivate toggle
+    // switch, uninstalled ones render an Install button.
+    const hasToggle = await pluginCard.locator('button[role="switch"]').count()
+    const hasInstall = await pluginCard.locator('button:has-text("Install")').count()
+    const hasSettings = await pluginCard.locator('button[title="Settings"], button:has-text("Settings")').count()
     
-    expect(hasActivate + hasDeactivate + hasSettings).toBeGreaterThan(0)
+    expect(hasToggle + hasInstall + hasSettings).toBeGreaterThan(0)
   })
 
   test('should toggle plugin status', async ({ page }) => {
@@ -193,19 +193,18 @@ test.describe('Plugin Management @plugins', () => {
     }
   })
 
-  test('should show install dropdown options', async ({ page }) => {
+  test('should show installable plugin options', async ({ page }) => {
     await page.goto(`${BASE_URL}/admin/plugins`)
     
-    // Click install plugin button
-    await page.click('button:has-text("Install Plugin")')
+    // The install dropdown was replaced by a per-card Install button on every
+    // uninstalled catalog plugin, so the installable options are those cards.
+    const installButtons = page.locator('.plugin-card[data-status="uninstalled"] button:has-text("Install")')
     
-    // Check dropdown appears
-    await expect(page.locator('#plugin-dropdown')).toBeVisible()
-    
-    // Should have at least one installable option
-    const dropdownButtons = page.locator('#plugin-dropdown button')
-    const buttonCount = await dropdownButtons.count()
+    // Should have at least one installable option, and it should be clickable
+    const buttonCount = await installButtons.count()
     expect(buttonCount).toBeGreaterThan(0)
+    await expect(installButtons.first()).toBeVisible()
+    await expect(installButtons.first()).toBeEnabled()
   })
 
   test('should filter plugins by search', async ({ page }) => {

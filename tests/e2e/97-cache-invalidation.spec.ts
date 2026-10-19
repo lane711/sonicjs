@@ -9,35 +9,40 @@
  */
 
 import { test, expect } from '@playwright/test'
-import { loginAsAdmin, TEST_ORIGIN } from './utils/test-helpers'
+import { loginAsAdmin, ADMIN_CREDENTIALS, TEST_ORIGIN } from './utils/test-helpers'
 
 const API = TEST_ORIGIN
+// Collection slugs use underscores; `blog` is not a registered collection.
+const COLLECTION = 'blog_post'
 
 test.describe('Cache invalidation — list freshness after item update', () => {
   test('creating item via public API invalidates list cache', async ({ request }) => {
-    const loginRes = await request.post(`${API}/api/auth/sign-in/email`, {
-      data: { email: 'admin@sonicjs.com', password: 'admin' },
+    const loginRes = await request.post(`${API}/auth/sign-in/email`, {
+      data: { email: ADMIN_CREDENTIALS.email, password: ADMIN_CREDENTIALS.password },
+      headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
     })
     expect(loginRes.ok()).toBeTruthy()
 
     // Fetch list — populate cache
-    const list1 = await request.get(`${API}/api/blog`)
+    const list1 = await request.get(`${API}/api/${COLLECTION}`)
     expect(list1.status()).toBe(200)
     const data1 = await list1.json()
     const countBefore: number = (data1?.data ?? []).length
 
     // Create new item
-    const createRes = await request.post(`${API}/api/blog`, {
+    const stamp = Date.now()
+    const createRes = await request.post(`${API}/api/${COLLECTION}`, {
       data: {
-        title: `Cache test item ${Date.now()}`,
-        slug: `cache-test-${Date.now()}`,
+        title: `Cache test item ${stamp}`,
+        slug: `cache-test-${stamp}`,
         data: {},
       },
+      headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
     })
     expect(createRes.ok()).toBeTruthy()
 
     // Fetch list again — must reflect new item, not return stale cached count
-    const list2 = await request.get(`${API}/api/blog`)
+    const list2 = await request.get(`${API}/api/${COLLECTION}`)
     expect(list2.status()).toBe(200)
     const data2 = await list2.json()
     const countAfter: number = (data2?.data ?? []).length
@@ -49,7 +54,7 @@ test.describe('Cache invalidation — list freshness after item update', () => {
     await loginAsAdmin(page)
 
     // Prime the list cache
-    await page.request.get(`${API}/api/blog`)
+    await page.request.get(`${API}/api/${COLLECTION}`)
 
     // Clear all caches via admin endpoint
     const clearRes = await page.request.post(`${API}/admin/cache/clear`)
@@ -58,7 +63,7 @@ test.describe('Cache invalidation — list freshness after item update', () => {
     expect(clearData.success).toBe(true)
 
     // List should still be fetchable after clear
-    const listRes = await page.request.get(`${API}/api/blog`)
+    const listRes = await page.request.get(`${API}/api/${COLLECTION}`)
     expect(listRes.status()).toBe(200)
   })
 })

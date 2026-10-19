@@ -126,9 +126,10 @@ test.describe('JSON field viewer @database', () => {
     await toggleBtn.click()
     await expect(toggleBtn).toHaveText('Edit JSON')
 
-    // Submit the form
-    await page.getByRole('button', { name: /update/i }).click()
-    await page.waitForLoadState('networkidle')
+    // Submit the form (content form action buttons are Save / Save & close / Publish)
+    await page.locator('button[name="action"][value="save"]').first().click()
+    await page.waitForLoadState('domcontentloaded')
+    await expect(page.locator('[data-json-toggle]').first()).toBeVisible({ timeout: 15000 })
 
     // Re-open and verify persisted
     await page.goto(`${TEST_ORIGIN}/admin/content/${contentId}/edit`)

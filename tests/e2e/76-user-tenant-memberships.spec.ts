@@ -54,8 +54,14 @@ test.describe.serial('User-centric tenant memberships @auth', () => {
 
   test('user edit page links to membership management when the plugin is active', async ({ page }) => {
     await page.goto(`${BASE_URL}/admin/users/${UID}/edit`)
-    await page.waitForLoadState('networkidle')
-    await expect(page.locator('[data-tenant-memberships-link]')).toBeVisible()
+    await page.waitForLoadState('domcontentloaded')
+    // The standalone "manage memberships" link was replaced by an inline memberships matrix
+    // (commit 39a9f61eb); the section only renders while the multi-tenant plugin is active.
+    const section = page.locator('[data-tenant-memberships]')
+    await expect(section).toBeVisible()
+    await expect(section.getByRole('heading', { name: 'Tenant memberships' })).toBeVisible()
+    // Management affordance: the add-to-tenant form targeting this user's memberships endpoint.
+    await expect(section.locator(`form[action="/admin/tenants/users/${UID}/memberships"]`)).toBeVisible()
   })
 
   test('add user to a tenant, change role, remove', async ({ page }) => {

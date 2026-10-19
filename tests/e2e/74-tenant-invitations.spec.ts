@@ -93,6 +93,10 @@ test.describe.serial('Tenant invitations @auth', () => {
     const email = `revoke${RUN}@example.com`
     await page.fill('#invite-email', email)
     await Promise.all([page.waitForURL(/\/members/), page.click('[data-send-invite]')])
+    // The POST always redirects back with a status banner; wait for it so a rejected invite
+    // (e.g. plugin deactivated by a concurrent spec) fails on the banner text, not on a bare
+    // missing row.
+    await expect(page.locator('[data-members-alert]')).toBeVisible()
     await expect(page.locator(`[data-invite-row="${email}"]`)).toBeVisible()
 
     await Promise.all([

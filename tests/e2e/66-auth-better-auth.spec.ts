@@ -1,5 +1,28 @@
 import { test, expect } from '@playwright/test';
+import type { APIRequestContext, APIResponse } from '@playwright/test';
 import { ADMIN_CREDENTIALS, loginAsAdmin, logout, TEST_ORIGIN } from './utils/test-helpers';
+
+/**
+ * POST /auth/seed-admin until a request actually reaches the handler.
+ *
+ * The route is rate-limited to 10 requests per minute per IP
+ * (`rateLimit({ max: 10, windowMs: 60_000, keyPrefix: 'seed-admin' })` in routes/auth.ts) and
+ * `loginAsAdmin` POSTs it on EVERY sign-in, so in a full-suite run the window is routinely spent
+ * by the other workers before this test gets a turn. A 429 is the limiter answering, not the
+ * seeder, and asserting on whichever request happened to land first tests the wrong thing.
+ *
+ * Polled rather than slept out via `Retry-After`: the window is fixed, so its slots free up in a
+ * burst the instant it rolls and the other workers reclaim them within seconds.
+ */
+async function seedAdminPastRateLimit(request: APIRequestContext): Promise<APIResponse> {
+  const deadline = Date.now() + 90_000;
+  let res = await request.post('/auth/seed-admin');
+  while (res.status() === 429 && Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 2_000));
+    res = await request.post('/auth/seed-admin');
+  }
+  return res;
+}
 
 /**
  * Better Auth integration E2E tests.
@@ -120,8 +143,12 @@ test.describe('Better Auth — protected routes', () => {
 
 test.describe('Better Auth — seed-admin creates credentials', () => {
   test('seed-admin creates user and login works', async ({ request }) => {
-    const res = await request.post('/auth/seed-admin');
-    expect(res.ok()).toBeTruthy();
+    // Headroom for the rate-limit poll above: the default 60s timeout is shorter than the
+    // limiter's own 60s window, so a test that starts on an exhausted window cannot outlast it.
+    test.setTimeout(150_000);
+
+    const res = await seedAdminPastRateLimit(request);
+    expect(res.ok(), `seed-admin never got past the rate limiter: ${res.status()}`).toBeTruthy();
     const body = await res.json();
     expect(body.message).toBe('Seed complete');
     const adminEntry = (body.users ?? []).find((u: any) => u.email === ADMIN_CREDENTIALS.email);

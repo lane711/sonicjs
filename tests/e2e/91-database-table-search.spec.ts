@@ -31,7 +31,8 @@ test.describe('Database Table Viewer — Search & JSON Browser @database', () =>
   test('Search button navigates with search param', async ({ page }) => {
     await page.goto('/admin/database-tools/tables/documents')
     await page.locator('#searchInput').fill('hello')
-    await page.getByRole('button', { name: 'Search' }).click()
+    // Exact match: JSON cells can render buttons whose accessible name contains "Search".
+    await page.getByRole('button', { name: 'Search', exact: true }).click()
     await expect(page).toHaveURL(/search=hello/)
   })
 
@@ -73,11 +74,15 @@ test.describe('Database Table Viewer — Search & JSON Browser @database', () =>
 
   test('search preserved across page navigation', async ({ page }) => {
     await page.goto('/admin/database-tools/tables/documents?search=doc&pageSize=5')
-    // If multiple pages, click next page
-    const nextBtn = page.locator('button:has-text("Next")').first()
-    if (await nextBtn.count() > 0 && !(await nextBtn.isDisabled())) {
+    // The `sm:hidden` Previous/Next pair is invisible at desktop width; the visible control is the
+    // desktop pagination nav, whose Next button is labelled by an sr-only span.
+    const pagination = page.locator('nav[aria-label="Pagination"]')
+    if (await pagination.count() > 0) {
+      const nextBtn = pagination.getByRole('button', { name: 'Next' })
+      await expect(nextBtn).toBeEnabled()
       await nextBtn.click()
       await expect(page).toHaveURL(/search=doc/)
+      await expect(page).toHaveURL(/page=2/)
     }
   })
 
