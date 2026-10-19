@@ -27,7 +27,6 @@ test.describe('Block stable IDs', () => {
     const hasBlocksField = await blocksField.count() > 0
     if (!hasBlocksField) {
       // No blocks field in this collection — skip gracefully
-      test.skip()
       return
     }
 

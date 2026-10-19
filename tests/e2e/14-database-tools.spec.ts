@@ -1,8 +1,15 @@
 import { test, expect } from '@playwright/test';
-import { loginAsAdmin, getCsrfTokenFromPage } from './utils/test-helpers';
+import { loginAsAdmin, getCsrfTokenFromPage, isFeatureAvailable } from './utils/test-helpers';
 
-test.describe.skip('Database Tools', () => {
+let featureAvailable = false;
+
+test.describe('Database Tools', () => {
+  test.beforeAll(async ({ request }) => {
+    featureAvailable = await isFeatureAvailable(request, '/admin/settings');
+  });
+
   test.beforeEach(async ({ page }) => {
+    if (!featureAvailable) { test.skip(); return; }
     await loginAsAdmin(page);
   });
 

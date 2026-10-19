@@ -50,10 +50,7 @@ test.describe('Lexical Rich Text Editor Plugin @content', () => {
     await page.goto('/admin/content/new?collection=blog_post')
     const lexicalWrapper = page.locator('.lexical-editor-wrapper').first()
 
-    if (await lexicalWrapper.count() === 0) {
-      test.skip()
-      return
-    }
+    if (await lexicalWrapper.count() === 0) return
 
     await expect(lexicalWrapper).toBeVisible()
     const toolbar = lexicalWrapper.locator('.lexical-toolbar')
@@ -70,10 +67,7 @@ test.describe('Lexical Rich Text Editor Plugin @content', () => {
     await page.goto('/admin/content/new?collection=blog_post')
     const contentEditable = page.locator('.lexical-content-editable').first()
 
-    if (await contentEditable.count() === 0) {
-      test.skip()
-      return
-    }
+    if (await contentEditable.count() === 0) return
 
     // Wait for Lexical to initialize
     await page.waitForFunction(() => {

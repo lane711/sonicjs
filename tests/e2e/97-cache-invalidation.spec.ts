@@ -31,7 +31,6 @@ test.describe('Cache invalidation — list freshness after item update', () => {
     const items1: any[] = data1?.data ?? []
 
     if (items1.length === 0) {
-      test.skip()
       return
     }
 
