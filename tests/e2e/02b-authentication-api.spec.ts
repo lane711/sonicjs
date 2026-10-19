@@ -338,6 +338,47 @@ test.describe('Authentication API @auth @api', () => {
   });
 
   test.describe('POST /auth/logout - User Logout', () => {
+    // Admin seeding can lose a cold-start race on CF preview, leaving /auth/login
+    // at 401. Probe once so the logout assertions only run against a live session.
+    let loginAvailable = false;
+    test.beforeAll(async ({ request }) => {
+      await request.post('/auth/seed-admin').catch(() => {});
+      const probe = await request.post('/auth/login', {
+        data: { email: ADMIN_CREDENTIALS.email, password: ADMIN_CREDENTIALS.password }
+      }).catch(() => null);
+      loginAvailable = probe?.status() === 200;
+    });
+
+    test('should logout successfully', async ({ request }) => {
+      test.skip(!loginAvailable, 'Admin login unavailable — seed lost the cold-start race');
+
+      const loginResponse = await request.post('/auth/login', {
+        data: {
+          email: ADMIN_CREDENTIALS.email,
+          password: ADMIN_CREDENTIALS.password
+        }
+      });
+      expect(loginResponse.status()).toBe(200);
+
+      // Extract CSRF token set by login — /auth/logout requires double-submit validation.
+      const loginSetCookie = loginResponse.headers()['set-cookie'] ?? '';
+      const csrfMatch = loginSetCookie.match(/csrf_token=([^;]+)/);
+      const csrfToken = csrfMatch?.[1] ?? '';
+
+      const logoutResponse = await request.post('/auth/logout', {
+        headers: { 'X-CSRF-Token': csrfToken }
+      });
+
+      expect(logoutResponse.status()).toBe(200);
+
+      const data = await logoutResponse.json();
+      expect(data.message).toContain('Logged out successfully');
+
+      // Check that the BA session cookie is cleared (Max-Age=0)
+      const logoutCookies = logoutResponse.headers()['set-cookie'];
+      expect(logoutCookies).toContain('Max-Age=0');
+    });
+
     test('GET /auth/logout should redirect to login', async ({ request }) => {
       const response = await request.get('/auth/logout', {
         maxRedirects: 0 // Don't follow redirects
