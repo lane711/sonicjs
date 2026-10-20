@@ -10,8 +10,18 @@ const __dirname = dirname(__filename);
  */
 export default defineConfig({
   testDir: './e2e',
-  /* Run tests in files in parallel */
-  fullyParallel: true,
+  /* Files run in parallel; tests WITHIN a file do not.
+   *
+   * `fullyParallel: true` spreads the tests of one file across all four workers, and this suite
+   * cannot take that: every spec shares one database, one `admin@sonicjs.com` account, one
+   * site-settings row and one set of plugin activation flags. 27-settings-general is the clearest
+   * case — eight tests, each POSTing the whole general-settings form, so the one asserting its
+   * unique site name read back "SonicJS AI" where a sibling had just saved the form it had loaded
+   * before the write. Several specs say "workers:1 → the tests run serially" in their own headers;
+   * this makes that true again without giving up file-level parallelism.
+   *
+   * Cross-FILE conflicts over the same global are handled by the `@lock-*` tags — see fixtures.ts. */
+  fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only — 2 retries handles consecutive transient CF Worker cold-starts */

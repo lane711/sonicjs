@@ -1,5 +1,10 @@
 import { test as base } from '@playwright/test'
 import type { Browser, BrowserContext, Page, Response } from '@playwright/test'
+import { createHash } from 'node:crypto'
+import { mkdirSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { dirname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 /**
  * Drop-in replacement for `@playwright/test` that hardens navigation against the admin UI's
@@ -164,7 +169,114 @@ function hardenContext(context: BrowserContext): BrowserContext {
   return context
 }
 
-export const test = base.extend<{ page: Page; context: BrowserContext }, { browser: Browser }>({
+/**
+ * Cross-file mutual exclusion for tests that mutate shared server state.
+ *
+ * `test.describe.serial` only orders tests inside one file. It does nothing about two FILES that
+ * own the same global: 68-plugin-activity-log toggles the `hello-world` plugin while
+ * 68-plugin-install-click uninstalls it, and 70-multi-tenant deactivates the multi-tenant plugin
+ * while 71-tenant-membership-gate needs it active. Both pairs are green alone and red together —
+ * the failure surfaces as "element(s) not found" on a button the other spec just took away.
+ *
+ * A test opts in by carrying a `@lock-<name>` tag; it then holds that name for its whole duration.
+ * Workers are separate OS processes on one machine, so the mutex is a directory: `mkdir` is atomic
+ * and fails with EEXIST when someone already holds it.
+ */
+const LOCK_ROOT = join(
+  tmpdir(),
+  `sonicjs-e2e-locks-${createHash('sha1')
+    .update(resolve(dirname(fileURLToPath(import.meta.url)), '../..'))
+    .digest('hex')
+    .slice(0, 12)}`
+)
+
+/**
+ * A held lock is heartbeated (below), so a mtime this old means the holder process is gone —
+ * killed worker, Ctrl-C, OOM. Without the heartbeat this would have to exceed the longest a test
+ * may legitimately hold the lock, and `submitLoginForm` can extend its own budget by 75s to wait
+ * out a rate-limit window; the next worker would have stolen the lock mid-test.
+ */
+const LOCK_STALE_MS = 150_000
+const LOCK_POLL_MS = 100
+
+/** Generous: the holder is a whole test, and several may be queued ahead of us. */
+const LOCK_WAIT_MS = 300_000
+
+async function acquireLock(name: string): Promise<() => void> {
+  const dir = join(LOCK_ROOT, name.replace(/[^a-z0-9-]/gi, '_'))
+  const deadline = Date.now() + LOCK_WAIT_MS
+
+  mkdirSync(LOCK_ROOT, { recursive: true })
+
+  for (;;) {
+    try {
+      mkdirSync(dir)
+      writeFileSync(join(dir, 'owner'), `pid ${process.pid}\n`)
+      // Keep the mtime fresh while we hold it, so "stale" means the holder died rather than
+      // "the holder is taking a while". `unref` so a leaked timer cannot hold the worker open.
+      const heartbeat = setInterval(() => {
+        try {
+          const now = new Date()
+          utimesSync(dir, now, now)
+        } catch {
+          // Already released; the clearInterval below is about to run anyway.
+        }
+      }, Math.floor(LOCK_STALE_MS / 3))
+      heartbeat.unref()
+      return () => {
+        clearInterval(heartbeat)
+        rmSync(dir, { recursive: true, force: true })
+      }
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
+
+      try {
+        if (Date.now() - statSync(dir).mtimeMs > LOCK_STALE_MS) {
+          rmSync(dir, { recursive: true, force: true })
+          continue
+        }
+      } catch {
+        // Released between the mkdir and the stat — just go round again.
+      }
+
+      if (Date.now() > deadline) {
+        throw new Error(`Timed out after ${LOCK_WAIT_MS}ms waiting for the "${name}" e2e lock (${dir})`)
+      }
+      await new Promise((r) => setTimeout(r, LOCK_POLL_MS))
+    }
+  }
+}
+
+export const test = base.extend<
+  { page: Page; context: BrowserContext; exclusiveLocks: void },
+  { browser: Browser }
+>({
+  // Auto-use, so a spec opts in with a tag alone and cannot forget to release.
+  exclusiveLocks: [
+    async ({}, use, testInfo) => {
+      const names = testInfo.tags
+        .filter((tag) => tag.startsWith('@lock-'))
+        .map((tag) => tag.slice('@lock-'.length))
+        // Deterministic order: two tests holding {a,b} in opposite orders would deadlock.
+        .sort()
+
+      const releases: Array<() => void> = []
+      const waitStartedAt = Date.now()
+      try {
+        for (const name of names) releases.push(await acquireLock(name))
+
+        // Queueing behind another spec is not this test's own work, so hand the budget back —
+        // otherwise the slowest-to-acquire test reports a timeout that says nothing about it.
+        const waited = Date.now() - waitStartedAt
+        if (waited > 1_000) testInfo.setTimeout(testInfo.timeout + waited)
+
+        await use()
+      } finally {
+        for (const release of releases.reverse()) release()
+      }
+    },
+    { auto: true },
+  ],
   // Worker-scoped, because `browser` is. A good number of specs open their own page or context
   // off the raw `browser` handle in a beforeAll instead of taking the `page` fixture, and those
   // navigations stall exactly like any other — so the hardening has to start here rather than at
