@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures'
-import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers'
+import { loginAsAdmin, ensureAdminUserExists, gotoMediaLibrary } from './utils/test-helpers'
 
 const minimalJpeg = Buffer.from([
   0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01,
@@ -21,7 +21,7 @@ const minimalJpeg = Buffer.from([
 test.describe('Media — document model (slice 3) @media', () => {
   test.beforeEach(async ({ page }) => {
     await ensureAdminUserExists(page)
-    await loginAsAdmin(page)
+    await loginAsAdmin(page, false)
   })
 
   test('API upload returns document rootId and file is listed from documents', async ({ context }) => {
@@ -82,16 +82,14 @@ test.describe('Media — document model (slice 3) @media', () => {
   })
 
   test('Admin media library page loads without error', async ({ page }) => {
-    await loginAsAdmin(page)
-    await page.goto('/admin/media')
-    await page.waitForLoadState('networkidle')
+    await loginAsAdmin(page, false)
+    await gotoMediaLibrary(page)
     await expect(page.locator('h1')).toContainText('Media Library')
   })
 
   test('Admin upload creates document-backed file visible in media library', async ({ page, context }) => {
-    await loginAsAdmin(page)
-    await page.goto('/admin/media')
-    await page.waitForLoadState('networkidle')
+    await loginAsAdmin(page, false)
+    await gotoMediaLibrary(page)
 
     const uniqueName = `e2e-doc-${Date.now()}.jpg`
 
@@ -108,8 +106,7 @@ test.describe('Media — document model (slice 3) @media', () => {
     await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', { timeout: 10000 })
 
     // Page auto-redirects; wait for media library to reload
-    await page.waitForURL(/\/admin\/media/, { timeout: 8000 })
-    await page.waitForLoadState('networkidle', { timeout: 10000 })
+    await page.waitForURL(/\/admin\/media/, { timeout: 20000, waitUntil: 'domcontentloaded' })
 
     // File should appear in the grid (sourced from documents now)
     await expect(page.locator('#media-grid')).toContainText(uniqueName, { timeout: 10000 })

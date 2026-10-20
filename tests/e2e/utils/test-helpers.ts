@@ -429,9 +429,16 @@ export async function ensureTestCollectionExists(_page: Page) {
 }
 
 /**
- * Login as admin user
+ * Login as admin user.
+ *
+ * `landOn` picks the page the browser is left on. The default `/admin` is the dashboard, which
+ * fans out into four htmx fragments and is the single most expensive page in the app to render
+ * cold. A spec whose first act is to navigate somewhere else pays that for nothing — and four
+ * parallel workers all cold-starting the dashboard at once is what pushed the media specs past
+ * their 90s budget. Pass the page the spec actually wants, or `false` to stay put (the session
+ * cookie is already in the context either way, since sign-in goes through `page.request`).
  */
-export async function loginAsAdmin(page: Page) {
+export async function loginAsAdmin(page: Page, landOn: string | false = '/admin') {
   // Ensure admin exists (also creates auth_account for Better Auth)
   await ensureAdminUserExists(page);
 
@@ -480,8 +487,10 @@ export async function loginAsAdmin(page: Page) {
   // /admin is the heaviest page in the app (metrics + recent activity + migrations status all
   // polling). Waiting for it to go quiet can eat most of the 60s test budget before the test
   // body starts. Nothing here needs subresources — the caller's own assertions auto-wait.
-  await page.goto('/admin', { waitUntil: 'domcontentloaded' });
-  await page.waitForURL(/\/admin/, { timeout: 20000, waitUntil: 'domcontentloaded' });
+  if (landOn !== false) {
+    await page.goto(landOn, { waitUntil: 'domcontentloaded' });
+    await page.waitForURL(/\/admin/, { timeout: 20000, waitUntil: 'domcontentloaded' });
+  }
 
   // No `ensureWorkflowTablesExist` / `ensureWorkflowPluginActive` here. The first POSTs
   // /admin/api/migrations/run, which on D1 always answers 409 ("Migrations are managed by
@@ -489,6 +498,24 @@ export async function loginAsAdmin(page: Page) {
   // second has been a bare `return` since the workflow plugin stopped shipping. The three specs
   // that actually care (15-plugins, 28-plugin-filters-search, 39-ai-search-plugin) call
   // ensureWorkflowTablesExist themselves.
+}
+
+/**
+ * Open the media library and wait for its grid.
+ *
+ * Use this instead of `page.goto('/admin/media')`. `goto` defaults to `waitUntil: 'load'`, which
+ * holds until every thumbnail in the grid has answered. Thumbnails are served by the worker out
+ * of R2 and workers.dev previews get no edge cache, so each is a ~0.8s round trip: a default
+ * `goto` here measured 12.6s against a preview where the HTML alone took 2.2s. Three media specs
+ * were blowing their 90s budget on that wait alone once four workers competed for the isolate.
+ *
+ * `#media-grid` is server-rendered in the page body — it holds either the grid or the empty
+ * state — so it is present the moment the document parses. Nothing is being raced here; the wait
+ * is a guard that we landed on the library and not a redirect to the login page.
+ */
+export async function gotoMediaLibrary(page: Page, url = '/admin/media') {
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
+  await page.locator('#media-grid').waitFor({ state: 'attached', timeout: 20000 });
 }
 
 /**

@@ -1,11 +1,10 @@
 import { test, expect } from './fixtures';
-import { loginAsAdmin } from './utils/test-helpers';
+import { loginAsAdmin, gotoMediaLibrary } from './utils/test-helpers';
 
 test.describe('Media Upload - Immediate Availability @media', () => {
   test('uploaded photo should appear immediately in media list', async ({ page }) => {
-    await loginAsAdmin(page);
-    await page.goto('/admin/media');
-    await page.waitForLoadState('networkidle');
+    await loginAsAdmin(page, false);
+    await gotoMediaLibrary(page);
 
     // Open upload modal
     await page.locator('button').filter({ hasText: 'Upload Files' }).first().click();
@@ -45,11 +44,11 @@ test.describe('Media Upload - Immediate Availability @media', () => {
     await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', { timeout: 10000 });
 
     // Wait for page to redirect with cache-busting parameter
-    await page.waitForURL(/\/admin\/media\?t=/, { timeout: 5000 });
+    await page.waitForURL(/\/admin\/media\?t=/, { timeout: 20000, waitUntil: 'domcontentloaded' });
 
-    // Page should be fully loaded after refresh
-    await page.waitForLoadState('networkidle', { timeout: 10000 });
-
+    // No `networkidle` here. The redirect lands on the library, whose thumbnails are now
+    // `loading="lazy"` but still trickle in as they scroll into view; the assertion below is
+    // about the grid's text, which the server rendered before the first image was requested.
     // After refresh, verify the new file appears in the grid by filename
     // (It should be at the top since files are sorted by upload date DESC)
     await expect(page.locator('#media-grid')).toContainText(uniqueFilename, { timeout: 10000 });

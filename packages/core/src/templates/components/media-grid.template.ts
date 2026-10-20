@@ -89,6 +89,7 @@ export function renderMediaFileCard(
               <img src="${file.thumbnail_url || file.public_url}" alt="${
                     escapeHtml(file.alt || file.original_name)
                   }"
+                   loading="lazy" decoding="async" width="64" height="64"
                    class="w-16 h-16 object-cover rounded-lg ring-1 ring-zinc-950/10 dark:ring-white/10">
             `
                 : `
@@ -182,11 +183,19 @@ export function renderMediaFileCard(
 
       <div class="aspect-square relative">
         ${
+          /*
+           * Thumbnails are served by the worker out of R2 (`/files/...`), and workers.dev previews
+           * get no edge cache, so each one is a full round trip (~0.8s measured). A page of 24
+           * eager <img> tags therefore held the window `load` event open for 6+ seconds past the
+           * HTML — long enough that any test or user waiting on `load` saw the library as hung.
+           * Deferring the off-screen ones cuts that to the handful actually on screen.
+           */
           file.isImage
             ? `
           <img src="${file.thumbnail_url || file.public_url}" alt="${
                 escapeHtml(file.alt || file.original_name)
               }"
+               loading="lazy" decoding="async"
                class="w-full h-full object-cover">
         `
             : `

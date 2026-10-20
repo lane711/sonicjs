@@ -1,9 +1,9 @@
 import { test, expect } from './fixtures';
-import { loginAsAdmin, navigateToAdminSection } from './utils/test-helpers';
+import { loginAsAdmin, navigateToAdminSection, gotoMediaLibrary } from './utils/test-helpers';
 
 test.describe('Media Cleanup Unused Files @media', () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsAdmin(page);
+    await loginAsAdmin(page, false);
     await navigateToAdminSection(page, 'media');
   });
 
@@ -60,7 +60,6 @@ test.describe('Media Cleanup Unused Files @media', () => {
     await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', { timeout: 10000 });
 
     // Wait for page to reload after upload
-    await page.waitForLoadState('networkidle');
 
     // Now perform cleanup
     const cleanupButton = page.locator('button').filter({ hasText: 'Cleanup Unused' });
@@ -137,12 +136,10 @@ test.describe('Media Cleanup Unused Files @media', () => {
     await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', { timeout: 10000 });
 
     // Wait for page to reload
-    await page.waitForLoadState('networkidle');
 
     // Step 2: Create content that references this file
     // Navigate to content section
     await page.goto('/admin/content');
-    await page.waitForLoadState('networkidle');
 
     // Try to create new content (if create button exists)
     const createButton = page.locator('button').filter({ hasText: /Create|New Content/i });
@@ -167,8 +164,7 @@ test.describe('Media Cleanup Unused Files @media', () => {
     }
 
     // Step 3: Go back to media and run cleanup
-    await page.goto('/admin/media');
-    await page.waitForLoadState('networkidle');
+    await gotoMediaLibrary(page);
 
     const cleanupButton = page.locator('button').filter({ hasText: 'Cleanup Unused' });
 

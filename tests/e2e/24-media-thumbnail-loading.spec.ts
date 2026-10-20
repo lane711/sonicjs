@@ -1,5 +1,5 @@
 import { test, expect, type Locator } from './fixtures';
-import { loginAsAdmin } from './utils/test-helpers';
+import { loginAsAdmin, gotoMediaLibrary } from './utils/test-helpers';
 
 /**
  * A real, decodable 1x1 PNG.
@@ -13,8 +13,14 @@ const ONE_PX_PNG = Buffer.from(
   'base64'
 );
 
-/** Decoded width of an <img>; 0 means the browser could not render it (broken thumbnail). */
-function decodedWidth(image: Locator): Promise<number> {
+/**
+ * Decoded width of an <img>; 0 means the browser could not render it (broken thumbnail).
+ *
+ * Scrolls first: grid thumbnails are `loading="lazy"`, so one below the fold has not been
+ * requested yet and would read as a broken image rather than an undisplayed one.
+ */
+async function decodedWidth(image: Locator): Promise<number> {
+  await image.scrollIntoViewIfNeeded();
   return image.evaluate((img: HTMLImageElement) => {
     return new Promise<number>((resolve) => {
       if (img.complete) {
@@ -22,7 +28,11 @@ function decodedWidth(image: Locator): Promise<number> {
       } else {
         img.onload = () => resolve(img.naturalWidth);
         img.onerror = () => resolve(0);
-        setTimeout(() => resolve(0), 5000);
+        // A broken image reports through `onerror` within the round trip, so this cap is only
+        // reached when the fetch is still queued. Thumbnails come from the worker (~0.8s idle,
+        // far worse with four Playwright workers on one preview isolate), and 5s here failed as
+        // "broken thumbnail" when the image was merely late.
+        setTimeout(() => resolve(0), 20000);
       }
     });
   });
@@ -34,7 +44,7 @@ test.describe('Media Thumbnail Loading @media', () => {
 
   test.beforeEach(async ({ page }) => {
     uploadedIds = [];
-    await loginAsAdmin(page);
+    await loginAsAdmin(page, false);
   });
 
   test.afterEach(async ({ context }) => {
@@ -46,9 +56,7 @@ test.describe('Media Thumbnail Loading @media', () => {
   });
 
   test('uploaded image should display thumbnail without broken image', async ({ page }) => {
-    await page.goto('/admin/media');
-    // The library lazy-loads its grid over HTMX, so networkidle never settles here.
-    await page.waitForLoadState('domcontentloaded');
+    await gotoMediaLibrary(page);
 
     // Open upload modal
     await page.locator('button').filter({ hasText: 'Upload Files' }).first().click();
@@ -70,8 +78,7 @@ test.describe('Media Thumbnail Loading @media', () => {
     await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', { timeout: 10000 });
 
     // Wait for page to redirect with cache-busting parameter
-    await page.waitForURL(/\/admin\/media\?t=/, { timeout: 5000 });
-    await page.waitForLoadState('domcontentloaded');
+    await page.waitForURL(/\/admin\/media\?t=/, { timeout: 20000, waitUntil: 'domcontentloaded' });
 
     // Find the media item we just uploaded
     const mediaGrid = page.locator('#media-grid');
@@ -123,7 +130,7 @@ test.describe('Media Thumbnail Loading @media', () => {
       uploadedIds.push(result.uploaded[0].id);
     }
 
-    await page.goto('/admin/media');
+    await gotoMediaLibrary(page);
     await page.waitForLoadState('domcontentloaded');
 
     const mediaGrid = page.locator('#media-grid');

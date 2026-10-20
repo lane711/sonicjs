@@ -1,11 +1,11 @@
 import { test, expect } from './fixtures';
-import { loginAsAdmin } from './utils/test-helpers';
+import { loginAsAdmin, gotoMediaLibrary } from './utils/test-helpers';
 
 test.describe('Media Bulk Actions Menu Z-Index @media', () => {
   let uploadedFileIds: string[] = [];
 
   test.beforeEach(async ({ page, context }) => {
-    await loginAsAdmin(page);
+    await loginAsAdmin(page, false);
 
     // Upload 2 test files to ensure we have media items
     const testImageBuffer = Buffer.from([
@@ -43,12 +43,10 @@ test.describe('Media Bulk Actions Menu Z-Index @media', () => {
       uploadedFileIds = uploadResult.uploaded.map((file: any) => file.id);
     }
 
-    // Navigate to media page
-    await page.goto('/admin/media');
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(500);
-    await page.reload();
-    await page.waitForLoadState('networkidle');
+    // Navigate to media page. One load: the upload above is an awaited API call, so the two
+    // rows already exist server-side and the sleep-then-reload dance was only ever hiding the
+    // absence of a real wait. The tests below assert on the checkboxes, which auto-wait.
+    await gotoMediaLibrary(page);
   });
 
   test.afterEach(async ({ context }) => {

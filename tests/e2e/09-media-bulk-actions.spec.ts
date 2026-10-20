@@ -1,11 +1,11 @@
 import { test, expect } from './fixtures';
-import { loginAsAdmin } from './utils/test-helpers';
+import { loginAsAdmin, gotoMediaLibrary } from './utils/test-helpers';
 
 test.describe('Media Bulk Actions @media', () => {
   let uploadedFileIds: string[] = [];
 
   test.beforeEach(async ({ page, context }) => {
-    await loginAsAdmin(page);
+    await loginAsAdmin(page, false);
 
     // Upload 2 test files via API instead of UI to ensure they persist
     const testImageBuffer = Buffer.from([
@@ -57,16 +57,11 @@ test.describe('Media Bulk Actions @media', () => {
       throw new Error('Failed to upload files or invalid response format');
     }
 
-    // Now navigate to media page with cache busting
-    await page.goto(`/admin/media?t=${Date.now()}`);
-    await page.waitForLoadState('networkidle');
-
-    // Wait a moment for any post-upload processing
-    await page.waitForTimeout(1000);
-
-    // Reload to ensure we bypass cache
-    await page.reload();
-    await page.waitForLoadState('networkidle');
+    // Now navigate to media page with cache busting. One load, not two: the previous
+    // goto/sleep/reload sequence was guarding against the upload not being visible yet, but the
+    // uploads above are awaited API calls — the row exists before this navigation starts, and the
+    // poll below is what actually proves it. The round trip it removes is the expensive one.
+    await gotoMediaLibrary(page, `/admin/media?t=${Date.now()}`);
 
     // Wait for media grid to load with at least 2 files
     await page.waitForSelector('input[type="checkbox"].media-checkbox', { timeout: 10000 });

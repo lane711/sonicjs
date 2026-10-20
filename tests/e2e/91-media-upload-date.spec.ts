@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures'
-import { loginAsAdmin } from './utils/test-helpers'
+import { loginAsAdmin, gotoMediaLibrary } from './utils/test-helpers'
 
 /**
  * Regression spec for issue #889: new media uploads displayed as 1/1970 and
@@ -12,12 +12,11 @@ import { loginAsAdmin } from './utils/test-helpers'
  */
 test.describe('Media upload date display (#889) @media', () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsAdmin(page)
+    await loginAsAdmin(page, false)
   })
 
   test('media library page loads without 1970 dates', async ({ page }) => {
-    await page.goto('/admin/media')
-    await page.waitForLoadState('networkidle')
+    await gotoMediaLibrary(page)
 
     // Collect all date text visible on the page
     const dateTexts = await page.locator('.text-xs.text-gray-500').allTextContents()
@@ -30,8 +29,7 @@ test.describe('Media upload date display (#889) @media', () => {
   })
 
   test('newly uploaded file appears at the top of the media grid with a valid date', async ({ page }) => {
-    await page.goto('/admin/media')
-    await page.waitForLoadState('networkidle')
+    await gotoMediaLibrary(page)
 
     // Open upload modal
     const uploadButton = page.getByRole('button', { name: /upload/i }).first()
@@ -46,8 +44,7 @@ test.describe('Media upload date display (#889) @media', () => {
     })
 
     // Wait for upload to complete and page to reload
-    await page.waitForURL(/\/admin\/media/, { timeout: 10000 })
-    await page.waitForLoadState('networkidle')
+    await page.waitForURL(/\/admin\/media/, { timeout: 10000, waitUntil: 'domcontentloaded' })
 
     // The grid should list the newly uploaded file
     const firstFile = page.locator('[data-file-id]').first()

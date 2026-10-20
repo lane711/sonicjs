@@ -1,14 +1,13 @@
 import { test, expect } from './fixtures'
-import { loginAsAdmin } from './utils/test-helpers'
+import { loginAsAdmin, gotoMediaLibrary } from './utils/test-helpers'
 
 test.describe('Media library fixes (#888, #890) @media', () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsAdmin(page)
+    await loginAsAdmin(page, false)
   })
 
   test('#888 All Files count reflects real total, not page size', async ({ page }) => {
-    await page.goto('/admin/media')
-    await page.waitForLoadState('networkidle')
+    await gotoMediaLibrary(page)
 
     // Find the "All Files" sidebar entry - should show a number, not be capped at 24
     const allFilesText = page.locator('text=/All Files/').first()
@@ -22,7 +21,6 @@ test.describe('Media library fixes (#888, #890) @media', () => {
 
   test('#890 Media selector search input has name attribute', async ({ page }) => {
     await page.goto('/admin/media/selector')
-    await page.waitForLoadState('networkidle')
 
     const searchInput = page.locator('#media-selector-search')
     await expect(searchInput).toHaveAttribute('name', 'search')
