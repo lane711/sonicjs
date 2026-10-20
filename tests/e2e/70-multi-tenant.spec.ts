@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect, type Page } from './fixtures'
 import { loginAsAdmin, ensureAdminUserExists, isFeatureAvailable } from './utils/test-helpers'
 
 // Multi-tenant plugin: off by default, activated on the Plugins page, then it exposes a Tenants
@@ -101,6 +101,32 @@ test.describe.serial('Multi-Tenant plugin @auth', () => {
     await page.waitForLoadState('networkidle')
     await expect(page.locator('a[href="/admin/tenants"]').first()).toBeAttached()
     await expect(page.locator('[data-tenant-switcher]').first()).toBeVisible()
+  })
+
+  test('stays active for every admin request, not just the isolate that served the toggle', async ({ page }) => {
+    await setPluginState(page, 'activate')
+
+    // Two independent readers of "is the plugin on", on the same page: the Tenants nav link comes
+    // from pluginMenuMiddleware, which queries the DB per request, while the switcher comes from
+    // tenantMiddleware. tenantMiddleware used to answer from a 30s TTL cache that is per-isolate —
+    // as is invalidateTenantCache() — so activating the plugin only took effect immediately on
+    // whichever isolate happened to serve the toggle. Measured against a preview deployment right
+    // after activation: nav link on 10/10 admin loads, switcher on 5/10. The cosmetic half of that
+    // is the switcher; the real half is that an isolate reporting the plugin inactive also ignores
+    // the tenant header, the cookie and the domain map and serves everything as 'default'.
+    //
+    // One load can pass on the stale path by luck, so sample enough of them to be conclusive.
+    for (let i = 1; i <= 8; i++) {
+      await page.goto(`${BASE_URL}/admin/content`)
+      await expect(
+        page.locator('a[href="/admin/tenants"]').first(),
+        `Tenants nav link missing on admin load #${i}`
+      ).toBeAttached()
+      await expect(
+        page.locator('[data-tenant-switcher]').first(),
+        `tenant switcher missing on admin load #${i} — tenant state went stale between isolates`
+      ).toBeVisible()
+    }
   })
 
   test('lists the default tenant and creates a new tenant via the admin UI', async ({ page }) => {

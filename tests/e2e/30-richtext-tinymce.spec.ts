@@ -1,5 +1,11 @@
-import { test, expect, Page } from '@playwright/test';
-import { loginAsAdmin, navigateToAdminSection } from './utils/test-helpers';
+import { test, expect, Page } from './fixtures';
+import {
+  loginAsAdmin,
+  navigateToAdminSection,
+  expectRichTextFieldUsable,
+  fillRichTextField,
+  richTextFieldValue,
+} from './utils/test-helpers';
 
 /**
  * TinyMCE is an optional editor plugin. `renderDynamicField` decides, server-side, which
@@ -8,9 +14,17 @@ import { loginAsAdmin, navigateToAdminSection } from './utils/test-helpers';
  * `.tox-tinymce` into exactly those slots. When no rich text plugin is active the field
  * degrades to an amber-bannered plain <textarea>.
  *
+ * "TinyMCE slot absent" is NOT the same as "plain textarea". There are three states, and on a
+ * fresh install the middle one is what renders: Lexical is the default rich text editor, so the
+ * field is a contenteditable surface plus a hidden input and `textarea[name="content"]` does not
+ * exist at all. Only with *no* editor plugin active does the field degrade to an amber-bannered
+ * plain <textarea>. Asserting a textarea in the else branch is what made this spec pass locally
+ * (no editor plugin rows) and fail on a fresh CI preview (Lexical active).
+ *
  * Each test therefore asserts the branch the server actually rendered:
  *   TinyMCE slot present -> TinyMCE must really mount (container, toolbar, buttons, typing)
- *   TinyMCE slot absent  -> no TinyMCE chrome may leak in, and the fallback must still work
+ *   TinyMCE slot absent  -> no TinyMCE chrome may leak in, and whichever editor did render must
+ *                           still back a usable, submittable field (`expectRichTextFieldUsable`)
  * Both branches are falsifiable, and the discriminator is server-rendered markup rather than
  * plugin state, so these specs are safe to run alongside the /admin/plugins specs.
  */
@@ -66,8 +80,6 @@ test.describe('Rich Text Editor (TinyMCE) @content', () => {
   test('should load TinyMCE for blog post content field', async ({ page }) => {
     await openNewContentForm(page, 'blog_post');
 
-    const contentField = page.locator('textarea[name="content"]');
-
     if (await tinymceBacksField(page)) {
       // TinyMCE must take the field over: container, toolbar and toolbar buttons
       await expect(page.locator('.tox-tinymce').first()).toBeVisible({ timeout: 15000 });
@@ -79,8 +91,7 @@ test.describe('Rich Text Editor (TinyMCE) @content', () => {
       // No TinyMCE slot => no TinyMCE assets and no TinyMCE DOM, and the field still works
       await expect(page.locator('script[src*="tiny.cloud"]')).toHaveCount(0);
       await expect(page.locator('.tox-tinymce')).toHaveCount(0);
-      await expect(contentField).toBeVisible();
-      await expect(contentField).toBeEditable();
+      await expectRichTextFieldUsable(page, 'content');
     }
   });
 
@@ -90,15 +101,12 @@ test.describe('Rich Text Editor (TinyMCE) @content', () => {
     // text field gets identical editor treatment" case.
     await openNewContentForm(page, 'e2e_test');
 
-    const richContentField = page.locator('textarea[name="richContent"]');
-
     if (await tinymceBacksField(page)) {
       await expect(page.locator('.tox-tinymce').first()).toBeVisible({ timeout: 15000 });
     } else {
       await expect(page.locator('script[src*="tiny.cloud"]')).toHaveCount(0);
       await expect(page.locator('.tox-tinymce')).toHaveCount(0);
-      await expect(richContentField).toBeVisible();
-      await expect(richContentField).toBeEditable();
+      await expectRichTextFieldUsable(page, 'richContent');
     }
   });
 
@@ -124,12 +132,11 @@ test.describe('Rich Text Editor (TinyMCE) @content', () => {
         await expect(editableDiv).toContainText(testContent);
       }
     } else {
-      // Textarea fallback must accept and keep the typed value
-      const textarea = page.locator('textarea[name="content"]');
-      await expect(textarea).toBeVisible();
-      await textarea.click();
-      await textarea.fill(testContent);
-      await expect(textarea).toHaveValue(testContent);
+      // Whichever editor did render must accept the typed value and expose it on the control
+      // the form submits.
+      await expectRichTextFieldUsable(page, 'content');
+      await fillRichTextField(page, 'content', testContent);
+      expect(await richTextFieldValue(page, 'content')).toContain(testContent);
     }
   });
 
@@ -148,7 +155,7 @@ test.describe('Rich Text Editor (TinyMCE) @content', () => {
       // No TinyMCE chrome may be rendered, and the fallback field stays editable
       await expect(page.locator('.tox-toolbar, .tox-toolbar__primary')).toHaveCount(0);
       await expect(page.locator('.tox-tbtn')).toHaveCount(0);
-      await expect(page.locator('textarea[name="content"]')).toBeEditable();
+      await expectRichTextFieldUsable(page, 'content');
     }
   });
 
@@ -165,7 +172,7 @@ test.describe('Rich Text Editor (TinyMCE) @content', () => {
       await editorBody.click();
       await editorBody.fill(`<p>${testContent}</p>`);
     } else {
-      await page.locator('textarea[name="content"]').fill(testContent);
+      await fillRichTextField(page, 'content', testContent);
     }
 
     // A successful save redirects to the new document's edit page with a success flag; a
@@ -174,6 +181,9 @@ test.describe('Rich Text Editor (TinyMCE) @content', () => {
 
     await page.waitForURL(/\/admin\/content\/[^/]+\/edit\?success=/, { timeout: 20000 });
     await expect(page.locator('input[name="title"]')).toHaveValue(uniqueTitle);
-    await expect(page.locator('textarea[name="content"], .ql-editor, iframe[id*="content"]').first()).toBeAttached();
+    // The reloaded edit form re-renders the field through whichever editor is active.
+    await expect(
+      page.locator('textarea[name="content"], input[name="content"], iframe[id*="content"]').first()
+    ).toBeAttached();
   });
 });

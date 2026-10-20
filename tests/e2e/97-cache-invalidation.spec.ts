@@ -8,7 +8,7 @@
  * (patterns like `content-filtered:*` never matched stored keys `api:content-filtered:...:v1`)
  */
 
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { loginAsAdmin, ADMIN_CREDENTIALS, TEST_ORIGIN } from './utils/test-helpers'
 
 const API = TEST_ORIGIN

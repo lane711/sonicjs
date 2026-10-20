@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Page } from './fixtures'
 import { loginAsAdmin, ensureAdminUserExists, TEST_ORIGIN } from './utils/test-helpers'
 
 /**

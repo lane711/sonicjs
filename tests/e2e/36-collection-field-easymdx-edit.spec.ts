@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page } from './fixtures';
 import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers';
 
 /**

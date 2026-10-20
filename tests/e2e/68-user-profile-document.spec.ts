@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { loginAsAdmin } from './utils/test-helpers';
 
 // Phase 1: user profiles are stored as `user_profile` documents (is_auth type),

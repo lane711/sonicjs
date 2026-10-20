@@ -1,5 +1,11 @@
-import { test, expect, Page } from '@playwright/test';
-import { loginAsAdmin, navigateToAdminSection } from './utils/test-helpers';
+import { test, expect, Page } from './fixtures';
+import {
+  loginAsAdmin,
+  navigateToAdminSection,
+  expectRichTextFieldUsable,
+  fillRichTextField,
+  richTextFieldValue,
+} from './utils/test-helpers';
 
 /**
  * Quill is an optional editor plugin. `renderDynamicField` decides, server-side, which editor
@@ -7,6 +13,12 @@ import { loginAsAdmin, navigateToAdminSection } from './utils/test-helpers';
  * contenteditable div plus a hidden input), which the Quill bundle hydrates into
  * `.ql-container` / `.ql-toolbar` / `.ql-editor`. With no rich text plugin active the field
  * degrades to an amber-bannered plain <textarea>.
+ *
+ * "No Quill slot" does not imply a textarea: Lexical is the default rich text editor, so on a
+ * fresh install the field is a contenteditable surface plus a hidden input and
+ * `textarea[name="content"]` does not exist. The else branch therefore asserts that no Quill
+ * chrome leaked in and that whichever editor DID render still backs a usable field, rather than
+ * naming a specific element.
  *
  * Each test asserts the branch the server actually rendered, so both directions are
  * falsifiable. The old unauthenticated `test.beforeAll` that POSTed to
@@ -75,10 +87,7 @@ test.describe('Rich Text Editor (Quill) @content', () => {
       await expect(page.locator('script[src*="quill"]')).toHaveCount(0);
       await expect(page.locator('.ql-container')).toHaveCount(0);
       await expect(page.locator('.ql-toolbar')).toHaveCount(0);
-
-      const contentField = page.locator('textarea[name="content"]');
-      await expect(contentField).toBeVisible();
-      await expect(contentField).toBeEditable();
+      await expectRichTextFieldUsable(page, 'content');
     }
   });
 
@@ -95,11 +104,9 @@ test.describe('Rich Text Editor (Quill) @content', () => {
       await editor.fill(testContent);
       await expect(editor).toContainText(testContent);
     } else {
-      const textarea = page.locator('textarea[name="content"]');
-      await expect(textarea).toBeVisible();
-      await textarea.click();
-      await textarea.fill(testContent);
-      await expect(textarea).toHaveValue(testContent);
+      await expectRichTextFieldUsable(page, 'content');
+      await fillRichTextField(page, 'content', testContent);
+      expect(await richTextFieldValue(page, 'content')).toContain(testContent);
     }
   });
 
@@ -120,7 +127,7 @@ test.describe('Rich Text Editor (Quill) @content', () => {
       // No Quill chrome may leak into the page; the fallback field stays editable
       await expect(page.locator('.ql-toolbar')).toHaveCount(0);
       await expect(page.locator('.ql-toolbar button.ql-bold')).toHaveCount(0);
-      await expect(page.locator('textarea[name="content"]')).toBeEditable();
+      await expectRichTextFieldUsable(page, 'content');
     }
   });
 
@@ -139,7 +146,7 @@ test.describe('Rich Text Editor (Quill) @content', () => {
       await editor.fill(testContent);
       await expect(editor).toContainText(testContent);
     } else {
-      await page.locator('textarea[name="content"]').fill(testContent);
+      await fillRichTextField(page, 'content', testContent);
     }
 
     // A successful save redirects to the new document's edit page with a success flag; a
@@ -148,7 +155,10 @@ test.describe('Rich Text Editor (Quill) @content', () => {
 
     await page.waitForURL(/\/admin\/content\/[^/]+\/edit\?success=/, { timeout: 20000 });
     await expect(page.locator('input[name="title"]')).toHaveValue(uniqueTitle);
-    await expect(page.locator('textarea[name="content"], .ql-editor, iframe[id*="content"]').first()).toBeAttached();
+    // The reloaded edit form re-renders the field through whichever editor is active.
+    await expect(
+      page.locator('textarea[name="content"], input[name="content"], .ql-editor').first()
+    ).toBeAttached();
   });
 
   test('should apply bold formatting in Quill editor', async ({ page }) => {
@@ -168,12 +178,10 @@ test.describe('Rich Text Editor (Quill) @content', () => {
       // Quill wraps the selection in <strong> (or <b>)
       await expect(editor.locator('strong, b').first()).toBeVisible();
     } else {
-      // Without Quill there is no rich formatting at all: the value stays literal text and
-      // no formatting control is offered.
-      const textarea = page.locator('textarea[name="content"]');
-      await textarea.click();
-      await page.keyboard.type('Bold text test');
-      await expect(textarea).toHaveValue('Bold text test');
+      // No Quill means no Quill formatting controls, whatever else backs the field. The field
+      // must still take the typed text and carry it on the control the form submits.
+      await fillRichTextField(page, 'content', 'Bold text test');
+      expect(await richTextFieldValue(page, 'content')).toContain('Bold text test');
       await expect(page.locator('.ql-toolbar button.ql-bold')).toHaveCount(0);
     }
   });

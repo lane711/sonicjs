@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { loginAsAdmin, getCsrfTokenFromPage, isFeatureAvailable } from './utils/test-helpers';
 
 let featureAvailable = false;

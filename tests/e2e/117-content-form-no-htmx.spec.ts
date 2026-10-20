@@ -1,5 +1,5 @@
-import { test, expect, Page } from '@playwright/test'
-import { loginAsAdmin } from './utils/test-helpers'
+import { test, expect, Page } from './fixtures'
+import { fillHiddenEditorFields, loginAsAdmin } from './utils/test-helpers'
 
 /**
  * The content form has to survive a submit that htmx did not intercept.
@@ -93,4 +93,10 @@ async function fillRequiredFields(page: Page, timestamp: number) {
     if (await control.inputValue()) continue
     await control.fill(`E2E ${timestamp}`)
   }
+
+  // Lexical — the default richtext editor on a fresh install — edits a contenteditable surface
+  // and mirrors into a hidden input, so `[required]:not([type="hidden"])` never sees it. The
+  // browser raises no constraint error either, and the save fails server-side instead
+  // ("Content is required"), which looks like a broken form rather than an unfilled field.
+  await fillHiddenEditorFields(page, `E2E no-htmx body ${timestamp}`)
 }

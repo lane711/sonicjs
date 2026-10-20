@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 import { loginAsAdmin } from './utils/test-helpers'
 
 async function resolvePageBlocksCollectionKey(page: import('@playwright/test').Page): Promise<string | null> {

@@ -1,4 +1,4 @@
-import { expect, test, type Locator, type Page } from '@playwright/test'
+import { expect, test, type Locator, type Page } from './fixtures'
 import { ensureAdminUserExists, loginAsAdmin } from './utils/test-helpers'
 
 async function resolvePageBlocksCollectionKey(page: Page): Promise<string> {
@@ -425,7 +425,18 @@ test.describe('Nested Array Serialization Scope @content', () => {
     }
     await newMemberFirstChild.locator('input[name$="__name"]').first().fill('Child After Return')
 
-    await page.click('button[name="action"][value="save"]')
+    // Unlike the first save this one updates an existing document, so there is no HX-Redirect and
+    // no URL change to wait on — and `networkidle` can resolve before the POST has even been
+    // issued. Reloading at that point re-reads the pre-save document and `team.members` comes
+    // back with just the one item from the first save. Wait for the write to be acknowledged.
+    const [saveResponse] = await Promise.all([
+      page.waitForResponse(
+        (r) => r.request().method() === 'POST' && r.url().includes('/admin/content'),
+        { timeout: 15000 }
+      ),
+      page.click('button[name="action"][value="save"]'),
+    ])
+    expect(saveResponse.ok(), `save returned ${saveResponse.status()}`).toBeTruthy()
     await page.waitForLoadState('networkidle', { timeout: 15000 })
 
     const secondSaveEditUrl = await getEditUrlFromPage(page)

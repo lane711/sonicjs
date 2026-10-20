@@ -194,6 +194,7 @@ test.describe('Media Upload @media', () => { … })
 | `src/routes/admin-database*` | `@smoke @database` |
 | `src/routes/admin-plugins*`, `src/plugins/sdk/*`, `src/plugins/core-plugins/*`, plugin registry/middleware | `@smoke @plugins` |
 | `src/routes/admin-forms*`, `src/routes/public-forms*`, `forms-plugin` | `@smoke @forms` |
+| `src/middleware/tenant*`, anything `multi-tenant` | `@smoke @auth @plugins` |
 | `packages/core/migrations/*` | `@smoke @content @media @api` |
 | Anything else / multiple areas | `@smoke` only |
 

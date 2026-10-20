@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { seedAdminPastRateLimit } from './utils/test-helpers'
 
 test.describe('seed-admin environment gate @smoke @auth', () => {

@@ -16,8 +16,17 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only — 2 retries handles consecutive transient CF Worker cold-starts */
   retries: process.env.CI ? 2 : 0,
-  /* Per-test timeout: remote CF Workers under parallel load need headroom */
-  timeout: 60 * 1000,
+  /* Per-test timeout.
+   *
+   * Most specs log in (3 API round trips + a navigation) before their first assertion, then make
+   * several more navigations against a remote CF Worker. On an idle machine that whole shape runs
+   * in 10-15s, but CI packs four Chromium instances onto a four-vCPU runner and every admin page
+   * compiles its own CSS in-browser via the Tailwind Play CDN, so the renderers contend for cores
+   * and individual navigations stretch by an order of magnitude. At 60s a run produced 28 failures
+   * and 52 flakes, nearly all of them "Test timeout of 60000ms exceeded" parked on whichever
+   * navigation happened to be in flight rather than on a real defect. Headroom is cheap here —
+   * a passing test still finishes in its usual 15s and never touches this number. */
+  timeout: 90 * 1000,
   /* 1 worker locally (in-memory D1 conflicts); 4 in CI (remote D1, I/O bound) */
   workers: process.env.CI ? 4 : 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -36,8 +45,14 @@ export default defineConfig({
     /* Screenshot on failure */
     screenshot: 'only-on-failure',
 
-    /* Video only on failure (recording all tests is too slow in CI) */
-    video: 'retain-on-failure',
+    /* Video on retry, matching `trace` above.
+     *
+     * 'retain-on-failure' sounds cheaper than it is: Playwright has to record EVERY test and then
+     * throw the file away when it passes, so the ~95% of the suite that is green still pays for
+     * four concurrent video encoders on a four-vCPU runner. That CPU is taken straight from the
+     * browsers, which is what pushes navigations past the test timeout in the first place. With
+     * two retries configured, anything that really fails is still recorded on its first retry. */
+    video: 'on-first-retry',
   },
 
   /* Configure projects for major browsers */

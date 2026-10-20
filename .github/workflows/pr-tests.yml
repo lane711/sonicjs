@@ -252,6 +252,12 @@ jobs:
           if echo "$CHANGED_SRC" | grep -qE 'admin-forms|public-forms|forms-plugin'; then
             TAGS="$TAGS|@forms"
           fi
+          # The multi-tenant specs are tagged @auth (they exercise per-tenant RBAC) and are
+          # driven from the Plugins page, but middleware/tenant.ts sits under neither matcher
+          # above, so a change to tenant resolution otherwise shipped with @smoke only.
+          if echo "$CHANGED_SRC" | grep -qE 'middleware/tenant|multi-tenant'; then
+            TAGS="$TAGS|@auth|@plugins"
+          fi
           if echo "$CHANGED_SRC" | grep -qE 'migrations/'; then
             TAGS="$TAGS|@content|@media|@api"
           fi

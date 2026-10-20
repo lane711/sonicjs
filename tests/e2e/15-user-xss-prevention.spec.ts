@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixtures';
 import { loginAsAdmin } from './utils/test-helpers';
 
 // The admin user form no longer has `username` or `bio` fields, and the role <select> now holds

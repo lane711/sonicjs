@@ -1,13 +1,23 @@
-import { test, expect, Page } from '@playwright/test';
-import { loginAsAdmin, navigateToAdminSection } from './utils/test-helpers';
+import { test, expect, Page } from './fixtures';
+import {
+  loginAsAdmin,
+  navigateToAdminSection,
+  expectRichTextFieldUsable,
+  fillRichTextField,
+  richTextFieldValue,
+} from './utils/test-helpers';
 
 /**
  * The "MDXEditor" plugin ships as `easy-mdx` and is listed on /admin/plugins as
  * "EasyMDE Markdown Editor"; its assets are EasyMDE's CDN bundle (`easymde.min.js`), not
  * anything named `mdxeditor`. Markdown-backed fields are rendered server-side as
  * `.richtext-container[data-editor-provider="easymde"]`, which the plugin's init script
- * hydrates into an EasyMDE instance (`.EasyMDEContainer` / `.editor-toolbar`). With the
- * plugin off the field degrades to a plain <textarea>.
+ * hydrates into an EasyMDE instance (`.EasyMDEContainer` / `.editor-toolbar`). With *no* editor
+ * plugin at all the field degrades to an amber-bannered plain <textarea> — but that is only one
+ * of the two non-EasyMDE states. Lexical is the default rich text editor, so on a fresh install
+ * the field is a contenteditable surface plus a hidden input and `textarea[name="content"]` does
+ * not exist. The else branches assert "no EasyMDE chrome leaked in and the field still works"
+ * rather than naming a textarea.
  *
  * These specs only READ plugin state (no install/activate/deactivate) so they can run
  * alongside the /admin/plugins specs, and they assert whichever branch is actually live.
@@ -117,15 +127,21 @@ test.describe('MDXEditor Rich Text Editor @content', () => {
       await expect(page.locator('.editor-toolbar').first()).toBeVisible();
       await expect(page.locator('.CodeMirror').first()).toBeVisible();
     } else {
-      // No markdown-backed slot: nothing may be hydrated, and the field falls back to a
-      // plain textarea carrying the "plugin is inactive" notice.
+      // No markdown-backed slot: nothing EasyMDE may be hydrated, and the field still has to be
+      // usable through whichever editor did render.
       await expect(page.locator(EASYMDE_SLOT)).toHaveCount(0);
       await expect(page.locator('.EasyMDEContainer')).toHaveCount(0);
 
-      const textarea = page.locator('textarea[name="content"]');
-      await expect(textarea).toBeVisible();
-      await expect(textarea).toBeEditable();
-      await expect(page.locator('div.bg-amber-50', { hasText: 'plugin is inactive' }).first()).toBeVisible();
+      const backing = await expectRichTextFieldUsable(page, 'content');
+
+      // The amber "plugin is inactive" notice belongs to the no-editor-at-all fallback only;
+      // when another editor owns the field there is nothing to warn about.
+      const notice = page.locator('div.bg-amber-50', { hasText: 'editor plugin is' });
+      if (backing === 'textarea') {
+        await expect(notice.first()).toBeVisible();
+      } else {
+        await expect(notice).toHaveCount(0);
+      }
     }
   });
 
@@ -145,10 +161,9 @@ test.describe('MDXEditor Rich Text Editor @content', () => {
       await expect(codeMirror).toContainText('Test Heading');
       await expect(page.locator(`${EASYMDE_SLOT} textarea`).first()).toHaveValue(/Test Heading/);
     } else {
-      const textarea = page.locator('textarea[name="content"]');
-      await expect(textarea).toBeVisible();
-      await textarea.fill(markdown);
-      await expect(textarea).toHaveValue(markdown);
+      await expectRichTextFieldUsable(page, 'content');
+      await fillRichTextField(page, 'content', markdown);
+      expect(await richTextFieldValue(page, 'content')).toContain('Test Heading');
     }
   });
 
@@ -166,7 +181,7 @@ test.describe('MDXEditor Rich Text Editor @content', () => {
       await codeMirror.click();
       await page.keyboard.type(mdxContent);
     } else {
-      await page.locator('textarea[name="content"]').fill(mdxContent);
+      await fillRichTextField(page, 'content', mdxContent);
     }
 
     await page.click('button[name="action"][value="save"]');
@@ -175,6 +190,9 @@ test.describe('MDXEditor Rich Text Editor @content', () => {
     // validation failure would keep us on /new, so the redirect proves the value persisted.
     await page.waitForURL(/\/admin\/content\/[^/]+\/edit\?success=/, { timeout: 20000 });
     await expect(page.locator('input[name="title"]')).toHaveValue(title);
-    await expect(page.locator('textarea[name="content"], .CodeMirror').first()).toBeAttached();
+    // The reloaded edit form re-renders the field through whichever editor is active.
+    await expect(
+      page.locator('textarea[name="content"], input[name="content"], .CodeMirror').first()
+    ).toBeAttached();
   });
 });

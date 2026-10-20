@@ -5,7 +5,7 @@
  * Issue #461: https://github.com/SonicJs-Org/sonicjs/issues/461
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { ensurePluginActive, loginAsAdmin, waitForHTMX, isFeatureAvailable } from './utils/test-helpers';
 
 test.describe('Cache Plugin Dashboard @plugins', () => {

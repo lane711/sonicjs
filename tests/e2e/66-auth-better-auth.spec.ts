@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { ADMIN_CREDENTIALS, loginAsAdmin, logout, seedAdminPastRateLimit, TEST_ORIGIN } from './utils/test-helpers';
 
 /**

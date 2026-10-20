@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers'
 
 test.describe('Hero CTA Style Persistence @content', () => {

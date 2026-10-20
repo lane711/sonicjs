@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { loginAsAdmin, waitForHTMX, ADMIN_CREDENTIALS } from './utils/test-helpers';
 
 // These tests require defineUserProfile() to be called in the app entry point

@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect, type Page } from './fixtures'
 import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers'
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8787'

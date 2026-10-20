@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { ensureAdminUserExists, ADMIN_CREDENTIALS, TEST_ORIGIN } from './utils/test-helpers'
 
 test.describe('Login redirect param @smoke @auth', () => {

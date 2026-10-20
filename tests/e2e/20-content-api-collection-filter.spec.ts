@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Content API Collection Filtering @content @api', () => {
   test('should filter content by collection parameter', async ({ request }) => {

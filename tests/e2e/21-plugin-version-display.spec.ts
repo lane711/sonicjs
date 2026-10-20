@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers';
 
 // Use environment variable for port or default to 8787

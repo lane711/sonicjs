@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { loginAsAdmin } from './utils/test-helpers'
 
 // Demo-login telemetry (`POST /v1/events`) and the "Demo Site Logins" dashboard cards belong to

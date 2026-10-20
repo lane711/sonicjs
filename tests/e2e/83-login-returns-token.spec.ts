@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 
 test.describe('POST /auth/login returns token @smoke @auth', () => {
   test.beforeAll(async ({ request }) => {

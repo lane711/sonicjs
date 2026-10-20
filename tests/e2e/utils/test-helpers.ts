@@ -474,11 +474,21 @@ export async function loginAsAdmin(page: Page) {
     );
   }
 
-  // Navigate to admin (session cookie is now in context)
-  await page.goto('/admin');
-  await page.waitForURL(/\/admin/, { timeout: 20000 });
-  await ensureWorkflowTablesExist(page);
-  await ensureWorkflowPluginActive(page);
+  // Navigate to admin (session cookie is now in context).
+  //
+  // `domcontentloaded`, not the default `load`: this runs in almost every spec's beforeEach, and
+  // /admin is the heaviest page in the app (metrics + recent activity + migrations status all
+  // polling). Waiting for it to go quiet can eat most of the 60s test budget before the test
+  // body starts. Nothing here needs subresources — the caller's own assertions auto-wait.
+  await page.goto('/admin', { waitUntil: 'domcontentloaded' });
+  await page.waitForURL(/\/admin/, { timeout: 20000, waitUntil: 'domcontentloaded' });
+
+  // No `ensureWorkflowTablesExist` / `ensureWorkflowPluginActive` here. The first POSTs
+  // /admin/api/migrations/run, which on D1 always answers 409 ("Migrations are managed by
+  // Cloudflare D1") — a guaranteed-useless round trip in the beforeEach of nearly every spec. The
+  // second has been a bare `return` since the workflow plugin stopped shipping. The three specs
+  // that actually care (15-plugins, 28-plugin-filters-search, 39-ai-search-plugin) call
+  // ensureWorkflowTablesExist themselves.
 }
 
 /**
@@ -487,8 +497,8 @@ export async function loginAsAdmin(page: Page) {
 export async function navigateToAdminSection(page: Page, section: 'collections' | 'content' | 'media' | 'users' | 'forms' | 'plugins') {
   // Navigate directly instead of clicking navigation links
   // This is more reliable as admin navigation may vary
-  await page.goto(`/admin/${section}`);
-  await page.waitForURL(/\/admin/, { timeout: 20000 });
+  await page.goto(`/admin/${section}`, { waitUntil: 'domcontentloaded' });
+  await page.waitForURL(/\/admin/, { timeout: 20000, waitUntil: 'domcontentloaded' });
 }
 
 /**
@@ -728,4 +738,198 @@ export async function checkAPIHealth(page: Page) {
   const health = await response.json();
   expect(health.status).toBe('running');
   return health;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────────
+ * Rich text fields
+ *
+ * `renderDynamicField` decides SERVER-SIDE which editor backs a rich text field, and the
+ * markup it emits is different in every case — there is no single selector that works:
+ *
+ *   lexical  (the default on a fresh install, when the lexical-editor plugin is active)
+ *            `.lexical-editor-wrapper` → contenteditable surface + `<input type="hidden">`
+ *   tinymce  `.richtext-container[data-editor-provider="tinymce"]` wrapping a `<textarea>`
+ *   easymde  `.richtext-container[data-editor-provider="easymde"]` wrapping a `<textarea>`
+ *   quill    `.quill-editor-container` → contenteditable div + hidden input
+ *   textarea no editor plugin active at all → amber-bannered plain `<textarea>`
+ *
+ * Specs used to assume a binary ("the editor under test, or else a plain textarea"), which
+ * is wrong the moment a *different* editor owns the field: on a fresh install Lexical does,
+ * so `textarea[name="content"]` does not exist at all. Route rich text through these helpers
+ * instead of hard-coding a selector.
+ * ────────────────────────────────────────────────────────────────────────────── */
+
+export type RichTextBacking = 'lexical' | 'tinymce' | 'easymde' | 'quill' | 'textarea' | 'missing';
+
+/** Which editor the server actually rendered for `fieldName` on the current page. */
+export async function richTextBacking(page: Page, fieldName: string): Promise<RichTextBacking> {
+  if (await page.locator(`.lexical-editor-wrapper:has(input[name="${fieldName}"])`).count() > 0) return 'lexical';
+  if (await page.locator(`.richtext-container[data-editor-provider="tinymce"]:has(textarea[name="${fieldName}"])`).count() > 0) return 'tinymce';
+  if (await page.locator(`.richtext-container[data-editor-provider="easymde"]:has(textarea[name="${fieldName}"])`).count() > 0) return 'easymde';
+  if (await page.locator(`.quill-editor-container:has(input[name="${fieldName}"]), .quill-editor-container:has(textarea[name="${fieldName}"])`).count() > 0) return 'quill';
+  if (await page.locator(`textarea[name="${fieldName}"]`).count() > 0) return 'textarea';
+  return 'missing';
+}
+
+/**
+ * The element a user actually types into for `fieldName`, whichever editor backs it.
+ * For the textarea backings this is the form control itself; for Lexical/Quill it is the
+ * contenteditable surface, and the form control is a sibling hidden input.
+ */
+export function richTextSurface(page: Page, fieldName: string, backing: RichTextBacking) {
+  switch (backing) {
+    case 'lexical':
+      return page.locator(`.lexical-editor-wrapper:has(input[name="${fieldName}"]) .lexical-content-editable`).first();
+    case 'quill':
+      return page.locator('.quill-editor-container .ql-editor, .quill-editor-container .quill-editor').first();
+    case 'easymde':
+      // EasyMDE hides the textarea behind CodeMirror once it hydrates; before that the
+      // textarea is still the surface.
+      return page.locator(`.CodeMirror, textarea[name="${fieldName}"]`).first();
+    default:
+      return page.locator(`textarea[name="${fieldName}"]`).first();
+  }
+}
+
+/**
+ * Put `value` into a rich text field through whichever editor rendered.
+ *
+ * Lexical only mirrors into its hidden input from an editor update listener, so typing is the
+ * only way to get a value that survives submit — unless the CDN bundle never loaded, in which
+ * case nothing will overwrite a value written straight to the hidden input.
+ * Returns the backing that was used so callers can assert against the right surface.
+ */
+export async function fillRichTextField(page: Page, fieldName: string, value: string): Promise<RichTextBacking> {
+  const backing = await richTextBacking(page, fieldName);
+
+  if (backing === 'lexical') {
+    const wrapper = page.locator(`.lexical-editor-wrapper:has(input[name="${fieldName}"])`).first();
+    const initialized = await wrapper
+      .evaluate((el) => el.getAttribute('data-lexical-initialized') === 'true')
+      .catch(() => false);
+
+    if (!initialized) {
+      await page
+        .waitForFunction(
+          (name) => {
+            const w = document.querySelector(`.lexical-editor-wrapper:has(input[name="${name}"])`);
+            return !!w && w.getAttribute('data-lexical-initialized') === 'true';
+          },
+          fieldName,
+          { timeout: 15000 }
+        )
+        .catch(() => {});
+    }
+
+    const ready = await wrapper
+      .evaluate((el) => el.getAttribute('data-lexical-initialized') === 'true')
+      .catch(() => false);
+
+    if (ready) {
+      const surface = richTextSurface(page, fieldName, backing);
+      await surface.click();
+      await page.keyboard.type(value);
+      // The update listener is what writes the hidden input; wait for it rather than racing it.
+      await expect(page.locator(`.lexical-editor-wrapper input[name="${fieldName}"]`)).not.toHaveValue('');
+    } else {
+      // Lexical never booted (CDN blocked): nothing will clobber a direct write.
+      await page.locator(`.lexical-editor-wrapper input[name="${fieldName}"]`).evaluate((el, v) => {
+        (el as HTMLInputElement).value = v;
+      }, value);
+    }
+    return backing;
+  }
+
+  if (backing === 'quill') {
+    const surface = richTextSurface(page, fieldName, backing);
+    await surface.click();
+    await page.keyboard.type(value);
+    return backing;
+  }
+
+  if (backing === 'easymde') {
+    const codeMirror = page.locator('.CodeMirror').first();
+    if (await codeMirror.count() > 0) {
+      await codeMirror.click();
+      await page.keyboard.type(value);
+      return backing;
+    }
+    await page.locator(`textarea[name="${fieldName}"]`).fill(value);
+    return backing;
+  }
+
+  if (backing === 'textarea' || backing === 'tinymce') {
+    await page.locator(`textarea[name="${fieldName}"]`).fill(value);
+    return backing;
+  }
+
+  throw new Error(`No rich text field named "${fieldName}" rendered on ${page.url()}`);
+}
+
+/**
+ * The value that would be submitted for `fieldName` — read off the form control, not the
+ * editing surface, so it is the same string the server will receive.
+ */
+export async function richTextFieldValue(page: Page, fieldName: string): Promise<string> {
+  return page.evaluate((name) => {
+    const el = document.querySelector(
+      `textarea[name="${name}"], input[name="${name}"]`
+    ) as HTMLInputElement | HTMLTextAreaElement | null;
+    return el?.value ?? '';
+  }, fieldName);
+}
+
+/**
+ * Assert the field is present and usable whichever editor backs it. Used by the per-editor
+ * specs in the branch where the editor under test is NOT the one that rendered: the point is
+ * that the field still works, not which editor won.
+ */
+export async function expectRichTextFieldUsable(page: Page, fieldName: string) {
+  const backing = await richTextBacking(page, fieldName);
+  expect(backing, `no rich text field named "${fieldName}" rendered`).not.toBe('missing');
+
+  const surface = richTextSurface(page, fieldName, backing);
+  await expect(surface).toBeVisible();
+
+  if (backing === 'textarea' || backing === 'tinymce') {
+    await expect(surface).toBeEditable();
+  } else {
+    // Contenteditable surfaces are not "editable" in the form-control sense Playwright checks.
+    await expect(surface).toHaveAttribute('contenteditable', 'true');
+  }
+
+  // Whatever the surface, the form must still carry a control the save posts.
+  await expect(page.locator(`textarea[name="${fieldName}"], input[name="${fieldName}"]`)).toHaveCount(1);
+  return backing;
+}
+
+/**
+ * Names of the rich text fields on the current page whose real form control is a *hidden*
+ * input — Lexical and Quill both edit a contenteditable surface and mirror into one.
+ *
+ * These are invisible to the usual "fill every visible [required] control" sweep, so a form
+ * that looks complete still fails server-side validation. Callers that need a submittable
+ * form (rather than a specific editor's behaviour) use this to find what they missed.
+ */
+export async function hiddenEditorFieldNames(page: Page): Promise<string[]> {
+  return page.evaluate(() =>
+    Array.from(
+      document.querySelectorAll(
+        '.lexical-editor-wrapper input[type="hidden"][name], .quill-editor-container input[type="hidden"][name]'
+      )
+    )
+      .map((el) => (el as HTMLInputElement).name)
+      .filter(Boolean)
+  );
+}
+
+/** Fill every empty hidden-input-backed rich text field on the page. Returns the names filled. */
+export async function fillHiddenEditorFields(page: Page, value: string): Promise<string[]> {
+  const filled: string[] = [];
+  for (const name of await hiddenEditorFieldNames(page)) {
+    if (await richTextFieldValue(page, name)) continue;
+    await fillRichTextField(page, name, value);
+    filled.push(name);
+  }
+  return filled;
 }

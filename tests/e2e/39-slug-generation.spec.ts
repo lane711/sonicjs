@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers'
 
 // Tests below that actually save content need a name no earlier run has already used: a

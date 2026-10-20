@@ -1,5 +1,11 @@
-import { test, expect } from '@playwright/test';
-import { loginAsAdmin, checkAPIHealth, ADMIN_CREDENTIALS, TEST_ORIGIN } from './utils/test-helpers';
+import { test, expect } from './fixtures';
+import {
+  loginAsAdmin,
+  checkAPIHealth,
+  ADMIN_CREDENTIALS,
+  TEST_ORIGIN,
+  fillHiddenEditorFields,
+} from './utils/test-helpers';
 
 /**
  * Smoke Test Suite
@@ -150,6 +156,13 @@ test.describe('Smoke Tests - Critical Path @smoke', () => {
         (await control.getAttribute('data-pattern')) !== null;
       await control.fill(isSlug ? `smoke-test-${timestamp}` : `Smoke test ${timestamp}`);
     }
+
+    // A rich text field is invisible to the sweep above. Lexical — the default editor on a
+    // fresh install — edits a contenteditable surface and mirrors into a hidden input, so the
+    // `[required]:not([type="hidden"])` filter never sees it, the browser raises no constraint
+    // error, and the save fails server-side validation instead. blog_post requires `content`,
+    // so a smoke test that only fills what it can see creates nothing.
+    await fillHiddenEditorFields(page, `Smoke test content ${timestamp}`);
 
     // Get the Save button that's actually inside (or references) the form
     const saveButton = page.locator('button[name="action"][value="save"]').first();

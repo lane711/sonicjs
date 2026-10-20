@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 
 // Simulate a cross-origin frontend (Astro default port)
 const EXTERNAL_ORIGIN = 'http://localhost:4321'

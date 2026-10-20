@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Page } from './fixtures'
 import { ensureAdminUserExists, loginAsAdmin } from './utils/test-helpers'
 
 async function resolvePageBlocksCollectionKey(page: Page): Promise<string> {

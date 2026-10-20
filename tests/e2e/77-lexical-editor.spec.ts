@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { loginAsAdmin } from './utils/test-helpers'
 
 test.describe('Lexical Rich Text Editor Plugin @content', () => {
@@ -81,8 +81,9 @@ test.describe('Lexical Rich Text Editor Plugin @content', () => {
     await contentEditable.type('Hello Lexical Editor')
 
     // Check that the hidden input was updated
-    const fieldId = await contentEditable.closest('.lexical-editor-wrapper').then(
-      w => w?.getAttribute('data-field-id')
+    // `Locator` has no `closest` — walk up in the page instead.
+    const fieldId = await contentEditable.evaluate(
+      (el) => el.closest('.lexical-editor-wrapper')?.getAttribute('data-field-id') ?? null
     )
     if (fieldId) {
       const hiddenInput = page.locator(`#${fieldId}[type="hidden"]`)
