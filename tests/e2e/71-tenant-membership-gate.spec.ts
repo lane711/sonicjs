@@ -1,8 +1,5 @@
 import { test, expect, type Page } from './fixtures'
-import { execFileSync } from 'node:child_process'
-import { fileURLToPath } from 'node:url'
-import { dirname, resolve } from 'node:path'
-import { loginAsAdmin, ensureAdminUserExists, ADMIN_CREDENTIALS, isFeatureAvailable, IS_REMOTE_DEPLOYMENT } from './utils/test-helpers'
+import { loginAsAdmin, ensureAdminUserExists, ADMIN_CREDENTIALS, isFeatureAvailable, IS_REMOTE_DEPLOYMENT, d1Exec } from './utils/test-helpers'
 
 // Membership gate: an authed admin may only switch into / resolve tenants they belong to. Creating a
 // tenant auto-enrolls the creator (owner), so the happy path works; a tenant the admin is NOT a
@@ -17,22 +14,13 @@ const ORPHAN_SLUG = `orphan${RUN}`        // seeded directly; admin is NOT a mem
 const MEMBER_SLUG = `member${RUN}`         // created via UI; admin auto-enrolled
 const MEMBER_NAME = `Member Co ${RUN}`
 
-const APP_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../../my-sonicjs-app')
-
-function d1Exec(sql: string) {
-  // Seed/clean rows in the dev server's *local* D1 (same .wrangler state the worker uses).
-  execFileSync('npx', ['wrangler', 'd1', 'execute', 'DB', '--local', '--command', sql], {
-    cwd: APP_DIR,
-    stdio: 'pipe',
-  })
-}
 
 async function setPluginState(page: Page, action: 'activate' | 'deactivate') {
   await page.request.post(`${BASE_URL}/admin/plugins/install`, { data: { name: PLUGIN_ID } }).catch(() => {})
   await page.request.post(`${BASE_URL}/admin/plugins/${PLUGIN_ID}/${action}`).catch(() => {})
 }
 
-test.describe.serial('Multi-Tenant membership gate @auth', () => {
+test.describe.serial('Multi-Tenant membership gate @auth @lock-plugin-multi-tenant', () => {
   let featureAvailable = false
   test.beforeAll(async ({ request }) => {
     featureAvailable = !IS_REMOTE_DEPLOYMENT && await isFeatureAvailable(request, '/admin/tenants')

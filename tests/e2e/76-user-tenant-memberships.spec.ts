@@ -1,8 +1,5 @@
 import { test, expect, type Page } from './fixtures'
-import { execFileSync } from 'node:child_process'
-import { fileURLToPath } from 'node:url'
-import { dirname, resolve } from 'node:path'
-import { loginAsAdmin, ensureAdminUserExists, isFeatureAvailable, IS_REMOTE_DEPLOYMENT } from './utils/test-helpers'
+import { loginAsAdmin, ensureAdminUserExists, isFeatureAvailable, IS_REMOTE_DEPLOYMENT, d1Exec } from './utils/test-helpers'
 
 // User-centric tenant membership management: from a user's edit page, open their memberships,
 // add the user to a tenant with a role, change the role, and remove them. Roles are per-tenant.
@@ -15,16 +12,12 @@ const T_B = `umtb${RUN}`
 const UID = `umbr${RUN}`
 const UEMAIL = `member${RUN}@example.com`
 
-const APP_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../../my-sonicjs-app')
-function d1Exec(sql: string) {
-  execFileSync('npx', ['wrangler', 'd1', 'execute', 'DB', '--local', '--command', sql], { cwd: APP_DIR, stdio: 'pipe' })
-}
 async function setPluginState(page: Page, action: 'activate' | 'deactivate') {
   await page.request.post(`${BASE_URL}/admin/plugins/install`, { data: { name: PLUGIN_ID } }).catch(() => {})
   await page.request.post(`${BASE_URL}/admin/plugins/${PLUGIN_ID}/${action}`).catch(() => {})
 }
 
-test.describe.serial('User-centric tenant memberships @auth', () => {
+test.describe.serial('User-centric tenant memberships @auth @lock-plugin-multi-tenant', () => {
   let featureAvailable = false
   test.beforeAll(async ({ request }) => {
     featureAvailable = !IS_REMOTE_DEPLOYMENT && await isFeatureAvailable(request, '/admin/tenants')

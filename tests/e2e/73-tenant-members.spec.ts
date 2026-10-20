@@ -1,8 +1,5 @@
 import { test, expect, type Page } from './fixtures'
-import { execFileSync } from 'node:child_process'
-import { fileURLToPath } from 'node:url'
-import { dirname, resolve } from 'node:path'
-import { loginAsAdmin, ensureAdminUserExists, isFeatureAvailable, IS_REMOTE_DEPLOYMENT } from './utils/test-helpers'
+import { loginAsAdmin, ensureAdminUserExists, isFeatureAvailable, IS_REMOTE_DEPLOYMENT, d1Exec } from './utils/test-helpers'
 
 // Member management UI (G4): add a user to a tenant by email with a role, change their role, remove
 // them — all from /admin/tenants/<slug>/members. Lockout guards (last admin) covered by unit tests.
@@ -14,21 +11,31 @@ const TENANT_SLUG = `members${RUN}`
 const TENANT_NAME = `Members Co ${RUN}`
 const MEMBER_EMAIL = `member${RUN}@example.com`
 
-const APP_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../../my-sonicjs-app')
-
-function d1Exec(sql: string) {
-  execFileSync('npx', ['wrangler', 'd1', 'execute', 'DB', '--local', '--command', sql], {
-    cwd: APP_DIR,
-    stdio: 'pipe',
-  })
-}
 
 async function setPluginState(page: Page, action: 'activate' | 'deactivate') {
   await page.request.post(`${BASE_URL}/admin/plugins/install`, { data: { name: PLUGIN_ID } }).catch(() => {})
   await page.request.post(`${BASE_URL}/admin/plugins/${PLUGIN_ID}/${action}`).catch(() => {})
 }
 
-test.describe.serial('Tenant member management @auth', () => {
+/**
+ * Wait for the members page to come back from a form POST carrying `message=<expected>`.
+ *
+ * Not `waitForURL(/\/members/)`: every one of these POSTs is submitted *from* the members page,
+ * so that pattern already matches the current URL and resolves before the click has even been
+ * dispatched — the `Promise.all` collapses to a bare click and the assertions that follow race
+ * the redirect. 74's revoke test lost that race and reported the status banner as "element(s)
+ * not found". Every members route redirects with a `message` query param (routes/admin.ts), and
+ * each step's message is distinct, so matching on it waits for *this* POST rather than the
+ * previous one's URL. A predicate rather than a regex because the handlers are inconsistent
+ * about percent-encoding the message.
+ */
+const membersSettled = (expected: string | RegExp) => (url: URL) => {
+  if (!url.pathname.endsWith('/members')) return false
+  const message = url.searchParams.get('message') ?? ''
+  return typeof expected === 'string' ? message.includes(expected) : expected.test(message)
+}
+
+test.describe.serial('Tenant member management @auth @lock-plugin-multi-tenant', () => {
   let featureAvailable = false
   test.beforeAll(async ({ request }) => {
     featureAvailable = !IS_REMOTE_DEPLOYMENT && await isFeatureAvailable(request, '/admin/tenants')
@@ -72,14 +79,17 @@ test.describe.serial('Tenant member management @auth', () => {
     // Add the seeded user as a viewer.
     await page.fill('#member-email', MEMBER_EMAIL)
     await page.selectOption('#member-role', 'viewer')
-    await Promise.all([page.waitForURL(/\/members/), page.click('[data-add-member]')])
+    await Promise.all([
+      page.waitForURL(membersSettled('Member added')),
+      page.click('[data-add-member]'),
+    ])
     const row = page.locator(`[data-member-row="${MEMBER_EMAIL}"]`)
     await expect(row).toBeVisible()
     await expect(row.locator('[data-member-role]')).toHaveValue('viewer')
 
     // Change their role to editor (select auto-submits).
     await Promise.all([
-      page.waitForURL(/\/members/),
+      page.waitForURL(membersSettled('Role updated')),
       row.locator('[data-member-role]').selectOption('editor'),
     ])
     await expect(
@@ -89,7 +99,7 @@ test.describe.serial('Tenant member management @auth', () => {
     // Remove them.
     page.on('dialog', (d) => d.accept())
     await Promise.all([
-      page.waitForURL(/\/members/),
+      page.waitForURL(membersSettled('Member removed')),
       page.locator(`[data-remove-member="${MEMBER_EMAIL}"]`).click(),
     ])
     await expect(page.locator(`[data-member-row="${MEMBER_EMAIL}"]`)).toHaveCount(0)
@@ -99,7 +109,10 @@ test.describe.serial('Tenant member management @auth', () => {
     await page.goto(`${BASE_URL}/admin/tenants/${TENANT_SLUG}/members`)
     await page.waitForLoadState('networkidle')
     await page.fill('#member-email', `ghost${RUN}@example.com`)
-    await Promise.all([page.waitForURL(/\/members/), page.click('[data-add-member]')])
+    await Promise.all([
+      page.waitForURL(membersSettled(/No user found/i)),
+      page.click('[data-add-member]'),
+    ])
     await expect(page.locator('[data-members-alert]')).toContainText(/No user found/i)
   })
 

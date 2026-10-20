@@ -19,7 +19,7 @@ async function setPluginState(page: Page, action: 'activate' | 'deactivate') {
   await page.request.post(`${BASE_URL}/admin/plugins/${PLUGIN_ID}/${action}`).catch(() => {})
 }
 
-test.describe.serial('Multi-Tenant plugin @auth', () => {
+test.describe.serial('Multi-Tenant plugin @auth @lock-plugin-multi-tenant', () => {
   let featureAvailable = false
   test.beforeAll(async ({ request }) => {
     featureAvailable = await isFeatureAvailable(request, '/admin/tenants')
