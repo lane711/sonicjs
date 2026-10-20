@@ -1,12 +1,12 @@
 import { test, expect } from './fixtures'
-import { loginAsAdmin, TEST_ORIGIN } from './utils/test-helpers'
+import { loginAsAdmin, submitLoginForm, TEST_ORIGIN } from './utils/test-helpers'
 
 /**
  * Issue #783: viewer role sees all sidebar items.
  * A viewer account is provisioned; the viewer sidebar must not expose
  * Users, Plugins, or Settings navigation.
  */
-test.describe('Viewer role sidebar scope', () => {
+test.describe('Viewer role sidebar scope @auth @lock-auth-login', () => {
   const viewerEmail = `viewer-test-${Date.now()}@example.com`
   const viewerPassword = 'ViewerPass1!'
 
@@ -39,12 +39,11 @@ test.describe('Viewer role sidebar scope', () => {
   })
 
   test('viewer sees Content and Collections but not Users/Plugins/Settings', async ({ page }) => {
-    // Sign in as viewer
+    // Sign in as viewer. `submitLoginForm` rather than a bare click: the form POST is rate
+    // limited per IP, the whole suite is one IP, and a 429 to an htmx post is not swapped — the
+    // page silently stays on /auth/login and this reads as an unexplained waitForURL timeout.
     await page.goto('/auth/login')
-    await page.fill('input[name="email"]', viewerEmail)
-    await page.fill('input[name="password"]', viewerPassword)
-    await page.click('button[type="submit"]')
-    await page.waitForURL(/\/admin/)
+    await submitLoginForm(page, viewerEmail, viewerPassword)
 
     // The layout renders every nav link twice (desktop sidebar + #mobile-sidebar), hence .first().
     // Content link present

@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import { ADMIN_CREDENTIALS } from './utils/test-helpers';
+import { ADMIN_CREDENTIALS, requestLoginToken } from './utils/test-helpers';
 
 /**
  * Check if a registration response indicates registration is disabled
@@ -11,7 +11,7 @@ function isRegistrationDisabled(status: number, body: any): boolean {
   return status === 403;
 }
 
-test.describe('Authentication API @auth @api', () => {
+test.describe('Authentication API @auth @api @lock-auth-login', () => {
   const testUser = {
     email: 'test.api.user@example.com',
     password: 'TestPassword123!',
@@ -30,18 +30,17 @@ test.describe('Authentication API @auth @api', () => {
 
     // Ensure registration is enabled (may have been disabled by 37-disable-registration tests)
     try {
-      const loginRes = await request.post('/auth/login', {
-        data: { email: ADMIN_CREDENTIALS.email, password: ADMIN_CREDENTIALS.password }
+      // `requestLoginToken` rather than a bare POST: this file's own rate-limit test empties the
+      // /auth/login bucket, and a beforeAll hook is not covered by the @lock-auth-login tag (that
+      // fixture is test-scoped). A 429 swallowed here leaves registration disabled and every
+      // register test below fails with a 403 that names the wrong cause.
+      const token = await requestLoginToken(request, ADMIN_CREDENTIALS);
+      await request.post('/admin/plugins/core-auth/settings', {
+        headers: { Authorization: `Bearer ${token}` },
+        data: {
+          registration: { enabled: true, requireEmailVerification: false, defaultRole: 'viewer' }
+        }
       });
-      if (loginRes.ok()) {
-        const { token } = await loginRes.json();
-        await request.post('/admin/plugins/core-auth/settings', {
-          headers: { Authorization: `Bearer ${token}` },
-          data: {
-            registration: { enabled: true, requireEmailVerification: false, defaultRole: 'viewer' }
-          }
-        });
-      }
     } catch (error) {
       // Best effort — tests will fail with clear 403 if this didn't work
     }

@@ -1,6 +1,6 @@
 import { test, expect } from './fixtures'
 import type { Page } from '@playwright/test'
-import { loginAsAdmin, getCsrfTokenFromPage, TEST_ORIGIN } from './utils/test-helpers'
+import { loginAsAdmin, getCsrfTokenFromPage, submitLoginForm, TEST_ORIGIN } from './utils/test-helpers'
 // The SAME helper `__tests__/services/two-factor-roundtrip.test.ts` verifies against a real Better
 // Auth instance. Importing it rather than keeping a second copy is deliberate: the cheap tier proves
 // the codes it produces are accepted, so this spec cannot fail in CI over a drifted TOTP
@@ -133,10 +133,10 @@ async function createEnrolledUser(page: Page, slot: string) {
 async function loginAndExpectChallenge(page: Page, email: string, password: string) {
   await page.context().clearCookies()
   await page.goto('/auth/login')
-  await page.fill('input[name="email"]', email)
-  await page.fill('input[name="password"]', password)
-  await page.click('button[type="submit"]')
-  await expect(page).toHaveURL(/\/auth\/two-factor/, { timeout: 15_000 })
+  // `submitLoginForm`, not a bare click: the form POST is rate limited per IP and the suite is one
+  // IP, so under four workers this submit comes back 429. htmx does not swap a non-2xx response,
+  // so the page stays put and the only symptom is this URL never becoming /auth/two-factor.
+  await submitLoginForm(page, email, password, /\/auth\/two-factor/)
 }
 
 /**
@@ -154,7 +154,7 @@ async function expectSessionUpgraded(page: Page) {
     .toBe(true)
 }
 
-test.describe('Two-Factor Authentication @auth', () => {
+test.describe('Two-Factor Authentication @auth @lock-auth-login', () => {
   test.describe('enrolment page', () => {
     test.beforeEach(async ({ page }) => {
       await loginAsAdmin(page)
