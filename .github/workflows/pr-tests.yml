@@ -258,6 +258,17 @@ jobs:
           if echo "$CHANGED_SRC" | grep -qE 'middleware/tenant|multi-tenant'; then
             TAGS="$TAGS|@auth|@plugins"
           fi
+          # The admin sidebar is assembled by middleware/plugin-menu.ts and middleware/menu.ts.
+          # Neither filename matches 'plugin-middleware' or 'services/plugin' above, so edits to
+          # the sidebar shipped with @smoke only — past the specs that actually look at it
+          # (disabled-plugin entries, viewer-scoped entries, the dashboard fragments it wraps).
+          if echo "$CHANGED_SRC" | grep -qE 'middleware/plugin-menu|middleware/menu|plugin-menu-singleton|manifest-registry'; then
+            TAGS="$TAGS|@plugins|@auth"
+          fi
+          # Dashboard route + template feed the htmx fragments every admin page load pays for.
+          if echo "$CHANGED_SRC" | grep -qE 'admin-dashboard'; then
+            TAGS="$TAGS|@content"
+          fi
           if echo "$CHANGED_SRC" | grep -qE 'migrations/'; then
             TAGS="$TAGS|@content|@media|@api"
           fi
