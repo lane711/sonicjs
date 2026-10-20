@@ -28,14 +28,17 @@ test.describe('Admin dashboard fragments @smoke', () => {
     // The skeleton and the dynamic-menu variant both render before the fragment answers, so the
     // card text alone proves nothing. Read the numbers: a seeded install always has at least one
     // collection and the admin account we just signed in as.
+    // NaN while the skeleton is still up: it renders four pulsing placeholder boxes with no
+    // label text and no `.text-2xl`, so the cell genuinely does not exist yet. Returning NaN
+    // rather than throwing keeps the poll below retrying instead of failing on the first tick.
     const valueFor = async (label: string): Promise<number> => {
-      const text = await stats
+      const cell = stats
         .locator('div.px-4.py-5', { hasText: label })
         .first()
         .locator('div.text-2xl')
         .first()
-        .innerText()
-      return Number(text.trim())
+      if ((await cell.count()) === 0) return NaN
+      return Number((await cell.innerText()).trim())
     }
 
     await expect
@@ -62,6 +65,12 @@ test.describe('Admin dashboard fragments @smoke', () => {
     // Both fragments are mounted on `hx-trigger="load"`. Two containers with the same id — which
     // the two dashboard render functions make easy to reintroduce — would double the admin
     // shell's startup traffic against endpoints that query D1.
+    // Park on a page that mounts none of these fragments first. loginAsAdmin lands on /admin, and
+    // its htmx triggers can still be firing when the test body starts — those requests belong to
+    // the previous load but would be counted against this one.
+    await page.goto('/admin/content', { waitUntil: 'domcontentloaded' })
+    await page.waitForTimeout(1_000)
+
     const counts = new Map<string, number>()
     page.on('request', (r) => {
       const match = r.url().match(/\/admin\/dashboard\/(stats|storage|recent-activity)(\?|$)/)
