@@ -116,6 +116,27 @@ const BETTER_AUTH_SESSION_SEGMENTS = [
   "token",
 ] as const;
 
+/**
+ * Paths that are served without touching the collection registry, document types or plugin hooks:
+ * static assets and the health probe.
+ *
+ * Exported because `app.ts` gates plugin wiring on the same set — the two costs are separate
+ * (bootstrap runs here, `boot()` runs one middleware below) but neither is reachable from a
+ * request for a .css file, so they skip together or the skip is only half done.
+ */
+export function isStaticOrHealthPath(path: string): boolean {
+  return (
+    path.startsWith("/images/") ||
+    path.startsWith("/assets/") ||
+    path === "/health" ||
+    path.endsWith(".js") ||
+    path.endsWith(".css") ||
+    path.endsWith(".png") ||
+    path.endsWith(".jpg") ||
+    path.endsWith(".ico")
+  );
+}
+
 export function isBetterAuthSessionPath(path: string): boolean {
   return BETTER_AUTH_SESSION_SEGMENTS.some(
     (seg) => path === `/auth/${seg}` || path.startsWith(`/auth/${seg}/`)
@@ -186,16 +207,7 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
 
     // Skip bootstrap for static assets and health checks
     const path = c.req.path;
-    if (
-      path.startsWith("/images/") ||
-      path.startsWith("/assets/") ||
-      path === "/health" ||
-      path.endsWith(".js") ||
-      path.endsWith(".css") ||
-      path.endsWith(".png") ||
-      path.endsWith(".jpg") ||
-      path.endsWith(".ico")
-    ) {
+    if (isStaticOrHealthPath(path)) {
       return next();
     }
 
