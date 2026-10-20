@@ -7,7 +7,7 @@ import { loginAsAdmin } from './utils/test-helpers'
  * A plugin disabled via /admin/plugins should have its sidebar link removed
  * immediately; re-enabling it should restore the link.
  */
-test.describe('Disabled plugin hidden from sidebar (#971)', () => {
+test.describe('Disabled plugin hidden from sidebar (#971) @plugins @lock-plugin-hello-world', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })

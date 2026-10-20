@@ -27,7 +27,7 @@ async function clearFilters(page: Page) {
 // Use environment variable for port or default to 8787
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8787'
 
-test.describe('Plugin Filters and Search @plugins', () => {
+test.describe('Plugin Filters and Search @plugins @lock-plugin-hello-world', () => {
   test.beforeEach(async ({ page }) => {
     await ensureAdminUserExists(page)
     await ensureWorkflowTablesExist(page)

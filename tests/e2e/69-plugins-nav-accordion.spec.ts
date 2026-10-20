@@ -3,7 +3,7 @@ import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers'
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8787'
 
-test.describe('Plugins Nav Accordion @plugins', () => {
+test.describe('Plugins Nav Accordion @plugins @lock-plugin-hello-world', () => {
   test.beforeEach(async ({ page }) => {
     await ensureAdminUserExists(page)
     await loginAsAdmin(page)

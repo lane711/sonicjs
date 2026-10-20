@@ -1,7 +1,7 @@
 import { test, expect } from './fixtures'
 import { loginAsAdmin } from './utils/test-helpers'
 
-test.describe('Plugin Install Click Behavior @smoke @plugins', () => {
+test.describe('Plugin Install Click Behavior @smoke @plugins @lock-plugin-hello-world', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })
