@@ -67,6 +67,12 @@ jobs:
           echo "$CHANGED"
           bash scripts/lint-e2e-no-skip.sh $CHANGED
 
+      # Whole-suite, not just the changed files: the property is that no test is
+      # invisible to the tag filter below, and a test can lose its only tag
+      # through an edit to a describe several lines above it.
+      - name: Lint E2E tests for missing CI tags
+        run: bash scripts/lint-e2e-tags.sh
+
       - name: Run unit tests with coverage
         run: npm run test:cov
 
