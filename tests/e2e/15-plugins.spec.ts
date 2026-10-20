@@ -121,21 +121,34 @@ test.describe('Plugin Management @plugins', () => {
 
   test('should show plugin actions', async ({ page }) => {
     await page.goto(`${BASE_URL}/admin/plugins`)
-    
+
     // The catalog is code-defined, so cards are always rendered
     const pluginCount = await page.locator('.plugin-card').count()
     expect(pluginCount).toBeGreaterThan(0)
-    
-    // Find any plugin card
-    const pluginCard = page.locator('.plugin-card').first()
-    
-    // Should have an action: installed plugins render an activate/deactivate toggle
-    // switch, uninstalled ones render an Install button.
-    const hasToggle = await pluginCard.locator('button[role="switch"]').count()
-    const hasInstall = await pluginCard.locator('button:has-text("Install")').count()
-    const hasSettings = await pluginCard.locator('button[title="Settings"], button:has-text("Settings")').count()
-    
-    expect(hasToggle + hasInstall + hasSettings).toBeGreaterThan(0)
+
+    // Not `.first()`: the list is ordered `isCore DESC, title ASC` (PluginService.getAllPlugins),
+    // so the first card is always a core plugin, and `core-auth`/`core-media` are in
+    // `criticalCorePlugins` — they render a deliberately inert <div> toggle titled "Core plugin
+    // cannot be disabled", with no Install and no uninstall button. Asserting an interactive
+    // control on the first card therefore passed or failed purely on which plugins happened to be
+    // installed when the spec ran. Assert the invariant that actually holds instead: every card
+    // renders one of the three affordances the template can produce.
+    const actionless = await page.locator('.plugin-card').evaluateAll((cards) =>
+      cards
+        .filter(
+          (card) =>
+            !card.querySelector('button[role="switch"], [title="Core plugin cannot be disabled"]') &&
+            !Array.from(card.querySelectorAll('button')).some((b) => b.textContent?.trim() === 'Install')
+        )
+        .map((card) => card.getAttribute('data-name'))
+    )
+    expect(actionless, 'plugin cards rendering no action control').toEqual([])
+
+    // ...and at least one card exposes a control the operator can actually click.
+    const interactive = await page
+      .locator('.plugin-card button[role="switch"], .plugin-card button:has-text("Install")')
+      .count()
+    expect(interactive).toBeGreaterThan(0)
   })
 
   test('should toggle plugin status', async ({ page }) => {
