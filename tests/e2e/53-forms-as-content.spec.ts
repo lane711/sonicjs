@@ -141,12 +141,18 @@ test.describe('Forms as Content @content', () => {
     }
   })
 
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async () => {
     test.skip(!featureAvailable, 'Plugin/feature not available in this deployment')
-    await loginAsAdmin(page);
   });
 
+  // Logging in is the single most expensive thing these tests do — a full admin page load, which
+  // on a cold preview has been measured at ~10s. It is done per test rather than in `beforeEach`
+  // so the one test that talks to the public API through the unauthenticated `request` fixture,
+  // and therefore cannot use the session anyway, does not pay for it. That test timing out while
+  // still inside its own setup is how this file last failed CI.
+
   test('should NOT show form-sourced collections on collections page', async ({ page }) => {
+    await loginAsAdmin(page);
     await page.goto('/admin/collections');
     await page.waitForLoadState('networkidle');
 
@@ -157,6 +163,7 @@ test.describe('Forms as Content @content', () => {
   });
 
   test('should NOT show form-sourced collections in new-content picker', async ({ page }) => {
+    await loginAsAdmin(page);
     await page.goto('/admin/content/new');
     await page.waitForLoadState('networkidle');
 
@@ -165,6 +172,7 @@ test.describe('Forms as Content @content', () => {
   });
 
   test('should NOT show form submissions in the regular content list', async ({ page }) => {
+    await loginAsAdmin(page);
     // Visit the unfiltered content list
     await page.goto('/admin/content');
     await page.waitForLoadState('networkidle');
@@ -175,6 +183,7 @@ test.describe('Forms as Content @content', () => {
   });
 
   test('should NOT show form collections in collections API', async ({ page }) => {
+    await loginAsAdmin(page);
     const response = await page.request.get('/admin/api/collections');
     expect(response.ok()).toBe(true);
     const body = await response.json();
@@ -199,6 +208,7 @@ test.describe('Forms as Content @content', () => {
   });
 
   test('should preserve existing collection and content counts', async ({ page }) => {
+    await loginAsAdmin(page);
     // This is the critical test: dashboard counts should NOT include form data
     const response = await page.request.get('/admin/api/stats');
     if (response.ok()) {

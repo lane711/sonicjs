@@ -34,7 +34,11 @@ test.describe('Public role — API ACL enforcement @auth @api', () => {
     expect(res.status()).not.toBe(403)
   })
 
-  test('public-role user cannot see content from default-grant collection via /api/:collection', async ({ page }) => {
+  // Shares `document_type:example` with 99-rbac-grant-api-access, which grants the public role
+  // read on it and revokes again. That grant is global, so while 99 holds it this test's
+  // premise — "no public grant" — is false and /api/example answers 200. Same `@lock-` name on
+  // both, so the two can never overlap.
+  test('public-role user cannot see content from default-grant collection via /api/:collection @lock-rbac-example-grant', async ({ page }) => {
     // Sign up a new user. The email carries this run's timestamp, so a 400 ("already
     // exists") would mean something else went wrong.
     const signUp = await page.request.post('/auth/sign-up/email', {

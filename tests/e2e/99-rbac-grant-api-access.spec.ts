@@ -80,7 +80,7 @@ async function setPublicRoleGrant(page: any, grant: boolean) {
   await expect(target).toBeChecked()
 }
 
-test.describe('RBAC grant → immediate API access @auth @api', () => {
+test.describe('RBAC grant → immediate API access @auth @api @lock-rbac-example-grant', () => {
   // Four admin logins and roughly fifteen page loads, against a preview where one cold admin
   // page load has been measured at ~10s. The suite default is sized for a test that loads a
   // couple of pages.
