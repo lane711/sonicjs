@@ -15,7 +15,7 @@ const RPC_URL = `${TEST_ORIGIN}/mcp`
 // Unique slug per run so parallel/repeat runs don't collide.
 const SLUG = `mcp-e2e-${Date.now()}`
 
-test.describe('MCP JSON-RPC endpoint', () => {
+test.describe('MCP JSON-RPC endpoint @plugins @api', () => {
   let apiKey = ''
   let keyId = ''
 

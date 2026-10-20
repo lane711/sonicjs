@@ -18,7 +18,7 @@ import { test, expect } from './fixtures'
 const SELF_HOST_EMAIL = process.env.SONICJS_ADMIN_EMAIL ?? 'admin@sonicjs.com'
 const SELF_HOST_PASSWORD = process.env.SONICJS_ADMIN_PASSWORD ?? 'sonicjs!'
 
-test.describe('Self-Host Smoke Tests', () => {
+test.describe('Self-Host Smoke Tests @smoke', () => {
   test('health endpoint returns ok', async ({ request }) => {
     const res = await request.get('/health')
     expect(res.ok()).toBeTruthy()

@@ -2,7 +2,7 @@ import { test, expect } from './fixtures';
 import { loginAsAdmin, navigateToAdminSection } from './utils/test-helpers';
 
 
-test.describe('Turnstile Forms List Buttons', () => {
+test.describe('Turnstile Forms List Buttons @forms', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
   });

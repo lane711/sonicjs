@@ -14,7 +14,7 @@ import { loginAsAdmin } from './utils/test-helpers'
  * in the unit-level wire.ts tests. This spec covers the observable symptom:
  * deactivated plugins are not shown as active in the admin plugins page.
  */
-test.describe('Removed plugin deactivated on boot (#970)', () => {
+test.describe('Removed plugin deactivated on boot (#970) @plugins', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })

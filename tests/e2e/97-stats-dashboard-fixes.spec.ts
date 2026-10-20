@@ -6,7 +6,7 @@ import { loginAsAdmin } from './utils/test-helpers'
 // with its own wrangler.toml and D1 database). The CMS app under test never registers
 // `statsDashboardPlugin`, so those surfaces only exist when the stats worker is the deployment
 // being pointed at. Detected at run time via its health endpoint.
-test.describe('Stats dashboard data parsing', () => {
+test.describe('Stats dashboard data parsing @stats', () => {
   let statsWorker = false
 
   test.beforeAll(async ({ request }) => {

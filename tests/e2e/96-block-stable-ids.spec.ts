@@ -5,7 +5,7 @@ import { loginAsAdmin } from './utils/test-helpers'
  * Issue #931: block array items need stable persisted IDs.
  * blockId must be generated on create and preserved on reorder/edit.
  */
-test.describe('Block stable IDs', () => {
+test.describe('Block stable IDs @content', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })

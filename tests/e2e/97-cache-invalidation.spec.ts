@@ -15,7 +15,7 @@ const API = TEST_ORIGIN
 // Collection slugs use underscores; `blog` is not a registered collection.
 const COLLECTION = 'blog_post'
 
-test.describe('Cache invalidation — list freshness after item update', () => {
+test.describe('Cache invalidation — list freshness after item update @api', () => {
   test('creating item via public API invalidates list cache', async ({ request }) => {
     const loginRes = await request.post(`${API}/auth/sign-in/email`, {
       data: { email: ADMIN_CREDENTIALS.email, password: ADMIN_CREDENTIALS.password },

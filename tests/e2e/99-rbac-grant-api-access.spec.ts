@@ -71,7 +71,7 @@ async function setPublicRoleGrant(page: any, grant: boolean) {
   await expect(page.locator(`${cell}[value="${grant ? 'any' : 'none'}"]`)).toBeChecked()
 }
 
-test.describe('RBAC grant → immediate API access', () => {
+test.describe('RBAC grant → immediate API access @auth @api', () => {
   test('granting public role read on document_type:example unblocks /api/example immediately', async ({ page }) => {
     // 1. Ensure test user exists.
     const userId = await signUp(page)

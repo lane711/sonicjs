@@ -23,7 +23,7 @@ async function firstUserEditUrl(page: Page): Promise<string> {
   return match![0]
 }
 
-test.describe('User edit — dynamic role dropdown', () => {
+test.describe('User edit — dynamic role dropdown @auth', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })

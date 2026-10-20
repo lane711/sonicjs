@@ -9,7 +9,7 @@
 import { test, expect } from './fixtures'
 import { loginAsAdmin } from './utils/test-helpers'
 
-test.describe('MCP admin dashboard', () => {
+test.describe('MCP admin dashboard @plugins', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })

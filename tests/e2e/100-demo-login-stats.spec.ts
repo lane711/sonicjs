@@ -4,7 +4,7 @@ import { loginAsAdmin } from './utils/test-helpers'
 // Demo-login telemetry (`POST /v1/events`) and the "Demo Site Logins" dashboard cards belong to
 // the separate `sonicjs-stats` worker (packages/stats → stats.sonicjs.com, own wrangler.toml +
 // D1). The CMS app under test does not register `statsDashboardPlugin`; probe at run time.
-test.describe('Demo login stats', () => {
+test.describe('Demo login stats @stats', () => {
   let statsWorker = false
 
   test.beforeAll(async ({ request }) => {
