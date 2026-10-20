@@ -1,5 +1,5 @@
 import { test, expect, type Page } from './fixtures'
-import { loginAsAdmin, ensureAdminUserExists, ADMIN_CREDENTIALS, isFeatureAvailable, IS_REMOTE_DEPLOYMENT, d1Exec } from './utils/test-helpers'
+import { loginAsAdmin, ensureAdminUserExists, ADMIN_CREDENTIALS, isFeatureAvailable, IS_REMOTE_DEPLOYMENT, d1Exec, flashedTo } from './utils/test-helpers'
 
 // Membership gate: an authed admin may only switch into / resolve tenants they belong to. Creating a
 // tenant auto-enrolls the creator (owner), so the happy path works; a tenant the admin is NOT a
@@ -76,7 +76,7 @@ test.describe.serial('Multi-Tenant membership gate @auth @lock-plugin-multi-tena
     await page.fill('#tenant-name', MEMBER_NAME)
     await page.fill('#tenant-slug', MEMBER_SLUG)
     await Promise.all([
-      page.waitForURL(/\/admin\/tenants/),
+      page.waitForURL(flashedTo('/admin/tenants', 'Tenant created')),
       page.click('[data-save-tenant]'),
     ])
 

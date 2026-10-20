@@ -46,6 +46,27 @@ export function d1Exec(sql: string) {
   }
 }
 
+/**
+ * Predicate for `page.waitForURL` after a form POST that redirects back with a `?message=`
+ * flash.
+ *
+ * Matching on the message, not just the path, is the whole point: several of these handlers
+ * redirect to the very URL the form was submitted from (`/admin/tenants/new` -> `/admin/tenants`
+ * matches `/\/admin\/tenants/` before the click even dispatches), so a path-only pattern is
+ * already true and `waitForURL` resolves instantly, leaving the assertions below to run against
+ * the pre-submit page. A predicate rather than a regex over the href because the handlers are
+ * inconsistent about percent-encoding the message, and `searchParams` decodes either form.
+ */
+export const flashedTo =
+  (pathname: string | RegExp, expected: string | RegExp) =>
+  (url: URL): boolean => {
+    const pathOk =
+      typeof pathname === 'string' ? url.pathname === pathname : pathname.test(url.pathname)
+    if (!pathOk) return false
+    const message = url.searchParams.get('message') ?? ''
+    return typeof expected === 'string' ? message.includes(expected) : expected.test(message)
+  }
+
 // Default admin credentials for testing
 export const ADMIN_CREDENTIALS = {
   email: 'admin@sonicjs.com',

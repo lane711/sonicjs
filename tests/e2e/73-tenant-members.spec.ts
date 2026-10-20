@@ -1,5 +1,5 @@
 import { test, expect, type Page } from './fixtures'
-import { loginAsAdmin, ensureAdminUserExists, isFeatureAvailable, IS_REMOTE_DEPLOYMENT, d1Exec } from './utils/test-helpers'
+import { loginAsAdmin, ensureAdminUserExists, isFeatureAvailable, IS_REMOTE_DEPLOYMENT, d1Exec, flashedTo } from './utils/test-helpers'
 
 // Member management UI (G4): add a user to a tenant by email with a role, change their role, remove
 // them — all from /admin/tenants/<slug>/members. Lockout guards (last admin) covered by unit tests.
@@ -29,11 +29,7 @@ async function setPluginState(page: Page, action: 'activate' | 'deactivate') {
  * previous one's URL. A predicate rather than a regex because the handlers are inconsistent
  * about percent-encoding the message.
  */
-const membersSettled = (expected: string | RegExp) => (url: URL) => {
-  if (!url.pathname.endsWith('/members')) return false
-  const message = url.searchParams.get('message') ?? ''
-  return typeof expected === 'string' ? message.includes(expected) : expected.test(message)
-}
+const membersSettled = (expected: string | RegExp) => flashedTo(/\/members$/, expected)
 
 test.describe.serial('Tenant member management @auth @lock-plugin-multi-tenant', () => {
   let featureAvailable = false
@@ -69,7 +65,10 @@ test.describe.serial('Tenant member management @auth @lock-plugin-multi-tenant',
     await page.waitForLoadState('networkidle')
     await page.fill('#tenant-name', TENANT_NAME)
     await page.fill('#tenant-slug', TENANT_SLUG)
-    await Promise.all([page.waitForURL(/\/admin\/tenants/), page.click('[data-save-tenant]')])
+    await Promise.all([
+      page.waitForURL(flashedTo('/admin/tenants', 'Tenant created')),
+      page.click('[data-save-tenant]'),
+    ])
 
     // Members page: the creator is listed as admin.
     await page.goto(`${BASE_URL}/admin/tenants/${TENANT_SLUG}/members`)

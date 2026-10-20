@@ -1,5 +1,5 @@
 import { test, expect, type Page } from './fixtures'
-import { loginAsAdmin, ensureAdminUserExists, isFeatureAvailable } from './utils/test-helpers'
+import { loginAsAdmin, ensureAdminUserExists, isFeatureAvailable, flashedTo } from './utils/test-helpers'
 
 // Multi-tenant plugin: off by default, activated on the Plugins page, then it exposes a Tenants
 // admin page + sidebar switcher and scopes document reads/writes to the resolved tenant.
@@ -146,7 +146,7 @@ test.describe.serial('Multi-Tenant plugin @auth @lock-plugin-multi-tenant', () =
     await page.fill('#tenant-name', TENANT_NAME)
     await page.fill('#tenant-slug', TENANT_SLUG)
     await Promise.all([
-      page.waitForURL(/\/admin\/tenants/),
+      page.waitForURL(flashedTo('/admin/tenants', 'Tenant created')),
       page.click('[data-save-tenant]'),
     ])
 
@@ -187,11 +187,12 @@ test.describe.serial('Multi-Tenant plugin @auth @lock-plugin-multi-tenant', () =
     await page.goto(`${BASE_URL}/admin/tenants`)
     await page.waitForLoadState('networkidle')
 
-    // Switch to the created tenant via the row action.
-    await Promise.all([
-      page.waitForURL(/\/admin\/tenants/),
-      page.locator(`[data-switch-tenant="${TENANT_SLUG}"]`).click(),
-    ])
+    // Switch to the created tenant via the row action. POST /admin/tenants/switch redirects to
+    // the same /admin/tenants the form was submitted from and sets no flash, so there is no URL
+    // change to wait for. The current tenant renders no Switch button, so that button going away
+    // is the re-render landing — and unlike the badge, it is not already true before the click.
+    await page.locator(`[data-switch-tenant="${TENANT_SLUG}"]`).click()
+    await expect(page.locator(`[data-switch-tenant="${TENANT_SLUG}"]`)).toHaveCount(0)
 
     // The created tenant row now carries the "Current" badge.
     await expect(
@@ -199,10 +200,8 @@ test.describe.serial('Multi-Tenant plugin @auth @lock-plugin-multi-tenant', () =
     ).toBeVisible()
 
     // Switch back to default so later tests/specs are unaffected.
-    await Promise.all([
-      page.waitForURL(/\/admin\/tenants/),
-      page.locator('[data-switch-tenant="default"]').click(),
-    ])
+    await page.locator('[data-switch-tenant="default"]').click()
+    await expect(page.locator('[data-switch-tenant="default"]')).toHaveCount(0)
     await expect(
       page.locator('[data-tenant-row="default"] [data-current-tenant-badge]')
     ).toBeVisible()

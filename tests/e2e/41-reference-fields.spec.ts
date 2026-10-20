@@ -44,10 +44,23 @@ async function openReferencePicker(page: Page) {
 
   const refButton = container.locator('button:has-text("Select reference")')
   await expect(refButton).toBeVisible()
-  await refButton.click()
+
+  // The modal paints empty and `loadResults()` fills it from /admin/api/references. Waiting on
+  // that response rather than giving the first result button a fixed timeout is what lets this
+  // survive a slow deployment — the fetch is the only thing between the click and a populated
+  // list, and on a cold preview it alone can outlast the 10s the assertions used to allow.
+  await Promise.all([
+    page.waitForResponse(
+      (r) => r.url().includes('/admin/api/references') && r.request().method() === 'GET'
+    ),
+    refButton.click(),
+  ])
 
   const modal = page.locator('#reference-selector-modal')
   await expect(modal).toBeVisible({ timeout: 5000 })
+  // A failed fetch renders this instead of buttons; without the check the failure surfaces as a
+  // bare "element(s) not found" on the result list.
+  await expect(page.locator('#reference-results')).not.toContainText('Failed to load references.')
   return { container, modal }
 }
 
@@ -57,7 +70,9 @@ test.describe('Reference Fields @content', () => {
     const context = await browser.newContext({ baseURL: TEST_ORIGIN })
     const page = await context.newPage()
     await ensureAdminUserExists(page)
-    await loginAsAdmin(page)
+    // API-only session: these hooks never touch the DOM, and rendering /admin inside them is
+    // what blew the afterAll budget on a cold preview.
+    await loginAsAdmin(page, false)
     const res = await page.request.post('/api/content', {
       data: {
         collectionId: REFERENCE_TARGET_COLLECTION,
@@ -78,7 +93,7 @@ test.describe('Reference Fields @content', () => {
     if (!referenceTargetId) return
     const context = await browser.newContext({ baseURL: TEST_ORIGIN })
     const page = await context.newPage()
-    await loginAsAdmin(page)
+    await loginAsAdmin(page, false)
     await page.request.delete(`/api/content/${referenceTargetId}`)
     await context.close()
   })

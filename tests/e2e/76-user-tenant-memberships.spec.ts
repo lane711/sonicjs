@@ -1,5 +1,5 @@
 import { test, expect, type Page } from './fixtures'
-import { loginAsAdmin, ensureAdminUserExists, isFeatureAvailable, IS_REMOTE_DEPLOYMENT, d1Exec } from './utils/test-helpers'
+import { loginAsAdmin, ensureAdminUserExists, isFeatureAvailable, IS_REMOTE_DEPLOYMENT, d1Exec, flashedTo } from './utils/test-helpers'
 
 // User-centric tenant membership management: from a user's edit page, open their memberships,
 // add the user to a tenant with a role, change the role, and remove them. Roles are per-tenant.
@@ -65,14 +65,17 @@ test.describe.serial('User-centric tenant memberships @auth @lock-plugin-multi-t
     // Add to tenant A as viewer.
     await page.selectOption('#membership-tenant', T_A)
     await page.selectOption('#membership-role', 'viewer')
-    await Promise.all([page.waitForURL(/\/tenants\/users\//), page.click('[data-add-membership]')])
+    await Promise.all([
+      page.waitForURL(flashedTo(`/admin/tenants/users/${UID}`, `Added to ${T_A}`)),
+      page.click('[data-add-membership]'),
+    ])
     const row = page.locator(`[data-membership-row="${T_A}"]`)
     await expect(row).toBeVisible()
     await expect(row.locator('[data-membership-role]')).toHaveValue('viewer')
 
     // Change role to editor (select auto-submits).
     await Promise.all([
-      page.waitForURL(/\/tenants\/users\//),
+      page.waitForURL(flashedTo(`/admin/tenants/users/${UID}`, 'Role updated')),
       row.locator('[data-membership-role]').selectOption('editor'),
     ])
     await expect(page.locator(`[data-membership-row="${T_A}"] [data-membership-role]`)).toHaveValue('editor')
@@ -80,7 +83,7 @@ test.describe.serial('User-centric tenant memberships @auth @lock-plugin-multi-t
     // Remove.
     page.on('dialog', (d) => d.accept())
     await Promise.all([
-      page.waitForURL(/\/tenants\/users\//),
+      page.waitForURL(flashedTo(`/admin/tenants/users/${UID}`, `Removed from ${T_A}`)),
       page.locator(`[data-remove-membership="${T_A}"]`).click(),
     ])
     await expect(page.locator(`[data-membership-row="${T_A}"]`)).toHaveCount(0)
