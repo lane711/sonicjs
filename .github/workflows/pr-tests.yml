@@ -246,6 +246,12 @@ jobs:
           if echo "$CHANGED_SRC" | grep -qE 'collection-registry|admin-collections'; then
             TAGS="$TAGS|@collections"
           fi
+          if echo "$CHANGED_SRC" | grep -qE 'admin-plugins|plugins/sdk|plugin-definition-registry|plugin-middleware|services/plugin|core-plugins/|routes/plugin'; then
+            TAGS="$TAGS|@plugins"
+          fi
+          if echo "$CHANGED_SRC" | grep -qE 'admin-forms|public-forms|forms-plugin'; then
+            TAGS="$TAGS|@forms"
+          fi
           if echo "$CHANGED_SRC" | grep -qE 'migrations/'; then
             TAGS="$TAGS|@content|@media|@api"
           fi

@@ -44,7 +44,7 @@ Full design + remediation runbook: `docs/ai/plans/document-model-poc-plan.md` (A
 | **R8** | Escape every user-controlled value rendered into HTML with `escapeHtml` from `utils/sanitize`. |
 | **R9** | After editing any `packages/core/migrations/*.sql`: run `cd packages/core && npm run generate:migrations`, re-sync the `my-sonicjs-app/migrations/` copies (byte-identical), commit the regenerated `src/db/migrations-bundle.ts`. |
 | **R10** | Unit tests on the pure-mock DB cannot verify SQL, constraints, batch atomicity, generated columns, or bind counts. Real coverage requires the `better-sqlite3` harness — `documents.sqlite.test.ts` + the `*.integration.test.ts` route harness. |
-| **R11** | New E2E specs are numbered **68+** (highest existing is 67). |
+| **R11** | New E2E specs are numbered **118+** (highest existing is 117). Six files already share the number 68 — do not add a seventh. |
 | **R12** | POC runs **alongside** legacy paths. Do not drop legacy plugin tables in the POC — decommission only after read-flip + backfill + grep-gate (see plan §"Decommissioning"). |
 
 ### Key behaviors to preserve
@@ -143,7 +143,7 @@ Base grants only match `public` + `role`, so the `role` principal is mandatory f
 5. **Public exposure**: set `settings.baseGrants.public = ['read']` only if the data is non-PII.
 6. **PII**: set `settings.pii = true` and ensure the erase path covers it.
 7. **Tests**: add at least one `*.sqlite.test.ts` or `*.integration.test.ts` case. Mock tests prove nothing about SQL (R10).
-8. **E2E**: add a Playwright spec (numbered 68+). Write it; do NOT run it locally — CI validates it.
+8. **E2E**: add a Playwright spec (numbered 118+). Write it; do NOT run it locally — CI validates it.
 
 ### Status snapshot (avoid re-investigating)
 
@@ -192,6 +192,8 @@ test.describe('Media Upload @media', () => { … })
 | `src/middleware/auth*`, `src/auth/*`, `src/routes/auth*`, `src/routes/admin-settings*`, anything `two-factor` | `@smoke @auth @api-keys` |
 | `src/services/api-keys*` or related | `@smoke @api-keys` |
 | `src/routes/admin-database*` | `@smoke @database` |
+| `src/routes/admin-plugins*`, `src/plugins/sdk/*`, `src/plugins/core-plugins/*`, plugin registry/middleware | `@smoke @plugins` |
+| `src/routes/admin-forms*`, `src/routes/public-forms*`, `forms-plugin` | `@smoke @forms` |
 | `packages/core/migrations/*` | `@smoke @content @media @api` |
 | Anything else / multiple areas | `@smoke` only |
 
@@ -201,7 +203,7 @@ CI invocation: `npx playwright test --grep "@smoke|@<detected-tag>"`.
 
 Workflow:
 1. Implement
-2. Add `tests/e2e/<NN>-<slug>.spec.ts` (NN = next sequential; current floor 68 — R11)
+2. Add `tests/e2e/<NN>-<slug>.spec.ts` (NN = next sequential; current floor 118 — R11)
 3. Tag tests with `@smoke` and/or appropriate feature tag
 4. Commit implementation + tests together — CI selects and runs relevant tests
 
