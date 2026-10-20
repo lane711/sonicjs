@@ -1,4 +1,7 @@
-import { Page, expect } from '@playwright/test';
+import { APIRequestContext, Page, expect, test } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // Better Auth enforces CSRF by rejecting a missing/null/untrusted Origin (MISSING_OR_NULL_ORIGIN).
 // Playwright's page.request from about:blank sends a null Origin, so every auth API call below must
@@ -9,6 +12,39 @@ export const TEST_ORIGIN = process.env.BASE_URL || 'http://localhost:8787';
 // Tenant tests use `wrangler d1 execute --local` which only affects local SQLite,
 // not the remote worker's D1 — skip those tests in remote deployments.
 export const IS_REMOTE_DEPLOYMENT = !TEST_ORIGIN.includes('localhost') && !TEST_ORIGIN.includes('127.0.0.1');
+
+const APP_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../../../my-sonicjs-app');
+
+/**
+ * Run one SQL statement against the dev server's *local* D1 (the same .wrangler state the
+ * running worker uses). Used by the tenant specs to seed and clean rows the admin UI has no
+ * route for.
+ *
+ * Retries on SQLITE_BUSY: this opens the very SQLite file `wrangler dev` holds open, so a write
+ * that lands while the worker is mid-transaction is refused outright rather than queued. It
+ * surfaced as `Command failed: npx wrangler d1 execute … NOSENTRY database is locked:
+ * SQLITE_BUSY` in whichever tenant test happened to be unlucky, naming nothing about tenancy.
+ *
+ * Shared rather than copy-pasted: six specs had their own one-line version of this, so the
+ * retry had to be added six times or it protected only the file it was written in.
+ */
+export function d1Exec(sql: string) {
+  const ATTEMPTS = 5;
+  for (let attempt = 1; ; attempt++) {
+    try {
+      execFileSync('npx', ['wrangler', 'd1', 'execute', 'DB', '--local', '--command', sql], {
+        cwd: APP_DIR,
+        stdio: 'pipe',
+      });
+      return;
+    } catch (error) {
+      const output = `${(error as { stderr?: Buffer }).stderr ?? ''}${(error as Error).message ?? ''}`;
+      if (attempt === ATTEMPTS || !/SQLITE_BUSY|database is locked/i.test(output)) throw error;
+      // Synchronous on purpose: the callers are sync beforeAll/afterAll hooks.
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 400 * attempt);
+    }
+  }
+}
 
 // Default admin credentials for testing
 export const ADMIN_CREDENTIALS = {
@@ -426,6 +462,109 @@ export async function ensureTestCollectionExists(_page: Page) {
   // the old version drove /admin/collections/new (which is now instructional), hanging for ~60s
   // and timing out every caller (createTestContent → 05/11/12/42 cascades).
   return;
+}
+
+/**
+ * Fill and submit the /auth/login form, waiting out a rate-limit rejection instead of failing on it.
+ *
+ * `/auth/login/form` is capped at 30 requests per minute per IP and the whole suite is one IP —
+ * on a workers.dev preview `cf-connecting-ip` is the single CI runner, and on a local dev server
+ * there is no IP header at all so every worker shares the `unknown` bucket. Four workers running
+ * specs that each sign a throwaway user in blow that bucket in a burst. The 429 comes back to an
+ * htmx post, which does not swap non-2xx responses, so the page simply does not move and the test
+ * reports a bare `waitForURL` timeout with nothing on screen to explain it.
+ *
+ * The limit itself is correct — brute-force protection should not be weakened to suit a test
+ * suite — so this waits for the window to roll and submits again. The wait is not the test's own
+ * work, so its budget is extended by however long it queued.
+ */
+/**
+ * Hand back time spent queueing behind someone else's rate-limit window.
+ *
+ * Waiting for a bucket to drain is not the test's own work, so it should not come out of the
+ * test's budget. No-op when there is no running test: `test.info()` throws inside a `beforeAll`
+ * hook, which is one of the places the callers below run from.
+ */
+function extendCurrentTimeout(ms: number) {
+  try {
+    const info = test.info();
+    info.setTimeout(info.timeout + ms);
+  } catch {
+    // beforeAll/afterAll — the hook's budget is the test timeout and cannot be extended here.
+  }
+}
+
+/**
+ * POST /auth/login and return the bearer token, waiting out a rate-limit rejection.
+ *
+ * `/auth/login` is capped at 30 requests per minute per IP and the whole suite is one IP: on a
+ * workers.dev preview `cf-connecting-ip` is the single CI runner, and against a local dev server
+ * there is no IP header at all so every worker shares the `unknown` bucket. 02b-authentication-api
+ * deliberately empties that bucket to prove the limiter works.
+ *
+ * The `@lock-auth-login` tag keeps those tests from overlapping, but it is a *test-scoped* fixture
+ * and a `beforeAll` hook runs before any test's fixtures are set up — so hooks are not covered by
+ * it. That is exactly where 16-user-management's admin login came back 429, leaving `authToken`
+ * undefined and every test in the file failing on a DELETE that was never authorised.
+ *
+ * The limit itself is correct — brute-force protection should not be weakened to suit a test
+ * suite — so wait for the window to roll and ask again.
+ */
+export async function requestLoginToken(
+  request: APIRequestContext,
+  credentials: { email: string; password: string } = ADMIN_CREDENTIALS
+): Promise<string> {
+  const MAX_ATTEMPTS = 3;
+  /** The window is 60s wide, so no legitimate Retry-After exceeds it. */
+  const MAX_BACKOFF_MS = 65_000;
+
+  let res = await request.post('/auth/login', { data: credentials });
+  for (let attempt = 1; res.status() === 429 && attempt < MAX_ATTEMPTS; attempt++) {
+    const retryAfter = Number(res.headers()['retry-after'] ?? '60');
+    const backoff = Math.min(Number.isFinite(retryAfter) ? retryAfter * 1000 : 60_000, MAX_BACKOFF_MS);
+    extendCurrentTimeout(backoff + 10_000);
+    await new Promise((resolve) => setTimeout(resolve, backoff + 500));
+    res = await request.post('/auth/login', { data: credentials });
+  }
+
+  expect(res.status(), `/auth/login failed: ${await res.text()}`).toBe(200);
+  const body = await res.json();
+  expect(typeof body.token, '/auth/login returned 200 without a token').toBe('string');
+  return body.token as string;
+}
+
+export async function submitLoginForm(
+  page: Page,
+  email: string,
+  password: string,
+  expectUrl: RegExp = /\/admin/,
+  timeout = 20000
+) {
+  const MAX_ATTEMPTS = 3
+  /** The window is 60s wide, so no legitimate Retry-After exceeds it. */
+  const MAX_BACKOFF_MS = 65_000
+
+  for (let attempt = 1; ; attempt++) {
+    await page.fill('input[name="email"]', email)
+    await page.fill('input[name="password"]', password)
+
+    const posted = page.waitForResponse(
+      (r) => r.url().includes('/auth/login/form') && r.request().method() === 'POST',
+      { timeout }
+    )
+    await page.click('button[type="submit"]')
+    const res = await posted
+
+    if (res.status() !== 429 || attempt === MAX_ATTEMPTS) break
+
+    const retryAfter = Number(res.headers()['retry-after'] ?? '60')
+    const backoff = Math.min(Number.isFinite(retryAfter) ? retryAfter * 1000 : 60_000, MAX_BACKOFF_MS)
+    extendCurrentTimeout(backoff + 10_000)
+    await page.waitForTimeout(backoff + 500)
+    await page.reload({ waitUntil: 'domcontentloaded' })
+  }
+
+  await page.waitForURL(expectUrl, { timeout, waitUntil: 'domcontentloaded' })
 }
 
 /**
