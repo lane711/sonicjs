@@ -75,23 +75,26 @@ test.describe('Schema-driven plugin settings @plugins', () => {
     expect(body?.toLowerCase()).toContain('hello')
   })
 
-  test('email plugin /configure renders apiKey as password field', async ({ page }) => {
-    await page.goto(`${BASE_URL}/admin/plugins/email/configure`)
-    await page.waitForLoadState('networkidle')
+  test('email plugin keeps its legacy settings page instead of /configure', async ({ page }) => {
+    // Documented contract in admin-plugins.ts: schema-driven settings are opt-in via
+    // definePlugin's `configSchema`. The email plugin declares none, so /configure must 404
+    // rather than render an empty form — it keeps its legacy settings page instead.
+    const resp = await page.goto(`${BASE_URL}/admin/plugins/email/configure`)
+    expect(resp?.status()).toBe(404)
+    expect(await page.locator('body').textContent()).toContain('No schema-driven settings')
 
-    // Email plugin declares configSchema with apiKey { type: 'string', variant: 'sensitive' }
-    const form = page.locator('form')
-    if (await form.count() > 0) {
-      await expect(form).toBeVisible()
+    const legacy = await page.goto(`${BASE_URL}/admin/plugins/email`)
+    expect(legacy?.status()).toBe(200)
+  })
 
-      // apiKey should be a password-type input (sensitive variant)
-      const apiKeyInput = page.locator('input[name="apiKey"]')
-      if (await apiKeyInput.count() > 0) {
-        await expect(apiKeyInput).toHaveAttribute('type', 'password')
-      }
-    } else {
-      // If not rendered (plugin might use legacy settings page), skip gracefully
-      test.skip(true, 'email /configure not available (plugin uses legacy settings)')
-    }
+  test('a plugin that declares a configSchema renders its fields', async ({ page }) => {
+    // api-keys declares two numeric fields; the auto-rendered form must post back to /configure.
+    const resp = await page.goto(`${BASE_URL}/admin/plugins/api-keys/configure`)
+    expect(resp?.status()).toBe(200)
+
+    const form = page.locator('form[action="/admin/plugins/api-keys/configure"]')
+    await expect(form).toBeVisible()
+    await expect(form.locator('input[name="maxKeysPerUser"]')).toHaveAttribute('type', 'number')
+    await expect(form.locator('input[name="defaultExpiryDays"]')).toHaveAttribute('type', 'number')
   })
 })

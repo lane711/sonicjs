@@ -1,28 +1,5 @@
 import { test, expect } from '@playwright/test';
-import type { APIRequestContext, APIResponse } from '@playwright/test';
-import { ADMIN_CREDENTIALS, loginAsAdmin, logout, TEST_ORIGIN } from './utils/test-helpers';
-
-/**
- * POST /auth/seed-admin until a request actually reaches the handler.
- *
- * The route is rate-limited to 10 requests per minute per IP
- * (`rateLimit({ max: 10, windowMs: 60_000, keyPrefix: 'seed-admin' })` in routes/auth.ts) and
- * `loginAsAdmin` POSTs it on EVERY sign-in, so in a full-suite run the window is routinely spent
- * by the other workers before this test gets a turn. A 429 is the limiter answering, not the
- * seeder, and asserting on whichever request happened to land first tests the wrong thing.
- *
- * Polled rather than slept out via `Retry-After`: the window is fixed, so its slots free up in a
- * burst the instant it rolls and the other workers reclaim them within seconds.
- */
-async function seedAdminPastRateLimit(request: APIRequestContext): Promise<APIResponse> {
-  const deadline = Date.now() + 90_000;
-  let res = await request.post('/auth/seed-admin');
-  while (res.status() === 429 && Date.now() < deadline) {
-    await new Promise((resolve) => setTimeout(resolve, 2_000));
-    res = await request.post('/auth/seed-admin');
-  }
-  return res;
-}
+import { ADMIN_CREDENTIALS, loginAsAdmin, logout, seedAdminPastRateLimit, TEST_ORIGIN } from './utils/test-helpers';
 
 /**
  * Better Auth integration E2E tests.

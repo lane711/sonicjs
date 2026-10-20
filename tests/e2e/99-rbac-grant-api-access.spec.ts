@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { loginAsAdmin } from './utils/test-helpers'
+import { loginAsAdmin, TEST_ORIGIN } from './utils/test-helpers'
 
 /**
  * RBAC grant takes effect immediately on the API.
@@ -19,72 +19,70 @@ import { loginAsAdmin } from './utils/test-helpers'
 const USER_EMAIL = `rbac-grant-test-${Date.now()}@test.com`
 const USER_PASSWORD = 'Passw0rd!rbac'
 
-async function signUp(page: any) {
+async function signUp(page: any): Promise<string> {
   const res = await page.request.post('/auth/sign-up/email', {
     data: { email: USER_EMAIL, password: USER_PASSWORD, name: 'RBAC Grant Tester' },
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
   })
-  return res.ok() || res.status() === 400 // 400 = already exists
+  expect(res.ok(), `sign-up failed: ${res.status()}`).toBeTruthy()
+  const id = (await res.json())?.user?.id
+  expect(id, 'sign-up returned no user id').toBeTruthy()
+  return id
 }
 
 async function signIn(page: any) {
   return page.request.post('/auth/sign-in/email', {
     data: { email: USER_EMAIL, password: USER_PASSWORD },
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
   })
 }
 
-async function assignRole(page: any, roleValue: string) {
+// Addressed by id rather than hunted for in the users table: the list paginates, so a
+// brand-new user is not reliably on page one.
+async function assignRole(page: any, userId: string, roleValue: string) {
   await loginAsAdmin(page)
-  await page.goto('/admin/users')
-  await page.waitForLoadState('networkidle')
-  const editLink = page.locator('a[href*="/edit"]').filter({ hasText: USER_EMAIL }).first()
-  if ((await editLink.count()) === 0) { return false }
-  await editLink.click()
+  await page.goto(`/admin/users/${userId}/edit`)
   await page.waitForLoadState('networkidle')
   await page.locator('select[name="role"]').selectOption(roleValue)
   await page.locator('button[type="submit"]').filter({ hasText: /save|update/i }).click()
   await page.waitForLoadState('networkidle')
-  return true
 }
 
+// The matrix only renders the roles named in `?roles=` (with `compare=1`); a plain visit
+// defaults to the first three roles, and "public" is not one of them. Each cell is a group of
+// three radios named `g|<roleId>|<resource>|<verb>` with value any|own|none — not a checkbox —
+// and the resource attribute is `data-res`. The radios are visually hidden (1px, opacity 0,
+// pointer-events none), so the click has to land on the wrapping <label class="scope">.
 async function setPublicRoleGrant(page: any, grant: boolean) {
   await loginAsAdmin(page)
-  await page.goto('/admin/rbac')
+  await page.goto('/admin/rbac?compare=1&roles=role-public')
   await page.waitForLoadState('networkidle')
-  // Navigate to the matrix tab.
-  const matrixTab = page.locator('[data-subtab="matrix"], #subtab-matrix, button:has-text("Matrix"), a:has-text("Matrix")').first()
-  if ((await matrixTab.count()) > 0) {
-    await matrixTab.click()
-    await page.waitForLoadState('networkidle')
-  }
-  // Find the checkbox for role-public × document_type:example × read.
-  const checkbox = page
-    .locator('input[type="checkbox"]')
-    .filter({ has: page.locator('[data-role="role-public"][data-resource="document_type:example"][data-verb="read"]') })
-    .first()
-  if ((await checkbox.count()) > 0) {
-    const checked = await checkbox.isChecked()
-    if (grant !== checked) await checkbox.click()
-    await page.locator('button[type="submit"]').filter({ hasText: /save|apply/i }).first().click()
-    await page.waitForLoadState('networkidle')
-  }
+
+  const cell = 'input[name="g|role-public|document_type:example|read"]'
+  const label = page.locator(`label.scope:has(${cell}[value="${grant ? 'any' : 'none'}"])`)
+  await expect(label, 'public × document_type:example × read cell missing from matrix').toHaveCount(1)
+  await label.click()
+  await expect(page.locator(`${cell}[value="${grant ? 'any' : 'none'}"]`)).toBeChecked()
+
+  await page.locator('form[action="/admin/rbac/grants"] button[type="submit"]').first().click()
+  await page.waitForLoadState('networkidle')
+
+  // The redirect re-renders the matrix from the saved grants — confirm the write landed.
+  await expect(page.locator(`${cell}[value="${grant ? 'any' : 'none'}"]`)).toBeChecked()
 }
 
 test.describe('RBAC grant → immediate API access', () => {
   test('granting public role read on document_type:example unblocks /api/example immediately', async ({ page }) => {
     // 1. Ensure test user exists.
-    const created = await signUp(page)
-    if (!created) { test.skip(); return }
+    const userId = await signUp(page)
 
     // 2. Assign public role via admin UI.
-    const assigned = await assignRole(page, 'role-public')
-    if (!assigned) { test.skip(); return }
+    await assignRole(page, userId, 'role-public')
 
     // 3. Sign in as the public-role user and confirm 403 (no grant yet).
     await page.context().clearCookies()
     const signIn1 = await signIn(page)
-    if (!signIn1.ok()) { test.skip(); return }
+    expect(signIn1.ok(), `sign-in failed: ${signIn1.status()}`).toBeTruthy()
 
     const res1 = await page.request.get('/api/example')
     // Must be 403 (or 404 if collection not registered) — NOT 200.
@@ -96,7 +94,7 @@ test.describe('RBAC grant → immediate API access', () => {
     // 5. Sign back in as public-role user and re-check.
     await page.context().clearCookies()
     const signIn2 = await signIn(page)
-    if (!signIn2.ok()) { test.skip(); return }
+    expect(signIn2.ok(), `sign-in failed: ${signIn2.status()}`).toBeTruthy()
 
     const res2 = await page.request.get('/api/example')
     // After grant: must be 200 (even if data is empty).
@@ -107,7 +105,7 @@ test.describe('RBAC grant → immediate API access', () => {
 
     await page.context().clearCookies()
     const signIn3 = await signIn(page)
-    if (!signIn3.ok()) { test.skip(); return }
+    expect(signIn3.ok(), `sign-in failed: ${signIn3.status()}`).toBeTruthy()
 
     const res3 = await page.request.get('/api/example')
     expect(res3.status()).not.toBe(200)

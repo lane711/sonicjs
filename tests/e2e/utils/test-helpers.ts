@@ -60,13 +60,58 @@ export async function getCsrfTokenFromPage(page: Page): Promise<string> {
 
 /**
  * Ensure admin user exists (for testing)
+ *
+ * `/auth/seed-admin` is rate limited to 10 requests per minute, and this runs from the
+ * beforeEach of ~28 specs. Seeding on literally every test spent the whole budget, so the
+ * endpoint started answering 429 to whoever asked next — including the spec that asserts it
+ * answers 200. The seed is idempotent, so once per worker per window is enough.
  */
-export async function ensureAdminUserExists(page: Page) {
-  try {
-    await page.request.post('/auth/seed-admin');
-  } catch (error) {
-    // Admin might already exist, ignore errors
+const SEED_TTL_MS = 30_000;
+let lastSeedAt = 0;
+let seedInFlight: Promise<void> | null = null;
+
+async function seedAdminOnce(client: { post: (url: string, options?: any) => Promise<unknown> }) {
+  if (Date.now() - lastSeedAt < SEED_TTL_MS) return;
+  if (!seedInFlight) {
+    seedInFlight = client
+      .post('/auth/seed-admin')
+      .then(() => { lastSeedAt = Date.now(); })
+      .catch(() => { /* admin may already exist — not fatal */ })
+      .finally(() => { seedInFlight = null; });
   }
+  await seedInFlight;
+}
+
+export async function ensureAdminUserExists(page: Page) {
+  await seedAdminOnce(page.request);
+}
+
+/**
+ * POST /auth/seed-admin until a request actually reaches the handler.
+ *
+ * The route is rate-limited to 10 requests per minute per IP
+ * (`rateLimit({ max: 10, windowMs: 60_000, keyPrefix: 'seed-admin' })` in routes/auth.ts), so in
+ * a full-suite run the window can already be spent by the time a test that asserts on the
+ * seeder's own response gets a turn. A 429 is the limiter answering, not the seeder, and
+ * asserting on whichever request happened to land first tests the wrong thing.
+ *
+ * Polled rather than slept out via `Retry-After`: the window is fixed, so its slots free up in a
+ * burst the instant it rolls.
+ *
+ * Callers need `test.setTimeout(150_000)` — the default 60s test timeout is shorter than the
+ * limiter's own 60s window, so a test that starts on an exhausted window cannot outlast it.
+ */
+export async function seedAdminPastRateLimit(
+  request: import('@playwright/test').APIRequestContext
+): Promise<import('@playwright/test').APIResponse> {
+  const deadline = Date.now() + 90_000;
+  let res = await request.post('/auth/seed-admin');
+  while (res.status() === 429 && Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 2_000));
+    res = await request.post('/auth/seed-admin');
+  }
+  if (res.ok()) lastSeedAt = Date.now();
+  return res;
 }
 
 /**
@@ -660,7 +705,7 @@ export async function isFeatureAvailable(request: import('@playwright/test').API
     // Authenticate so that auth-protected admin routes return 200/404 rather than 302→login.
     // Without auth, all /admin/* routes redirect to /auth/login (not 404), making it impossible
     // to distinguish "plugin not installed" from "plugin installed but needs auth".
-    await request.post('/auth/seed-admin', { headers: { Origin: baseURL } }).catch(() => {})
+    await seedAdminOnce(request)
     await request.post('/auth/sign-in/email', {
       data: { email: ADMIN_CREDENTIALS.email, password: ADMIN_CREDENTIALS.password },
       headers: { 'Content-Type': 'application/json', Origin: baseURL },

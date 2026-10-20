@@ -93,23 +93,60 @@ test.describe('Forms as Content @content', () => {
   test.describe.configure({ mode: 'serial' });
 
   let featureAvailable = false
-  test.beforeAll(async ({ request }) => {
-    featureAvailable = await isFeatureAvailable(request, '/admin/forms')
-  })
-  test.beforeEach(() => { test.skip(!featureAvailable, 'Plugin/feature not available in this deployment') })
-
-  let testFormId: string;
-  let submissionCreated = false;
+  let testFormId = '';
   const testFormName = `fac_test_${Date.now()}`;
   const testFormDisplayName = 'FAC Test Contact';
 
+  // The assertions below are all "the form's shadow collection/content must NOT leak into the
+  // regular admin UI", so they are only meaningful once a form and a submission actually exist.
+  // Build both here rather than guarding each test on a never-assigned id.
+  test.beforeAll(async ({ browser, request }) => {
+    featureAvailable = await isFeatureAvailable(request, '/admin/forms')
+    if (!featureAvailable) return
+    const page = await browser.newPage()
+    try {
+      await loginAsAdmin(page)
+      testFormId = await createTestFormWithSchema(
+        page,
+        testFormName,
+        testFormDisplayName,
+        'Forms-as-content fixture',
+        CONTACT_FORM_SCHEMA
+      )
+      const submit = await page.request.post(`/api/forms/${testFormId}/submit`, {
+        data: {
+          data: {
+            name: 'Jane Doe',
+            email: 'jane.doe@example.com',
+            subject: 'Forms as content',
+            message: 'Submission used to prove form content stays out of the content list.',
+          },
+        },
+        headers: { 'Content-Type': 'application/json' },
+      })
+      expect(submit.ok(), `form submit failed: ${submit.status()} ${await submit.text()}`).toBe(true)
+    } finally {
+      await page.close()
+    }
+  })
+
+  test.afterAll(async ({ browser }) => {
+    if (!testFormId) return
+    const page = await browser.newPage()
+    try {
+      await loginAsAdmin(page)
+      await page.request.delete(`/admin/forms/${testFormId}`)
+    } finally {
+      await page.close()
+    }
+  })
+
   test.beforeEach(async ({ page }) => {
+    test.skip(!featureAvailable, 'Plugin/feature not available in this deployment')
     await loginAsAdmin(page);
   });
 
   test('should NOT show form-sourced collections on collections page', async ({ page }) => {
-    if (!testFormId) { test.skip(); return; }
-
     await page.goto('/admin/collections');
     await page.waitForLoadState('networkidle');
 
@@ -120,8 +157,6 @@ test.describe('Forms as Content @content', () => {
   });
 
   test('should NOT show form-sourced collections in new-content picker', async ({ page }) => {
-    if (!testFormId) { test.skip(); return; }
-
     await page.goto('/admin/content/new');
     await page.waitForLoadState('networkidle');
 
@@ -130,8 +165,6 @@ test.describe('Forms as Content @content', () => {
   });
 
   test('should NOT show form submissions in the regular content list', async ({ page }) => {
-    if (!submissionCreated) { test.skip(); return; }
-
     // Visit the unfiltered content list
     await page.goto('/admin/content');
     await page.waitForLoadState('networkidle');
@@ -142,8 +175,6 @@ test.describe('Forms as Content @content', () => {
   });
 
   test('should NOT show form collections in collections API', async ({ page }) => {
-    if (!testFormId) { test.skip(); return; }
-
     const response = await page.request.get('/admin/api/collections');
     expect(response.ok()).toBe(true);
     const body = await response.json();
