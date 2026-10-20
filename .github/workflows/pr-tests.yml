@@ -290,6 +290,19 @@ jobs:
             TAGS="$TAGS|@stats"
           fi
 
+          # middleware/bootstrap.ts runs on EVERY request — it decides which paths pay the
+          # cold-start D1 work and holds the cross-isolate KV flag. There is no feature it does
+          # not touch, and it matched no pattern above, so a change to request-path ordering or
+          # to the bootstrap cache key shipped with @smoke only. Select the lot.
+          if echo "$CHANGED_SRC" | grep -qE 'middleware/bootstrap'; then
+            TAGS="$TAGS|@auth|@api|@api-keys|@content|@media|@plugins|@collections|@database|@forms"
+          fi
+          # The rate limiter guards /auth/login and /auth/seed-admin; the login specs and every
+          # spec whose beforeEach logs in are the ones that notice when its bucketing changes.
+          if echo "$CHANGED_SRC" | grep -qE 'middleware/rate-limit'; then
+            TAGS="$TAGS|@auth|@api"
+          fi
+
           # Deduplicate tags
           TAGS=$(echo "$TAGS" | tr '|' '\n' | sort -u | tr '\n' '|' | sed 's/|$//')
 
