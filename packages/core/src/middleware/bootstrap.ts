@@ -23,9 +23,27 @@ type Bindings = {
 let bootstrapComplete = false;
 
 // KV key for cross-isolate bootstrap state. Version-keyed so a code deployment
-// (SONICJS_VERSION bump) automatically invalidates the cached flag and forces
-// a fresh full bootstrap on the next cold start.
-const BOOTSTRAP_KV_KEY = () => `_sonicjs_bootstrap_v${SONICJS_VERSION}`
+// (SONICJS_VERSION bump) automatically invalidates the cached flag and forces a fresh full
+// bootstrap on the next cold start.
+//
+// Also HOST-keyed, because the flag describes one D1 database and the KV namespace is shared by
+// everything deployed from the same wrangler.toml. CI makes that concrete: `pr-tests.yml` deletes
+// and recreates the D1 for every PR run but leaves `kv_namespaces.id` alone, so each preview read
+// a `'1'` written by a sibling preview against a database it has never seen. The stale-flag guard
+// below then deleted the key — out from under the preview that legitimately owned it — and both
+// deployments fell back to the full cold bootstrap, concurrently, on a brand-new D1. That is the
+// shape behind the 90s hangs on `GET /api/collections`.
+//
+// The host is the cheapest discriminator that is already per-deployment (`sonicjs-pr-<branch>.…`
+// vs the demo's own hostname). A worker reachable on two hostnames simply bootstraps once per
+// hostname, which costs one extra cold start and never serves stale state.
+//
+// A forged Host cannot be used to force repeated bootstraps: `bootstrapComplete` short-circuits
+// above this, without reading KV at all, so an isolate that has bootstrapped once never consults
+// the key again whatever Host arrives. The worst a junk Host can do is what a missing flag
+// already does today — one bootstrap on one cold isolate.
+const BOOTSTRAP_KV_KEY = (host?: string) =>
+  `_sonicjs_bootstrap_v${SONICJS_VERSION}${host ? `:${host}` : ''}`
 
 /**
  * Verify security-critical environment configuration at startup.
@@ -153,13 +171,58 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
       return next();
     }
 
-    // Fast KV check: if a previous isolate already ran the full bootstrap for this
-    // app version, skip the expensive D1 operations entirely. KV reads are ~10ms
-    // vs 5-10s for cold D1. Version-keyed so deployments auto-invalidate the flag.
+    // Path-based short-circuits come FIRST — above the KV fast-path below, not under it.
+    //
+    // The "fast" path is only fast relative to a cold full bootstrap: it still costs a KV read,
+    // a `SELECT COUNT(*) FROM document_types`, a collection-config load and three serial D1
+    // bootstrap calls. Sitting underneath it, these two skips were dead in the steady state —
+    // the KV flag is present on any deployment that has served one request, so every health
+    // check, every .js/.css/.png and every Better Auth sign-in paid the whole thing on a cold
+    // isolate. Measured on a preview deployment: ~9s cold vs ~0.5s warm, and a Playwright run
+    // spreads over enough isolates that this stacks into 90s test timeouts.
+    //
+    // Both blocks must stay below verifySecurityConfigMemoized — a bad JWT_SECRET still has to
+    // fail closed on every request — and below the bootstrapComplete check, which is cheaper.
+
+    // Skip bootstrap for static assets and health checks
+    const path = c.req.path;
+    if (
+      path.startsWith("/images/") ||
+      path.startsWith("/assets/") ||
+      path === "/health" ||
+      path.endsWith(".js") ||
+      path.endsWith(".css") ||
+      path.endsWith(".png") ||
+      path.endsWith(".jpg") ||
+      path.endsWith(".ico")
+    ) {
+      return next();
+    }
+
+    // Skip the heavy D1 bootstrap for Better Auth's stateless session API. These
+    // endpoints only read/write the auth_* tables (created by migration 0001) —
+    // they never need the collection registry, document types, or RBAC seed. On
+    // a cold isolate the ~10s bootstrap otherwise runs on the same request as
+    // Better Auth's scrypt password verify, exhausting the Worker's CPU/time
+    // budget and returning a bare 500. Login is the first request in most flows,
+    // so this is exactly the request that must not carry the bootstrap tax.
+    // (Not /auth/login or /auth/seed-admin: the former is a page render, the
+    // latter self-seeds its own prerequisites — neither is a hot cold-start path
+    // that 500s.) The full bootstrap still runs on the next non-auth request.
+    if (isBetterAuthSessionPath(path)) {
+      return next();
+    }
+
+    const host = c.req.header('host') || '';
+
+    // Fast KV check: if a previous isolate already ran the full bootstrap for this app version
+    // AND this hostname, skip the expensive D1 operations entirely. KV reads are ~10ms vs 5-10s
+    // for cold D1. Version- and host-keyed so deployments auto-invalidate the flag — see
+    // BOOTSTRAP_KV_KEY for why the host matters.
     try {
       const cacheKv = (c.env as any).CACHE_KV as KVNamespace | undefined
       if (cacheKv) {
-        const kvDone = await cacheKv.get(BOOTSTRAP_KV_KEY())
+        const kvDone = await cacheKv.get(BOOTSTRAP_KV_KEY(host))
         if (kvDone === '1') {
           // Guard against stale KV key + fresh D1 (e.g. CI re-creates D1 each run but
           // reuses KV). If document_types is empty the KV flag is lying — fall through
@@ -199,42 +262,13 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
             return next()
           }
           // D1 is fresh — delete the stale KV key so the next cold start also re-bootstraps.
-          cacheKv.delete(BOOTSTRAP_KV_KEY()).catch(() => {})
+          // Host-keyed, so this only ever discards this deployment's own flag.
+          cacheKv.delete(BOOTSTRAP_KV_KEY(host)).catch(() => {})
         }
       }
     } catch { /* KV unavailable — fall through to full bootstrap */ }
 
-    // Skip bootstrap for static assets and health checks
-    const path = c.req.path;
-    if (
-      path.startsWith("/images/") ||
-      path.startsWith("/assets/") ||
-      path === "/health" ||
-      path.endsWith(".js") ||
-      path.endsWith(".css") ||
-      path.endsWith(".png") ||
-      path.endsWith(".jpg") ||
-      path.endsWith(".ico")
-    ) {
-      return next();
-    }
-
-    // Skip the heavy D1 bootstrap for Better Auth's stateless session API. These
-    // endpoints only read/write the auth_* tables (created by migration 0001) —
-    // they never need the collection registry, document types, or RBAC seed. On
-    // a cold isolate the ~10s bootstrap otherwise runs on the same request as
-    // Better Auth's scrypt password verify, exhausting the Worker's CPU/time
-    // budget and returning a bare 500. Login is the first request in most flows,
-    // so this is exactly the request that must not carry the bootstrap tax.
-    // (Not /auth/login or /auth/seed-admin: the former is a page render, the
-    // latter self-seeds its own prerequisites — neither is a hot cold-start path
-    // that 500s.) The full bootstrap still runs on the next non-auth request.
-    if (isBetterAuthSessionPath(path)) {
-      return next();
-    }
-
     // Show branch label automatically on localhost — no env var needed
-    const host = c.req.header('host') || '';
     const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1');
     const gitBranch = (c.env as any).GIT_BRANCH as string | undefined;
     setBranchLabel(isLocalhost && gitBranch ? gitBranch : undefined);
@@ -336,7 +370,7 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
         if (cacheKv) {
           // 24h TTL — long enough that hot instances never re-bootstrap, short
           // enough that a DB reset auto-heals within a day.
-          await cacheKv.put(BOOTSTRAP_KV_KEY(), '1', { expirationTtl: 86400 })
+          await cacheKv.put(BOOTSTRAP_KV_KEY(host), '1', { expirationTtl: 86400 })
         }
       } catch { /* KV write failure is non-fatal */ }
 
