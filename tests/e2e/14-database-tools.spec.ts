@@ -13,7 +13,7 @@ const dbToolsApiCall = (op: string) => (response: { url(): string; status(): num
     new URL(response.url()).pathname,
   ) && response.status() === 200;
 
-test.describe('Database Tools', () => {
+test.describe('Database Tools @database', () => {
   test.beforeAll(async ({ request }) => {
     featureAvailable = await isFeatureAvailable(request, '/admin/settings');
   });

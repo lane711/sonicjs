@@ -89,7 +89,7 @@ test.describe('Forms Management @content', () => {
 
 });
 
-test.describe('Form Deletion', () => {
+test.describe('Form Deletion @forms', () => {
   test('should delete a form', async ({ page }) => {
     // Create a form specifically for deletion
     await loginAsAdmin(page);

@@ -96,7 +96,7 @@ test.describe('Cache Plugin Dashboard @plugins', () => {
   });
 });
 
-test.describe('Cache API Endpoints', () => {
+test.describe('Cache API Endpoints @plugins @api', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
   });
@@ -270,7 +270,7 @@ test.describe('Cache API Endpoints', () => {
   });
 });
 
-test.describe('Cache Management Workflow', () => {
+test.describe('Cache Management Workflow @plugins', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
   });
@@ -339,7 +339,7 @@ test.describe('Cache Management Workflow', () => {
   });
 });
 
-test.describe('Cache Dashboard Navigation', () => {
+test.describe('Cache Dashboard Navigation @plugins', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
     // Both tests below assert on the sidebar link, which `reconcileMenuFromPlugins` hides
@@ -371,7 +371,7 @@ test.describe('Cache Dashboard Navigation', () => {
   });
 });
 
-test.describe('Cache API Error Handling', () => {
+test.describe('Cache API Error Handling @plugins @api', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
   });

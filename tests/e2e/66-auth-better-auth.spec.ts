@@ -97,7 +97,7 @@ test.describe('Better Auth — sign in / sign out @smoke @auth', () => {
   });
 });
 
-test.describe('Better Auth — protected routes', () => {
+test.describe('Better Auth — protected routes @auth', () => {
   test('unauthenticated GET /admin redirects to login', async ({ page }) => {
     await page.context().clearCookies();
 
@@ -118,7 +118,7 @@ test.describe('Better Auth — protected routes', () => {
   });
 });
 
-test.describe('Better Auth — seed-admin creates credentials', () => {
+test.describe('Better Auth — seed-admin creates credentials @auth', () => {
   test('seed-admin creates user and login works', async ({ request }) => {
     // Headroom for the rate-limit poll above: the default 60s timeout is shorter than the
     // limiter's own 60s window, so a test that starts on an exhausted window cannot outlast it.

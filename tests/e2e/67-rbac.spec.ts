@@ -30,7 +30,7 @@ test.describe('RBAC — seeded roles and grants @smoke @auth', () => {
   });
 });
 
-test.describe('RBAC — portal access enforcement', () => {
+test.describe('RBAC — portal access enforcement @auth', () => {
   test('admin has portal:access (can load gated admin route)', async ({ page }) => {
     await loginAsAdmin(page);
     const res = await page.goto('/admin/rbac');
@@ -46,7 +46,7 @@ test.describe('RBAC — portal access enforcement', () => {
 
 });
 
-test.describe('RBAC — role management API', () => {
+test.describe('RBAC — role management API @auth', () => {
   test('GET /admin/rbac returns 200 with role matrix HTML', async ({ page }) => {
     await loginAsAdmin(page);
     const res = await page.goto('/admin/rbac');
@@ -128,7 +128,7 @@ test.describe('RBAC — role management API', () => {
   });
 });
 
-test.describe('RBAC — sub-tab navigation', () => {
+test.describe('RBAC — sub-tab navigation @auth', () => {
   test('Matrix tab is active by default', async ({ page }) => {
     await loginAsAdmin(page);
     await page.goto('/admin/rbac');
@@ -274,7 +274,7 @@ test.describe('RBAC — sub-tab navigation', () => {
   });
 });
 
-test.describe('RBAC — admin sections accessible', () => {
+test.describe('RBAC — admin sections accessible @auth', () => {
   // Quick smoke: admin can reach each gated section
   const sections = [
     { path: '/admin/users', name: 'users' },

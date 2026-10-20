@@ -52,7 +52,7 @@ test.describe('collection registry (PR 1) @collections', () => {
   })
 })
 
-test.describe('collection registry — authed admin UI', () => {
+test.describe('collection registry — authed admin UI @collections', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })
