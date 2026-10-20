@@ -53,25 +53,39 @@ async function assignRole(page: any, userId: string, roleValue: string) {
 // three radios named `g|<roleId>|<resource>|<verb>` with value any|own|none — not a checkbox —
 // and the resource attribute is `data-res`. The radios are visually hidden (1px, opacity 0,
 // pointer-events none), so the click has to land on the wrapping <label class="scope">.
+//
+// Reads the current state before writing. That is not only cheaper: the grant is global and
+// outlives the test, so a run that dies between granting and revoking leaves it on, and
+// Playwright's retry then re-runs against a database where the "no grant yet" assertion is
+// already false. That is how this spec failed three attempts running in CI, for a reason that
+// had nothing to do with the behaviour it covers.
 async function setPublicRoleGrant(page: any, grant: boolean) {
   await loginAsAdmin(page)
   await page.goto('/admin/rbac?compare=1&roles=role-public')
   await page.waitForLoadState('networkidle')
 
   const cell = 'input[name="g|role-public|document_type:example|read"]'
-  const label = page.locator(`label.scope:has(${cell}[value="${grant ? 'any' : 'none'}"])`)
-  await expect(label, 'public × document_type:example × read cell missing from matrix').toHaveCount(1)
-  await label.click()
-  await expect(page.locator(`${cell}[value="${grant ? 'any' : 'none'}"]`)).toBeChecked()
+  const target = page.locator(`${cell}[value="${grant ? 'any' : 'none'}"]`)
+  await expect(target, 'public × document_type:example × read cell missing from matrix').toHaveCount(1)
+
+  if (await target.isChecked()) return
+
+  await page.locator(`label.scope:has(${cell}[value="${grant ? 'any' : 'none'}"])`).click()
+  await expect(target).toBeChecked()
 
   await page.locator('form[action="/admin/rbac/grants"] button[type="submit"]').first().click()
   await page.waitForLoadState('networkidle')
 
   // The redirect re-renders the matrix from the saved grants — confirm the write landed.
-  await expect(page.locator(`${cell}[value="${grant ? 'any' : 'none'}"]`)).toBeChecked()
+  await expect(target).toBeChecked()
 }
 
 test.describe('RBAC grant → immediate API access @auth @api', () => {
+  // Four admin logins and roughly fifteen page loads, against a preview where one cold admin
+  // page load has been measured at ~10s. The suite default is sized for a test that loads a
+  // couple of pages.
+  test.setTimeout(240000)
+
   test('granting public role read on document_type:example unblocks /api/example immediately', async ({ page }) => {
     // 1. Ensure test user exists.
     const userId = await signUp(page)
@@ -79,7 +93,11 @@ test.describe('RBAC grant → immediate API access @auth @api', () => {
     // 2. Assign public role via admin UI.
     await assignRole(page, userId, 'role-public')
 
-    // 3. Sign in as the public-role user and confirm 403 (no grant yet).
+    // 3. Start from a known state rather than trusting that the last run reached its revoke.
+    //    Costs one matrix load when the grant is already off, which is the normal case.
+    await setPublicRoleGrant(page, false)
+
+    // 4. Sign in as the public-role user and confirm 403 (no grant yet).
     await page.context().clearCookies()
     const signIn1 = await signIn(page)
     expect(signIn1.ok(), `sign-in failed: ${signIn1.status()}`).toBeTruthy()
@@ -88,10 +106,10 @@ test.describe('RBAC grant → immediate API access @auth @api', () => {
     // Must be 403 (or 404 if collection not registered) — NOT 200.
     expect(res1.status()).not.toBe(200)
 
-    // 4. Admin grants read.
+    // 5. Admin grants read.
     await setPublicRoleGrant(page, true)
 
-    // 5. Sign back in as public-role user and re-check.
+    // 6. Sign back in as public-role user and re-check.
     await page.context().clearCookies()
     const signIn2 = await signIn(page)
     expect(signIn2.ok(), `sign-in failed: ${signIn2.status()}`).toBeTruthy()
@@ -100,7 +118,7 @@ test.describe('RBAC grant → immediate API access @auth @api', () => {
     // After grant: must be 200 (even if data is empty).
     expect(res2.status()).toBe(200)
 
-    // 6. Admin revokes grant — access must be blocked again.
+    // 7. Admin revokes grant — access must be blocked again.
     await setPublicRoleGrant(page, false)
 
     await page.context().clearCookies()
