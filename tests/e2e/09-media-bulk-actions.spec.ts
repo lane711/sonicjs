@@ -243,16 +243,18 @@ test.describe('Media Bulk Actions @media', () => {
   });
 
   test('should successfully delete selected files using bulk delete', async ({ page }) => {
-    // Files are already uploaded in beforeEach
-    const mediaItems = page.locator('input[type="checkbox"].media-checkbox');
+    // Target the two files this spec uploaded, by id, rather than "whatever is first in the
+    // grid". The media library is shared with every other @media spec running in parallel: by
+    // position this test deletes a neighbour's fixtures, and comparing the grid's total count
+    // before and after fails whenever a neighbour uploads in between (seen as `Expected: 16,
+    // Received: 18`).
+    expect(uploadedFileIds, 'beforeEach should have uploaded exactly two files').toHaveLength(2);
 
-    // Get initial count of media items
-    const initialCount = await mediaItems.count();
-    expect(initialCount).toBeGreaterThanOrEqual(2);
-
-    // Select first 2 files
-    await mediaItems.nth(0).check();
-    await mediaItems.nth(1).check();
+    for (const id of uploadedFileIds) {
+      const box = page.locator(`input[type="checkbox"].media-checkbox[value="${id}"]`);
+      await expect(box, `uploaded file ${id} should be on the first page of the grid`).toBeVisible();
+      await box.check();
+    }
 
     // Open bulk actions menu
     const bulkActionsBtn = page.locator('#bulk-actions-btn');
@@ -279,12 +281,14 @@ test.describe('Media Bulk Actions @media', () => {
     await expect(confirmButton).toBeVisible();
     await confirmButton.click({ force: true });
 
-    // Wait for deletion to complete and grid to refresh
-    await page.waitForTimeout(1000);
-
-    // Verify files were deleted - count should decrease by 2
-    const finalCount = await mediaItems.count();
-    expect(finalCount).toBe(initialCount - 2);
+    // Our two rows go away. What the rest of the library is doing is another spec's business.
+    for (const id of uploadedFileIds) {
+      await expect(
+        page.locator(`[data-file-id="${id}"]`),
+        `media item ${id} should be gone from the grid after bulk delete`
+      ).toHaveCount(0, { timeout: 15000 });
+    }
+    uploadedFileIds = [];
 
     // Verify bulk actions button is disabled (no files selected)
     await expect(bulkActionsBtn).toBeDisabled();
