@@ -38,6 +38,36 @@ const LOAD_ATTEMPT_TIMEOUT_MS = 15_000
 /** The fallback only re-checks already-satisfied state, so it needs no real budget. */
 const FALLBACK_TIMEOUT_MS = 10_000
 
+/**
+ * `net::ERR_ABORTED` on a navigation means it was *superseded*, not that it failed: the page
+ * started another navigation (a client-side redirect racing the server's, an htmx boost) and the
+ * browser cancelled this one. The document the caller wanted usually loads a moment later anyway.
+ *
+ * This was the second-largest error signature in CI — `page.goto: net::ERR_ABORTED; maybe frame
+ * was detached?` out of `loginAsAdmin`'s hop to /admin, which already passes an explicit
+ * `domcontentloaded` and so never touched the stall handling below. One retry from a frame that
+ * has stopped moving clears it.
+ *
+ * A frame detached for real — the test timed out and Playwright is tearing the page down — throws
+ * the same error on the retry, so nothing is masked; a closed page skips the retry outright.
+ */
+function isSupersededNavigation(error: unknown): boolean {
+  return String((error as Error)?.message ?? error).includes('net::ERR_ABORTED')
+}
+
+async function retryIfSuperseded<T>(page: Page, attempt: () => Promise<T>): Promise<T> {
+  try {
+    return await attempt()
+  } catch (error) {
+    if (!isSupersededNavigation(error) || page.isClosed()) throw error
+    // Let whatever superseded us finish committing first. Retrying into a frame that is still
+    // navigating just loses the same race again. 'domcontentloaded' resolves immediately when the
+    // current document has already parsed, so this costs nothing in the common case.
+    await page.waitForLoadState('domcontentloaded', { timeout: FALLBACK_TIMEOUT_MS }).catch(() => {})
+    return await attempt()
+  }
+}
+
 function isNavigationStall(error: unknown): boolean {
   const message = String((error as Error)?.message ?? error)
   return (
@@ -76,9 +106,14 @@ function hardenPage(page: Page): Page {
   const originalWaitForNavigation = page.waitForNavigation.bind(page)
 
   page.goto = async (url: string, options?: Parameters<Page['goto']>[1]): Promise<Response | null> => {
-    // 'domcontentloaded' / 'commit' do not wait on subresources, so they never hit this.
-    if (!waitsOnSubresources(options?.waitUntil)) return originalGoto(url, options)
-    if (loadEventIsUnreachable) return originalGoto(url, { ...options, waitUntil: 'domcontentloaded' })
+    // 'domcontentloaded' / 'commit' do not wait on subresources, so they never hit the stall
+    // handling — but they can still be superseded, hence the retry on every path.
+    if (!waitsOnSubresources(options?.waitUntil)) {
+      return retryIfSuperseded(page, () => originalGoto(url, options))
+    }
+    if (loadEventIsUnreachable) {
+      return retryIfSuperseded(page, () => originalGoto(url, { ...options, waitUntil: 'domcontentloaded' }))
+    }
 
     const bounded = Math.min(options?.timeout ?? LOAD_ATTEMPT_TIMEOUT_MS, LOAD_ATTEMPT_TIMEOUT_MS)
     try {
@@ -86,15 +121,22 @@ function hardenPage(page: Page): Page {
     } catch (error) {
       if (!isNavigationStall(error)) throw error
       loadEventIsUnreachable = true
-      // The document itself is fine — only the settle condition was unreachable.
-      return await originalGoto(url, { ...options, waitUntil: 'domcontentloaded' })
+      // The document itself is fine — only the settle condition was unreachable. The timed-out
+      // navigation is still running in the browser, so let it parse before starting another:
+      // re-navigating on top of it is what turns this fallback into its own ERR_ABORTED.
+      await originalWaitForLoadState('domcontentloaded', { timeout: FALLBACK_TIMEOUT_MS }).catch(() => {})
+      return retryIfSuperseded(page, () => originalGoto(url, { ...options, waitUntil: 'domcontentloaded' }))
     }
   }
 
   page.reload = async (options?: Parameters<Page['reload']>[0]): Promise<Response | null> => {
     // Same contract as goto, and the media library in particular reloads straight into the stall.
-    if (!waitsOnSubresources(options?.waitUntil)) return originalReload(options)
-    if (loadEventIsUnreachable) return originalReload({ ...options, waitUntil: 'domcontentloaded' })
+    if (!waitsOnSubresources(options?.waitUntil)) {
+      return retryIfSuperseded(page, () => originalReload(options))
+    }
+    if (loadEventIsUnreachable) {
+      return retryIfSuperseded(page, () => originalReload({ ...options, waitUntil: 'domcontentloaded' }))
+    }
 
     const bounded = Math.min(options?.timeout ?? LOAD_ATTEMPT_TIMEOUT_MS, LOAD_ATTEMPT_TIMEOUT_MS)
     try {
@@ -102,7 +144,8 @@ function hardenPage(page: Page): Page {
     } catch (error) {
       if (!isNavigationStall(error)) throw error
       loadEventIsUnreachable = true
-      return await originalReload({ ...options, waitUntil: 'domcontentloaded' })
+      await originalWaitForLoadState('domcontentloaded', { timeout: FALLBACK_TIMEOUT_MS }).catch(() => {})
+      return retryIfSuperseded(page, () => originalReload({ ...options, waitUntil: 'domcontentloaded' }))
     }
   }
 
