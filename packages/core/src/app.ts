@@ -28,7 +28,7 @@ import {
   adminDashboardRoutes
 } from './routes'
 import { getCoreVersion } from './utils/version'
-import { bootstrapMiddleware, isStaticOrHealthPath } from './middleware/bootstrap'
+import { bootstrapMiddleware } from './middleware/bootstrap'
 import { metricsMiddleware } from './middleware/metrics'
 import { csrfProtection } from './middleware/csrf'
 import { securityHeadersMiddleware } from './middleware/security-headers'
@@ -435,29 +435,7 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   // Plugin wiring middleware - calls boot() on the first request so it runs after
   // bootstrap. Subsequent requests return the cached once-guard result instantly.
   app.use('*', async (c, next) => {
-    const env = c.env as unknown as Record<string, unknown>
-
-    // Wiring is multi-second on a cold isolate against remote D1: initEmailService reads the
-    // email-settings row, then every plugin's onBoot runs one after another, several of them
-    // registering document types. None of that is reachable from a .css file or a health probe —
-    // boot() only subscribes hooks (plugin routes are mounted synchronously at construction), and
-    // no hook fires on those paths. They were still waiting for all of it on the first request an
-    // isolate served, directly underneath the bootstrap skips added for the same reason.
-    if (isStaticOrHealthPath(c.req.path)) {
-      const booting = boot(env)
-      try {
-        // Keep the isolate alive for the wiring the response is not waiting on.
-        c.executionCtx?.waitUntil(booting)
-      } catch {
-        // No execution context (direct app.fetch, test harness). boot() is idempotent —
-        // initEmailService once-guards and wirePlugins memoizes its promise — and swallows its
-        // own errors, so dropping this handle only means the next request drives it instead.
-        void booting
-      }
-      return next()
-    }
-
-    await boot(env)
+    await boot(c.env as unknown as Record<string, unknown>)
     return next()
   })
 
