@@ -205,6 +205,8 @@ CI invocation: `npx playwright test --grep "@smoke|@<detected-tag>"`.
 
 **When writing a new spec**: choose the tightest matching feature tag. If it spans multiple features, use the primary one + `@smoke` if it tests login/nav/core flow.
 
+**A tag is mandatory, and CI enforces it.** `scripts/lint-e2e-tags.sh` fails the build if `--grep-invert` over the whole tag vocabulary lists any test — i.e. if a test exists that no changed path could ever select. The tag may sit on the test or on any enclosing describe; a file whose first describe is tagged does **not** cover the rest of the file.
+
 Workflow:
 1. Implement
 2. Add `tests/e2e/<NN>-<slug>.spec.ts` (NN = next sequential; current floor 118 — R11)
