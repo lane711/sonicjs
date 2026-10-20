@@ -17,6 +17,13 @@ test.describe('Admin background request load @smoke', () => {
   })
 
   test('checks migration status once per session, not once per page view', async ({ page }) => {
+    // Every other test in the suite loads one page, which is what the 90s default is sized for.
+    // This one deliberately loads four (the login redirect plus the loop below) to prove the
+    // count does not grow with navigations, so it needs a budget that scales with them. Against a
+    // cold preview an admin page load has been measured at ~10s p90, and the default left no room
+    // for that.
+    test.setTimeout(180_000)
+
     // The pending-migrations banner used to re-query on every admin page's DOMContentLoaded.
     // The endpoint reads the migration bundle and the d1_migrations table (1.0-5.7s measured),
     // and answers "0 pending" on every healthy install, so paying for it per navigation was pure
@@ -26,7 +33,11 @@ test.describe('Admin background request load @smoke', () => {
       if (r.url().includes('/admin/api/migrations/status')) statusRequests++
     })
 
-    for (const path of ['/admin', '/admin/content', '/admin/media', '/admin/content', '/admin']) {
+    // Three navigations, not five: the regression is "once per page view", so the second and third
+    // loads already distinguish a cached count from a per-navigation one. The extra two only added
+    // page loads to a test that was timing out on page loads.
+    const paths = ['/admin', '/admin/content', '/admin/media']
+    for (const path of paths) {
       await page.goto(path, { waitUntil: 'domcontentloaded' })
       // The check runs from a DOMContentLoaded handler, so give it a turn to fire before moving on.
       await page.waitForTimeout(600)
@@ -34,8 +45,8 @@ test.describe('Admin background request load @smoke', () => {
 
     expect(
       statusRequests,
-      `migration status was requested ${statusRequests}x across 5 admin navigations; it should be ` +
-        'served from the session cache after the first'
+      `migration status was requested ${statusRequests}x across ${paths.length} admin navigations; ` +
+        'it should be served from the session cache after the first'
     ).toBeLessThanOrEqual(1)
   })
 

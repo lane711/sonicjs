@@ -265,13 +265,20 @@ test.describe('Content Duplicate Functionality @content', () => {
       const duplicateButton = page.locator('button').filter({ hasText: 'Duplicate Content' });
       await duplicateButton.click();
 
-      // Confirm duplication
-      await page.waitForTimeout(500);
-      const confirmButton = page.locator('button').filter({ hasText: 'Duplicate' }).last();
+      // Confirm duplication. Scope to the dialog rather than `hasText: 'Duplicate'` + `.last()`:
+      // that filter also matches the "Duplicate Content" trigger, so which button `.last()` picked
+      // depended on DOM order rather than on being the confirm control.
+      const confirmButton = page.locator('#duplicate-content-confirm .confirm-button');
+      await expect(confirmButton).toBeVisible();
       await confirmButton.click();
 
-      // Wait for navigation
-      await page.waitForTimeout(2000);
+      // performDuplicateContent() POSTs, then sets window.location to the new record's edit page,
+      // so this is a real navigation — wait for it instead of sleeping a fixed 2s. The POST plus
+      // the follow-up page load routinely exceeds 2s on a cold preview, which is what made this
+      // test fail with newUrl still equal to originalUrl.
+      await page.waitForURL(
+        (url) => url.href !== originalUrl && /\/admin\/content\/[^/]+\/edit/.test(url.pathname)
+      );
 
       // Should be on the edit page of the NEW content (different ID)
       const newUrl = page.url();
