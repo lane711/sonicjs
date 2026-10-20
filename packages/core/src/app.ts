@@ -132,6 +132,12 @@ export interface Variables {
   csrfToken?: string
   pluginMenuItems?: Array<{ label: string; path: string; icon: string }>
   /**
+   * Slugs of the plugins pluginMenuMiddleware found active, shared so the rest of the /admin
+   * chain does not re-query for the same answer. Absent off /admin and on any request that ran
+   * before that middleware — treat absence as unknown and fall back to a direct read.
+   */
+  activePluginSlugs?: Set<string>
+  /**
    * The plugin hook system attached to the request. Set by bootstrapMiddleware
    * BEFORE any heavy bootstrap work runs, so anything that emits a hook during
    * bootstrap (cron cold starts, RBAC seed, document-type registration) sees a

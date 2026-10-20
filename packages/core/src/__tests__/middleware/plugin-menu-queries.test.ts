@@ -137,6 +137,43 @@ describe('pluginMenuMiddleware D1 usage', () => {
     expect((captured['pluginMenuItems'] as MenuItem[]).map((i) => i.path)).toContain('/admin/docs')
   })
 
+  it('publishes the resolved slugs for the rest of the admin chain', async () => {
+    setPluginMenu([{ label: 'Billing', path: '/admin/billing', pluginId: 'billing-plugin', order: 10 }])
+
+    const captured: Record<string, unknown> = {}
+    const c = {
+      env: {
+        DB: {
+          prepare: () => ({
+            bind: (...args: unknown[]) => ({
+              all: async () => ({
+                results: ['billing-plugin', 'menu']
+                  .filter((s) => args.includes(s))
+                  .map((slug) => ({ slug })),
+              }),
+            }),
+          }),
+        },
+      },
+      req: { path: '/admin', url: 'http://localhost/admin' },
+      res: new Response('<html></html>', { headers: { 'content-type': 'text/html' } }),
+      get: (k: string) => captured[k],
+      set: (k: string, v: unknown) => {
+        captured[k] = v
+      },
+    }
+
+    await pluginMenuMiddleware()(c as never, async () => {})
+
+    const slugs = captured['activePluginSlugs'] as Set<string>
+    expect(slugs, 'downstream middleware falls back to its own query without this').toBeInstanceOf(Set)
+    expect(slugs.has('billing-plugin')).toBe(true)
+
+    // `menu` contributes no sidebar entry (adminMenu: null) but menuMiddleware needs its status,
+    // so it has to ride along in the same statement rather than costing a second one.
+    expect(slugs.has('menu'), 'menu plugin status must come from the shared lookup').toBe(true)
+  })
+
   it('skips the lookup entirely off the admin surface', async () => {
     setPluginMenu([{ label: 'Docs', path: '/admin/docs', order: 10 }])
 

@@ -87,6 +87,17 @@ function renderMenuItem(item: { label: string; path: string; icon?: string }, cu
 /** D1 caps a statement at 100 bound parameters; stay clear of it with room for the literals. */
 const MAX_SLUG_BINDS = 90
 
+/**
+ * Plugins that contribute no sidebar entry of their own but whose active status another `/admin`
+ * middleware needs in the same request.
+ *
+ * `menu` declares `adminMenu: null`, so it is absent from {@link REGISTRY_MENU_PLUGINS} — yet
+ * `menuMiddleware`, which runs immediately after this one, asked the identical question with its
+ * own query. Folding the slug in here costs one extra bind on a statement already being sent and
+ * saves that round trip on every HTML admin response.
+ */
+const STATUS_ONLY_PLUGIN_IDS = ['menu'] as const
+
 function chunk<T>(items: T[], size: number): T[][] {
   const out: T[][] = []
   for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size))
@@ -145,8 +156,17 @@ export function pluginMenuMiddleware() {
       singletonItems.map(i => i.pluginId).filter((id): id is string => !!id)
     )]
     const activeIds = await selectActivePluginSlugs(db, [
-      ...new Set([...REGISTRY_MENU_PLUGINS.map(p => p.id), ...singletonPluginIds]),
+      ...new Set([
+        ...REGISTRY_MENU_PLUGINS.map(p => p.id),
+        ...singletonPluginIds,
+        ...STATUS_ONLY_PLUGIN_IDS,
+      ]),
     ])
+
+    // Published for the rest of the /admin chain so nobody re-asks the DB which plugins are on.
+    // Consumers must treat an absent value as "unknown" and fall back, since this middleware is
+    // only mounted on /admin.
+    c.set('activePluginSlugs', activeIds)
 
     const activeMenuItems: Array<{ label: string; path: string; icon?: string; order: number }> =
       REGISTRY_MENU_PLUGINS.filter(p => activeIds.has(p.id)).map(p => ({
