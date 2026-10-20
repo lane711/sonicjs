@@ -272,6 +272,23 @@ jobs:
           if echo "$CHANGED_SRC" | grep -qE 'migrations/'; then
             TAGS="$TAGS|@content|@media|@api"
           fi
+          # RBAC lives in routes/admin-rbac.ts + services/rbac.ts. Neither filename contains
+          # 'auth', so until now a change to role grants or the permission matrix shipped with
+          # @smoke only — past 98-public-role-api-acl and 99-rbac-grant-api-access, the two specs
+          # that assert a grant actually reaches the API.
+          if echo "$CHANGED_SRC" | grep -qE 'admin-rbac|services/rbac'; then
+            TAGS="$TAGS|@auth"
+          fi
+          # services/cache.ts backs both the cache plugin's dashboard and the list-freshness
+          # guarantee the API specs assert after a write.
+          if echo "$CHANGED_SRC" | grep -qE 'services/cache|cache-plugin'; then
+            TAGS="$TAGS|@plugins|@api"
+          fi
+          # The telemetry surfaces (/v1/events, the install/demo-login dashboard cards) are a
+          # separate worker in packages/stats with its own wrangler.toml and D1.
+          if echo "$CHANGED_SRC" | grep -qE 'packages/stats|stats-dashboard'; then
+            TAGS="$TAGS|@stats"
+          fi
 
           # Deduplicate tags
           TAGS=$(echo "$TAGS" | tr '|' '\n' | sort -u | tr '\n' '|' | sed 's/|$//')

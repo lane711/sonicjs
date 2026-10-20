@@ -196,6 +196,9 @@ test.describe('Media Upload @media', () => { … })
 | `src/routes/admin-forms*`, `src/routes/public-forms*`, `forms-plugin` | `@smoke @forms` |
 | `src/middleware/tenant*`, anything `multi-tenant` | `@smoke @auth @plugins` |
 | `packages/core/migrations/*` | `@smoke @content @media @api` |
+| `src/routes/admin-rbac*`, `src/services/rbac*` | `@smoke @auth` |
+| `src/services/cache*`, `cache-plugin` | `@smoke @plugins @api` |
+| `packages/stats/*` | `@smoke @stats` |
 | Anything else / multiple areas | `@smoke` only |
 
 CI invocation: `npx playwright test --grep "@smoke|@<detected-tag>"`.
