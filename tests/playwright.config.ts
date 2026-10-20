@@ -35,8 +35,24 @@ export default defineConfig({
    * and individual navigations stretch by an order of magnitude. At 60s a run produced 28 failures
    * and 52 flakes, nearly all of them "Test timeout of 60000ms exceeded" parked on whichever
    * navigation happened to be in flight rather than on a real defect. Headroom is cheap here —
-   * a passing test still finishes in its usual 15s and never touches this number. */
-  timeout: 90 * 1000,
+   * a passing test still finishes in its usual 15s and never touches this number.
+   *
+   * 90s is still short against a preview deployment. The run at that number failed 9 tests, and
+   * all 9 were "Test timeout of 90000ms exceeded" with not one assertion failure among them;
+   * several were a bare `apiRequestContext.post` with no browser in the picture, so it is the
+   * Worker that did not answer, not a renderer that could not keep up. Cause is below the suite:
+   * the KV fast path in `middleware/bootstrap.ts` still runs three serial D1 writes on the first
+   * request of every isolate (bootstrapDocumentTypes, autoRegisterCollectionDocumentTypes,
+   * bootstrapDefaultContent), D1 serializes writes, and four workers churn isolates for the whole
+   * run — measured ~5.5s cold against ~0.5s warm. Until that is restructured, this number has to
+   * cover it. The same suite is 730/730 against a local wrangler, so the budget is what is
+   * environment-specific, not the tests.
+   *
+   * 120 and not more: the job's own budget is 90 minutes, and a timeout that does fire now costs
+   * a third more than it used to — three attempts each. The last run spent roughly 25 of its 49
+   * minutes burning the 90s limit, so the headroom has to stay small enough that the worst case
+   * still lands inside the job. */
+  timeout: process.env.CI ? 120 * 1000 : 90 * 1000,
   /* 1 worker locally (in-memory D1 conflicts); 4 in CI (remote D1, I/O bound) */
   workers: process.env.CI ? 4 : 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
