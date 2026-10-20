@@ -8,8 +8,10 @@
 >
 > **Postgres (Tier 2) update:** counts re-verified + a compile-only Kysely spike
 > measured the two chokepoint paths (read `list()` + write `saveDraft()`). Both
-> compile to SQLite **and** Postgres from one builder. Revised estimate **~5–9 weeks**,
-> lower risk. See [`postgres-portability-poc/`](postgres-portability-poc/README.md).
+> compile to SQLite **and** Postgres from one builder. Revised estimate **~7–10 weeks**
+> (bottom-up phase roll-up), at roughly half the defect risk of a hand-written SQL port.
+> See [`postgres-implementation-plan.md`](postgres-implementation-plan.md) for the runbook
+> and [`postgres-portability-poc/`](postgres-portability-poc/README.md) for the measurements.
 
 ## TL;DR
 

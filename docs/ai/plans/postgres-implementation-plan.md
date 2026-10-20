@@ -18,7 +18,10 @@ documents, versioning, ACL, media, plugins, auth — on Postgres. D1/SQLite stay
 the default and the recommended edge path. One codebase, dialect chosen at runtime.
 
 **Non-goals:** dropping D1/SQLite; multi-DB in one process; sharding; a query-builder
-rewrite of all 743 `.prepare()` sites (Kysely adoption is an *optional* quality track — §9).
+rewrite of all 764 `.prepare()` sites (Kysely adoption is an *optional* quality track — §9).
+
+> Site counts below re-verified 2026-10-20 against `packages/core/src` (tests excluded):
+> `.prepare(` **764 / 106 files**, `json_extract` **38 / 20 files**, `INSERT OR IGNORE|REPLACE` **19**.
 
 ## 2. Strategy — keep `D1Database` as the universal seam
 
@@ -40,10 +43,10 @@ Three decisions keep the residual small — each removes a whole class of edits:
 |---|---|
 | **PG keeps `0/1` integer columns for booleans** (`is_published integer`, not `boolean`) | the hundreds of `= 1` / `visible ? 1 : 0` comparisons need **zero change** |
 | **`q_*` stay real columns on PG** (`GENERATED … STORED`, not dropped for expression indexes) | `DocumentRepository.list()` — the read chokepoint — needs **zero change** |
-| **`postgres-driver` rewrites `?`→`$N` internally** | the 743 `.prepare('… ?')` sites run unchanged; only genuinely-divergent SQL is touched |
+| **`postgres-driver` rewrites `?`→`$N` internally** | the 764 `.prepare('… ?')` sites run unchanged; only genuinely-divergent SQL is touched |
 
-Residual dialect surface after those three: **~20 `json_extract` files + 1 DDL
-generator + `INSERT OR IGNORE` (21 sites) + migrations + auth adapter.** Bounded.
+Residual dialect surface after those three: **20 `json_extract` files + 1 DDL
+generator + `INSERT OR IGNORE`/`OR REPLACE` (19 sites) + migrations + auth adapter.** Bounded.
 
 ## 3. Phase 0 — Decisions & scaffolding  *(~0.5 wk)*
 
@@ -51,6 +54,7 @@ generator + `INSERT OR IGNORE` (21 sites) + migrations + auth adapter.** Bounded
 - [ ] **Driver selection:** `DB_DRIVER = d1 | sqlite | postgres` read in `adapters/node-server.ts` + `my-sonicjs-app/src/self-host.ts`. Default `d1`.
 - [ ] **`data`/`metadata` column type on PG:** `jsonb` (needed so `->>` works). Driver returns them already-parsed; guard `rowToDocument`/projection `JSON.parse` to accept object-or-string (2 files: `document-repository.ts`, `document-projection.ts`).
 - [ ] **Gen-col strategy:** `GENERATED ALWAYS AS ((data->>'path')::cast) STORED` — preserves the `q_*` column contract. (`->>` is immutable → legal in STORED.)
+  - **Cast allow-list:** only `text` / `double precision` / `numeric` / `bigint` / `boolean` casts are immutable. A `::timestamptz` cast is **stable, not immutable** (it reads `TimeZone`) and PG will reject it in a generated column — any future date-typed `q_*` must store an epoch `bigint`, as SQLite already does. Enforce in the affinity map.
 - [ ] **Dialect context:** a process-level `getDialect(): 'sqlite' | 'postgres'` (from `DB_DRIVER`) importable by the helpers in Phase 3. No threading through call sites.
 
 ## 4. Phase 1 — Postgres driver (D1Database-compatible)  *(~1.5–2 wk)*
@@ -94,7 +98,7 @@ New: `packages/core/src/adapters/db/postgres-driver.ts`, mirroring `sqlite-drive
   `plugins/core-plugins/email-reconciliation/index.ts` (2), `middleware/plugin-middleware.ts` (2),
   + 9 single-hit files (`plugin-bootstrap`, `media-documents`, `api-media`, `webhooks`,
   `security-audit-service`, `menu-repository`, `middleware/menu`, `document-scalar-schema`, `services/plugin-service`).
-- [ ] **Replace `INSERT OR IGNORE`/`OR REPLACE` (21 sites)** with `upsertIgnore()`.
+- [ ] **Replace `INSERT OR IGNORE`/`OR REPLACE` (19 sites)** with `upsertIgnore()`.
 - [ ] No-change confirmations: `COALESCE(MAX)+1` (3 sites, standard SQL — R6), keyset pagination, ACL SQL.
 
 **Exit:** documents create/saveDraft/publish/unpublish/erase + media + plugins produce valid PG SQL. Spike (`postgres-portability-poc/`) already proved list + saveDraft compile.
@@ -109,15 +113,30 @@ New: `packages/core/src/adapters/db/postgres-driver.ts`, mirroring `sqlite-drive
 - [ ] **`src/__tests__/utils/d1-postgres.ts`** — pg→D1 shim mirroring `d1-sqlite.ts`, backed by **`pglite`** (embedded PG, in-process — CI-friendly, no docker) or a testcontainer.
 - [ ] Parametrize `documents.sqlite.test.ts` + `**/*.integration.test.ts` over `DIALECT=sqlite|postgres` (R10 — real-DB coverage; mocks prove nothing).
 - [ ] New cases: driver placeholder-rewrite fuzz, batch rollback atomicity, STORED gen-col filter parity, `->>`/facet filter parity, `ON CONFLICT` upsert, partial-unique concurrent-version rejection (R6).
+- [ ] **Bind-budget chunking test** for `document-projection.ts` derived rows — D1 caps at **100 params/statement**, PG at 65535, and neither limit reproduces on local SQLite (chunk-count unit test, per CLAUDE.md).
 - [ ] E2E: CI lane running existing Playwright specs against a PG-backed `self-host` (tag `@database`). New spec `tests/e2e/68-postgres-smoke.spec.ts` (R11) — write, don't run locally.
 
 ## 9. Optional track — Kysely (quality, not on critical path)
 
 The merged spike proves Kysely compiles both chokepoints to both dialects and
-**deletes the R5 bind-counting bug class**. Adopt *incrementally* after GA, starting
-with `document-repository.ts` then `documents.ts`, to retire raw SQL for compile-time
-type safety + a single `sql\`\`` seam for the 20 json files. **Not required for PG GA** —
-the driver-shim + helpers path ships first and faster.
+**deletes the R5 bind-counting bug class for fixed-column statements**. Adopt
+*incrementally* after GA, starting with `document-repository.ts` then `documents.ts`, to
+retire raw SQL for compile-time type safety + a single `sql\`\`` seam for the 20 json
+files. **Not required for PG GA** — the driver-shim + helpers path ships first and faster.
+
+Two prerequisites, both measured by the spike and **neither free**:
+
+- [ ] **Compile-and-batch shim for D1 (blocking).** D1 has no interactive transactions and
+  `kysely-d1@0.4.0` does not emulate them — `dist/index.js:95-110` throws
+  `'Transactions are not supported yet.'` from `beginTransaction`/`commit`/`rollback`, so
+  `db.transaction()` fails at runtime on Workers. Wrap `q.compile()` →
+  `env.DB.prepare(sql).bind(...parameters)` → `env.DB.batch(stmts)` (~1 file) and keep
+  statement order (demote before insert — R6's partial unique index must never see two
+  current drafts mid-batch). Without this, every batched document write breaks on CF (R1/R7).
+- [ ] **Keep the manual bind chunking.** Kysely's `values([...])` emits one placeholder
+  tuple per row, so `document-projection.ts`'s derived facet/reference inserts still need
+  the 100-param D1 budget enforced by hand. Kysely removes *positional* counting, not the
+  *row-count* budget.
 
 ## 10. Risk register
 
@@ -129,6 +148,9 @@ the driver-shim + helpers path ships first and faster.
 | `jsonb` double-parse in `rowToDocument` | Low | typeof guard (2 files) |
 | Auth adapter untested on PG | Med | Phase 4 e2e gate before GA |
 | Migration drift SQLite vs PG bundles | Med | per-dialect R9 regen + a schema-parity test |
+| **Kysely track only:** `kysely-d1` throws on `.transaction()` — batched writes break on CF | **High** (if §9 adopted) | compile-and-batch shim over `env.DB.batch()` + mid-batch-failure atomicity test, landed *before* any repository port |
+| Derived-row multi-row INSERT exceeds 100 D1 params | Med | keep `document-projection.ts` chunking; chunk-count unit test (limit invisible on local SQLite) |
+| `::timestamptz` in a STORED gen-col rejected (not immutable) | Low | epoch `bigint` only; cast allow-list in the affinity map (§3) |
 
 ## 11. Effort roll-up
 
@@ -148,4 +170,3 @@ the driver-shim + helpers path ships first and faster.
 - Ships behind `DB_DRIVER` — default `d1`, PG strictly opt-in. Zero impact on existing installs.
 - Docs: `DATABASE_URL`, `docker-compose` PG service, self-host guide, "which tier" matrix update.
 - GA gate: full dual-dialect unit + integration + PG e2e green.
-```
