@@ -1,4 +1,4 @@
-import { APIRequestContext, Page, expect, test } from '@playwright/test';
+import { APIRequestContext, BrowserContext, Page, expect, test } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -646,7 +646,82 @@ export async function submitLoginForm(
  * their 90s budget. Pass the page the spec actually wants, or `false` to stay put (the session
  * cookie is already in the context either way, since sign-in goes through `page.request`).
  */
+/**
+ * The admin session this worker process has already paid for.
+ *
+ * Measured against the app: `POST /auth/sign-in/email` is 42ms on its own, but eight concurrent
+ * sign-ins each take 315ms and all finish together at ~8x40ms — the password verification
+ * serializes in the isolate rather than overlapping. Every test in the suite signed in from
+ * scratch, so a CI run was ~530 serialized hashes from four workers against one preview isolate,
+ * and that is what the 120s hangs were: `beforeEach` queued behind other workers' scrypt. The
+ * hangs showed up on `apiRequestContext.post` as often as on `page.goto`, with no browser in the
+ * loop, which is what ruled out the renderer and pointed here.
+ *
+ * `GET /auth/get-session` with an existing cookie is 4ms and does no hashing, so it does not
+ * serialize. Sign in once per worker; re-validate with that instead.
+ */
+type SessionCookies = Awaited<ReturnType<BrowserContext['cookies']>>
+let cachedSessionCookies: SessionCookies | null = null
+
+/**
+ * Install the cached session into this test's context and prove it is still live.
+ *
+ * Validated with a request, not with "did a navigation land on /auth/login": `loginAsAdmin(page,
+ * false)` callers never navigate, so a revoked session would otherwise go unnoticed until some
+ * later step failed for an unrelated-looking reason. Specs that sign out, reset a password or
+ * enrol a second factor on the shared admin all revoke the session — this is the path that
+ * notices and falls back to a real sign-in.
+ */
+async function reuseCachedSession(page: Page): Promise<boolean> {
+  if (!cachedSessionCookies) return false
+
+  await page.context().addCookies(cachedSessionCookies)
+  const res = await page.request
+    .get('/auth/get-session', { headers: { Origin: TEST_ORIGIN } })
+    .catch(() => null)
+
+  if (!res || !res.ok()) {
+    cachedSessionCookies = null
+    await page.context().clearCookies()
+    return false
+  }
+
+  const body = (await res.json().catch(() => null)) as { user?: unknown } | null
+  if (!body?.user) {
+    cachedSessionCookies = null
+    await page.context().clearCookies()
+    return false
+  }
+
+  return true
+}
+
 export async function loginAsAdmin(page: Page, landOn: string | false = '/admin') {
+  if (!(await reuseCachedSession(page))) {
+    await signInAsAdmin(page);
+  }
+
+  // Navigate to admin (session cookie is now in context).
+  //
+  // `domcontentloaded`, not the default `load`: this runs in almost every spec's beforeEach, and
+  // /admin is the heaviest page in the app (metrics + recent activity + migrations status all
+  // polling). Waiting for it to go quiet can eat most of the 60s test budget before the test
+  // body starts. Nothing here needs subresources — the caller's own assertions auto-wait.
+  if (landOn !== false) {
+    await page.goto(landOn, { waitUntil: 'domcontentloaded' });
+    await page.waitForURL(/\/admin/, { timeout: 20000, waitUntil: 'domcontentloaded' });
+  }
+
+  // No `ensureWorkflowTablesExist` / `ensureWorkflowPluginActive` here. The first POSTs
+  // /admin/api/migrations/run, which on D1 always answers 409 ("Migrations are managed by
+  // Cloudflare D1") — a guaranteed-useless round trip in the beforeEach of nearly every spec. The
+  // second has been a bare `return` since the workflow plugin stopped shipping. The three specs
+  // that actually care (15-plugins, 28-plugin-filters-search, 39-ai-search-plugin) call
+  // ensureWorkflowTablesExist themselves.
+}
+
+/** The real sign-in: seed, hash a password, keep the cookies it issued. */
+async function signInAsAdmin(page: Page) {
   // Ensure admin exists (also creates auth_account for Better Auth)
   await ensureAdminUserExists(page);
 
@@ -689,23 +764,11 @@ export async function loginAsAdmin(page: Page, landOn: string | false = '/admin'
     );
   }
 
-  // Navigate to admin (session cookie is now in context).
-  //
-  // `domcontentloaded`, not the default `load`: this runs in almost every spec's beforeEach, and
-  // /admin is the heaviest page in the app (metrics + recent activity + migrations status all
-  // polling). Waiting for it to go quiet can eat most of the 60s test budget before the test
-  // body starts. Nothing here needs subresources — the caller's own assertions auto-wait.
-  if (landOn !== false) {
-    await page.goto(landOn, { waitUntil: 'domcontentloaded' });
-    await page.waitForURL(/\/admin/, { timeout: 20000, waitUntil: 'domcontentloaded' });
-  }
-
-  // No `ensureWorkflowTablesExist` / `ensureWorkflowPluginActive` here. The first POSTs
-  // /admin/api/migrations/run, which on D1 always answers 409 ("Migrations are managed by
-  // Cloudflare D1") — a guaranteed-useless round trip in the beforeEach of nearly every spec. The
-  // second has been a bare `return` since the workflow plugin stopped shipping. The three specs
-  // that actually care (15-plugins, 28-plugin-filters-search, 39-ai-search-plugin) call
-  // ensureWorkflowTablesExist themselves.
+  // Keep only what the sign-in issued. `context.cookies()` also holds `csrf_token`, which the
+  // app rotates per request and `getCsrfTokenFromPage` reads straight back out of the jar —
+  // replaying a stale one into 700 later contexts is a risk the session token does not carry.
+  const all = await page.context().cookies();
+  cachedSessionCookies = all.filter((c) => c.name.startsWith('better-auth.'));
 }
 
 /**
