@@ -361,7 +361,6 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
           hx-post="/admin/media/upload"
           hx-encoding="multipart/form-data"
           hx-target="#upload-results"
-          hx-on::after-request="if(event.detail.successful) { setTimeout(() => { window.location.href = '/admin/media?t=' + Date.now(); }, 1500); }"
           class="space-y-4"
         >
           <!-- Drag and Drop Zone -->
