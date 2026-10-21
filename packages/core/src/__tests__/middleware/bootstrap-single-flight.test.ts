@@ -112,8 +112,12 @@ describe('bootstrapMiddleware runs one bootstrap per isolate under concurrency',
       )
     )
 
-    // The work happened once...
-    expect(probe.kvGets).toHaveLength(1)
+    // The work happened once. Counted as "no key was looked up twice" rather than as a fixed
+    // number of reads: the fast path reads the bootstrap flag and its sync-throttle marker in one
+    // parallel round, and what single-flight actually promises is that a second request does not
+    // repeat the round -- not that the round is one key wide.
+    expect(probe.kvGets).toEqual([...new Set(probe.kvGets)])
+    expect(probe.kvGets.length).toBeGreaterThan(0)
     expect(probe.d1Queries.filter((q) => q.includes('document_types'))).toHaveLength(1)
     // ...and every request still reached the handler behind it.
     expect(nextCalls).toBe(5)
@@ -127,8 +131,9 @@ describe('bootstrapMiddleware runs one bootstrap per isolate under concurrency',
     const afterFirst = probe.kvGets.length
     await mw(makeContext(probe), async () => {})
 
-    expect(afterFirst).toBe(1)
-    expect(probe.kvGets).toHaveLength(1)
+    expect(afterFirst).toBeGreaterThan(0)
+    // The second request added nothing: `bootstrapComplete` short-circuits above the KV read.
+    expect(probe.kvGets).toHaveLength(afterFirst)
   })
 
   it('does not wait forever on a holder whose request was torn down', async () => {

@@ -132,8 +132,10 @@ describe('the bootstrap KV flag is scoped to the deployment it describes', () =>
 
   it('reads a key carrying this deployment hostname', async () => {
     const { kvGets } = await runMiddleware('/admin/content', 'sonicjs-pr-feature-x.workers.dev')
-    expect(kvGets).toHaveLength(1)
-    expect(kvGets[0]).toContain('sonicjs-pr-feature-x.workers.dev')
+    expect(kvGets.length).toBeGreaterThan(0)
+    // Every key, not just the first: the fast path also reads a sync-throttle marker, and an
+    // unscoped one would be just as cross-deployment as an unscoped flag.
+    for (const key of kvGets) expect(key).toContain('sonicjs-pr-feature-x.workers.dev')
   })
 
   it('gives two deployments two different keys', async () => {

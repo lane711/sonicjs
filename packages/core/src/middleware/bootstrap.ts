@@ -91,6 +91,27 @@ const BOOTSTRAP_KV_KEY = (host?: string) =>
   `_sonicjs_bootstrap_v${SONICJS_VERSION}${host ? `:${host}` : ''}`
 
 /**
+ * Throttle key for the fast path's background document-type sync.
+ *
+ * Moving that sync off the critical path (see the `runInBackground` call below) stopped the
+ * *request* waiting for it, but every cold isolate still issued the whole batch of D1 statements
+ * — and D1 serialises writes per database. Under a four-worker Playwright run the platform churns
+ * isolates for twenty minutes straight, so the aggregate is a sustained write storm against the
+ * one preview database, which is the shape behind the 30s HTTP timeouts on requests that have
+ * nothing to do with bootstrap.
+ *
+ * The sync only needs to run often enough to pick up a code collection added without a version
+ * bump — the local-dev case. A deploy still invalidates BOOTSTRAP_KV_KEY and runs the full awaited
+ * bootstrap, so correctness never rests on this. Gating on a short-lived marker turns "once per
+ * cold isolate" into "at most once per minute per deployment" and costs one KV read, issued in
+ * parallel with the one already being made.
+ */
+const BOOTSTRAP_SYNC_KV_KEY = (host?: string) => `${BOOTSTRAP_KV_KEY(host)}:synced`
+
+/** KV's floor for `expirationTtl`. Also about the longest a dev wants to wait for a new collection. */
+const BOOTSTRAP_SYNC_THROTTLE_SECONDS = 60
+
+/**
  * Hand a promise to the runtime so it outlives the response.
  *
  * `c.executionCtx` throws outside a real Workers fetch handler — the Vitest harness and
@@ -310,7 +331,13 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
     try {
       const cacheKv = (c.env as any).CACHE_KV as KVNamespace | undefined
       if (cacheKv) {
-        const kvDone = await cacheKv.get(BOOTSTRAP_KV_KEY(host))
+        // Both reads in one round trip's worth of wall clock: the throttle marker is only
+        // consulted when the flag says "already bootstrapped", but fetching it eagerly keeps the
+        // fast path at a single KV latency instead of two serial ones.
+        const [kvDone, syncedRecently] = await Promise.all([
+          cacheKv.get(BOOTSTRAP_KV_KEY(host)),
+          cacheKv.get(BOOTSTRAP_SYNC_KV_KEY(host)),
+        ])
         if (kvDone === '1') {
           // Guard against stale KV key + fresh D1 (e.g. CI re-creates D1 each run but
           // reuses KV). If document_types is empty the KV flag is lying — fall through
@@ -347,37 +374,54 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
             // What is left for the fast path to cover is purely the local-dev case of adding a
             // code collection without bumping the version, and that can land a beat late.
             // waitUntil keeps them alive past the response instead of being cancelled with it.
-            runInBackground(
-              c,
-              (async () => {
-                await bootstrapDocumentTypes(c.env.DB).catch((e) =>
-                  console.error("[Bootstrap] KV fast-path: error syncing document types:", e)
-                )
-                await autoRegisterCollectionDocumentTypes(c.env.DB).catch((e) =>
-                  console.error("[Bootstrap] KV fast-path: error auto-registering collection types:", e)
-                )
-                await bootstrapDefaultContent(c.env.DB).catch((e) =>
-                  console.error("[Bootstrap] KV fast-path: error seeding default content:", e)
-                )
-                // Plugin bootstrap is the one piece of the full path that has no other way to
-                // self-heal. If the isolate that set the KV flag was torn down partway through
-                // its install loop, a plugin can be left uninstalled with the flag already
-                // saying "done" — and from then on every isolate takes this fast path and never
-                // looks. isBootstrapNeeded() is a single COUNT, and this whole block is off the
-                // request's critical path, so checking costs one query on a cold isolate.
-                if (!config.plugins?.disableAll) {
-                  await (async () => {
-                    const bootstrapService = new PluginBootstrapService(c.env.DB)
-                    if (await bootstrapService.isBootstrapNeeded()) {
-                      console.log("[Bootstrap] KV fast-path: repairing core plugin install")
-                      await bootstrapService.bootstrapCorePlugins()
-                    }
-                  })().catch((e) =>
-                    console.error("[Bootstrap] KV fast-path: error bootstrapping plugins:", e)
+            // Throttled, not per-isolate: see BOOTSTRAP_SYNC_KV_KEY. A cold isolate inside an
+            // already-synced window skips the batch entirely, which is what keeps four
+            // Playwright workers from turning isolate churn into sustained D1 write pressure.
+            if (syncedRecently !== '1') {
+              // Claim the window before doing the work rather than after. Nothing here is a
+              // correctness guarantee -- it all repeats next window, and a deploy runs the full
+              // awaited bootstrap -- so narrowing the burst of isolates that start concurrently
+              // is worth more than confirming completion.
+              runInBackground(
+                c,
+                cacheKv
+                  .put(BOOTSTRAP_SYNC_KV_KEY(host), '1', {
+                    expirationTtl: BOOTSTRAP_SYNC_THROTTLE_SECONDS,
+                  })
+                  .catch(() => {})
+              )
+              runInBackground(
+                c,
+                (async () => {
+                  await bootstrapDocumentTypes(c.env.DB).catch((e) =>
+                    console.error("[Bootstrap] KV fast-path: error syncing document types:", e)
                   )
-                }
-              })()
-            )
+                  await autoRegisterCollectionDocumentTypes(c.env.DB).catch((e) =>
+                    console.error("[Bootstrap] KV fast-path: error auto-registering collection types:", e)
+                  )
+                  await bootstrapDefaultContent(c.env.DB).catch((e) =>
+                    console.error("[Bootstrap] KV fast-path: error seeding default content:", e)
+                  )
+                  // Plugin bootstrap is the one piece of the full path that has no other way to
+                  // self-heal. If the isolate that set the KV flag was torn down partway through
+                  // its install loop, a plugin can be left uninstalled with the flag already
+                  // saying "done" — and from then on every isolate takes this fast path and never
+                  // looks. isBootstrapNeeded() is a single COUNT, and this whole block is off the
+                  // request's critical path, so checking costs one query on a cold isolate.
+                  if (!config.plugins?.disableAll) {
+                    await (async () => {
+                      const bootstrapService = new PluginBootstrapService(c.env.DB)
+                      if (await bootstrapService.isBootstrapNeeded()) {
+                        console.log("[Bootstrap] KV fast-path: repairing core plugin install")
+                        await bootstrapService.bootstrapCorePlugins()
+                      }
+                    })().catch((e) =>
+                      console.error("[Bootstrap] KV fast-path: error bootstrapping plugins:", e)
+                    )
+                  }
+                })()
+              )
+            }
             bootstrapComplete = true
             return next()
           }

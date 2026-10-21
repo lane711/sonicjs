@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+import { SONICJS_VERSION } from '../../utils/version'
+
 // Cold-start latency regression guard for the KV fast path.
 //
 // The fast path exists so an isolate that has already bootstrapped this version skips the ~3-9s
@@ -42,8 +44,12 @@ vi.mock('../../plugins/cache/services/catalog', () => ({
   loadKvCatalog: vi.fn(async () => {}),
 }))
 
-function makeContext(waited: Promise<unknown>[]) {
-  return {
+function makeContext(waited: Promise<unknown>[], kv: Record<string, string> = {}) {
+  // Key-aware, because the fast path now reads two keys out of this namespace and the whole
+  // point of the second one is that it can be absent while the first is present. A mock that
+  // answers '1' to everything cannot express "bootstrapped, but not synced this minute".
+  const puts: Array<{ key: string; ttl?: number }> = []
+  const ctx = {
     env: {
       JWT_SECRET: 'a-strong-random-secret-value-for-tests',
       CORS_ORIGINS: 'http://localhost:8787',
@@ -61,9 +67,12 @@ function makeContext(waited: Promise<unknown>[]) {
         batch: async () => [],
       },
       CACHE_KV: {
-        get: async () => '1',
-        put: async () => {},
-        delete: async () => {},
+        get: async (key: string) => kv[key] ?? null,
+        put: async (key: string, value: string, opts?: { expirationTtl?: number }) => {
+          kv[key] = value
+          puts.push({ key, ttl: opts?.expirationTtl })
+        },
+        delete: async (key: string) => { delete kv[key] },
       },
     },
     req: {
@@ -75,6 +84,12 @@ function makeContext(waited: Promise<unknown>[]) {
     set: () => {},
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- minimal Hono context stand-in
   } as any
+  return Object.assign(ctx, { kvPuts: puts })
+}
+
+/** The state a deployment is in once some earlier isolate has completed a full bootstrap. */
+function bootstrapped(host = 'sonicjs-pr-demo.workers.dev') {
+  return { [`_sonicjs_bootstrap_v${SONICJS_VERSION}:${host}`]: '1' }
 }
 
 async function freshMiddleware() {
@@ -101,7 +116,7 @@ describe('bootstrapMiddleware KV fast path does not block the request on D1 sync
 
     // The seeds are gated open-ended, so if the middleware awaited any of them this never
     // settles and the test times out rather than passing by luck.
-    await mw(makeContext(waited), async () => { handlerRan = true })
+    await mw(makeContext(waited, bootstrapped()), async () => { handlerRan = true })
 
     expect(handlerRan).toBe(true)
     // The first sync started — the work is dispatched, not dropped — and the request did not
@@ -117,7 +132,7 @@ describe('bootstrapMiddleware KV fast path does not block the request on D1 sync
     const mw = await freshMiddleware()
     const waited: Promise<unknown>[] = []
 
-    await mw(makeContext(waited), async () => {})
+    await mw(makeContext(waited, bootstrapped()), async () => {})
     releaseSeeds()
     await Promise.all(waited)
 
@@ -129,11 +144,47 @@ describe('bootstrapMiddleware KV fast path does not block the request on D1 sync
     ])
   })
 
+  it('skips the D1 syncs entirely when another isolate already synced this minute', async () => {
+    // The reason this matters is aggregate, not per-request: D1 serialises writes per database,
+    // and a four-worker Playwright run churns isolates for the length of the run. Once-per-cold-
+    // isolate turns that churn into sustained write pressure on the one preview database; this
+    // gate turns it into at most one batch per minute per deployment.
+    const mw = await freshMiddleware()
+    const waited: Promise<unknown>[] = []
+    const kv = bootstrapped()
+    kv[`${Object.keys(kv)[0]}:synced`] = '1'
+    let handlerRan = false
+
+    await mw(makeContext(waited, kv), async () => { handlerRan = true })
+    releaseSeeds()
+    await Promise.all(waited)
+
+    expect(handlerRan).toBe(true)
+    expect(seedCalls).toEqual([])
+  })
+
+  it('claims the throttle window with a 60s TTL so the sync still re-runs', async () => {
+    // A marker without an expiry would silence the sync until the next deploy, which is the one
+    // case the fast path exists to cover: a code collection added without a version bump.
+    const mw = await freshMiddleware()
+    const waited: Promise<unknown>[] = []
+    const ctx = makeContext(waited, bootstrapped())
+
+    await mw(ctx, async () => {})
+    releaseSeeds()
+    await Promise.all(waited)
+
+    const marker = ctx.kvPuts.find((p: { key: string }) => p.key.endsWith(':synced'))
+    expect(marker, 'the fast path ran its syncs without claiming the window').toBeDefined()
+    expect(marker.ttl).toBe(60)
+    expect(seedCalls).toContain('bootstrapDocumentTypes')
+  })
+
   it('still serves the request when there is no execution context to offload to', async () => {
     // `c.executionCtx` throws outside a real fetch handler — app.request() in tests, for one.
     // The guard must swallow that, not turn a latency optimisation into a 500.
     const mw = await freshMiddleware()
-    const ctx = makeContext([])
+    const ctx = makeContext([], bootstrapped())
     Object.defineProperty(ctx, 'executionCtx', {
       get() { throw new Error('This context has no ExecutionContext') },
     })
