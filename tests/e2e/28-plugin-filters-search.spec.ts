@@ -24,6 +24,15 @@ async function clearFilters(page: Page) {
   await page.fill('#search-input', '')
 }
 
+// The plugins page renders a card for every manifest in the registry, so the count is
+// never zero on a working page. Each of these tests used to `return` early when it was,
+// which turned a broken plugins page into a silent pass across seven tests at once.
+async function pluginCardCount(page: Page) {
+  const total = await page.locator('.plugin-card').count()
+  expect(total, 'plugins page rendered no plugin cards').toBeGreaterThan(0)
+  return total
+}
+
 // Use environment variable for port or default to 8787
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8787'
 
@@ -53,12 +62,7 @@ test.describe('Plugin Filters and Search @plugins @lock-plugin-hello-world', () 
 
   test('should filter plugins by category', async ({ page }) => {
     // Get total plugin count
-    const totalPlugins = await page.locator('.plugin-card').count()
-
-    if (totalPlugins === 0) {
-      console.log('No plugins to test filtering - skipping')
-      return
-    }
+    const totalPlugins = await pluginCardCount(page)
 
     // Select security category
     await page.check('#category-security')
@@ -67,7 +71,10 @@ test.describe('Plugin Filters and Search @plugins @lock-plugin-hello-world', () 
     // Check that only security plugins are visible
     const visiblePlugins = await page.locator('.plugin-card:visible').count()
 
-    // Should have fewer or equal plugins than total
+    // `core-auth` and `two-factor-auth` are both category `security`, so a working filter
+    // always leaves cards on screen. Without this floor a filter that hid *everything*
+    // passed, because the per-card loop below has nothing to iterate over.
+    expect(visiblePlugins, 'security filter hid every plugin').toBeGreaterThan(0)
     expect(visiblePlugins).toBeLessThanOrEqual(totalPlugins)
 
     // Verify all visible plugins have security category
@@ -95,12 +102,7 @@ test.describe('Plugin Filters and Search @plugins @lock-plugin-hello-world', () 
     await page.reload()
 
     // Get total plugin count
-    const totalPlugins = await page.locator('.plugin-card').count()
-
-    if (totalPlugins === 0) {
-      console.log('No plugins to test filtering - skipping')
-      return
-    }
+    const totalPlugins = await pluginCardCount(page)
 
     // Select active status
     await page.check('#status-active')
@@ -109,7 +111,8 @@ test.describe('Plugin Filters and Search @plugins @lock-plugin-hello-world', () 
     // Check that only active plugins are visible
     const visiblePlugins = await page.locator('.plugin-card:visible').count()
 
-    // Should have fewer or equal plugins than total
+    // Four plugins are active after bootstrap, so this is never legitimately zero.
+    expect(visiblePlugins, 'active filter hid every plugin').toBeGreaterThan(0)
     expect(visiblePlugins).toBeLessThanOrEqual(totalPlugins)
 
     // Verify all visible plugins have active status
@@ -126,8 +129,15 @@ test.describe('Plugin Filters and Search @plugins @lock-plugin-hello-world', () 
 
     const inactivePlugins = await page.locator('.plugin-card:visible').count()
 
-    // Inactive count + active count should equal total (assuming no errors)
-    // expect(visiblePlugins + inactivePlugins).toBeLessThanOrEqual(totalPlugins)
+    // This is what the `multi-tenant` setup at the top of the test is for. The count was
+    // read and then thrown away -- the only assertion over it was commented out -- so the
+    // inactive half of "filter plugins by status" tested nothing.
+    expect(inactivePlugins, 'inactive filter hid the plugin parked at inactive').toBeGreaterThan(0)
+    for (const card of await page.locator('.plugin-card:visible').all()) {
+      expect(await card.getAttribute('data-status')).toBe('inactive')
+    }
+    await expect(page.locator('.plugin-card[data-name*="multi-tenant" i]')).toBeVisible()
+    expect(visiblePlugins + inactivePlugins).toBeLessThanOrEqual(totalPlugins)
 
     // Reset filter
     await clearFilters(page)
@@ -140,21 +150,13 @@ test.describe('Plugin Filters and Search @plugins @lock-plugin-hello-world', () 
 
   test('should search plugins by name', async ({ page }) => {
     // Get total plugin count
-    const totalPlugins = await page.locator('.plugin-card').count()
-
-    if (totalPlugins === 0) {
-      console.log('No plugins to test search - skipping')
-      return
-    }
+    const totalPlugins = await pluginCardCount(page)
 
     // Get first plugin name
     const firstCard = page.locator('.plugin-card').first()
-    const firstPluginName = await firstCard.getAttribute('data-name')
+    const firstPluginName = (await firstCard.getAttribute('data-name')) ?? ''
 
-    if (!firstPluginName) {
-      console.log('No plugin name found - skipping')
-      return
-    }
+    expect(firstPluginName, 'plugin card is missing its data-name attribute').not.toBe('')
 
     // Search for first few characters of the name
     const searchTerm = firstPluginName.substring(0, 4).toLowerCase()
@@ -187,12 +189,7 @@ test.describe('Plugin Filters and Search @plugins @lock-plugin-hello-world', () 
 
   test('should search plugins by description', async ({ page }) => {
     // Get total plugin count
-    const totalPlugins = await page.locator('.plugin-card').count()
-
-    if (totalPlugins === 0) {
-      console.log('No plugins to test search - skipping')
-      return
-    }
+    const totalPlugins = await pluginCardCount(page)
 
     // Search for common word that might be in descriptions
     await page.fill('#search-input', 'management')
@@ -210,20 +207,18 @@ test.describe('Plugin Filters and Search @plugins @lock-plugin-hello-world', () 
 
   test('should combine category and status filters', async ({ page }) => {
     // Get total plugin count
-    const totalPlugins = await page.locator('.plugin-card').count()
-
-    if (totalPlugins === 0) {
-      console.log('No plugins to test filtering - skipping')
-      return
-    }
+    const totalPlugins = await pluginCardCount(page)
 
     // Select security category AND active status
     await page.check('#category-security')
     await page.check('#status-active')
     await page.waitForTimeout(500) // Allow filter to apply
 
-    // Should show filtered results
     const visiblePlugins = await page.locator('.plugin-card:visible').count()
+
+    // security + active describes `core-auth` and `two-factor-auth`, so the intersection
+    // is never empty on a working page -- and an empty one would skip the loop below.
+    expect(visiblePlugins, 'security+active filter hid every plugin').toBeGreaterThan(0)
     expect(visiblePlugins).toBeLessThanOrEqual(totalPlugins)
 
     // Verify all visible plugins match both filters
@@ -242,12 +237,7 @@ test.describe('Plugin Filters and Search @plugins @lock-plugin-hello-world', () 
 
   test('should combine all three filters', async ({ page }) => {
     // Get total plugin count
-    const totalPlugins = await page.locator('.plugin-card').count()
-
-    if (totalPlugins === 0) {
-      console.log('No plugins to test filtering - skipping')
-      return
-    }
+    const totalPlugins = await pluginCardCount(page)
 
     // Apply all three filters
     await page.check('#category-security')
@@ -255,13 +245,15 @@ test.describe('Plugin Filters and Search @plugins @lock-plugin-hello-world', () 
     await page.fill('#search-input', 'auth')
     await page.waitForTimeout(500) // Allow filter to apply
 
-    // Should show highly filtered results (possibly zero)
     const visiblePlugins = await page.locator('.plugin-card:visible').count()
-    expect(visiblePlugins).toBeGreaterThanOrEqual(0)
+
+    // `core-auth` is security, active, and matches "auth", so all three filters together
+    // still leave it on screen. The old `toBeGreaterThanOrEqual(0)` was true of every
+    // possible outcome, and the guarded loop under it never ran when the count was zero.
+    expect(visiblePlugins, 'three-filter combination hid every plugin').toBeGreaterThan(0)
     expect(visiblePlugins).toBeLessThanOrEqual(totalPlugins)
 
-    // If any plugins visible, verify they match all filters
-    if (visiblePlugins > 0) {
+    {
       const visibleCards = await page.locator('.plugin-card:visible').all()
       for (const card of visibleCards) {
         const category = await card.getAttribute('data-category')
@@ -286,12 +278,7 @@ test.describe('Plugin Filters and Search @plugins @lock-plugin-hello-world', () 
 
   test('should show no results message when no plugins match', async ({ page }) => {
     // Get total plugin count
-    const totalPlugins = await page.locator('.plugin-card').count()
-
-    if (totalPlugins === 0) {
-      console.log('No plugins to test - skipping')
-      return
-    }
+    const totalPlugins = await pluginCardCount(page)
 
     // Search for something that definitely won't match
     await page.fill('#search-input', 'xyzabc123nonexistent')
