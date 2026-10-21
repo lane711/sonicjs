@@ -55,16 +55,11 @@ test.describe('Block Media Persistence @content @media', () => {
     let createdContentId: string | null = null;
     const title = `Block Media ${Date.now()}`;
     const slug = `block-media-${Date.now()}`;
-    await page.goto('/admin/content/new');
-    const e2eTestLink = page.locator('a[href^="/admin/content/new?collection="]').filter({ hasText: 'E2E Test' });
-    const hasE2eTest = await e2eTestLink.isVisible().catch(() => false);
-    if (!hasE2eTest) {
-      test.skip(true, 'E2E Test collection not available');
-      return;
-    }
-
-    await e2eTestLink.click();
-    await page.waitForLoadState('networkidle');
+    // `e2e_test` is registered in code at bootstrap (`registerCollections`), so the form has a
+    // direct URL. Going through the collection picker meant a missing or slow-to-render link
+    // reported itself as `test.skip(true, 'E2E Test collection not available')` — a green run for
+    // a page that never loaded.
+    await page.goto('/admin/content/new?collection=e2e_test');
     await expect(page.locator('form#content-form')).toBeVisible();
 
     await page.fill('input[name="title"]', title);

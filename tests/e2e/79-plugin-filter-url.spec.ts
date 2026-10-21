@@ -1,5 +1,33 @@
 import { test, expect } from './fixtures'
+import type { Page } from '@playwright/test'
 import { loginAsAdmin } from './utils/test-helpers'
+
+/**
+ * A category or status checkbox is rendered `disabled` when no installed plugin falls into it
+ * (admin-plugins-list.template.ts), and the categories are sorted by count descending — so the
+ * enabled ones are whichever buckets this build's plugins actually occupy, and `#category-security`
+ * is not guaranteed to be one of them.
+ *
+ * The three tests below used to cope with that by not testing: two bailed out through
+ * `test.skip(true, 'No enabled category checkboxes found')` / `'Need at least 2 …'`, and the third
+ * wrapped both of its assertions in `if (count > 0)`, so a page that rendered no filters at all
+ * passed. Read the values off the page instead, and assert that they are there — a plugin list with
+ * fewer than two occupied categories is a broken fixture, not a reason to skip.
+ *
+ * `networkidle` is also gone from this file: /admin/plugins pulls Tailwind, Alpine and HTMX from
+ * CDNs and may never reach it, which in CI costs the test its whole budget before the first
+ * assertion. Waiting for the control under test is both faster and a stronger statement.
+ */
+
+/** The filter checkboxes this build actually offers, in render order. */
+function enabledFilters(page: Page, name: 'category' | 'status') {
+  return page.locator(`input[name="${name}"]:not([disabled])`)
+}
+
+async function openPluginsList(page: Page) {
+  await page.goto('/admin/plugins')
+  await expect(page.locator('#search-input')).toBeVisible()
+}
 
 test.describe('Plugin Filter URL Persistence @plugins', () => {
   test.beforeEach(async ({ page }) => {
@@ -7,11 +35,10 @@ test.describe('Plugin Filter URL Persistence @plugins', () => {
   })
 
   test('URL updates when category filter is checked', async ({ page }) => {
-    await page.goto('/admin/plugins')
-    await page.waitForLoadState('networkidle')
+    await openPluginsList(page)
 
     // Find a non-disabled category checkbox and click it
-    const checkbox = page.locator('input[name="category"]:not([disabled])').first()
+    const checkbox = enabledFilters(page, 'category').first()
     const categoryValue = await checkbox.getAttribute('value')
     await checkbox.check()
 
@@ -20,10 +47,9 @@ test.describe('Plugin Filter URL Persistence @plugins', () => {
   })
 
   test('URL updates when status filter is checked', async ({ page }) => {
-    await page.goto('/admin/plugins')
-    await page.waitForLoadState('networkidle')
+    await openPluginsList(page)
 
-    const checkbox = page.locator('input[name="status"]:not([disabled])').first()
+    const checkbox = enabledFilters(page, 'status').first()
     const statusValue = await checkbox.getAttribute('value')
     await checkbox.check()
 
@@ -31,67 +57,51 @@ test.describe('Plugin Filter URL Persistence @plugins', () => {
   })
 
   test('filter state is restored from URL on page load', async ({ page }) => {
-    // Navigate with pre-set URL params
-    await page.goto('/admin/plugins?category=security&status=active')
-    await page.waitForLoadState('networkidle')
+    // Take the params off the page rather than hardcoding `category=security`, which is only
+    // enabled when a security-category plugin happens to be installed.
+    await openPluginsList(page)
+    const categoryValue = await enabledFilters(page, 'category').first().getAttribute('value')
+    const statusValue = await enabledFilters(page, 'status').first().getAttribute('value')
+    expect(categoryValue, 'no enabled category filter rendered').toBeTruthy()
+    expect(statusValue, 'no enabled status filter rendered').toBeTruthy()
 
-    // Checkboxes should be checked based on URL params
-    const securityCb = page.locator('#category-security')
-    const activeCb = page.locator('#status-active')
+    await page.goto(`/admin/plugins?category=${categoryValue}&status=${statusValue}`)
 
-    // Only check if these categories/statuses exist on the page
-    if (await securityCb.count() > 0) {
-      await expect(securityCb).toBeChecked()
-    }
-    if (await activeCb.count() > 0) {
-      await expect(activeCb).toBeChecked()
-    }
+    await expect(page.locator(`#category-${categoryValue}`)).toBeChecked()
+    await expect(page.locator(`#status-${statusValue}`)).toBeChecked()
   })
 
   test('filter state is retained after page reload', async ({ page }) => {
-    await page.goto('/admin/plugins')
-    await page.waitForLoadState('networkidle')
+    await openPluginsList(page)
 
     // Check first available category checkbox
-    const checkbox = page.locator('input[name="category"]:not([disabled])').first()
+    const checkbox = enabledFilters(page, 'category').first()
     const categoryValue = await checkbox.getAttribute('value')
-
-    if (!categoryValue) {
-      test.skip(true, 'No enabled category checkboxes found')
-      return
-    }
+    expect(categoryValue, 'no enabled category filter rendered').toBeTruthy()
 
     await checkbox.check()
     await expect(page).toHaveURL(new RegExp(`category=${categoryValue}`))
 
     // Reload — URL params are preserved by the browser
     await page.reload()
-    await page.waitForLoadState('networkidle')
 
     // Checkbox should be re-checked from URL
-    const reloadedCheckbox = page.locator(`#category-${categoryValue}`)
-    if (await reloadedCheckbox.count() > 0 && !(await reloadedCheckbox.isDisabled())) {
-      await expect(reloadedCheckbox).toBeChecked()
-    }
+    await expect(page.locator(`#category-${categoryValue}`)).toBeChecked()
   })
 
   test('multiple category filters update URL with multiple params', async ({ page }) => {
-    await page.goto('/admin/plugins')
-    await page.waitForLoadState('networkidle')
+    await openPluginsList(page)
 
-    const checkboxes = page.locator('input[name="category"]:not([disabled])')
-    const count = await checkboxes.count()
-
-    if (count < 2) {
-      test.skip(true, 'Need at least 2 enabled category checkboxes')
-      return
-    }
+    const checkboxes = enabledFilters(page, 'category')
+    expect(
+      await checkboxes.count(),
+      'fewer than two categories are occupied by installed plugins'
+    ).toBeGreaterThanOrEqual(2)
 
     await checkboxes.nth(0).check()
     await checkboxes.nth(1).check()
 
-    const url = page.url()
-    const params = new URL(url).searchParams.getAll('category')
+    const params = new URL(page.url()).searchParams.getAll('category')
     expect(params.length).toBe(2)
   })
 
