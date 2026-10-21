@@ -67,6 +67,23 @@ const BOOTSTRAP_KV_KEY = (host?: string) =>
   `_sonicjs_bootstrap_v${SONICJS_VERSION}${host ? `:${host}` : ''}`
 
 /**
+ * Hand a promise to the runtime so it outlives the response.
+ *
+ * `c.executionCtx` throws outside a real Workers fetch handler — the Vitest harness and
+ * `app.request()` both hit that — so the access has to be guarded. Without the ctx the promise
+ * still runs; it just loses its keep-alive, which for idempotent background work means the next
+ * cold isolate redoes it. Never await the result: the whole point is to be off the hot path.
+ */
+function runInBackground(c: Context, work: Promise<unknown>): void {
+  const settled = work.catch(() => {})
+  try {
+    c.executionCtx.waitUntil(settled)
+  } catch {
+    /* no execution context (tests, direct app.request) — let it run unsupervised */
+  }
+}
+
+/**
  * Verify security-critical environment configuration at startup.
  * Logs warnings in development, throws in production to prevent
  * insecure deployments from silently running.
@@ -286,14 +303,29 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
             // Sync document types to D1 even on KV fast-path — idempotent no-ops when
             // nothing changed, but ensures newly added code collections reach D1 without
             // requiring a version bump or full cold-start bootstrap.
-            await bootstrapDocumentTypes(c.env.DB).catch((e) =>
-              console.error("[Bootstrap] KV fast-path: error syncing document types:", e)
-            )
-            await autoRegisterCollectionDocumentTypes(c.env.DB).catch((e) =>
-              console.error("[Bootstrap] KV fast-path: error auto-registering collection types:", e)
-            )
-            await bootstrapDefaultContent(c.env.DB).catch((e) =>
-              console.error("[Bootstrap] KV fast-path: error seeding default content:", e)
+            //
+            // Deliberately NOT awaited. These are three sequential D1 round trips, and on
+            // Cloudflare that is ~15-150ms of network the first request on every cold isolate
+            // would otherwise pay before it is even routed — on a single-threaded isolate that
+            // stalls every request co-located with it. Nothing downstream reads what they
+            // write: BOOTSTRAP_KV_KEY embeds SONICJS_VERSION, so a deploy invalidates the flag
+            // and the first request of a new version runs the full awaited bootstrap anyway.
+            // What is left for the fast path to cover is purely the local-dev case of adding a
+            // code collection without bumping the version, and that can land a beat late.
+            // waitUntil keeps them alive past the response instead of being cancelled with it.
+            runInBackground(
+              c,
+              (async () => {
+                await bootstrapDocumentTypes(c.env.DB).catch((e) =>
+                  console.error("[Bootstrap] KV fast-path: error syncing document types:", e)
+                )
+                await autoRegisterCollectionDocumentTypes(c.env.DB).catch((e) =>
+                  console.error("[Bootstrap] KV fast-path: error auto-registering collection types:", e)
+                )
+                await bootstrapDefaultContent(c.env.DB).catch((e) =>
+                  console.error("[Bootstrap] KV fast-path: error seeding default content:", e)
+                )
+              })()
             )
             bootstrapComplete = true
             return next()
