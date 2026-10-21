@@ -164,8 +164,16 @@ function hardenPage(page: Page): Page {
       loadEventIsUnreachable = true
       // Settling is advisory: callers follow it with assertions that auto-wait for what they
       // actually need, so blocking the whole test on an idle state that will never arrive buys
-      // nothing. Make sure the document at least parsed, then carry on.
-      await originalWaitForLoadState('domcontentloaded', { timeout: FALLBACK_TIMEOUT_MS })
+      // nothing. Give the document a chance to parse, then carry on.
+      //
+      // Swallowed, like the goto and reload fallbacks above. Rethrowing here reports the failure
+      // as `page.originalWaitForLoadState: Test timeout of 120000ms exceeded` at this line, which
+      // names the advisory wait rather than whatever the caller was really waiting for — that is
+      // how 26-content-duplicate spent a whole CI failure pointing at fixtures.ts instead of at
+      // the edit form that never rendered.
+      await originalWaitForLoadState('domcontentloaded', { timeout: FALLBACK_TIMEOUT_MS }).catch(
+        () => {}
+      )
     }
   }
 
