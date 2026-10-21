@@ -943,16 +943,25 @@ export async function uploadTestFile(page: Page, fileName: string = 'test-image.
 }
 
 /**
- * Wait for HTMX request to complete
+ * Wait for any in-flight HTMX request to finish.
+ *
+ * htmx puts the `htmx-request` class on the element issuing the request (and on any
+ * `hx-indicator`) for exactly the lifetime of that request, so that class is the signal. The
+ * version this replaces waited on `networkidle` for 5s and then, on timeout, slept another
+ * second — and admin pages poll metrics, recent activity and migration status, so they do not go
+ * idle and every one of the 19 call sites paid the full 6s whether or not anything was pending.
+ *
+ * Returns within a frame when nothing is in flight, which is the common case: a request that has
+ * not been issued yet marks nothing, and every caller follows this with an auto-waiting
+ * assertion (`toHaveURL`, `toBeVisible`, `toContainText`) that does the real waiting. Kept
+ * best-effort — the timeout is swallowed, as it was before, because the caller's assertion is
+ * what should report a swap that never happened, and a click that navigates tears down the
+ * execution context under `waitForFunction`.
  */
 export async function waitForHTMX(page: Page) {
-  try {
-    // Wait for any ongoing network requests to complete
-    await page.waitForLoadState('networkidle', { timeout: 5000 });
-  } catch {
-    // If network idle times out, just wait a bit for HTMX
-    await page.waitForTimeout(1000);
-  }
+  await page
+    .waitForFunction(() => !document.querySelector('.htmx-request'), null, { timeout: 5000 })
+    .catch(() => {});
 }
 
 /**
