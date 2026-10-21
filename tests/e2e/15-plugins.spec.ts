@@ -2,7 +2,8 @@ import { test, expect } from './fixtures'
 import { 
   loginAsAdmin, 
   ensureAdminUserExists,
-  ensureWorkflowTablesExist
+  ensureWorkflowTablesExist,
+  ensurePluginActive
 } from './utils/test-helpers'
 
 // Use environment variable for port or default to 8787
@@ -151,60 +152,66 @@ test.describe('Plugin Management @plugins', () => {
     expect(interactive).toBeGreaterThan(0)
   })
 
-  test('should toggle plugin status', async ({ page }) => {
+  // Both of the tests that used to live here were written against a plugins UI that no
+  // longer exists. Activate/Deactivate are now a single toggle switch, and there is no
+  // Settings button -- the card itself opens the settings page. Each test looked for its
+  // control with `if (count > 0)` inside a loop over three cards and did nothing when it
+  // found none, so neither has asserted anything since the redesign.
+  //
+  // `hello-world` is the suite's designated safe mutation target; the lock tag serializes
+  // this against the other specs that install and toggle it.
+  test('should toggle plugin status @lock-plugin-hello-world', async ({ page }) => {
+    expect(await ensurePluginActive(page, 'hello-world')).toBe(true)
     await page.goto(`${BASE_URL}/admin/plugins`)
-    
-    // Find a plugin that can be toggled
-    const pluginCards = page.locator('.plugin-card')
-    const count = await pluginCards.count()
-    
-    for (let i = 0; i < Math.min(count, 3); i++) {
-      const card = pluginCards.nth(i)
-      const activateBtn = card.locator('button:has-text("Activate")')
-      const deactivateBtn = card.locator('button:has-text("Deactivate")')
-      
-      const hasActivate = await activateBtn.count()
-      const hasDeactivate = await deactivateBtn.count()
-      
-      if (hasActivate > 0) {
-        // Plugin is inactive, try to activate
-        await activateBtn.click()
-        
-        // Wait for status change
-        await expect(card.locator('.status-badge')).toContainText('Active', { timeout: 5000 })
-        break
-      } else if (hasDeactivate > 0) {
-        // Plugin is active, try to deactivate
-        await deactivateBtn.click()
-        
-        // Wait for status change
-        await expect(card.locator('.status-badge')).toContainText('Inactive', { timeout: 5000 })
-        break
-      }
+
+    const card = page.locator('.plugin-card[data-name="Hello World"]')
+    await expect(card).toBeVisible()
+    await expect(card).toHaveAttribute('data-status', 'active')
+
+    const toggle = card.locator('button.toggle-button')
+    await expect(toggle).toHaveAttribute('aria-checked', 'true')
+
+    try {
+      await toggle.click()
+
+      // The badge, the switch and the card's own data-status all have to agree. They are
+      // written by three separate lines of the toggle handler, and data-status is the one
+      // the status filter reads.
+      await expect(card.locator('.status-badge')).toContainText('Inactive', { timeout: 10_000 })
+      await expect(toggle).toHaveAttribute('aria-checked', 'false')
+      await expect(card).toHaveAttribute('data-status', 'inactive')
+
+      await toggle.click()
+      await expect(card.locator('.status-badge')).toContainText('Active', { timeout: 10_000 })
+      await expect(toggle).toHaveAttribute('aria-checked', 'true')
+      await expect(card).toHaveAttribute('data-status', 'active')
+
+      // Reload to confirm the switch wrote through to the server rather than only to the
+      // DOM -- the previous version of this test could not tell the difference.
+      await page.reload()
+      await expect(page.locator('.plugin-card[data-name="Hello World"]')).toHaveAttribute(
+        'data-status',
+        'active'
+      )
+    } finally {
+      await ensurePluginActive(page, 'hello-world')
     }
   })
 
   test('should access plugin settings', async ({ page }) => {
     await page.goto(`${BASE_URL}/admin/plugins`)
-    
-    // Find a plugin with settings button
-    const pluginCards = page.locator('.plugin-card')
-    const count = await pluginCards.count()
-    
-    for (let i = 0; i < Math.min(count, 3); i++) {
-      const card = pluginCards.nth(i)
-      const settingsBtn = card.locator('button[title="Settings"], button:has-text("Settings")')
-      
-      const hasSettings = await settingsBtn.count()
-      if (hasSettings > 0) {
-        await settingsBtn.click()
-        
-        // Should navigate to plugin settings page
-        await expect(page.url()).toContain('/admin/plugins/')
-        await expect(page.locator('h2:has-text("Plugin Settings")')).toBeVisible()
-        break
-      }
-    }
+
+    const card = page.locator('.plugin-card').first()
+    await expect(card).toBeVisible()
+    const name = (await card.getAttribute('data-name')) ?? ''
+    expect(name, 'first plugin card has no data-name').not.toBe('')
+
+    // The card is the control: `openPluginSettings(id)` is wired to its onclick, and the
+    // per-card buttons all call event.stopPropagation() to avoid triggering it.
+    await card.click()
+    await page.waitForURL(/\/admin\/plugins\/[^/]+$/, { timeout: 15_000 })
+    await expect(page.locator('h1')).toContainText('Plugin Settings')
+    await expect(page.locator('h2').first()).toContainText(name)
   })
 
   test('should show installable plugin options', async ({ page }) => {
@@ -226,21 +233,25 @@ test.describe('Plugin Management @plugins', () => {
     
     // Find search input
     const searchInput = page.locator('input[placeholder*="Search"], input[type="search"]')
-    const hasSearch = await searchInput.count()
-    
-    if (hasSearch > 0) {
-      // Search for "auth"
-      await searchInput.fill('auth')
-      await page.waitForTimeout(1000) // Allow filter to apply
-      
-      // Should show filtered results
-      const visibleCards = await page.locator('.plugin-card:visible').count()
-      expect(visibleCards).toBeGreaterThanOrEqual(0)
-      
-      // Clear search
-      await searchInput.fill('')
-      await page.waitForTimeout(500)
-    }
+    // The whole body was wrapped in `if (hasSearch > 0)`, and the one assertion inside --
+    // `toBeGreaterThanOrEqual(0)` -- is true of every possible count, so this test passed
+    // whether the box existed, whether it filtered, and whether it filtered correctly.
+    expect(await searchInput.count(), 'no search box on the plugins page').toBeGreaterThan(0)
+
+    const totalCards = await page.locator('.plugin-card').count()
+    await searchInput.fill('auth')
+    await page.waitForTimeout(1000) // Allow filter to apply
+
+    // `core-auth` and `two-factor-auth` both match, and plenty of plugins do not, so a
+    // working filter lands strictly between "nothing" and "everything".
+    const visibleCards = await page.locator('.plugin-card:visible').count()
+    expect(visibleCards, 'searching "auth" matched no plugin').toBeGreaterThan(0)
+    expect(visibleCards, 'searching "auth" did not filter anything out').toBeLessThan(totalCards)
+
+    // Clear search
+    await searchInput.fill('')
+    await page.waitForTimeout(500)
+    expect(await page.locator('.plugin-card:visible').count()).toBe(totalCards)
   })
 
   test('should show plugin information', async ({ page }) => {
@@ -266,10 +277,9 @@ test.describe('Plugin Management @plugins', () => {
     const cards = page.locator('.plugin-card')
     const count = await cards.count()
     
-    if (count > 0) {
-      // Should show at least one category
-      await expect(page.locator('text=/security|content|media|system/i').first()).toBeVisible()
-    }
+    // Cards always exist on a working page, so the guard only ever hid a broken one.
+    expect(count, 'plugins page rendered no cards').toBeGreaterThan(0)
+    await expect(page.locator('text=/security|content|media|system/i').first()).toBeVisible()
   })
 
   test('should show core vs non-core plugins', async ({ page }) => {
@@ -279,13 +289,14 @@ test.describe('Plugin Management @plugins', () => {
     const corePlugins = page.locator('.plugin-card').filter({ hasText: /Authentication|Media|Workflow/ })
     const coreCount = await corePlugins.count()
     
-    if (coreCount > 0) {
-      const firstCore = corePlugins.first()
-      
-      // Core plugins typically don't have uninstall buttons
-      const hasUninstall = await firstCore.locator('button:has-text("Uninstall")').count()
-      expect(hasUninstall).toBe(0)
-    }
+    // `core-auth` and `core-media` are always installed, so a zero count here means the
+    // filter stopped matching -- at which point the rule below was never checked at all.
+    expect(coreCount, 'no core plugin cards found').toBeGreaterThan(0)
+
+    const firstCore = corePlugins.first()
+    // Core plugins typically don't have uninstall buttons
+    const hasUninstall = await firstCore.locator('button:has-text("Uninstall")').count()
+    expect(hasUninstall).toBe(0)
   })
 
   test('should validate plugin management permissions', async ({ page }) => {

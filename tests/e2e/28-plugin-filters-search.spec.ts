@@ -334,11 +334,26 @@ test.describe('Plugin Filters and Search @plugins @lock-plugin-hello-world', () 
       // Verify category filter is still applied after the toggle
       await expect(page.locator('#category-utilities')).toBeChecked()
       expect(await page.locator('.plugin-card:visible').count()).toBe(initialCount)
+
+      // The status filter reads `data-status` off the card, and togglePlugin() used to
+      // update the badge and the switch but not that attribute -- so a plugin you had
+      // just switched off went on filtering as active until the next full page load.
+      const flippedStatus = flipped === 'true' ? 'active' : 'inactive'
+      await expect(toggleCard).toHaveAttribute('data-status', flippedStatus)
+      await page.check(`#status-${flippedStatus}`)
+      await page.waitForTimeout(500)
+      await expect(toggleCard).toBeVisible()
+      await page.uncheck(`#status-${flippedStatus}`)
+      await page.waitForTimeout(500)
+
+      // A second click on the switch used to navigate to the plugin settings page:
+      // togglePlugin() rebound button.onclick without event.stopPropagation(), so the
+      // click bubbled to the card's openPluginSettings() handler. Restoring through the
+      // UI is what proves that is fixed; it used to have to go through the API.
+      await toggle.click()
+      await expect(toggle).toHaveAttribute('aria-checked', wasChecked, { timeout: 10000 })
+      await expect(page).toHaveURL(/\/admin\/plugins(\?|$)/)
     } finally {
-      // Restore the plugin to its original state. This goes through the API rather
-      // than a second toggle click because togglePlugin() rebinds button.onclick
-      // WITHOUT event.stopPropagation(), so the second click bubbles to the card's
-      // openPluginSettings() handler and navigates away (product bug — see report).
       const restoreAction = wasChecked === 'true' ? 'activate' : 'deactivate'
       const res = await page.request.post(`/admin/plugins/hello-world/${restoreAction}`, {
         headers: { 'Content-Type': 'application/json' },
