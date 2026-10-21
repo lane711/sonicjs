@@ -202,22 +202,36 @@ export async function getCsrfTokenFromPage(page: Page): Promise<string> {
 /**
  * Ensure admin user exists (for testing)
  *
- * `/auth/seed-admin` is rate limited to 10 requests per minute, and this runs from the
- * beforeEach of ~28 specs. Seeding on literally every test spent the whole budget, so the
- * endpoint started answering 429 to whoever asked next — including the spec that asserts it
- * answers 200. The seed is idempotent, so once per worker per window is enough.
+ * `/auth/seed-admin` is rate limited to 10 requests per minute and this runs from the beforeEach
+ * of ~36 specs, so seeding on every test spent the window and the endpoint answered 429 to
+ * whoever asked next — including `114-seed-admin-env-gate`, which asserts on the seeder's own
+ * response. That was first fixed with a 30s TTL, which is still ~40 windows per worker over an
+ * E2E phase: ~160 requests across four workers.
+ *
+ * None of them do anything. The seed is idempotent, the preview D1 is created fresh for the run,
+ * and nothing in the suite mutates `admin@sonicjs.com` — `115-admin-set-password` creates its own
+ * user, and the 2FA specs leave state the seeder does not touch either (hence the explicit
+ * two-factor error in `signInAsAdmin`). So a re-seed restores nothing that was lost.
+ *
+ * It is not free, either. `upsertSeedUser` calls `AuthManager.hashPassword` *before* it checks
+ * whether the user exists, and runs twice per request (admin + editor), so every one of those
+ * requests is two scrypt hashes plus `bootstrapDocumentTypes` and `ensureSystemRbacSeed`. Hashing
+ * serializes in the isolate — the same cost that put 120s hangs in `loginAsAdmin`'s beforeEach
+ * and is why sign-in is now cached per worker.
+ *
+ * So: latch on success, once per worker. A *failed* seed does not latch, so a cold-start 500 or a
+ * 429 from another worker is still retried by the next caller.
  */
-const SEED_TTL_MS = 30_000;
-let lastSeedAt = 0;
+let seeded = false;
 let seedInFlight: Promise<void> | null = null;
 
 async function seedAdminOnce(client: { post: (url: string, options?: any) => Promise<unknown> }) {
-  if (Date.now() - lastSeedAt < SEED_TTL_MS) return;
+  if (seeded) return;
   if (!seedInFlight) {
     seedInFlight = client
       .post('/auth/seed-admin')
-      .then(() => { lastSeedAt = Date.now(); })
-      .catch(() => { /* admin may already exist — not fatal */ })
+      .then(() => { seeded = true; })
+      .catch(() => { /* admin may already exist — not fatal, and not latched, so it retries */ })
       .finally(() => { seedInFlight = null; });
   }
   await seedInFlight;
@@ -251,7 +265,7 @@ export async function seedAdminPastRateLimit(
     await new Promise((resolve) => setTimeout(resolve, 2_000));
     res = await request.post('/auth/seed-admin');
   }
-  if (res.ok()) lastSeedAt = Date.now();
+  if (res.ok()) seeded = true;
   return res;
 }
 
