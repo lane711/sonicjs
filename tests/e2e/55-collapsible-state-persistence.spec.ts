@@ -41,32 +41,55 @@ async function gotoPageBlocksNewForm(page: Page) {
   return collectionKey
 }
 
-async function saveAndCaptureEditUrl(page: Page): Promise<string> {
-  await page.click('button[name="action"][value="save"]')
-  // A new-document save answers the HTMX request with `HX-Redirect: /admin/content/<id>/edit`,
-  // and htmx sets location *after* that response — networkidle can therefore resolve while the
-  // URL is still /admin/content/new. Wait for the edit URL instead of racing it.
-  await page
-    .waitForURL(/\/admin\/content\/[^/]+\/edit/, { timeout: 15000 })
-    // An edit-page save is a PUT that stays put, so no navigation is expected there.
-    .catch(() => {})
-  await page.waitForLoadState('networkidle', { timeout: 15000 })
-  const currentUrl = page.url()
-  if (/\/admin\/content\/[^/]+\/edit/.test(currentUrl)) {
-    return currentUrl
+/**
+ * Save the open new-content form and return the created record's edit URL.
+ *
+ * Two product facts shape this. The save is an htmx POST whose success signal is the `HX-Redirect`
+ * header — the failure path returns the error banner as 200 HTML, so `res.ok()` cannot tell the two
+ * apart. And `action=save` redirects to the collection list, not to the new record, so the id has
+ * to be read off the row.
+ *
+ * The version this replaces waited for an edit URL that only `action=save_and_continue` ever
+ * produces (and no template renders that button), swallowed the timeout, then fell through to
+ * `a[href*="/edit"]` `.first()` on whatever page it was still on. Two failure modes in CI: on the
+ * list page that hands back a stranger's document, and when the create itself fails it reports
+ * "edit link not found" from the form page it never left — which is what run 39582792718 reported.
+ */
+async function saveAndCaptureEditUrl(page: Page, title: string): Promise<string> {
+  const [res] = await Promise.all([
+    page.waitForResponse(
+      (r) => r.request().method() === 'POST' && new URL(r.url()).pathname === '/admin/content'
+    ),
+    page.click('button[name="action"][value="save"]'),
+  ])
+
+  const redirect = res.headers()['hx-redirect']
+  if (!redirect) {
+    throw new Error(
+      `Saving "${title}" did not redirect (HTTP ${res.status()}): ${(await res.text()).slice(0, 300)}`
+    )
   }
 
-  // Fallback for environments that may not auto-redirect after save.
-  const editLink = page.locator('a[href*="/admin/content/"][href*="/edit"]').first()
-  await expect(editLink).toBeVisible({ timeout: 10000 })
+  // Ask for a page big enough that the three other CI workers writing to this collection cannot
+  // push our row off it, then match the exact title this test generated.
+  const listUrl = new URL(redirect, page.url())
+  listUrl.searchParams.set('limit', '100')
+  await page.goto(`${listUrl.pathname}${listUrl.search}`, { waitUntil: 'domcontentloaded' })
+
+  const editLink = page
+    .locator('a[href*="/admin/content/"][href*="/edit"]')
+    .filter({ hasText: title })
+  await expect(editLink).toHaveCount(1)
+
   const href = await editLink.getAttribute('href')
   if (!href) {
-    throw new Error('Could not resolve edit URL after saving content')
+    throw new Error(`Row for "${title}" has no edit href`)
   }
-  await page.goto(href)
-  await page.waitForLoadState('networkidle', { timeout: 15000 })
-  await expect(page.locator('form#content-form')).toBeVisible()
-  return page.url()
+
+  // Drop the list's `?ref=` round-trip param. The collapse-state key is
+  // `window.location.pathname + ':' + collectionId`, so the query is noise — and a canonical URL
+  // keeps the two documents' keys comparable, which is the whole point of this test.
+  return new URL(href, page.url()).pathname
 }
 
 test.describe('Collapsible State Persistence @content', () => {
@@ -144,7 +167,7 @@ test.describe('Collapsible State Persistence @content', () => {
     await blockContent(1).locator('input[type="text"]').first().fill('Text Heading')
     await blockContent(1).locator('textarea').first().fill('Text body content')
 
-    const docAEditUrl = await saveAndCaptureEditUrl(page)
+    const docAEditUrl = await saveAndCaptureEditUrl(page, docATitle)
 
     // Set UI collapse state on the saved edit page (same document path/key).
     await page.goto(docAEditUrl)
@@ -192,7 +215,7 @@ test.describe('Collapsible State Persistence @content', () => {
     }
     await page.fill('input[name="title"]', docBTitle)
     await page.fill('input[name="slug"]', docBSlug)
-    const docBEditUrl = await saveAndCaptureEditUrl(page)
+    const docBEditUrl = await saveAndCaptureEditUrl(page, docBTitle)
 
     // Return to document A and verify state restoration.
     await page.goto(docAEditUrl)
