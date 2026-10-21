@@ -22,6 +22,27 @@ type Bindings = {
 // Track if bootstrap has been run in this worker instance
 let bootstrapComplete = false;
 
+/**
+ * The bootstrap currently running on this isolate, if any.
+ *
+ * `bootstrapComplete` is only set at the *end* of the work, so it cannot keep a second request
+ * out while the first is still going. Every request that arrived on a cold isolate before the
+ * first one finished therefore saw `false` and ran the whole bootstrap again — concurrently, on a
+ * single-threaded isolate, against the same D1. The cost is not N parallel bootstraps but N
+ * interleaved ones: each copy's serial D1 round trips queue behind every other copy's, so all N
+ * requests take roughly N times the ~3-9s a cold bootstrap costs on its own.
+ *
+ * That is reachable from ordinary traffic — a dashboard load fires five fragment requests at once
+ * — and it is what a four-worker Playwright run hitting a freshly spawned isolate does on every
+ * cold start. It showed up as whole batches of unrelated requests, browser and API client alike,
+ * stalling past 30s on preview deployments with nothing in the logs: no errors, no 429s, just an
+ * isolate spending its time redoing work it had already started.
+ *
+ * So hold the first caller's promise and let everyone else wait on it. One bootstrap per isolate,
+ * and the requests that would have duplicated it now cost a single `await`.
+ */
+let bootstrapInFlight: Promise<void> | null = null;
+
 // KV key for cross-isolate bootstrap state. Version-keyed so a code deployment
 // (SONICJS_VERSION bump) automatically invalidates the cached flag and forces a fresh full
 // bootstrap on the next cold start.
@@ -213,6 +234,22 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
       return next();
     }
 
+    // Somebody else is already doing this. Wait for them rather than starting a second copy.
+    // The promise below is only ever resolved, never rejected — every failure path inside the
+    // bootstrap is already caught and logged — so there is nothing to catch here.
+    if (bootstrapInFlight) {
+      await bootstrapInFlight;
+      return next();
+    }
+
+    let releaseBootstrap: () => void = () => {};
+    bootstrapInFlight = new Promise<void>((resolve) => {
+      releaseBootstrap = resolve;
+    });
+
+    // `try` so that the gate is released on *every* exit, including a throw from somewhere that
+    // is not already wrapped. Leaking it would park every later request on this isolate forever.
+    try {
     const host = c.req.header('host') || '';
 
     // Fast KV check: if a previous isolate already ran the full bootstrap for this app version
@@ -441,6 +478,12 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
       console.error("[Bootstrap] Error during system initialization:", error);
       // Don't prevent the app from starting, but log the error
     }
+    } finally {
+      // Clear the holder too: on success `bootstrapComplete` keeps everyone out, and on failure
+      // the next request should be free to try again rather than inherit a settled promise.
+      releaseBootstrap();
+      bootstrapInFlight = null;
+    }
 
     return next();
   };
@@ -451,6 +494,7 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
  */
 export function resetBootstrap(complete?: boolean) {
   bootstrapComplete = complete ?? false;
+  bootstrapInFlight = null;
   lastSecurityBindings = null
   lastSecurityError = null
   securityWarned = false
