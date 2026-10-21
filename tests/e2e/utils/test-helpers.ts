@@ -713,37 +713,58 @@ export async function submitLoginForm(
 type SessionCookies = Awaited<ReturnType<BrowserContext['cookies']>>
 let cachedSessionCookies: SessionCookies | null = null
 
+/** The email the cookie jar currently authenticates as, lowercased, or null if nobody. */
+async function signedInAs(page: Page): Promise<string | null> {
+  const res = await page.request
+    .get('/auth/get-session', { headers: { Origin: TEST_ORIGIN } })
+    .catch(() => null)
+  if (!res || !res.ok()) return null
+  const body = (await res.json().catch(() => null)) as { user?: { email?: string } } | null
+  return body?.user?.email?.toLowerCase() ?? null
+}
+
 /**
- * Install the cached session into this test's context and prove it is still live.
+ * Install the cached session into this test's context and prove it is live *and the admin's*.
  *
  * Validated with a request, not with "did a navigation land on /auth/login": `loginAsAdmin(page,
  * false)` callers never navigate, so a revoked session would otherwise go unnoticed until some
  * later step failed for an unrelated-looking reason. Specs that sign out, reset a password or
  * enrol a second factor on the shared admin all revoke the session — this is the path that
  * notices and falls back to a real sign-in.
+ *
+ * Checking the identity, not just that `user` is present, is the whole point. `loginAsAdmin` is
+ * not only called from a `beforeEach` with a fresh context: specs sign in as somebody else first
+ * and then call it to get back to being admin. `108-two-factor-api-enforcement` does exactly
+ * that — `createEnrolledUser` signs in as a throwaway user and enrols them, then `resetAsAdmin`
+ * calls `loginAsAdmin`. That user's `better-auth.session_token` is still in the jar, it is live,
+ * and it has a `user`, so a presence-only check reports success and the real sign-in is skipped.
+ * The page then stays authenticated as the wrong person, `/admin` redirects away from itself,
+ * and `loginAsAdmin`'s `waitForURL(/\/admin/)` times out at 20s on both attempts. That was three
+ * hard failures in CI run 39587538658, plus the RBAC and auth specs that do the same thing.
+ *
+ * When the jar holds a foreign session, clear it and retry with only the cached cookies before
+ * giving up — the admin session is usually still perfectly good, just shadowed. Cookies are
+ * cleared only on that path, so the ordinary `beforeEach` case still touches nothing.
  */
 async function reuseCachedSession(page: Page): Promise<boolean> {
   if (!cachedSessionCookies) return false
 
+  const adminEmail = ADMIN_CREDENTIALS.email.toLowerCase()
+
   await page.context().addCookies(cachedSessionCookies)
-  const res = await page.request
-    .get('/auth/get-session', { headers: { Origin: TEST_ORIGIN } })
-    .catch(() => null)
+  if ((await signedInAs(page)) === adminEmail) return true
 
-  if (!res || !res.ok()) {
-    cachedSessionCookies = null
-    await page.context().clearCookies()
-    return false
-  }
+  // Either nobody is signed in, or somebody else's cookie won. Drop everything and re-seat only
+  // the cached admin cookies — `addCookies` does not reliably displace a same-named cookie that
+  // another sign-in set with a different path or domain.
+  await page.context().clearCookies()
+  await page.context().addCookies(cachedSessionCookies)
+  if ((await signedInAs(page)) === adminEmail) return true
 
-  const body = (await res.json().catch(() => null)) as { user?: unknown } | null
-  if (!body?.user) {
-    cachedSessionCookies = null
-    await page.context().clearCookies()
-    return false
-  }
-
-  return true
+  // The cached session itself is dead (signed out, password changed, second factor enrolled).
+  cachedSessionCookies = null
+  await page.context().clearCookies()
+  return false
 }
 
 export async function loginAsAdmin(page: Page, landOn: string | false = '/admin') {
@@ -817,6 +838,32 @@ async function signInAsAdmin(page: Page) {
   // Keep only what the sign-in issued. `context.cookies()` also holds `csrf_token`, which the
   // app rotates per request and `getCsrfTokenFromPage` reads straight back out of the jar —
   // replaying a stale one into 700 later contexts is a risk the session token does not carry.
+  // Confirm the jar actually authenticates as the admin before caching it for the rest of the
+  // worker. A spec that signed in as somebody else first can leave their own `better-auth.*`
+  // cookie behind on a different path, and caching that would poison every later test in the
+  // process — the same failure as reusing a foreign session, but persistent instead of per-test.
+  //
+  // Self-healing rather than fatal: on a worker's first call `reuseCachedSession` returns before
+  // it clears anything, so a foreign cookie can still be present here. Clearing and signing in
+  // again on a clean jar settles it.
+  if ((await signedInAs(page)) !== ADMIN_CREDENTIALS.email.toLowerCase()) {
+    await page.context().clearCookies();
+    const retry = await page.request.post('/auth/sign-in/email', {
+      data: { email: ADMIN_CREDENTIALS.email, password: ADMIN_CREDENTIALS.password },
+      headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
+    });
+    if (!retry.ok()) {
+      throw new Error(`BA sign-in failed on a cleared jar: ${retry.status()} ${await retry.text()}`);
+    }
+    if ((await signedInAs(page)) !== ADMIN_CREDENTIALS.email.toLowerCase()) {
+      cachedSessionCookies = null;
+      throw new Error(
+        'Signed in as the admin but /auth/get-session reports somebody else, on a jar that was ' +
+          'just cleared. The shared admin account is in an unexpected state.'
+      );
+    }
+  }
+
   const all = await page.context().cookies();
   cachedSessionCookies = all.filter((c) => c.name.startsWith('better-auth.'));
 }
