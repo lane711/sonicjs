@@ -6,7 +6,7 @@ import { loginAsAdmin, submitLoginForm, TEST_ORIGIN } from './utils/test-helpers
  * A viewer account is provisioned; the viewer sidebar must not expose
  * Users, Plugins, or Settings navigation.
  */
-test.describe('Viewer role sidebar scope @auth @lock-auth-login', () => {
+test.describe('Viewer role sidebar scope @auth @lock-auth-login @lock-auth-registration', () => {
   const viewerEmail = `viewer-test-${Date.now()}@example.com`
   const viewerPassword = 'ViewerPass1!'
 

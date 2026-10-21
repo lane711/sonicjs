@@ -173,7 +173,7 @@ async function submitTwoFactorForm(page: Page, click: () => Promise<void>): Prom
   ])
 }
 
-test.describe('Two-Factor Authentication @auth @lock-auth-login', () => {
+test.describe('Two-Factor Authentication @auth @lock-auth-login @lock-auth-registration', () => {
   test.describe('enrolment page', () => {
     test.beforeEach(async ({ page }) => {
       await loginAsAdmin(page)

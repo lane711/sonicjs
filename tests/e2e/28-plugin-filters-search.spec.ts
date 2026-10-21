@@ -195,10 +195,13 @@ test.describe('Plugin Filters and Search @plugins @lock-plugin-hello-world', () 
     await page.fill('#search-input', 'management')
     await page.waitForTimeout(500) // Allow filter to apply
 
-    // Should show some results or none
+    // Six catalog descriptions contain "management" (auth, media, database tools, forms,
+    // redirects, subscriptions), so a working description filter matches some and hides others.
+    // `toBeGreaterThanOrEqual(0)` held for every count, including zero -- i.e. for a filter that
+    // matched nothing because it never looked at descriptions at all.
     const visiblePlugins = await page.locator('.plugin-card:visible').count()
-    expect(visiblePlugins).toBeGreaterThanOrEqual(0)
-    expect(visiblePlugins).toBeLessThanOrEqual(totalPlugins)
+    expect(visiblePlugins, 'searching descriptions for "management" matched nothing').toBeGreaterThan(0)
+    expect(visiblePlugins, 'the description filter hid nothing').toBeLessThan(totalPlugins)
 
     // Clear search
     await page.fill('#search-input', '')

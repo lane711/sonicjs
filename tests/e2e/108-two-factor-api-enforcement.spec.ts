@@ -131,7 +131,7 @@ async function signInWithPassword(page: Page, email: string, password: string) {
   expect(body.twoFactorRedirect ?? false).toBe(false)
 }
 
-test.describe('Two-Factor API Enforcement @auth', () => {
+test.describe('Two-Factor API Enforcement @auth @lock-auth-registration', () => {
   // Once per worker rather than per test: the memo being busted lives in the SERVER isolate, so
   // one activation covers every test that follows, and each repeat would cost another admin
   // sign-in against the 10/min rate limit on /auth/seed-admin.

@@ -242,7 +242,16 @@ function hardenPage(page: Page): Page {
       // Safe to retry: waitForURL tests the CURRENT url, so if the navigation did happen while
       // we were waiting on `load`, the retry matches immediately. If it never happened, this
       // still waits for it — just without the unreachable settle condition.
-      await originalWaitForURL(url, { ...options, waitUntil: 'domcontentloaded', timeout: FALLBACK_TIMEOUT_MS })
+      // Keep the caller's budget. This is the one fallback that waits for something the caller
+      // chose the timeout for -- a save round trip, not an advisory settle -- so collapsing 15s or
+      // 20s down to a flat 10s here both shortens the wait and reports a number the caller never
+      // asked for: `waitForURL: Timeout 10000ms` against a `{ timeout: 15000 }` call site, which
+      // is how 39-slug-generation's CI failure ended up looking like a fixtures bug.
+      await originalWaitForURL(url, {
+        ...options,
+        waitUntil: 'domcontentloaded',
+        timeout: Math.max(options?.timeout ?? 0, FALLBACK_TIMEOUT_MS),
+      })
     }
   }
 

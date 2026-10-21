@@ -4,6 +4,13 @@ import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers'
 // Tests below that actually save content need a name no earlier run has already used: a
 // repeated slug is rejected by the duplicate check and the form never submits. The `Test `
 // prefix is what the cleanup endpoint matches on, so these rows do not pile up either.
+// Slug availability is checked by a 500ms-debounced request to the worker, so these
+// assertions wait on a cold HTTP round trip rather than on local DOM work. Playwright's
+// 5s expect default does not cover that against a preview deployment: it is what failed
+// two of these tests in CI, both attempts, with the status stuck on
+// "⏳ Checking availability..." -- the request in flight, not a product defect.
+const SLUG_CHECK_TIMEOUT = 20_000
+
 const RUN = Date.now()
 
 /**
@@ -39,7 +46,7 @@ test.describe('Slug Generation @content', () => {
     
     // Should show available status
     const statusDiv = page.locator('#field-slug-status')
-    await expect(statusDiv).toContainText('Available', { timeout: 5000 })
+    await expect(statusDiv).toContainText('Available', { timeout: SLUG_CHECK_TIMEOUT })
   })
 
   test('should auto-generate slug for blog_post collection', async ({ page }) => {
@@ -60,7 +67,7 @@ test.describe('Slug Generation @content', () => {
     
     // Should show available status
     const statusDiv = page.locator('#field-slug-status')
-    await expect(statusDiv).toContainText('Available', { timeout: 5000 })
+    await expect(statusDiv).toContainText('Available', { timeout: SLUG_CHECK_TIMEOUT })
   })
 
   test('should handle special characters in slug generation', async ({ page }) => {
@@ -186,7 +193,7 @@ test.describe('Slug Generation @content', () => {
     
     // Should show as unavailable
     const statusDiv = page.locator('#field-slug-status')
-    await expect(statusDiv).toContainText('already in use')
+    await expect(statusDiv).toContainText('already in use', { timeout: SLUG_CHECK_TIMEOUT })
     
     // Form should have validation error
     const isInvalid = await slugField.evaluate((el: HTMLInputElement) => !el.validity.valid)
@@ -326,7 +333,7 @@ test.describe('Slug Generation @content', () => {
     await page.waitForTimeout(1500)
     
     // Should show available
-    await expect(statusDiv).toContainText('Available')
+    await expect(statusDiv).toContainText('Available', { timeout: SLUG_CHECK_TIMEOUT })
   })
 
   test('should prevent form submission with duplicate slug', async ({ page }) => {
@@ -373,7 +380,9 @@ test.describe('Slug Generation @content', () => {
     await page.waitForTimeout(1500)
     
     // Should show error
-    await expect(page.locator('#field-slug-status')).toContainText('already in use')
+    await expect(page.locator('#field-slug-status')).toContainText('already in use', {
+      timeout: SLUG_CHECK_TIMEOUT,
+    })
     
     // Try to submit
     await page.click('button[name="action"][value="save_and_publish"]')

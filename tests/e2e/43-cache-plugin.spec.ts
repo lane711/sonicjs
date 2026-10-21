@@ -69,13 +69,11 @@ test.describe('Cache Plugin Dashboard @plugins', () => {
     await page.goto('/admin/cache');
     await waitForHTMX(page);
 
-    // Look for clear cache functionality
-    // The button might have different text depending on the UI
+    // The dashboard renders "Clear All" unconditionally (admin-cache.template.ts), so this is a
+    // hard requirement. `toBeGreaterThanOrEqual(0)` was true of every possible count, including
+    // the one where the page failed to render any buttons at all.
     const clearButton = page.locator('button').filter({ hasText: /clear/i }).first();
-
-    // Should have at least one clear button
-    const buttonCount = await clearButton.count();
-    expect(buttonCount).toBeGreaterThanOrEqual(0); // Button may or may not exist based on UI
+    await expect(clearButton).toBeVisible();
   });
 
   test('should have refresh functionality', async ({ page }) => {
@@ -83,16 +81,17 @@ test.describe('Cache Plugin Dashboard @plugins', () => {
     await waitForHTMX(page);
 
     // Look for refresh button
+    // Also rendered unconditionally; the old `if (count > 0)` turned a missing Refresh button
+    // into a pass for the test whose whole subject is the Refresh button.
     const refreshButton = page.locator('button').filter({ hasText: /refresh/i }).first();
+    await expect(refreshButton).toBeVisible();
 
-    if (await refreshButton.count() > 0) {
-      // Click refresh
-      await refreshButton.click();
-      await waitForHTMX(page);
+    await refreshButton.click();
+    await waitForHTMX(page);
 
-      // Page should still be on cache dashboard
-      await expect(page).toHaveURL(/\/admin\/cache/);
-    }
+    // Page should still be on cache dashboard
+    await expect(page).toHaveURL(/\/admin\/cache/);
+    await expect(refreshButton).toBeVisible();
   });
 });
 

@@ -124,21 +124,23 @@ test.describe('Settings - General Tab @auth', () => {
     await page.locator('input[name="siteName"]').fill('');
     await page.locator('textarea[name="siteDescription"]').fill('');
 
-    // Try to save
-    await page.locator('button:has-text("Save Changes")').click();
-    await page.waitForTimeout(1000);
+    // Try to save, and wait for the POST rather than for a fixed second: the notification only
+    // exists between the response landing and its own five-second self-destruct.
+    const [response] = await Promise.all([
+      page.waitForResponse(
+        (r) => r.url().includes('/admin/settings/general') && r.request().method() === 'POST',
+        { timeout: 30000 }
+      ),
+      page.locator('button:has-text("Save Changes")').click(),
+    ]);
 
-    // Should show an error (either validation message or notification)
-    // We expect either an HTML5 validation or an error notification
-    const siteNameField = page.locator('input[name="siteName"]');
-    const isInvalid = await siteNameField.evaluate((el: HTMLInputElement) => !el.validity.valid);
+    expect(response.status(), 'an empty site name was accepted').toBe(400);
+    expect((await response.json()).error).toMatch(/required/i);
 
-    // If HTML5 validation isn't triggered, check for error notification
-    if (!isInvalid) {
-      // Should see error notification or error state
-      const hasErrorNotification = await page.locator('text=/required|error/i').count() > 0;
-      expect(hasErrorNotification).toBeTruthy();
-    }
+    // ...and the rejection has to reach the operator, not just the network tab.
+    await expect(page.locator('#notification-container')).toContainText(/required/i, {
+      timeout: 10000,
+    });
   });
 
   test('should update admin email', async ({ page }) => {

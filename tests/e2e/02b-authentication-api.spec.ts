@@ -6,12 +6,7 @@ import { ADMIN_CREDENTIALS, requestLoginToken } from './utils/test-helpers';
  * by a concurrent test shard (37-disable-registration.spec.ts).
  * Returns true if the test should be skipped.
  */
-function isRegistrationDisabled(status: number, body: any): boolean {
-  // Any 403 from /auth/register means registration is blocked (disabled, rate-limited, etc.)
-  return status === 403;
-}
-
-test.describe('Authentication API @auth @api @lock-auth-login', () => {
+test.describe('Authentication API @auth @api @lock-auth-login @lock-auth-registration', () => {
   const testUser = {
     email: 'test.api.user@example.com',
     password: 'TestPassword123!',
@@ -65,7 +60,6 @@ test.describe('Authentication API @auth @api @lock-auth-login', () => {
       });
 
       const data = await response.json();
-      if (isRegistrationDisabled(response.status(), data)) return;
 
       expect(response.status()).toBe(201);
       expect(data).toHaveProperty('user');
@@ -99,7 +93,6 @@ test.describe('Authentication API @auth @api @lock-auth-login', () => {
       });
 
       const data = await response.json();
-      if (isRegistrationDisabled(response.status(), data)) return;
 
       expect(response.status()).toBe(201);
       expect(data.user.email).toBe(uniqueUser.email.toLowerCase());
@@ -142,7 +135,6 @@ test.describe('Authentication API @auth @api @lock-auth-login', () => {
         data: uniqueUser
       });
       const firstData = await firstResponse.json();
-      if (isRegistrationDisabled(firstResponse.status(), firstData)) return;
       expect(firstResponse.status()).toBe(201);
 
       // Second registration with same email should fail
@@ -170,11 +162,6 @@ test.describe('Authentication API @auth @api @lock-auth-login', () => {
         data: uniqueUser
       });
 
-      if (response.status() === 403) {
-        const body = await response.json();
-        if (isRegistrationDisabled(response.status(), body)) return;
-      }
-
       expect(response.status()).toBe(201);
 
       // Check for auth cookie
@@ -197,7 +184,6 @@ test.describe('Authentication API @auth @api @lock-auth-login', () => {
       });
 
       const data = await response.json();
-      if (isRegistrationDisabled(response.status(), data)) return;
 
       expect(response.status()).toBe(201);
       expect(data.user.role).toBe('viewer');
@@ -501,7 +487,6 @@ test.describe('Authentication API @auth @api @lock-auth-login', () => {
       });
 
       const data = await response.json();
-      if (isRegistrationDisabled(response.status(), data)) return;
 
       expect(response.status()).toBe(201);
 
@@ -559,12 +544,16 @@ test.describe('Authentication API @auth @api @lock-auth-login', () => {
         data: xssPayload
       });
 
+      expect([201, 400], `unexpected status ${response.status()}`).toContain(response.status());
+      const data = await response.json();
+
       if (response.status() === 201) {
-        const data = await response.json();
-        
-        // Names should be stored as-is (not executed)
+        // Stored verbatim, not re-encoded and not executed.
         expect(data.user.firstName).toBe(xssPayload.firstName);
         expect(data.user.lastName).toBe(xssPayload.lastName);
+      } else {
+        // Rejected by validation is equally fine -- but it has to say so.
+        expect(data).toHaveProperty('error');
       }
     });
 
@@ -644,13 +633,16 @@ test.describe('Authentication API @auth @api @lock-auth-login', () => {
         }
       });
 
-      // Should handle gracefully (either accept or reject with proper error)
+      // Should handle gracefully: either a clean rejection or a clean acceptance. What it may
+      // not do is 5xx, and it may not reject without saying why.
+      const data = await response.json();
       if (!response.ok()) {
         expect(response.status()).toBeGreaterThanOrEqual(400);
-        expect(response.status()).toBeLessThan(600);
-        
-        const data = await response.json();
+        expect(response.status()).toBeLessThan(500);
         expect(data).toHaveProperty('error');
+      } else {
+        expect(response.status()).toBe(201);
+        expect(data.user).toHaveProperty('email');
       }
     });
   });
@@ -658,15 +650,7 @@ test.describe('Authentication API @auth @api @lock-auth-login', () => {
   test.describe('Session Management', () => {
     test('should maintain session across requests', async ({ request }) => {
       // Login — Playwright stores session cookies automatically
-      const loginResponse = await request.post('/auth/login', {
-        data: {
-          email: ADMIN_CREDENTIALS.email,
-          password: ADMIN_CREDENTIALS.password
-        }
-      });
-      // Skip if rate-limited
-      if (loginResponse.status() === 429) return;
-      expect(loginResponse.status()).toBe(200);
+      await requestLoginToken(request, ADMIN_CREDENTIALS);
 
       // Make authenticated requests — Playwright auto-sends session cookies
       const meResponse = await request.get('/auth/me');

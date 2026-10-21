@@ -1,7 +1,7 @@
 import { test, expect } from './fixtures';
 import { ADMIN_CREDENTIALS, requestLoginToken } from './utils/test-helpers';
 
-test.describe('User Management - Hard Delete @auth @lock-auth-login', () => {
+test.describe('User Management - Hard Delete @auth @lock-auth-login @lock-auth-registration', () => {
   let authToken: string;
 
   test.beforeAll(async ({ request }) => {

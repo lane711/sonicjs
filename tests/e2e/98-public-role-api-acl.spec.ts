@@ -25,7 +25,7 @@ async function ensurePublicRoleExists(page: any) {
   return body.includes('Public') || body.includes('public')
 }
 
-test.describe('Public role — API ACL enforcement @auth @api', () => {
+test.describe('Public role — API ACL enforcement @auth @api @lock-auth-registration', () => {
   test('anonymous user sees published content (baseline)', async ({ page }) => {
     await page.context().clearCookies()
     const res = await page.request.get('/api/blog_post')

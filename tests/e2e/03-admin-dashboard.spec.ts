@@ -59,14 +59,31 @@ test.describe('Admin Dashboard @smoke', () => {
 
 
   test('should handle quick actions', async ({ page }) => {
-    // Test any quick action buttons on dashboard
-    const quickActions = page.locator('.quick-action, .btn-primary');
-    const count = await quickActions.count();
+    // The dashboard is at /admin/dashboard -- /admin lands on the content list. This test used
+    // to look for `.quick-action, .btn-primary` on whatever page login left it on; neither class
+    // exists anywhere in the catalyst templates, so the count was always 0 and the old
+    // `if (count > 0)` guard made that a pass.
+    await page.goto('/admin/dashboard');
 
-    if (count > 0) {
-      // Verify first quick action is clickable
-      await expect(quickActions.first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Quick Actions' })).toBeVisible();
+
+    // The three actions the panel is built from, and where each one goes. Matched by their own
+    // labels rather than by an enclosing element: every one of these hrefs is also a sidebar
+    // link, but the sidebar calls them "Content", "Media" and "Users".
+    const action = (title: string, href: string) =>
+      page.locator(`a[href="${href}"]`).filter({ hasText: title });
+
+    for (const [title, href] of [
+      ['Create Content', '/admin/content/new'],
+      ['Upload Media', '/admin/media'],
+      ['Manage Users', '/admin/users'],
+    ] as const) {
+      await expect(action(title, href), `quick action "${title}" is missing`).toBeVisible();
     }
+
+    // And it has to actually navigate -- the links are the only control on this panel.
+    await action('Create Content', '/admin/content/new').click();
+    await page.waitForURL(/\/admin\/content\/new/, { timeout: 15_000 });
   });
 
   test('should open and close User Dropdown menu in desktop and mobile', async ({ page }) => {
@@ -98,11 +115,12 @@ test.describe('Admin Dashboard @smoke', () => {
     await page.goto('/admin');
 
     // Open mobile sidebar first (mobile nav is hidden by default)
+    // The viewport was set to 375px above, so the hamburger has to be there. Guarding on its
+    // visibility meant a missing mobile nav skipped straight past this and still passed.
     const mobileMenuButton = page.locator('button[aria-label="Open navigation"]');
-    if (await mobileMenuButton.isVisible()) {
-      await mobileMenuButton.click();
-      await page.waitForTimeout(500); // Wait for sidebar animation
-    }
+    await expect(mobileMenuButton).toBeVisible({ timeout: 5000 });
+    await mobileMenuButton.click();
+    await page.waitForTimeout(500); // Wait for sidebar animation
 
     // Find the user menu button (mobile version)
     const mobileUserButton = page.locator('[data-user-menu]').last();
