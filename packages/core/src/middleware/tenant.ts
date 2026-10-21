@@ -14,7 +14,8 @@
  * Every candidate is validated against the tenant registry (must exist AND be active); invalid
  * candidates fall through to the next source. Resolution state (plugin status + settings + tenant
  * map) is cached per isolate with a short TTL and invalidated by tenant/plugin writes in the same
- * isolate.
+ * isolate — so an /admin request naming a tenant this isolate's registry does not hold re-reads the
+ * registry once rather than falling through to 'default' (see tenantMiddleware).
  *
  * `getDocumentRequestContext()` reads the resolved value — the document layer chokepoint stays the
  * single place tenant scope enters queries (R3).
@@ -235,7 +236,32 @@ export function tenantMiddleware() {
     // result, so admin requests re-read the activation flag instead of trusting the per-isolate
     // cache. See loadTenantState().
     const path = new URL(c.req.url).pathname
-    const state = await loadTenantState(db, path.startsWith('/admin'))
+    const isAdmin = path.startsWith('/admin')
+    let state = await loadTenantState(db, isAdmin)
+
+    // A tenant created on another isolate is absent from this isolate's cached registry, and
+    // resolveTenantSlug() rejects any candidate it cannot find there. So for up to the full 30s TTL
+    // the cookie the switcher just set silently resolves to 'default': the admin clicks Switch, the
+    // redirect lands on an isolate that has never heard of the tenant they created a moment ago, and
+    // the row comes back still offering to switch. That is CI run 39582792718's 70-multi-tenant
+    // failure, and it is invisible locally because `wrangler dev` runs one isolate, where the
+    // create's own invalidateTenantCache() is always the cache the next read hits.
+    //
+    // Both candidates are free to read, so when one names a tenant this isolate does not know,
+    // re-read the registry once before giving up on it. Admin-only, for the same reason
+    // loadTenantState() re-reads the activation flag only there: /admin is where someone is watching
+    // the result of a write they just made, and gating on the path keeps public and API traffic from
+    // being able to force a registry reload with a junk header.
+    if (isAdmin && state.pluginActive) {
+      const candidates = [
+        c.req.header(state.settings.headerName)?.trim().toLowerCase(),
+        getCookie(c, TENANT_COOKIE)?.trim().toLowerCase(),
+      ]
+      if (candidates.some((slug) => slug && !state.tenants.has(slug))) {
+        invalidateTenantCache()
+        state = await loadTenantState(db)
+      }
+    }
 
     // Membership gate: for authed requests, resolution is restricted to the user's tenants. Anon
     // requests (public API / content) skip enforcement so public routing is unchanged. Platform
