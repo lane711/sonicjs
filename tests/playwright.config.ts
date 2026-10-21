@@ -41,8 +41,44 @@ export default defineConfig({
    * worst case per failing test from 360s to 240s.
    *
    * The job cap itself is not adjustable from here — pull_request_target runs the base branch's
-   * copy of pr-tests.yml, so a timeout-minutes change on this branch stays inert until merge. */
-  retries: process.env.CI ? 1 : 0,
+   * copy of pr-tests.yml, so a timeout-minutes change on this branch stays inert until merge.
+   *
+   * Back to 2, now that halving `workers` (below) bought the room. Run 39649589162 went
+   * 5 failed / 22 flaky / 478 passed in 42.7 min, a 47-minute job against a 90-minute cap, and
+   * four of those five failures were the same thing twice in a row: a request that left the
+   * runner and never came back, once on the first attempt and once on the retry. Nothing about
+   * them is specific to the test — three are `goto('/admin')` inside `loginAsAdmin`, one is a
+   * bare `apiRequestContext.post('/auth/register')` with no browser involved.
+   *
+   * The server is not what is failing, and that is measured rather than assumed. Against this
+   * same preview deployment, 24 concurrent real registrations — each one a scrypt hash plus a
+   * two-statement D1 batch — answered in 3.6s worst case; 40 concurrent POSTs answered in 4.3s
+   * worst case; 28 concurrent authenticated admin page loads in 2.9s. No load reproducible from
+   * outside CI makes it hang, and the hangs themselves are binary rather than slow: the requests
+   * that fail never produce a first byte, while the slowest that completes is ~10s.
+   *
+   * So the residual is infrastructure between the runner and Cloudflare, at roughly a 10% chance
+   * per attempt — and the arithmetic falls out of that exactly: 0.1^2 x 533 = 5.3 against the 5
+   * seen, which also says the hangs are independent *between* attempts (a fresh browser context,
+   * so fresh connections) even though the in-fixture navigation retry hangs along with the
+   * attempt it belongs to.
+   *
+   * Each extra attempt is near-free, because only the tests that already failed every previous
+   * one ever reach it: the third costs five tests x 30-75s, about 4 minutes, and the fourth costs
+   * the ~0.5 tests expected to get that far. Expected failures go 5.3 -> 0.5 -> 0.05. Stopping at
+   * 2 would leave a ~40% chance of a green run, which is not a gate. */
+  retries: process.env.CI ? 3 : 0,
+  /* Circuit breaker for the retries above.
+   *
+   * Three retries are cheap only while failures are rare. If something systemic breaks — a bad
+   * deploy, a migration that did not apply, an expired token — then every test fails four times
+   * instead of once, which is 4x the slowest possible run and would blow the job's 90-minute cap.
+   * That is the one outcome worth avoiding outright: a killed job uploads videos but no report,
+   * so it tells you nothing, while a run that stops early still says exactly what broke.
+   *
+   * 25 sits well clear of the 0-5 this suite produces when it is merely flaky, and is reached
+   * within the first few minutes of a systemic break. */
+  maxFailures: process.env.CI ? 25 : 0,
   /* Per-test timeout.
    *
    * Most specs log in (3 API round trips + a navigation) before their first assertion, then make
@@ -66,9 +102,10 @@ export default defineConfig({
    * environment-specific, not the tests.
    *
    * 120 and not more: the job's own budget is 90 minutes, and every timeout that does fire costs
-   * two attempts (see `retries`). One run spent roughly 25 of its 49 minutes burning the 90s
+   * every attempt `retries` allows. One run spent roughly 25 of its 49 minutes burning the 90s
    * limit, so the headroom has to stay small enough that the worst case still lands inside the
-   * job. */
+   * job. What keeps that worst case in hand now is `actionTimeout` below: a hung request fails
+   * its action at 30s and names itself, so a test rarely reaches this number at all. */
   timeout: process.env.CI ? 120 * 1000 : 90 * 1000,
   /* 1 worker locally (in-memory D1 conflicts); 2 in CI.
    *
