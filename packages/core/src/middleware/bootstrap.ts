@@ -43,6 +43,47 @@ let bootstrapComplete = false;
  */
 let bootstrapInFlight: Promise<void> | null = null;
 
+/** When the current holder took the gate, for the deadline below. */
+let bootstrapStartedAt = 0;
+
+/**
+ * How long a follower will wait on the holder before giving up and bootstrapping itself.
+ *
+ * The gate above is an optimisation — it exists to stop N concurrent bootstraps, not to make a
+ * follower correct — so waiting on it must never be able to outlive the thing it waits for.
+ * `bootstrapInFlight` is created inside *another request's* execution context, and Cloudflare
+ * cancels a request's pending work the moment its client disconnects. A follower that signed up
+ * for a holder whose request was torn down before the `finally` ran would wait on a promise
+ * nobody is left to resolve: not slow, never. Every later request on that isolate inherits the
+ * same dead promise, so one timed-out client silently wedges the isolate for every client after
+ * it — which is exactly the reported signature, a request that leaves the test runner and never
+ * produces a first byte.
+ *
+ * 20s is chosen against the two numbers either side of it: a cold bootstrap is ~90 serial D1
+ * round trips, so ~3s local and well under 10s even on a slow remote D1, while the E2E suite's
+ * action timeout is 30s. A follower that is still waiting at 20s is not waiting on a bootstrap
+ * that is about to finish.
+ */
+const BOOTSTRAP_DEADLINE_MS = 20_000;
+
+/**
+ * Resolve to true if `p` settles within `ms`, false if the clock wins.
+ *
+ * The timer is always cleared: a pending `setTimeout` holds the Worker's I/O context open past
+ * the response, and this runs on the hot path of every request on a cold isolate.
+ */
+function settlesWithin(p: Promise<unknown>, ms: number): Promise<boolean> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  return Promise.race([
+    p.then(() => true, () => true),
+    new Promise<boolean>((resolve) => {
+      timer = setTimeout(() => resolve(false), ms);
+    }),
+  ]).finally(() => {
+    if (timer !== undefined) clearTimeout(timer);
+  });
+}
+
 // KV key for cross-isolate bootstrap state. Version-keyed so a code deployment
 // (SONICJS_VERSION bump) automatically invalidates the cached flag and forces a fresh full
 // bootstrap on the next cold start.
@@ -251,18 +292,28 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
       return next();
     }
 
-    // Somebody else is already doing this. Wait for them rather than starting a second copy.
-    // The promise below is only ever resolved, never rejected — every failure path inside the
-    // bootstrap is already caught and logged — so there is nothing to catch here.
+    // Somebody else is already doing this. Wait for them rather than starting a second copy —
+    // but only up to a deadline, because the holder's request can be cancelled out from under
+    // this one. See BOOTSTRAP_DEADLINE_MS.
     if (bootstrapInFlight) {
-      await bootstrapInFlight;
-      return next();
+      const remaining = bootstrapStartedAt + BOOTSTRAP_DEADLINE_MS - Date.now();
+      if (remaining > 0 && (await settlesWithin(bootstrapInFlight, remaining))) {
+        return next();
+      }
+      // Either the holder blew the deadline or its request was torn down before the `finally`
+      // could release the gate. Drop the dead promise and bootstrap here instead of inheriting
+      // it. Worst case this is one duplicate bootstrap after a 20s stall — the operations are
+      // all idempotent — against an isolate that would otherwise never answer again.
+      console.warn("[Bootstrap] in-flight bootstrap exceeded its deadline; taking over");
+      bootstrapInFlight = null;
     }
 
     let releaseBootstrap: () => void = () => {};
-    bootstrapInFlight = new Promise<void>((resolve) => {
+    const ownGate = new Promise<void>((resolve) => {
       releaseBootstrap = resolve;
     });
+    bootstrapInFlight = ownGate;
+    bootstrapStartedAt = Date.now();
 
     // `try` so that the gate is released on *every* exit, including a throw from somewhere that
     // is not already wrapped. Leaking it would park every later request on this isolate forever.
@@ -513,8 +564,14 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
     } finally {
       // Clear the holder too: on success `bootstrapComplete` keeps everyone out, and on failure
       // the next request should be free to try again rather than inherit a settled promise.
+      //
+      // Only if the gate is still ours. A request that blew the deadline above and was taken
+      // over by a follower must not null out the follower's gate on its way out — that would
+      // reopen the stampede it was holding shut.
       releaseBootstrap();
-      bootstrapInFlight = null;
+      if (bootstrapInFlight === ownGate) {
+        bootstrapInFlight = null;
+      }
     }
 
     return next();
@@ -527,6 +584,7 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
 export function resetBootstrap(complete?: boolean) {
   bootstrapComplete = complete ?? false;
   bootstrapInFlight = null;
+  bootstrapStartedAt = 0;
   lastSecurityBindings = null
   lastSecurityError = null
   securityWarned = false

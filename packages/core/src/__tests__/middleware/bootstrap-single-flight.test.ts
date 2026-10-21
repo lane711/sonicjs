@@ -131,6 +131,72 @@ describe('bootstrapMiddleware runs one bootstrap per isolate under concurrency',
     expect(probe.kvGets).toHaveLength(1)
   })
 
+  it('does not wait forever on a holder whose request was torn down', async () => {
+    // `bootstrapInFlight` is created inside one request's execution context, and Cloudflare
+    // cancels a request's pending work the moment its client disconnects. A holder killed
+    // before its `finally` ran leaves a promise nobody will ever resolve — and every later
+    // request on the isolate then inherits it, so one timed-out client wedges the isolate for
+    // everyone after it. That reads exactly like the reported failure: a request that leaves
+    // the test runner and never produces a first byte.
+    //
+    // Simulated by taking the gate with a request whose KV read never settles, then letting a
+    // second request in. The second one must still reach its handler.
+    vi.useFakeTimers()
+    try {
+      const mw = await freshMiddleware()
+      const probe: Probe = { kvGets: [], d1Queries: [] }
+      let nextCalls = 0
+
+      const wedged = makeContext(probe)
+      wedged.env.CACHE_KV.get = () => new Promise(() => {})
+      // Deliberately not awaited: this is the request that never comes back.
+      void mw(wedged, async () => { nextCalls += 1 })
+      await Promise.resolve()
+
+      const follower = mw(makeContext(probe), async () => { nextCalls += 1 })
+      // Past BOOTSTRAP_DEADLINE_MS (20s). The follower takes over rather than inheriting.
+      await vi.advanceTimersByTimeAsync(21_000)
+      await follower
+
+      expect(nextCalls).toBe(1)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('leaves a taken-over gate alone when the original holder finally exits', async () => {
+    // A holder that blew the deadline and was taken over must not null out the new holder's
+    // gate on its way out — that reopens the stampede the gate exists to prevent.
+    vi.resetModules()
+    const mod = await import('../../middleware/bootstrap')
+    const mw = mod.bootstrapMiddleware({})
+    const probe: Probe = { kvGets: [], d1Queries: [] }
+
+    let releaseWedged: (v: string) => void = () => {}
+    const wedged = makeContext(probe)
+    wedged.env.CACHE_KV.get = () => new Promise<string>((r) => { releaseWedged = r })
+
+    vi.useFakeTimers()
+    try {
+      void mw(wedged, async () => {})
+      await Promise.resolve()
+
+      const follower = mw(makeContext(probe), async () => {})
+      await vi.advanceTimersByTimeAsync(21_000)
+      await follower
+
+      // The follower completed a full bootstrap, so `bootstrapComplete` is set and a third
+      // request short-circuits without touching KV at all.
+      const before = probe.kvGets.length
+      vi.useRealTimers()
+      releaseWedged('1')
+      await mw(makeContext(probe), async () => {})
+      expect(probe.kvGets).toHaveLength(before)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('releases the gate when a bootstrap fails, so the next request can retry', async () => {
     // A gate held by a failed attempt would park every later request on this isolate forever —
     // strictly worse than the duplicate work it exists to prevent. The D1 mock throws from
