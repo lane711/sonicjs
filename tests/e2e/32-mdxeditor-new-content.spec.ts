@@ -122,48 +122,36 @@ test.describe('MDXEditor on New Content Form @content', () => {
     }
   })
 
-  test('should check mdxeditor plugin status and settings', async ({ page }) => {
-    // Go to plugins page
+  // This test used to be a script, not a test: every branch ended in console.log and it
+  // made zero assertions, so it passed whether or not the plugin existed. It also clicked
+  // "Activate" when it found the button -- mutating plugin state in the middle of a run,
+  // with no verification, which is a cross-spec race rather than coverage. The toggle is
+  // covered by 15-plugins; what belongs here is that the card is coherent.
+  //
+  // The old locator was `/MDX.*Editor/i`, which matches no plugin in the catalog -- the
+  // markdown editor ships as `easy-mdx`, "EasyMDE Markdown Editor". So the test took its
+  // "plugin not found" branch on every single run and printed a list of the plugins it
+  // had failed to match. Nothing ever told anyone, because the branch logged and returned.
+  test('shows a coherent install status for the markdown editor plugin', async ({ page }) => {
     await page.goto('/admin/plugins')
     await page.waitForLoadState('networkidle')
 
-    // Find MDXEditor plugin
-    const mdxPluginCard = page.locator('.plugin-card').filter({ hasText: /MDX.*Editor/i })
-    const isVisible = await mdxPluginCard.isVisible()
-    console.log('MDX Editor plugin card visible:', isVisible)
+    const card = page.locator('.plugin-card').filter({ hasText: /EasyMDE/i }).first()
+    await expect(card).toBeVisible()
 
-    if (isVisible) {
-      // Check status
-      const statusBadge = await mdxPluginCard.locator('[data-status]')
-      const status = await statusBadge.textContent()
-      console.log('MDX Editor status:', status)
+    const status = await card.getAttribute('data-status')
+    expect(['active', 'inactive', 'installed', 'uninstalled'], `unexpected status ${status}`).toContain(status)
 
-      // Check if there's an activate/deactivate button
-      const activateBtn = mdxPluginCard.locator('button:has-text("Activate")')
-      const deactivateBtn = mdxPluginCard.locator('button:has-text("Deactivate")')
-
-      const hasActivate = await activateBtn.count() > 0
-      const hasDeactivate = await deactivateBtn.count() > 0
-
-      console.log('Has Activate button:', hasActivate)
-      console.log('Has Deactivate button:', hasDeactivate)
-
-      // If not active, activate it
-      if (hasActivate) {
-        console.log('Activating MDXEditor plugin...')
-        await activateBtn.click()
-        await page.waitForTimeout(1000)
-
-        // Verify activation
-        const newStatus = await mdxPluginCard.locator('[data-status]').textContent()
-        console.log('New status after activation:', newStatus)
-      }
-    } else {
-      console.log('MDXEditor plugin not found in plugins list')
-
-      // List all plugins
-      const allPlugins = await page.locator('.plugin-card h3').allTextContents()
-      console.log('Available plugins:', allPlugins)
+    // The action offered has to match the state shown. A card claiming to be active while
+    // offering "Activate" means the status badge and the button are reading different
+    // sources -- which is how a plugin ends up looking installed while it is not.
+    const hasActivate = (await card.locator('button:has-text("Activate")').count()) > 0
+    const hasDeactivate = (await card.locator('button:has-text("Deactivate")').count()) > 0
+    if (status === 'active') {
+      expect(hasActivate, 'an active plugin offered an Activate button').toBe(false)
+      expect(hasDeactivate, 'an active plugin offered no Deactivate button').toBe(true)
+    } else if (status === 'inactive') {
+      expect(hasActivate, 'an inactive plugin offered no Activate button').toBe(true)
     }
   })
 })
