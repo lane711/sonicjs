@@ -7,6 +7,7 @@ import { bootstrapDocumentTypes, autoRegisterCollectionDocumentTypes, bootstrapD
 import { getHookSystem, hasHookSystem } from "../plugins/hooks/hook-system-singleton";
 import { getTelemetryService } from "../services/telemetry-service"
 import { SONICJS_VERSION } from "../utils/version";
+import { settlesWithin } from "../utils/shared-promise";
 import type { SonicJSConfig } from "../app";
 import { setBranchLabel } from "../templates/layouts/admin-layout-catalyst.template";
 
@@ -65,24 +66,6 @@ let bootstrapStartedAt = 0;
  * that is about to finish.
  */
 const BOOTSTRAP_DEADLINE_MS = 20_000;
-
-/**
- * Resolve to true if `p` settles within `ms`, false if the clock wins.
- *
- * The timer is always cleared: a pending `setTimeout` holds the Worker's I/O context open past
- * the response, and this runs on the hot path of every request on a cold isolate.
- */
-function settlesWithin(p: Promise<unknown>, ms: number): Promise<boolean> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  return Promise.race([
-    p.then(() => true, () => true),
-    new Promise<boolean>((resolve) => {
-      timer = setTimeout(() => resolve(false), ms);
-    }),
-  ]).finally(() => {
-    if (timer !== undefined) clearTimeout(timer);
-  });
-}
 
 // KV key for cross-isolate bootstrap state. Version-keyed so a code deployment
 // (SONICJS_VERSION bump) automatically invalidates the cached flag and forces a fresh full
