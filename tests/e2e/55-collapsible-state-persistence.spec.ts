@@ -65,6 +65,7 @@ async function saveAndCaptureEditUrl(page: Page, title: string): Promise<string>
   // `window.location.pathname + ':' + collectionId`, so `?success=...` is noise.
   return editPath
 }
+
 test.describe('Collapsible State Persistence @content', () => {
   test.beforeEach(async ({ page }) => {
     await ensureAdminUserExists(page)
