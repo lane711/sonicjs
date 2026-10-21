@@ -219,19 +219,37 @@ export async function getCsrfTokenFromPage(page: Page): Promise<string> {
  * serializes in the isolate — the same cost that put 120s hangs in `loginAsAdmin`'s beforeEach
  * and is why sign-in is now cached per worker.
  *
- * So: latch on success, once per worker. A *failed* seed does not latch, so a cold-start 500 or a
- * 429 from another worker is still retried by the next caller.
+ * So: latch on success, once per worker.
+ *
+ * On *success* specifically — `request.post()` resolves for a 429 and a 500 just as it does for a
+ * 200, because Playwright only rejects on a transport error. Latching in `.then()` therefore
+ * latched failures too: the first worker to be told "rate limited, another worker is seeding" or
+ * to hit a cold-isolate 500 would mark itself seeded and never ask again, and if every worker's
+ * first attempt landed that way nobody would seed at all while all four believed somebody had.
+ * `res.ok()` is the only thing that means the handler ran.
+ *
+ * Retries are capped rather than unbounded: if the endpoint is refusing for a reason waiting will
+ * not fix — `ENABLE_SEED_ADMIN` unset, a production `ENVIRONMENT` — then every test's beforeEach
+ * would otherwise POST again, spending the 10/min window on requests that cannot succeed. Three
+ * attempts is enough to ride out a cold start or one worker's 429 without becoming a storm.
  */
+const MAX_SEED_ATTEMPTS = 3;
 let seeded = false;
+let seedAttempts = 0;
 let seedInFlight: Promise<void> | null = null;
 
-async function seedAdminOnce(client: { post: (url: string, options?: any) => Promise<unknown> }) {
-  if (seeded) return;
+type SeedClient = {
+  post: (url: string, options?: any) => Promise<{ ok: () => boolean; status: () => number }>;
+};
+
+async function seedAdminOnce(client: SeedClient) {
+  if (seeded || seedAttempts >= MAX_SEED_ATTEMPTS) return;
   if (!seedInFlight) {
+    seedAttempts += 1;
     seedInFlight = client
       .post('/auth/seed-admin')
-      .then(() => { seeded = true; })
-      .catch(() => { /* admin may already exist — not fatal, and not latched, so it retries */ })
+      .then((res) => { seeded = res.ok(); })
+      .catch(() => { /* transport error — not latched, so the next caller retries */ })
       .finally(() => { seedInFlight = null; });
   }
   await seedInFlight;
