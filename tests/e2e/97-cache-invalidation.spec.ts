@@ -8,92 +8,95 @@
  * (patterns like `content-filtered:*` never matched stored keys `api:content-filtered:...:v1`)
  */
 
-import { test, expect } from '@playwright/test'
-import { loginAsAdmin, TEST_ORIGIN } from './utils/test-helpers'
+import { test, expect } from './fixtures'
+import { loginAsAdmin, ADMIN_CREDENTIALS, TEST_ORIGIN } from './utils/test-helpers'
 
 const API = TEST_ORIGIN
+// Collection slugs use underscores; `blog` is not a registered collection.
+const COLLECTION = 'blog_post'
 
-test.describe('Cache invalidation — list freshness after item update', () => {
-  test('updating item via public API invalidates list cache', async ({ request }) => {
-    // First: authenticate to create/update content
-    // Use the admin session cookie approach via a page login
-    await request.post(`${API}/auth/seed-admin`)
+test.describe('Cache invalidation — list freshness after item update @api', () => {
+  test('creating item via public API invalidates list cache', async ({ request }) => {
     const loginRes = await request.post(`${API}/auth/sign-in/email`, {
-      data: { email: 'admin@sonicjs.com', password: 'sonicjs!' },
-      headers: { 'Content-Type': 'application/json', Origin: API },
+      data: { email: ADMIN_CREDENTIALS.email, password: ADMIN_CREDENTIALS.password },
+      headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
     })
     expect(loginRes.ok()).toBeTruthy()
 
     // Fetch list — populate cache
-    const list1 = await request.get(`${API}/api/blog`)
+    const list1 = await request.get(`${API}/api/${COLLECTION}`)
     expect(list1.status()).toBe(200)
     const data1 = await list1.json()
-    const items1: any[] = data1?.data ?? []
+    const idsBefore: string[] = (data1?.data ?? []).map((i: any) => i.id)
 
-    if (items1.length === 0) {
-      return
-    }
+    // Create new item
+    const stamp = Date.now()
+    const createRes = await request.post(`${API}/api/${COLLECTION}`, {
+      data: {
+        title: `Cache test item ${stamp}`,
+        slug: `cache-test-${stamp}`,
+        data: {},
+      },
+      headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
+    })
+    expect(createRes.ok()).toBeTruthy()
+    const createdId = (await createRes.json())?.data?.id
+    expect(createdId).toBeTruthy()
+    expect(idsBefore).not.toContain(createdId)
 
-    const firstItem = items1[0]
-    const originalTitle = firstItem.title as string
-    const newTitle = `${originalTitle} (updated-${Date.now()})`
+    // Fetch list again — must contain the new item, not a stale cached page.
+    // Checked by id rather than by row count: the list is capped at 50 per page, so once the
+    // collection holds a full page the count stops growing and a count assertion passes or
+    // fails on how much seed data happens to exist. The item is on page one because document
+    // lists are ordered newest-first.
+    const list2 = await request.get(`${API}/api/${COLLECTION}`)
+    expect(list2.status()).toBe(200)
+    const data2 = await list2.json()
+    expect((data2?.data ?? []).map((i: any) => i.id)).toContain(createdId)
+  })
 
-    // Update the first item — should invalidate list cache
-    const updateRes = await request.put(`${API}/api/blog/${firstItem.id}`, {
+  test('updating item via public API invalidates list cache', async ({ request }) => {
+    const loginRes = await request.post(`${API}/auth/sign-in/email`, {
+      data: { email: ADMIN_CREDENTIALS.email, password: ADMIN_CREDENTIALS.password },
+      headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
+    })
+    expect(loginRes.ok()).toBeTruthy()
+
+    // Create the item this test will edit, so it never depends on seeded content.
+    const stamp = Date.now()
+    const createRes = await request.post(`${API}/api/${COLLECTION}`, {
+      data: { title: `Cache update target ${stamp}`, slug: `cache-update-${stamp}`, data: {} },
+      headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
+    })
+    expect(createRes.ok()).toBeTruthy()
+    const created = (await createRes.json())?.data
+    expect(created?.id).toBeTruthy()
+
+    // Prime the list cache with the pre-update title.
+    const list1 = await request.get(`${API}/api/${COLLECTION}`)
+    expect(list1.status()).toBe(200)
+    expect(((await list1.json())?.data ?? []).some((i: any) => i.id === created.id)).toBe(true)
+
+    const newTitle = `Cache update target ${stamp} (updated)`
+    const updateRes = await request.put(`${API}/api/${COLLECTION}/${created.id}`, {
       data: { title: newTitle },
+      headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
     })
     expect(updateRes.ok()).toBeTruthy()
 
-    // Fetch list again — must NOT return stale cached title
-    const list2 = await request.get(`${API}/api/blog`)
+    // The very next read must be fresh — no stale-while-revalidate serve of the old title.
+    const list2 = await request.get(`${API}/api/${COLLECTION}`)
     expect(list2.status()).toBe(200)
-    const data2 = await list2.json()
-    const items2: any[] = data2?.data ?? []
-
-    const updatedItem = items2.find((i: any) => i.id === firstItem.id)
-    expect(updatedItem).toBeDefined()
-    expect(updatedItem?.title).toBe(newTitle)
-    expect(updatedItem?.title).not.toBe(originalTitle)
-  })
-
-  test('creating item via public API invalidates list cache', async ({ request }) => {
-    await request.post(`${API}/auth/seed-admin`)
-    const loginRes = await request.post(`${API}/auth/sign-in/email`, {
-      data: { email: 'admin@sonicjs.com', password: 'sonicjs!' },
-      headers: { 'Content-Type': 'application/json', Origin: API },
-    })
-    expect(loginRes.ok()).toBeTruthy()
-
-    // Fetch list — populate cache
-    const list1 = await request.get(`${API}/api/blog`)
-    expect(list1.status()).toBe(200)
-    const data1 = await list1.json()
-    const countBefore: number = (data1?.data ?? []).length
-
-    // Create new item
-    const createRes = await request.post(`${API}/api/blog`, {
-      data: {
-        title: `Cache test item ${Date.now()}`,
-        slug: `cache-test-${Date.now()}`,
-        data: {},
-      },
-    })
-    expect(createRes.ok()).toBeTruthy()
-
-    // Fetch list again — must reflect new item, not return stale cached count
-    const list2 = await request.get(`${API}/api/blog`)
-    expect(list2.status()).toBe(200)
-    const data2 = await list2.json()
-    const countAfter: number = (data2?.data ?? []).length
-
-    expect(countAfter).toBeGreaterThan(countBefore)
+    const updated = ((await list2.json())?.data ?? []).find((i: any) => i.id === created.id)
+    expect(updated).toBeDefined()
+    expect(updated?.title).toBe(newTitle)
   })
 
   test('admin clear cache endpoint restores fresh list', async ({ page }) => {
     await loginAsAdmin(page)
 
     // Prime the list cache
-    await page.request.get(`${API}/api/blog`)
+    await page.request.get(`${API}/api/${COLLECTION}`)
 
     // Clear all caches via admin endpoint
     const clearRes = await page.request.post(`${API}/admin/cache/clear`)
@@ -102,7 +105,7 @@ test.describe('Cache invalidation — list freshness after item update', () => {
     expect(clearData.success).toBe(true)
 
     // List should still be fetchable after clear
-    const listRes = await page.request.get(`${API}/api/blog`)
+    const listRes = await page.request.get(`${API}/api/${COLLECTION}`)
     expect(listRes.status()).toBe(200)
   })
 })

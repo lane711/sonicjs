@@ -1,7 +1,7 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { loginAsAdmin, logout, isAuthenticated, ADMIN_CREDENTIALS } from './utils/test-helpers';
 
-test.describe('Authentication @smoke @auth', () => {
+test.describe('Authentication @smoke @auth @lock-auth-login', () => {
   test.beforeEach(async ({ page }) => {
     // Ensure we start logged out
     await logout(page);

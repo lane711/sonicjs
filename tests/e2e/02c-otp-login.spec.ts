@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { TEST_ORIGIN } from './utils/test-helpers';
 
 /**
@@ -23,10 +23,21 @@ const BA_HEADERS = {
 };
 
 test.describe('Email OTP Authentication (Better Auth) @auth', () => {
+  // The emailOTP plugin only answers once a mail transport (Resend/SMTP) is bound.
+  // Preview workers ship without one, so probe the send endpoint and gate the tests
+  // that need a live transport rather than asserting against a disabled plugin.
+  let otpSendAvailable = false;
+  test.beforeAll(async ({ request }) => {
+    const probe = await request.post('/auth/email-otp/send-verification-otp', {
+      headers: BA_HEADERS,
+      data: { email: uniqueEmail('otp-probe'), type: 'sign-in' }
+    }).catch(() => null);
+    otpSendAvailable = probe?.status() === 200;
+  });
 
   test.describe('POST /auth/email-otp/send-verification-otp - Request OTP Code', () => {
     test('should accept valid email and return success', async ({ request }) => {
-      test.fixme(true, 'Email service (Resend/SMTP) not configured in CF preview worker — OTP send returns non-200');
+      test.skip(!otpSendAvailable, 'Email transport (Resend/SMTP) not configured');
       const response = await request.post('/auth/email-otp/send-verification-otp', {
         headers: BA_HEADERS,
         data: { email: uniqueEmail('otp-valid'), type: 'sign-in' }
@@ -38,7 +49,7 @@ test.describe('Email OTP Authentication (Better Auth) @auth', () => {
     });
 
     test('should normalize email to lowercase (accept uppercase)', async ({ request }) => {
-      test.fixme(true, 'Email service (Resend/SMTP) not configured in CF preview worker — OTP send returns non-200');
+      test.skip(!otpSendAvailable, 'Email transport (Resend/SMTP) not configured');
       const email = uniqueEmail('OTP-UPPERCASE');
       const response = await request.post('/auth/email-otp/send-verification-otp', {
         headers: BA_HEADERS,
@@ -51,7 +62,7 @@ test.describe('Email OTP Authentication (Better Auth) @auth', () => {
     });
 
     test('should reject invalid email format with 400', async ({ request }) => {
-      test.fixme(true, 'emailOTP plugin not configured in CF preview — returns non-400 for invalid email');
+      test.skip(!otpSendAvailable, 'emailOTP plugin not configured');
       const response = await request.post('/auth/email-otp/send-verification-otp', {
         headers: BA_HEADERS,
         data: { email: 'not-an-email', type: 'sign-in' }
@@ -63,7 +74,7 @@ test.describe('Email OTP Authentication (Better Auth) @auth', () => {
     });
 
     test('should reject empty email with 400', async ({ request }) => {
-      test.fixme(true, 'emailOTP plugin not configured in CF preview — returns non-400 for empty email');
+      test.skip(!otpSendAvailable, 'emailOTP plugin not configured');
       const response = await request.post('/auth/email-otp/send-verification-otp', {
         headers: BA_HEADERS,
         data: { email: '', type: 'sign-in' }
@@ -72,28 +83,8 @@ test.describe('Email OTP Authentication (Better Auth) @auth', () => {
       expect(response.status()).toBe(400);
     });
 
-    test('should reject missing email field with 400', async ({ request }) => {
-      const response = await request.post('/auth/email-otp/send-verification-otp', {
-        headers: BA_HEADERS,
-        data: { type: 'sign-in' }
-      });
-
-      expect(response.status()).toBe(400);
-    });
-
-    test('should reject missing type field with 400', async ({ request }) => {
-      const response = await request.post('/auth/email-otp/send-verification-otp', {
-        headers: BA_HEADERS,
-        data: { email: uniqueEmail('otp-no-type') }
-      });
-
-      expect(response.status()).toBe(400);
-      const data = await response.json();
-      expect(data).toHaveProperty('code', 'VALIDATION_ERROR');
-    });
-
     test('should not reveal if user exists (same success response for any valid email)', async ({ request }) => {
-      test.fixme(true, 'Email service (Resend/SMTP) not configured in CF preview worker — OTP send returns non-200');
+      test.skip(!otpSendAvailable, 'Email transport (Resend/SMTP) not configured');
       const email1 = uniqueEmail('otp-security1');
       const email2 = uniqueEmail('otp-security2');
 
@@ -117,7 +108,7 @@ test.describe('Email OTP Authentication (Better Auth) @auth', () => {
     });
 
     test('should rate limit excessive requests from same email', async ({ request }) => {
-      test.fixme(true, 'Email service (Resend/SMTP) not configured in CF preview worker — OTP send returns non-200');
+      test.skip(!otpSendAvailable, 'Email transport (Resend/SMTP) not configured');
       const email = uniqueEmail('ratelimit');
       const responses = await Promise.all(
         Array.from({ length: 10 }, () =>
@@ -133,6 +124,27 @@ test.describe('Email OTP Authentication (Better Auth) @auth', () => {
       const allSuccess = statuses.every(s => s === 200);
       expect(has429 || allSuccess).toBe(true);
     });
+
+    test('should reject missing email field with 400', async ({ request }) => {
+      const response = await request.post('/auth/email-otp/send-verification-otp', {
+        headers: BA_HEADERS,
+        data: { type: 'sign-in' }
+      });
+
+      expect(response.status()).toBe(400);
+    });
+
+    test('should reject missing type field with 400', async ({ request }) => {
+      const response = await request.post('/auth/email-otp/send-verification-otp', {
+        headers: BA_HEADERS,
+        data: { email: uniqueEmail('otp-no-type') }
+      });
+
+      expect(response.status()).toBe(400);
+      const data = await response.json();
+      expect(data).toHaveProperty('code', 'VALIDATION_ERROR');
+    });
+
   });
 
   test.describe('POST /auth/sign-in/email-otp - Verify OTP Code', () => {

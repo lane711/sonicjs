@@ -1,11 +1,11 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { TEST_ORIGIN } from './utils/test-helpers'
 
 /**
  * The register form must create both auth_user AND auth_account credential row
  * so that Better Auth's sign-in/email endpoint can authenticate the new user.
  */
-test.describe('Register creates sign-in credential @smoke @auth', () => {
+test.describe('Register creates sign-in credential @smoke @auth @lock-auth-registration', () => {
   test('registered user can sign in immediately', async ({ request }) => {
     const unique = Date.now()
     const email = `regtest-${unique}@example.com`

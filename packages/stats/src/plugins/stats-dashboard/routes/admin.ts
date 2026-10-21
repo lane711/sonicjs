@@ -679,6 +679,8 @@ adminRoutes.get('/', async (c) => {
       user: user
         ? { name: user.email.split('@')[0] || 'Admin', email: user.email, role: user.role }
         : undefined,
+      // Chart.js is not in the shared layout — this page charts, so it asks for it.
+      scripts: ['https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js'],
       content,
       dynamicMenuItems: c.get('pluginMenuItems'),
     })

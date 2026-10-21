@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import type { Page } from '@playwright/test'
 import { loginAsAdmin, getCsrfTokenFromPage, TEST_ORIGIN } from './utils/test-helpers'
 import { totpFromOtpauthUri } from '../../packages/core/src/__tests__/utils/totp'
@@ -27,6 +27,50 @@ import { totpFromOtpauthUri } from '../../packages/core/src/__tests__/utils/totp
 
 function json(data: unknown) {
   return { headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN }, data }
+}
+
+const TWO_FACTOR_PLUGIN_ID = 'two-factor-auth'
+
+/**
+ * Put the plugin into the state the gate assumes: installed and ACTIVE.
+ *
+ * `enforceTwoFactorEnrolment()` opens with `if (!(await isPluginActive(...))) return next()`
+ * (two-factor-auth/recovery.ts), and that lookup is memoised per server isolate with no TTL,
+ * busted only by the isolate that toggled the plugin. An isolate that resolved it once before
+ * the plugin row was seeded therefore waves every request through for the rest of its life —
+ * `/api/documents` answers its own `400 type query parameter is required` instead of the `403`
+ * this file is about, which reads exactly like a deleted gate.
+ *
+ * `POST /admin/plugins/:id/activate` is idempotent and calls `invalidatePluginStatusCache()`.
+ */
+async function ensureTwoFactorPluginActive(page: Page) {
+  await loginAsAdmin(page)
+  const csrf = await getCsrfTokenFromPage(page)
+  const headers = {
+    'Content-Type': 'application/json',
+    Origin: TEST_ORIGIN,
+    ...(csrf ? { 'X-CSRF-Token': csrf } : {}),
+  }
+  const activate = () =>
+    page.request.post(`${TEST_ORIGIN}/admin/plugins/${TWO_FACTOR_PLUGIN_ID}/activate`, {
+      headers,
+      data: {},
+    })
+
+  let res = await activate()
+  if (!res.ok()) {
+    // Nothing to activate yet (greenfield DB whose bootstrap has not registered the row).
+    await page.request.post(`${TEST_ORIGIN}/admin/plugins/install`, {
+      headers,
+      data: { id: TWO_FACTOR_PLUGIN_ID, name: TWO_FACTOR_PLUGIN_ID },
+    })
+    res = await activate()
+  }
+  expect(
+    res.ok(),
+    `could not activate the ${TWO_FACTOR_PLUGIN_ID} plugin: ${res.status()} ${await res.text()}`,
+  ).toBeTruthy()
+  await page.context().clearCookies()
 }
 
 /** Create a throwaway account and take it to a VERIFIED enrolment. Leaves the session signed in. */
@@ -87,7 +131,19 @@ async function signInWithPassword(page: Page, email: string, password: string) {
   expect(body.twoFactorRedirect ?? false).toBe(false)
 }
 
-test.describe('Two-Factor API Enforcement @auth', () => {
+test.describe('Two-Factor API Enforcement @auth @lock-auth-registration', () => {
+  // Once per worker rather than per test: the memo being busted lives in the SERVER isolate, so
+  // one activation covers every test that follows, and each repeat would cost another admin
+  // sign-in against the 10/min rate limit on /auth/seed-admin.
+  test.beforeAll(async ({ browser }) => {
+    const context = await browser.newContext({ baseURL: TEST_ORIGIN })
+    try {
+      await ensureTwoFactorPluginActive(await context.newPage())
+    } finally {
+      await context.close()
+    }
+  })
+
   test('a user who owes an enrolment is refused by the JSON API @smoke', async ({ page }) => {
     const target = await createEnrolledUser(page, 'apigate')
     await resetAsAdmin(page, target.id, target.email)

@@ -1,9 +1,9 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers'
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8787'
 
-test.describe('Plugins Nav Accordion @plugins', () => {
+test.describe('Plugins Nav Accordion @plugins @lock-plugin-hello-world', () => {
   test.beforeEach(async ({ page }) => {
     await ensureAdminUserExists(page)
     await loginAsAdmin(page)
@@ -30,24 +30,32 @@ test.describe('Plugins Nav Accordion @plugins', () => {
   })
 
   test('Plugins submenu starts hidden and expands on chevron click', async ({ page }) => {
+    // The collapsed state is persisted in the `plugins_menu_open` cookie and applied
+    // before first paint via a `.plugins-closed` class on <html> (CSS hides the
+    // submenu). Seed the cookie so the accordion genuinely starts collapsed.
+    await page.context().addCookies([
+      { name: 'plugins_menu_open', value: '0', url: BASE_URL },
+    ])
+
     await page.goto(`${BASE_URL}/admin`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     const accordion = page.locator('[data-plugins-accordion]').first()
+    await expect(accordion).toBeVisible()
     const submenu = accordion.locator('[data-plugins-submenu]')
 
     // Submenu hidden by default (no active plugin sub-item on dashboard)
-    await expect(submenu).toHaveClass(/hidden/)
+    await expect(submenu).toBeHidden()
 
     // Click toggle button
     await accordion.locator('button[aria-label="Toggle plugins submenu"]').click()
 
     // Submenu should now be visible
-    await expect(submenu).not.toHaveClass(/hidden/)
+    await expect(submenu).toBeVisible()
 
     // Click again to collapse
     await accordion.locator('button[aria-label="Toggle plugins submenu"]').click()
-    await expect(submenu).toHaveClass(/hidden/)
+    await expect(submenu).toBeHidden()
   })
 
   test('Plugin items do not appear as top-level nav items', async ({ page }) => {
@@ -80,25 +88,29 @@ test.describe('Plugins Nav Accordion @plugins', () => {
     const cardExists = await helloWorldCard.count()
 
     if (cardExists > 0) {
-      const activateBtn = helloWorldCard.locator('button').filter({ hasText: /activate|enable/i }).first()
-      const activateBtnCount = await activateBtn.count()
-      if (activateBtnCount > 0) {
-        await activateBtn.click()
-        await page.waitForLoadState('networkidle')
+      // Installed cards expose a switch (role="switch") rather than an Activate button.
+      const toggle = helloWorldCard.locator('button[role="switch"]')
+      if ((await toggle.count()) > 0 && (await toggle.getAttribute('aria-checked')) !== 'true') {
+        await toggle.click()
+        await expect(toggle).toHaveAttribute('aria-checked', 'true', { timeout: 15000 })
       }
     }
 
     // Navigate to dashboard
     await page.goto(`${BASE_URL}/admin`)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     const accordion = page.locator('[data-plugins-accordion]').first()
+    await expect(accordion).toBeVisible()
     const submenu = accordion.locator('[data-plugins-submenu]')
 
     // If hello-world is active, the submenu should auto-expand when on its path
-    // OR we can expand manually and check for the link
-    await accordion.locator('button[aria-label="Toggle plugins submenu"]').click()
-    await expect(submenu).not.toHaveClass(/hidden/)
+    // OR we can expand manually and check for the link. The accordion remembers its
+    // last state in a cookie, so only toggle when it is currently collapsed.
+    if (await submenu.isHidden()) {
+      await accordion.locator('button[aria-label="Toggle plugins submenu"]').click()
+    }
+    await expect(submenu).toBeVisible()
 
     // If hello-world plugin has a menu item, it should be inside submenu, not at top level
     const helloWorldLink = submenu.locator('a[href="/admin/hello-world"]')

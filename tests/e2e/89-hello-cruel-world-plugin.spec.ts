@@ -5,7 +5,7 @@
  * SonicJS app: public API routes respond, the admin page loads, and the plugin
  * appears in the admin plugins list.
  */
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { loginAsAdmin, isFeatureAvailable } from './utils/test-helpers'
 
 const BASE = process.env.BASE_URL || 'http://localhost:8787'

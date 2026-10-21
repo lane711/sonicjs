@@ -1,6 +1,6 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import type { Page } from '@playwright/test'
-import { loginAsAdmin, getCsrfTokenFromPage, TEST_ORIGIN } from './utils/test-helpers'
+import { loginAsAdmin, getCsrfTokenFromPage, submitLoginForm, TEST_ORIGIN } from './utils/test-helpers'
 // The SAME helper `__tests__/services/two-factor-roundtrip.test.ts` verifies against a real Better
 // Auth instance. Importing it rather than keeping a second copy is deliberate: the cheap tier proves
 // the codes it produces are accepted, so this spec cannot fail in CI over a drifted TOTP
@@ -38,6 +38,53 @@ import { totpFromOtpauthUri } from '../../packages/core/src/__tests__/utils/totp
 /** JSON request options for `page.request` calls to Better Auth. */
 function json(data: unknown) {
   return { headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN }, data }
+}
+
+const TWO_FACTOR_PLUGIN_ID = 'two-factor-auth'
+
+/**
+ * Put the plugin into the state every test below assumes: installed and ACTIVE.
+ *
+ * The enrolment surface sits behind a deactivate→404 gate — `twoFactorAdminRoutes` calls
+ * `isPluginActive()` and answers `c.notFound()` when it is false (plugins/core-plugins/
+ * two-factor-auth/routes.ts). That lookup is memoised per server isolate with no TTL and is only
+ * busted by the isolate that toggled the plugin, so an isolate that resolved it once before the
+ * plugin row was seeded keeps 404ing `/admin/two-factor` and `/admin/two-factor/qr` for the rest
+ * of its life even though the row now reads `active`. The same memo is consulted by
+ * `enforceTwoFactorEnrolment()`, so a stale `false` silently un-gates the API too.
+ *
+ * `POST /admin/plugins/:id/activate` is idempotent and calls `invalidatePluginStatusCache()`, so
+ * this pins the real precondition instead of inheriting whatever the isolate happened to cache.
+ *
+ * Requires an admin session on `page` — every caller runs after `loginAsAdmin`.
+ */
+async function ensureTwoFactorPluginActive(page: Page) {
+  const csrf = await getCsrfTokenFromPage(page)
+  const headers = {
+    'Content-Type': 'application/json',
+    Origin: TEST_ORIGIN,
+    ...(csrf ? { 'X-CSRF-Token': csrf } : {}),
+  }
+  const activate = () =>
+    page.request.post(`${TEST_ORIGIN}/admin/plugins/${TWO_FACTOR_PLUGIN_ID}/activate`, {
+      headers,
+      data: {},
+    })
+
+  let res = await activate()
+  if (!res.ok()) {
+    // Nothing to activate yet (greenfield DB whose bootstrap has not registered the row).
+    // Install first — the generic installer resolves the id straight out of the plugin registry.
+    await page.request.post(`${TEST_ORIGIN}/admin/plugins/install`, {
+      headers,
+      data: { id: TWO_FACTOR_PLUGIN_ID, name: TWO_FACTOR_PLUGIN_ID },
+    })
+    res = await activate()
+  }
+  expect(
+    res.ok(),
+    `could not activate the ${TWO_FACTOR_PLUGIN_ID} plugin: ${res.status()} ${await res.text()}`,
+  ).toBeTruthy()
 }
 
 /**
@@ -86,10 +133,10 @@ async function createEnrolledUser(page: Page, slot: string) {
 async function loginAndExpectChallenge(page: Page, email: string, password: string) {
   await page.context().clearCookies()
   await page.goto('/auth/login')
-  await page.fill('input[name="email"]', email)
-  await page.fill('input[name="password"]', password)
-  await page.click('button[type="submit"]')
-  await expect(page).toHaveURL(/\/auth\/two-factor/, { timeout: 15_000 })
+  // `submitLoginForm`, not a bare click: the form POST is rate limited per IP and the suite is one
+  // IP, so under four workers this submit comes back 429. htmx does not swap a non-2xx response,
+  // so the page stays put and the only symptom is this URL never becoming /auth/two-factor.
+  await submitLoginForm(page, email, password, /\/auth\/two-factor/)
 }
 
 /**
@@ -107,10 +154,30 @@ async function expectSessionUpgraded(page: Page) {
     .toBe(true)
 }
 
-test.describe('Two-Factor Authentication @auth', () => {
+/**
+ * Click a two-factor form's submit button and wait for the POST it fires.
+ *
+ * Both of these pages render `#tf-msg` from their own `fetch` handler, so the banner cannot
+ * appear until the request answers — and answering it means a password-hash comparison on a
+ * possibly-cold isolate. `expect(...).toBeVisible()` budgets 5s, which is an assertion budget,
+ * not a server-round-trip budget: in CI the wrong-password test failed with the locator still
+ * resolving to `<div id="tf-msg" class="hidden ...">` on its 14th poll. Wait for the response
+ * and let the assertion check what the handler did with it.
+ */
+async function submitTwoFactorForm(page: Page, click: () => Promise<void>): Promise<void> {
+  await Promise.all([
+    page.waitForResponse(
+      (r) => r.request().method() === 'POST' && r.url().includes('/auth/two-factor/')
+    ),
+    click(),
+  ])
+}
+
+test.describe('Two-Factor Authentication @auth @lock-auth-login @lock-auth-registration', () => {
   test.describe('enrolment page', () => {
     test.beforeEach(async ({ page }) => {
       await loginAsAdmin(page)
+      await ensureTwoFactorPluginActive(page)
     })
 
     test('is reachable from the sidebar and renders the disabled state @smoke', async ({ page }) => {
@@ -144,7 +211,7 @@ test.describe('Two-Factor Authentication @auth', () => {
     test('rejects setup with the wrong password and stays in the off state', async ({ page }) => {
       await page.goto('/admin/two-factor')
       await page.fill('#tf-pw', 'definitely-not-the-password')
-      await page.click('#enrolBtn')
+      await submitTwoFactorForm(page, () => page.click('#enrolBtn'))
       await expect(page.locator('#tf-msg')).toBeVisible()
       await expect(page.locator('#state-enrolling')).toBeHidden()
       await expect(page.locator('#tf-status')).toHaveText('Disabled')
@@ -206,7 +273,7 @@ test.describe('Two-Factor Authentication @auth', () => {
       await page.context().clearCookies()
       await page.goto('/auth/two-factor')
       await page.fill('#tf-code', '000000')
-      await page.click('#totpBtn')
+      await submitTwoFactorForm(page, () => page.click('#totpBtn'))
       await expect(page.locator('#tf-msg')).toBeVisible()
       await expect(page).toHaveURL(/\/auth\/two-factor/)
     })
@@ -282,6 +349,7 @@ test.describe('Two-Factor Authentication @auth', () => {
 
     test.beforeEach(async ({ page }) => {
       await loginAsAdmin(page)
+      await ensureTwoFactorPluginActive(page)
     })
 
     test('renders a QR big enough to scan, for any issuer length', async ({ page }) => {

@@ -1,7 +1,7 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { loginAsAdmin } from './utils/test-helpers'
 
-test.describe('Media create folder (#929)', () => {
+test.describe('Media create folder (#929) @media', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })
