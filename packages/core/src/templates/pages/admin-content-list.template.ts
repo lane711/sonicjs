@@ -521,11 +521,14 @@ export function renderContentListPage(data: ContentListPageData): string {
         }
       }
 
-      // Select all functionality
+      // Select all functionality. renderTable gives the header checkbox the id
+      // 'select-all-' + tableId, so match the prefix — a bare 'select-all' never matches.
+      // This is delegated rather than bound per element because htmx swaps the table in.
       document.addEventListener('change', function(e) {
-        if (e.target.id === 'select-all') {
-          const checkboxes = document.querySelectorAll('.row-checkbox');
-          checkboxes.forEach(cb => cb.checked = e.target.checked);
+        if (e.target.id && e.target.id.indexOf('select-all-') === 0) {
+          const table = document.getElementById(e.target.id.replace('select-all-', ''));
+          const scope = table || document;
+          scope.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = e.target.checked);
           updateBulkActionsButton();
         } else if (e.target.classList.contains('row-checkbox')) {
           updateBulkActionsButton();

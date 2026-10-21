@@ -1,5 +1,5 @@
-import { test, expect, type Page } from '@playwright/test'
-import { loginAsAdmin, ensureAdminUserExists, isFeatureAvailable } from './utils/test-helpers'
+import { test, expect, type Page } from './fixtures'
+import { loginAsAdmin, ensureAdminUserExists, isFeatureAvailable, flashedTo } from './utils/test-helpers'
 
 // Multi-tenant plugin: off by default, activated on the Plugins page, then it exposes a Tenants
 // admin page + sidebar switcher and scopes document reads/writes to the resolved tenant.
@@ -19,7 +19,7 @@ async function setPluginState(page: Page, action: 'activate' | 'deactivate') {
   await page.request.post(`${BASE_URL}/admin/plugins/${PLUGIN_ID}/${action}`).catch(() => {})
 }
 
-test.describe.serial('Multi-Tenant plugin @auth', () => {
+test.describe.serial('Multi-Tenant plugin @auth @lock-plugin-multi-tenant', () => {
   let featureAvailable = false
   test.beforeAll(async ({ request }) => {
     featureAvailable = await isFeatureAvailable(request, '/admin/tenants')
@@ -103,6 +103,32 @@ test.describe.serial('Multi-Tenant plugin @auth', () => {
     await expect(page.locator('[data-tenant-switcher]').first()).toBeVisible()
   })
 
+  test('stays active for every admin request, not just the isolate that served the toggle', async ({ page }) => {
+    await setPluginState(page, 'activate')
+
+    // Two independent readers of "is the plugin on", on the same page: the Tenants nav link comes
+    // from pluginMenuMiddleware, which queries the DB per request, while the switcher comes from
+    // tenantMiddleware. tenantMiddleware used to answer from a 30s TTL cache that is per-isolate —
+    // as is invalidateTenantCache() — so activating the plugin only took effect immediately on
+    // whichever isolate happened to serve the toggle. Measured against a preview deployment right
+    // after activation: nav link on 10/10 admin loads, switcher on 5/10. The cosmetic half of that
+    // is the switcher; the real half is that an isolate reporting the plugin inactive also ignores
+    // the tenant header, the cookie and the domain map and serves everything as 'default'.
+    //
+    // One load can pass on the stale path by luck, so sample enough of them to be conclusive.
+    for (let i = 1; i <= 8; i++) {
+      await page.goto(`${BASE_URL}/admin/content`)
+      await expect(
+        page.locator('a[href="/admin/tenants"]').first(),
+        `Tenants nav link missing on admin load #${i}`
+      ).toBeAttached()
+      await expect(
+        page.locator('[data-tenant-switcher]').first(),
+        `tenant switcher missing on admin load #${i} — tenant state went stale between isolates`
+      ).toBeVisible()
+    }
+  })
+
   test('lists the default tenant and creates a new tenant via the admin UI', async ({ page }) => {
     await setPluginState(page, 'activate')
 
@@ -120,7 +146,7 @@ test.describe.serial('Multi-Tenant plugin @auth', () => {
     await page.fill('#tenant-name', TENANT_NAME)
     await page.fill('#tenant-slug', TENANT_SLUG)
     await Promise.all([
-      page.waitForURL(/\/admin\/tenants/),
+      page.waitForURL(flashedTo('/admin/tenants', 'Tenant created')),
       page.click('[data-save-tenant]'),
     ])
 
@@ -161,11 +187,12 @@ test.describe.serial('Multi-Tenant plugin @auth', () => {
     await page.goto(`${BASE_URL}/admin/tenants`)
     await page.waitForLoadState('networkidle')
 
-    // Switch to the created tenant via the row action.
-    await Promise.all([
-      page.waitForURL(/\/admin\/tenants/),
-      page.locator(`[data-switch-tenant="${TENANT_SLUG}"]`).click(),
-    ])
+    // Switch to the created tenant via the row action. POST /admin/tenants/switch redirects to
+    // the same /admin/tenants the form was submitted from and sets no flash, so there is no URL
+    // change to wait for. The current tenant renders no Switch button, so that button going away
+    // is the re-render landing — and unlike the badge, it is not already true before the click.
+    await page.locator(`[data-switch-tenant="${TENANT_SLUG}"]`).click()
+    await expect(page.locator(`[data-switch-tenant="${TENANT_SLUG}"]`)).toHaveCount(0)
 
     // The created tenant row now carries the "Current" badge.
     await expect(
@@ -173,10 +200,8 @@ test.describe.serial('Multi-Tenant plugin @auth', () => {
     ).toBeVisible()
 
     // Switch back to default so later tests/specs are unaffected.
-    await Promise.all([
-      page.waitForURL(/\/admin\/tenants/),
-      page.locator('[data-switch-tenant="default"]').click(),
-    ])
+    await page.locator('[data-switch-tenant="default"]').click()
+    await expect(page.locator('[data-switch-tenant="default"]')).toHaveCount(0)
     await expect(
       page.locator('[data-tenant-row="default"] [data-current-tenant-badge]')
     ).toBeVisible()

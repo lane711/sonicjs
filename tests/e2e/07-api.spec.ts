@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { loginAsAdmin, TEST_ORIGIN } from './utils/test-helpers';
 
 test.describe('API Endpoints @smoke @api', () => {

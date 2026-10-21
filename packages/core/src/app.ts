@@ -38,7 +38,7 @@ import { emailReconciliationPlugin } from './plugins/core-plugins/email-reconcil
 import { otpLoginPlugin } from './plugins/core-plugins/otp-login-plugin'
 import { oauthProvidersPlugin } from './plugins/core-plugins/oauth-providers'
 import { userProfilesPlugin } from './plugins/core-plugins/user-profiles'
-import { aiSearchPlugin } from './plugins/core-plugins/ai-search-plugin'
+import { aiSearchPlugin, aiSearchApiRoutes } from './plugins/core-plugins/ai-search-plugin'
 import { securityAuditPlugin } from './plugins/core-plugins/security-audit-plugin'
 import { securityAuditMiddleware, securityAuditApiRoutes, securityAuditAdminRoutes } from './plugins/core-plugins/security-audit-plugin'
 import {
@@ -131,6 +131,12 @@ export interface Variables {
   appVersion?: string
   csrfToken?: string
   pluginMenuItems?: Array<{ label: string; path: string; icon: string }>
+  /**
+   * Slugs of the plugins pluginMenuMiddleware found active, shared so the rest of the /admin
+   * chain does not re-query for the same answer. Absent off /admin and on any request that ran
+   * before that middleware — treat absence as unknown and fall back to a direct read.
+   */
+  activePluginSlugs?: Set<string>
   /**
    * The plugin hook system attached to the request. Set by bootstrapMiddleware
    * BEFORE any heavy bootstrap work runs, so anything that emits a hook during
@@ -451,6 +457,16 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   // Supports wildcard prefix: "*.example.com" matches any subdomain of example.com.
   app.use('*', cors({
     origin: (origin, c) => {
+      // The app's own origin is always allowed. A same-origin request is not subject to CORS in
+      // the first place, so echoing the header back grants nothing — but it does mean the app
+      // keeps working wherever it happens to be served from (a dev port, a preview deployment)
+      // without every host having to be enumerated in CORS_ORIGINS.
+      try {
+        if (origin && origin === new URL(c.req.url).origin) return origin
+      } catch {
+        // Non-absolute request URL — fall through to the allowlist.
+      }
+
       const allowed = (c.env as any)?.CORS_ORIGINS as string | undefined
       if (!allowed) return null
       const list = allowed.split(',').map((s: string) => s.trim())
@@ -662,6 +678,11 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   // /api/:collection/:id catch-all must be mounted BEFORE app.route('/api', apiRoutes).
   app.route('/api/security-audit', securityAuditApiRoutes as any)
   app.route('/admin/plugins/security-audit', securityAuditAdminRoutes as any)
+  // Same shadowing problem: the AI Search plugin registers /api/search in its own
+  // register(), but that runs with corePluginsBeforeCatchAll — i.e. after the bare
+  // app.route('/api', apiRoutes) below, whose /:collection wildcard swallowed every
+  // /api/search request ('Collection not found' on GET, 'title is required' on POST).
+  app.route('/api/search', aiSearchApiRoutes as any)
 
   // Core routes
   // Routes are being imported incrementally from routes/*

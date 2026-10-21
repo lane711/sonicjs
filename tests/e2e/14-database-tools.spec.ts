@@ -1,9 +1,19 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { loginAsAdmin, getCsrfTokenFromPage, isFeatureAvailable } from './utils/test-helpers';
 
 let featureAvailable = false;
 
-test.describe('Database Tools', () => {
+/**
+ * The settings page's buttons call `/admin/settings/api/database-tools/<op>`; the same handlers
+ * are also mounted at `/admin/database-tools/api/<op>`, which is what the direct-request tests
+ * further down use. Match either so a wait follows whichever path the UI is wired to.
+ */
+const dbToolsApiCall = (op: string) => (response: { url(): string; status(): number }) =>
+  new RegExp(`/(?:settings/api/database-tools|database-tools/api)/${op}$`).test(
+    new URL(response.url()).pathname,
+  ) && response.status() === 200;
+
+test.describe('Database Tools @database', () => {
   test.beforeAll(async ({ request }) => {
     featureAvailable = await isFeatureAvailable(request, '/admin/settings');
   });
@@ -85,9 +95,7 @@ test.describe('Database Tools', () => {
     await page.waitForTimeout(1000);
 
     // Now listen for the NEXT API call (triggered by button click)
-    const responsePromise = page.waitForResponse(response =>
-      response.url().includes('/admin/database-tools/api/stats') && response.status() === 200
-    );
+    const responsePromise = page.waitForResponse(dbToolsApiCall('stats'));
 
     // Click refresh button
     await page.click('button:has-text("Refresh Stats")');
@@ -113,9 +121,7 @@ test.describe('Database Tools', () => {
     await page.waitForTimeout(1000);
 
     // Listen for validation API call
-    const responsePromise = page.waitForResponse(response =>
-      response.url().includes('/admin/database-tools/api/validate') && response.status() === 200
-    );
+    const responsePromise = page.waitForResponse(dbToolsApiCall('validate'));
 
     // Click validate database button
     await page.click('button:has-text("Validate Database")');
@@ -141,9 +147,7 @@ test.describe('Database Tools', () => {
     await page.waitForTimeout(1000);
 
     // Listen for backup API call
-    const responsePromise = page.waitForResponse(response =>
-      response.url().includes('/admin/database-tools/api/backup') && response.status() === 200
-    );
+    const responsePromise = page.waitForResponse(dbToolsApiCall('backup'));
 
     // Click create backup button
     await page.click('button:has-text("Create Backup")');
@@ -222,9 +226,10 @@ test.describe('Database Tools', () => {
     expect(totalTables).not.toBeNull();
     expect(totalRows).not.toBeNull();
     
-    // Values should be valid numbers or formatted numbers
-    expect(parseInt(totalTables?.replace(/,/g, '') || '0')).toBeGreaterThanOrEqual(0);
-    expect(parseInt(totalRows?.replace(/,/g, '') || '0')).toBeGreaterThanOrEqual(0);
+    // A count is never negative, so the old `toBeGreaterThanOrEqual(0)` pair passed even when the
+    // stats API returned nothing and the template's placeholder '0' was still on screen.
+    expect(parseInt(totalTables?.replace(/,/g, '') || '0'), 'no tables counted').toBeGreaterThan(0);
+    expect(parseInt(totalRows?.replace(/,/g, '') || '0'), 'no rows counted').toBeGreaterThan(0);
   });
 
   test('should have proper accessibility features', async ({ page }) => {
@@ -256,7 +261,7 @@ test.describe('Database Tools', () => {
     await page.click('[data-tab="database-tools"]');
     
     // Mock a failed API response for stats
-    await page.route('**/admin/database-tools/api/stats', route => {
+    await page.route('**/api/database-tools/stats', route => {
       route.fulfill({
         status: 500,
         contentType: 'application/json',
@@ -289,8 +294,10 @@ test.describe('Database Tools', () => {
     const tableLinks = page.locator('#tables-list a[href^="/admin/database-tools/tables/"]');
     const tableCount = await tableLinks.count();
 
-    // If there are tables, click on the first one
-    if (tableCount > 0) {
+    // The schema always has tables, so this is a floor, not a condition: the whole body below
+    // used to be skipped -- silently -- whenever the list failed to render.
+    expect(tableCount, 'no tables listed on the database-tools page').toBeGreaterThan(0);
+    {
       const firstTableLink = tableLinks.first();
       const tableName = await firstTableLink.textContent();
 

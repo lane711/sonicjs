@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { loginAsAdmin } from './utils/test-helpers'
 
 const BASE = process.env.BASE_URL || 'http://localhost:8787'
@@ -52,7 +52,7 @@ test.describe('collection registry (PR 1) @collections', () => {
   })
 })
 
-test.describe('collection registry — authed admin UI', () => {
+test.describe('collection registry — authed admin UI @collections', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })

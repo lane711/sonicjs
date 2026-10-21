@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test'
-import { loginAsAdmin } from './utils/test-helpers'
+import { test, expect } from './fixtures'
+import { loginAsAdmin, submitAndWaitForXhr, TEST_ORIGIN } from './utils/test-helpers'
 
 /**
  * A user assigned the "Public" RBAC role must be blocked from /api/:collection
@@ -25,7 +25,7 @@ async function ensurePublicRoleExists(page: any) {
   return body.includes('Public') || body.includes('public')
 }
 
-test.describe('Public role — API ACL enforcement', () => {
+test.describe('Public role — API ACL enforcement @auth @api @lock-auth-registration', () => {
   test('anonymous user sees published content (baseline)', async ({ page }) => {
     await page.context().clearCookies()
     const res = await page.request.get('/api/blog_post')
@@ -34,49 +34,53 @@ test.describe('Public role — API ACL enforcement', () => {
     expect(res.status()).not.toBe(403)
   })
 
-  test('public-role user cannot see content from default-grant collection via /api/:collection', async ({ page }) => {
-    // Sign up a new user
+  // Shares `document_type:example` with 99-rbac-grant-api-access, which grants the public role
+  // read on it and revokes again. That grant is global, so while 99 holds it this test's
+  // premise — "no public grant" — is false and /api/example answers 200. Same `@lock-` name on
+  // both, so the two can never overlap.
+  test('public-role user cannot see content from default-grant collection via /api/:collection @lock-rbac-example-grant', async ({ page }) => {
+    // Sign up a new user. The email carries this run's timestamp, so a 400 ("already
+    // exists") would mean something else went wrong.
     const signUp = await page.request.post('/auth/sign-up/email', {
       data: { email: PUBLIC_USER_EMAIL, password: PUBLIC_USER_PASSWORD, name: 'Public ACL Tester' },
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
     })
-    if (!signUp.ok() && signUp.status() !== 400) { test.skip(); return }
+    expect(signUp.ok(), `sign-up failed: ${signUp.status()}`).toBeTruthy()
+    const userId = (await signUp.json())?.user?.id
+    expect(userId).toBeTruthy()
 
     // Sign in
     const signIn = await page.request.post('/auth/sign-in/email', {
       data: { email: PUBLIC_USER_EMAIL, password: PUBLIC_USER_PASSWORD },
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
     })
-    if (!signIn.ok()) { test.skip(); return }
+    expect(signIn.ok(), `sign-in failed: ${signIn.status()}`).toBeTruthy()
 
-    // Assign "public" role to this user via admin
+    // Assign "public" role to this user via admin. Addressed by id rather than hunted for in
+    // the users table: the list paginates, so a brand-new user is not reliably on page one.
     await loginAsAdmin(page)
-    await page.goto('/admin/users')
-    await page.waitForLoadState('networkidle')
-
-    // Find and open the user's edit page
-    const userLink = page.locator(`a[href*="/edit"]`).filter({ hasText: PUBLIC_USER_EMAIL }).first()
-    if ((await userLink.count()) === 0) { test.skip(); return }
-    await userLink.click()
+    await page.goto(`/admin/users/${userId}/edit`)
     await page.waitForLoadState('networkidle')
 
     const roleSelect = page.locator('select[name="role"]')
     await expect(roleSelect).toBeVisible()
 
-    // Select public role (value = role-public)
-    const publicOption = roleSelect.locator('option[value="role-public"]')
-    if ((await publicOption.count()) === 0) { test.skip(); return }
+    // Select public role (value = role-public). The role is seeded by the RBAC bootstrap.
+    await expect(roleSelect.locator('option[value="role-public"]')).toHaveCount(1)
     await roleSelect.selectOption('role-public')
-    await page.locator('button[type="submit"]').filter({ hasText: /save|update/i }).click()
-    await page.waitForLoadState('networkidle')
+    // htmx `PUT`, no navigation — see submitAndWaitForXhr. `networkidle` here could report the
+    // quiet that precedes the request rather than the one that follows it.
+    await submitAndWaitForXhr(page, 'PUT', `/admin/users/${userId}`, () =>
+      page.locator('button[type="submit"]').filter({ hasText: /save|update/i }).click()
+    )
 
     // Now sign back in as the public-role user and call the API
     await page.context().clearCookies()
     const signIn2 = await page.request.post('/auth/sign-in/email', {
       data: { email: PUBLIC_USER_EMAIL, password: PUBLIC_USER_PASSWORD },
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Origin: TEST_ORIGIN },
     })
-    if (!signIn2.ok()) { test.skip(); return }
+    expect(signIn2.ok(), `sign-in after role change failed: ${signIn2.status()}`).toBeTruthy()
 
     // 'example' collection has no public grant by default — public-role user should get 403.
     const res = await page.request.get('/api/example')

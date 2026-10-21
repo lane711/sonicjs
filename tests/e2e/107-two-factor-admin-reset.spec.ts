@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import type { Page } from '@playwright/test'
 import { loginAsAdmin, getCsrfTokenFromPage, TEST_ORIGIN } from './utils/test-helpers'
 import { totpFromOtpauthUri } from '../../packages/core/src/__tests__/utils/totp'
@@ -105,7 +105,7 @@ async function postReset(
   })
 }
 
-test.describe('Two-Factor Admin Reset @auth', () => {
+test.describe('Two-Factor Admin Reset @auth @lock-auth-registration', () => {
   test('an admin can reset a locked-out user, who can then sign in with their password @smoke', async ({
     page,
   }) => {
