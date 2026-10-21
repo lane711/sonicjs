@@ -15,24 +15,41 @@ fi
 
 violations=0
 
+# Match a pattern in real code: drop line-comment and block-comment lines so that a doc comment
+# *describing* a banned pattern is not itself a violation. Keeps grep's line numbers.
+scan() {
+  grep -nE "$2" "$1" 2>/dev/null | grep -vE '^[0-9]+:[[:space:]]*(//|\*|/\*)'
+}
+
 for f in "${files[@]}"; do
   [ -f "$f" ] || continue
 
   # describe.skip — always banned
-  if grep -nE 'describe\.skip\(' "$f" 2>/dev/null; then
+  if scan "$f" 'describe\.skip\('; then
     echo -e "${RED}BANNED${NC}: describe.skip in $f"
     violations=$((violations + 1))
   fi
 
   # test.skip('name' — writing a test just to skip it
-  if grep -nE "test\.skip\('" "$f" 2>/dev/null; then
+  if scan "$f" "test\.skip\('"; then
     echo -e "${RED}BANNED${NC}: test.skip('name') in $f"
     violations=$((violations + 1))
   fi
 
-  # bare test.skip() NOT inside an if/ternary (unconditional skip)
-  if grep -nE '^\s+test\.skip\(\)' "$f" 2>/dev/null | grep -vE 'if\s*\(|&&|\|\||\?' ; then
-    echo -e "${RED}BANNED${NC}: unconditional test.skip() in $f"
+  # test.skip(true, 'reason') — an unconditional skip wearing a feature guard's clothes. This is
+  # how a product failure gets reported as an absent feature: the test discovers it cannot do its
+  # setup, calls test.skip(true, 'Could not create test content'), and the run stays green.
+  if scan "$f" 'test\.skip\([[:space:]]*true'; then
+    echo -e "${RED}BANNED${NC}: test.skip(true, …) in $f — assert instead, or delete the test"
+    violations=$((violations + 1))
+  fi
+
+  # Bare test.skip(), wherever it sits on the line. The previous rule anchored to the start of the
+  # line, so `if (!collectionHref) test.skip()` — the same unconditional bail with a condition in
+  # front of it — was never checked. The one legal form is the documented runtime guard, which
+  # names featureAvailable.
+  if scan "$f" 'test\.skip\(\)' | grep -vE 'featureAvailable'; then
+    echo -e "${RED}BANNED${NC}: bare test.skip() in $f — only a featureAvailable guard may skip"
     violations=$((violations + 1))
   fi
 
