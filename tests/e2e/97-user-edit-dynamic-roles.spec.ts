@@ -1,5 +1,5 @@
 import { test, expect, type Page } from './fixtures'
-import { loginAsAdmin } from './utils/test-helpers'
+import { loginAsAdmin, submitAndWaitForDocument } from './utils/test-helpers'
 
 /**
  * Verify that the role dropdown on the user-edit and user-new screens
@@ -61,8 +61,12 @@ test.describe('User edit — dynamic role dropdown @auth', () => {
     if ((await existingInput.count()) === 0) {
       await page.locator('form[action="/admin/rbac/roles"] input[name="name"]').fill(CUSTOM_ROLE_NAME)
       await page.locator('form[action="/admin/rbac/roles"] input[name="display_name"]').fill(CUSTOM_ROLE_DISPLAY)
-      await page.locator('form[action="/admin/rbac/roles"] button').filter({ hasText: 'Add role' }).click()
-      await page.waitForLoadState('networkidle')
+      // Native POST that redirects to /admin/rbac. The `page.goto('/admin/users/new')` below
+      // would cancel it mid-flight if we only waited for `networkidle`, and the custom role
+      // this test then looks for in the dropdown would never have been created.
+      await submitAndWaitForDocument(page, '/admin/rbac', () =>
+        page.locator('form[action="/admin/rbac/roles"] button').filter({ hasText: 'Add role' }).click()
+      )
     }
 
     // Now visit user-new and confirm the custom role appears

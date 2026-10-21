@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures'
-import { loginAsAdmin, TEST_ORIGIN } from './utils/test-helpers'
+import { loginAsAdmin, submitAndWaitForDocument, submitAndWaitForXhr, TEST_ORIGIN } from './utils/test-helpers'
 
 /**
  * RBAC grant takes effect immediately on the API.
@@ -44,8 +44,14 @@ async function assignRole(page: any, userId: string, roleValue: string) {
   await page.goto(`/admin/users/${userId}/edit`)
   await page.waitForLoadState('networkidle')
   await page.locator('select[name="role"]').selectOption(roleValue)
-  await page.locator('button[type="submit"]').filter({ hasText: /save|update/i }).click()
-  await page.waitForLoadState('networkidle')
+  // The user form is a `PUT`, so htmx sends it as an XHR and swaps an alert in — there is no
+  // navigation, and `networkidle` can go true before htmx has issued the request at all. The
+  // very next thing this spec does is `page.goto`, which would cancel the save in flight and
+  // leave the user on their old role, so the 200-after-grant assertion would fail for a reason
+  // that has nothing to do with grants.
+  await submitAndWaitForXhr(page, 'PUT', `/admin/users/${userId}`, () =>
+    page.locator('button[type="submit"]').filter({ hasText: /save|update/i }).click()
+  )
 }
 
 // The matrix only renders the roles named in `?roles=` (with `compare=1`); a plain visit
@@ -73,8 +79,12 @@ async function setPublicRoleGrant(page: any, grant: boolean) {
   await page.locator(`label.scope:has(${cell}[value="${grant ? 'any' : 'none'}"])`).click()
   await expect(target).toBeChecked()
 
-  await page.locator('form[action="/admin/rbac/grants"] button[type="submit"]').first().click()
-  await page.waitForLoadState('networkidle')
+  // Wait for the document the POST redirects to. Without it the check below runs against the
+  // page the form was submitted from, where the radio is checked because this function clicked
+  // it — so "confirm the write landed" confirmed nothing.
+  await submitAndWaitForDocument(page, '/admin/rbac', () =>
+    page.locator('form[action="/admin/rbac/grants"] button[type="submit"]').first().click()
+  )
 
   // The redirect re-renders the matrix from the saved grants — confirm the write landed.
   await expect(target).toBeChecked()

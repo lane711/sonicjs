@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures'
-import { loginAsAdmin, TEST_ORIGIN } from './utils/test-helpers'
+import { loginAsAdmin, submitAndWaitForXhr, TEST_ORIGIN } from './utils/test-helpers'
 
 /**
  * A user assigned the "Public" RBAC role must be blocked from /api/:collection
@@ -68,8 +68,11 @@ test.describe('Public role — API ACL enforcement @auth @api', () => {
     // Select public role (value = role-public). The role is seeded by the RBAC bootstrap.
     await expect(roleSelect.locator('option[value="role-public"]')).toHaveCount(1)
     await roleSelect.selectOption('role-public')
-    await page.locator('button[type="submit"]').filter({ hasText: /save|update/i }).click()
-    await page.waitForLoadState('networkidle')
+    // htmx `PUT`, no navigation — see submitAndWaitForXhr. `networkidle` here could report the
+    // quiet that precedes the request rather than the one that follows it.
+    await submitAndWaitForXhr(page, 'PUT', `/admin/users/${userId}`, () =>
+      page.locator('button[type="submit"]').filter({ hasText: /save|update/i }).click()
+    )
 
     // Now sign back in as the public-role user and call the API
     await page.context().clearCookies()

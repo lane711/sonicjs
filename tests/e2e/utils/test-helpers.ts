@@ -67,6 +67,54 @@ export const flashedTo =
     return typeof expected === 'string' ? message.includes(expected) : expected.test(message)
   }
 
+/**
+ * Click something that submits a native form, and wait for the document the server redirects to.
+ *
+ * `page.waitForLoadState('networkidle')` straight after the click is not that wait: it reports
+ * on the page you are still on, so it can resolve before the navigation has even committed and
+ * leave the assertions below reading the pre-submit DOM. For a "did this persist?" test that DOM
+ * still holds the value the test itself typed, so it passes whether or not anything was written.
+ */
+export async function submitAndWaitForDocument(
+  page: Page,
+  pathname: string | RegExp,
+  click: () => Promise<void>
+): Promise<void> {
+  const matches = (p: string) => (typeof pathname === 'string' ? p === pathname : pathname.test(p))
+  await Promise.all([
+    page.waitForResponse(
+      (r) =>
+        r.request().resourceType() === 'document' &&
+        r.request().method() === 'GET' &&
+        matches(new URL(r.url()).pathname)
+    ),
+    click(),
+  ])
+  await page.waitForLoadState('domcontentloaded')
+}
+
+/**
+ * Save a form htmx submits with a verb an HTML form cannot send (PUT/DELETE), and wait for the
+ * response instead of for `networkidle`.
+ *
+ * `waitForLoadState('networkidle')` can resolve before htmx has even issued the XHR — the page
+ * is quiet at that instant precisely because the request has not started. The next `page.goto`
+ * then cancels the in-flight save, the write silently never lands, and the failure surfaces
+ * several steps later as an unrelated-looking assertion.
+ */
+export async function submitAndWaitForXhr(
+  page: Page,
+  method: string,
+  urlPart: string,
+  click: () => Promise<void>
+): Promise<void> {
+  const [res] = await Promise.all([
+    page.waitForResponse((r) => r.request().method() === method && r.url().includes(urlPart)),
+    click(),
+  ])
+  expect(res.ok(), `${method} ${urlPart} failed: ${res.status()}`).toBeTruthy()
+}
+
 // Default admin credentials for testing
 export const ADMIN_CREDENTIALS = {
   email: 'admin@sonicjs.com',
