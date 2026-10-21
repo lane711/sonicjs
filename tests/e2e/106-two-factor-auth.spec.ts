@@ -154,6 +154,25 @@ async function expectSessionUpgraded(page: Page) {
     .toBe(true)
 }
 
+/**
+ * Click a two-factor form's submit button and wait for the POST it fires.
+ *
+ * Both of these pages render `#tf-msg` from their own `fetch` handler, so the banner cannot
+ * appear until the request answers — and answering it means a password-hash comparison on a
+ * possibly-cold isolate. `expect(...).toBeVisible()` budgets 5s, which is an assertion budget,
+ * not a server-round-trip budget: in CI the wrong-password test failed with the locator still
+ * resolving to `<div id="tf-msg" class="hidden ...">` on its 14th poll. Wait for the response
+ * and let the assertion check what the handler did with it.
+ */
+async function submitTwoFactorForm(page: Page, click: () => Promise<void>): Promise<void> {
+  await Promise.all([
+    page.waitForResponse(
+      (r) => r.request().method() === 'POST' && r.url().includes('/auth/two-factor/')
+    ),
+    click(),
+  ])
+}
+
 test.describe('Two-Factor Authentication @auth @lock-auth-login', () => {
   test.describe('enrolment page', () => {
     test.beforeEach(async ({ page }) => {
@@ -192,7 +211,7 @@ test.describe('Two-Factor Authentication @auth @lock-auth-login', () => {
     test('rejects setup with the wrong password and stays in the off state', async ({ page }) => {
       await page.goto('/admin/two-factor')
       await page.fill('#tf-pw', 'definitely-not-the-password')
-      await page.click('#enrolBtn')
+      await submitTwoFactorForm(page, () => page.click('#enrolBtn'))
       await expect(page.locator('#tf-msg')).toBeVisible()
       await expect(page.locator('#state-enrolling')).toBeHidden()
       await expect(page.locator('#tf-status')).toHaveText('Disabled')
@@ -254,7 +273,7 @@ test.describe('Two-Factor Authentication @auth @lock-auth-login', () => {
       await page.context().clearCookies()
       await page.goto('/auth/two-factor')
       await page.fill('#tf-code', '000000')
-      await page.click('#totpBtn')
+      await submitTwoFactorForm(page, () => page.click('#totpBtn'))
       await expect(page.locator('#tf-msg')).toBeVisible()
       await expect(page).toHaveURL(/\/auth\/two-factor/)
     })
