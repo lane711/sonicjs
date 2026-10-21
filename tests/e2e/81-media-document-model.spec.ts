@@ -105,8 +105,10 @@ test.describe('Media — document model (slice 3) @media', () => {
     await page.locator('#upload-modal button[type="submit"]').click()
     await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', { timeout: 10000 })
 
-    // Page auto-redirects; wait for media library to reload
-    await page.waitForURL(/\/admin\/media/, { timeout: 20000, waitUntil: 'domcontentloaded' })
+    // Page auto-redirects; wait for media library to reload. The `?t=` matters: the upload runs
+    // on /admin/media itself, so a bare /\/admin\/media/ matches the page it was started from and
+    // the grid assertion below races the reload that is about to destroy its execution context.
+    await page.waitForURL(/\/admin\/media\?t=/, { timeout: 20000, waitUntil: 'domcontentloaded' })
 
     // File should appear in the grid (sourced from documents now)
     await expect(page.locator('#media-grid')).toContainText(uniqueName, { timeout: 10000 })

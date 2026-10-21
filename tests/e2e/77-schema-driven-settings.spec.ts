@@ -51,11 +51,17 @@ test.describe('Schema-driven plugin settings @plugins @lock-plugin-hello-world',
     await expect(greetingInput).toBeVisible({ timeout: 10000 })
 
     await greetingInput.fill(uniqueGreeting)
-    await page.locator('button[type="submit"]').click()
-
-    // POST auto-upserts the plugin if not in DB then redirects back to /configure
-    await page.waitForURL(`**/configure`, { timeout: 10000 })
-    await page.waitForLoadState('networkidle')
+    // POST /admin/plugins/:id/configure redirects back to /configure, the page it was submitted
+    // from, so `waitForURL('**/configure')` is true before the click dispatches. The assertion
+    // below then read back the value `fill()` had just typed and passed without anything being
+    // saved. Wait for the POST, then reload so the input is re-rendered from the database.
+    await Promise.all([
+      page.waitForResponse(
+        (r) => r.request().method() === 'POST' && r.url().includes('/configure')
+      ),
+      page.locator('button[type="submit"]').click(),
+    ])
+    await page.reload({ waitUntil: 'networkidle' })
 
     const savedInput = page.locator('input[name="greeting"]')
     await expect(savedInput).toBeVisible({ timeout: 10000 })

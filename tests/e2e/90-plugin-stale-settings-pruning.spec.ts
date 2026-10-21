@@ -57,11 +57,17 @@ test.describe('Plugin stale settings pruning (issue #972) @plugins @lock-plugin-
     const greetingInput = page.locator('input[name="greeting"]')
     await expect(greetingInput).toBeVisible({ timeout: 10000 })
     await greetingInput.fill('After prune')
-    await page.locator('button[type="submit"]').click()
-
-    // Redirect back to /configure after save
-    await page.waitForURL(`**/configure`, { timeout: 10000 })
-    await page.waitForLoadState('networkidle')
+    // POST /admin/plugins/:id/configure redirects back to /configure, the page it was submitted
+    // from, so `waitForURL('**/configure')` is true before the click dispatches. The assertion
+    // below then read back the value `fill()` had just typed and passed without anything being
+    // saved. Wait for the POST, then reload so the input is re-rendered from the database.
+    await Promise.all([
+      page.waitForResponse(
+        (r) => r.request().method() === 'POST' && r.url().includes('/configure')
+      ),
+      page.locator('button[type="submit"]').click(),
+    ])
+    await page.reload({ waitUntil: 'networkidle' })
 
     // Step 3: verify saved greeting persisted
     const savedInput = page.locator('input[name="greeting"]')

@@ -34,8 +34,15 @@ test.describe('Content title preserved after edit @content', () => {
     // Save without changing anything
     await page.click('button:has-text("Save")')
 
-    // Wait for redirect back to list or edit confirmation
-    await page.waitForURL(/\/admin\/content/, { timeout: 15000 })
+    // A plain `save` over htmx does not navigate at all — the handler returns an inline
+    // success banner and the URL stays on /admin/content/<id>/edit. So there was nothing for
+    // `waitForURL(/\/admin\/content/)` to wait for, and it matched the current URL anyway; the
+    // goto below could abort the POST this spec exists to assert on. Wait for the banner.
+    // `.last()` because htmx holds the outgoing node alongside the swapped-in one for the
+    // duration of the settle, so the id is briefly non-unique.
+    await expect(page.locator('#form-messages').last()).toContainText(/successfully/i, {
+      timeout: 15000,
+    })
 
     // Navigate to the Example collection list page
     await page.goto('/admin/content?collection=example')
