@@ -115,6 +115,42 @@ export async function submitAndWaitForXhr(
   expect(res.ok(), `${method} ${urlPart} failed: ${res.status()}`).toBeTruthy()
 }
 
+/**
+ * Save the open `/admin/content/new` form and return the created record's edit path.
+ *
+ * The create answers the htmx POST with `HX-Redirect: /admin/content/<rootId>/edit`, and that
+ * header is its only success signal: both failure paths in the handler answer the same POST with
+ * HTML — the error banner at 200 and "Collection is not document-backed" at 400 — so neither
+ * `res.ok()` nor the eventual URL distinguishes a failed create from a slow one.
+ *
+ * `page.waitForURL(/\/edit/)` on its own spends the whole budget blind. It cannot tell "the save
+ * is still in flight" from "the save came back with a validation error and htmx is never going to
+ * navigate", and it reports both as a navigation timeout pointing at fixtures.ts. Three specs
+ * flaked or failed that way in CI run 39582792718. Read the header first, then wait for the
+ * navigation htmx is about to make.
+ */
+export async function saveNewContent(page: Page, click: () => Promise<void>): Promise<string> {
+  const [res] = await Promise.all([
+    page.waitForResponse(
+      (r) => r.request().method() === 'POST' && new URL(r.url()).pathname === '/admin/content'
+    ),
+    click(),
+  ])
+
+  const redirect = res.headers()['hx-redirect']
+  const editPath = redirect ? new URL(redirect, page.url()).pathname : ''
+  if (!/^\/admin\/content\/[^/]+\/edit$/.test(editPath)) {
+    throw new Error(
+      `Content create did not redirect to an edit form (HTTP ${res.status()}, HX-Redirect ` +
+        `${redirect || 'absent'}): ${(await res.text()).slice(0, 300)}`
+    )
+  }
+
+  // htmx sets location *after* the response, so the URL is still /admin/content/new at this point.
+  await page.waitForURL((url) => url.pathname === editPath, { timeout: 15000 })
+  return editPath
+}
+
 // Default admin credentials for testing
 export const ADMIN_CREDENTIALS = {
   email: 'admin@sonicjs.com',

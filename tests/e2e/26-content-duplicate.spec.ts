@@ -1,6 +1,6 @@
 import { test, expect } from './fixtures';
 import type { Page } from '@playwright/test';
-import { loginAsAdmin } from './utils/test-helpers';
+import { loginAsAdmin, saveNewContent } from './utils/test-helpers';
 
 /**
  * Two things were wrong with every test in this file.
@@ -41,8 +41,12 @@ async function createRecord(page: Page): Promise<string> {
   await page.fill('input[name="title"]', `Duplicate source ${stamp}`);
   await page.fill('input[name="slug"]', `duplicate-source-${stamp}`);
 
-  await page.locator('button[type="submit"]').filter({ hasText: /Save|Create/ }).first().click();
-  await page.waitForURL(EDIT_URL);
+  // `saveNewContent` reads the POST's `HX-Redirect` before waiting for htmx to navigate to it. A
+  // bare `waitForURL(EDIT_URL)` here could not tell a save still in flight from one that came back
+  // with a validation error, and reported both as a navigation timeout pointing at fixtures.ts.
+  await saveNewContent(page, () =>
+    page.locator('button[type="submit"]').filter({ hasText: /Save|Create/ }).first().click()
+  );
   // The duplicate control lives on the edit form; waiting for it also proves the form rendered.
   await expect(page.locator('button').filter({ hasText: 'Duplicate Content' })).toBeVisible();
   return page.url();

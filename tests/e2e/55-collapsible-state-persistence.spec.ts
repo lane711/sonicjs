@@ -1,5 +1,5 @@
 import { expect, test, type Page } from './fixtures'
-import { ensureAdminUserExists, loginAsAdmin } from './utils/test-helpers'
+import { ensureAdminUserExists, loginAsAdmin, saveNewContent } from './utils/test-helpers'
 
 async function resolvePageBlocksCollectionKey(page: Page): Promise<string> {
   await page.goto('/admin/content/new')
@@ -44,48 +44,27 @@ async function gotoPageBlocksNewForm(page: Page) {
 /**
  * Save the open new-content form and return the created record's edit URL.
  *
- * The create answers the htmx POST with `HX-Redirect: /admin/content/<rootId>/edit`, and that
- * header is also the only success signal: both failure paths in the handler answer the same POST
- * with HTML — the error banner at 200 and "Collection is not document-backed" at 400 — so neither
- * `res.ok()` nor the eventual URL can tell a failed create from a slow one.
+ * The shared helper does the work; this adds the title to the error and proves the edit form
+ * rendered, because everything below reads structured fields off it.
  *
- * The version this replaces swallowed its `waitForURL` with `.catch(() => {})` and fell through to
- * a "fallback for environments that may not auto-redirect" that took `a[href*="/edit"]` `.first()`
- * on whatever page it was still on. On the form page that is nothing, so a create that failed
- * server-side was reported as "edit link not found" with the real error discarded — which is what
- * CI run 39582792718 reported. On a list page it would be worse: it hands back a stranger's
- * document and the test goes on to assert this test's collapse state against it.
+ * What the version this replaces got wrong: it swallowed its `waitForURL` with `.catch(() => {})`
+ * and fell through to a "fallback for environments that may not auto-redirect" that took
+ * `a[href*="/edit"]` `.first()` on the page it never left. On the form page that is nothing, so a
+ * create that failed server-side was reported as "edit link not found" with the real error
+ * discarded — which is what CI run 39582792718 reported.
  */
 async function saveAndCaptureEditUrl(page: Page, title: string): Promise<string> {
-  const [res] = await Promise.all([
-    page.waitForResponse(
-      (r) => r.request().method() === 'POST' && new URL(r.url()).pathname === '/admin/content'
-    ),
-    page.click('button[name="action"][value="save"]'),
-  ])
+  const editPath = await saveNewContent(page, () =>
+    page.click('button[name="action"][value="save"]')
+  ).catch((error: Error) => {
+    throw new Error(`Saving "${title}": ${error.message}`)
+  })
 
-  const redirect = res.headers()['hx-redirect']
-  if (!redirect) {
-    throw new Error(
-      `Saving "${title}" did not redirect (HTTP ${res.status()}): ${(await res.text()).slice(0, 300)}`
-    )
-  }
-
-  const editPath = new URL(redirect, page.url()).pathname
-  if (!/^\/admin\/content\/[^/]+\/edit$/.test(editPath)) {
-    throw new Error(`Saving "${title}" redirected to ${redirect}, not to the record's edit form`)
-  }
-
-  // htmx sets location *after* the response, so the URL is still /admin/content/new at this point.
-  // Wait for the navigation it is about to make rather than racing it with a goto of our own.
-  await page.waitForURL((url) => url.pathname === editPath, { timeout: 15000 })
   await expect(page.locator('form#content-form')).toBeVisible()
-
-  // Return the pathname, not the landed URL: the collapse-state key is
+  // The pathname, not the landed URL: the collapse-state key is
   // `window.location.pathname + ':' + collectionId`, so `?success=...` is noise.
   return editPath
 }
-
 test.describe('Collapsible State Persistence @content', () => {
   test.beforeEach(async ({ page }) => {
     await ensureAdminUserExists(page)

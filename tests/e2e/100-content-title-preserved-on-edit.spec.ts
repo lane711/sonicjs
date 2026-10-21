@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures'
-import { loginAsAdmin } from './utils/test-helpers'
+import { loginAsAdmin, saveNewContent } from './utils/test-helpers'
 
 test.describe('Content title preserved after edit @content', () => {
   test.beforeEach(async ({ page }) => {
@@ -65,9 +65,10 @@ test.describe('Content title preserved after edit @content', () => {
     await page.fill('input[name="emoji"]', '🧪')
     await page.fill('input[name="description"]', 'E2E test mood')
 
-    // Save — POST success redirects to /admin/content/<ID>/edit, not the list
-    await page.click('button:has-text("Save")')
-    await page.waitForURL(/\/admin\/content\/[^?]+\/edit/, { timeout: 15000 })
+    // Save. The POST's `HX-Redirect` is what says it worked — waiting on the navigation alone
+    // cannot tell a save still in flight from one that came back with a validation error htmx will
+    // never navigate for, and reported both as a 15s timeout pointing at fixtures.ts in CI.
+    await saveNewContent(page, () => page.click('button:has-text("Save")'))
 
     // Navigate to the Example collection list page
     await page.goto('/admin/content?collection=example')
