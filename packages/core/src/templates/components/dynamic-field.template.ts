@@ -482,7 +482,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
           type="number" 
           id="${fieldId}"
           name="${fieldName}"
-          value="${value}"
+          value="${escapeHtml(String(value ?? ''))}"
           min="${opts.min || ''}"
           max="${opts.max || ''}"
           step="${opts.step || ''}"
@@ -521,7 +521,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
           type="date"
           id="${fieldId}"
           name="${fieldName}"
-          value="${value}"
+          value="${escapeHtml(String(value ?? ''))}"
           min="${opts.min || ''}"
           max="${opts.max || ''}"
           class="${baseClasses} ${errorClasses} !w-auto dark:[color-scheme:dark]"
@@ -539,7 +539,7 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
           type="datetime-local"
           id="${fieldId}"
           name="${fieldName}"
-          value="${value}"
+          value="${escapeHtml(String(value ?? ''))}"
           min="${opts.min || ''}"
           max="${opts.max || ''}"
           class="${baseClasses} ${errorClasses} !w-auto dark:[color-scheme:dark]"
@@ -891,14 +891,14 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
       const renderMediaPreview = (url: unknown, alt: string, classes: string) => {
         if (typeof url !== 'string' || url === '') return ''
         if (isVideoUrl(url)) {
-          return `<video src="${url}" class="${classes}" muted></video>`
+          return `<video src="${escapeHtml(url)}" class="${classes}" muted></video>`
         }
-        return `<img src="${url}" alt="${alt}" class="${classes}">`
+        return `<img src="${escapeHtml(url)}" alt="${escapeHtml(alt)}" class="${classes}">`
       }
 
       fieldHTML = `
         <div class="media-field-container">
-          <input type="hidden" id="${fieldId}" name="${fieldName}" value="${isMultiple ? mediaValues.join(',') : singleValue}" data-multiple="${isMultiple}">
+          <input type="hidden" id="${fieldId}" name="${fieldName}" value="${escapeHtml(String(isMultiple ? mediaValues.join(',') : singleValue))}" data-multiple="${isMultiple}">
 
           ${
             isMultiple
@@ -907,11 +907,11 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
               ${mediaValues
                 .map(
                   (url: string, idx: number) => `
-                <div class="relative media-preview-item" data-url="${url}">
+                <div class="relative media-preview-item" data-url="${escapeHtml(url)}">
                   ${renderMediaPreview(url, `Media ${idx + 1}`, 'w-full h-24 object-cover rounded-lg border border-white/20')}
                   <button
                     type="button"
-                    onclick="removeMediaFromMultiple('${fieldId}', '${url}')"
+                    onclick="removeMediaFromMultiple('${fieldId}', '${escapeJsAttr(url)}')"
                     data-media-remove="true"
                     class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 hover:bg-red-700"
                     ${disabled ? 'disabled' : ''}
@@ -999,13 +999,21 @@ export function renderDynamicField(field: FieldDefinition, options: FieldRenderO
             hx-swap="innerHTML"
             hx-include="this"
             ${disabled ? 'disabled' : ''}
+            ${required}
           >
+          <!--
+            The required flag belongs on the visible search box, not on the hidden input
+            below:
+            a hidden control that fails validation is not focusable, so Chrome aborts the
+            submit without reporting anything and the Save button looks dead. The submit
+            handler further down copies the display value into the hidden input whenever
+            no user is linked, so validating the visible field is equivalent.
+          -->
           <input
             type="hidden"
             id="${fieldId}"
             name="${fieldName}"
             value="${escapeHtml(idValue)}"
-            ${required}
           >
           <div
             id="${fieldId}-dropdown"
@@ -2170,6 +2178,18 @@ function getStructuredFieldScript(): string {
                 updateOrderLabels();
               };
 
+              // updateHiddenInput re-dispatches a bubbling change event from this container's
+              // own hidden input so ancestor containers re-serialize. A nested array's hidden
+              // input lives inside the PARENT's [data-structured-array-list], so the unscoped
+              // target.closest('[data-structured-array-list]') test below also matched this
+              // container's own synthetic event and re-entered updateHiddenInput until the stack
+              // blew ("Maximum call stack size exceeded" on every nested add/remove/edit).
+              const isOwnListMutation = (target) => {
+                if (target === getLiveHiddenInput()) return false;
+                const liveList = getLiveList();
+                return !!liveList && liveList.contains(target);
+              };
+
               const addArrayItem = () => {
                 const liveList = getLiveList();
                 if (!liveList) return;
@@ -2299,7 +2319,7 @@ function getStructuredFieldScript(): string {
               container.addEventListener('input', (event) => {
               const target = event.target;
               if (!(target instanceof Element)) return;
-              if (target.closest('[data-structured-array-list]')) {
+              if (isOwnListMutation(target)) {
                 updateHiddenInput();
               }
               });
@@ -2307,7 +2327,7 @@ function getStructuredFieldScript(): string {
               container.addEventListener('change', (event) => {
               const target = event.target;
               if (!(target instanceof Element)) return;
-              if (target.closest('[data-structured-array-list]')) {
+              if (isOwnListMutation(target)) {
                 updateHiddenInput();
               }
               });
@@ -2647,4 +2667,23 @@ function escapeHtml(text: string): string {
     '"': '&quot;',
     "'": '&#39;'
   }[char] || char))
+}
+
+/**
+ * Escape a string for a single-quoted JS string inside an HTML attribute —
+ * e.g. onclick="f('${escapeJsAttr(x)}')". escapeHtml is insufficient: the browser
+ * HTML-decodes the attribute BEFORE the inline script parses, so &#39; decodes back
+ * to ' and terminates the string. Emits \xHH escapes so no raw '"<>&\ survives.
+ */
+function escapeJsAttr(value: unknown): string {
+  return String(value ?? '').replace(/[\\'"<>&\r\n]/g, (ch) => ({
+    '\\': '\\\\',
+    "'": '\\x27',
+    '"': '\\x22',
+    '<': '\\x3C',
+    '>': '\\x3E',
+    '&': '\\x26',
+    '\r': '\\r',
+    '\n': '\\n'
+  }[ch] || ch))
 }

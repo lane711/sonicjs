@@ -3,16 +3,18 @@ import { loadCollectionConfigs } from "../services/collection-loader";
 import { getCollectionRegistry } from "../services/collection-registry";
 import { MigrationService } from "../services/migrations";
 import { PluginBootstrapService } from "../services/plugin-bootstrap";
-import { bootstrapDocumentTypes, autoRegisterCollectionDocumentTypes } from "../services/document-types-seed";
+import { bootstrapDocumentTypes, autoRegisterCollectionDocumentTypes, bootstrapDefaultContent } from "../services/document-types-seed";
 import { getHookSystem, hasHookSystem } from "../plugins/hooks/hook-system-singleton";
 import { getTelemetryService } from "../services/telemetry-service"
 import { SONICJS_VERSION } from "../utils/version";
+import { settlesWithin } from "../utils/shared-promise";
 import type { SonicJSConfig } from "../app";
 import { setBranchLabel } from "../templates/layouts/admin-layout-catalyst.template";
 
 type Bindings = {
   DB: D1Database;
-  KV: KVNamespace;
+  KV?: KVNamespace;
+  CACHE_KV?: KVNamespace;
   JWT_SECRET?: string;
   CORS_ORIGINS?: string;
   ENVIRONMENT?: string;
@@ -21,10 +23,110 @@ type Bindings = {
 // Track if bootstrap has been run in this worker instance
 let bootstrapComplete = false;
 
+/**
+ * The bootstrap currently running on this isolate, if any.
+ *
+ * `bootstrapComplete` is only set at the *end* of the work, so it cannot keep a second request
+ * out while the first is still going. Every request that arrived on a cold isolate before the
+ * first one finished therefore saw `false` and ran the whole bootstrap again — concurrently, on a
+ * single-threaded isolate, against the same D1. The cost is not N parallel bootstraps but N
+ * interleaved ones: each copy's serial D1 round trips queue behind every other copy's, so all N
+ * requests take roughly N times the ~3-9s a cold bootstrap costs on its own.
+ *
+ * That is reachable from ordinary traffic — a dashboard load fires five fragment requests at once
+ * — and it is what a four-worker Playwright run hitting a freshly spawned isolate does on every
+ * cold start. It showed up as whole batches of unrelated requests, browser and API client alike,
+ * stalling past 30s on preview deployments with nothing in the logs: no errors, no 429s, just an
+ * isolate spending its time redoing work it had already started.
+ *
+ * So hold the first caller's promise and let everyone else wait on it. One bootstrap per isolate,
+ * and the requests that would have duplicated it now cost a single `await`.
+ */
+let bootstrapInFlight: Promise<void> | null = null;
+
+/** When the current holder took the gate, for the deadline below. */
+let bootstrapStartedAt = 0;
+
+/**
+ * How long a follower will wait on the holder before giving up and bootstrapping itself.
+ *
+ * The gate above is an optimisation — it exists to stop N concurrent bootstraps, not to make a
+ * follower correct — so waiting on it must never be able to outlive the thing it waits for.
+ * `bootstrapInFlight` is created inside *another request's* execution context, and Cloudflare
+ * cancels a request's pending work the moment its client disconnects. A follower that signed up
+ * for a holder whose request was torn down before the `finally` ran would wait on a promise
+ * nobody is left to resolve: not slow, never. Every later request on that isolate inherits the
+ * same dead promise, so one timed-out client silently wedges the isolate for every client after
+ * it — which is exactly the reported signature, a request that leaves the test runner and never
+ * produces a first byte.
+ *
+ * 20s is chosen against the two numbers either side of it: a cold bootstrap is ~90 serial D1
+ * round trips, so ~3s local and well under 10s even on a slow remote D1, while the E2E suite's
+ * action timeout is 30s. A follower that is still waiting at 20s is not waiting on a bootstrap
+ * that is about to finish.
+ */
+const BOOTSTRAP_DEADLINE_MS = 20_000;
+
 // KV key for cross-isolate bootstrap state. Version-keyed so a code deployment
-// (SONICJS_VERSION bump) automatically invalidates the cached flag and forces
-// a fresh full bootstrap on the next cold start.
-const BOOTSTRAP_KV_KEY = () => `_sonicjs_bootstrap_v${SONICJS_VERSION}`
+// (SONICJS_VERSION bump) automatically invalidates the cached flag and forces a fresh full
+// bootstrap on the next cold start.
+//
+// Also HOST-keyed, because the flag describes one D1 database and the KV namespace is shared by
+// everything deployed from the same wrangler.toml. CI makes that concrete: `pr-tests.yml` deletes
+// and recreates the D1 for every PR run but leaves `kv_namespaces.id` alone, so each preview read
+// a `'1'` written by a sibling preview against a database it has never seen. The stale-flag guard
+// below then deleted the key — out from under the preview that legitimately owned it — and both
+// deployments fell back to the full cold bootstrap, concurrently, on a brand-new D1. That is the
+// shape behind the 90s hangs on `GET /api/collections`.
+//
+// The host is the cheapest discriminator that is already per-deployment (`sonicjs-pr-<branch>.…`
+// vs the demo's own hostname). A worker reachable on two hostnames simply bootstraps once per
+// hostname, which costs one extra cold start and never serves stale state.
+//
+// A forged Host cannot be used to force repeated bootstraps: `bootstrapComplete` short-circuits
+// above this, without reading KV at all, so an isolate that has bootstrapped once never consults
+// the key again whatever Host arrives. The worst a junk Host can do is what a missing flag
+// already does today — one bootstrap on one cold isolate.
+const BOOTSTRAP_KV_KEY = (host?: string) =>
+  `_sonicjs_bootstrap_v${SONICJS_VERSION}${host ? `:${host}` : ''}`
+
+/**
+ * Throttle key for the fast path's background document-type sync.
+ *
+ * Moving that sync off the critical path (see the `runInBackground` call below) stopped the
+ * *request* waiting for it, but every cold isolate still issued the whole batch of D1 statements
+ * — and D1 serialises writes per database. Under a four-worker Playwright run the platform churns
+ * isolates for twenty minutes straight, so the aggregate is a sustained write storm against the
+ * one preview database, which is the shape behind the 30s HTTP timeouts on requests that have
+ * nothing to do with bootstrap.
+ *
+ * The sync only needs to run often enough to pick up a code collection added without a version
+ * bump — the local-dev case. A deploy still invalidates BOOTSTRAP_KV_KEY and runs the full awaited
+ * bootstrap, so correctness never rests on this. Gating on a short-lived marker turns "once per
+ * cold isolate" into "at most once per minute per deployment" and costs one KV read, issued in
+ * parallel with the one already being made.
+ */
+const BOOTSTRAP_SYNC_KV_KEY = (host?: string) => `${BOOTSTRAP_KV_KEY(host)}:synced`
+
+/** KV's floor for `expirationTtl`. Also about the longest a dev wants to wait for a new collection. */
+const BOOTSTRAP_SYNC_THROTTLE_SECONDS = 60
+
+/**
+ * Hand a promise to the runtime so it outlives the response.
+ *
+ * `c.executionCtx` throws outside a real Workers fetch handler — the Vitest harness and
+ * `app.request()` both hit that — so the access has to be guarded. Without the ctx the promise
+ * still runs; it just loses its keep-alive, which for idempotent background work means the next
+ * cold isolate redoes it. Never await the result: the whole point is to be off the hot path.
+ */
+function runInBackground(c: Context, work: Promise<unknown>): void {
+  const settled = work.catch(() => {})
+  try {
+    c.executionCtx.waitUntil(settled)
+  } catch {
+    /* no execution context (tests, direct app.request) — let it run unsupervised */
+  }
+}
 
 /**
  * Verify security-critical environment configuration at startup.
@@ -83,6 +185,50 @@ export function verifySecurityConfig(env: Bindings): void {
   }
 }
 
+// Better Auth stateless session/auth API paths that must never carry the
+// cold-start bootstrap tax (they only touch auth_* migration tables). Matched
+// as `/auth/<seg>` prefixes so `/auth/sign-in/email`, `/auth/callback/github`,
+// etc. are all covered. Deliberately excludes `/auth/login` (page render) and
+// `/auth/seed-admin` (self-seeds its own prerequisites).
+const BETTER_AUTH_SESSION_SEGMENTS = [
+  "sign-in",
+  "sign-up",
+  "sign-out",
+  "get-session",
+  "callback",
+  "token",
+] as const;
+
+export function isBetterAuthSessionPath(path: string): boolean {
+  return BETTER_AUTH_SESSION_SEGMENTS.some(
+    (seg) => path === `/auth/${seg}` || path.startsWith(`/auth/${seg}/`)
+  );
+}
+
+// Per-isolate memo so verifySecurityConfig logs warnings once but throws on
+// every production request with a bad JWT_SECRET.
+let lastSecurityBindings: string | null = null
+let lastSecurityError: Error | null = null
+let securityWarned = false
+
+function verifySecurityConfigMemoized(env: Bindings): void {
+  const sig = `${env.JWT_SECRET ?? ''}|${env.CORS_ORIGINS ?? ''}|${env.ENVIRONMENT ?? ''}`
+  if (sig !== lastSecurityBindings) {
+    lastSecurityBindings = sig
+    lastSecurityError = null
+    securityWarned = false
+  }
+  if (lastSecurityError) throw lastSecurityError
+  if (securityWarned) return
+  try {
+    verifySecurityConfig(env)
+    securityWarned = true
+  } catch (e) {
+    lastSecurityError = e instanceof Error ? e : new Error(String(e))
+    throw lastSecurityError
+  }
+}
+
 /**
  * Bootstrap middleware that ensures system initialization
  * Runs once per worker instance
@@ -99,37 +245,27 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
       (c as any).set("hookSystem", getHookSystem());
     }
 
+    // Security check runs on EVERY request — before any short-circuit.
+    // Production with a bad/missing JWT_SECRET must fail closed.
+    verifySecurityConfigMemoized(c.env as Bindings);
+
     // Skip if already bootstrapped in this worker instance
     if (bootstrapComplete) {
       return next();
     }
 
-    // Fast KV check: if a previous isolate already ran the full bootstrap for this
-    // app version, skip the expensive D1 operations entirely. KV reads are ~10ms
-    // vs 5-10s for cold D1. Version-keyed so deployments auto-invalidate the flag.
-    try {
-      const cacheKv = (c.env as any).CACHE_KV as KVNamespace | undefined
-      if (cacheKv) {
-        const kvDone = await cacheKv.get(BOOTSTRAP_KV_KEY())
-        if (kvDone === '1') {
-          // Hydrate in-memory state without touching D1.
-          try {
-            const kv = (c.env as any).CACHE_KV as KVNamespace
-            const { setGlobalKVNamespace } = await import("../plugins/cache/services/cache")
-            setGlobalKVNamespace(kv)
-            const { setGlobalCatalogKv, loadKvCatalog } = await import("../plugins/cache/services/catalog")
-            setGlobalCatalogKv(kv)
-            c.executionCtx.waitUntil(loadKvCatalog())
-          } catch { /* KV wiring optional */ }
-          try {
-            const configs = await loadCollectionConfigs()
-            getCollectionRegistry().register(configs)
-          } catch { /* registry optional in fast-path */ }
-          bootstrapComplete = true
-          return next()
-        }
-      }
-    } catch { /* KV unavailable — fall through to full bootstrap */ }
+    // Path-based short-circuits come FIRST — above the KV fast-path below, not under it.
+    //
+    // The "fast" path is only fast relative to a cold full bootstrap: it still costs a KV read,
+    // a `SELECT COUNT(*) FROM document_types`, a collection-config load and three serial D1
+    // bootstrap calls. Sitting underneath it, these two skips were dead in the steady state —
+    // the KV flag is present on any deployment that has served one request, so every health
+    // check, every .js/.css/.png and every Better Auth sign-in paid the whole thing on a cold
+    // isolate. Measured on a preview deployment: ~9s cold vs ~0.5s warm, and a Playwright run
+    // spreads over enough isolates that this stacks into 90s test timeouts.
+    //
+    // Both blocks must stay below verifySecurityConfigMemoized — a bad JWT_SECRET still has to
+    // fail closed on every request — and below the bootstrapComplete check, which is cheaper.
 
     // Skip bootstrap for static assets and health checks
     const path = c.req.path;
@@ -146,8 +282,157 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
       return next();
     }
 
-    // Show branch label automatically on localhost — no env var needed
+    // Skip the heavy D1 bootstrap for Better Auth's stateless session API. These
+    // endpoints only read/write the auth_* tables (created by migration 0001) —
+    // they never need the collection registry, document types, or RBAC seed. On
+    // a cold isolate the ~10s bootstrap otherwise runs on the same request as
+    // Better Auth's scrypt password verify, exhausting the Worker's CPU/time
+    // budget and returning a bare 500. Login is the first request in most flows,
+    // so this is exactly the request that must not carry the bootstrap tax.
+    // (Not /auth/login or /auth/seed-admin: the former is a page render, the
+    // latter self-seeds its own prerequisites — neither is a hot cold-start path
+    // that 500s.) The full bootstrap still runs on the next non-auth request.
+    if (isBetterAuthSessionPath(path)) {
+      return next();
+    }
+
+    // Somebody else is already doing this. Wait for them rather than starting a second copy —
+    // but only up to a deadline, because the holder's request can be cancelled out from under
+    // this one. See BOOTSTRAP_DEADLINE_MS.
+    if (bootstrapInFlight) {
+      const remaining = bootstrapStartedAt + BOOTSTRAP_DEADLINE_MS - Date.now();
+      if (remaining > 0 && (await settlesWithin(bootstrapInFlight, remaining))) {
+        return next();
+      }
+      // Either the holder blew the deadline or its request was torn down before the `finally`
+      // could release the gate. Drop the dead promise and bootstrap here instead of inheriting
+      // it. Worst case this is one duplicate bootstrap after a 20s stall — the operations are
+      // all idempotent — against an isolate that would otherwise never answer again.
+      console.warn("[Bootstrap] in-flight bootstrap exceeded its deadline; taking over");
+      bootstrapInFlight = null;
+    }
+
+    let releaseBootstrap: () => void = () => {};
+    const ownGate = new Promise<void>((resolve) => {
+      releaseBootstrap = resolve;
+    });
+    bootstrapInFlight = ownGate;
+    bootstrapStartedAt = Date.now();
+
+    // `try` so that the gate is released on *every* exit, including a throw from somewhere that
+    // is not already wrapped. Leaking it would park every later request on this isolate forever.
+    try {
     const host = c.req.header('host') || '';
+
+    // Fast KV check: if a previous isolate already ran the full bootstrap for this app version
+    // AND this hostname, skip the expensive D1 operations entirely. KV reads are ~10ms vs 5-10s
+    // for cold D1. Version- and host-keyed so deployments auto-invalidate the flag — see
+    // BOOTSTRAP_KV_KEY for why the host matters.
+    try {
+      const cacheKv = (c.env as any).CACHE_KV as KVNamespace | undefined
+      if (cacheKv) {
+        // Both reads in one round trip's worth of wall clock: the throttle marker is only
+        // consulted when the flag says "already bootstrapped", but fetching it eagerly keeps the
+        // fast path at a single KV latency instead of two serial ones.
+        const [kvDone, syncedRecently] = await Promise.all([
+          cacheKv.get(BOOTSTRAP_KV_KEY(host)),
+          cacheKv.get(BOOTSTRAP_SYNC_KV_KEY(host)),
+        ])
+        if (kvDone === '1') {
+          // Guard against stale KV key + fresh D1 (e.g. CI re-creates D1 each run but
+          // reuses KV). If document_types is empty the KV flag is lying — fall through
+          // to full bootstrap so autoRegisterCollectionDocumentTypes runs.
+          const d1Fresh = await (c.env.DB as D1Database)
+            .prepare('SELECT COUNT(*) n FROM document_types LIMIT 1')
+            .first<{ n: number }>()
+            .then(r => !r || r.n === 0)
+            .catch(() => true)
+          if (!d1Fresh) {
+            // D1 has data — fast-path is valid.
+            try {
+              const kv = (c.env as any).CACHE_KV as KVNamespace
+              const { setGlobalKVNamespace } = await import("../plugins/cache/services/cache")
+              setGlobalKVNamespace(kv)
+              const { setGlobalCatalogKv, loadKvCatalog } = await import("../plugins/cache/services/catalog")
+              setGlobalCatalogKv(kv)
+              c.executionCtx.waitUntil(loadKvCatalog())
+            } catch { /* KV wiring optional */ }
+            try {
+              const configs = await loadCollectionConfigs()
+              getCollectionRegistry().register(configs)
+            } catch { /* registry optional in fast-path */ }
+            // Sync document types to D1 even on KV fast-path — idempotent no-ops when
+            // nothing changed, but ensures newly added code collections reach D1 without
+            // requiring a version bump or full cold-start bootstrap.
+            //
+            // Deliberately NOT awaited. These are three sequential D1 round trips, and on
+            // Cloudflare that is ~15-150ms of network the first request on every cold isolate
+            // would otherwise pay before it is even routed — on a single-threaded isolate that
+            // stalls every request co-located with it. Nothing downstream reads what they
+            // write: BOOTSTRAP_KV_KEY embeds SONICJS_VERSION, so a deploy invalidates the flag
+            // and the first request of a new version runs the full awaited bootstrap anyway.
+            // What is left for the fast path to cover is purely the local-dev case of adding a
+            // code collection without bumping the version, and that can land a beat late.
+            // waitUntil keeps them alive past the response instead of being cancelled with it.
+            // Throttled, not per-isolate: see BOOTSTRAP_SYNC_KV_KEY. A cold isolate inside an
+            // already-synced window skips the batch entirely, which is what keeps four
+            // Playwright workers from turning isolate churn into sustained D1 write pressure.
+            if (syncedRecently !== '1') {
+              // Claim the window before doing the work rather than after. Nothing here is a
+              // correctness guarantee -- it all repeats next window, and a deploy runs the full
+              // awaited bootstrap -- so narrowing the burst of isolates that start concurrently
+              // is worth more than confirming completion.
+              runInBackground(
+                c,
+                cacheKv
+                  .put(BOOTSTRAP_SYNC_KV_KEY(host), '1', {
+                    expirationTtl: BOOTSTRAP_SYNC_THROTTLE_SECONDS,
+                  })
+                  .catch(() => {})
+              )
+              runInBackground(
+                c,
+                (async () => {
+                  await bootstrapDocumentTypes(c.env.DB).catch((e) =>
+                    console.error("[Bootstrap] KV fast-path: error syncing document types:", e)
+                  )
+                  await autoRegisterCollectionDocumentTypes(c.env.DB).catch((e) =>
+                    console.error("[Bootstrap] KV fast-path: error auto-registering collection types:", e)
+                  )
+                  await bootstrapDefaultContent(c.env.DB).catch((e) =>
+                    console.error("[Bootstrap] KV fast-path: error seeding default content:", e)
+                  )
+                  // Plugin bootstrap is the one piece of the full path that has no other way to
+                  // self-heal. If the isolate that set the KV flag was torn down partway through
+                  // its install loop, a plugin can be left uninstalled with the flag already
+                  // saying "done" — and from then on every isolate takes this fast path and never
+                  // looks. isBootstrapNeeded() is a single COUNT, and this whole block is off the
+                  // request's critical path, so checking costs one query on a cold isolate.
+                  if (!config.plugins?.disableAll) {
+                    await (async () => {
+                      const bootstrapService = new PluginBootstrapService(c.env.DB)
+                      if (await bootstrapService.isBootstrapNeeded()) {
+                        console.log("[Bootstrap] KV fast-path: repairing core plugin install")
+                        await bootstrapService.bootstrapCorePlugins()
+                      }
+                    })().catch((e) =>
+                      console.error("[Bootstrap] KV fast-path: error bootstrapping plugins:", e)
+                    )
+                  }
+                })()
+              )
+            }
+            bootstrapComplete = true
+            return next()
+          }
+          // D1 is fresh — delete the stale KV key so the next cold start also re-bootstraps.
+          // Host-keyed, so this only ever discards this deployment's own flag.
+          cacheKv.delete(BOOTSTRAP_KV_KEY(host)).catch(() => {})
+        }
+      }
+    } catch { /* KV unavailable — fall through to full bootstrap */ }
+
+    // Show branch label automatically on localhost — no env var needed
     const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1');
     const gitBranch = (c.env as any).GIT_BRANCH as string | undefined;
     setBranchLabel(isLocalhost && gitBranch ? gitBranch : undefined);
@@ -235,6 +520,11 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
             })().catch((e) => console.error("[Bootstrap] Error bootstrapping plugins:", e)),
       ])
 
+      // Seed starter content after types are registered (idempotent no-op when present).
+      await bootstrapDefaultContent(c.env.DB).catch((e) =>
+        console.error("[Bootstrap] Error seeding default content:", e)
+      )
+
       // Mark bootstrap as complete for this worker instance and persist to KV
       // so subsequent cold-start isolates can skip the D1 work entirely.
       bootstrapComplete = true;
@@ -244,7 +534,7 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
         if (cacheKv) {
           // 24h TTL — long enough that hot instances never re-bootstrap, short
           // enough that a DB reset auto-heals within a day.
-          await cacheKv.put(BOOTSTRAP_KV_KEY(), '1', { expirationTtl: 86400 })
+          await cacheKv.put(BOOTSTRAP_KV_KEY(host), '1', { expirationTtl: 86400 })
         }
       } catch { /* KV write failure is non-fatal */ }
 
@@ -282,7 +572,7 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
         // Stable installation ID via KV (generated once, persisted)
         let installationId = 'unknown';
         try {
-          const kv = c.env.KV as KVNamespace | undefined;
+          const kv = (c.env.CACHE_KV ?? c.env.KV) as KVNamespace | undefined;
           if (kv) {
             installationId = (await kv.get('_sonicjs_installation_id')) ?? '';
             if (!installationId) {
@@ -291,6 +581,13 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
             }
           }
         } catch { /* KV not available */ }
+
+        // Extract deploy origin (scheme + host only — no path, no query, no PII)
+        let deployUrl: string | undefined;
+        try {
+          const u = new URL(c.req.url);
+          deployUrl = u.origin; // e.g. "https://example.com"
+        } catch { /* malformed URL — skip */ }
 
         const telemetry = getTelemetryService();
         await telemetry.trackProjectSnapshot({
@@ -301,16 +598,25 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
           field_type_histogram: fieldTypeHistogram,
           doc_total: docTotal,
           sonicjs_version: SONICJS_VERSION,
+          deploy_url: deployUrl,
         });
       } catch { /* silent — telemetry must never break boot */ }
     } catch (error) {
       console.error("[Bootstrap] Error during system initialization:", error);
       // Don't prevent the app from starting, but log the error
     }
-
-    // 4. Verify security configuration (outside try/catch so critical
-    // errors in production propagate and prevent insecure deployments)
-    verifySecurityConfig(c.env as Bindings);
+    } finally {
+      // Clear the holder too: on success `bootstrapComplete` keeps everyone out, and on failure
+      // the next request should be free to try again rather than inherit a settled promise.
+      //
+      // Only if the gate is still ours. A request that blew the deadline above and was taken
+      // over by a follower must not null out the follower's gate on its way out — that would
+      // reopen the stampede it was holding shut.
+      releaseBootstrap();
+      if (bootstrapInFlight === ownGate) {
+        bootstrapInFlight = null;
+      }
+    }
 
     return next();
   };
@@ -319,8 +625,13 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
 /**
  * Reset bootstrap flag (useful for testing)
  */
-export function resetBootstrap() {
-  bootstrapComplete = false;
+export function resetBootstrap(complete?: boolean) {
+  bootstrapComplete = complete ?? false;
+  bootstrapInFlight = null;
+  bootstrapStartedAt = 0;
+  lastSecurityBindings = null
+  lastSecurityError = null
+  securityWarned = false
 }
 
 /**

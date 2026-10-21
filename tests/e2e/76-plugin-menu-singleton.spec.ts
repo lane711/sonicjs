@@ -1,7 +1,25 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from './fixtures'
 import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers'
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8787'
+
+/**
+ * The submenu is open by default. It is hidden by a `plugins-closed` class on <html>
+ * (see `.plugins-closed [data-plugins-submenu] { display: none }` in the catalyst layout),
+ * never by a class on the submenu itself — so clicking the toggle unconditionally *closes* it,
+ * and asserting `not.toHaveClass(/hidden/)` on the submenu can never fail. Toggle only when
+ * the submenu is actually hidden, and assert on real visibility.
+ */
+async function openPluginsSubmenu(page: Page) {
+  const accordion = page.locator('[data-plugins-accordion]').first()
+  await expect(accordion).toBeVisible({ timeout: 10000 })
+  const submenu = accordion.locator('[data-plugins-submenu]')
+  if (!(await submenu.isVisible())) {
+    await accordion.locator('button[aria-label="Toggle plugins submenu"]').click()
+  }
+  await expect(submenu).toBeVisible()
+  return submenu
+}
 
 // Verifies that declarative menu entries (definePlugin `menu: [...]`) collected by
 // setPluginMenu() appear inside the plugins submenu in the catalyst admin sidebar.
@@ -16,15 +34,7 @@ test.describe('Plugin menu singleton @plugins', () => {
     await page.goto(`${BASE_URL}/admin`)
     await page.waitForLoadState('networkidle')
 
-    const accordion = page.locator('[data-plugins-accordion]').first()
-    await expect(accordion).toBeVisible({ timeout: 10000 })
-
-    // Open the plugins submenu
-    const toggleBtn = accordion.locator('button[aria-label="Toggle plugins submenu"]')
-    await toggleBtn.click()
-
-    const submenu = accordion.locator('[data-plugins-submenu]')
-    await expect(submenu).not.toHaveClass(/hidden/)
+    const submenu = await openPluginsSubmenu(page)
 
     // At least one plugin menu entry (from core plugins that declared menu:[]) should appear.
     // The email plugin, dashboard, analytics etc. all declare menu entries with no permissions
@@ -38,11 +48,7 @@ test.describe('Plugin menu singleton @plugins', () => {
     await page.goto(`${BASE_URL}/admin`)
     await page.waitForLoadState('networkidle')
 
-    const accordion = page.locator('[data-plugins-accordion]').first()
-    await accordion.locator('button[aria-label="Toggle plugins submenu"]').click()
-
-    const submenu = accordion.locator('[data-plugins-submenu]')
-    await expect(submenu).not.toHaveClass(/hidden/)
+    const submenu = await openPluginsSubmenu(page)
 
     // Email plugin declares menu: [{ label: 'Email', path: '/admin/plugins/email' }]
     const emailLink = submenu.locator('a[href="/admin/plugins/email"]')
@@ -64,9 +70,7 @@ test.describe('Plugin menu singleton @plugins', () => {
 
     // Plugin-level menu items must live inside the accordion submenu, not as
     // top-level siblings (Dashboard, Collections, etc.)
-    const accordion = page.locator('[data-plugins-accordion]').first()
-    await accordion.locator('button[aria-label="Toggle plugins submenu"]').click()
-    const submenu = accordion.locator('[data-plugins-submenu]')
+    const submenu = await openPluginsSubmenu(page)
 
     // Count links in submenu
     const subLinks = await submenu.locator('a[href^="/admin/"]').count()

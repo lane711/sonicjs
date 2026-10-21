@@ -5,7 +5,9 @@ import { renderPluginSettingsPage, PluginSettingsPageData } from '../templates/p
 import { SettingsService } from '../services/settings'
 import { PluginService } from '../services'
 import { PLUGIN_REGISTRY, findPluginByCodeName } from '../plugins/manifest-registry'
-import { getPluginDefinition } from '../services/plugin-definition-registry'
+import type { PluginRegistryEntry } from '../plugins/manifest-registry'
+import { getPluginDefinition, getAllPluginDefinitions } from '../services/plugin-definition-registry'
+import type { RegisterablePlugin } from '../plugins/sdk/register-plugins'
 import { getUserProfileConfig } from '../plugins/core-plugins/user-profiles'
 import {
   renderSchemaFields,
@@ -20,22 +22,88 @@ const adminPluginRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>
 // Apply authentication middleware
 adminPluginRoutes.use('*', requireAuth())
 
-// Build available plugins list from the auto-generated registry.
-// To add a new plugin to this list, create a manifest.json in the plugin directory
-// and run: node packages/scripts/generate-plugin-registry.mjs
-const AVAILABLE_PLUGINS = Object.values(PLUGIN_REGISTRY).map(p => ({
-  id: p.id,
-  name: p.codeName,
-  display_name: p.displayName,
-  description: p.description,
-  version: p.version,
-  author: p.author,
-  category: p.category,
-  icon: p.iconEmoji,
-  permissions: p.permissions,
-  dependencies: p.dependencies,
-  is_core: p.is_core
-}))
+// Fields that exist on RegisterablePlugin at runtime but aren't in the
+// structural type (they come from definePlugin's options bag, not MountablePlugin).
+type DefinedPluginExtras = {
+  description?: string
+  author?: string | { name?: string }
+  category?: string
+  iconEmoji?: string
+  permissions?: string[]
+}
+
+function resolveAuthor(d: DefinedPluginExtras): string {
+  return typeof d.author === 'object' ? d.author?.name ?? '' : (d.author ?? '')
+}
+
+// `id` is required on RegisterablePlugin but the definition registry also holds
+// pre-SDK plugin objects that only carry `name` (magic-link-auth is one). Those
+// rendered a phantom card keyed on `undefined`, duplicating the manifest entry
+// and linking to /admin/plugins/undefined/configure.
+function getDefinedPlugins(): ReadonlyArray<RegisterablePlugin> {
+  return getAllPluginDefinitions().filter(p => p.id && !PLUGIN_REGISTRY[p.id])
+}
+
+// Build the available plugins list from the manifest registry (core plugins)
+// PLUS code-registered definePlugin plugins. Computed per-request because
+// setPluginDefinitions() runs at app construction, after module import.
+function getAvailablePlugins() {
+  const registryPlugins = Object.values(PLUGIN_REGISTRY).map(p => ({
+    id: p.id,
+    name: p.codeName,
+    display_name: p.displayName,
+    description: p.description,
+    version: p.version,
+    author: p.author,
+    category: p.category,
+    icon: p.iconEmoji,
+    permissions: p.permissions,
+    dependencies: p.dependencies,
+    is_core: p.is_core
+  }))
+
+  const definedPlugins = getDefinedPlugins()
+    .map(p => {
+      const d = p as DefinedPluginExtras
+      return {
+        id: p.id,
+        name: p.name ?? p.id,
+        display_name: p.displayName ?? p.name ?? p.id,
+        description: d.description ?? '',
+        version: p.version,
+        author: resolveAuthor(d),
+        category: d.category ?? 'general',
+        icon: d.iconEmoji ?? '🔌',
+        permissions: d.permissions ?? [],
+        dependencies: p.dependencies ?? [],
+        is_core: false
+      }
+    })
+
+  return [...registryPlugins, ...definedPlugins]
+}
+
+// Convert a code-registered (definePlugin) plugin to the registry-entry shape
+// used by the install route, so the install handler keeps a single contract.
+function toRegistryEntry(p: RegisterablePlugin | undefined): PluginRegistryEntry | undefined {
+  if (!p) return undefined
+  const d = p as DefinedPluginExtras
+  return {
+    id: p.id,
+    codeName: p.name ?? p.id,
+    displayName: p.displayName ?? p.name ?? p.id,
+    description: d.description ?? '',
+    version: p.version,
+    author: resolveAuthor(d),
+    category: d.category ?? 'general',
+    iconEmoji: d.iconEmoji ?? '🔌',
+    is_core: false,
+    permissions: d.permissions ?? [],
+    dependencies: p.dependencies ?? [],
+    defaultSettings: {},
+    adminMenu: null,
+  }
+}
 
 // Plugin list page
 adminPluginRoutes.get('/', async (c) => {
@@ -64,6 +132,7 @@ adminPluginRoutes.get('/', async (c) => {
     }
 
     // Filter out DB records whose IDs no longer exist in the registry (e.g. renamed plugins)
+    const AVAILABLE_PLUGINS = getAvailablePlugins()
     const registryIds = new Set(AVAILABLE_PLUGINS.map(p => p.id))
     const validInstalledPlugins = installedPlugins.filter(p => registryIds.has(p.id))
 
@@ -73,11 +142,20 @@ adminPluginRoutes.get('/', async (c) => {
     // Find uninstalled plugins
     const uninstalledPlugins = AVAILABLE_PLUGINS.filter(p => !installedPluginIds.has(p.id))
 
-    // Map installed plugins to template format
+    // `ensurePlugin` falls back to `display_name: id` when it installs a plugin without a
+    // display name, so rows written that way show the raw slug on their card forever. Fall back
+    // to the registry's label in exactly that case — a row with a real label still wins, since
+    // the DB is where an operator-edited name would live.
+    const availableById = new Map(AVAILABLE_PLUGINS.map(p => [p.id, p]))
+    const resolveDisplayName = (p: { id: string; name: string; display_name: string }) =>
+      p.display_name && p.display_name !== p.id && p.display_name !== p.name
+        ? p.display_name
+        : availableById.get(p.id)?.display_name || p.display_name
+
     const templatePlugins: Plugin[] = validInstalledPlugins.map(p => ({
       id: p.id,
       name: p.name,
-      displayName: p.display_name,
+      displayName: resolveDisplayName(p),
       description: p.description,
       version: p.version,
       author: p.author,
@@ -152,17 +230,38 @@ adminPluginRoutes.get('/:id', async (c) => {
     let plugin = await pluginService.getPlugin(pluginId)
 
     if (!plugin) {
-      // Auto-register definePlugin-based plugins that have never been explicitly installed.
-      const def = getPluginDefinition(pluginId)
-      if (!def) return c.text('Plugin not found', 404)
-      plugin = await pluginService.ensurePlugin(pluginId, {
-        displayName: def.displayName ?? pluginId,
-        version: def.version,
-        description: (def as any).description,
-        author: typeof (def as any).author === 'object'
-          ? (def as any).author?.name
-          : (def as any).author,
-      })
+      // Plugin not installed — show detail page from registry without auto-installing.
+      const availablePlugin = getAvailablePlugins().find(p => p.id === pluginId || p.name === pluginId)
+      if (!availablePlugin) return c.text('Plugin not found', 404)
+
+      const pageData: PluginSettingsPageData = {
+        plugin: {
+          id: availablePlugin.id,
+          name: availablePlugin.name,
+          displayName: availablePlugin.display_name,
+          description: availablePlugin.description,
+          version: availablePlugin.version,
+          author: availablePlugin.author,
+          status: 'uninstalled',
+          category: availablePlugin.category,
+          icon: availablePlugin.icon,
+          downloadCount: 0,
+          rating: 0,
+          lastUpdated: 'Not installed',
+          dependencies: availablePlugin.dependencies,
+          permissions: availablePlugin.permissions,
+          isCore: availablePlugin.is_core,
+          settings: {},
+        },
+        activity: [],
+        user: {
+          name: user?.email || 'User',
+          email: user?.email || '',
+          role: user?.role || 'user'
+        },
+      }
+
+      return c.html(renderPluginSettingsPage(pageData))
     }
 
     // Get activity log
@@ -404,8 +503,9 @@ adminPluginRoutes.post('/:id/deactivate', async (c) => {
   }
 })
 
-// Generic install handler - uses the auto-generated plugin registry.
-// No per-plugin switch/case needed. Adding a manifest.json is enough.
+// Generic install handler - looks up the auto-generated plugin registry AND
+// code-registered (definePlugin) definitions. No per-plugin switch/case needed.
+// Adding a manifest.json is enough for registry-backed plugins.
 adminPluginRoutes.post('/install', async (c) => {
   try {
     const user = c.get('user')
@@ -419,11 +519,15 @@ adminPluginRoutes.post('/install', async (c) => {
     const body = await c.req.json()
     const pluginService = new PluginService(db)
 
-    // Look up plugin in registry by codeName (what the frontend sends as body.name)
-    // or by id
+    // Look up plugin by codeName (what the frontend sends as body.name) or by id,
+    // across BOTH the manifest registry and code-registered (definePlugin) plugins.
     const registryEntry = findPluginByCodeName(body.name)
       || PLUGIN_REGISTRY[body.name]
       || PLUGIN_REGISTRY[body.id]
+      || toRegistryEntry(
+          getDefinedPlugins()
+            .find(p => p.id === body.name || p.id === body.id)
+        )
 
     if (!registryEntry) {
       return c.json({ error: 'Plugin not found in registry' }, 404)

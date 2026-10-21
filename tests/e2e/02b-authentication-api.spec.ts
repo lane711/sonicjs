@@ -1,17 +1,12 @@
-import { test, expect } from '@playwright/test';
-import { ADMIN_CREDENTIALS } from './utils/test-helpers';
+import { test, expect } from './fixtures';
+import { ADMIN_CREDENTIALS, requestLoginToken } from './utils/test-helpers';
 
 /**
  * Check if a registration response indicates registration is disabled
  * by a concurrent test shard (37-disable-registration.spec.ts).
  * Returns true if the test should be skipped.
  */
-function isRegistrationDisabled(status: number, body: any): boolean {
-  // Any 403 from /auth/register means registration is blocked (disabled, rate-limited, etc.)
-  return status === 403;
-}
-
-test.describe('Authentication API @auth @api', () => {
+test.describe('Authentication API @auth @api @lock-auth-login @lock-auth-registration', () => {
   const testUser = {
     email: 'test.api.user@example.com',
     password: 'TestPassword123!',
@@ -30,18 +25,17 @@ test.describe('Authentication API @auth @api', () => {
 
     // Ensure registration is enabled (may have been disabled by 37-disable-registration tests)
     try {
-      const loginRes = await request.post('/auth/login', {
-        data: { email: ADMIN_CREDENTIALS.email, password: ADMIN_CREDENTIALS.password }
+      // `requestLoginToken` rather than a bare POST: this file's own rate-limit test empties the
+      // /auth/login bucket, and a beforeAll hook is not covered by the @lock-auth-login tag (that
+      // fixture is test-scoped). A 429 swallowed here leaves registration disabled and every
+      // register test below fails with a 403 that names the wrong cause.
+      const token = await requestLoginToken(request, ADMIN_CREDENTIALS);
+      await request.post('/admin/plugins/core-auth/settings', {
+        headers: { Authorization: `Bearer ${token}` },
+        data: {
+          registration: { enabled: true, requireEmailVerification: false, defaultRole: 'viewer' }
+        }
       });
-      if (loginRes.ok()) {
-        const { token } = await loginRes.json();
-        await request.post('/admin/plugins/core-auth/settings', {
-          headers: { Authorization: `Bearer ${token}` },
-          data: {
-            registration: { enabled: true, requireEmailVerification: false, defaultRole: 'viewer' }
-          }
-        });
-      }
     } catch (error) {
       // Best effort — tests will fail with clear 403 if this didn't work
     }
@@ -66,7 +60,6 @@ test.describe('Authentication API @auth @api', () => {
       });
 
       const data = await response.json();
-      if (isRegistrationDisabled(response.status(), data)) return;
 
       expect(response.status()).toBe(201);
       expect(data).toHaveProperty('user');
@@ -100,7 +93,6 @@ test.describe('Authentication API @auth @api', () => {
       });
 
       const data = await response.json();
-      if (isRegistrationDisabled(response.status(), data)) return;
 
       expect(response.status()).toBe(201);
       expect(data.user.email).toBe(uniqueUser.email.toLowerCase());
@@ -108,13 +100,14 @@ test.describe('Authentication API @auth @api', () => {
 
     test('should validate required fields', async ({ request }) => {
       const invalidPayloads = [
-        { email: 'test@example.com' }, // Missing other fields
+        // Note: { email only, no password } is intentionally excluded — the server
+        // permits passwordless accounts (magic-link / social auth paths).
+        // Note: username is not a validated field in the registration schema.
         { ...testUser, email: '' }, // Empty email
         { ...testUser, email: 'invalid-email' }, // Invalid email format
-        { ...testUser, password: '123' }, // Too short password
-        { ...testUser, username: 'ab' }, // Too short username
-        { ...testUser, firstName: '' }, // Empty first name
-        { ...testUser, lastName: '' } // Empty last name
+        { ...testUser, password: '123' }, // Too short password (min 8)
+        { ...testUser, firstName: '' }, // Empty first name (min 1 when provided)
+        { ...testUser, lastName: '' } // Empty last name (min 1 when provided)
       ];
 
       for (const payload of invalidPayloads) {
@@ -142,7 +135,6 @@ test.describe('Authentication API @auth @api', () => {
         data: uniqueUser
       });
       const firstData = await firstResponse.json();
-      if (isRegistrationDisabled(firstResponse.status(), firstData)) return;
       expect(firstResponse.status()).toBe(201);
 
       // Second registration with same email should fail
@@ -159,11 +151,6 @@ test.describe('Authentication API @auth @api', () => {
       expect(data.error).toContain('already exists');
     });
 
-    test.skip('should prevent duplicate username registration', async ({ request }) => {
-      // BA does not enforce unique usernames — the /auth/register endpoint
-      // does not carry a uniqueness constraint on the username field.
-    });
-
     test('should set auth cookie on registration', async ({ request }) => {
       const uniqueUser = {
         ...testUser,
@@ -174,11 +161,6 @@ test.describe('Authentication API @auth @api', () => {
       const response = await request.post('/auth/register', {
         data: uniqueUser
       });
-
-      if (response.status() === 403) {
-        const body = await response.json();
-        if (isRegistrationDisabled(response.status(), body)) return;
-      }
 
       expect(response.status()).toBe(201);
 
@@ -202,7 +184,6 @@ test.describe('Authentication API @auth @api', () => {
       });
 
       const data = await response.json();
-      if (isRegistrationDisabled(response.status(), data)) return;
 
       expect(response.status()).toBe(201);
       expect(data.user.role).toBe('viewer');
@@ -342,8 +323,20 @@ test.describe('Authentication API @auth @api', () => {
   });
 
   test.describe('POST /auth/logout - User Logout', () => {
+    // Admin seeding can lose a cold-start race on CF preview, leaving /auth/login
+    // at 401. Probe once so the logout assertions only run against a live session.
+    let loginAvailable = false;
+    test.beforeAll(async ({ request }) => {
+      await request.post('/auth/seed-admin').catch(() => {});
+      const probe = await request.post('/auth/login', {
+        data: { email: ADMIN_CREDENTIALS.email, password: ADMIN_CREDENTIALS.password }
+      }).catch(() => null);
+      loginAvailable = probe?.status() === 200;
+    });
+
     test('should logout successfully', async ({ request }) => {
-      // First login to get a session
+      test.skip(!loginAvailable, 'Admin login unavailable — seed lost the cold-start race');
+
       const loginResponse = await request.post('/auth/login', {
         data: {
           email: ADMIN_CREDENTIALS.email,
@@ -352,8 +345,14 @@ test.describe('Authentication API @auth @api', () => {
       });
       expect(loginResponse.status()).toBe(200);
 
-      // Logout — Playwright's request context auto-sends the session cookie
-      const logoutResponse = await request.post('/auth/logout', {});
+      // Extract CSRF token set by login — /auth/logout requires double-submit validation.
+      const loginSetCookie = loginResponse.headers()['set-cookie'] ?? '';
+      const csrfMatch = loginSetCookie.match(/csrf_token=([^;]+)/);
+      const csrfToken = csrfMatch?.[1] ?? '';
+
+      const logoutResponse = await request.post('/auth/logout', {
+        headers: { 'X-CSRF-Token': csrfToken }
+      });
 
       expect(logoutResponse.status()).toBe(200);
 
@@ -439,9 +438,16 @@ test.describe('Authentication API @auth @api', () => {
       // Wait a moment to ensure different timestamp
       await new Promise(resolve => setTimeout(resolve, 1100));
 
+      // Extract CSRF token from login — /auth/refresh requires double-submit validation.
+      const loginSetCookie = loginResponse.headers()['set-cookie'] ?? '';
+      const csrfMatch = loginSetCookie.match(/csrf_token=([^;]+)/);
+      const csrfToken = csrfMatch?.[1] ?? '';
+
       // Refresh token — /auth/refresh reads auth_token cookie (set by /auth/login)
       // Playwright's request context auto-sends it
-      const refreshResponse = await request.post('/auth/refresh');
+      const refreshResponse = await request.post('/auth/refresh', {
+        headers: { 'X-CSRF-Token': csrfToken }
+      });
 
       expect(refreshResponse.status()).toBe(200);
 
@@ -481,7 +487,6 @@ test.describe('Authentication API @auth @api', () => {
       });
 
       const data = await response.json();
-      if (isRegistrationDisabled(response.status(), data)) return;
 
       expect(response.status()).toBe(201);
 
@@ -539,12 +544,16 @@ test.describe('Authentication API @auth @api', () => {
         data: xssPayload
       });
 
+      expect([201, 400], `unexpected status ${response.status()}`).toContain(response.status());
+      const data = await response.json();
+
       if (response.status() === 201) {
-        const data = await response.json();
-        
-        // Names should be stored as-is (not executed)
+        // Stored verbatim, not re-encoded and not executed.
         expect(data.user.firstName).toBe(xssPayload.firstName);
         expect(data.user.lastName).toBe(xssPayload.lastName);
+      } else {
+        // Rejected by validation is equally fine -- but it has to say so.
+        expect(data).toHaveProperty('error');
       }
     });
 
@@ -624,13 +633,16 @@ test.describe('Authentication API @auth @api', () => {
         }
       });
 
-      // Should handle gracefully (either accept or reject with proper error)
+      // Should handle gracefully: either a clean rejection or a clean acceptance. What it may
+      // not do is 5xx, and it may not reject without saying why.
+      const data = await response.json();
       if (!response.ok()) {
         expect(response.status()).toBeGreaterThanOrEqual(400);
-        expect(response.status()).toBeLessThan(600);
-        
-        const data = await response.json();
+        expect(response.status()).toBeLessThan(500);
         expect(data).toHaveProperty('error');
+      } else {
+        expect(response.status()).toBe(201);
+        expect(data.user).toHaveProperty('email');
       }
     });
   });
@@ -638,15 +650,7 @@ test.describe('Authentication API @auth @api', () => {
   test.describe('Session Management', () => {
     test('should maintain session across requests', async ({ request }) => {
       // Login — Playwright stores session cookies automatically
-      const loginResponse = await request.post('/auth/login', {
-        data: {
-          email: ADMIN_CREDENTIALS.email,
-          password: ADMIN_CREDENTIALS.password
-        }
-      });
-      // Skip if rate-limited
-      if (loginResponse.status() === 429) return;
-      expect(loginResponse.status()).toBe(200);
+      await requestLoginToken(request, ADMIN_CREDENTIALS);
 
       // Make authenticated requests — Playwright auto-sends session cookies
       const meResponse = await request.get('/auth/me');

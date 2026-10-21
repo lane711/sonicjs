@@ -1,4 +1,4 @@
-import { expect, test, type APIRequestContext, type Page } from '@playwright/test'
+import { expect, test, type APIRequestContext, type Page } from './fixtures'
 import { ensureAdminUserExists, loginAsAdmin } from './utils/test-helpers'
 
 type UploadedMedia = {
@@ -177,7 +177,7 @@ test.describe('Array Media Picker Targeting @content @media', () => {
     expect(secondSelectedValue).not.toBe(firstSelectedValue)
     await expect(firstHiddenInput).toHaveValue(firstSelectedValue)
 
-    await page.click('button[name="action"][value="save_and_publish"]')
+    await page.click('button[name="action"][value="save"]')
     await page.waitForURL(/\/admin\/content\/[^/]+\/edit|\/admin\/content\?/, { timeout: 15000 })
 
     try {

@@ -188,8 +188,12 @@ export function renderContentFormPage(data: ContentFormData, opts?: { partialOnl
             ${isEdit ? `hx-put="/admin/content/${data.id}"` : `hx-post="/admin/content"`}
             hx-target="#form-messages"
             hx-encoding="multipart/form-data"
+            method="post"
+            action="${isEdit ? `/admin/content/${data.id}` : '/admin/content'}"
+            enctype="multipart/form-data"
             data-has-validation-errors="${hasValidationErrors ? 'true' : 'false'}"
             class="space-y-6"
+            novalidate
           >
             <input type="hidden" name="collection_id" value="${data.collection.id}">
             ${isEdit ? `<input type="hidden" name="id" value="${data.id}">` : ''}
@@ -1501,34 +1505,21 @@ export function renderContentFormPage(data: ContentFormData, opts?: { partialOnl
         });
       }
 
-      // Auto-save functionality
-      let autoSaveTimeout;
-      function scheduleAutoSave() {
-        clearTimeout(autoSaveTimeout);
-        autoSaveTimeout = setTimeout(() => {
-          const form = document.getElementById('content-form');
-          const formData = new FormData(form);
-          formData.append('action', 'autosave');
-          
-          fetch(form.action, {
-            method: 'POST',
-            body: formData
-          })
-          .then(response => {
-            if (response.ok) {
-              console.log('Auto-saved');
-            }
-          })
-          .catch(error => console.error('Auto-save failed:', error));
-        }, 30000); // Auto-save every 30 seconds
-      }
-
-      // Bind auto-save to form changes
-      document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('content-form');
-        form.addEventListener('input', scheduleAutoSave);
-        form.addEventListener('change', scheduleAutoSave);
-      });
+      // There was an "auto-save" here. It never saved anything, and it could not have: the
+      // request went to form.action, and HTMLFormElement is [LegacyOverrideBuiltIns], so a
+      // control named "action" -- this form has two, the save_draft and save_and_publish buttons
+      // -- shadows the built-in action property. form.action was the RadioNodeList of those
+      // buttons, not the URL, so every attempt went to /admin/content/[object RadioNodeList]
+      // relative to the current page. One of those turned up in a CI trace, which is how this
+      // was found.
+      //
+      // Repairing the URL would have been worse than leaving it broken: nothing server-side
+      // handles action=autosave (grep says the string exists only here), so the request would
+      // have fallen through to the ordinary create/update path and written a new document every
+      // thirty seconds of typing. The timer was also re-armed on every keystroke and outlived
+      // the page that set it, firing into whatever had navigated there since.
+      //
+      // Removed rather than fixed. Reinstating it means a real server-side endpoint first.
 
       ${data.tinymceEnabled ? getTinyMCEInitScript({
     skin: data.tinymceSettings?.skin,

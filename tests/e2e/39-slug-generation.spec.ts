@@ -1,5 +1,26 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers'
+
+// Tests below that actually save content need a name no earlier run has already used: a
+// repeated slug is rejected by the duplicate check and the form never submits. The `Test `
+// prefix is what the cleanup endpoint matches on, so these rows do not pile up either.
+// Slug availability is checked by a 500ms-debounced request to the worker, so these
+// assertions wait on a cold HTTP round trip rather than on local DOM work. Playwright's
+// 5s expect default does not cover that against a preview deployment: it is what failed
+// two of these tests in CI, both attempts, with the status stuck on
+// "⏳ Checking availability..." -- the request in flight, not a product defect.
+const SLUG_CHECK_TIMEOUT = 20_000
+
+const RUN = Date.now()
+
+/**
+ * No `waitForLoadState('networkidle')` in this file.
+ *
+ * Every test used to open a form page and then wait up to 15s for the network to go idle before
+ * its real `waitForSelector`. Admin pages poll, so idle need never arrive, and the selector wait
+ * that follows is the one that actually gates the fills — the idle wait only ever added up to 15s
+ * of dead time per test to a suite whose failures are all budget exhaustion.
+ */
 
 test.describe('Slug Generation @content', () => {
   test.beforeEach(async ({ page }) => {
@@ -9,7 +30,6 @@ test.describe('Slug Generation @content', () => {
 
   test('should auto-generate slug from title when creating new content', async ({ page }) => {
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     const titleField = page.locator('input[name="title"]')
@@ -26,12 +46,11 @@ test.describe('Slug Generation @content', () => {
     
     // Should show available status
     const statusDiv = page.locator('#field-slug-status')
-    await expect(statusDiv).toContainText('Available', { timeout: 5000 })
+    await expect(statusDiv).toContainText('Available', { timeout: SLUG_CHECK_TIMEOUT })
   })
 
   test('should auto-generate slug for blog_post collection', async ({ page }) => {
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     const titleField = page.locator('input[name="title"]')
@@ -48,12 +67,11 @@ test.describe('Slug Generation @content', () => {
     
     // Should show available status
     const statusDiv = page.locator('#field-slug-status')
-    await expect(statusDiv).toContainText('Available', { timeout: 5000 })
+    await expect(statusDiv).toContainText('Available', { timeout: SLUG_CHECK_TIMEOUT })
   })
 
   test('should handle special characters in slug generation', async ({ page }) => {
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     const titleField = page.locator('input[name="title"]')
@@ -72,7 +90,6 @@ test.describe('Slug Generation @content', () => {
 
   test('should stop auto-generating after manual edit', async ({ page }) => {
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     const titleField = page.locator('input[name="title"]')
@@ -99,7 +116,6 @@ test.describe('Slug Generation @content', () => {
 
   test('should regenerate slug when button clicked', async ({ page }) => {
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     const titleField = page.locator('input[name="title"]')
@@ -131,7 +147,6 @@ test.describe('Slug Generation @content', () => {
   test('should detect duplicate slugs within same collection', async ({ page }) => {
     // First, create content with a specific slug
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     await page.fill('input[name="title"]', 'Test Duplicate Page')
@@ -141,19 +156,32 @@ test.describe('Slug Generation @content', () => {
     await expect(slugField).toHaveValue('test-duplicate-page')
 
     // Fill required fields before saving
-    await page.evaluate(() => { const el = document.querySelector('input[name="author"]') as HTMLInputElement; if (el) { el.value = 'Test Author'; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })) } })
+    // Fill the user-picker author field. Setting the hidden input alone is not enough:
+    // the field's submit handler overwrites the hidden value from the visible search box
+    // unless the display value matches dataset.linkedName. Set all three so it sticks.
     await page.evaluate(() => {
-      const el = document.querySelector('input[name="content"]') as HTMLInputElement
+      const container = document.querySelector('.user-search-field-container')
+      if (container) {
+        const display = container.querySelector('input[type="text"]') as HTMLInputElement | null
+        const hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement | null
+        if (display) { display.value = 'Test Author'; display.dataset.linkedName = 'Test Author' }
+        if (hidden) { hidden.value = 'Test Author' }
+      } else {
+        const el = document.querySelector('input[name="author"]') as HTMLInputElement | null
+        if (el) { el.value = 'Test Author'; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })) }
+      }
+    })
+    await page.evaluate(() => {
+      const el = document.querySelector('input[name="content"], textarea[name="content"]') as HTMLInputElement | HTMLTextAreaElement
       if (el) el.value = 'Test content'
     })
 
     // Save the content
     await page.click('button[name="action"][value="save_and_publish"]')
-    await page.waitForTimeout(2000)
+    await page.waitForURL(/\/admin\/content\/[^/]+\/edit/, { timeout: 15000 })
 
     // Now try to create another with same slug
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     await page.fill('input[name="title"]', 'Different Title')
@@ -165,84 +193,52 @@ test.describe('Slug Generation @content', () => {
     
     // Should show as unavailable
     const statusDiv = page.locator('#field-slug-status')
-    await expect(statusDiv).toContainText('already in use')
+    await expect(statusDiv).toContainText('already in use', { timeout: SLUG_CHECK_TIMEOUT })
     
     // Form should have validation error
     const isInvalid = await slugField.evaluate((el: HTMLInputElement) => !el.validity.valid)
     expect(isInvalid).toBe(true)
   })
 
-  test.skip('should allow same slug in different collections', async ({ page }) => {
-    // NOTE: Skipping because blog_post doesn't have a slug field in the database
-    // Only blog_post has a slug field defined in migration 003
-    // This test would need another collection with a slug field to work properly
-    
-    // Create in blog_post collection
-    await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
-    await page.waitForSelector('input[name="title"]', { timeout: 10000 })
-    
-    await page.fill('input[name="title"]', 'Test Cross Collection')
-    await page.waitForTimeout(1000)
-    
-    const slugValue = 'test-cross-collection'
-    await expect(page.locator('input[name="slug"]')).toHaveValue(slugValue)
-    
-    await page.click('button[name="action"][value="save_and_publish"]')
-    await page.waitForTimeout(2000)
-    
-    // Try to use same slug in blog_post collection
-    await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
-    
-    // Wait for the form to load
-    const titleField = page.locator('input[name="title"]')
-    await expect(titleField).toBeVisible({ timeout: 10000 })
-    
-    await titleField.fill('Different Content Same Slug')
-    await page.waitForTimeout(500)
-    
-    // Use same slug
-    const slugField = page.locator('input[name="slug"]')
-    await slugField.fill(slugValue)
-    await page.waitForTimeout(1500)
-    
-    // Should show as available (different collection)
-    const statusDiv = page.locator('#field-slug-status')
-    await expect(statusDiv).toContainText('Available', { timeout: 5000 })
-  })
-
   test('should not auto-change slug when editing existing content', async ({ page }) => {
     // Create content first
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
-    await page.fill('input[name="title"]', 'Edit Mode Test Page')
+    await page.fill('input[name="title"]', `Test Edit Mode ${RUN}`)
     await page.waitForTimeout(1000)
 
-    const originalSlug = 'edit-mode-test-page'
+    const originalSlug = `test-edit-mode-${RUN}`
     await expect(page.locator('input[name="slug"]')).toHaveValue(originalSlug)
 
     // Fill required fields before saving
-    await page.evaluate(() => { const el = document.querySelector('input[name="author"]') as HTMLInputElement; if (el) { el.value = 'Test Author'; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })) } })
+    // Fill the user-picker author field. Setting the hidden input alone is not enough:
+    // the field's submit handler overwrites the hidden value from the visible search box
+    // unless the display value matches dataset.linkedName. Set all three so it sticks.
     await page.evaluate(() => {
-      const el = document.querySelector('input[name="content"]') as HTMLInputElement
+      const container = document.querySelector('.user-search-field-container')
+      if (container) {
+        const display = container.querySelector('input[type="text"]') as HTMLInputElement | null
+        const hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement | null
+        if (display) { display.value = 'Test Author'; display.dataset.linkedName = 'Test Author' }
+        if (hidden) { hidden.value = 'Test Author' }
+      } else {
+        const el = document.querySelector('input[name="author"]') as HTMLInputElement | null
+        if (el) { el.value = 'Test Author'; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })) }
+      }
+    })
+    await page.evaluate(() => {
+      const el = document.querySelector('input[name="content"], textarea[name="content"]') as HTMLInputElement | HTMLTextAreaElement
       if (el) el.value = 'Test content'
     })
 
     await page.click('button[name="action"][value="save_and_publish"]')
-    await page.waitForTimeout(2000)
+    await page.waitForURL(/\/admin\/content\/[^/]+\/edit/, { timeout: 15000 })
 
-    // Navigate to content list and find the item
-    await page.goto('/admin/content?collection=blog_post')
-    await page.waitForTimeout(1000)
-    
-    // Click on the content to edit it
-    const contentLink = page.locator(`a:has-text("Edit Mode Test Page")`).first()
-    await contentLink.click()
-    await page.waitForTimeout(1000)
-    
+    // Publishing navigated to this record's freshly server-rendered edit form, so the slug below
+    // is the stored one. The list round trip this replaces hunted for the row by title on a
+    // paginated page four workers write to concurrently — the same race that burned a full 120s
+    // budget in CI two tests down.
     const titleField = page.locator('input[name="title"]')
     const slugField = page.locator('input[name="slug"]')
     
@@ -261,30 +257,39 @@ test.describe('Slug Generation @content', () => {
   test('should allow manual regeneration in edit mode', async ({ page }) => {
     // Create content first
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
-    await page.fill('input[name="title"]', 'Regen Test Page')
+    await page.fill('input[name="title"]', `Test Regen Page ${RUN}`)
     await page.waitForTimeout(1000)
 
     // Fill required fields before saving
-    await page.evaluate(() => { const el = document.querySelector('input[name="author"]') as HTMLInputElement; if (el) { el.value = 'Test Author'; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })) } })
+    // Fill the user-picker author field. Setting the hidden input alone is not enough:
+    // the field's submit handler overwrites the hidden value from the visible search box
+    // unless the display value matches dataset.linkedName. Set all three so it sticks.
     await page.evaluate(() => {
-      const el = document.querySelector('input[name="content"]') as HTMLInputElement
+      const container = document.querySelector('.user-search-field-container')
+      if (container) {
+        const display = container.querySelector('input[type="text"]') as HTMLInputElement | null
+        const hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement | null
+        if (display) { display.value = 'Test Author'; display.dataset.linkedName = 'Test Author' }
+        if (hidden) { hidden.value = 'Test Author' }
+      } else {
+        const el = document.querySelector('input[name="author"]') as HTMLInputElement | null
+        if (el) { el.value = 'Test Author'; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })) }
+      }
+    })
+    await page.evaluate(() => {
+      const el = document.querySelector('input[name="content"], textarea[name="content"]') as HTMLInputElement | HTMLTextAreaElement
       if (el) el.value = 'Test content'
     })
 
     await page.click('button[name="action"][value="save_and_publish"]')
-    await page.waitForTimeout(2000)
-    
-    // Navigate to edit
-    await page.goto('/admin/content?collection=blog_post')
-    await page.waitForTimeout(1000)
-    
-    const contentLink = page.locator(`a:has-text("Regen Test Page")`).first()
-    await contentLink.click()
-    await page.waitForTimeout(1000)
-    
+    await page.waitForURL(/\/admin\/content\/[^/]+\/edit/, { timeout: 15000 })
+
+    // Publishing already landed on this record's edit form, which is where the rest of the test
+    // runs. The round trip this replaces went back out to /admin/content and hunted for the row
+    // by title, which is a race on a paginated list that four workers are writing to: in CI the
+    // link never appeared and the click burned the whole 120s budget. The edit URL is in hand.
     const titleField = page.locator('input[name="title"]')
     const slugField = page.locator('input[name="slug"]')
     const regenerateBtn = page.locator('button:has-text("Regenerate from title")')
@@ -295,7 +300,7 @@ test.describe('Slug Generation @content', () => {
     await page.waitForTimeout(1500)
     
     // Slug still shows old value
-    await expect(slugField).toHaveValue('regen-test-page')
+    await expect(slugField).toHaveValue(`test-regen-page-${RUN}`)
     
     // Click regenerate
     await regenerateBtn.click()
@@ -307,7 +312,6 @@ test.describe('Slug Generation @content', () => {
 
   test('should show checking status during duplicate validation', async ({ page }) => {
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     const titleField = page.locator('input[name="title"]')
@@ -329,42 +333,56 @@ test.describe('Slug Generation @content', () => {
     await page.waitForTimeout(1500)
     
     // Should show available
-    await expect(statusDiv).toContainText('Available')
+    await expect(statusDiv).toContainText('Available', { timeout: SLUG_CHECK_TIMEOUT })
   })
 
   test('should prevent form submission with duplicate slug', async ({ page }) => {
     // Create first content
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
-    await page.fill('input[name="title"]', 'Submission Test Original')
+    await page.fill('input[name="title"]', `Test Submission ${RUN}`)
     await page.waitForTimeout(1000)
 
     // Fill required fields before saving
-    await page.evaluate(() => { const el = document.querySelector('input[name="author"]') as HTMLInputElement; if (el) { el.value = 'Test Author'; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })) } })
+    // Fill the user-picker author field. Setting the hidden input alone is not enough:
+    // the field's submit handler overwrites the hidden value from the visible search box
+    // unless the display value matches dataset.linkedName. Set all three so it sticks.
     await page.evaluate(() => {
-      const el = document.querySelector('input[name="content"]') as HTMLInputElement
+      const container = document.querySelector('.user-search-field-container')
+      if (container) {
+        const display = container.querySelector('input[type="text"]') as HTMLInputElement | null
+        const hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement | null
+        if (display) { display.value = 'Test Author'; display.dataset.linkedName = 'Test Author' }
+        if (hidden) { hidden.value = 'Test Author' }
+      } else {
+        const el = document.querySelector('input[name="author"]') as HTMLInputElement | null
+        if (el) { el.value = 'Test Author'; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })) }
+      }
+    })
+    await page.evaluate(() => {
+      const el = document.querySelector('input[name="content"], textarea[name="content"]') as HTMLInputElement | HTMLTextAreaElement
       if (el) el.value = 'Test content'
     })
 
     await page.click('button[name="action"][value="save_and_publish"]')
-    await page.waitForTimeout(2000)
-    
+    await page.waitForURL(/\/admin\/content\/[^/]+\/edit/, { timeout: 15000 })
+
     // Try to create duplicate
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     await page.fill('input[name="title"]', 'Different Title')
     await page.waitForTimeout(500)
     
     // Set duplicate slug
-    await page.fill('input[name="slug"]', 'submission-test-original')
+    await page.fill('input[name="slug"]', `test-submission-${RUN}`)
     await page.waitForTimeout(1500)
     
     // Should show error
-    await expect(page.locator('#field-slug-status')).toContainText('already in use')
+    await expect(page.locator('#field-slug-status')).toContainText('already in use', {
+      timeout: SLUG_CHECK_TIMEOUT,
+    })
     
     // Try to submit
     await page.click('button[name="action"][value="save_and_publish"]')

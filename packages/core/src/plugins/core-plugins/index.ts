@@ -23,7 +23,7 @@ export { otpLoginPlugin, createOTPLoginPlugin } from './otp-login-plugin'
 export { turnstilePlugin } from './turnstile-plugin'
 export { TurnstileService, verifyTurnstile, createTurnstileMiddleware } from './turnstile-plugin'
 export { aiSearchPlugin } from './ai-search-plugin'
-export { AISearchService, IndexManager } from './ai-search-plugin'
+export { AISearchService, IndexManager, aiSearchApiRoutes } from './ai-search-plugin'
 export { oauthProvidersPlugin, createOAuthProvidersPlugin } from './oauth-providers'
 export { OAuthService, BUILT_IN_PROVIDERS } from './oauth-providers/oauth-service'
 export { globalVariablesPlugin, createGlobalVariablesPlugin } from './global-variables-plugin'
@@ -46,6 +46,7 @@ export { versioningPlugin, createVersioningPlugin } from './versioning-plugin'
 export { mcpPlugin, createMcpPlugin } from './mcp-plugin'
 export type { McpConfigInput, McpConfig } from './mcp-plugin'
 export { menuPlugin, createMenuPlugin } from './menu-plugin'
+export { twoFactorAuthPlugin, createTwoFactorAuthPlugin } from './two-factor-auth'
 
 // Core plugins list - now imported from auto-generated registry
 export const CORE_PLUGIN_IDS = [
@@ -70,6 +71,7 @@ export const CORE_PLUGIN_IDS = [
   'multi-tenant',
   'versioning',
   'menu',
+  'two-factor-auth',
 ] as const
 
 export type CorePluginNames = (typeof CORE_PLUGIN_IDS)[number]

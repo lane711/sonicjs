@@ -1,3 +1,4 @@
+import { escapeHtml } from '../../utils/sanitize'
 import { renderAdminLayoutCatalyst, AdminLayoutCatalystData } from '../layouts/admin-layout-catalyst.template'
 import { renderPagination, PaginationData } from '../pagination.template'
 import { renderTable, TableData, TableColumn } from '../table.template'
@@ -111,9 +112,9 @@ export function renderContentListPage(data: ContentListPageData): string {
         <div class="flex items-center">
           <div>
             <div class="text-sm font-medium text-zinc-950 dark:text-white">
-              <a href="/admin/content/${row.id}/edit${currentParams ? `?ref=${encodeURIComponent(currentParams)}` : ''}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">${row.title}</a>
+              <a href="/admin/content/${row.id}/edit${currentParams ? `?ref=${encodeURIComponent(currentParams)}` : ''}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">${escapeHtml(row.title)}</a>
             </div>
-            <div class="text-sm text-zinc-500 dark:text-zinc-400">${row.slug}</div>
+            <div class="text-sm text-zinc-500 dark:text-zinc-400">${escapeHtml(row.slug)}</div>
           </div>
         </div>
       `
@@ -520,11 +521,14 @@ export function renderContentListPage(data: ContentListPageData): string {
         }
       }
 
-      // Select all functionality
+      // Select all functionality. renderTable gives the header checkbox the id
+      // 'select-all-' + tableId, so match the prefix — a bare 'select-all' never matches.
+      // This is delegated rather than bound per element because htmx swaps the table in.
       document.addEventListener('change', function(e) {
-        if (e.target.id === 'select-all') {
-          const checkboxes = document.querySelectorAll('.row-checkbox');
-          checkboxes.forEach(cb => cb.checked = e.target.checked);
+        if (e.target.id && e.target.id.indexOf('select-all-') === 0) {
+          const table = document.getElementById(e.target.id.replace('select-all-', ''));
+          const scope = table || document;
+          scope.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = e.target.checked);
           updateBulkActionsButton();
         } else if (e.target.classList.contains('row-checkbox')) {
           updateBulkActionsButton();

@@ -95,6 +95,9 @@ export { emailReconciliationPlugin } from './plugins/core-plugins/email-reconcil
 export { redirectPlugin, createRedirectPlugin } from './plugins/redirect-management'
 export { helloWorldPlugin, createHelloWorldPlugin } from './plugins/core-plugins/hello-world-plugin'
 export { demoLoginPlugin } from './plugins/core-plugins/demo-login'
+export { versioningPlugin, createVersioningPlugin } from './plugins/core-plugins/versioning-plugin'
+export { graphqlPlugin } from './plugins/core-plugins/graphql-plugin'
+export type { GraphqlConfigInput, GraphqlConfig } from './plugins/core-plugins/graphql-plugin'
 
 // ============================================================================
 // Placeholders - To be populated in Phase 2

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 import { loginAsAdmin } from './utils/test-helpers'
 
 test.describe('Object Layout @content', () => {

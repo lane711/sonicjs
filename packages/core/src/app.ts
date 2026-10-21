@@ -38,14 +38,22 @@ import { emailReconciliationPlugin } from './plugins/core-plugins/email-reconcil
 import { otpLoginPlugin } from './plugins/core-plugins/otp-login-plugin'
 import { oauthProvidersPlugin } from './plugins/core-plugins/oauth-providers'
 import { userProfilesPlugin } from './plugins/core-plugins/user-profiles'
-import { aiSearchPlugin } from './plugins/core-plugins/ai-search-plugin'
+import { aiSearchPlugin, aiSearchApiRoutes } from './plugins/core-plugins/ai-search-plugin'
 import { securityAuditPlugin } from './plugins/core-plugins/security-audit-plugin'
 import { securityAuditMiddleware, securityAuditApiRoutes, securityAuditAdminRoutes } from './plugins/core-plugins/security-audit-plugin'
+import {
+  twoFactorAuthPlugin,
+  twoFactorChallengeRoutes,
+  twoFactorRecoveryRoutes,
+  enforceTwoFactorEnrolment,
+  guardRequiredSecondFactorDisable,
+} from './plugins/core-plugins/two-factor-auth'
 import { apiKeysPlugin, apiKeyAuthMiddleware } from './plugins/core-plugins/api-keys-plugin'
 import { stripePlugin } from './plugins/core-plugins/stripe-plugin'
 import { formsPlugin } from './plugins/core-plugins/forms-plugin'
 import { requireAuth, requireRole, requireRbac, AuthManager } from './middleware/auth'
 import { createAuth } from './auth/config'
+import { guardPasswordlessSecondFactor } from './auth/passwordless-second-factor-guard'
 import { adminRbacRoutes } from './routes/admin-rbac'
 import { pluginMenuMiddleware } from './middleware/plugin-menu'
 import { menuMiddleware } from './middleware/menu'
@@ -124,12 +132,27 @@ export interface Variables {
   csrfToken?: string
   pluginMenuItems?: Array<{ label: string; path: string; icon: string }>
   /**
+   * Slugs of the plugins pluginMenuMiddleware found active, shared so the rest of the /admin
+   * chain does not re-query for the same answer. Absent off /admin and on any request that ran
+   * before that middleware — treat absence as unknown and fall back to a direct read.
+   */
+  activePluginSlugs?: Set<string>
+  /**
    * The plugin hook system attached to the request. Set by bootstrapMiddleware
    * BEFORE any heavy bootstrap work runs, so anything that emits a hook during
    * bootstrap (cron cold starts, RBAC seed, document-type registration) sees a
    * live bus instead of a no-op.
    */
   hookSystem?: import('./plugins/hooks/typed-hooks').HookSystemLike
+  /**
+   * How `user` was authenticated, when that distinction matters to policy.
+   *
+   * Only set for machine credentials (`'api-key'`); a session, a JWT cookie and a JWT bearer are
+   * all a person at a browser or a CLI who owns the account, and nothing needs to tell them apart.
+   * Consumed by the forced two-factor enrolment gate, which must not take a running integration
+   * offline for a requirement its holder cannot satisfy in-band.
+   */
+  authMethod?: 'api-key'
   /** Tenant slug resolved per request by tenantMiddleware ('default' when single-tenant). */
   tenantId?: string
   /** The authed user's role IN the resolved tenant (per-tenant RBAC); global role for 'default'. */
@@ -283,6 +306,11 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   const magicLinkPlugin = createMagicLinkAuthPlugin()
   const corePluginsBeforeCatchAll = [
     securityAuditPlugin,
+    // Mounts /admin/two-factor (enrolment) only. Must be in the BEFORE-catch-all list so it wins
+    // the route match against the bare `/admin` router registered further down. The login
+    // challenge at /auth/two-factor is deliberately NOT here — core mounts it unconditionally,
+    // because `disableAll` must not strand users Better Auth still challenges.
+    twoFactorAuthPlugin,
     apiKeysPlugin,
     aiSearchPlugin,
     oauthProvidersPlugin,
@@ -429,6 +457,16 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   // Supports wildcard prefix: "*.example.com" matches any subdomain of example.com.
   app.use('*', cors({
     origin: (origin, c) => {
+      // The app's own origin is always allowed. A same-origin request is not subject to CORS in
+      // the first place, so echoing the header back grants nothing — but it does mean the app
+      // keeps working wherever it happens to be served from (a dev port, a preview deployment)
+      // without every host having to be enumerated in CORS_ORIGINS.
+      try {
+        if (origin && origin === new URL(c.req.url).origin) return origin
+      } catch {
+        // Non-absolute request URL — fall through to the allowlist.
+      }
+
       const allowed = (c.env as any)?.CORS_ORIGINS as string | undefined
       if (!allowed) return null
       const list = allowed.split(',').map((s: string) => s.trim())
@@ -613,10 +651,38 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
     }
   })
 
+  // Forced two-factor re-enrolment. Runs last of the /admin/* middleware — after requireAuth
+  // (it needs c.get('user')) and after the RBAC shell (a user who owes an enrolment should still
+  // land on a page they have permission for once they finish).
+  //
+  // Wired here rather than in the plugin's register(): Hono composes matched handlers in
+  // registration order, and plugin registration is interleaved with the app.route('/admin/...')
+  // calls below, so middleware added from a plugin would silently not run for any admin route
+  // mounted before it. See recovery.ts.
+  app.use('/admin/*', enforceTwoFactorEnrolment())
+
+  // …and on the JSON API, for the same policy. Without it "you must enrol before using the portal"
+  // means only the HTML portal: the same session cookie drives /api/*, so a user who owes an
+  // enrolment could keep reading and writing content through the API indefinitely. Registered
+  // before every app.route('/api/…') below, because Hono composes matched handlers in registration
+  // order. Unauthenticated public API traffic is untouched — the middleware returns early when
+  // there is no c.get('user') — and API-key callers are exempted inside it.
+  app.use('/api/*', enforceTwoFactorEnrolment())
+
+  // The break-glass reset. Mounted unconditionally and on its own prefix — deactivating the
+  // two-factor plugin does not stop Better Auth from challenging enrolled users, so the recovery
+  // path must outlive the plugin's own surface. See recovery.ts.
+  app.route('/admin/two-factor-reset', twoFactorRecoveryRoutes)
+
   // Plugin-specific API routes that would otherwise be shadowed by the generic
   // /api/:collection/:id catch-all must be mounted BEFORE app.route('/api', apiRoutes).
   app.route('/api/security-audit', securityAuditApiRoutes as any)
   app.route('/admin/plugins/security-audit', securityAuditAdminRoutes as any)
+  // Same shadowing problem: the AI Search plugin registers /api/search in its own
+  // register(), but that runs with corePluginsBeforeCatchAll — i.e. after the bare
+  // app.route('/api', apiRoutes) below, whose /:collection wildcard swallowed every
+  // /api/search request ('Collection not found' on GET, 'title is required' on POST).
+  app.route('/api/search', aiSearchApiRoutes as any)
 
   // Core routes
   // Routes are being imported incrementally from routes/*
@@ -675,13 +741,44 @@ export function createSonicJSApp(config: SonicJSConfig = {}): SonicJSApp {
   app.route('/admin/logs', adminLogsRoutes)
   app.route('/admin/rbac', adminRbacRoutes)
   app.route('/admin', adminUsersRoutes)
+
+  // The 2FA login challenge, mounted from CORE and deliberately OUTSIDE the `disableAll` guard.
+  //
+  // `twoFactor()` is composed into Better Auth unconditionally (auth/config.ts), so an enrolled
+  // user is challenged on sign-in whether or not plugins are enabled. When the challenge PAGE was
+  // mounted by the plugin, `config.plugins.disableAll` short-circuited `boot()` before
+  // `wirePlugins()` and the redirect to `/auth/two-factor` landed on a 404 — locking every
+  // enrolled user out of an app that still demanded their second factor.
+  //
+  // Only the ENROLMENT surface (`/admin/two-factor`) belongs to the plugin, because turning the
+  // plugin off should stop new enrolments without stranding existing ones. These routes carry no
+  // plugin-active gate for the same reason.
+  app.route('/auth/two-factor', twoFactorChallengeRoutes)
+
   app.route('/auth', authRoutes)
 
   // Better Auth handler — serves /auth/sign-in/*, /auth/sign-up/*, /auth/sign-out,
   // /auth/get-session, /auth/callback/* etc. Registered AFTER authRoutes so the
   // page-render routes (GET /auth/login, /auth/register) take precedence; only
   // Better Auth's own API paths fall through to this catch-all.
-  app.on(['GET', 'POST'], '/auth/*', (c) => {
+  app.on(['GET', 'POST'], '/auth/*', async (c) => {
+    // Second-factor enforcement for the passwordless flows. BA's twoFactor plugin challenges
+    // only on /sign-in/email|username|phone-number, so magicLink and emailOTP would otherwise
+    // hand an enrolled account a session with no code. Runs BEFORE auth.handler so nothing is
+    // mailed; reads a body clone so the stream handed to BA is untouched.
+    const refused = await guardPasswordlessSecondFactor(c as unknown as Context<{ Bindings: { DB: D1Database } }>)
+    if (refused) return refused
+
+    // A user whose admin MANDATED a second factor may not turn it off. Also runs before
+    // auth.handler, because BA's /two-factor/disable deletes the enrolment row in its handler —
+    // an after-hook would fire once the account was already unprotected. The /admin/* enforcement
+    // middleware cannot cover this: wrong path, and the page hosting the disable form has to stay
+    // exempt so enrolment is possible at all.
+    const disableRefused = await guardRequiredSecondFactorDisable(
+      c as unknown as Context<{ Bindings: { DB: D1Database }; Variables: { user?: { userId?: string } } }>,
+    )
+    if (disableRefused) return disableRefused
+
     const reqUrl = new URL(c.req.url)
     const requestBaseURL = `${reqUrl.protocol}//${reqUrl.host}`
     const auth = createAuth(c.env, config.auth?.extendBetterAuth, requestBaseURL)
