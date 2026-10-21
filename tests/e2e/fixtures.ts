@@ -64,11 +64,41 @@ function isSupersededNavigation(error: unknown): boolean {
   return String((error as Error)?.message ?? error).includes('net::ERR_ABORTED')
 }
 
-async function retryIfSuperseded<T>(page: Page, attempt: () => Promise<T>): Promise<T> {
+/**
+ * A navigation that ran out its OWN budget, as opposed to one killed by the test budget.
+ *
+ * Playwright words these differently and the distinction decides whether retrying is sane:
+ * `page.goto: Timeout 30000ms exceeded.` leaves the test with time left to try again, while
+ * `page.goto: Test timeout of 120000ms exceeded.` means the test is already over and Playwright
+ * is tearing the page down — a retry there runs into a dying frame and reports a confusing
+ * ERR_ABORTED on top of the real failure.
+ */
+function isOwnTimeout(error: unknown): boolean {
+  const message = String((error as Error)?.message ?? error)
+  return /Timeout \d+ms exceeded/.test(message) && !message.includes('Test timeout')
+}
+
+/**
+ * `retryOnTimeout` is for navigations that have no other retry behind them.
+ *
+ * Traces from CI run 39587538658 show the preview occasionally dropping a browser navigation
+ * outright: in three of them `POST /auth/seed-admin` and `POST /auth/sign-in/email` both answered
+ * 200 in about a second through Playwright's Node client, and then `GET /admin` from the browser
+ * on a fresh page — nothing else in flight — never produced a first byte and sat there until the
+ * test was killed. Same origin, seconds apart. Whatever the deployment is doing there, a second
+ * attempt on a new connection is the only move available from this side, and it is cheap: the
+ * first attempt now gives up after `use.navigationTimeout` rather than eating the test budget.
+ */
+async function retryTransientNavigation<T>(
+  page: Page,
+  attempt: () => Promise<T>,
+  { retryOnTimeout = false }: { retryOnTimeout?: boolean } = {}
+): Promise<T> {
   try {
     return await attempt()
   } catch (error) {
-    if (!isSupersededNavigation(error) || page.isClosed()) throw error
+    const retryable = isSupersededNavigation(error) || (retryOnTimeout && isOwnTimeout(error))
+    if (!retryable || page.isClosed()) throw error
     // Let whatever superseded us finish committing first. Retrying into a frame that is still
     // navigating just loses the same race again. 'domcontentloaded' resolves immediately when the
     // current document has already parsed, so this costs nothing in the common case.
@@ -118,10 +148,14 @@ function hardenPage(page: Page): Page {
     // 'domcontentloaded' / 'commit' do not wait on subresources, so they never hit the stall
     // handling — but they can still be superseded, hence the retry on every path.
     if (!waitsOnSubresources(options?.waitUntil)) {
-      return retryIfSuperseded(page, () => originalGoto(url, options))
+      return retryTransientNavigation(page, () => originalGoto(url, options), { retryOnTimeout: true })
     }
     if (loadEventIsUnreachable) {
-      return retryIfSuperseded(page, () => originalGoto(url, { ...options, waitUntil: 'domcontentloaded' }))
+      return retryTransientNavigation(
+        page,
+        () => originalGoto(url, { ...options, waitUntil: 'domcontentloaded' }),
+        { retryOnTimeout: true }
+      )
     }
 
     const bounded = Math.min(options?.timeout ?? LOAD_ATTEMPT_TIMEOUT_MS, LOAD_ATTEMPT_TIMEOUT_MS)
@@ -134,17 +168,21 @@ function hardenPage(page: Page): Page {
       // navigation is still running in the browser, so let it parse before starting another:
       // re-navigating on top of it is what turns this fallback into its own ERR_ABORTED.
       await originalWaitForLoadState('domcontentloaded', { timeout: FALLBACK_TIMEOUT_MS }).catch(() => {})
-      return retryIfSuperseded(page, () => originalGoto(url, { ...options, waitUntil: 'domcontentloaded' }))
+      return retryTransientNavigation(page, () => originalGoto(url, { ...options, waitUntil: 'domcontentloaded' }))
     }
   }
 
   page.reload = async (options?: Parameters<Page['reload']>[0]): Promise<Response | null> => {
     // Same contract as goto, and the media library in particular reloads straight into the stall.
     if (!waitsOnSubresources(options?.waitUntil)) {
-      return retryIfSuperseded(page, () => originalReload(options))
+      return retryTransientNavigation(page, () => originalReload(options), { retryOnTimeout: true })
     }
     if (loadEventIsUnreachable) {
-      return retryIfSuperseded(page, () => originalReload({ ...options, waitUntil: 'domcontentloaded' }))
+      return retryTransientNavigation(
+        page,
+        () => originalReload({ ...options, waitUntil: 'domcontentloaded' }),
+        { retryOnTimeout: true }
+      )
     }
 
     const bounded = Math.min(options?.timeout ?? LOAD_ATTEMPT_TIMEOUT_MS, LOAD_ATTEMPT_TIMEOUT_MS)
@@ -154,7 +192,7 @@ function hardenPage(page: Page): Page {
       if (!isNavigationStall(error)) throw error
       loadEventIsUnreachable = true
       await originalWaitForLoadState('domcontentloaded', { timeout: FALLBACK_TIMEOUT_MS }).catch(() => {})
-      return retryIfSuperseded(page, () => originalReload({ ...options, waitUntil: 'domcontentloaded' }))
+      return retryTransientNavigation(page, () => originalReload({ ...options, waitUntil: 'domcontentloaded' }))
     }
   }
 

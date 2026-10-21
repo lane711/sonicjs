@@ -864,8 +864,18 @@ async function signInAsAdmin(page: Page) {
     }
   }
 
+  // Match the name anywhere, not as a prefix. Better Auth adds the `__Secure-` cookie prefix when
+  // it is serving over HTTPS, so the session cookie is `better-auth.session_token` against a local
+  // wrangler but `__Secure-better-auth.session_token` against the CI preview deployment. A
+  // `startsWith` filter therefore captured the real cookies locally and an EMPTY array in CI — the
+  // cache silently did nothing in the only environment it was written for, and cost two extra
+  // /auth/get-session round trips per test on top of the sign-in it failed to avoid.
   const all = await page.context().cookies();
-  cachedSessionCookies = all.filter((c) => c.name.startsWith('better-auth.'));
+  const session = all.filter((c) => c.name.includes('better-auth.'));
+
+  // An empty list is not a cache. Leaving it null makes the next call sign in directly rather than
+  // walk `reuseCachedSession`'s clear-and-recheck path to discover the same thing again.
+  cachedSessionCookies = session.length > 0 ? session : null;
 }
 
 /**
