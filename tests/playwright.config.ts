@@ -24,8 +24,25 @@ export default defineConfig({
   fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only — 2 retries handles consecutive transient CF Worker cold-starts */
-  retries: process.env.CI ? 2 : 0,
+  /* Retry on CI only.
+   *
+   * Was 2, for "consecutive transient CF Worker cold-starts". That cause is gone: the menu
+   * plugin's onBoot was ~51 serial D1 round trips and is now 2-3 (1ff44bdeb), which took a cold
+   * preview isolate from 11-13s to a p50 of 0.45s. What the third attempt buys now is mostly a
+   * third 120s timeout on a test that was going to fail anyway.
+   *
+   * It has to come down because the job does not fit any more. This PR touches
+   * middleware/bootstrap.ts, which trips the "select the lot" branch of the workflow's changed-
+   * area detection, so CI runs the whole suite — and tagging the previously-unselectable specs
+   * took that from 468 tests to 740. The last completed run did 468 in 28 minutes; the next one
+   * was still going at 88 and was killed by the job's 90-minute cap, which uploads videos but no
+   * report. A cancelled run is worth less than a run that completes with failures in it: one
+   * tells you nothing, the other tells you what to fix. Dropping the third attempt takes the
+   * worst case per failing test from 360s to 240s.
+   *
+   * The job cap itself is not adjustable from here — pull_request_target runs the base branch's
+   * copy of pr-tests.yml, so a timeout-minutes change on this branch stays inert until merge. */
+  retries: process.env.CI ? 1 : 0,
   /* Per-test timeout.
    *
    * Most specs log in (3 API round trips + a navigation) before their first assertion, then make
@@ -48,10 +65,10 @@ export default defineConfig({
    * cover it. The same suite is 730/730 against a local wrangler, so the budget is what is
    * environment-specific, not the tests.
    *
-   * 120 and not more: the job's own budget is 90 minutes, and a timeout that does fire now costs
-   * a third more than it used to — three attempts each. The last run spent roughly 25 of its 49
-   * minutes burning the 90s limit, so the headroom has to stay small enough that the worst case
-   * still lands inside the job. */
+   * 120 and not more: the job's own budget is 90 minutes, and every timeout that does fire costs
+   * two attempts (see `retries`). One run spent roughly 25 of its 49 minutes burning the 90s
+   * limit, so the headroom has to stay small enough that the worst case still lands inside the
+   * job. */
   timeout: process.env.CI ? 120 * 1000 : 90 * 1000,
   /* 1 worker locally (in-memory D1 conflicts); 4 in CI (remote D1, I/O bound) */
   workers: process.env.CI ? 4 : 1,
