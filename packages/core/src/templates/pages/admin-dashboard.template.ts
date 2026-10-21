@@ -114,6 +114,9 @@ export function renderDashboardPage(data: DashboardPageData): string {
     currentPath: "/admin",
     user: data.user,
     version: data.version,
+    // The only page in core that charts anything, so it brings its own Chart.js rather than
+    // making every other admin page pay for the global.
+    scripts: ["https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"],
     content: pageContent,
   };
 
@@ -187,6 +190,8 @@ export function renderDashboardPageWithDynamicMenu(
     user: data.user,
     version: data.version,
     enableExperimentalFeatures: data.enableExperimentalFeatures,
+    // See the note on the sibling renderer above.
+    scripts: ["https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"],
     content: pageContent,
     dynamicMenuItems,
   };
