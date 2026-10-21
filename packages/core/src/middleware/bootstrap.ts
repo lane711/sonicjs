@@ -359,6 +359,23 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
                 await bootstrapDefaultContent(c.env.DB).catch((e) =>
                   console.error("[Bootstrap] KV fast-path: error seeding default content:", e)
                 )
+                // Plugin bootstrap is the one piece of the full path that has no other way to
+                // self-heal. If the isolate that set the KV flag was torn down partway through
+                // its install loop, a plugin can be left uninstalled with the flag already
+                // saying "done" — and from then on every isolate takes this fast path and never
+                // looks. isBootstrapNeeded() is a single COUNT, and this whole block is off the
+                // request's critical path, so checking costs one query on a cold isolate.
+                if (!config.plugins?.disableAll) {
+                  await (async () => {
+                    const bootstrapService = new PluginBootstrapService(c.env.DB)
+                    if (await bootstrapService.isBootstrapNeeded()) {
+                      console.log("[Bootstrap] KV fast-path: repairing core plugin install")
+                      await bootstrapService.bootstrapCorePlugins()
+                    }
+                  })().catch((e) =>
+                    console.error("[Bootstrap] KV fast-path: error bootstrapping plugins:", e)
+                  )
+                }
               })()
             )
             bootstrapComplete = true
