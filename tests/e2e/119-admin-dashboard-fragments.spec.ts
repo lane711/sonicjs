@@ -78,7 +78,13 @@ test.describe('Admin dashboard fragments @smoke', () => {
     })
 
     await page.goto('/admin', { waitUntil: 'domcontentloaded' })
-    await expect(page.locator('#stats-container')).toContainText('Total Collections')
+    // Same 20s budget the first test in this file already gives this fragment. On a cold preview
+    // isolate the load-triggered request can still be in flight well past the default 5s — CI run
+    // 39605228238 failed here with the container still carrying `htmx-request` and holding the
+    // skeleton's empty divs. Waiting longer costs nothing when the fragment is fast.
+    await expect(page.locator('#stats-container')).toContainText('Total Collections', {
+      timeout: 20_000,
+    })
     await page.waitForTimeout(2_000)
 
     for (const fragment of ['stats', 'storage', 'recent-activity']) {
