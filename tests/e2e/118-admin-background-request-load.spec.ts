@@ -12,8 +12,14 @@ import { loginAsAdmin } from './utils/test-helpers'
  * whole E2E suite read as "flaky" as a result.
  */
 test.describe('Admin background request load @smoke', () => {
+  // `false`: do not let the helper land on /admin. Both tests below count requests the dashboard
+  // issues, and the helper's own landing would start a first dashboard document whose poller is
+  // still running — and, in the overlap test, still holding an intercepted response — when the
+  // test navigates to /admin itself. That second document's first tick then overlaps the first
+  // document's last one and the test reads 2 concurrent requests from two pages rather than from
+  // a broken hx-sync. Each test navigates itself, so exactly one dashboard is ever live.
   test.beforeEach(async ({ page }) => {
-    await loginAsAdmin(page)
+    await loginAsAdmin(page, false)
   })
 
   test('checks migration status once per session, not once per page view', async ({ page }) => {

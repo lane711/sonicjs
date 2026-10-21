@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import { loginAsAdmin, navigateToAdminSection, createTestCollection, deleteTestCollection, TEST_DATA } from './utils/test-helpers';
+import { loginAsAdmin, navigateToAdminSection, createTestCollection, deleteTestCollection, TEST_DATA, submitAndWaitForXhr } from './utils/test-helpers';
 
 test.describe('Full Integration Workflows @smoke', () => {
   test('should handle media upload and usage workflow', async ({ page }) => {
@@ -32,7 +32,13 @@ test.describe('Full Integration Workflows @smoke', () => {
       buffer: testImageBuffer
     });
 
-    await page.locator('#upload-btn').click();
+    // The upload is an htmx POST to /admin/media/upload that writes to R2 and inserts a
+    // document; #upload-results stays empty until it answers. Asserting straight after the click
+    // spends an assertion budget on a server round trip — that is how this flaked in CI with the
+    // locator resolving 24x to an empty <div id="upload-results">. Wait for the response first.
+    await submitAndWaitForXhr(page, 'POST', '/admin/media/upload', () =>
+      page.locator('#upload-btn').click()
+    );
     
     // Wait for upload to complete with longer timeout
     await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', { timeout: 15000 });

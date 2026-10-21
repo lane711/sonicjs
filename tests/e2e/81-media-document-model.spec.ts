@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures'
-import { loginAsAdmin, ensureAdminUserExists, gotoMediaLibrary } from './utils/test-helpers'
+import { loginAsAdmin, ensureAdminUserExists, gotoMediaLibrary, submitAndWaitForXhr } from './utils/test-helpers'
 
 const minimalJpeg = Buffer.from([
   0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01,
@@ -102,7 +102,13 @@ test.describe('Media — document model (slice 3) @media', () => {
       buffer: minimalJpeg,
     })
 
-    await page.locator('#upload-modal button[type="submit"]').click()
+    // The upload is an htmx POST to /admin/media/upload that writes to R2 and inserts a
+    // document; #upload-results stays empty until it answers. Asserting straight after the click
+    // spends an assertion budget on a server round trip — that is how this flaked in CI with the
+    // locator resolving 24x to an empty <div id="upload-results">. Wait for the response first.
+    await submitAndWaitForXhr(page, 'POST', '/admin/media/upload', () =>
+      page.locator('#upload-modal button[type="submit"]').click()
+    )
     await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', { timeout: 10000 })
 
     // Page auto-redirects; wait for media library to reload. The `?t=` matters: the upload runs

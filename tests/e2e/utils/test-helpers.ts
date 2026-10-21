@@ -834,9 +834,12 @@ export async function uploadTestFile(page: Page, fileName: string = 'test-image.
     buffer: testImageBuffer
   });
   
-  await page.click('button[type="submit"]');
-  
-  // Wait for upload completion
+  // Same as the spec-level upload sites: #upload-results is rendered from the POST response,
+  // so the default assertion budget would be standing in for an R2 write. Await the response.
+  await submitAndWaitForXhr(page, 'POST', '/admin/media/upload', () =>
+    page.click('button[type="submit"]')
+  );
+
   await expect(page.locator('#upload-results')).toContainText('successful');
 }
 

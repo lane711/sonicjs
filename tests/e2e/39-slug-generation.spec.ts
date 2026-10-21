@@ -6,6 +6,15 @@ import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers'
 // prefix is what the cleanup endpoint matches on, so these rows do not pile up either.
 const RUN = Date.now()
 
+/**
+ * No `waitForLoadState('networkidle')` in this file.
+ *
+ * Every test used to open a form page and then wait up to 15s for the network to go idle before
+ * its real `waitForSelector`. Admin pages poll, so idle need never arrive, and the selector wait
+ * that follows is the one that actually gates the fills — the idle wait only ever added up to 15s
+ * of dead time per test to a suite whose failures are all budget exhaustion.
+ */
+
 test.describe('Slug Generation @content', () => {
   test.beforeEach(async ({ page }) => {
     await ensureAdminUserExists(page)
@@ -14,7 +23,6 @@ test.describe('Slug Generation @content', () => {
 
   test('should auto-generate slug from title when creating new content', async ({ page }) => {
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     const titleField = page.locator('input[name="title"]')
@@ -36,7 +44,6 @@ test.describe('Slug Generation @content', () => {
 
   test('should auto-generate slug for blog_post collection', async ({ page }) => {
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     const titleField = page.locator('input[name="title"]')
@@ -58,7 +65,6 @@ test.describe('Slug Generation @content', () => {
 
   test('should handle special characters in slug generation', async ({ page }) => {
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     const titleField = page.locator('input[name="title"]')
@@ -77,7 +83,6 @@ test.describe('Slug Generation @content', () => {
 
   test('should stop auto-generating after manual edit', async ({ page }) => {
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     const titleField = page.locator('input[name="title"]')
@@ -104,7 +109,6 @@ test.describe('Slug Generation @content', () => {
 
   test('should regenerate slug when button clicked', async ({ page }) => {
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     const titleField = page.locator('input[name="title"]')
@@ -136,7 +140,6 @@ test.describe('Slug Generation @content', () => {
   test('should detect duplicate slugs within same collection', async ({ page }) => {
     // First, create content with a specific slug
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     await page.fill('input[name="title"]', 'Test Duplicate Page')
@@ -172,7 +175,6 @@ test.describe('Slug Generation @content', () => {
 
     // Now try to create another with same slug
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     await page.fill('input[name="title"]', 'Different Title')
@@ -194,7 +196,6 @@ test.describe('Slug Generation @content', () => {
   test('should not auto-change slug when editing existing content', async ({ page }) => {
     // Create content first
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     await page.fill('input[name="title"]', `Test Edit Mode ${RUN}`)
@@ -227,15 +228,10 @@ test.describe('Slug Generation @content', () => {
     await page.click('button[name="action"][value="save_and_publish"]')
     await page.waitForURL(/\/admin\/content\/[^/]+\/edit/, { timeout: 15000 })
 
-    // Navigate to content list and find the item
-    await page.goto('/admin/content?collection=blog_post')
-    await page.waitForTimeout(1000)
-    
-    // Click on the content to edit it
-    const contentLink = page.locator(`a:has-text("Test Edit Mode ${RUN}")`).first()
-    await contentLink.click()
-    await page.waitForTimeout(1000)
-    
+    // Publishing navigated to this record's freshly server-rendered edit form, so the slug below
+    // is the stored one. The list round trip this replaces hunted for the row by title on a
+    // paginated page four workers write to concurrently — the same race that burned a full 120s
+    // budget in CI two tests down.
     const titleField = page.locator('input[name="title"]')
     const slugField = page.locator('input[name="slug"]')
     
@@ -254,7 +250,6 @@ test.describe('Slug Generation @content', () => {
   test('should allow manual regeneration in edit mode', async ({ page }) => {
     // Create content first
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     await page.fill('input[name="title"]', `Test Regen Page ${RUN}`)
@@ -284,14 +279,10 @@ test.describe('Slug Generation @content', () => {
     await page.click('button[name="action"][value="save_and_publish"]')
     await page.waitForURL(/\/admin\/content\/[^/]+\/edit/, { timeout: 15000 })
 
-    // Navigate to edit
-    await page.goto('/admin/content?collection=blog_post')
-    await page.waitForTimeout(1000)
-    
-    const contentLink = page.locator(`a:has-text("Test Regen Page ${RUN}")`).first()
-    await contentLink.click()
-    await page.waitForTimeout(1000)
-    
+    // Publishing already landed on this record's edit form, which is where the rest of the test
+    // runs. The round trip this replaces went back out to /admin/content and hunted for the row
+    // by title, which is a race on a paginated list that four workers are writing to: in CI the
+    // link never appeared and the click burned the whole 120s budget. The edit URL is in hand.
     const titleField = page.locator('input[name="title"]')
     const slugField = page.locator('input[name="slug"]')
     const regenerateBtn = page.locator('button:has-text("Regenerate from title")')
@@ -314,7 +305,6 @@ test.describe('Slug Generation @content', () => {
 
   test('should show checking status during duplicate validation', async ({ page }) => {
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     const titleField = page.locator('input[name="title"]')
@@ -342,7 +332,6 @@ test.describe('Slug Generation @content', () => {
   test('should prevent form submission with duplicate slug', async ({ page }) => {
     // Create first content
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     await page.fill('input[name="title"]', `Test Submission ${RUN}`)
@@ -374,7 +363,6 @@ test.describe('Slug Generation @content', () => {
 
     // Try to create duplicate
     await page.goto('/admin/content/new?collection=blog_post')
-    await page.waitForLoadState('networkidle', { timeout: 15000 })
     await page.waitForSelector('input[name="title"]', { timeout: 10000 })
     
     await page.fill('input[name="title"]', 'Different Title')

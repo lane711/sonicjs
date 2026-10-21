@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import { loginAsAdmin, navigateToAdminSection } from './utils/test-helpers';
+import { loginAsAdmin, navigateToAdminSection, submitAndWaitForXhr } from './utils/test-helpers';
 
 test.describe('Media Management @smoke @media', () => {
   test.beforeEach(async ({ page }) => {
@@ -50,7 +50,13 @@ test.describe('Media Management @smoke @media', () => {
       buffer: testImageBuffer
     });
 
-    await page.locator('#upload-modal button#upload-btn').click();
+    // The upload is an htmx POST to /admin/media/upload that writes to R2 and inserts a
+    // document; #upload-results stays empty until it answers. Asserting straight after the click
+    // spends an assertion budget on a server round trip — that is how this flaked in CI with the
+    // locator resolving 24x to an empty <div id="upload-results">. Wait for the response first.
+    await submitAndWaitForXhr(page, 'POST', '/admin/media/upload', () =>
+      page.locator('#upload-modal button#upload-btn').click()
+    );
     
     // Should show upload success
     await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', { timeout: 10000 });
@@ -67,7 +73,13 @@ test.describe('Media Management @smoke @media', () => {
       buffer: Buffer.from('fake executable')
     });
 
-    await page.locator('#upload-modal button#upload-btn').click();
+    // The upload is an htmx POST to /admin/media/upload that writes to R2 and inserts a
+    // document; #upload-results stays empty until it answers. Asserting straight after the click
+    // spends an assertion budget on a server round trip — that is how this flaked in CI with the
+    // locator resolving 24x to an empty <div id="upload-results">. Wait for the response first.
+    await submitAndWaitForXhr(page, 'POST', '/admin/media/upload', () =>
+      page.locator('#upload-modal button#upload-btn').click()
+    );
     
     // Should show validation error
     await expect(page.locator('#upload-results')).toContainText('Unsupported file type');

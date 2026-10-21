@@ -1,5 +1,5 @@
 import { test, expect, type Locator } from './fixtures';
-import { loginAsAdmin, gotoMediaLibrary } from './utils/test-helpers';
+import { loginAsAdmin, gotoMediaLibrary, submitAndWaitForXhr } from './utils/test-helpers';
 
 /**
  * A real, decodable 1x1 PNG.
@@ -72,7 +72,13 @@ test.describe('Media Thumbnail Loading @media', () => {
     });
 
     // Submit upload
-    await page.locator('#upload-modal button[type="submit"]').click();
+    // The upload is an htmx POST to /admin/media/upload that writes to R2 and inserts a
+    // document; #upload-results stays empty until it answers. Asserting straight after the click
+    // spends an assertion budget on a server round trip — that is how this flaked in CI with the
+    // locator resolving 24x to an empty <div id="upload-results">. Wait for the response first.
+    await submitAndWaitForXhr(page, 'POST', '/admin/media/upload', () =>
+      page.locator('#upload-modal button[type="submit"]').click()
+    );
 
     // Wait for success message
     await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', { timeout: 10000 });
