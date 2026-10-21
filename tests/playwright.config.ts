@@ -82,6 +82,20 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: process.env.BASE_URL || 'http://localhost:8787',
 
+    /* Playwright's own defaults for these two are 0 — meaning NO timeout, not 30s. An operation
+     * given no budget of its own runs until the TEST budget expires, which is why so many CI
+     * failures read `page.originalGoto: Test timeout of 120000ms exceeded` rather than naming a
+     * navigation timeout: the navigation never had one. A single stalled `goto` therefore consumed
+     * the whole 120s, twice over with `retries`, and reported an error that pointed at the test's
+     * last line instead of at the hop that hung.
+     *
+     * 30s is far above anything healthy here — `domcontentloaded` lands in well under a second
+     * warm and ~5.5s on a cold isolate, and no spec in the suite asks for more than 30s anywhere.
+     * So nothing that passes today starts failing; what changes is that a hang now costs 30s and
+     * says which operation hung, instead of costing 120s and blaming the test. */
+    actionTimeout: 30 * 1000,
+    navigationTimeout: 30 * 1000,
+
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
 

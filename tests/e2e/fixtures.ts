@@ -39,6 +39,15 @@ const LOAD_ATTEMPT_TIMEOUT_MS = 15_000
 const FALLBACK_TIMEOUT_MS = 10_000
 
 /**
+ * The `domcontentloaded` navigations below deliberately pass no `timeout`, so they inherit
+ * `use.navigationTimeout` from playwright.config.ts (30s). That default is load-bearing: before it
+ * was set, Playwright's own default of 0 meant NO timeout, and every one of those calls could run
+ * until the 120s test budget expired — the `page.originalGoto: Test timeout of 120000ms exceeded`
+ * signature that dominated CI. `loadEventIsUnreachable` is a per-worker latch, so a single early
+ * stall routed every later navigation in that worker down one of those unbounded paths.
+ */
+
+/**
  * `net::ERR_ABORTED` on a navigation means it was *superseded*, not that it failed: the page
  * started another navigation (a client-side redirect racing the server's, an htmx boost) and the
  * browser cancelled this one. The document the caller wanted usually loads a moment later anyway.
