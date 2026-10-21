@@ -70,8 +70,34 @@ export default defineConfig({
    * limit, so the headroom has to stay small enough that the worst case still lands inside the
    * job. */
   timeout: process.env.CI ? 120 * 1000 : 90 * 1000,
-  /* 1 worker locally (in-memory D1 conflicts); 4 in CI (remote D1, I/O bound) */
-  workers: process.env.CI ? 4 : 1,
+  /* 1 worker locally (in-memory D1 conflicts); 2 in CI.
+   *
+   * Was 4, on the reasoning that a remote D1 makes the suite I/O bound. The run data says
+   * otherwise: of 568 results in run 39638222664, 107 (19%) took 15s or more, and every single
+   * one of the 31 failures overlapped in time with 2-8 other slow results on *other* workers.
+   * A per-test or server-side cause does not produce that — the workers degrade together, in
+   * lockstep, for the whole 30 minutes.
+   *
+   * The server is not what is degrading. Probing the same preview deployment directly: 28
+   * concurrent authenticated admin requests (4 simultaneous dashboard loads, page + all six HTMX
+   * fragments each) all answered in under 2.9s, and the six fragments measured 0.69-2.62s
+   * serially. Meanwhile the hangs in the traces are binary rather than slow — of ~1300 completed
+   * requests the worst was ~10s, while the ones that failed never completed at all and sat at
+   * exactly the Playwright timeout. That is a client that never got scheduled to send or parse,
+   * not a server that answered late. It also explains why `apiRequestContext` calls hang with no
+   * browser in the picture: a starved runner starves the Node test process too.
+   *
+   * The runner is `ubuntu-24.04` with four vCPUs. Four Chromium instances on it is double what
+   * Playwright itself would pick — its default worker count is half the core count, for exactly
+   * this reason — and each admin page here is unusually expensive to render: a ~270KB document
+   * plus htmx, Alpine and the Tailwind Play CDN, which compiles the stylesheet in-browser by
+   * scanning that DOM on every single navigation.
+   *
+   * Two workers is that default. The suite stays parallel, and the lock lanes (fixtures.ts) that
+   * dominate wall time are serialized either way, so the cost is far less than 2x: halving the
+   * login rate also keeps the suite under the 30 req/min/IP auth limiter it was tripping, and
+   * each trip was costing a test a ~60s backoff. */
+  workers: process.env.CI ? 2 : 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Global setup and teardown */

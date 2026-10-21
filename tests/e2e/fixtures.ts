@@ -309,9 +309,14 @@ const LOCK_POLL_MS = 100
 /** Generous: the holder is a whole test, and several may be queued ahead of us. */
 const LOCK_WAIT_MS = 300_000
 
-async function acquireLock(name: string): Promise<() => void> {
+async function acquireLock(
+  name: string,
+  /** Called on every poll with how long this acquisition has been queueing so far. */
+  onWaiting?: (waitedMs: number) => void
+): Promise<() => void> {
   const dir = join(LOCK_ROOT, name.replace(/[^a-z0-9-]/gi, '_'))
-  const deadline = Date.now() + LOCK_WAIT_MS
+  const startedAt = Date.now()
+  const deadline = startedAt + LOCK_WAIT_MS
 
   mkdirSync(LOCK_ROOT, { recursive: true })
 
@@ -350,6 +355,7 @@ async function acquireLock(name: string): Promise<() => void> {
         throw new Error(`Timed out after ${LOCK_WAIT_MS}ms waiting for the "${name}" e2e lock (${dir})`)
       }
       await new Promise((r) => setTimeout(r, LOCK_POLL_MS))
+      onWaiting?.(Date.now() - startedAt)
     }
   }
 }
@@ -368,14 +374,32 @@ export const test = base.extend<
         .sort()
 
       const releases: Array<() => void> = []
-      const waitStartedAt = Date.now()
-      try {
-        for (const name of names) releases.push(await acquireLock(name))
 
-        // Queueing behind another spec is not this test's own work, so hand the budget back —
-        // otherwise the slowest-to-acquire test reports a timeout that says nothing about it.
-        const waited = Date.now() - waitStartedAt
-        if (waited > 1_000) testInfo.setTimeout(testInfo.timeout + waited)
+      // Queueing behind another spec is not this test's own work, so hand the budget back — and
+      // hand it back *as it is spent*, not once the last lock is in hand. Doing it afterwards
+      // meant the one case the hand-back existed for was the one case it could not help: a queue
+      // longer than the test timeout killed the test inside this fixture, reporting
+      // "Test timeout of 120000ms exceeded while setting up exclusiveLocks" and naming no lock,
+      // no holder and no spec. CI hit that twice in one run, on 107-two-factor-admin-reset and
+      // 116-register-credential, while the auth lanes were saturated.
+      const baseTimeout = testInfo.timeout
+      let waitedBefore = 0
+      let granted = 0
+      const giveBackQueueTime = (waitedOnThisLock: number) => {
+        const waited = waitedBefore + waitedOnThisLock
+        // Only when it has moved by a second — this runs every LOCK_POLL_MS.
+        if (waited - granted < 1_000) return
+        granted = waited
+        testInfo.setTimeout(baseTimeout + waited)
+      }
+
+      try {
+        for (const name of names) {
+          const startedAt = Date.now()
+          releases.push(await acquireLock(name, giveBackQueueTime))
+          waitedBefore += Date.now() - startedAt
+        }
+        giveBackQueueTime(0)
 
         await use()
       } finally {
