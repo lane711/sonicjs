@@ -1,6 +1,6 @@
 {
   "name": "sonicjs",
-  "version": "3.0.0-beta.28",
+  "version": "3.0.0-beta.22",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -11,7 +11,6 @@
   "scripts": {
     "predev": "test -d node_modules/@sonicjs-cms || npm install",
     "dev": "npm run dev --workspace=my-sonicjs-app",
-    "dev:demo": "bash scripts/dev-demo.sh",
     "dev:www": "npm run dev --workspace=www",
     "build": "npm run build:core && npm run build --workspace=my-sonicjs-app",
     "build:www": "npm run build --workspace=www",
@@ -20,8 +19,6 @@
     "deploy": "npm run deploy --workspace=my-sonicjs-app",
     "deploy:www": "npm run deploy --workspace=www",
     "deploy:stats": "npm run deploy:production --workspace=sonicjs-stats",
-    "dev:react-demo": "cd demos/employee-directory && npm run dev",
-    "deploy:demo": "cd demos/employee-directory && npm run build && npx wrangler pages deploy dist --project-name sonicjs-sdk-demo --branch main",
     "test": "npm run test --workspace=@sonicjs-cms/core",
     "test:cov": "npm run test:cov --workspace=@sonicjs-cms/core",
     "test:watch": "npm run test:watch --workspace=@sonicjs-cms/core",
@@ -29,7 +26,6 @@
     "e2e:ui": "playwright test --config=tests/playwright.config.ts --ui",
     "e2e:smoke": "playwright test --config=tests/playwright.smoke.config.ts",
     "e2e:smoke:ui": "playwright test --config=tests/playwright.smoke.config.ts --ui",
-    "e2e:www": "playwright test --config=tests/playwright.www.config.ts",
     "killall": "pkill -9 -f 'workerd|wrangler' 2>/dev/null; echo 'Killed wrangler/workerd processes'",
     "prepare": "husky",
     "type-check": "npm run type-check --workspace=@sonicjs-cms/core",
@@ -67,17 +63,14 @@
     "drizzle-orm": "^0.45.2",
     "drizzle-zod": "^0.8.3",
     "highlight.js": "^11.11.1",
-    "hono": "^4.13.13",
+    "hono": "^4.12.26",
     "marked": "^16.4.1",
     "motion": "^12.23.22",
     "semver": "^7.7.3",
     "zod": "^4.1.12"
   },
-  "optionalDependencies": {
-    "better-sqlite3": "12.11.1"
-  },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20260724.1",
+    "@cloudflare/workers-types": "^4.20251014.0",
     "@playwright/test": "^1.53.1",
     "@types/node": "^24.9.2",
     "@types/semver": "^7.7.0",

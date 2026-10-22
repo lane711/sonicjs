@@ -280,7 +280,7 @@ export function renderAdminLayoutCatalyst(
   <!-- Scripts -->
   <script src="https://unpkg.com/htmx.org@2.0.3"></script>
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-  <!-- No Chart.js here: only the dashboards chart, and they ask for it via the scripts option. -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
   <!-- CSRF: Auto-attach token to all HTMX and fetch requests -->
   <script>
@@ -518,51 +518,10 @@ export function renderAdminLayoutCatalyst(
       }
     }
 
-    // How long a pending-migration count stays good for. Migrations only change on deploy, so
-    // this can be generous; it exists to stop the check turning into per-pageview database load.
-    var MIGRATION_STATUS_TTL_MS = 5 * 60 * 1000;
-
-    function showMigrationBanner(count) {
-      if (!(count > 0)) return;
-      const banner = document.getElementById('migration-banner');
-      const countElement = document.getElementById('migration-count');
-      if (banner && countElement) {
-        countElement.textContent = count;
-        banner.classList.remove('hidden');
-      }
-    }
-
-    function cachedMigrationCount() {
-      try {
-        const raw = sessionStorage.getItem('migrationStatus');
-        if (!raw) return null;
-        const cached = JSON.parse(raw);
-        if (typeof cached.count !== 'number') return null;
-        if (Date.now() - cached.at > MIGRATION_STATUS_TTL_MS) return null;
-        return cached.count;
-      } catch (error) {
-        return null;
-      }
-    }
-
-    // Check for pending migrations on page load.
-    //
-    // Cached per session rather than re-fetched on every navigation. /admin/api/migrations/status
-    // reads the migration bundle and the d1_migrations table and measured 1.0-5.7s against a
-    // preview deployment; firing it from the DOMContentLoaded handler of every admin page meant
-    // one slow database round trip per pageview, for a banner that reads "0 pending" on every
-    // healthy install. Under rapid navigation those fetches outlived the documents that issued
-    // them and piled up — a browser moving between admin pages accumulated upwards of ten
-    // concurrent copies, which starved the real page loads behind them.
+    // Check for pending migrations on page load
     async function checkPendingMigrations() {
       // Don't check if user dismissed the banner in this session
       if (sessionStorage.getItem('migrationBannerDismissed') === 'true') {
-        return;
-      }
-
-      const cached = cachedMigrationCount();
-      if (cached !== null) {
-        showMigrationBanner(cached);
         return;
       }
 
@@ -570,12 +529,13 @@ export function renderAdminLayoutCatalyst(
         const response = await fetch('/admin/api/migrations/status');
         if (response.ok) {
           const data = await response.json();
-          if (data.success && data.data) {
-            const count = data.data.pendingMigrations;
-            try {
-              sessionStorage.setItem('migrationStatus', JSON.stringify({ count: count, at: Date.now() }));
-            } catch (error) { /* storage full or disabled — just skip the cache */ }
-            showMigrationBanner(count);
+          if (data.success && data.data && data.data.pendingMigrations > 0) {
+            const banner = document.getElementById('migration-banner');
+            const countElement = document.getElementById('migration-count');
+            if (banner && countElement) {
+              countElement.textContent = data.data.pendingMigrations;
+              banner.classList.remove('hidden');
+            }
           }
         }
       } catch (error) {
@@ -646,13 +606,6 @@ function renderCatalystSidebar(
   // Active plugin nav items injected by pluginMenuMiddleware via dynamicMenuItems.
   // When not provided, the marker below is replaced by the middleware post-render.
   const resolvedMenuItems = dynamicMenuItems ?? [];
-  const userRole: string = user?.role ?? 'viewer';
-  const isAdmin = userRole === 'admin';
-  const isEditor = userRole === 'editor';
-  const canManageUsers = isAdmin;
-  const canAccessSettings = isAdmin || isEditor;
-  const canAccessPlugins = isAdmin;
-
   let baseMenuItems = [
     {
       label: "Content",
@@ -668,13 +621,13 @@ function renderCatalystSidebar(
         <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/>
       </svg>`,
     },
-    ...(canManageUsers ? [{
+    {
       label: "Users",
       path: "/admin/users",
       icon: `<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
         <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
       </svg>`,
-    }] : []),
+    },
   ];
 
   const pluginsIcon = `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -792,7 +745,7 @@ function renderCatalystSidebar(
             `;
             })
             .join("")}
-          ${canAccessPlugins ? `<!-- Plugins accordion -->
+          <!-- Plugins accordion -->
           <div data-plugins-accordion class="relative">
             ${isPluginsActive ? '<span class="absolute inset-y-2 -left-4 w-0.5 rounded-full bg-cyan-500 dark:bg-cyan-400"></span>' : ""}
             <div class="flex w-full items-center">
@@ -823,7 +776,7 @@ function renderCatalystSidebar(
             <div data-plugins-submenu class="pl-6 mt-0.5 flex flex-col gap-0.5">
               ${pluginsSubItems}
             </div>
-          </div>` : ""}
+          </div>
           <!-- /ADMIN_SIDEBAR_NAV_ITEMS -->
         </div>
       </div>
@@ -869,7 +822,7 @@ function renderCatalystSidebar(
         </div>
       </div>
 
-      ${canAccessSettings ? `<!-- Settings Menu Item (Bottom) -->
+      <!-- Settings Menu Item (Bottom) -->
       <div class="border-t border-zinc-950/5 p-4 dark:border-white/5">
         ${(() => {
           const isActive =
@@ -905,7 +858,7 @@ function renderCatalystSidebar(
             </span>
           `;
         })()}
-      </div>` : ""}
+      </div>
 
       <!-- Sidebar Footer (User) -->
       ${

@@ -35,7 +35,7 @@ export interface PluginSettingsPageData {
     description: string
     version: string
     author: string
-    status: 'active' | 'inactive' | 'error' | 'uninstalled'
+    status: 'active' | 'inactive' | 'error'
     category: string
     icon: string
     downloadCount?: number
@@ -61,26 +61,14 @@ export interface PluginSettingsPageData {
   settingsTabData?: any
 }
 
-/**
- * Plugins whose Settings tab is a static panel rather than a list of editable keys.
- * They store no user-editable settings, so the key-count check below would hide the tab
- * entirely — but the panel is the whole point (user-profiles documents its code-defined
- * field model), so it has to be opted in explicitly.
- */
-const STATIC_SETTINGS_PANEL_PLUGINS = new Set(['user-profiles'])
-
 export function renderPluginSettingsPage(data: PluginSettingsPageData): string {
   const { plugin, activity = [], user, settingsTabData } = data
-  const isUninstalled = plugin.status === 'uninstalled'
   // true only when the plugin has at least one user-configurable setting key
   // (_-prefixed keys are internal metadata, not settings the user can edit)
   const pluginDef = getPluginDefinition(plugin.id || plugin.name)
-  const pluginId = plugin.id || plugin.name
-  const hasUserSettings = !isUninstalled && (pluginDef?.settingsTabContent != null ||
-    Object.keys(plugin.settings || {}).some(k => !k.startsWith('_')) ||
-    hasCustomSettingsComponent(pluginId) ||
-    STATIC_SETTINGS_PANEL_PLUGINS.has(pluginId))
-  const defaultTab = isUninstalled ? 'info' : hasUserSettings ? 'settings' : 'info'
+  const hasUserSettings = pluginDef?.settingsTabContent != null ||
+    Object.keys(plugin.settings || {}).some(k => !k.startsWith('_'))
+  const defaultTab = hasUserSettings ? 'settings' : 'info'
 
 
   const pageContent = `
@@ -213,33 +201,6 @@ export function renderPluginSettingsPage(data: PluginSettingsPageData): string {
       window.addEventListener('hashchange', initTabFromHash);
       initTabFromHash();
 
-      async function installPlugin(pluginName) {
-        const button = event.target;
-        button.disabled = true;
-        button.textContent = 'Installing...';
-
-        try {
-          const response = await fetch('/admin/plugins/install', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: pluginName })
-          });
-
-          const result = await response.json();
-
-          if (result.success) {
-            showNotification('Plugin installed successfully!', 'success');
-            setTimeout(() => location.reload(), 1500);
-          } else {
-            throw new Error(result.error || 'Failed to install plugin');
-          }
-        } catch (error) {
-          showNotification(error.message, 'error');
-          button.disabled = false;
-          button.textContent = 'Install';
-        }
-      }
-
       async function togglePlugin(pluginId, action) {
         const button = event.target;
         const originalText = button.textContent;
@@ -273,28 +234,9 @@ export function renderPluginSettingsPage(data: PluginSettingsPageData): string {
         const form = document.getElementById('settings-form');
         const formData = new FormData(form);
         const isAuthPlugin = '${plugin.id}' === 'core-auth';
-        const isOAuthPlugin = '${plugin.id}' === 'oauth-providers';
         let settings = {};
 
-        if (isOAuthPlugin) {
-          // Build nested provider settings structure
-          const getVal = id => (document.getElementById(id) || {}).value || '';
-          const getChecked = id => !!(document.getElementById(id) || {}).checked;
-          settings = {
-            providers: {
-              github: {
-                clientId: getVal('oauth_github_clientId'),
-                clientSecret: getVal('oauth_github_clientSecret'),
-                enabled: getChecked('oauth_github_enabled'),
-              },
-              google: {
-                clientId: getVal('oauth_google_clientId'),
-                clientSecret: getVal('oauth_google_clientSecret'),
-                enabled: getChecked('oauth_google_enabled'),
-              },
-            }
-          };
-        } else if (isAuthPlugin) {
+        if (isAuthPlugin) {
           // Handle nested auth settings structure
           settings = {
             requiredFields: {},
@@ -412,15 +354,13 @@ function renderStatusBadge(status: string): string {
   const statusColors: Record<string, string> = {
     active: 'bg-green-900/50 text-green-300 border-green-600/30',
     inactive: 'bg-gray-800/50 text-gray-400 border-gray-600/30',
-    error: 'bg-red-900/50 text-red-300 border-red-600/30',
-    uninstalled: 'bg-zinc-800/50 text-zinc-400 border-zinc-600/30',
+    error: 'bg-red-900/50 text-red-300 border-red-600/30'
   }
 
   const statusIcons: Record<string, string> = {
     active: '<div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>',
     inactive: '<div class="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>',
-    error: '<div class="w-2 h-2 bg-red-400 rounded-full mr-2"></div>',
-    uninstalled: '<div class="w-2 h-2 bg-zinc-500 rounded-full mr-2"></div>',
+    error: '<div class="w-2 h-2 bg-red-400 rounded-full mr-2"></div>'
   }
 
   return `
@@ -431,15 +371,11 @@ function renderStatusBadge(status: string): string {
 }
 
 function renderToggleButton(plugin: any): string {
-  if (plugin.status === 'uninstalled') {
-    return `<button onclick="installPlugin('${plugin.name || plugin.id}')" class="bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">Install</button>`
-  }
-
   if (plugin.isCore) {
     return '<span class="text-sm text-gray-400">Core Plugin</span>'
   }
 
-  return plugin.status === 'active'
+  return plugin.status === 'active' 
     ? `<button onclick="togglePlugin('${plugin.id}', 'deactivate')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Deactivate</button>`
     : `<button onclick="togglePlugin('${plugin.id}', 'activate')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Activate</button>`
 }
@@ -844,7 +780,6 @@ type PluginSettingsRenderer = (plugin: any, settings: PluginSettings) => string
 const pluginSettingsComponents: Record<string, PluginSettingsRenderer> = {
   'otp-login': renderOTPLoginSettingsContent,
   'email': renderEmailSettingsContent,
-  'oauth-providers': renderOAuthProvidersSettingsContent,
 }
 
 /**
@@ -1594,66 +1529,6 @@ defineUserProfile({
       </div>
 
       ${fieldsTable}
-    </div>
-  `
-}
-
-/**
- * OAuth Providers plugin settings — renders GitHub and Google credential fields.
- * Settings are stored as { providers: { github: {...}, google: {...} } }.
- * The saveSettings() JS function handles the nested structure for oauth-providers.
- */
-function renderOAuthProvidersSettingsContent(plugin: any, settings: PluginSettings): string {
-  const providers = (settings.providers as Record<string, any>) || {}
-  const gh = providers.github || {}
-  const gg = providers.google || {}
-  const inputClass = 'backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full'
-
-  return `
-    <div class="space-y-6">
-      <form id="settings-form">
-        <div class="backdrop-blur-md bg-white/5 rounded-xl border border-white/10 p-6 space-y-6">
-          <h3 class="text-lg font-semibold text-white">GitHub OAuth</h3>
-          <div>
-            <label for="oauth_github_clientId" class="block text-sm font-medium text-gray-300 mb-2">Client ID</label>
-            <input type="text" id="oauth_github_clientId" name="oauth_github_clientId"
-              value="${escapeHtmlAttr(gh.clientId || '')}"
-              placeholder="GitHub OAuth App Client ID" class="${inputClass}" />
-          </div>
-          <div>
-            <label for="oauth_github_clientSecret" class="block text-sm font-medium text-gray-300 mb-2">Client Secret</label>
-            <input type="password" id="oauth_github_clientSecret" name="oauth_github_clientSecret"
-              value="${escapeHtmlAttr(gh.clientSecret || '')}"
-              placeholder="GitHub OAuth App Client Secret" class="${inputClass}" />
-          </div>
-          <div class="flex items-center gap-3">
-            <input type="checkbox" id="oauth_github_enabled" name="oauth_github_enabled"
-              ${gh.enabled ? 'checked' : ''} class="w-4 h-4 rounded border-white/10" />
-            <label for="oauth_github_enabled" class="text-sm text-gray-300">Enable GitHub login</label>
-          </div>
-        </div>
-
-        <div class="backdrop-blur-md bg-white/5 rounded-xl border border-white/10 p-6 space-y-6 mt-6">
-          <h3 class="text-lg font-semibold text-white">Google OAuth</h3>
-          <div>
-            <label for="oauth_google_clientId" class="block text-sm font-medium text-gray-300 mb-2">Client ID</label>
-            <input type="text" id="oauth_google_clientId" name="oauth_google_clientId"
-              value="${escapeHtmlAttr(gg.clientId || '')}"
-              placeholder="Google OAuth Client ID" class="${inputClass}" />
-          </div>
-          <div>
-            <label for="oauth_google_clientSecret" class="block text-sm font-medium text-gray-300 mb-2">Client Secret</label>
-            <input type="password" id="oauth_google_clientSecret" name="oauth_google_clientSecret"
-              value="${escapeHtmlAttr(gg.clientSecret || '')}"
-              placeholder="Google OAuth Client Secret" class="${inputClass}" />
-          </div>
-          <div class="flex items-center gap-3">
-            <input type="checkbox" id="oauth_google_enabled" name="oauth_google_enabled"
-              ${gg.enabled ? 'checked' : ''} class="w-4 h-4 rounded border-white/10" />
-            <label for="oauth_google_enabled" class="text-sm text-gray-300">Enable Google login</label>
-          </div>
-        </div>
-      </form>
     </div>
   `
 }

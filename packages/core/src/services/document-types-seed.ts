@@ -1,10 +1,8 @@
 import { D1Database } from '@cloudflare/workers-types'
 import { z } from 'zod'
 import { DocumentTypeRegistry } from './document-type-registry'
-import { DocumentsService } from './documents'
 import { getCollectionRegistry } from './collection-registry'
 import type { Permission } from '../schemas/document'
-import { createDocumentSchema } from '../schemas/document'
 
 // Passthrough schema: accepts any JSON object for POC types.
 // Individual fields are validated at the queryable-field level; the full
@@ -16,9 +14,6 @@ const anyObject = z.record(z.string(), z.unknown())
 // Each call is a no-op if the type already exists and the schema hasn't changed.
 export async function bootstrapDocumentTypes(db: D1Database): Promise<void> {
   const registry = new DocumentTypeRegistry(db)
-  // Pre-warm cache: 1 SELECT for all types instead of N individual SELECTs.
-  // register() will hit cache and early-return when schema is unchanged.
-  await registry.preloadAll()
 
   // Site settings: internal singleton config — never surfaced in content admin.
   await registry.register({
@@ -46,7 +41,6 @@ export async function bootstrapDocumentTypes(db: D1Database): Promise<void> {
     source: 'system',
     schema: anyObject,
     settings: {
-      versioning: true,
       baseGrants: { public: ['read'], admin: ['read', 'create', 'update', 'delete', 'publish', 'manage'], editor: ['read', 'create', 'update', 'publish'], viewer: ['read'] },
       maxVersionsPerRoot: 50,
     },
@@ -133,8 +127,7 @@ export async function bootstrapDocumentTypes(db: D1Database): Promise<void> {
       internal: true,
       maxVersionsPerRoot: 5,
       baseGrants: {
-        public: ['read'],
-        admin: ['read', 'create', 'update', 'delete', 'publish', 'manage'],
+        admin: ['read', 'create', 'update', 'delete', 'manage'],
         editor: ['read', 'create', 'update'],
         author: ['read', 'create'],
         viewer: ['read'],
@@ -236,37 +229,25 @@ export async function bootstrapDocumentTypes(db: D1Database): Promise<void> {
     ],
   })
 
-  // AI Search history + index metadata (document-backed; replace the legacy ai_search_history
-  // and ai_search_index_meta tables, which were never added to any migration — every write to
-  // them failed with `no such table` and was swallowed by the plugin's own error handling).
-  // No queryable fields: history is read by json_extract aggregate, and index metadata is keyed
-  // by slug (= collection id), which is already covered by idx_documents_unique_slug.
+  // Media asset: every file upload creates a media_asset document (document-authoritative).
+  // File bytes stay in R2; this document holds intrinsic metadata (dimensions, mime, r2Key…).
   await registry.register({
-    id: 'ai_search_history',
-    name: 'ai_search_history',
-    displayName: 'AI Search History',
-    description: 'Logged search queries, used for autocomplete suggestions and search analytics',
+    id: 'media_asset',
+    name: 'media_asset',
+    displayName: 'Media Asset',
+    description: 'Media file metadata (R2 object key + intrinsic properties; URL derived at read time)',
     source: 'system',
     schema: anyObject,
     settings: {
-      internal: true,
-      maxVersionsPerRoot: 1,
-      baseGrants: { admin: ['read', 'create', 'manage'] },
+      baseGrants: { public: ['read'], admin: ['read', 'create', 'update', 'delete', 'publish', 'manage'], editor: ['read', 'create', 'update'] },
+      maxVersionsPerRoot: 5,
     },
-  })
-
-  await registry.register({
-    id: 'ai_search_index_meta',
-    name: 'ai_search_index_meta',
-    displayName: 'AI Search Index Status',
-    description: 'Per-collection search index state (item counts, last sync, errors)',
-    source: 'system',
-    schema: anyObject,
-    settings: {
-      internal: true,
-      maxVersionsPerRoot: 1,
-      baseGrants: { admin: ['read', 'create', 'manage'] },
-    },
+    queryableFields: [
+      { name: 'mimeType', kind: 'scalar', type: 'text',    column: 'q_media_mime' },
+      { name: 'folder',   kind: 'scalar', type: 'text',    column: 'q_media_folder' },
+      { name: 'size',     kind: 'scalar', type: 'integer', column: 'q_media_size' },
+      { name: 'tags',     kind: 'facet',  type: 'text' },
+    ],
   })
 
   // ── RBAC (auth-owned). 3 document types replace 4 relational tables: ──────────
@@ -307,8 +288,6 @@ export async function bootstrapDocumentTypes(db: D1Database): Promise<void> {
  */
 export async function autoRegisterCollectionDocumentTypes(db: D1Database): Promise<string[]> {
   const registry = new DocumentTypeRegistry(db)
-  // Pre-warm cache so register() calls hit cache instead of doing N individual SELECTs.
-  await registry.preloadAll()
   const collections = getCollectionRegistry().listActive()
   const registered: string[] = []
 
@@ -341,7 +320,7 @@ export async function autoRegisterCollectionDocumentTypes(db: D1Database): Promi
           maxVersionsPerRoot: 50,
           ...(collection.versioning ? { versioning: true } : {}),
         },
-        queryableFields: collection.queryableFields ?? [],
+        queryableFields: [],
       })
       registered.push(collection.name)
     } catch (error) {
@@ -350,44 +329,4 @@ export async function autoRegisterCollectionDocumentTypes(db: D1Database): Promi
   }
 
   return registered
-}
-
-/**
- * Create starter content for fresh installs. Idempotent — skips if already present.
- * Must be called AFTER bootstrapDocumentTypes so the blog_post type exists.
- */
-export async function bootstrapDefaultContent(db: D1Database): Promise<void> {
-  const existing = await db
-    .prepare(
-      `SELECT id FROM documents WHERE type_id = 'blog_post' AND tenant_id = 'default' AND slug = 'welcome-to-sonicjs' AND is_current_draft = 1 LIMIT 1`
-    )
-    .first()
-  if (existing) return
-
-  const svc = new DocumentsService(db, {
-    queryableFields: [],
-    typeSchemaVersion: 1,
-    maxVersionsPerRoot: 50,
-    tenantId: 'default',
-    versioning: false,
-  })
-  await svc.create(
-    createDocumentSchema.parse({
-      typeId: 'blog_post',
-      tenantId: 'default',
-      locale: 'default',
-      title: 'Welcome to SonicJS',
-      slug: 'welcome-to-sonicjs',
-      data: {
-        title: 'Welcome to SonicJS',
-        slug: 'welcome-to-sonicjs',
-        content: '<p>Welcome to SonicJS. This first post confirms your default blog content is ready.</p>',
-        author: 'SonicJS Team',
-        difficulty: 'beginner',
-        excerpt: 'Welcome to SonicJS.',
-      },
-      publishOnCreate: true,
-    }),
-    'system'
-  )
 }

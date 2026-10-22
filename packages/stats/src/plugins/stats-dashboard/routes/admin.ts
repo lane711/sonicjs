@@ -67,9 +67,6 @@ adminRoutes.get('/', async (c) => {
     snapshotDocVolumeR,
     snapshotCountR,
     countryR,
-    demoLoginDailyR,
-    demoLoginTotalR,
-    deployUrlsR,
   ] = await Promise.all([
     // 1. Weekly funnel: started/completed/failed counts per week (keyed to Monday date)
     db.prepare(
@@ -132,14 +129,13 @@ adminRoutes.get('/', async (c) => {
        FROM documents WHERE ${EVENTS_WHERE} AND json_extract(data,'$.event_type')='installation_started'
        GROUP BY t ORDER BY count DESC`
     ).all(),
-    // 9. Install failures by errorType + step + version
+    // 9. Install failures by errorType
     db.prepare(
       `SELECT COALESCE(json_extract(data,'$.properties.errorType'), json_extract(data,'$.error_code'),'unknown') AS err,
-              COALESCE(json_extract(data,'$.properties.step'),'-') AS step,
-              COALESCE(json_extract(data,'$.properties.version'),'-') AS version,
+              COALESCE(json_extract(data,'$.step'),'-') AS step,
               COUNT(*) AS count
        FROM documents WHERE ${EVENTS_WHERE} AND json_extract(data,'$.event_type')='installation_failed'
-       GROUP BY err, step, version ORDER BY count DESC LIMIT 25`
+       GROUP BY err, step ORDER BY count DESC LIMIT 25`
     ).all(),
     // 10. Runtime errors (error_occurred) by errorType + version
     db.prepare(
@@ -149,31 +145,18 @@ adminRoutes.get('/', async (c) => {
        FROM documents WHERE ${EVENTS_WHERE} AND json_extract(data,'$.event_type')='error_occurred'
        GROUP BY err, version ORDER BY count DESC LIMIT 25`
     ).all(),
-    // 11. Collections from project_snapshot — union all collection_names arrays across all snapshots.
-    // Using collection_names (full list incl. 0-doc collections) rather than collection_counts keys.
-    // Each snapshot row is a distinct data point; dedup by installation_id is skipped because
-    // most existing rows carry installation_id='unknown' (KV binding bug, now fixed) so grouping
-    // by it would collapse many distinct installs into one.
+    // 11. Top collections from project_snapshot (aggregate doc counts across installations)
     db.prepare(
-      `SELECT value AS collection,
-              COUNT(*) AS snapshot_count
-       FROM documents, json_each(json(json_extract(data,'$.properties.collection_names')))
+      `SELECT key AS collection, SUM(CAST(value AS INTEGER)) AS total_docs, COUNT(DISTINCT json_extract(data,'$.properties.installation_id')) AS installations
+       FROM documents, json_each(json(json_extract(data,'$.properties.collection_counts')))
        WHERE ${EVENTS_WHERE} AND json_extract(data,'$.event_type')='project_snapshot'
-         AND json_extract(data,'$.properties.collection_names') IS NOT NULL
-       GROUP BY value ORDER BY snapshot_count DESC`
+       GROUP BY key ORDER BY total_docs DESC LIMIT 20`
     ).all(),
-    // 12. Top plugins from project_snapshot — latest snapshot per installation
+    // 12. Top plugins from project_snapshot (count appearances across installations)
     db.prepare(
-      `WITH latest AS (
-         SELECT json_extract(data,'$.properties.installation_id') AS installation_id,
-                json_extract(data,'$.properties.active_plugins') AS plugins_json
-         FROM documents
-         WHERE ${EVENTS_WHERE} AND json_extract(data,'$.event_type')='project_snapshot'
-         GROUP BY json_extract(data,'$.properties.installation_id')
-         HAVING created_at = MAX(created_at)
-       )
-       SELECT value AS plugin, COUNT(DISTINCT installation_id) AS installations
-       FROM latest, json_each(json(plugins_json))
+      `SELECT value AS plugin, COUNT(DISTINCT json_extract(data,'$.properties.installation_id')) AS installations
+       FROM documents, json_each(json(json_extract(data,'$.properties.active_plugins')))
+       WHERE ${EVENTS_WHERE} AND json_extract(data,'$.event_type')='project_snapshot'
        GROUP BY value ORDER BY installations DESC LIMIT 20`
     ).all(),
     // 13. Field type histogram aggregated across all snapshots
@@ -218,27 +201,6 @@ adminRoutes.get('/', async (c) => {
        FROM documents WHERE ${EVENTS_WHERE}
        GROUP BY country ORDER BY installs DESC LIMIT 30`
     ).all(),
-    // 18. Daily demo login counts (last 30 days)
-    db.prepare(
-      `SELECT date(datetime(created_at, 'unixepoch')) AS day, COUNT(*) AS count
-       FROM documents WHERE ${EVENTS_WHERE}
-         AND json_extract(data,'$.event_type') = 'demo_login'
-         AND created_at >= unixepoch('now', '-30 days')
-       GROUP BY day ORDER BY day ASC`
-    ).all(),
-    // 19. Total demo logins all time
-    db.prepare(
-      `SELECT COUNT(*) AS total FROM documents WHERE ${EVENTS_WHERE}
-         AND json_extract(data,'$.event_type') = 'demo_login'`
-    ).first(),
-    // 20. Deploy URLs seen in project_snapshot events
-    db.prepare(
-      `SELECT json_extract(data,'$.properties.deploy_url') AS url, COUNT(*) AS snapshots
-       FROM documents WHERE ${EVENTS_WHERE} AND json_extract(data,'$.event_type')='project_snapshot'
-         AND json_extract(data,'$.properties.deploy_url') IS NOT NULL
-         AND json_extract(data,'$.properties.deploy_url') != 'null'
-       GROUP BY url ORDER BY snapshots DESC`
-    ).all(),
   ])
 
   // ── Funnel aggregation ──────────────────────────────────────────────────
@@ -266,7 +228,7 @@ adminRoutes.get('/', async (c) => {
     const s = t.get('installation_started') ?? 0
     const comp = t.get('installation_completed') ?? 0
     const f = t.get('installation_failed') ?? 0
-    return { week: w, started: s, completed: comp, failed: f, rate: s > 0 ? Math.round((comp / s) * 100) : 0, avgPerDay: (comp / 7).toFixed(1) }
+    return { week: w, started: s, completed: comp, failed: f, rate: s > 0 ? Math.round((comp / s) * 100) : 0 }
   })
 
   // ── Totals / KPIs ──────────────────────────────────────────────────────
@@ -303,11 +265,11 @@ adminRoutes.get('/', async (c) => {
     count: Number(r.count),
   }))
   const templateRows = rowsOf(templateR) as { t: string; count: number }[]
-  const installFailRows = rowsOf(installFailR) as { err: string; step: string; version: string; count: number }[]
+  const installFailRows = rowsOf(installFailR) as { err: string; step: string; count: number }[]
   const runtimeErrRows = rowsOf(runtimeErrR) as { err: string; version: string; count: number }[]
 
   // ── Project snapshot breakdowns ─────────────────────────────────────────
-  const snapshotCollectionRows = rowsOf(snapshotCollectionsR) as { collection: string; snapshot_count: number }[]
+  const snapshotCollectionRows = rowsOf(snapshotCollectionsR) as { collection: string; total_docs: number; installations: number }[]
   const snapshotPluginRows = rowsOf(snapshotPluginsR) as { plugin: string; installations: number }[]
   const snapshotFieldTypeRows = rowsOf(snapshotFieldTypesR) as { field_type: string; total_fields: number }[]
   const snapshotVersionRows = rowsOf(snapshotVersionR) as { version: string; installations: number }[]
@@ -318,14 +280,6 @@ adminRoutes.get('/', async (c) => {
   // ── Country breakdown ────────────────────────────────────────────────────
   const countryRows = (rowsOf(countryR) as { country: string; installs: number }[]).filter((r) => r.country !== 'unknown')
 
-  // ── Deploy URLs ──────────────────────────────────────────────────────────
-  const deployUrlRows = rowsOf(deployUrlsR) as { url: string; snapshots: number }[]
-
-  // ── Demo logins ──────────────────────────────────────────────────────────
-  const demoLoginDailyRows = rowsOf(demoLoginDailyR) as { day: string; count: number }[]
-  const demoLoginTotal = Number((demoLoginTotalR as Row | null)?.total ?? 0)
-  const demoLogin30d = demoLoginDailyRows.reduce((s, r) => s + Number(r.count), 0)
-
   // ── Chart datasets (serialized) ─────────────────────────────────────────
   const charts = {
     trend: { labels: trendLabels.map(fmtWeekDate), weekly: trendCounts, cumulative: trendCumulative },
@@ -335,13 +289,12 @@ adminRoutes.get('/', async (c) => {
     os: { labels: osRows.map((r) => r.os), data: osRows.map((r) => Number(r.count)) },
     node: { labels: nodeRows.map((r) => r.v), data: nodeRows.map((r) => r.count) },
     template: { labels: templateRows.map((r) => r.t), data: templateRows.map((r) => Number(r.count)) },
-    collections: { labels: snapshotCollectionRows.slice(0, 20).map((r) => r.collection), data: snapshotCollectionRows.slice(0, 20).map((r) => Number(r.snapshot_count)) },
+    collections: { labels: snapshotCollectionRows.map((r) => r.collection), docs: snapshotCollectionRows.map((r) => Number(r.total_docs)), installs: snapshotCollectionRows.map((r) => Number(r.installations)) },
     plugins: { labels: snapshotPluginRows.map((r) => r.plugin), data: snapshotPluginRows.map((r) => Number(r.installations)) },
     fieldTypes: { labels: snapshotFieldTypeRows.map((r) => r.field_type), data: snapshotFieldTypeRows.map((r) => Number(r.total_fields)) },
     versions: { labels: snapshotVersionRows.map((r) => r.version), data: snapshotVersionRows.map((r) => Number(r.installations)) },
     docVolume: { labels: snapshotDocVolumeRows.map((r) => r.bucket), data: snapshotDocVolumeRows.map((r) => Number(r.count)) },
     country: { labels: countryRows.map((r) => r.country), data: countryRows.map((r) => Number(r.installs)) },
-    demoLogin: { labels: demoLoginDailyRows.map((r) => r.day), data: demoLoginDailyRows.map((r) => Number(r.count)) },
   }
 
   // ── KPI card markup ─────────────────────────────────────────────────────
@@ -417,39 +370,6 @@ adminRoutes.get('/', async (c) => {
     ${card('Country', 'Unique installs by country (CF-IPCountry, no PII)', countryRows.length > 0 ? '<canvas id="chartCountry" height="280"></canvas>' : '<div class="py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">No country data yet — will populate for new events.</div>')}
   </div>
 
-  <!-- Demo Site Logins -->
-  <div>
-    <h2 class="text-xl font-semibold text-zinc-950 dark:text-white">Demo Site Logins</h2>
-    <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Logins with demo credentials (admin@sonicjs.com) on the live demo site</p>
-  </div>
-  <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-    ${kpi('Total Logins', demoLoginTotal.toLocaleString(), 'all time', 'text-indigo-600 dark:text-indigo-400')}
-    ${kpi('Last 30 Days', demoLogin30d.toLocaleString(), 'daily breakdown below', 'text-emerald-600 dark:text-emerald-400')}
-  </div>
-  <div class="grid grid-cols-1 gap-6">
-    ${card('Daily Demo Logins', 'Last 30 days', demoLoginDailyRows.length > 0 ? '<canvas id="chartDemoLogin" height="200"></canvas>' : '<div class="py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">No demo login events yet.</div>')}
-  </div>
-
-  <!-- Deploy URLs -->
-  ${deployUrlRows.length > 0 ? card('Deployed Sites', `${deployUrlRows.length} unique domain${deployUrlRows.length !== 1 ? 's' : ''} reporting snapshots`, `
-    <div class="overflow-x-auto max-h-64 overflow-y-auto"><table class="w-full text-sm">
-      <thead class="sticky top-0 bg-white dark:bg-zinc-900 text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-        <tr>
-          <th class="py-2 text-left font-medium">Domain</th>
-          <th class="py-2 text-right font-medium">Snapshots</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-zinc-950/5 dark:divide-white/5">
-      ${deployUrlRows.map((r) => `<tr>
-        <td class="py-1.5 font-mono text-sm text-zinc-700 dark:text-zinc-300">
-          <a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-600 dark:hover:text-indigo-400">${esc(r.url)}</a>
-        </td>
-        <td class="py-1.5 text-right text-zinc-500 dark:text-zinc-400">${Number(r.snapshots).toLocaleString()}</td>
-      </tr>`).join('')}
-      </tbody>
-    </table></div>
-  `) : ''}
-
   <!-- Weekly table -->
   ${card('Weekly Breakdown', 'Detailed funnel by week', tableWeeks.length === 0 ? '<div class="py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">No data yet.</div>' : `
     <div class="overflow-x-auto"><table class="w-full text-sm">
@@ -458,7 +378,6 @@ adminRoutes.get('/', async (c) => {
           <th class="py-2 text-left font-medium">Week</th>
           <th class="py-2 text-right font-medium">Started</th>
           <th class="py-2 text-right font-medium">Completed</th>
-          <th class="py-2 text-right font-medium">Avg/day</th>
           <th class="py-2 text-right font-medium">Failed</th>
           <th class="py-2 text-right font-medium">Completion %</th>
         </tr>
@@ -468,7 +387,6 @@ adminRoutes.get('/', async (c) => {
         <td class="py-2 font-mono text-zinc-700 dark:text-zinc-300">${fmtWeekDate(r.week)}</td>
         <td class="py-2 text-right text-zinc-700 dark:text-zinc-300">${r.started.toLocaleString()}</td>
         <td class="py-2 text-right text-emerald-600 dark:text-emerald-400 font-medium">${r.completed.toLocaleString()}</td>
-        <td class="py-2 text-right text-zinc-500 dark:text-zinc-400">${r.avgPerDay}</td>
         <td class="py-2 text-right ${r.failed > 0 ? 'text-red-600 dark:text-red-400' : 'text-zinc-400'}">${r.failed.toLocaleString()}</td>
         <td class="py-2 text-right"><span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${r.rate >= 70 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : r.rate >= 40 ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400'}">${r.rate}%</span></td>
       </tr>`).join('')}
@@ -476,20 +394,7 @@ adminRoutes.get('/', async (c) => {
 
   <!-- Errors -->
   <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-    ${card('Install Failures', 'installation_failed grouped by error + step + version', installFailRows.length === 0
-      ? '<div class="py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">No failures recorded.</div>'
-      : `<div class="overflow-x-auto"><table class="w-full text-sm">
-          <thead class="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-            <tr><th class="py-2 text-left font-medium">Error</th><th class="py-2 text-left font-medium">Step</th><th class="py-2 text-left font-medium">Version</th><th class="py-2 text-right font-medium">Count</th></tr>
-          </thead>
-          <tbody class="divide-y divide-zinc-950/5 dark:divide-white/5">
-          ${installFailRows.map((r) => `<tr>
-            <td class="py-2 pr-4 text-zinc-700 dark:text-zinc-300 max-w-xs break-words">${esc(r.err)}</td>
-            <td class="py-2 pr-4 font-mono text-xs text-zinc-500 dark:text-zinc-400">${esc(r.step)}</td>
-            <td class="py-2 pr-4 font-mono text-xs text-zinc-500 dark:text-zinc-400">${esc(r.version)}</td>
-            <td class="py-2 text-right font-semibold text-red-600 dark:text-red-400">${Number(r.count).toLocaleString()}</td>
-          </tr>`).join('')}
-          </tbody></table></div>`)}
+    ${card('Install Failures', 'installation_failed grouped by error + step', errTable(installFailRows.map((r) => ({ err: r.err, sub: r.step, count: Number(r.count) })), 'Step', 'No failures recorded.'))}
     ${card('Runtime Errors', 'error_occurred grouped by error + version', errTable(runtimeErrRows.map((r) => ({ err: r.err, sub: r.version, count: Number(r.count) })), 'Version', 'No runtime errors recorded.'))}
   </div>
 
@@ -521,52 +426,20 @@ adminRoutes.get('/', async (c) => {
     ${card('Content Volume', 'Distribution of total doc counts per installation', hasSnapshotData ? '<canvas id="chartDocVolume" height="240"></canvas>' : '<div class="py-12 text-center text-sm text-zinc-400 dark:text-zinc-500">No data yet</div>')}
   </div>
 
-  ${hasSnapshotData ? (() => {
-    // System/built-in collections that ship with every SonicJS install or template.
-    // Everything else is user-defined.
-    const SYSTEM_COLLECTIONS = new Set([
-      'menu_item', 'plugin', 'plugin_activity',
-      'rbac_role', 'rbac_verb', 'rbac_user_roles',
-      'content', 'media',
-    ])
-    const customCollections = snapshotCollectionRows.filter((r) => !SYSTEM_COLLECTIONS.has(r.collection))
-    return `
-  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-    ${card('All Collections', `${snapshotCollectionRows.length} unique collection names seen across all snapshots`, `
-      <div class="overflow-x-auto max-h-96 overflow-y-auto"><table class="w-full text-sm">
-        <thead class="sticky top-0 bg-white dark:bg-zinc-900 text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-          <tr>
-            <th class="py-2 text-left font-medium">Collection</th>
-            <th class="py-2 text-right font-medium">Snapshots</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-zinc-950/5 dark:divide-white/5">
-        ${snapshotCollectionRows.map((r) => `<tr>
-          <td class="py-1.5 font-mono text-sm ${SYSTEM_COLLECTIONS.has(r.collection) ? 'text-zinc-400 dark:text-zinc-500' : 'text-zinc-700 dark:text-zinc-300'}">${esc(r.collection)}${SYSTEM_COLLECTIONS.has(r.collection) ? ' <span class="text-xs text-zinc-400">sys</span>' : ''}</td>
-          <td class="py-1.5 text-right font-semibold text-indigo-600 dark:text-indigo-400">${Number(r.snapshot_count).toLocaleString()}</td>
-        </tr>`).join('')}
-        </tbody>
-      </table></div>
-    `)}
-    ${card(`Custom Collections <span class="ml-2 text-xs font-normal text-zinc-400">${customCollections.length} unique</span>`, 'Non-system collections — user-defined schemas', customCollections.length === 0
-      ? '<div class="py-12 text-center text-sm text-zinc-400 dark:text-zinc-500">None yet</div>'
-      : `<div class="overflow-x-auto max-h-96 overflow-y-auto"><table class="w-full text-sm">
-        <thead class="sticky top-0 bg-white dark:bg-zinc-900 text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-          <tr>
-            <th class="py-2 text-left font-medium">Collection</th>
-            <th class="py-2 text-right font-medium">Snapshots</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-zinc-950/5 dark:divide-white/5">
-        ${customCollections.map((r) => `<tr>
-          <td class="py-1.5 font-mono text-sm text-emerald-700 dark:text-emerald-400">${esc(r.collection)}</td>
-          <td class="py-1.5 text-right text-zinc-500 dark:text-zinc-400">${Number(r.snapshot_count).toLocaleString()}</td>
-        </tr>`).join('')}
-        </tbody>
-      </table></div>`
-    )}
-  </div>`
-  })() : ''}
+  ${hasSnapshotData ? card('Collections Detail', 'Collections appearing across projects — doc count + number of installs using it', `
+    <div class="overflow-x-auto"><table class="w-full text-sm">
+      <thead class="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+        <tr><th class="py-2 text-left font-medium">Collection</th><th class="py-2 text-right font-medium">Total Docs</th><th class="py-2 text-right font-medium">Installations</th></tr>
+      </thead>
+      <tbody class="divide-y divide-zinc-950/5 dark:divide-white/5">
+      ${snapshotCollectionRows.slice(0, 15).map((r) => `<tr>
+        <td class="py-2 font-mono text-zinc-700 dark:text-zinc-300">${esc(r.collection)}</td>
+        <td class="py-2 text-right font-semibold text-zinc-900 dark:text-white">${Number(r.total_docs).toLocaleString()}</td>
+        <td class="py-2 text-right text-zinc-500 dark:text-zinc-400">${Number(r.installations).toLocaleString()}</td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>
+  `) : ''}
 </div>
 
 <script>
@@ -641,8 +514,9 @@ adminRoutes.get('/', async (c) => {
   // What people build — project_snapshot charts
   if (D.collections && D.collections.labels.length) {
     bar('chartCollections', D.collections.labels, [
-      { label: 'Snapshots', data: D.collections.data, backgroundColor: P[0] }
-    ], { horizontal: true, legend: false });
+      { label: 'Total Docs', data: D.collections.docs, backgroundColor: P[0] },
+      { label: 'Installations', data: D.collections.installs, backgroundColor: P[1] }
+    ], { horizontal: true });
   }
   if (D.plugins && D.plugins.labels.length) {
     bar('chartPlugins', D.plugins.labels, [
@@ -660,13 +534,6 @@ adminRoutes.get('/', async (c) => {
       { label: 'Installations', data: D.docVolume.data, backgroundColor: P[2] }
     ], { legend: false });
   }
-
-  // Demo logins
-  if (D.demoLogin && D.demoLogin.labels.length) {
-    bar('chartDemoLogin', D.demoLogin.labels, [
-      { label: 'Logins', data: D.demoLogin.data, backgroundColor: P[0] }
-    ], { legend: false });
-  }
 })();
 </script>`
 
@@ -679,8 +546,6 @@ adminRoutes.get('/', async (c) => {
       user: user
         ? { name: user.email.split('@')[0] || 'Admin', email: user.email, role: user.role }
         : undefined,
-      // Chart.js is not in the shared layout — this page charts, so it asks for it.
-      scripts: ['https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js'],
       content,
       dynamicMenuItems: c.get('pluginMenuItems'),
     })

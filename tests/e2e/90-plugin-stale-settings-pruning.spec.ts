@@ -1,4 +1,4 @@
-import { test, expect } from './fixtures'
+import { test, expect } from '@playwright/test'
 import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers'
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8787'
@@ -11,7 +11,7 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:8787'
 // We inject a stale key 'oldField' via the JSON settings endpoint, then verify
 // it does NOT appear in the legacy settings UI and is pruned when saving via /configure.
 
-test.describe('Plugin stale settings pruning (issue #972) @plugins @lock-plugin-hello-world', () => {
+test.describe('Plugin stale settings pruning (issue #972)', () => {
   test.beforeEach(async ({ page }) => {
     await ensureAdminUserExists(page)
     await loginAsAdmin(page)
@@ -57,17 +57,11 @@ test.describe('Plugin stale settings pruning (issue #972) @plugins @lock-plugin-
     const greetingInput = page.locator('input[name="greeting"]')
     await expect(greetingInput).toBeVisible({ timeout: 10000 })
     await greetingInput.fill('After prune')
-    // POST /admin/plugins/:id/configure redirects back to /configure, the page it was submitted
-    // from, so `waitForURL('**/configure')` is true before the click dispatches. The assertion
-    // below then read back the value `fill()` had just typed and passed without anything being
-    // saved. Wait for the POST, then reload so the input is re-rendered from the database.
-    await Promise.all([
-      page.waitForResponse(
-        (r) => r.request().method() === 'POST' && r.url().includes('/configure')
-      ),
-      page.locator('button[type="submit"]').click(),
-    ])
-    await page.reload({ waitUntil: 'networkidle' })
+    await page.locator('button[type="submit"]').click()
+
+    // Redirect back to /configure after save
+    await page.waitForURL(`**/configure`, { timeout: 10000 })
+    await page.waitForLoadState('networkidle')
 
     // Step 3: verify saved greeting persisted
     const savedInput = page.locator('input[name="greeting"]')

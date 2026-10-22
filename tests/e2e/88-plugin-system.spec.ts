@@ -8,12 +8,12 @@
  * - Hook event paths exist (content create endpoint, auth registration endpoint)
  * - configSchema form renders on the plugins admin page
  */
-import { test, expect } from './fixtures'
+import { test, expect } from '@playwright/test'
 import { loginAsAdmin } from './utils/test-helpers'
 
 const BASE = process.env.BASE_URL || 'http://localhost:8787'
 
-test.describe('Plugin system @plugins @lock-plugin-hello-world @lock-auth-registration', () => {
+test.describe('Plugin system', () => {
   test('hello-world plugin route accessible after login', async ({ page }) => {
     await loginAsAdmin(page)
     const res = await page.goto('/admin/hello-world')
@@ -39,6 +39,33 @@ test.describe('Plugin system @plugins @lock-plugin-hello-world @lock-auth-regist
     // A successful response from the root proves all plugins validated
     const res = await request.get('/')
     expect(res.status()).toBeLessThan(500)
+  })
+
+  test('content:after:create hook path — document write endpoint exists', async ({ request }) => {
+    // Sign in via Better Auth (path is /auth/sign-in/email, NOT /api/auth/sign-in/email)
+    const signIn = await request.post('/auth/sign-in/email', {
+      headers: { 'Content-Type': 'application/json', Origin: BASE },
+      data: { email: 'admin@sonicjs.com', password: 'sonicjs!' },
+    })
+    expect(signIn.status()).toBe(200)
+
+    const body = await signIn.json()
+    const token = body?.token as string | undefined
+
+    expect(token, 'sign-in must return a token').toBeTruthy()
+    if (!token) return
+
+    // Attempt document creation (triggers content:after:create hook if type exists)
+    // 400/404/422 = type not registered or bad payload; app still didn't crash
+    const create = await request.post('/api/v1/documents', {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        Origin: BASE,
+      },
+      data: { type: 'post', data: { title: 'Hook test' } },
+    })
+    expect([200, 201, 400, 404, 422]).toContain(create.status())
   })
 
   test('auth:registration:completed hook path — sign-up endpoint exists', async ({ request }) => {

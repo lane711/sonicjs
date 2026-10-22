@@ -1,12 +1,10 @@
-import { test, expect } from './fixtures'
+import { test, expect } from '@playwright/test'
 import { loginAsAdmin, TEST_ORIGIN } from './utils/test-helpers'
 
-// `e2e_test` is the only collection with a `json`-typed field (`metadata`), which is the field
-// this spec is about — `blog_post` has no json field, so its edit form renders no viewer at all.
 const COLLECTION = 'e2e_test'
 const SAMPLE_JSON = { version: 1, tags: ['a', 'b'], nested: { active: true } }
 
-test.describe('JSON field viewer @database', () => {
+test.describe('JSON field viewer', () => {
   let contentId: string
 
   test.beforeAll(async ({ browser }) => {
@@ -128,10 +126,9 @@ test.describe('JSON field viewer @database', () => {
     await toggleBtn.click()
     await expect(toggleBtn).toHaveText('Edit JSON')
 
-    // Submit the form (content form action buttons are Save / Save & close / Publish)
-    await page.locator('button[name="action"][value="save"]').first().click()
-    await page.waitForLoadState('domcontentloaded')
-    await expect(page.locator('[data-json-toggle]').first()).toBeVisible({ timeout: 15000 })
+    // Submit the form
+    await page.getByRole('button', { name: /update/i }).click()
+    await page.waitForLoadState('networkidle')
 
     // Re-open and verify persisted
     await page.goto(`${TEST_ORIGIN}/admin/content/${contentId}/edit`)

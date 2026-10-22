@@ -1,7 +1,7 @@
-import { test, expect } from './fixtures';
+import { test, expect } from '@playwright/test';
 import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers';
 
-test.describe('Block Media Persistence @content @media', () => {
+test.describe('Block Media Persistence', () => {
   let uploadedFileId: string | undefined;
 
   test.beforeEach(async ({ page, context }) => {
@@ -55,11 +55,13 @@ test.describe('Block Media Persistence @content @media', () => {
     let createdContentId: string | null = null;
     const title = `Block Media ${Date.now()}`;
     const slug = `block-media-${Date.now()}`;
-    // `e2e_test` is registered in code at bootstrap (`registerCollections`), so the form has a
-    // direct URL. Going through the collection picker meant a missing or slow-to-render link
-    // reported itself as `test.skip(true, 'E2E Test collection not available')` — a green run for
-    // a page that never loaded.
-    await page.goto('/admin/content/new?collection=e2e_test');
+    await page.goto('/admin/content/new');
+    const e2eTestLink = page.locator('a[href^="/admin/content/new?collection="]').filter({ hasText: 'E2E Test' });
+    const hasE2eTest = await e2eTestLink.isVisible().catch(() => false);
+    expect(hasE2eTest, 'E2E Test collection must be available').toBe(true);
+
+    await e2eTestLink.click();
+    await page.waitForLoadState('networkidle');
     await expect(page.locator('form#content-form')).toBeVisible();
 
     await page.fill('input[name="title"]', title);
@@ -81,7 +83,7 @@ test.describe('Block Media Persistence @content @media', () => {
     }
     await ctaPrimaryLabelInput.fill('Primary CTA');
 
-    const imageField = firstBlock.locator('[data-block-field="backgroundImage"]');
+    const imageField = firstBlock.locator('[data-block-field="image"]');
     const selectMediaButton = imageField.locator('button:has-text("Select Media")');
     await expect(selectMediaButton).toBeVisible();
     await selectMediaButton.click();
@@ -94,7 +96,7 @@ test.describe('Block Media Persistence @content @media', () => {
     const hiddenInput = imageField.locator('input[type="hidden"]');
     await expect(hiddenInput).not.toHaveValue('');
 
-    await page.click('button[name="action"][value="save"]');
+    await page.click('button[name="action"][value="save_and_publish"]');
     await page.waitForURL(/\/admin\/content\/[^/]+\/edit|\/admin\/content\?/, { timeout: 15000 });
 
     try {
@@ -113,7 +115,7 @@ test.describe('Block Media Persistence @content @media', () => {
       }
 
       const reloadedBlock = page.locator('[data-field-name="body"] .blocks-item').first();
-      const reloadedHiddenInput = reloadedBlock.locator('[data-block-field="backgroundImage"] input[type="hidden"]');
+      const reloadedHiddenInput = reloadedBlock.locator('[data-block-field="image"] input[type="hidden"]');
       await expect(reloadedHiddenInput).not.toHaveValue('');
     } finally {
       if (!createdContentId) {

@@ -113,23 +113,10 @@ const ACCORDION_SCRIPT = `
   })
 </script>`
 
-/**
- * Is the menu plugin active for this request?
- *
- * `pluginMenuMiddleware` runs just before this one on `/admin` and already resolved the active
- * plugin slugs, `menu` included, so the common path is a Set lookup rather than a third copy of
- * the same query on every HTML admin response. The direct read stays as the fallback for callers
- * that mount this middleware on its own.
- */
-async function isMenuPluginActive(
-  c: Context<{ Bindings: Bindings; Variables: Variables }>,
-): Promise<boolean> {
-  const resolved = c.get('activePluginSlugs')
-  if (resolved instanceof Set) return resolved.has('menu')
-
+async function isMenuPluginActive(db: any): Promise<boolean> {
   try {
     // Plugins live in documents (type_id='plugin', slug=pluginId) — not the legacy plugins table
-    const row = await c.env.DB
+    const row = await db
       .prepare(
         `SELECT json_extract(data, '$.status') AS status
          FROM documents
@@ -158,7 +145,7 @@ export function menuMiddleware() {
     if (!c.res.headers.get('content-type')?.includes('text/html')) return
 
     // Revert to hardcoded sidebar when plugin is explicitly disabled
-    if (!(await isMenuPluginActive(c))) return
+    if (!(await isMenuPluginActive(c.env.DB))) return
 
     let items: Awaited<ReturnType<typeof listMenuItems>> = []
     try {

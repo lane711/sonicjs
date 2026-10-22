@@ -94,10 +94,6 @@ export type { EmailLogRow } from './services/email/types'
 export { emailReconciliationPlugin } from './plugins/core-plugins/email-reconciliation'
 export { redirectPlugin, createRedirectPlugin } from './plugins/redirect-management'
 export { helloWorldPlugin, createHelloWorldPlugin } from './plugins/core-plugins/hello-world-plugin'
-export { demoLoginPlugin } from './plugins/core-plugins/demo-login'
-export { versioningPlugin, createVersioningPlugin } from './plugins/core-plugins/versioning-plugin'
-export { graphqlPlugin } from './plugins/core-plugins/graphql-plugin'
-export type { GraphqlConfigInput, GraphqlConfig } from './plugins/core-plugins/graphql-plugin'
 
 // ============================================================================
 // Placeholders - To be populated in Phase 2
@@ -376,10 +372,6 @@ export { OAuthService, BUILT_IN_PROVIDERS } from './plugins/core-plugins/oauth-p
 // User Profiles Plugin
 export { userProfilesPlugin, createUserProfilesPlugin, defineUserProfile, getUserProfileConfig } from './plugins/core-plugins/user-profiles'
 export type { ProfileFieldDefinition, UserProfileConfig } from './plugins/core-plugins/user-profiles'
-
-// MCP Server Plugin (opt-in)
-export { mcpPlugin, createMcpPlugin } from './plugins/core-plugins/mcp-plugin'
-export type { McpConfigInput, McpConfig } from './plugins/core-plugins/mcp-plugin'
 
 // ============================================================================
 // Version

@@ -1,6 +1,6 @@
-import { test, expect } from './fixtures'
+import { test, expect } from '@playwright/test'
 
-test.describe('POST /auth/login returns token @smoke @auth @lock-auth-login', () => {
+test.describe('POST /auth/login returns token', () => {
   test.beforeAll(async ({ request }) => {
     await request.post('/auth/seed-admin')
   })

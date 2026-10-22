@@ -12,31 +12,11 @@ import { getEmailService, hasEmailService } from '../services/email/email-servic
 import { authValidationService, isRegistrationEnabled, isFirstUserRegistration } from '../services/auth-validation'
 import type { RegistrationData } from '../services/auth-validation'
 import type { Bindings, Variables } from '../app'
-import type { KVNamespace } from '@cloudflare/workers-types'
 import { getUserProfileConfig, getRegistrationFields, getProfileFieldDefaults, sanitizeCustomData, saveCustomData, getCustomData } from '../plugins/core-plugins/user-profiles'
 import { dispatchHookEvent } from '../plugins/hooks/dispatch-event'
 import { RbacService } from '../services/rbac'
-import { syncCredentialPassword } from '../auth/credential-account'
-import { bootstrapDocumentTypes } from '../services/document-types-seed'
-import { isDemoModeActive } from '../services/demo-mode'
 
 const JWT_SECRET_FALLBACK = 'your-super-secret-jwt-key-change-in-production'
-
-const DEMO_EMAIL = 'admin@sonicjs.com'
-const STATS_EVENTS_ENDPOINT = 'https://stats.sonicjs.com/v1/events'
-
-async function trackDemoLogin(kv: KVNamespace | undefined): Promise<void> {
-  try {
-    const installationId = (await kv?.get('_sonicjs_installation_id')) ?? 'demo-unknown'
-    await fetch(STATS_EVENTS_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        data: { installation_id: installationId, event_type: 'demo_login', properties: {}, timestamp: new Date().toISOString() }
-      }),
-    })
-  } catch { /* silent — telemetry never blocks auth */ }
-}
 
 /** Minimal, dependency-free HTML body for the password-reset email. */
 function renderPasswordResetEmail(resetLink: string, firstName?: string): string {
@@ -97,8 +77,17 @@ authRoutes.get('/login', async (c) => {
     redirect: redirect && redirect.startsWith('/') ? redirect : undefined,
   }
   
-  // Check if demo login plugin is active (set by demoLoginPlugin.onBoot at bootstrap)
-  const demoLoginActive = isDemoModeActive()
+  // Check if demo login plugin is active
+  const db = c.env.DB
+  let demoLoginActive = false
+  try {
+    const plugin = await db.prepare('SELECT * FROM plugins WHERE id = ? AND status = ?')
+      .bind('demo-login-prefill', 'active')
+      .first()
+    demoLoginActive = !!plugin
+  } catch (error) {
+    // Ignore database errors - plugin system might not be initialized
+  }
   
   return c.html(renderLoginPage(pageData, demoLoginActive))
 })
@@ -286,7 +275,7 @@ authRoutes.post('/login',
       const normalizedEmail = email.toLowerCase()
 
       const { createAuth } = await import('../auth/config')
-      const auth = createAuth(c.env, undefined, new URL(c.req.url).origin)
+      const auth = createAuth(c.env)
 
       const baReq = new Request(new URL('/auth/sign-in/email', c.req.url).href, {
         method: 'POST',
@@ -300,47 +289,18 @@ authRoutes.post('/login',
       }
 
       // Forward BA session cookie(s) to client.
-      // Use c.header() so headers survive into the c.json() response (c.res.headers mutations are discarded).
-      // Prefer getSetCookie() — headers.get('set-cookie') joins multiple cookies with ',' which corrupts them.
-      if ((baRes.headers as any).getSetCookie) {
+      const rawSetCookie = baRes.headers.get('set-cookie')
+      if (rawSetCookie) {
+        c.res.headers.append('Set-Cookie', rawSetCookie)
+      } else if ((baRes.headers as any).getSetCookie) {
         for (const sc of (baRes.headers as any).getSetCookie()) {
-          c.header('Set-Cookie', sc, { append: true })
-        }
-      } else {
-        const rawSetCookie = baRes.headers.get('set-cookie')
-        if (rawSetCookie) {
-          c.header('Set-Cookie', rawSetCookie, { append: true })
+          c.res.headers.append('Set-Cookie', sc)
         }
       }
 
       await setCsrfCookie(c)
 
       const baBody = await baRes.json() as any
-
-      // Second factor pending. Better Auth answers a 2FA challenge with HTTP **200** and a body
-      // of `{twoFactorRedirect:true}` — no `user`, no `token`, and it deletes the session it had
-      // just created. So `baRes.ok` above is TRUE and this is NOT a credential failure.
-      //
-      // This must be handled before the JWT mint below. `baBody.user` is absent here, so
-      // `generateToken(undefined, undefined, 'viewer', …)` would sign a token for a
-      // non-existent principal, set it as `auth_token`, and hand it back as `token` — and
-      // app.ts's Bearer-JWT fallback would then populate `c.get('user')` with
-      // `{userId: undefined}`, which `requireAuth()` accepts because the object is truthy.
-      //
-      // 200, not 401: the credentials were correct, and a 401 would teach API clients to
-      // re-prompt for the password. BA's signed challenge cookie has already been forwarded onto
-      // this response by the Set-Cookie loop above, which is what /auth/two-factor/verify-totp
-      // needs in order to resolve the challenge.
-      if (baBody?.twoFactorRedirect === true) {
-        return c.json({
-          twoFactorRequired: true,
-          // BA only ever reports 'totp'/'otp' here — never 'backup_code'. A client must offer
-          // backup-code entry unconditionally rather than keying off this list.
-          twoFactorMethods: baBody.twoFactorMethods ?? [],
-          redirectTo: '/auth/two-factor',
-        })
-      }
-
       const user = baBody.user ?? {}
 
       // Mint a JWT so API callers can use Bearer token auth (same as /register)
@@ -359,10 +319,6 @@ authRoutes.post('/login',
         sameSite: 'Strict',
         maxAge: tokenTtl,
       })
-
-      if (normalizedEmail === DEMO_EMAIL) {
-        c.executionCtx?.waitUntil(trackDemoLogin(c.env.CACHE_KV))
-      }
 
       return c.json({
         user: {
@@ -385,7 +341,7 @@ authRoutes.post('/logout', async (c) => {
   // Delegate to BA to invalidate the session server-side, then clear cookies.
   try {
     const { createAuth } = await import('../auth/config')
-    const auth = createAuth(c.env, undefined, new URL(c.req.url).origin)
+    const auth = createAuth(c.env)
     const baReq = new Request(new URL('/auth/sign-out', c.req.url).href, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Origin': new URL(c.req.url).origin, 'Cookie': c.req.header('Cookie') || '' },
@@ -394,8 +350,7 @@ authRoutes.post('/logout', async (c) => {
     await auth.handler(baReq)
   } catch { /* non-fatal — clear cookie regardless */ }
 
-  const isSecure = new URL(c.req.url).protocol === 'https:'
-  setCookie(c, 'better-auth.session_token', '', { httpOnly: true, sameSite: 'Lax', path: '/', maxAge: 0, secure: isSecure })
+  setCookie(c, 'better-auth.session_token', '', { httpOnly: true, sameSite: 'Lax', path: '/', maxAge: 0 })
   clearCsrfCookie(c)
   return c.json({ message: 'Logged out successfully' })
 })
@@ -404,7 +359,7 @@ authRoutes.get('/logout', async (c) => {
   // Delegate to BA to invalidate the session server-side, then clear cookies.
   try {
     const { createAuth } = await import('../auth/config')
-    const auth = createAuth(c.env, undefined, new URL(c.req.url).origin)
+    const auth = createAuth(c.env)
     const baReq = new Request(new URL('/auth/sign-out', c.req.url).href, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Origin': new URL(c.req.url).origin, 'Cookie': c.req.header('Cookie') || '' },
@@ -413,8 +368,7 @@ authRoutes.get('/logout', async (c) => {
     await auth.handler(baReq)
   } catch { /* non-fatal */ }
 
-  const isSecure = new URL(c.req.url).protocol === 'https:'
-  setCookie(c, 'better-auth.session_token', '', { httpOnly: true, sameSite: 'Lax', path: '/', maxAge: 0, secure: isSecure })
+  setCookie(c, 'better-auth.session_token', '', { httpOnly: true, sameSite: 'Lax', path: '/', maxAge: 0 })
   clearCsrfCookie(c)
   return c.redirect('/auth/login?message=You have been logged out successfully')
 })
@@ -584,82 +538,45 @@ authRoutes.post('/register/form',
     // Determine role: first user gets admin, others get viewer
     const role = isFirstUser ? 'admin' : 'viewer'
 
-    const rbacService = new RbacService(db)
-
-    // First user needs system RBAC roles to exist before assignment. Seed them
-    // here (same as /auth/seed-admin) — a failed first boot must not leave an
-    // admin without roles.
-    if (isFirstUser) {
-      await bootstrapDocumentTypes(db)
-      await rbacService.ensureSystemRbacSeed()
-    }
-
     // Create user
     const userId = crypto.randomUUID()
     const now = new Date()
-    const nowSec = Math.floor(now.getTime() / 1000)
 
-    await db.batch([
-      db.prepare(`
-        INSERT INTO auth_user (id, email, first_name, last_name, password_hash, role, is_active, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(
-        userId,
-        normalizedEmail,
-        firstName,
-        lastName,
-        passwordHash,
-        role,
-        1, // is_active
-        now.getTime(),
-        now.getTime()
-      ),
-      // Better Auth sign-in/email requires an auth_account credential row
-      db.prepare(`INSERT OR IGNORE INTO auth_account (id, user_id, account_id, provider_id, password, created_at, updated_at)
-        VALUES (?, ?, ?, 'credential', ?, ?, ?)`)
-        .bind(`cred-${userId}`, userId, userId, passwordHash, nowSec, nowSec),
-    ])
+    await db.prepare(`
+      INSERT INTO auth_user (id, email, first_name, last_name, password_hash, role, is_active, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      userId,
+      normalizedEmail,
+      firstName,
+      lastName,
+      passwordHash,
+      role,
+      1, // is_active
+      now.getTime(),
+      now.getTime()
+    ).run()
 
-    // Assign RBAC role before anything optional — for the first user this makes
-    // them the admin. If it fails, remove the account: an admin without the role
-    // gets 403 everywhere.
-    try {
-      await rbacService.addUserRoleByName(userId, role)
-      if (isFirstUser) {
-        const assigned = await rbacService.getRolesForUser(userId)
-        if (!assigned.some((r) => r.name === 'admin')) {
-          throw new Error('Admin role could not be assigned to the first user')
-        }
-      }
-    } catch (error) {
-      await db.batch([
-        db.prepare('DELETE FROM auth_account WHERE user_id = ?').bind(userId),
-        db.prepare('DELETE FROM auth_user WHERE id = ?').bind(userId),
-      ])
-      throw error
-    }
-
-    // Save custom profile fields if configured. Account is complete and can
-    // sign in by now, so a failure here is logged instead of blocking.
+    // Save custom profile fields if configured
     const profileConfig = getUserProfileConfig()
     if (profileConfig) {
       const regFields = getRegistrationFields()
       if (regFields.length > 0) {
-        try {
-          const customData: Record<string, any> = { ...getProfileFieldDefaults() }
-          for (const field of regFields) {
-            const raw = formData.get(field.name)?.toString()
-            if (raw !== undefined && raw !== null) {
-              customData[field.name] = raw
-            }
+        const customData: Record<string, any> = { ...getProfileFieldDefaults() }
+        for (const field of regFields) {
+          const raw = formData.get(field.name)?.toString()
+          if (raw !== undefined && raw !== null) {
+            customData[field.name] = raw
           }
-          const sanitized = sanitizeCustomData(customData, profileConfig)
-          await saveCustomData(db, userId, sanitized)
-        } catch (profileError) {
-          console.error('Failed to save custom profile fields:', profileError)
         }
+        const sanitized = sanitizeCustomData(customData, profileConfig)
+        await saveCustomData(db, userId, sanitized)
       }
     }
+
+    // Assign RBAC role so the new user passes requireRbac('portal', 'access')
+    const rbacService = new RbacService(db)
+    await rbacService.addUserRoleByName(userId, role)
 
     // Fire auth:registration:completed (fire-and-forget — does not block the response)
     dispatchHookEvent(
@@ -727,7 +644,7 @@ authRoutes.post('/login/form',
 
     // Delegate to Better Auth — call sign-in/email, get session token, set BA cookie.
     const { createAuth } = await import('../auth/config')
-    const auth = createAuth(c.env, undefined, new URL(c.req.url).origin)
+    const auth = createAuth(c.env)
 
     const baReq = new Request(new URL('/auth/sign-in/email', c.req.url).href, {
       method: 'POST',
@@ -747,60 +664,21 @@ authRoutes.post('/login/form',
     // Forward BA's Set-Cookie header(s) to the browser.
     // BA sets better-auth.session_token as token.signature (signed). Using the
     // raw JSON .token field would break session lookup — must use the full cookie value.
-    // Use c.header() (not c.res.headers.append) — Hono's c.html() creates a new Response
-    // from c's internal header store; mutations to c.res.headers are discarded.
-    // Prefer getSetCookie() — headers.get('set-cookie') joins multiple cookies with ',' which corrupts them.
-    if ((baRes.headers as any).getSetCookie) {
+    const rawSetCookie = baRes.headers.get('set-cookie')
+    if (rawSetCookie) {
+      // Workers may join multiple Set-Cookie values; for BA there is normally one.
+      // Append each cookie directive as-is.
+      c.res.headers.append('Set-Cookie', rawSetCookie)
+    } else if ((baRes.headers as any).getSetCookie) {
       for (const sc of (baRes.headers as any).getSetCookie()) {
-        c.header('Set-Cookie', sc, { append: true })
-      }
-    } else {
-      const rawSetCookie = baRes.headers.get('set-cookie')
-      if (rawSetCookie) {
-        c.header('Set-Cookie', rawSetCookie, { append: true })
+        c.res.headers.append('Set-Cookie', sc)
       }
     }
 
     await setCsrfCookie(c)
 
-    // Second factor pending — see the sibling branch in POST /auth/login for the full note.
-    // The password was CORRECT and `baRes.ok` is true, so without this branch the handler
-    // reports "Login successful! Redirecting…" and sends the browser to /admin/content with no
-    // session, which bounces straight back to the login page. BA's signed challenge cookie is
-    // already on this response; send the browser to the challenge page instead.
-    const baChallengeBody = (await baRes
-      .clone()
-      .json()
-      .catch(() => null)) as { twoFactorRedirect?: boolean } | null
-    if (baChallengeBody?.twoFactorRedirect === true) {
-      const isHtmxChallenge = c.req.header('HX-Request') === 'true'
-      if (isHtmxChallenge) {
-        c.header('HX-Redirect', '/auth/two-factor')
-      }
-      return c.html(html`
-        <div id="form-response">
-          <p class="text-sm text-zinc-600 dark:text-zinc-300">Password accepted. Redirecting for two-step verification…</p>
-          <script>
-            window.location.href = '/auth/two-factor';
-          </script>
-        </div>
-      `)
-    }
-
-    if (email === DEMO_EMAIL) {
-      c.executionCtx?.waitUntil(trackDemoLogin(c.env.CACHE_KV))
-    }
-
     const rawRedirect = c.req.query('redirect')
     const redirectUrl = rawRedirect && rawRedirect.startsWith('/') ? rawRedirect : '/admin/content'
-
-    // For HTMX requests: HX-Redirect triggers an immediate client-side navigation.
-    // For native form submissions (HTMX not loaded): the <script> setTimeout handles it.
-    const isHtmx = c.req.header('HX-Request') === 'true'
-    if (isHtmx) {
-      c.header('HX-Redirect', redirectUrl)
-      return c.html(html`<div id="form-response"><p class="text-sm text-green-600">Login successful! Redirecting...</p></div>`)
-    }
 
     return c.html(html`
       <div id="form-response">
@@ -829,30 +707,13 @@ authRoutes.post('/login/form',
   }
 })
 
-// Environments where the known-credential admin seed is permitted.
-const SEED_ADMIN_ALLOWED_ENVIRONMENTS = new Set(['development', 'test', 'e2e', 'preview', 'local'])
-
-// SECURITY: upserts a fixed-credential admin (admin@sonicjs.com / sonicjs!).
-// Needs ENABLE_SEED_ADMIN="true" AND a non-production ENVIRONMENT.
+// Test seeding endpoint (only for development/testing)
 authRoutes.post('/seed-admin',
   rateLimit({ max: 10, windowMs: 60 * 1000, keyPrefix: 'seed-admin' }),
   async (c) => {
-  const environment = (c.env?.ENVIRONMENT ?? '').toString().toLowerCase()
-  const enabled = (c.env as { ENABLE_SEED_ADMIN?: unknown } | undefined)?.ENABLE_SEED_ADMIN
-  if (!SEED_ADMIN_ALLOWED_ENVIRONMENTS.has(environment)) {
-    return c.json({ error: 'Seed endpoint not available in this environment' }, 403)
-  }
-  if (String(enabled).toLowerCase() !== 'true') {
-    return c.json({ error: 'Seed endpoint is disabled. Set ENABLE_SEED_ADMIN = "true" to use it in development.' }, 403)
-  }
   try {
     const db = c.env.DB
-    // Ensure document_types FK targets exist before RBAC seed — D1 enforces the FK
-    // and bootstrap's Promise.all can race. Also covers KV fast-path deployments that
-    // skip ensureSystemRbacSeed entirely.
-    await bootstrapDocumentTypes(db)
     const rbac = new RbacService(db)
-    await rbac.ensureSystemRbacSeed()
     const results: Array<{ email: string; status: string }> = []
 
     const upsertSeedUser = async (opts: {
@@ -1127,25 +988,24 @@ authRoutes.post('/accept-invitation', async (c) => {
     // Hash password
     const passwordHash = await AuthManager.hashPassword(password)
 
-    // Activate user account (and sync credential row Better Auth signs in with)
-    await db.batch([
-      db.prepare(`
-        UPDATE auth_user SET
-          password_hash = ?,
-          is_active = 1,
-          email_verified = 1,
-          invitation_token = NULL,
-          accepted_invitation_at = ?,
-          updated_at = ?
-        WHERE id = ?
-      `).bind(
-        passwordHash,
-        Date.now(),
-        Date.now(),
-        invitedUser.id
-      ),
-      ...syncCredentialPassword(db, invitedUser.id as string, passwordHash),
-    ])
+    // Activate user account
+    const updateStmt = db.prepare(`
+      UPDATE auth_user SET
+        password_hash = ?,
+        is_active = 1,
+        email_verified = 1,
+        invitation_token = NULL,
+        accepted_invitation_at = ?,
+        updated_at = ?
+      WHERE id = ?
+    `)
+
+    await updateStmt.bind(
+      passwordHash,
+      Date.now(),
+      Date.now(),
+      invitedUser.id
+    ).run()
 
     // Generate JWT token for auto-login
     const tokenTtl = await getJwtExpirySecondsFromDb(c.env.DB, c.env)
@@ -1480,22 +1340,21 @@ authRoutes.post('/reset-password', async (c) => {
       console.warn('Could not store password history:', historyError)
     }
 
-    // Update user password and clear reset token (and sync credential row)
-    await db.batch([
-      db.prepare(`
-        UPDATE auth_user SET
-          password_hash = ?,
-          password_reset_token = NULL,
-          password_reset_expires = NULL,
-          updated_at = ?
-        WHERE id = ?
-      `).bind(
-        newPasswordHash,
-        Date.now(),
-        user.id
-      ),
-      ...syncCredentialPassword(db, user.id as string, newPasswordHash),
-    ])
+    // Update user password and clear reset token
+    const updateStmt = db.prepare(`
+      UPDATE auth_user SET
+        password_hash = ?,
+        password_reset_token = NULL,
+        password_reset_expires = NULL,
+        updated_at = ?
+      WHERE id = ?
+    `)
+
+    await updateStmt.bind(
+      newPasswordHash,
+      Date.now(),
+      user.id
+    ).run()
 
     // Fire auth:password-reset:completed for audit/notification plugins.
     dispatchHookEvent(

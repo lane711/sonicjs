@@ -1,5 +1,5 @@
-import { test, expect } from './fixtures'
-import { loginAsAdmin, gotoMediaLibrary, submitAndWaitForXhr } from './utils/test-helpers'
+import { test, expect } from '@playwright/test'
+import { loginAsAdmin } from './utils/test-helpers'
 
 /**
  * Regression spec for issue #889: new media uploads displayed as 1/1970 and
@@ -10,13 +10,14 @@ import { loginAsAdmin, gotoMediaLibrary, submitAndWaitForXhr } from './utils/tes
  * the admin grid now reads created_at from the documents table and multiplies
  * by 1000 inside mediaDocToFile().
  */
-test.describe('Media upload date display (#889) @media', () => {
+test.describe('Media upload date display (#889)', () => {
   test.beforeEach(async ({ page }) => {
-    await loginAsAdmin(page, false)
+    await loginAsAdmin(page)
   })
 
   test('media library page loads without 1970 dates', async ({ page }) => {
-    await gotoMediaLibrary(page)
+    await page.goto('/admin/media')
+    await page.waitForLoadState('networkidle')
 
     // Collect all date text visible on the page
     const dateTexts = await page.locator('.text-xs.text-gray-500').allTextContents()
@@ -29,44 +30,32 @@ test.describe('Media upload date display (#889) @media', () => {
   })
 
   test('newly uploaded file appears at the top of the media grid with a valid date', async ({ page }) => {
-    await gotoMediaLibrary(page)
+    await page.goto('/admin/media')
+    await page.waitForLoadState('networkidle')
 
     // Open upload modal
     const uploadButton = page.getByRole('button', { name: /upload/i }).first()
     await uploadButton.click()
 
-    // Create a minimal test file. `#file-input`'s onchange only renders a preview — the upload
-    // is an htmx POST from the form — so selecting a file uploads nothing without this submit.
-    // Nothing was ever uploaded here before, and every assertion below still passed.
+    // Create a minimal test file
     const fileContent = Buffer.from('test-content-for-e2e')
-    await page.setInputFiles('#file-input', {
+    await page.setInputFiles('input[type="file"]', {
       name: 'e2e-test-upload.txt',
       mimeType: 'text/plain',
       buffer: fileContent,
     })
-    // The upload is an htmx POST to /admin/media/upload that writes to R2 and inserts a
-    // document; #upload-results stays empty until it answers. Asserting straight after the click
-    // spends an assertion budget on a server round trip — that is how this flaked in CI with the
-    // locator resolving 24x to an empty <div id="upload-results">. Wait for the response first.
-    await submitAndWaitForXhr(page, 'POST', '/admin/media/upload', () =>
-      page.locator('#upload-modal button[type="submit"]').click()
-    )
-    await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', {
-      timeout: 15000,
-    })
 
-    // Wait for upload to complete and page to reload. The `?t=` matters: the upload runs on
-    // /admin/media itself, so a bare /\/admin\/media/ matched the pre-upload page — and every
-    // assertion below passed against it, which is why a spec named for a date-rendering
-    // regression never once looked at the uploaded file's date.
-    await page.waitForURL(/\/admin\/media\?t=/, { timeout: 20000, waitUntil: 'domcontentloaded' })
+    // Wait for upload to complete and page to reload
+    await page.waitForURL(/\/admin\/media/, { timeout: 10000 })
+    await page.waitForLoadState('networkidle')
 
     // The grid should list the newly uploaded file
-    const uploaded = page.locator('[data-file-id]').filter({ hasText: 'e2e-test-upload' }).first()
-    await expect(uploaded).toBeVisible({ timeout: 15000 })
+    const firstFile = page.locator('[data-file-id]').first()
+    await expect(firstFile).toBeVisible()
 
-    // #889 was an epoch-seconds value rendered through `new Date(ms)`: every upload showed
-    // 1/1/1970. Assert on the card for the file just uploaded, not on the page as a whole.
-    await expect(uploaded).not.toContainText('1970')
+    // Check that no date text on the page shows 1970
+    const allText = await page.content()
+    expect(allText).not.toMatch(/1\/\d+\/1970/)
+    expect(allText).not.toMatch(/1970-01-01/)
   })
 })

@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'packages/stats/**'
+      - 'packages/core/src/**'
+      - '.github/workflows/deploy-stats.yml'
   workflow_dispatch:
 
 jobs:
@@ -18,11 +22,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build core package
         run: npm run build:core
