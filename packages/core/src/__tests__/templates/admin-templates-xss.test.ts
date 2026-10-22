@@ -3,6 +3,8 @@ import { renderContentListPage } from '../../templates/pages/admin-content-list.
 import { renderUsersListPage } from '../../templates/pages/admin-users-list.template'
 import { renderContentFormPage } from '../../templates/pages/admin-content-form.template'
 import { renderMediaFileDetails } from '../../templates/components/media-file-details.template'
+import { renderSettingsPage } from '../../templates/pages/admin-settings.template'
+import { renderMediaLibraryPage } from '../../templates/pages/admin-media-library.template'
 
 // A payload that breaks out of both element-text and double-quoted-attribute contexts.
 const SCRIPT = `<script>alert('xss')</script>`
@@ -114,6 +116,59 @@ describe('admin template XSS escaping', () => {
 
       expect(html).not.toContain(ATTR_BREAKOUT)
       expect(html).toContain(ESCAPED_ATTR_BREAKOUT)
+    })
+  })
+
+  describe('general settings (admin-controlled, stored)', () => {
+    it('escapes siteName, adminEmail and siteDescription', () => {
+      const html = renderSettingsPage({
+        activeTab: 'general',
+        settings: {
+          general: {
+            siteName: `site-${ATTR_BREAKOUT}`,
+            adminEmail: `mail-${ATTR_BREAKOUT}`,
+            siteDescription: `desc-${SCRIPT}`,
+            timezone: 'UTC',
+            language: 'en',
+            maintenanceMode: false,
+          },
+        },
+      })
+
+      // siteName / adminEmail sit in value="…" attributes
+      expect(html).not.toContain(ATTR_BREAKOUT)
+      expect(html).toContain(ESCAPED_ATTR_BREAKOUT)
+      // siteDescription is textarea element text
+      expect(html).not.toContain(SCRIPT)
+      expect(html).toContain(ESCAPED_SCRIPT)
+    })
+  })
+
+  describe('media library folder sidebar', () => {
+    it('escapes the folder name in the link body and encodes it in the href', () => {
+      const html = renderMediaLibraryPage({
+        files: [],
+        folders: [{ folder: `folder-${SCRIPT}`, count: 1 }],
+        types: [],
+        currentFolder: `cur-${ATTR_BREAKOUT}`,
+        currentType: '',
+        currentView: 'grid',
+        currentPage: 1,
+        totalFiles: 0,
+        hasNextPage: false,
+      })
+
+      expect(html).not.toContain(SCRIPT)
+      expect(html).toContain(ESCAPED_SCRIPT)
+      // href uses encodeURIComponent, so no raw angle bracket or quote reaches the URL
+      expect(html).toContain(`folder=${encodeURIComponent(`folder-${SCRIPT}`)}`)
+      // the currentFolder/currentType hidden inputs are attribute sinks too
+      expect(html).not.toContain(ATTR_BREAKOUT)
+      expect(html).toContain(ESCAPED_ATTR_BREAKOUT)
+      // the bulk-move onclick is a JS-string sink: the folder goes in as a JSON literal,
+      // so a quote cannot close the JS string and start new statements
+      expect(html).not.toContain(`performBulkMove('folder-`)
+      expect(html).toContain('performBulkMove(&quot;folder-')
     })
   })
 

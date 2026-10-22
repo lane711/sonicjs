@@ -225,12 +225,12 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                       </button>
-                      <input type="hidden" name="folder" value="${
+                      <input type="hidden" name="folder" value="${escapeHtml(
                         data.currentFolder
-                      }">
-                      <input type="hidden" name="type" value="${
+                      )}">
+                      <input type="hidden" name="type" value="${escapeHtml(
                         data.currentType
-                      }">
+                      )}">
                     </div>
                   </div>
 
@@ -460,11 +460,11 @@ export function renderMediaLibraryPage(data: MediaLibraryPageData): string {
                   .map(
                     (folder) => `
             <button
-              onclick="performBulkMove('${folder.folder}')"
+              onclick="performBulkMove(${escapeHtml(JSON.stringify(folder.folder))})"
               class="w-full text-left px-4 py-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-950 dark:text-white transition-colors ring-1 ring-inset ring-zinc-200 dark:ring-zinc-700"
             >
               <div class="flex items-center justify-between">
-                <span class="font-medium">${folder.folder}</span>
+                <span class="font-medium">${escapeHtml(folder.folder)}</span>
                 <span class="text-sm text-zinc-500 dark:text-zinc-400">${folder.count} files</span>
               </div>
             </button>

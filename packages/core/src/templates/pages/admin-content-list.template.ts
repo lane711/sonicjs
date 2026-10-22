@@ -4,7 +4,6 @@ import { renderPagination, PaginationData } from '../pagination.template'
 import { renderTable, TableData, TableColumn } from '../table.template'
 import type { FilterBarData } from '../filter-bar.template'
 import { renderConfirmationDialog, getConfirmationDialogScript } from '../confirmation-dialog.template'
-import { escapeHtml } from '../../utils/sanitize'
 
 export interface ContentItem {
   id: string

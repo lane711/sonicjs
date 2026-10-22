@@ -22,7 +22,8 @@ test.describe('Admin template XSS escaping @content @smoke', () => {
     const res = await page.request.get('/api/content')
     const body = await res.json().catch(() => ({} as any))
     const id: string | undefined = body?.data?.[0]?.id
-    test.skip(!id, 'no existing content on the preview to open an edit page')
+    // Assert rather than skip: the seed guarantees content, so an empty list is a real failure.
+    expect(id, 'seeded content is required to open a content edit page').toBeTruthy()
 
     const marker = `xss${Date.now()}`
     // Breaks out of a double-quoted attribute and injects an element whose onerror sets a flag.
