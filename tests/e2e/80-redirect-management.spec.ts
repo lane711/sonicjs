@@ -36,9 +36,8 @@ test.describe('Redirect Management @plugins', () => {
     await page.selectOption('select[name="status_code"]', '301')
 
     await page.click('button[type="submit"]')
-    await page.waitForLoadState('networkidle')
+    await page.waitForURL('**/admin/redirects', { timeout: 15000 })
 
-    await expect(page).toHaveURL('/admin/redirects')
     await expect(page.locator(`[data-source="${source}"]`)).toBeVisible()
   })
 
@@ -53,7 +52,7 @@ test.describe('Redirect Management @plugins', () => {
     await page.fill('input[name="destination"]', destination)
     await page.selectOption('select[name="status_code"]', '301')
     await page.click('button[type="submit"]')
-    await page.waitForLoadState('networkidle')
+    await page.waitForURL('**/admin/redirects', { timeout: 15000 })
 
     // Verify redirect is in the list
     await expect(page.locator(`[data-source="${source}"]`)).toBeVisible()
@@ -66,8 +65,8 @@ test.describe('Redirect Management @plugins', () => {
 
   test('can edit a redirect', async ({ page }) => {
     const source = src(3)
-    const originalDest = '/original-destination-3'
-    const updatedDest = '/updated-destination-3'
+    const originalDest = `/original-dest-${BASE_TS}-3`
+    const updatedDest = `/updated-dest-${BASE_TS}-3`
 
     // Create
     await page.goto('/admin/redirects/new')
@@ -76,7 +75,7 @@ test.describe('Redirect Management @plugins', () => {
     await page.fill('input[name="destination"]', originalDest)
     await page.selectOption('select[name="status_code"]', '301')
     await page.click('button[type="submit"]')
-    await page.waitForLoadState('networkidle')
+    await page.waitForURL('**/admin/redirects', { timeout: 15000 })
 
     // Click edit in the row
     const row = page.locator(`[data-source="${source}"]`)
@@ -87,10 +86,9 @@ test.describe('Redirect Management @plugins', () => {
     // Update destination
     await page.fill('input[name="destination"]', updatedDest)
     await page.click('button[type="submit"]')
-    await page.waitForLoadState('networkidle')
+    await page.waitForURL('**/admin/redirects', { timeout: 15000 })
 
-    await expect(page).toHaveURL('/admin/redirects')
-    await expect(page.locator(`[data-destination="${updatedDest}"]`)).toBeVisible()
+    await expect(page.locator(`tr[data-source="${source}"][data-destination="${updatedDest}"]`)).toBeVisible()
   })
 
   test('can delete a redirect', async ({ page }) => {
@@ -103,7 +101,7 @@ test.describe('Redirect Management @plugins', () => {
     await page.fill('input[name="destination"]', '/destination-4')
     await page.selectOption('select[name="status_code"]', '301')
     await page.click('button[type="submit"]')
-    await page.waitForLoadState('networkidle')
+    await page.waitForURL('**/admin/redirects', { timeout: 15000 })
 
     await expect(page.locator(`[data-source="${source}"]`)).toBeVisible()
 
