@@ -110,7 +110,7 @@ describe('bootstrapMiddleware path skips run before the KV fast-path', () => {
     // short-circuits everything would pass every assertion above.
     const { kvGets, d1Queries, nextCalled } = await runMiddleware('/admin/content')
     expect(kvGets.length).toBeGreaterThan(0)
-    expect(d1Queries.join(' ')).toContain('document_types')
+    expect(d1Queries.join(' ')).toContain('documents')
     expect(nextCalled).toBe(true)
   })
 
