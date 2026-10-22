@@ -319,7 +319,7 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
     // Backoff: the last full run finished with errors less than 30s ago. Serve without
     // re-running — every attempt is ~10s of D1 work, and a failure that persists would
     // otherwise make every request pay it. The next request after the window retries.
-    if (!bootstrapInFlight && lastBootstrapFailureAt && Date.now() - lastBootstrapFailureAt < BOOTSTRAP_BACKOFF_MS) {
+    if (lastBootstrapFailureAt && Date.now() - lastBootstrapFailureAt < BOOTSTRAP_BACKOFF_MS) {
       return next();
     }
 
@@ -422,7 +422,10 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
                       const bootstrapService = new PluginBootstrapService(c.env.DB)
                       if (await bootstrapService.isBootstrapNeeded()) {
                         console.log("[Bootstrap] KV fast-path: repairing core plugin install")
-                        await bootstrapService.bootstrapCorePlugins()
+                        const failed = await bootstrapService.bootstrapCorePlugins()
+                        if (failed.length) {
+                          console.warn(`[Bootstrap] KV fast-path: core plugin(s) failed to install: ${failed.join(", ")}`)
+                        }
                       }
                     })().catch((e) =>
                       console.error("[Bootstrap] KV fast-path: error bootstrapping plugins:", e)
@@ -432,6 +435,7 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
               )
             }
             bootstrapComplete = true
+            lastBootstrapFailureAt = 0
             return next()
           }
           // D1 is fresh — delete the stale KV key so the next cold start also re-bootstraps.
@@ -517,9 +521,11 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
         if (auto.length) console.log(`[Bootstrap] Document-backed collections registered: ${auto.join(", ")}`);
       });
 
-      // Phase B — CONSUMERS (+ the independent credential-account repair): the types now
-      // exist, so these can safely run in parallel to keep cold-start latency low.
-      await Promise.all([
+      // If Phase A failed, skip Phase B entirely — consumers would hit the same FK
+      // constraint this two-phase split exists to prevent.
+      if (!bootstrapOk) {
+        console.warn("[Bootstrap] Phase A (document type registration) failed — skipping Phase B consumers.");
+      } else await Promise.all([
         runStep("repairing credential accounts", () => repairMissingCredentialAccounts(c.env.DB)),
 
         runStep("seeding RBAC documents", () => rbacService.ensureSystemRbacSeed()),
@@ -684,9 +690,8 @@ export function resetBootstrap(complete?: boolean) {
 }
 
 /** Test-only: override bootstrap timing windows. Undone by resetBootstrap(). */
-export function _setBootstrapTimingForTests(timing: { waitMs?: number; staleMs?: number; retryBackoffMs?: number }) {
+export function _setBootstrapTimingForTests(timing: { waitMs?: number; retryBackoffMs?: number }) {
   if (timing.waitMs !== undefined) BOOTSTRAP_DEADLINE_MS = timing.waitMs;
-  if (timing.staleMs !== undefined) BOOTSTRAP_DEADLINE_MS = timing.staleMs;
   if (timing.retryBackoffMs !== undefined) BOOTSTRAP_BACKOFF_MS = timing.retryBackoffMs;
 }
 
