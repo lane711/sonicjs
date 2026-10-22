@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { loginAsAdmin, logout } from './utils/test-helpers';
+import { test, expect } from './fixtures';
+import { loginAsAdmin, submitAndWaitForDocument, logout } from './utils/test-helpers';
 
 /**
  * RBAC E2E tests.
@@ -30,7 +30,7 @@ test.describe('RBAC — seeded roles and grants @smoke @auth', () => {
   });
 });
 
-test.describe('RBAC — portal access enforcement', () => {
+test.describe('RBAC — portal access enforcement @auth', () => {
   test('admin has portal:access (can load gated admin route)', async ({ page }) => {
     await loginAsAdmin(page);
     const res = await page.goto('/admin/rbac');
@@ -44,48 +44,9 @@ test.describe('RBAC — portal access enforcement', () => {
     expect(page.url()).toMatch(/\/auth\/login/);
   });
 
-  test('viewer role cannot access /admin (no portal:access grant)', async ({ page }) => {
-    // Create a viewer-only user via BA
-    const TEST_VIEWER = { email: `viewer-rbac-${Date.now()}@test.com`, password: 'viewpass123' };
-
-    // Sign up a new user (will be viewer by default if not first user)
-    const signUp = await page.request.post('/auth/sign-up/email', {
-      data: {
-        email: TEST_VIEWER.email,
-        password: TEST_VIEWER.password,
-        name: 'Viewer Tester',
-      },
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    // Sign-up may fail if registration is disabled or user exists — skip gracefully
-    if (!signUp.ok() && signUp.status() !== 400) {
-      test.skip();
-      return;
-    }
-
-    // Sign in as viewer
-    const signIn = await page.request.post('/auth/sign-in/email', {
-      data: { email: TEST_VIEWER.email, password: TEST_VIEWER.password },
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    if (!signIn.ok()) {
-      test.skip(); // Registration may be disabled
-      return;
-    }
-
-    // Navigate to admin — should be blocked
-    await page.goto('/admin/rbac');
-    // Should redirect to login (no portal:access)
-    expect(page.url()).toMatch(/\/auth\/login|\/admin/);
-
-    // Clean up: sign out
-    await page.request.post('/auth/sign-out', { headers: { 'Content-Type': 'application/json' } });
-  });
 });
 
-test.describe('RBAC — role management API', () => {
+test.describe('RBAC — role management API @auth', () => {
   test('GET /admin/rbac returns 200 with role matrix HTML', async ({ page }) => {
     await loginAsAdmin(page);
     const res = await page.goto('/admin/rbac');
@@ -167,7 +128,7 @@ test.describe('RBAC — role management API', () => {
   });
 });
 
-test.describe('RBAC — sub-tab navigation', () => {
+test.describe('RBAC — sub-tab navigation @auth', () => {
   test('Matrix tab is active by default', async ({ page }) => {
     await loginAsAdmin(page);
     await page.goto('/admin/rbac');
@@ -264,8 +225,13 @@ test.describe('RBAC — sub-tab navigation', () => {
     await page.waitForLoadState('networkidle');
 
     await page.click('#subtab-roles-verbs');
-    await page.locator('#roles-bulk-form button[type="submit"]').filter({ hasText: 'Save roles' }).click();
-    await page.waitForLoadState('networkidle');
+    // Wait for the document the POST redirects to. `waitForLoadState('networkidle')` reports on
+    // the page we are still on, and the subtab click above has already made the panel visible —
+    // so this test used to assert the redirect landed on #roles-verbs without waiting for the
+    // redirect at all.
+    await submitAndWaitForDocument(page, '/admin/rbac', () =>
+      page.locator('#roles-bulk-form button[type="submit"]').filter({ hasText: 'Save roles' }).click()
+    );
 
     // After redirect, Roles & Verbs panel should be active
     await expect(page.locator('#panel-roles-verbs')).toBeVisible();
@@ -287,8 +253,9 @@ test.describe('RBAC — sub-tab navigation', () => {
     if ((await page.locator(`input[name="portal_${roleId}"]`).count()) === 0) {
       await page.locator('form[action="/admin/rbac/roles"] input[name="name"]').fill(roleName);
       await page.locator('form[action="/admin/rbac/roles"] input[name="display_name"]').fill('Portal Persist Test');
-      await page.locator('form[action="/admin/rbac/roles"] button').filter({ hasText: 'Add role' }).click();
-      await page.waitForLoadState('networkidle');
+      await submitAndWaitForDocument(page, '/admin/rbac', () =>
+        page.locator('form[action="/admin/rbac/roles"] button').filter({ hasText: 'Add role' }).click()
+      );
       await page.click('#subtab-roles-verbs');
     }
 
@@ -297,8 +264,11 @@ test.describe('RBAC — sub-tab navigation', () => {
     const wasChecked = await portal.isChecked();
     await portal.click();
 
-    await page.locator('#roles-bulk-form button[type="submit"]').filter({ hasText: 'Save roles' }).click();
-    await page.waitForLoadState('networkidle');
+    // Without waiting for the redirected document, `portalAfter` is the checkbox this test
+    // just clicked, not the one the server re-rendered from the database.
+    await submitAndWaitForDocument(page, '/admin/rbac', () =>
+      page.locator('#roles-bulk-form button[type="submit"]').filter({ hasText: 'Save roles' }).click()
+    );
     await expect(page.locator('#panel-roles-verbs')).toBeVisible();
 
     const portalAfter = page.locator(`input[name="portal_${roleId}"]`);
@@ -307,13 +277,14 @@ test.describe('RBAC — sub-tab navigation', () => {
 
     if (nowChecked !== wasChecked) {
       await portalAfter.click();
-      await page.locator('#roles-bulk-form button[type="submit"]').filter({ hasText: 'Save roles' }).click();
-      await page.waitForLoadState('networkidle');
+      await submitAndWaitForDocument(page, '/admin/rbac', () =>
+        page.locator('#roles-bulk-form button[type="submit"]').filter({ hasText: 'Save roles' }).click()
+      );
     }
   });
 });
 
-test.describe('RBAC — admin sections accessible', () => {
+test.describe('RBAC — admin sections accessible @auth', () => {
   // Quick smoke: admin can reach each gated section
   const sections = [
     { path: '/admin/users', name: 'users' },

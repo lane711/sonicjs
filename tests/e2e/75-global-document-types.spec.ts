@@ -1,8 +1,5 @@
-import { test, expect, type Page } from '@playwright/test'
-import { execFileSync } from 'node:child_process'
-import { fileURLToPath } from 'node:url'
-import { dirname, resolve } from 'node:path'
-import { loginAsAdmin, ensureAdminUserExists, isFeatureAvailable, IS_REMOTE_DEPLOYMENT } from './utils/test-helpers'
+import { test, expect, type Page } from './fixtures'
+import { loginAsAdmin, ensureAdminUserExists, isFeatureAvailable, IS_REMOTE_DEPLOYMENT, d1Exec } from './utils/test-helpers'
 
 // G5 — shared/global document types end-to-end through the canonical admin-documents route. A type
 // with settings.global=true is created from one tenant and is visible from another (shared pool),
@@ -16,16 +13,12 @@ const T_A = `gacme${RUN}`
 const T_B = `gbeta${RUN}`
 const GLOBAL_TYPE = `global_note${RUN}`
 
-const APP_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../../my-sonicjs-app')
-function d1Exec(sql: string) {
-  execFileSync('npx', ['wrangler', 'd1', 'execute', 'DB', '--local', '--command', sql], { cwd: APP_DIR, stdio: 'pipe' })
-}
 async function setPluginState(page: Page, action: 'activate' | 'deactivate') {
   await page.request.post(`${BASE_URL}/admin/plugins/install`, { data: { name: PLUGIN_ID } }).catch(() => {})
   await page.request.post(`${BASE_URL}/admin/plugins/${PLUGIN_ID}/${action}`).catch(() => {})
 }
 
-test.describe.serial('Global document types @content', () => {
+test.describe.serial('Global document types @content @lock-plugin-multi-tenant', () => {
   let featureAvailable = false
   test.beforeAll(async ({ request }) => {
     featureAvailable = !IS_REMOTE_DEPLOYMENT && await isFeatureAvailable(request, '/admin/tenants')

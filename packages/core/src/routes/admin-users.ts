@@ -11,6 +11,8 @@ import type { Bindings, Variables } from '../app'
 import { getUserProfileConfig, getRegistrationFields, renderCustomProfileSection, getCustomData, saveCustomData, extractCustomFieldsFromForm, sanitizeCustomData, validateCustomData, readProfileData, writeProfileData } from '../plugins/core-plugins/user-profiles'
 import { TenantService, VALID_MEMBER_ROLES } from '../plugins/core-plugins/multi-tenant-plugin/services/tenant-service'
 import { RbacService } from '../services/rbac'
+import { syncCredentialPassword } from '../auth/credential-account'
+import { ensureTwoFactorRequiredColumn } from '../services/migrations'
 
 const userRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 
@@ -75,7 +77,7 @@ userRoutes.get('/profile', async (c) => {
     // Get user profile data
     const userStmt = db.prepare(`
       SELECT id, email, first_name, last_name, phone, bio, avatar,
-             timezone, language, theme, email_notifications, 0 as two_factor_enabled,
+             timezone, language, theme, email_notifications, two_factor_enabled,
              role, created_at, last_login_at
       FROM auth_user
       WHERE id = ? AND is_active = 1
@@ -422,12 +424,14 @@ userRoutes.post('/profile/password', async (c) => {
       Date.now()
     ).run()
 
-    // Update user password
-    const updateStmt = db.prepare(`
-      UPDATE auth_user SET password_hash = ?, updated_at = ?
-      WHERE id = ?
-    `)
-    await updateStmt.bind(newPasswordHash, Date.now(), user!.userId).run()
+    // Update user password (and the credential row Better Auth signs in with)
+    await db.batch([
+      db.prepare(`
+        UPDATE auth_user SET password_hash = ?, updated_at = ?
+        WHERE id = ?
+      `).bind(newPasswordHash, Date.now(), user!.userId),
+      ...syncCredentialPassword(db, user!.userId, newPasswordHash),
+    ])
 
     // Log the activity
     await logActivity(
@@ -500,7 +504,7 @@ userRoutes.get('/users', async (c) => {
     const usersStmt = db.prepare(`
       SELECT u.id, u.email, u.first_name, u.last_name,
              u.role, u.avatar, u.created_at, u.last_login_at, u.updated_at,
-             u.email_verified, 0 as two_factor_enabled, u.is_active
+             u.email_verified, u.two_factor_enabled, u.is_active
       FROM auth_user u
       ${whereClause}
       ORDER BY u.created_at DESC
@@ -748,20 +752,26 @@ userRoutes.post('/users/new', async (c) => {
     // Hash password
     const passwordHash = await AuthManager.hashPassword(password)
 
-    // Create user
+    // Create user (with auth_account credential row for Better Auth sign-in)
     const userId = crypto.randomUUID()
-    const createStmt = db.prepare(`
-      INSERT INTO auth_user (
-        id, email, first_name, last_name, phone, bio,
-        password_hash, role, is_active, email_verified, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `)
+    const nowMs = Date.now()
+    const nowSec = Math.floor(nowMs / 1000)
 
-    await createStmt.bind(
-      userId, email, firstName, lastName, phone, bio,
-      passwordHash, role, isActive ? 1 : 0, emailVerified ? 1 : 0,
-      Date.now(), Date.now()
-    ).run()
+    await db.batch([
+      db.prepare(`
+        INSERT INTO auth_user (
+          id, email, first_name, last_name, phone, bio,
+          password_hash, role, is_active, email_verified, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        userId, email, firstName, lastName, phone, bio,
+        passwordHash, role, isActive ? 1 : 0, emailVerified ? 1 : 0,
+        nowMs, nowMs
+      ),
+      db.prepare(`INSERT OR IGNORE INTO auth_account (id, user_id, account_id, provider_id, password, created_at, updated_at)
+        VALUES (?, ?, ?, 'credential', ?, ?, ?)`)
+        .bind(`cred-${userId}`, userId, userId, passwordHash, nowSec, nowSec),
+    ])
 
     // Save registration profile fields if profile plugin is configured
     if (sanitizedRegistrationCustom !== null && Object.keys(sanitizedRegistrationCustom).length > 0) {
@@ -808,7 +818,7 @@ userRoutes.get('/users/:id', async (c) => {
     // Get user data (including inactive users for admin access)
     const userStmt = db.prepare(`
       SELECT id, email, first_name, last_name, phone, bio, avatar,
-             role, is_active, email_verified, 0 as two_factor_enabled, created_at, last_login_at
+             role, is_active, email_verified, two_factor_enabled, created_at, last_login_at
       FROM auth_user
       WHERE id = ?
     `)
@@ -861,14 +871,30 @@ userRoutes.get('/users/:id/edit', async (c) => {
 
   try {
     // Get user data (removed bio - now in profile)
-    const userStmt = db.prepare(`
+    // two_factor_required (migration 0007) drives the Two-Factor Recovery panel.
+    // ensureTwoFactorRequiredColumn() adds it from the bootstrap path and from the two-factor
+    // plugin's onBoot, but neither is guaranteed to have run on this isolate: bootstrap is behind
+    // a 24h KV marker, and plugin onBoot does not run under `config.plugins.disableAll`. SQLite
+    // rejects the WHOLE statement for one unknown column, so naming it unconditionally turns a
+    // missing ALTER into a 500 on the user edit page. Self-heal, then retry.
+    const selectUserToEdit = (withRequired: boolean) => db.prepare(`
       SELECT id, email, first_name, last_name, phone, avatar,
-             role, is_active, email_verified, 0 as two_factor_enabled, created_at, last_login_at
+             role, is_active, email_verified, two_factor_enabled${withRequired ? ', two_factor_required' : ''},
+             created_at, last_login_at
       FROM auth_user
       WHERE id = ?
-    `)
+    `).bind(userId).first() as Promise<any>
 
-    const userToEdit = await userStmt.bind(userId).first() as any
+    let userToEdit: any
+    try {
+      userToEdit = await selectUserToEdit(true)
+    } catch (e) {
+      console.warn('[admin-users] two_factor_required unavailable; attempting self-heal', e)
+      await ensureTwoFactorRequiredColumn(db)
+      // Still missing (the ALTER itself failed) → render without it. The recovery panel degrades
+      // to "not required", which is the pre-0007 behaviour, rather than losing the whole page.
+      userToEdit = await selectUserToEdit(true).catch(() => selectUserToEdit(false))
+    }
 
     if (!userToEdit) {
       return c.html(renderAlert({
@@ -905,6 +931,7 @@ userRoutes.get('/users/:id/edit', async (c) => {
       isActive: Boolean(userToEdit.is_active),
       emailVerified: Boolean(userToEdit.email_verified),
       twoFactorEnabled: Boolean(userToEdit.two_factor_enabled),
+      twoFactorRequired: Boolean(userToEdit.two_factor_required),
       createdAt: userToEdit.created_at,
       lastLoginAt: userToEdit.last_login_at,
       profile
@@ -1080,13 +1107,15 @@ userRoutes.put('/users/:id', async (c) => {
       Date.now(), userId
     ).run()
 
-    // Update password if provided
+    // Update password if provided (and the credential row Better Auth signs in with)
     if (newPassword) {
       const passwordHash = await AuthManager.hashPassword(newPassword)
-      const updatePasswordStmt = db.prepare(`
-        UPDATE auth_user SET password_hash = ?, updated_at = ? WHERE id = ?
-      `)
-      await updatePasswordStmt.bind(passwordHash, Date.now(), userId).run()
+      await db.batch([
+        db.prepare(`
+          UPDATE auth_user SET password_hash = ?, updated_at = ? WHERE id = ?
+        `).bind(passwordHash, Date.now(), userId),
+        ...syncCredentialPassword(db, userId, passwordHash),
+      ])
     }
 
     // Check if any profile field has data

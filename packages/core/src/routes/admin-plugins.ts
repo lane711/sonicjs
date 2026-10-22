@@ -36,8 +36,12 @@ function resolveAuthor(d: DefinedPluginExtras): string {
   return typeof d.author === 'object' ? d.author?.name ?? '' : (d.author ?? '')
 }
 
+// `id` is required on RegisterablePlugin but the definition registry also holds
+// pre-SDK plugin objects that only carry `name` (magic-link-auth is one). Those
+// rendered a phantom card keyed on `undefined`, duplicating the manifest entry
+// and linking to /admin/plugins/undefined/configure.
 function getDefinedPlugins(): ReadonlyArray<RegisterablePlugin> {
-  return getAllPluginDefinitions().filter(p => !PLUGIN_REGISTRY[p.id])
+  return getAllPluginDefinitions().filter(p => p.id && !PLUGIN_REGISTRY[p.id])
 }
 
 // Build the available plugins list from the manifest registry (core plugins)
@@ -138,11 +142,20 @@ adminPluginRoutes.get('/', async (c) => {
     // Find uninstalled plugins
     const uninstalledPlugins = AVAILABLE_PLUGINS.filter(p => !installedPluginIds.has(p.id))
 
-    // Map installed plugins to template format
+    // `ensurePlugin` falls back to `display_name: id` when it installs a plugin without a
+    // display name, so rows written that way show the raw slug on their card forever. Fall back
+    // to the registry's label in exactly that case — a row with a real label still wins, since
+    // the DB is where an operator-edited name would live.
+    const availableById = new Map(AVAILABLE_PLUGINS.map(p => [p.id, p]))
+    const resolveDisplayName = (p: { id: string; name: string; display_name: string }) =>
+      p.display_name && p.display_name !== p.id && p.display_name !== p.name
+        ? p.display_name
+        : availableById.get(p.id)?.display_name || p.display_name
+
     const templatePlugins: Plugin[] = validInstalledPlugins.map(p => ({
       id: p.id,
       name: p.name,
-      displayName: p.display_name,
+      displayName: resolveDisplayName(p),
       description: p.description,
       version: p.version,
       author: p.author,
@@ -217,17 +230,38 @@ adminPluginRoutes.get('/:id', async (c) => {
     let plugin = await pluginService.getPlugin(pluginId)
 
     if (!plugin) {
-      // Auto-register definePlugin-based plugins that have never been explicitly installed.
-      const def = getPluginDefinition(pluginId)
-      if (!def) return c.text('Plugin not found', 404)
-      plugin = await pluginService.ensurePlugin(pluginId, {
-        displayName: def.displayName ?? pluginId,
-        version: def.version,
-        description: (def as any).description,
-        author: typeof (def as any).author === 'object'
-          ? (def as any).author?.name
-          : (def as any).author,
-      })
+      // Plugin not installed — show detail page from registry without auto-installing.
+      const availablePlugin = getAvailablePlugins().find(p => p.id === pluginId || p.name === pluginId)
+      if (!availablePlugin) return c.text('Plugin not found', 404)
+
+      const pageData: PluginSettingsPageData = {
+        plugin: {
+          id: availablePlugin.id,
+          name: availablePlugin.name,
+          displayName: availablePlugin.display_name,
+          description: availablePlugin.description,
+          version: availablePlugin.version,
+          author: availablePlugin.author,
+          status: 'uninstalled',
+          category: availablePlugin.category,
+          icon: availablePlugin.icon,
+          downloadCount: 0,
+          rating: 0,
+          lastUpdated: 'Not installed',
+          dependencies: availablePlugin.dependencies,
+          permissions: availablePlugin.permissions,
+          isCore: availablePlugin.is_core,
+          settings: {},
+        },
+        activity: [],
+        user: {
+          name: user?.email || 'User',
+          email: user?.email || '',
+          role: user?.role || 'user'
+        },
+      }
+
+      return c.html(renderPluginSettingsPage(pageData))
     }
 
     // Get activity log

@@ -12,9 +12,11 @@ import { getEmailService, hasEmailService } from '../services/email/email-servic
 import { authValidationService, isRegistrationEnabled, isFirstUserRegistration } from '../services/auth-validation'
 import type { RegistrationData } from '../services/auth-validation'
 import type { Bindings, Variables } from '../app'
+import type { KVNamespace } from '@cloudflare/workers-types'
 import { getUserProfileConfig, getRegistrationFields, getProfileFieldDefaults, sanitizeCustomData, saveCustomData, getCustomData } from '../plugins/core-plugins/user-profiles'
 import { dispatchHookEvent } from '../plugins/hooks/dispatch-event'
 import { RbacService } from '../services/rbac'
+import { syncCredentialPassword } from '../auth/credential-account'
 import { bootstrapDocumentTypes } from '../services/document-types-seed'
 import { isDemoModeActive } from '../services/demo-mode'
 
@@ -314,6 +316,31 @@ authRoutes.post('/login',
       await setCsrfCookie(c)
 
       const baBody = await baRes.json() as any
+
+      // Second factor pending. Better Auth answers a 2FA challenge with HTTP **200** and a body
+      // of `{twoFactorRedirect:true}` — no `user`, no `token`, and it deletes the session it had
+      // just created. So `baRes.ok` above is TRUE and this is NOT a credential failure.
+      //
+      // This must be handled before the JWT mint below. `baBody.user` is absent here, so
+      // `generateToken(undefined, undefined, 'viewer', …)` would sign a token for a
+      // non-existent principal, set it as `auth_token`, and hand it back as `token` — and
+      // app.ts's Bearer-JWT fallback would then populate `c.get('user')` with
+      // `{userId: undefined}`, which `requireAuth()` accepts because the object is truthy.
+      //
+      // 200, not 401: the credentials were correct, and a 401 would teach API clients to
+      // re-prompt for the password. BA's signed challenge cookie has already been forwarded onto
+      // this response by the Set-Cookie loop above, which is what /auth/two-factor/verify-totp
+      // needs in order to resolve the challenge.
+      if (baBody?.twoFactorRedirect === true) {
+        return c.json({
+          twoFactorRequired: true,
+          // BA only ever reports 'totp'/'otp' here — never 'backup_code'. A client must offer
+          // backup-code entry unconditionally rather than keying off this list.
+          twoFactorMethods: baBody.twoFactorMethods ?? [],
+          redirectTo: '/auth/two-factor',
+        })
+      }
+
       const user = baBody.user ?? {}
 
       // Mint a JWT so API callers can use Bearer token auth (same as /register)
@@ -557,45 +584,82 @@ authRoutes.post('/register/form',
     // Determine role: first user gets admin, others get viewer
     const role = isFirstUser ? 'admin' : 'viewer'
 
+    const rbacService = new RbacService(db)
+
+    // First user needs system RBAC roles to exist before assignment. Seed them
+    // here (same as /auth/seed-admin) — a failed first boot must not leave an
+    // admin without roles.
+    if (isFirstUser) {
+      await bootstrapDocumentTypes(db)
+      await rbacService.ensureSystemRbacSeed()
+    }
+
     // Create user
     const userId = crypto.randomUUID()
     const now = new Date()
+    const nowSec = Math.floor(now.getTime() / 1000)
 
-    await db.prepare(`
-      INSERT INTO auth_user (id, email, first_name, last_name, password_hash, role, is_active, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).bind(
-      userId,
-      normalizedEmail,
-      firstName,
-      lastName,
-      passwordHash,
-      role,
-      1, // is_active
-      now.getTime(),
-      now.getTime()
-    ).run()
+    await db.batch([
+      db.prepare(`
+        INSERT INTO auth_user (id, email, first_name, last_name, password_hash, role, is_active, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        userId,
+        normalizedEmail,
+        firstName,
+        lastName,
+        passwordHash,
+        role,
+        1, // is_active
+        now.getTime(),
+        now.getTime()
+      ),
+      // Better Auth sign-in/email requires an auth_account credential row
+      db.prepare(`INSERT OR IGNORE INTO auth_account (id, user_id, account_id, provider_id, password, created_at, updated_at)
+        VALUES (?, ?, ?, 'credential', ?, ?, ?)`)
+        .bind(`cred-${userId}`, userId, userId, passwordHash, nowSec, nowSec),
+    ])
 
-    // Save custom profile fields if configured
+    // Assign RBAC role before anything optional — for the first user this makes
+    // them the admin. If it fails, remove the account: an admin without the role
+    // gets 403 everywhere.
+    try {
+      await rbacService.addUserRoleByName(userId, role)
+      if (isFirstUser) {
+        const assigned = await rbacService.getRolesForUser(userId)
+        if (!assigned.some((r) => r.name === 'admin')) {
+          throw new Error('Admin role could not be assigned to the first user')
+        }
+      }
+    } catch (error) {
+      await db.batch([
+        db.prepare('DELETE FROM auth_account WHERE user_id = ?').bind(userId),
+        db.prepare('DELETE FROM auth_user WHERE id = ?').bind(userId),
+      ])
+      throw error
+    }
+
+    // Save custom profile fields if configured. Account is complete and can
+    // sign in by now, so a failure here is logged instead of blocking.
     const profileConfig = getUserProfileConfig()
     if (profileConfig) {
       const regFields = getRegistrationFields()
       if (regFields.length > 0) {
-        const customData: Record<string, any> = { ...getProfileFieldDefaults() }
-        for (const field of regFields) {
-          const raw = formData.get(field.name)?.toString()
-          if (raw !== undefined && raw !== null) {
-            customData[field.name] = raw
+        try {
+          const customData: Record<string, any> = { ...getProfileFieldDefaults() }
+          for (const field of regFields) {
+            const raw = formData.get(field.name)?.toString()
+            if (raw !== undefined && raw !== null) {
+              customData[field.name] = raw
+            }
           }
+          const sanitized = sanitizeCustomData(customData, profileConfig)
+          await saveCustomData(db, userId, sanitized)
+        } catch (profileError) {
+          console.error('Failed to save custom profile fields:', profileError)
         }
-        const sanitized = sanitizeCustomData(customData, profileConfig)
-        await saveCustomData(db, userId, sanitized)
       }
     }
-
-    // Assign RBAC role so the new user passes requireRbac('portal', 'access')
-    const rbacService = new RbacService(db)
-    await rbacService.addUserRoleByName(userId, role)
 
     // Fire auth:registration:completed (fire-and-forget — does not block the response)
     dispatchHookEvent(
@@ -699,6 +763,30 @@ authRoutes.post('/login/form',
 
     await setCsrfCookie(c)
 
+    // Second factor pending — see the sibling branch in POST /auth/login for the full note.
+    // The password was CORRECT and `baRes.ok` is true, so without this branch the handler
+    // reports "Login successful! Redirecting…" and sends the browser to /admin/content with no
+    // session, which bounces straight back to the login page. BA's signed challenge cookie is
+    // already on this response; send the browser to the challenge page instead.
+    const baChallengeBody = (await baRes
+      .clone()
+      .json()
+      .catch(() => null)) as { twoFactorRedirect?: boolean } | null
+    if (baChallengeBody?.twoFactorRedirect === true) {
+      const isHtmxChallenge = c.req.header('HX-Request') === 'true'
+      if (isHtmxChallenge) {
+        c.header('HX-Redirect', '/auth/two-factor')
+      }
+      return c.html(html`
+        <div id="form-response">
+          <p class="text-sm text-zinc-600 dark:text-zinc-300">Password accepted. Redirecting for two-step verification…</p>
+          <script>
+            window.location.href = '/auth/two-factor';
+          </script>
+        </div>
+      `)
+    }
+
     if (email === DEMO_EMAIL) {
       c.executionCtx?.waitUntil(trackDemoLogin(c.env.CACHE_KV))
     }
@@ -741,10 +829,22 @@ authRoutes.post('/login/form',
   }
 })
 
-// Test seeding endpoint (only for development/testing)
+// Environments where the known-credential admin seed is permitted.
+const SEED_ADMIN_ALLOWED_ENVIRONMENTS = new Set(['development', 'test', 'e2e', 'preview', 'local'])
+
+// SECURITY: upserts a fixed-credential admin (admin@sonicjs.com / sonicjs!).
+// Needs ENABLE_SEED_ADMIN="true" AND a non-production ENVIRONMENT.
 authRoutes.post('/seed-admin',
   rateLimit({ max: 10, windowMs: 60 * 1000, keyPrefix: 'seed-admin' }),
   async (c) => {
+  const environment = (c.env?.ENVIRONMENT ?? '').toString().toLowerCase()
+  const enabled = (c.env as { ENABLE_SEED_ADMIN?: unknown } | undefined)?.ENABLE_SEED_ADMIN
+  if (!SEED_ADMIN_ALLOWED_ENVIRONMENTS.has(environment)) {
+    return c.json({ error: 'Seed endpoint not available in this environment' }, 403)
+  }
+  if (String(enabled).toLowerCase() !== 'true') {
+    return c.json({ error: 'Seed endpoint is disabled. Set ENABLE_SEED_ADMIN = "true" to use it in development.' }, 403)
+  }
   try {
     const db = c.env.DB
     // Ensure document_types FK targets exist before RBAC seed — D1 enforces the FK
@@ -1027,24 +1127,25 @@ authRoutes.post('/accept-invitation', async (c) => {
     // Hash password
     const passwordHash = await AuthManager.hashPassword(password)
 
-    // Activate user account
-    const updateStmt = db.prepare(`
-      UPDATE auth_user SET
-        password_hash = ?,
-        is_active = 1,
-        email_verified = 1,
-        invitation_token = NULL,
-        accepted_invitation_at = ?,
-        updated_at = ?
-      WHERE id = ?
-    `)
-
-    await updateStmt.bind(
-      passwordHash,
-      Date.now(),
-      Date.now(),
-      invitedUser.id
-    ).run()
+    // Activate user account (and sync credential row Better Auth signs in with)
+    await db.batch([
+      db.prepare(`
+        UPDATE auth_user SET
+          password_hash = ?,
+          is_active = 1,
+          email_verified = 1,
+          invitation_token = NULL,
+          accepted_invitation_at = ?,
+          updated_at = ?
+        WHERE id = ?
+      `).bind(
+        passwordHash,
+        Date.now(),
+        Date.now(),
+        invitedUser.id
+      ),
+      ...syncCredentialPassword(db, invitedUser.id as string, passwordHash),
+    ])
 
     // Generate JWT token for auto-login
     const tokenTtl = await getJwtExpirySecondsFromDb(c.env.DB, c.env)
@@ -1379,21 +1480,22 @@ authRoutes.post('/reset-password', async (c) => {
       console.warn('Could not store password history:', historyError)
     }
 
-    // Update user password and clear reset token
-    const updateStmt = db.prepare(`
-      UPDATE auth_user SET
-        password_hash = ?,
-        password_reset_token = NULL,
-        password_reset_expires = NULL,
-        updated_at = ?
-      WHERE id = ?
-    `)
-
-    await updateStmt.bind(
-      newPasswordHash,
-      Date.now(),
-      user.id
-    ).run()
+    // Update user password and clear reset token (and sync credential row)
+    await db.batch([
+      db.prepare(`
+        UPDATE auth_user SET
+          password_hash = ?,
+          password_reset_token = NULL,
+          password_reset_expires = NULL,
+          updated_at = ?
+        WHERE id = ?
+      `).bind(
+        newPasswordHash,
+        Date.now(),
+        user.id
+      ),
+      ...syncCredentialPassword(db, user.id as string, newPasswordHash),
+    ])
 
     // Fire auth:password-reset:completed for audit/notification plugins.
     dispatchHookEvent(

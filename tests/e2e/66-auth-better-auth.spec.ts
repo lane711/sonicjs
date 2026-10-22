@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { ADMIN_CREDENTIALS, loginAsAdmin, logout, TEST_ORIGIN } from './utils/test-helpers';
+import { test, expect } from './fixtures';
+import { ADMIN_CREDENTIALS, loginAsAdmin, logout, seedAdminPastRateLimit, TEST_ORIGIN } from './utils/test-helpers';
 
 /**
  * Better Auth integration E2E tests.
@@ -97,7 +97,7 @@ test.describe('Better Auth — sign in / sign out @smoke @auth', () => {
   });
 });
 
-test.describe('Better Auth — protected routes', () => {
+test.describe('Better Auth — protected routes @auth', () => {
   test('unauthenticated GET /admin redirects to login', async ({ page }) => {
     await page.context().clearCookies();
 
@@ -118,10 +118,14 @@ test.describe('Better Auth — protected routes', () => {
   });
 });
 
-test.describe('Better Auth — seed-admin creates credentials', () => {
+test.describe('Better Auth — seed-admin creates credentials @auth', () => {
   test('seed-admin creates user and login works', async ({ request }) => {
-    const res = await request.post('/auth/seed-admin');
-    expect(res.ok()).toBeTruthy();
+    // Headroom for the rate-limit poll above: the default 60s timeout is shorter than the
+    // limiter's own 60s window, so a test that starts on an exhausted window cannot outlast it.
+    test.setTimeout(150_000);
+
+    const res = await seedAdminPastRateLimit(request);
+    expect(res.ok(), `seed-admin never got past the rate limiter: ${res.status()}`).toBeTruthy();
     const body = await res.json();
     expect(body.message).toBe('Seed complete');
     const adminEntry = (body.users ?? []).find((u: any) => u.email === ADMIN_CREDENTIALS.email);

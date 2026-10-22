@@ -5,7 +5,7 @@
  * (not the legacy `content` / `media` tables) per the document-model migration.
  */
 
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { loginAsAdmin } from './utils/test-helpers'
 
 test.describe('Cache Warming — document model @content', () => {

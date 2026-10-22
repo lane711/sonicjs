@@ -1,6 +1,17 @@
 import { test, expect } from '@playwright/test'
+import { isFeatureAvailable } from './utils/test-helpers'
+
+let featureAvailable = false;
 
 test.describe('Marketing Home Page', () => {
+  test.beforeAll(async ({ request }) => {
+    featureAvailable = await isFeatureAvailable(request, '/');
+  });
+
+  test.beforeEach(async () => {
+    if (!featureAvailable) test.skip();
+  });
+
   test('no docs sidebar on home, full-width layout', async ({ page }) => {
     await page.goto('/')
 
@@ -31,8 +42,9 @@ test.describe('Marketing Home Page', () => {
     const discordHref = await discordLink.getAttribute('href')
     expect(discordHref).toContain('discord.gg')
 
-    // Secondary: Quickstart button at bottom
-    const quickstartLink = page.getByRole('link', { name: /Quickstart/i })
+    // Secondary: Quickstart button at bottom. The footer carries its own Quickstart link, so
+    // scope to <main> to keep this on the CTA band rather than tripping strict mode.
+    const quickstartLink = page.getByRole('main').getByRole('link', { name: /Quickstart/i }).last()
     await expect(quickstartLink).toBeVisible()
     const quickstartHref = await quickstartLink.getAttribute('href')
     expect(quickstartHref).toBe('/quickstart')

@@ -1,5 +1,6 @@
 import type { D1Database } from '@cloudflare/workers-types'
 import { Hono } from 'hono'
+import type { Context } from 'hono'
 import { html } from 'hono/html'
 import type { Bindings, Variables } from '../app'
 import { requireAuth, requireRole } from '../middleware'
@@ -19,6 +20,8 @@ import type { QueryableField } from '../schemas/document'
 import { loadCollectionConfigs, getVisibleCollections } from '../services/collection-loader'
 
 const adminContentRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
+
+type ContentRouteContext<P extends string = string> = Context<{ Bindings: Bindings; Variables: Variables }, P>
 
 // Field definition type for form processing
 interface FieldDefinition {
@@ -443,7 +446,10 @@ adminContentRoutes.get('/', async (c) => {
     // Get query parameters
     const page = parseInt(url.searchParams.get('page') || '1')
     const limit = parseInt(url.searchParams.get('limit') || '20')
-    const modelName = url.searchParams.get('model') || 'all'
+    // The filter dropdown posts `model`, but the content form's cancel link and the
+    // post-save redirects below send `collection` instead. Accept both, or saving an item
+    // drops the user on an unfiltered list rather than the collection they were editing.
+    const modelName = url.searchParams.get('model') || url.searchParams.get('collection') || 'all'
     const status = url.searchParams.get('status') || 'all'
     const search = url.searchParams.get('search') || ''
     const offset = (page - 1) * limit
@@ -1210,9 +1216,15 @@ adminContentRoutes.post('/', async (c) => {
     // Extract and validate field data
     const { data, errors } = extractFieldData(fields, formData)
 
-    // Defensive: title is always required regardless of schema
-    const titleVal = (formData.get('title') as string || '').trim()
-    if (!titleVal && !errors['title']) {
+    // Title may not be in schema — read from formData, then derive from common data fields
+    if (data.title === undefined) {
+      const formTitle = (formData.get('title') as string || '').trim()
+      data.title = formTitle || data.name || undefined
+    }
+    if (data.slug === undefined) data.slug = (formData.get('slug') as string || '').trim() || undefined
+
+    // Title is required — check formData and derived sources
+    if (!data.title && !errors['title']) {
       errors['title'] = ['Title is required']
     }
 
@@ -1384,8 +1396,13 @@ adminContentRoutes.post('/', async (c) => {
   }
 })
 
-// Update content
-adminContentRoutes.put('/:id', async (c) => {
+// Update content.
+//
+// Registered for PUT here and for POST at the bottom of this file (after the static POST
+// paths, so /preview, /duplicate and /bulk-action still win): a plain <form> can only GET
+// or POST, so without the POST alias an edit submitted before htmx has booted falls back to
+// a native GET and the user's changes are silently dropped.
+const handleContentUpdate = async (c: ContentRouteContext<'/:id'>) => {
   try {
     const id = c.req.param('id')
     const user = c.get('user')
@@ -1397,7 +1414,7 @@ adminContentRoutes.put('/:id', async (c) => {
     // ── Option B: if :id is a document-backed root, save a new draft + sync publish state ──
     const tenantId = reqTenant(c)
     const docRowU = await db
-      .prepare("SELECT id, type_id FROM documents WHERE root_id = ? AND is_current_draft = 1 AND tenant_id = ?")
+      .prepare("SELECT id, type_id, title, slug FROM documents WHERE root_id = ? AND is_current_draft = 1 AND tenant_id = ?")
       .bind(id, tenantId).first() as any
     if (docRowU) {
       const docType = await getDocBackingType(db, docRowU.type_id)
@@ -1405,6 +1422,13 @@ adminContentRoutes.put('/:id', async (c) => {
       if (docType && dcoll) {
         const fields = await getCollectionFields(db, dcoll.id)
         const { data, errors } = extractFieldData(fields, formData)
+        // Title/slug may live outside schema fields — read from formData, then fall back to existing DB values,
+        // then derive from common data fields (e.g. collections with 'name' but no 'title' property)
+        if (data.title === undefined) {
+          const formTitle = (formData.get('title') as string || '').trim()
+          data.title = formTitle || docRowU.title || data.name || undefined
+        }
+        if (data.slug === undefined) data.slug = (formData.get('slug') as string || '').trim() || docRowU.slug || undefined
         if (Object.keys(errors).length > 0) {
           const flags = await loadContentEditorFlags(db)
           const errFormData = {
@@ -1425,7 +1449,7 @@ adminContentRoutes.put('/:id', async (c) => {
         if (action === 'save_and_publish') status = 'published'
 
         const svc = makeDocService(db, docType, tenantId)
-        const newDraft = await svc.saveDraft(id, { title: data.title ?? null, slug, data }, user?.userId)
+        const newDraft = await svc.saveDraft(id, { title: data.title || slug || null, slug, data }, user?.userId)
         // saveDraft always returns an unpublished draft; sync against the root's published row.
         const pub = await db.prepare("SELECT id FROM documents WHERE root_id = ? AND is_published = 1 AND tenant_id = ?").bind(id, tenantId).first() as any
         if (status === 'published') await svc.publish(newDraft.id, user?.userId)
@@ -1496,6 +1520,12 @@ adminContentRoutes.put('/:id', async (c) => {
 
     // Extract and validate field data
     const { data, errors } = extractFieldData(fields, formData)
+    // Title/slug may live outside schema fields — read from formData, then fall back to existing DB values
+    if (data.title === undefined) {
+      const formTitle = (formData.get('title') as string || '').trim()
+      data.title = formTitle || existingContent.title || data.name || undefined
+    }
+    if (data.slug === undefined) data.slug = (formData.get('slug') as string || '').trim() || existingContent.slug || undefined
 
     if (Object.keys(errors).length > 0) {
       const flags = await loadContentEditorFlags(db)
@@ -1631,7 +1661,9 @@ adminContentRoutes.put('/:id', async (c) => {
       </div>
     `)
   }
-})
+}
+
+adminContentRoutes.put('/:id', handleContentUpdate)
 
 // Content preview
 adminContentRoutes.post('/preview', requireRole(['admin', 'editor', 'author']), async (c) => {
@@ -1650,6 +1682,7 @@ adminContentRoutes.post('/preview', requireRole(['admin', 'editor', 'author']), 
 
     // Extract field data for preview (skip validation)
     const { data } = extractFieldData(fields, formData, { skipValidation: true })
+    if (data.title === undefined) data.title = (formData.get('title') as string || '').trim() || data.name || undefined
 
     // Sanitize user-controlled values before rendering
     const safeTitle = escapeHtml(data.title || 'Untitled')
@@ -2320,5 +2353,10 @@ adminContentRoutes.get('/documents/:typeId/:rootId/versions', async (c) => {
 // The content list sets item.id = "documents/:typeId/:rootId", so the rendered edit link is
 // /admin/content/documents/:typeId/:rootId/edit — served by the GET handler above. No catch-all is
 // needed here (removed a stale comment that promised one but defined nothing — D14).
+
+// POST alias for the update handler. It has to sit below every static POST path above,
+// because the router runs matching handlers in registration order and '/:id' would
+// otherwise swallow /preview, /duplicate and /bulk-action.
+adminContentRoutes.post('/:id', handleContentUpdate)
 
 export default adminContentRoutes
