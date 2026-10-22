@@ -28,6 +28,20 @@ function isAnonPrincipal(principalSet: PrincipalRef[]): boolean {
 // Checks document ACL baseGrants first, then falls back to RBAC dynamic role grants.
 // Both systems must be consulted: baseGrants is set at registration time (in code), while
 // RBAC grants are set at runtime via the RBAC matrix UI and stored in the document store.
+// When the document_types row is absent (e.g. bootstrap not yet run in tests), fall back to the
+// CollectionRegistry's access config, which autoRegisterCollectionDocumentTypes would use to seed it.
+function resolveTypeSettings(docType: { settings?: any } | null | undefined, typeName: string): any {
+  if (docType?.settings) return docType.settings
+  const col = getCollectionRegistry().getByName(typeName)
+  if (!col) return {}
+  const defaultGrants: Record<string, string[]> = {
+    admin: ['read', 'create', 'update', 'delete', 'publish', 'manage'],
+    editor: ['read', 'create', 'update', 'publish'],
+    viewer: ['read'],
+  }
+  return { baseGrants: col.access ? { ...defaultGrants, ...col.access } : defaultGrants }
+}
+
 async function typeReadAllowed(
   db: any,
   principalSet: PrincipalRef[],
@@ -35,7 +49,7 @@ async function typeReadAllowed(
   typeName: string,
 ): Promise<boolean> {
   const perms = new DocumentPermissionsService(db)
-  if (perms.isAllowedSync(principalSet, [], 'read', docType?.settings ?? {})) return true
+  if (perms.isAllowedSync(principalSet, [], 'read', resolveTypeSettings(docType, typeName))) return true
   const rbac = new RbacService(db)
   let anyRbacRoleFound = false
   for (const p of principalSet) {
@@ -44,8 +58,8 @@ async function typeReadAllowed(
     anyRbacRoleFound = true
     if (await rbac.isGrantedForRole(p.id, `document_type:${typeName}`, 'read')) return true
   }
-  // No RBAC role found in principal set → legacy/unknown role → default allow
-  return !anyRbacRoleFound
+  // No recognized role grant found → deny (unknown/legacy roles do not implicitly get read access)
+  return false
 }
 
 // Document columns the public list is allowed to ORDER BY. The legacy `content` table exposed
@@ -741,6 +755,7 @@ apiRoutes.get('/content', optionalAuth(), async (c) => {
     const { tenantId: cTenantId, principalSet: cPrincipalSet } = getDocumentRequestContext(c)
     const cAnon = isAnonPrincipal(cPrincipalSet)
     // Admin/editor have unconditional access — ACL gates non-privileged authenticated callers only.
+    // Anonymous callers are handled by the type-level check below (D5).
     const cNeedsAcl = !cAnon && !canReadNonPublicContent(role)
 
     // Resolve collection scoping to document type ids (== collection name). Build a name→collectionId
@@ -784,6 +799,38 @@ apiRoutes.get('/content', optionalAuth(), async (c) => {
     if (!normalizedFilter.limit) normalizedFilter.limit = 50
     normalizedFilter.limit = Math.min(normalizedFilter.limit, 1000) // Max 1000
 
+    // D5: anonymous callers must pass the type-level access check.
+    // Load the actual document_type settings from DB so baseGrants are authoritative.
+    if (cAnon) {
+      const perms = new DocumentPermissionsService(db)
+      const anonPrincipal: PrincipalRef[] = [{ type: 'public', id: '*' }]
+      if (typeId) {
+        const anonDocType = await new DocumentTypeRegistry(db).findById(typeId)
+        if (!perms.isAllowedSync(anonPrincipal, [], 'read', resolveTypeSettings(anonDocType, typeId))) {
+          return c.json({ data: [], meta: addTimingMeta(c, { count: 0, timestamp: new Date().toISOString() }, executionStart) })
+        }
+      } else if (typeIds) {
+        // Batch-load all types and filter to those allowing public reads.
+        // Internal types are already excluded by the registry.listActive() filter above.
+        const typeReg = new DocumentTypeRegistry(db)
+        await typeReg.preloadAll()
+        const allowed: string[] = []
+        for (const tid of typeIds) {
+          const dt = await typeReg.findById(tid)
+          if (perms.isAllowedSync(anonPrincipal, [], 'read', resolveTypeSettings(dt, tid))) {
+            allowed.push(tid)
+          }
+        }
+        typeIds = allowed
+        if (typeIds.length === 0) {
+          return c.json({ data: [], meta: addTimingMeta(c, { count: 0, timestamp: new Date().toISOString() }, executionStart) })
+        }
+        // Re-augment filter with the filtered typeIds
+        const refiltered = augmentFilterForDocuments(filter, { typeIds, role })
+        Object.assign(normalizedFilter, refiltered)
+      }
+    }
+
     // Build SQL query from filter
     const builder = new QueryFilterBuilder()
     const queryResult = builder.build('documents', normalizedFilter)
@@ -797,7 +844,7 @@ apiRoutes.get('/content', optionalAuth(), async (c) => {
     }
 
     // Non-anonymous / non-privileged users get per-request ACL filtering — skip cache.
-    const cacheEnabled = c.get('cacheEnabled') && !cNeedsAcl
+    const cacheEnabled = c.get('cacheEnabled') && !cNeedsAcl && projFields.length === 0
     const cache = getCacheService(CACHE_CONFIGS.api!)
     const cacheKey = cache.generateKey('content-filtered', JSON.stringify({ filter: normalizedFilter, query: queryResult.sql }))
 
@@ -866,13 +913,13 @@ scheduleKvWrite(cacheKey, () => c.executionCtx)
       const typeSettingsMap = new Map<string, any>()
       const typeRbacOnlyMap = new Map<string, boolean>()
       const typeDeniedMap = new Map<string, boolean>()
+      const perms = new DocumentPermissionsService(db)
       await Promise.all(uniqueTypeIds.map(async (tid) => {
         const dt = await typeReg.findById(tid)
-        const settings = dt?.settings ?? {}
+        const settings = resolveTypeSettings(dt, tid)
         typeSettingsMap.set(tid, settings)
         const allowed = await typeReadAllowed(db, cPrincipalSet, dt, tid)
         if (!allowed) { typeDeniedMap.set(tid, true); return }
-        const perms = new DocumentPermissionsService(db)
         typeRbacOnlyMap.set(tid, !perms.isAllowedSync(cPrincipalSet, [], 'read', settings))
       }))
       const allowed = await Promise.all(
@@ -945,8 +992,15 @@ apiRoutes.get('/collections/:collection/content', optionalAuth(), async (c) => {
     const ccNeedsAcl = !ccAnon && !canReadNonPublicContent(role)
 
     // Non-privileged authenticated users with no type-level read grant get 403 immediately.
+    // Anonymous callers get an early 403 if the type denies public reads (D5).
     let ccDocType: Awaited<ReturnType<DocumentTypeRegistry['findById']>> | undefined
-    if (ccNeedsAcl) {
+    if (ccAnon) {
+      const anonPerms = new DocumentPermissionsService(db)
+      const ccAnonDocType = await new DocumentTypeRegistry(db).findById(record.name)
+      if (!anonPerms.isAllowedSync([{ type: 'public', id: '*' }], [], 'read', resolveTypeSettings(ccAnonDocType, record.name))) {
+        return c.json({ error: 'Forbidden' }, 403)
+      }
+    } else if (ccNeedsAcl) {
       ccDocType = await new DocumentTypeRegistry(db).findById(record.name)
       if (!(await typeReadAllowed(db, ccPrincipalSet, ccDocType, record.name))) {
         return c.json({ error: 'Forbidden' }, 403)
@@ -1118,8 +1172,15 @@ apiRoutes.get('/:collection', optionalAuth(), async (c) => {
     const needsAcl = !anon && !canReadNonPublicContent(role)
 
     // Non-privileged authenticated users with no type-level read grant get 403 immediately.
+    // Anonymous callers get an early 403 if the type denies public reads (D5).
     let docTypeForCheck: Awaited<ReturnType<DocumentTypeRegistry['findById']>> | undefined
-    if (needsAcl) {
+    if (anon) {
+      const anonPerms = new DocumentPermissionsService(db)
+      const anonDocType = await new DocumentTypeRegistry(db).findById(record.name)
+      if (!anonPerms.isAllowedSync([{ type: 'public', id: '*' }], [], 'read', resolveTypeSettings(anonDocType, record.name))) {
+        return c.json({ error: 'Forbidden' }, 403)
+      }
+    } else if (needsAcl) {
       docTypeForCheck = await new DocumentTypeRegistry(db).findById(record.name)
       if (!(await typeReadAllowed(db, principalSet, docTypeForCheck, record.name))) {
         return c.json({ error: 'Forbidden' }, 403)
@@ -1253,8 +1314,15 @@ apiRoutes.get('/:collection/:id', optionalAuth(), async (c) => {
     // Authenticated non-anonymous users must pass the document ACL.
     const colRole = c.get('user')?.role
     const { tenantId: colTenantId, principalSet: colPrincipalSet } = getDocumentRequestContext(c)
-    const colNeedsAcl = !isAnonPrincipal(colPrincipalSet) && !canReadNonPublicContent(colRole)
-    if (colNeedsAcl) {
+    const colAnon = isAnonPrincipal(colPrincipalSet)
+    const colNeedsAcl = !colAnon && !canReadNonPublicContent(colRole)
+    if (colAnon) {
+      const anonPerms = new DocumentPermissionsService(db)
+      const colAnonDocType = await new DocumentTypeRegistry(db).findById(record.name)
+      if (!anonPerms.isAllowedSync([{ type: 'public', id: '*' }], [], 'read', resolveTypeSettings(colAnonDocType, record.name))) {
+        return c.json({ error: 'Content not found' }, 404)
+      }
+    } else if (colNeedsAcl) {
       const docType = await new DocumentTypeRegistry(db).findById(record.name)
       // Check both baseGrants and RBAC grants (same two-system approach as the list routes).
       if (!(await typeReadAllowed(db, colPrincipalSet, docType, record.name))) {

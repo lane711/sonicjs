@@ -360,7 +360,10 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
             try {
               const configs = await loadCollectionConfigs()
               getCollectionRegistry().register(configs)
-            } catch { /* registry optional in fast-path */ }
+            } catch (e) {
+              console.warn('[Bootstrap] KV fast-path: collection registry failed; falling through to full bootstrap')
+              throw e
+            }
             // Sync document types to D1 even on KV fast-path — idempotent no-ops when
             // nothing changed, but ensures newly added code collections reach D1 without
             // requiring a version bump or full cold-start bootstrap.
@@ -572,7 +575,7 @@ export function bootstrapMiddleware(config: SonicJSConfig = {}, allPlugins?: Arr
         // Stable installation ID via KV (generated once, persisted)
         let installationId = 'unknown';
         try {
-          const kv = (c.env.CACHE_KV ?? c.env.KV) as KVNamespace | undefined;
+          const kv = (c.env.KV ?? c.env.CACHE_KV) as KVNamespace | undefined;
           if (kv) {
             installationId = (await kv.get('_sonicjs_installation_id')) ?? '';
             if (!installationId) {
