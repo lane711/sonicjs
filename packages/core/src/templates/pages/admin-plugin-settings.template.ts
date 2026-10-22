@@ -4,10 +4,24 @@ import type { AuthSettings } from '../../services/auth-validation'
 import { getPluginDefinition } from '../../services/plugin-definition-registry'
 
 /**
- * Escape HTML attribute values to prevent XSS
+ * Escape HTML attribute values to prevent XSS.
+ *
+ * Settings values are `any` (seeded verbatim from a manifest's `defaultSettings`), so a
+ * non-string reaches here routinely — `ai-search` ships `selected_collections: []` and
+ * `oauth-providers` ships a `providers` object. Coerce before escaping: a bare
+ * `value.replace(...)` would throw and 500 the plugin detail page.
  */
-function escapeHtmlAttr(value: string): string {
-  return value
+function escapeHtmlAttr(value: unknown): string {
+  const str =
+    typeof value === 'string'
+      ? value
+      : value == null
+        ? ''
+        : typeof value === 'object'
+          ? JSON.stringify(value)
+          : String(value)
+
+  return str
     .replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;')
