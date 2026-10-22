@@ -136,20 +136,13 @@ async function fetchActivePluginIds(db: D1Database): Promise<Set<string>> {
 
 export async function reconcileMenuFromPlugins(db: D1Database): Promise<void> {
   try {
-    // Source A: code-declared plugins via definePlugin({ menu: [...] })
     const singletonEntries = getPluginMenu()
-
-    // Source B: manifest-registered plugins with adminMenu
     const manifestEntries = (Object.values(PLUGIN_REGISTRY) as PluginRegistryEntry[]).filter(
       (p): p is PluginRegistryEntry & { adminMenu: NonNullable<PluginRegistryEntry['adminMenu']> } =>
         p.adminMenu !== null,
     )
 
-    // Merge into a map keyed by pluginId; manifest entries provide the base,
-    // singleton entries (code-declared) win if both define the same pluginId.
     const byPluginId = new Map<string, ActivePluginEntry>()
-
-    // Index manifest entries first (lower priority)
     manifestEntries.forEach((p: PluginRegistryEntry, idx: number) => {
       const menu = p.adminMenu!
       byPluginId.set(p.id, {
@@ -160,17 +153,11 @@ export async function reconcileMenuFromPlugins(db: D1Database): Promise<void> {
         sortOrder: 100 + idx * 10,
       })
     })
-
-    // Singleton entries override (higher priority — code-declared wins)
     singletonEntries.forEach((entry: PluginMenuEntry, idx: number) => {
-      // Derive pluginId from path: last path segment after /admin/plugins/<id>
-      // or fall back to a slugified label. The slug uniqueness is enforced by
-      // the caller using `menu:plugin:<pluginId>` so we do the same derivation.
       const pathParts = entry.path.replace(/\/$/, '').split('/')
       const pluginId =
         pathParts[pathParts.length - 1] ||
         entry.label.toLowerCase().replace(/\s+/g, '-')
-
       byPluginId.set(pluginId, {
         pluginId,
         label: entry.label,
@@ -180,18 +167,83 @@ export async function reconcileMenuFromPlugins(db: D1Database): Promise<void> {
       })
     })
 
-    // Only plugins explicitly active in DB get visible=true on first insert.
-    // Plugins not yet in DB (never installed) default to visible=false.
+    // Round trip 1: get active plugin IDs
     const activeIds = await fetchActivePluginIds(db)
 
-    // Upsert all registry plugin entries; visible depends on active status
+    // Round trip 2: get all existing plugin-source menu rows
+    const existingRows = await db
+      .prepare(
+        `SELECT id, slug, data, visible FROM documents
+         WHERE type_id = 'menu_item' AND tenant_id = 'default'
+           AND is_current_draft = 1 AND deleted_at IS NULL
+           AND json_extract(data, '$.source') = 'plugin'`
+      )
+      .all<{ id: string; slug: string; data: string; visible: number }>()
+
+    const existingBySlug = new Map(
+      (existingRows.results ?? []).map(r => [r.slug, r])
+    )
+    const expectedSlugs = new Set([...byPluginId.keys()].map(id => `menu:plugin:${id}`))
+    const now = Math.floor(Date.now() / 1000)
+
+    const statements: ReturnType<D1Database['prepare']>[] = []
+
+    // Insert new rows, skip existing
     for (const [pluginId, entry] of byPluginId) {
       const slug = `menu:plugin:${pluginId}`
-      await upsertPluginRow(db, slug, entry, activeIds.has(pluginId))
+      const existing = existingBySlug.get(slug)
+      const shouldBeVisible = activeIds.has(pluginId)
+
+      if (!existing) {
+        const id = nanoid()
+        const data = JSON.stringify({
+          label: entry.label,
+          url: entry.url,
+          icon: entry.icon,
+          target: '_self',
+          isExternal: false,
+          visible: shouldBeVisible,
+          parent: null,
+          source: 'plugin',
+          pluginId: entry.pluginId,
+          permissions: [],
+          lockedFields: ['url'],
+          sortOrder: entry.sortOrder,
+        })
+        statements.push(
+          db.prepare(
+            `INSERT INTO documents (id, root_id, type_id, type_version, version_of_id, version_number,
+               is_current_draft, is_published, status, parent_root_id, slug, path, title, zone,
+               sort_order, visible, published_at, scheduled_at, expires_at, deleted_at,
+               tenant_id, locale, translation_group_id, data, metadata,
+               owner_id, created_by, updated_by, created_at, updated_at)
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+          ).bind(
+            id, id, 'menu_item', 1, null, 1,
+            1, 0, 'draft', '', slug, null, entry.label, null,
+            entry.sortOrder, shouldBeVisible ? 1 : 0, null, null, null, null,
+            'default', 'default', '', data, '{}',
+            null, null, null, now, now,
+          )
+        )
+      }
     }
 
-    // Deactivate rows whose plugin is inactive or removed from registry
-    await deactivateStalePluginRows(db, activeIds)
+    // Deactivate stale rows (pluginId removed from registry)
+    for (const row of existingRows.results ?? []) {
+      if (!expectedSlugs.has(row.slug)) {
+        statements.push(
+          db.prepare(
+            `UPDATE documents SET data = json_set(data, '$.visible', 0), visible = 0, updated_at = ?
+             WHERE id = ? AND tenant_id = 'default'`,
+          ).bind(now, row.id)
+        )
+      }
+    }
+
+    if (statements.length > 0) {
+      await db.batch(statements)
+    }
   } catch {
     // DB may not be ready at bootstrap; swallow silently
   }

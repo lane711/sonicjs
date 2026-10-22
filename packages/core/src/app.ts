@@ -136,6 +136,8 @@ export interface Variables {
   tenantRole?: string
   /** Authentication method used for this request ('session' | 'api-key'). */
   authMethod?: 'session' | 'api-key'
+  /** Active plugin slugs resolved by pluginMenuMiddleware. */
+  activePluginSlugs?: Set<string>
 }
 
 export interface SonicJSConfig {

@@ -30,6 +30,9 @@ const ICON_SVG: Record<string, string> = {
   'shield-check': '<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>',
   'credit-card': '<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/></svg>',
   'document-text': '<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"/></svg>',
+  'lock-closed': '<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>',
+  'bolt': '<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"/></svg>',
+  'variable': '<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.745 3A23.933 23.933 0 0 0 3 12c0 3.183.62 6.22 1.745 9M19.255 3A23.933 23.933 0 0 1 21 12c0 3.183-.62 6.22-1.745 9M8.25 8.885l1.444-.89a.75.75 0 0 1 1.105.402l2.402 7.205a.75.75 0 0 0 1.104.401l1.445-.889m-8.25.75.213.09a1.687 1.687 0 0 0 2.062-.617l4.45-6.676a1.688 1.688 0 0 1 2.062-.618l.213.09"/></svg>',
   'pencil-square': '<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/></svg>',
   'server': '<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm14 1a1 1 0 11-2 0 1 1 0 012 0zM2 13a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2zm14 1a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd"/></svg>',
   'building-office': '<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>',
@@ -76,21 +79,41 @@ export function pluginMenuMiddleware() {
       return next()
     }
 
-    // Collect menu items from active plugins using the registry
+    // Collect all plugin IDs that need a DB active-check:
+    // 1. Manifest plugins with adminMenu
+    // 2. Singleton entries that declare a pluginId
+    // 3. The 'menu' plugin itself (no adminMenu, but other middleware gates on it)
+    const singletonItemsAll = resolvePluginMenuItems((c.get('user') as { role?: string } | undefined) ? { role: (c.get('user') as any).role } : undefined)
+    const singletonWithId = singletonItemsAll.filter(i => i.pluginId)
+    const singletonWithoutId = singletonItemsAll.filter(i => !i.pluginId)
+
+    const allPluginIds = [
+      ...REGISTRY_MENU_PLUGINS.map(p => p.id),
+      ...singletonWithId.map(i => i.pluginId as string),
+      'menu',
+    ]
+    // Deduplicate
+    const uniqueIds = [...new Set(allPluginIds)]
+
     let activeMenuItems: Array<{ label: string; path: string; icon?: string; order: number }> = []
-    try {
-      const db = c.env.DB
-      const pluginIds = REGISTRY_MENU_PLUGINS.map(p => p.id)
-      if (pluginIds.length > 0) {
-        const placeholders = pluginIds.map(() => '?').join(',')
+    const activeIds = new Set<string>()
+
+    if (uniqueIds.length > 0) {
+      try {
+        const db = c.env.DB
+        const placeholders = uniqueIds.map(() => '?').join(',')
         const result = await db.prepare(
           `SELECT slug FROM documents WHERE type_id = 'plugin' AND tenant_id = 'default' AND slug IN (${placeholders}) AND q_plugin_status = 'active' AND is_current_draft = 1 AND deleted_at IS NULL`
-        ).bind(...pluginIds).all()
+        ).bind(...uniqueIds).all()
 
-        const activeIds = new Set((result.results || []).map((r: any) => r.slug))
+        const activeSet = new Set((result.results || []).map((r: any) => r.slug))
 
+        // Populate activeIds Set for downstream middleware
+        for (const id of activeSet) activeIds.add(id)
+
+        // Add manifest plugins that are active
         for (const plugin of REGISTRY_MENU_PLUGINS) {
-          if (activeIds.has(plugin.id)) {
+          if (activeSet.has(plugin.id)) {
             activeMenuItems.push({
               label: plugin.label,
               path: plugin.path,
@@ -100,34 +123,39 @@ export function pluginMenuMiddleware() {
           }
         }
 
-        // Sort by order
-        activeMenuItems.sort((a, b) => a.order - b.order)
+        // Add singleton plugins with pluginId that are active
+        const existingPaths = new Set(activeMenuItems.map(i => i.path))
+        for (const item of singletonWithId) {
+          if (activeSet.has(item.pluginId as string) && !existingPaths.has(item.path)) {
+            activeMenuItems.push({ label: item.label, path: item.path, icon: item.icon, order: item.order })
+            existingPaths.add(item.path)
+          }
+        }
+      } catch {
+        // DB not ready or plugin table doesn't exist yet
+        // Fall open for entries without pluginId
       }
-    } catch {
-      // DB not ready or plugin table doesn't exist yet
     }
 
-    // Append user plugin menu items from the singleton.
-    // The singleton is populated with ONLY config.plugins.register entries (user plugins),
-    // so no DB active-check is needed — user plugins are always mounted when configured.
-    const user = c.get('user') as { role?: string } | undefined
-    const singletonItems = resolvePluginMenuItems(user ? { role: user.role } : undefined)
+    // Singleton items without pluginId are always shown (no DB gate)
     const existingPaths = new Set(activeMenuItems.map(i => i.path))
-    for (const item of singletonItems) {
+    for (const item of singletonWithoutId) {
       if (!existingPaths.has(item.path)) {
         activeMenuItems.push({ label: item.label, path: item.path, icon: item.icon, order: item.order })
       }
     }
+
     activeMenuItems.sort((a, b) => a.order - b.order)
 
-    c.set('pluginMenuItems', activeMenuItems.map(m => ({ label: m.label, path: m.path, icon: resolveIcon(m.icon) || m.icon || '' })))
+    c.set('pluginMenuItems', activeMenuItems.map(m => ({
+      label: m.label,
+      path: m.path,
+      icon: resolveIcon(m.icon) || '',
+    })))
+    c.set('activePluginSlugs', activeIds)
 
     await next()
 
-    // Inject menu items into HTML response by replacing the marker.
-    // Read from context var (not activeMenuItems) so plugins that self-inject
-    // via app.use('/admin/*', ...) pre-next are included even when they're not
-    // in the compiled manifest registry (e.g. external/stats plugin).
     const finalItems = (c.get('pluginMenuItems') as Array<{ label: string; path: string; icon: string }>) ?? []
     if (finalItems.length > 0 && c.res.headers.get('content-type')?.includes('text/html')) {
       const status = c.res.status
@@ -139,7 +167,6 @@ export function pluginMenuMiddleware() {
         const newHtml = html.split(MARKER).join(renderedItems)
         c.res = new Response(newHtml, { status, headers })
       } else {
-        // Body was consumed by .text(), must create new Response either way
         c.res = new Response(html, { status, headers })
       }
     }
