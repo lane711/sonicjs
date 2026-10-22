@@ -126,7 +126,7 @@ export function getDefaultAuthOptions(env: Bindings, requestBaseURL?: string) {
   // gates HTTP requests, and SonicJS never calls the organization API server-side.
   const organizationPaths = Object.values(tenantOrganization.endpoints)
     .map((endpoint) => (endpoint as { path?: unknown }).path)
-    .filter((path): path is string => typeof path === 'string' && path.startsWith('/organization/'))
+    .filter((path): path is string => typeof path === 'string' && (path === '/organization' || path.startsWith('/organization/')))
 
   return {
     secret: env.BETTER_AUTH_SECRET,
@@ -372,7 +372,8 @@ export function getDefaultAuthOptions(env: Bindings, requestBaseURL?: string) {
     ),
 
     // Our own KV session cache — set AFTER the spread so the shim cannot overwrite it.
-    secondaryStorage: createSecondaryStorage(env.CACHE_KV),
+    // Omit the key entirely when there is no KV binding, so BA never sees a present-but-undefined value.
+    ...(env.CACHE_KV ? { secondaryStorage: createSecondaryStorage(env.CACHE_KV) } : {}),
 
     disabledPaths: organizationPaths,
 
@@ -407,6 +408,14 @@ export function createAuth(env: Bindings, extendBetterAuth?: ExtendBetterAuth, r
   }
   const defaults = getDefaultAuthOptions(env, requestBaseURL)
   const options = extendBetterAuth ? extendBetterAuth(defaults) : defaults
+
+  if (defaults.disabledPaths?.length && (!options.disabledPaths || options.disabledPaths.length < defaults.disabledPaths.length)) {
+    console.warn(
+      '[sonicjs/auth] extendBetterAuth removed or reduced disabledPaths. ' +
+        'Organization endpoints are still blocked by app.ts, but the BA-level guard is weakened.'
+    )
+  }
+
   return betterAuth(options as Parameters<typeof betterAuth>[0])
 }
 

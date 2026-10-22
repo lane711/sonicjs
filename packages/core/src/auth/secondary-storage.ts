@@ -52,6 +52,10 @@ export function createSecondaryStorage(kv: KVNamespace | undefined): SecondarySt
         await kv.put(key, value)
         return
       }
+      if (ttl <= 0) {
+        await kv.delete(key)
+        return
+      }
       // Clamp rather than fail: KV rejects a sub-60s TTL outright. A value that outlives its
       // window is still rejected on read, because Better Auth checks the `expiresAt` it stores
       // inside the payload.
