@@ -1366,7 +1366,7 @@ adminContentRoutes.post('/', async (c) => {
     ).run()
 
     // Handle different actions
-    const referrerParams = formData.get('referrer_params') as string
+    const referrerParams = (formData.get('referrer_params') as string || '').replace(/[\r\n]/g, '')
     const redirectUrl = action === 'save_and_continue'
       ? `/admin/content/${contentId}/edit?success=Content saved successfully!${referrerParams ? `&ref=${encodeURIComponent(referrerParams)}` : ''}`
       : referrerParams
@@ -1461,7 +1461,7 @@ const handleContentUpdate = async (c: ContentRouteContext<'/:id'>) => {
         await apiCacheEdit.invalidate(`api:collection-content-filtered:${docRowU.type_id}:*`)
 
         const isHTMX = c.req.header('HX-Request') === 'true'
-        const referrerParams = formData.get('referrer_params') as string | null
+        const referrerParams = ((formData.get('referrer_params') as string | null) || '').replace(/[\r\n]/g, '') || null
         const listUrl = referrerParams
           ? `/admin/content?${referrerParams}`
           : `/admin/content?collection=${dcoll.id}`
