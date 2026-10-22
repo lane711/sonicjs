@@ -29,7 +29,11 @@ jobs:
   test:
     needs: authorize
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # 150, not 90. The suite is ~740 tests at 2 workers with retries: 3; the selected subset was
+    # 507 in 37.9 min (job 53 min), and an earlier unfiltered run was still going at 88 min and
+    # was killed by the old 90-minute cap — which uploads videos but no report, so it tells you
+    # nothing. Full runs need headroom for the retry tail, not just the median.
+    timeout-minutes: 150
 
     steps:
       - name: Checkout code
@@ -211,117 +215,18 @@ jobs:
           echo "Preview failed to become ready"
           exit 1
 
-      - name: Detect changed areas for E2E test selection
-        if: github.actor != 'dependabot[bot]'
-        id: test-tags
-        run: |
-          # Get changed files vs base branch (PR diff) or last commit (push)
-          if [ "${{ github.event_name }}" = "pull_request_target" ]; then
-            CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD 2>/dev/null || echo "")
-          else
-            CHANGED=$(git diff --name-only HEAD~1 2>/dev/null || echo "")
-          fi
-
-          echo "Changed files:"
-          echo "$CHANGED"
-
-          # Always include smoke
-          TAGS="@smoke"
-
-          # Strip test/spec files from consideration — only source changes should
-          # trigger extra E2E feature tags; test file renames/updates don't affect
-          # deployed behaviour and would otherwise pull in unrelated E2E suites.
-          CHANGED_SRC=$(echo "$CHANGED" | grep -vE '__tests__|\.test\.|\.spec\.' || true)
-
-          # Map changed source paths to feature tags
-          if echo "$CHANGED_SRC" | grep -qE 'admin-media|services/media|media-documents'; then
-            TAGS="$TAGS|@media"
-          fi
-          if echo "$CHANGED_SRC" | grep -qE 'admin-content|services/documents|document-repository|document-projection'; then
-            TAGS="$TAGS|@content"
-          fi
-          if echo "$CHANGED_SRC" | grep -qE 'routes/api|api-content|api-documents|api-media'; then
-            TAGS="$TAGS|@api"
-          fi
-          if echo "$CHANGED_SRC" | grep -qE 'middleware/auth|admin-settings|api-keys|services/api-key|src/auth/|routes/auth|two-factor'; then
-            TAGS="$TAGS|@auth|@api-keys"
-          fi
-          if echo "$CHANGED_SRC" | grep -qE 'admin-database|database-tools'; then
-            TAGS="$TAGS|@database"
-          fi
-          if echo "$CHANGED_SRC" | grep -qE 'collection-registry|admin-collections'; then
-            TAGS="$TAGS|@collections"
-          fi
-          if echo "$CHANGED_SRC" | grep -qE 'admin-plugins|plugins/sdk|plugin-definition-registry|plugin-middleware|services/plugin|core-plugins/|routes/plugin'; then
-            TAGS="$TAGS|@plugins"
-          fi
-          if echo "$CHANGED_SRC" | grep -qE 'admin-forms|public-forms|forms-plugin'; then
-            TAGS="$TAGS|@forms"
-          fi
-          # The multi-tenant specs are tagged @auth (they exercise per-tenant RBAC) and are
-          # driven from the Plugins page, but middleware/tenant.ts sits under neither matcher
-          # above, so a change to tenant resolution otherwise shipped with @smoke only.
-          if echo "$CHANGED_SRC" | grep -qE 'middleware/tenant|multi-tenant'; then
-            TAGS="$TAGS|@auth|@plugins"
-          fi
-          # The admin sidebar is assembled by middleware/plugin-menu.ts and middleware/menu.ts.
-          # Neither filename matches 'plugin-middleware' or 'services/plugin' above, so edits to
-          # the sidebar shipped with @smoke only — past the specs that actually look at it
-          # (disabled-plugin entries, viewer-scoped entries, the dashboard fragments it wraps).
-          if echo "$CHANGED_SRC" | grep -qE 'middleware/plugin-menu|middleware/menu|plugin-menu-singleton|manifest-registry'; then
-            TAGS="$TAGS|@plugins|@auth"
-          fi
-          # Dashboard route + template feed the htmx fragments every admin page load pays for.
-          if echo "$CHANGED_SRC" | grep -qE 'admin-dashboard'; then
-            TAGS="$TAGS|@content"
-          fi
-          if echo "$CHANGED_SRC" | grep -qE 'migrations/'; then
-            TAGS="$TAGS|@content|@media|@api"
-          fi
-          # RBAC lives in routes/admin-rbac.ts + services/rbac.ts. Neither filename contains
-          # 'auth', so until now a change to role grants or the permission matrix shipped with
-          # @smoke only — past 98-public-role-api-acl and 99-rbac-grant-api-access, the two specs
-          # that assert a grant actually reaches the API.
-          if echo "$CHANGED_SRC" | grep -qE 'admin-rbac|services/rbac'; then
-            TAGS="$TAGS|@auth"
-          fi
-          # services/cache.ts backs both the cache plugin's dashboard and the list-freshness
-          # guarantee the API specs assert after a write.
-          if echo "$CHANGED_SRC" | grep -qE 'services/cache|cache-plugin'; then
-            TAGS="$TAGS|@plugins|@api"
-          fi
-          # The telemetry surfaces (/v1/events, the install/demo-login dashboard cards) are a
-          # separate worker in packages/stats with its own wrangler.toml and D1.
-          if echo "$CHANGED_SRC" | grep -qE 'packages/stats|stats-dashboard'; then
-            TAGS="$TAGS|@stats"
-          fi
-
-          # middleware/bootstrap.ts runs on EVERY request — it decides which paths pay the
-          # cold-start D1 work and holds the cross-isolate KV flag. There is no feature it does
-          # not touch, and it matched no pattern above, so a change to request-path ordering or
-          # to the bootstrap cache key shipped with @smoke only. Select the lot.
-          if echo "$CHANGED_SRC" | grep -qE 'middleware/bootstrap'; then
-            TAGS="$TAGS|@auth|@api|@api-keys|@content|@media|@plugins|@collections|@database|@forms"
-          fi
-          # The rate limiter guards /auth/login and /auth/seed-admin; the login specs and every
-          # spec whose beforeEach logs in are the ones that notice when its bucketing changes.
-          if echo "$CHANGED_SRC" | grep -qE 'middleware/rate-limit'; then
-            TAGS="$TAGS|@auth|@api"
-          fi
-
-          # Deduplicate tags
-          TAGS=$(echo "$TAGS" | tr '|' '\n' | sort -u | tr '\n' '|' | sed 's/|$//')
-
-          echo "Running E2E with tag filter: $TAGS"
-          echo "grep_pattern=$TAGS" >> $GITHUB_OUTPUT
-
       - name: Install Playwright browsers
         if: github.actor != 'dependabot[bot]'
         run: npx playwright install --with-deps chromium
 
       - name: Run E2E tests against preview
         if: github.actor != 'dependabot[bot]'
-        run: npx playwright test --config=tests/playwright.config.ts --grep "${{ steps.test-tags.outputs.grep_pattern }}"
+        # Every PR runs the WHOLE suite. Changed-area tag selection used to narrow this to
+        # @smoke plus whatever a path matcher happened to map, which meant a defect was invisible
+        # to CI whenever the specs that cover it carried a tag the diff did not select — the
+        # escapeHtmlAttr 500 on /admin/plugins/ai-search (#1066) shipped green exactly that way:
+        # a templates/pages diff selects @smoke only, and the ai-search specs are @plugins.
+        run: npx playwright test --config=tests/playwright.config.ts
         env:
           CI: true
           BASE_URL: ${{ steps.deploy.outputs.preview_url }}
