@@ -7,6 +7,12 @@ const __dirname = dirname(__filename);
 
 /**
  * @see https://playwright.dev/docs/test-configuration
+ *
+ * CI budget, as of the switch to unfiltered runs: `pr-tests.yml` now runs this config with no
+ * `--grep`, so every PR pays for all ~740 tests rather than the ~500 that changed-area tag
+ * selection used to pick. The job cap moved 90 -> 150 minutes with it. Several notes below
+ * reason against the old 90-minute cap and against the suite being filtered; their arithmetic
+ * still holds for the numbers they cite, but the cap they compare to is now 150.
  */
 export default defineConfig({
   testDir: './e2e',

@@ -4,6 +4,22 @@ import { escapeHtml } from '../../utils/sanitize'
 import type { AuthSettings } from '../../services/auth-validation'
 import { getPluginDefinition } from '../../services/plugin-definition-registry'
 
+/**
+ * Coerce unknown setting values to string then HTML-escape.
+ * Settings are `any` — ai-search ships `selected_collections: []`, oauth-providers a
+ * `providers` object. Coerce before escaping so the page doesn't 500 on non-strings.
+ */
+function escapeHtmlAttr(value: unknown): string {
+  const str =
+    typeof value === 'string'
+      ? value
+      : value == null
+        ? ''
+        : typeof value === 'object'
+          ? JSON.stringify(value)
+          : String(value)
+  return escapeHtml(str)
+}
 
 export interface PluginSettings {
   [key: string]: any
@@ -548,7 +564,7 @@ function renderSettingsFields(settings: PluginSettings): string {
             type="text" 
             name="${fieldId}" 
             id="${fieldId}" 
-            value="${escapeHtml(value)}"
+            value="${escapeHtmlAttr(value)}"
             class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-300 focus:border-blue-400 focus:outline-none transition-colors w-full"
           >
         </div>

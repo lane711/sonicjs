@@ -52,3 +52,24 @@ test.describe('Admin template XSS escaping @content @smoke', () => {
     expect(html).toContain('&quot;&gt;&lt;img src=y onerror=')
   })
 })
+
+/**
+ * The plugin-settings escape (`escapeHtmlAttr` on the generic string branch) sits on a path whose
+ * values are `any` — seeded verbatim from a manifest's `defaultSettings`. `ai-search` ships two
+ * empty arrays, so an unguarded escape helper throws and 500s the detail page. Tagged @plugins so
+ * a change under templates/pages (which otherwise selects @smoke only) still gets this checked.
+ */
+test.describe('Plugin settings page renders non-string settings @smoke @plugins', () => {
+  test.beforeEach(async ({ page }) => {
+    await loginAsAdmin(page)
+  })
+
+  test('ai-search detail page renders instead of 500ing on array-valued settings', async ({ page }) => {
+    const res = await page.goto('/admin/plugins/ai-search')
+    expect(res?.status(), 'plugin detail page must not 500').toBe(200)
+
+    const html = await page.content()
+    expect(html).not.toContain('Internal server error')
+    await expect(page.getByRole('heading', { name: /AI Search/i }).first()).toBeVisible()
+  })
+})
