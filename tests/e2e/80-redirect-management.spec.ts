@@ -129,7 +129,7 @@ test.describe('Redirect Management @plugins', () => {
     await page.fill('input[name="destination"]', '/destination-5a')
     await page.selectOption('select[name="status_code"]', '301')
     await page.click('button[type="submit"]')
-    await page.waitForLoadState('networkidle')
+    await page.waitForURL('**/admin/redirects', { timeout: 15000 })
 
     // Try creating same source again
     await page.goto('/admin/redirects/new')
@@ -137,13 +137,14 @@ test.describe('Redirect Management @plugins', () => {
     await page.fill('input[name="source"]', source)
     await page.fill('input[name="destination"]', '/destination-5b')
     await page.selectOption('select[name="status_code"]', '301')
+    const dupResponse = page.waitForResponse(
+      (r) => r.url().includes('/admin/redirects') && r.request().method() === 'POST'
+    )
     await page.click('button[type="submit"]')
+    const res = await dupResponse
+    expect(res.status()).toBe(400)
 
-    // Wait for HTMX to insert the error into #form-messages
-    await page.waitForTimeout(1000)
-
-    // Error message should appear in the form-messages div
-    await expect(page.locator('#form-messages')).toBeVisible()
-    await expect(page.locator('#form-messages div')).toBeVisible()
+    // HTMX swaps the 400 error HTML into #form-messages via beforeSwap handler
+    await expect(page.locator('#form-messages div')).toBeVisible({ timeout: 5000 })
   })
 })
