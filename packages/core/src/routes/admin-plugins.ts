@@ -5,7 +5,7 @@ import { renderPluginSettingsPage, PluginSettingsPageData } from '../templates/p
 import { SettingsService } from '../services/settings'
 import { PluginService } from '../services'
 import { PLUGIN_REGISTRY, findPluginByCodeName } from '../plugins/manifest-registry'
-import { getPluginDefinition } from '../services/plugin-definition-registry'
+import { getPluginDefinition, getAllPluginDefinitions } from '../services/plugin-definition-registry'
 import { getUserProfileConfig } from '../plugins/core-plugins/user-profiles'
 import {
   renderSchemaFields,
@@ -63,15 +63,35 @@ adminPluginRoutes.get('/', async (c) => {
       // Continue with empty data
     }
 
-    // Filter out DB records whose IDs no longer exist in the registry (e.g. renamed plugins)
-    const registryIds = new Set(AVAILABLE_PLUGINS.map(p => p.id))
+    // Build combined registry: manifest.json plugins + definePlugin-registered plugins
+    const definedPlugins = getAllPluginDefinitions()
+    const definedPluginAvailable = definedPlugins.map(p => {
+      const pa = p as any
+      return {
+        id: p.id,
+        name: p.id,
+        display_name: p.displayName ?? p.id,
+        description: pa.description ?? '',
+        version: p.version ?? '1.0.0',
+        author: pa.author ?? '',
+        category: pa.category ?? 'utilities',
+        icon: pa.icon ?? '🔌',
+        permissions: pa.permissions ?? [],
+        dependencies: p.dependencies ?? [],
+        is_core: false,
+      }
+    })
+    const allAvailablePlugins = [...AVAILABLE_PLUGINS, ...definedPluginAvailable.filter(d => !AVAILABLE_PLUGINS.some(a => a.id === d.id))]
+
+    // Filter out DB records whose IDs no longer exist in either registry (e.g. renamed plugins)
+    const registryIds = new Set(allAvailablePlugins.map(p => p.id))
     const validInstalledPlugins = installedPlugins.filter(p => registryIds.has(p.id))
 
     // Get list of installed plugin IDs
     const installedPluginIds = new Set(validInstalledPlugins.map(p => p.id))
 
     // Find uninstalled plugins
-    const uninstalledPlugins = AVAILABLE_PLUGINS.filter(p => !installedPluginIds.has(p.id))
+    const uninstalledPlugins = allAvailablePlugins.filter(p => !installedPluginIds.has(p.id))
 
     // Map installed plugins to template format
     const templatePlugins: Plugin[] = validInstalledPlugins.map(p => ({
@@ -419,30 +439,49 @@ adminPluginRoutes.post('/install', async (c) => {
     const body = await c.req.json()
     const pluginService = new PluginService(db)
 
-    // Look up plugin in registry by codeName (what the frontend sends as body.name)
-    // or by id
+    // Look up plugin in manifest registry first, then definePlugin registry
     const registryEntry = findPluginByCodeName(body.name)
       || PLUGIN_REGISTRY[body.name]
       || PLUGIN_REGISTRY[body.id]
 
-    if (!registryEntry) {
-      return c.json({ error: 'Plugin not found in registry' }, 404)
+    let plugin: any
+    if (registryEntry) {
+      plugin = await pluginService.installPlugin({
+        id: registryEntry.id,
+        name: registryEntry.codeName,
+        display_name: registryEntry.displayName,
+        description: registryEntry.description,
+        version: registryEntry.version,
+        author: registryEntry.author,
+        category: registryEntry.category,
+        icon: registryEntry.iconEmoji,
+        permissions: registryEntry.permissions,
+        dependencies: registryEntry.dependencies,
+        is_core: registryEntry.is_core,
+        settings: registryEntry.defaultSettings,
+      })
+    } else {
+      // Fall back to definePlugin-registered plugins
+      const def = getPluginDefinition(body.name) || getPluginDefinition(body.id)
+      if (!def) {
+        return c.json({ error: 'Plugin not found in registry' }, 404)
+      }
+      const da = def as any
+      plugin = await pluginService.installPlugin({
+        id: def.id,
+        name: def.id,
+        display_name: def.displayName ?? def.id,
+        description: da.description ?? '',
+        version: def.version ?? '1.0.0',
+        author: da.author ?? '',
+        category: da.category ?? 'utilities',
+        icon: da.icon ?? '🔌',
+        permissions: da.permissions ?? [],
+        dependencies: def.dependencies ?? [],
+        is_core: false,
+        settings: {},
+      })
     }
-
-    const plugin = await pluginService.installPlugin({
-      id: registryEntry.id,
-      name: registryEntry.codeName,
-      display_name: registryEntry.displayName,
-      description: registryEntry.description,
-      version: registryEntry.version,
-      author: registryEntry.author,
-      category: registryEntry.category,
-      icon: registryEntry.iconEmoji,
-      permissions: registryEntry.permissions,
-      dependencies: registryEntry.dependencies,
-      is_core: registryEntry.is_core,
-      settings: registryEntry.defaultSettings,
-    })
 
     return c.json({ success: true, plugin })
   } catch (error) {

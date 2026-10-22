@@ -280,7 +280,6 @@ export function renderAdminLayoutCatalyst(
   <!-- Scripts -->
   <script src="https://unpkg.com/htmx.org@2.0.3"></script>
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
   <!-- CSRF: Auto-attach token to all HTMX and fetch requests -->
   <script>
