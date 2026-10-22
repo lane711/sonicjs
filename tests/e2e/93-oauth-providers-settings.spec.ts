@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { loginAsAdmin } from './utils/test-helpers'
 
-test.describe('OAuth Providers - settings page', () => {
+test.describe('OAuth Providers - settings page @auth', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })
