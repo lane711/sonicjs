@@ -86,7 +86,8 @@ test.describe('Cache invalidation — list freshness after item update @api', ()
     expect(created?.id).toBeTruthy()
 
     // Prime the list cache — poll until the created item appears (cross-isolate delay).
-    await pollListForItem(request, created.id)
+    const primedItems = await pollListForItem(request, created.id)
+    expect(primedItems.map((item: any) => item.id)).toContain(created.id)
 
     const newTitle = `Cache update target ${stamp} (updated)`
     const updateRes = await request.put(`${API}/api/${COLLECTION}/${created.id}`, {

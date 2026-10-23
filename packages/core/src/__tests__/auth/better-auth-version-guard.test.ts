@@ -43,6 +43,7 @@ describe('Better Auth dependency declaration', () => {
   })
 
   it('is at or above 1.7.7 (GHSA-965c-763c-88jm)', () => {
+    expect(atLeast('1.7.6', '1.7.7')).toBe(false)
     expect(atLeast(pkg.dependencies['better-auth']!, '1.7.7')).toBe(true)
   })
 })

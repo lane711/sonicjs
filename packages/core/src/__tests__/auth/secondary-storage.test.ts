@@ -42,6 +42,18 @@ describe('createSecondaryStorage', () => {
     expect(puts.map((p) => p.options?.expirationTtl)).toEqual([60, 600, undefined])
   })
 
+  it('deletes immediately when ttl is zero or negative instead of clamping', async () => {
+    const { kv, data, puts } = fakeKv()
+    const s = createSecondaryStorage(kv)!
+    await s.set('a', 'v')
+    await s.set('a', 'v', 0)
+    expect(data.has('a')).toBe(false)
+    await s.set('b', 'v')
+    await s.set('b', 'v', -5)
+    expect(data.has('b')).toBe(false)
+    expect(puts.map((p) => p.options?.expirationTtl)).toEqual([undefined, undefined])
+  })
+
   it('getAndDelete returns the value once and warns that KV cannot do it atomically', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const { kv } = fakeKv()

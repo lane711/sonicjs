@@ -56,6 +56,8 @@ test.describe('Better Auth 1.7 upgrade @auth', () => {
     const slug = `ba17-${Date.now().toString(36)}`
     const res = await page.request.post('/auth/organization/create', json({ name: 'BA17 Org', slug, domain: `${slug}.example.com` }))
     expect(res.status()).toBe(404)
+    const bare = await page.request.get('/auth/organization', { headers: { Origin: TEST_ORIGIN } })
+    expect(bare.status()).toBe(404)
     const list = await page.request.get('/auth/organization/list', { headers: { Origin: TEST_ORIGIN } })
     expect(list.status()).toBe(404)
   })
@@ -79,6 +81,7 @@ test.describe('Better Auth 1.7 upgrade @auth', () => {
       json({ provider: 'github', callbackURL: '/admin', additionalData: { email: victim, name: 'x' } }),
     )
     const body = await start.json().catch(() => null)
+    if (start.status() >= 500) throw new Error(`OAuth social sign-in returned server error ${start.status()}`)
     test.skip(start.status() !== 200 || !body?.url, 'No GitHub provider configured on this deployment')
 
     const state = new URL(body.url).searchParams.get('state')
