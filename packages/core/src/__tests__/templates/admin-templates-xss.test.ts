@@ -104,6 +104,64 @@ describe('admin template XSS escaping', () => {
       // alt value attribute breakout neutralized
       expect(html).toContain(ESCAPED_ATTR_BREAKOUT)
     })
+
+    it('escapes public_url in onclick JS string, href attributes, and text content', () => {
+      const jsBreakout = `'); alert(document.cookie);//`
+      const html = renderMediaFileDetails({
+        file: {
+          id: 'm2',
+          filename: 'f.png',
+          original_name: 'f.png',
+          mime_type: 'image/png',
+          size: 10,
+          public_url: jsBreakout,
+          alt: '',
+          caption: '',
+          tags: [],
+          uploaded_at: '',
+          fileSize: '10 B',
+          uploadedAt: '',
+          isImage: true,
+          isVideo: false,
+          isDocument: false,
+          folder: '',
+          width: 1,
+          height: 1,
+        },
+      })
+      // raw breakout string must not appear anywhere
+      expect(html).not.toContain(jsBreakout)
+      // onclick must use JSON-serialised string (double-quoted, special chars escaped)
+      expect(html).toContain('copyToClipboard(')
+      expect(html).not.toContain(`copyToClipboard('${jsBreakout}')`)
+    })
+
+    it('rejects javascript: scheme in public_url href', () => {
+      const html = renderMediaFileDetails({
+        file: {
+          id: 'm3',
+          filename: 'f.png',
+          original_name: 'f.png',
+          mime_type: 'image/png',
+          size: 10,
+          public_url: 'javascript:alert(1)',
+          alt: '',
+          caption: '',
+          tags: [],
+          uploaded_at: '',
+          fileSize: '10 B',
+          uploadedAt: '',
+          isImage: true,
+          isVideo: false,
+          isDocument: false,
+          folder: '',
+          width: 1,
+          height: 1,
+        },
+      })
+      // javascript: scheme must not appear in any href
+      expect(html).not.toContain('href="javascript:')
+    })
   })
 
   describe('content form (reflected ?ref= referrer param)', () => {
