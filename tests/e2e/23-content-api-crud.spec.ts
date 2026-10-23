@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers';
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8787';
@@ -10,7 +10,7 @@ let testContentId: string;
 // auth_token/JWT cookie no longer exists — auth is session-based now).
 let cookieHeader = '';
 
-test.describe('Content API CRUD Operations', () => {
+test.describe('Content API CRUD Operations @smoke @content @api', () => {
   test.beforeAll(async ({ browser }) => {
     const context = await browser.newContext();
     const page = await context.newPage();
@@ -140,7 +140,9 @@ test.describe('Content API CRUD Operations', () => {
         }
       });
 
-      if (response.ok()) {
+      // A failed create used to skip every assertion below it.
+      expect(response.ok(), `create failed: ${response.status()}`).toBeTruthy();
+      {
         const responseData = await response.json();
 
         // Slug should be generated from title
@@ -177,10 +179,9 @@ test.describe('Content API CRUD Operations', () => {
         }
       });
 
-      if (!firstResponse.ok()) {
-        console.log('Skipping duplicate slug test - first creation failed');
-        return;
-      }
+      // Without the first row there is nothing to collide with, so a failed create here
+      // meant the duplicate-slug rule was never exercised at all.
+      expect(firstResponse.ok(), `could not seed the first row: ${firstResponse.status()}`).toBeTruthy();
 
       const firstData = await firstResponse.json();
       const firstId = firstData.data.id;
@@ -237,11 +238,12 @@ test.describe('Content API CRUD Operations', () => {
         }
       });
 
-      if (response.ok()) {
-        const responseData = await response.json();
-        contentToUpdate = responseData.data.id;
-        console.log(`Created content for update test: ${contentToUpdate}`);
-      }
+      // Swallowing a failed create here is what made the tests below pass without
+      // running: each one checked `if (!contentToUpdate) return`, so a broken POST /api/content
+      // turned this whole describe block into a no-op instead of a failure.
+      expect(response.ok(), `could not create content for the update tests: ${response.status()}`).toBeTruthy();
+      const responseData = await response.json();
+      contentToUpdate = responseData.data.id;
     });
 
     test.afterEach(async ({ request }) => {
@@ -254,11 +256,6 @@ test.describe('Content API CRUD Operations', () => {
     });
 
     test('should update existing content', async ({ request }) => {
-      if (!contentToUpdate) {
-        console.log('Skipping - no content to update');
-        return;
-      }
-
       const updates = {
         title: 'Updated Title',
         status: 'published',
@@ -309,11 +306,6 @@ test.describe('Content API CRUD Operations', () => {
     });
 
     test('should require authentication for updates', async ({ request }) => {
-      if (!contentToUpdate) {
-        console.log('Skipping - no content to update');
-        return;
-      }
-
       const response = await request.put(`${BASE_URL}/api/content/${contentToUpdate}`, {
         data: { title: 'Unauthorized Update' },
         headers: {
@@ -326,11 +318,6 @@ test.describe('Content API CRUD Operations', () => {
     });
 
     test('should preserve unchanged fields', async ({ request }) => {
-      if (!contentToUpdate) {
-        console.log('Skipping - no content to update');
-        return;
-      }
-
       // Get original content (authenticated — drafts are hidden from anonymous callers).
       const getResponse = await request.get(`${BASE_URL}/api/content/${contentToUpdate}`, {
         headers: { 'Cookie': cookieHeader, 'Origin': BASE_URL }
@@ -351,7 +338,10 @@ test.describe('Content API CRUD Operations', () => {
         }
       });
 
-      if (updateResponse.ok()) {
+      // The entire body of this test was conditional on the PUT succeeding, so a broken
+      // partial update passed it.
+      expect(updateResponse.ok(), `partial update failed: ${updateResponse.status()}`).toBeTruthy();
+      {
         const updatedData = await updateResponse.json();
 
         // Title should remain unchanged
@@ -384,19 +374,15 @@ test.describe('Content API CRUD Operations', () => {
         }
       });
 
-      if (response.ok()) {
-        const responseData = await response.json();
-        contentToDelete = responseData.data.id;
-        console.log(`Created content for delete test: ${contentToDelete}`);
-      }
+      // Swallowing a failed create here is what made the tests below pass without
+      // running: each one checked `if (!contentToDelete) return`, so a broken POST /api/content
+      // turned this whole describe block into a no-op instead of a failure.
+      expect(response.ok(), `could not create content for the delete tests: ${response.status()}`).toBeTruthy();
+      const responseData = await response.json();
+      contentToDelete = responseData.data.id;
     });
 
     test('should delete existing content', async ({ request }) => {
-      if (!contentToDelete) {
-        console.log('Skipping - no content to delete');
-        return;
-      }
-
       const response = await request.delete(`${BASE_URL}/api/content/${contentToDelete}`, {
         headers: {
           'Cookie': cookieHeader, 'Origin': BASE_URL
@@ -438,11 +424,6 @@ test.describe('Content API CRUD Operations', () => {
     });
 
     test('should require authentication for deletion', async ({ request }) => {
-      if (!contentToDelete) {
-        console.log('Skipping - no content to delete');
-        return;
-      }
-
       const response = await request.delete(`${BASE_URL}/api/content/${contentToDelete}`, {
         headers: {
           'Content-Type': 'application/json'
@@ -484,10 +465,7 @@ test.describe('Content API CRUD Operations', () => {
         }
       });
 
-      if (!createResponse.ok()) {
-        console.log('Skipping lifecycle test - create failed');
-        return;
-      }
+      expect(createResponse.ok(), `lifecycle create failed: ${createResponse.status()}`).toBeTruthy();
 
       const createdData = await createResponse.json();
       const contentId = createdData.data.id;

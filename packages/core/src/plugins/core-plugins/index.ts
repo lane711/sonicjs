@@ -68,6 +68,7 @@ export const CORE_PLUGIN_IDS = [
   'multi-tenant',
   'versioning',
   'menu',
+  'two-factor-auth',
 ] as const
 
 export type CorePluginNames = (typeof CORE_PLUGIN_IDS)[number]

@@ -13,7 +13,7 @@ import { loginAsAdmin } from './utils/test-helpers'
  *
  * Related: GitHub Issue #555, PR #556
  */
-test.describe('Dynamic Field TDZ Bug Fix', () => {
+test.describe('Dynamic Field TDZ Bug Fix @content', () => {
   /**
    * Helper to find and navigate to E2E Test collection
    * Returns true if collection was found and navigated to, false otherwise
@@ -65,21 +65,11 @@ test.describe('Dynamic Field TDZ Bug Fix', () => {
     // Navigate to E2E Test collection
     const found = await navigateToE2eTestCollection(page)
 
-    if (!found) {
-      // If E2E Test collection doesn't exist, skip the test
-      test.skip(true, 'E2E Test collection not available - code-based collection required')
-      return
-    }
+    expect(found, 'E2E Test collection must be available').toBe(true)
 
-    // The bug would cause a crash here: "ReferenceError: Cannot access 'options' before initialization"
-    // If we can see the form, the bug is fixed
-
-    // Check if collection was found or if there's an error
     const collectionNotFound = page.locator('text=Collection not found')
-    if (await collectionNotFound.isVisible({ timeout: 2000 }).catch(() => false)) {
-      test.skip(true, 'E2E Test collection not synced to database')
-      return
-    }
+    const notFound = await collectionNotFound.isVisible({ timeout: 2000 }).catch(() => false)
+    expect(notFound, 'E2E Test collection must be synced to database').toBe(false)
 
     // Wait for the form to render - if there's a TDZ error, the page will show an error
     const form = page.locator('form#content-form')
@@ -121,34 +111,22 @@ test.describe('Dynamic Field TDZ Bug Fix', () => {
     // Navigate to E2E Test collection
     const found = await navigateToE2eTestCollection(page)
 
-    if (!found) {
-      test.skip(true, 'E2E Test collection not available')
-      return
-    }
+    expect(found, 'E2E Test collection must be available').toBe(true)
 
-    // Check for collection not found error
     const collectionNotFound = page.locator('text=Collection not found')
-    if (await collectionNotFound.isVisible({ timeout: 2000 }).catch(() => false)) {
-      test.skip(true, 'E2E Test collection not synced to database')
-      return
-    }
+    const notFound = await collectionNotFound.isVisible({ timeout: 2000 }).catch(() => false)
+    expect(notFound, 'E2E Test collection must be synced to database').toBe(false)
 
-    // Check if page loaded correctly (no TDZ crash)
     const form = page.locator('form#content-form')
     const isFormVisible = await form.isVisible({ timeout: 5000 }).catch(() => false)
 
     if (!isFormVisible) {
-      // Check for error message that would indicate TDZ bug
       const pageContent = await page.content()
       const hasTdzError = pageContent.includes('Cannot access') && pageContent.includes('before initialization')
-
       if (hasTdzError) {
         throw new Error('TDZ bug detected: "Cannot access \'options\' before initialization"')
       }
-
-      // If form not visible but no TDZ error, collection might not exist
-      test.skip(true, 'E2E Test collection form not available')
-      return
+      throw new Error('E2E Test collection form not visible')
     }
 
     // Fill required fields

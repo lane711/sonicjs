@@ -1,30 +1,43 @@
-import { test, expect, Page } from '@playwright/test'
-import { loginAsAdmin } from './utils/test-helpers'
+import { test, expect, Page } from './fixtures'
+import { loginAsAdmin, submitAndWaitForDocument } from './utils/test-helpers'
 
 /**
  * Starter installs now seed ONLY the `admin` role. Every other role is
  * created and managed by an administrator, so these specs create the role
  * they need via the public Add-role form before asserting against it.
  */
-async function ensureTestRole(page: Page, name: string, displayName: string): Promise<string> {
-  const roleId = `role-${name}`
+async function openRolesVerbsTab(page: Page) {
   await page.goto('/admin/rbac')
   await page.waitForLoadState('networkidle')
   await page.click('#subtab-roles-verbs')
   await page.locator('#panel-roles-verbs').waitFor({ state: 'visible' })
+}
+
+// Both Add-role and Save-roles are native POSTs that redirect back to /admin/rbac. Clicking the
+// subtab before that navigation commits just gets the click thrown away by the page it lands on.
+async function saveRoles(page: Page) {
+  await submitAndWaitForDocument(page, '/admin/rbac', () =>
+    page.locator('button[type="submit"]').filter({ hasText: 'Save roles' }).click()
+  )
+  await openRolesVerbsTab(page)
+}
+
+async function ensureTestRole(page: Page, name: string, displayName: string): Promise<string> {
+  const roleId = `role-${name}`
+  await openRolesVerbsTab(page)
   const existing = page.locator(`input[name="display_name_${roleId}"]`)
   if ((await existing.count()) === 0) {
     await page.locator('form[action="/admin/rbac/roles"] input[name="name"]').fill(name)
     await page.locator('form[action="/admin/rbac/roles"] input[name="display_name"]').fill(displayName)
-    await page.locator('form[action="/admin/rbac/roles"] button').filter({ hasText: 'Add role' }).click()
-    await page.waitForLoadState('networkidle')
-    await page.click('#subtab-roles-verbs')
-    await page.locator('#panel-roles-verbs').waitFor({ state: 'visible' })
+    await submitAndWaitForDocument(page, '/admin/rbac', () =>
+      page.locator('form[action="/admin/rbac/roles"] button').filter({ hasText: 'Add role' }).click()
+    )
+    await openRolesVerbsTab(page)
   }
   return roleId
 }
 
-test.describe('RBAC Roles & Verbs tab', () => {
+test.describe('RBAC Roles & Verbs tab @auth', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })
@@ -46,16 +59,14 @@ test.describe('RBAC Roles & Verbs tab', () => {
     const newName = 'Renamed Role'
     await input.fill(newName)
 
-    await page.locator('button[type="submit"]').filter({ hasText: 'Save roles' }).click()
-    await page.waitForLoadState('networkidle')
+    await saveRoles(page)
 
     const updatedInput = page.locator(`input[name="display_name_${roleId}"]`)
     await expect(updatedInput).toBeVisible()
     await expect(updatedInput).toHaveValue(newName)
 
     await updatedInput.fill(original)
-    await page.locator('button[type="submit"]').filter({ hasText: 'Save roles' }).click()
-    await page.waitForLoadState('networkidle')
+    await saveRoles(page)
     await expect(page.locator(`input[name="display_name_${roleId}"]`)).toHaveValue(original)
   })
 
@@ -69,8 +80,7 @@ test.describe('RBAC Roles & Verbs tab', () => {
     await checkbox.click()
     const shouldBeChecked = !wasChecked
 
-    await page.locator('button[type="submit"]').filter({ hasText: 'Save roles' }).click()
-    await page.waitForLoadState('networkidle')
+    await saveRoles(page)
 
     const checkboxAfter = page.locator(`input[name="portal_${roleId}"]`)
     await expect(checkboxAfter).toBeVisible()
@@ -82,8 +92,7 @@ test.describe('RBAC Roles & Verbs tab', () => {
 
     if ((await checkboxAfter.isChecked()) !== wasChecked) {
       await checkboxAfter.click()
-      await page.locator('button[type="submit"]').filter({ hasText: 'Save roles' }).click()
-      await page.waitForLoadState('networkidle')
+      await saveRoles(page)
     }
   })
 

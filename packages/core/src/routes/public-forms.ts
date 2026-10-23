@@ -1,27 +1,42 @@
 import { Hono } from 'hono'
 import { TurnstileService } from '../plugins/core-plugins/turnstile-plugin/services/turnstile'
 import { sanitizeInput } from '../utils/sanitize'
+import { rateLimit } from '../middleware'
+
+const MAX_SUBMISSION_BODY_BYTES = 512 * 1024
 // Note: form-collection-sync was removed in the drop-db-collections plan (PR 4).
 // Form submissions are still persisted to `form_submissions`; the legacy dual-write
 // to the `content` table is gone — content created by submissions will move to the
 // document model in a follow-up.
+
+// Submissions are anonymous: bound recursion depth (stack) and node count (CPU).
+const MAX_SANITIZE_DEPTH = 32
+const MAX_SANITIZE_NODES = 10_000
+
+class PayloadTooComplexError extends Error {}
 
 /**
  * Recursively sanitize all string values in arbitrary JSON data.
  * HTML-encodes entities (e.g., < becomes &lt;) to prevent stored XSS
  * when form submission data is rendered in admin templates.
  */
-function sanitizeDeep(value: unknown): unknown {
+function sanitizeDeep(value: unknown, depth = 0, counter = { n: 0 }): unknown {
+  if (depth > MAX_SANITIZE_DEPTH) {
+    throw new PayloadTooComplexError('submission nested too deeply')
+  }
+  if (++counter.n > MAX_SANITIZE_NODES) {
+    throw new PayloadTooComplexError('submission has too many fields')
+  }
   if (typeof value === 'string') {
     return sanitizeInput(value)
   }
   if (Array.isArray(value)) {
-    return value.map(sanitizeDeep)
+    return value.map((v) => sanitizeDeep(v, depth + 1, counter))
   }
   if (value !== null && typeof value === 'object') {
     const result: Record<string, unknown> = {}
     for (const [k, v] of Object.entries(value)) {
-      result[k] = sanitizeDeep(v)
+      result[k] = sanitizeDeep(v, depth + 1, counter)
     }
     return result
   }
@@ -514,10 +529,18 @@ publicFormsRoutes.get('/:name', async (c) => {
 })
 
 // Handle form submission (accepts either name or ID)
-publicFormsRoutes.post('/:identifier/submit', async (c) => {
+publicFormsRoutes.post(
+  '/:identifier/submit',
+  rateLimit({ max: 20, windowMs: 60 * 1000, keyPrefix: 'form-submit' }),
+  async (c) => {
   try {
     const db = c.env.DB
     const identifier = c.req.param('identifier')
+
+    const declaredLength = Number(c.req.header('content-length') || 0)
+    if (declaredLength > MAX_SUBMISSION_BODY_BYTES) {
+      return c.json({ error: 'Submission too large' }, 413)
+    }
     const body = await c.req.json()
 
     // Get form by ID or name
@@ -573,7 +596,15 @@ publicFormsRoutes.post('/:identifier/submit', async (c) => {
 
     // Sanitize all string values in submission data to prevent stored XSS.
     // HTML-encodes entities (e.g., < becomes &lt;) before storage.
-    const sanitizedData = sanitizeDeep(body.data) as Record<string, unknown>
+    let sanitizedData: Record<string, unknown>
+    try {
+      sanitizedData = sanitizeDeep(body.data) as Record<string, unknown>
+    } catch (err) {
+      if (err instanceof PayloadTooComplexError) {
+        return c.json({ error: 'Submission payload too large or too deeply nested' }, 413)
+      }
+      throw err
+    }
 
     // Create submission
     const submissionId = crypto.randomUUID()

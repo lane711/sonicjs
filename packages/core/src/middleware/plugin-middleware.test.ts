@@ -5,9 +5,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import {
   isPluginActive,
+  invalidatePluginStatusCache,
   requireActivePlugin,
   requireActivePlugins,
-  getActivePlugins
+  getActivePlugins,
 } from './plugin-middleware'
 
 // Mock D1Database
@@ -40,8 +41,10 @@ describe('isPluginActive', () => {
   let mockDb: ReturnType<typeof createMockDb>
 
   beforeEach(() => {
+    invalidatePluginStatusCache()
     mockDb = createMockDb()
     vi.clearAllMocks()
+    invalidatePluginStatusCache()
   })
 
   it('should return true when plugin status is active', async () => {
@@ -109,8 +112,10 @@ describe('requireActivePlugin', () => {
   let mockDb: ReturnType<typeof createMockDb>
 
   beforeEach(() => {
+    invalidatePluginStatusCache()
     mockDb = createMockDb()
     vi.clearAllMocks()
+    invalidatePluginStatusCache()
   })
 
   it('should not throw when plugin is active', async () => {
@@ -150,8 +155,10 @@ describe('requireActivePlugins', () => {
   let mockDb: ReturnType<typeof createMockDb>
 
   beforeEach(() => {
+    invalidatePluginStatusCache()
     mockDb = createMockDb()
     vi.clearAllMocks()
+    invalidatePluginStatusCache()
   })
 
   it('should not throw when all plugins are active', async () => {
@@ -212,8 +219,10 @@ describe('getActivePlugins', () => {
   let mockDb: ReturnType<typeof createMockDb>
 
   beforeEach(() => {
+    invalidatePluginStatusCache()
     mockDb = createMockDb()
     vi.clearAllMocks()
+    invalidatePluginStatusCache()
   })
 
   it('should return array of active plugins', async () => {

@@ -1,4 +1,4 @@
-import { expect, test, type APIRequestContext, type Page } from '@playwright/test'
+import { expect, test, type APIRequestContext, type Page } from './fixtures'
 import { ensureAdminUserExists, loginAsAdmin } from './utils/test-helpers'
 
 type UploadedMedia = {
@@ -95,7 +95,7 @@ async function selectMediaForField(
   await expect(modal).toBeHidden({ timeout: 5000 })
 }
 
-test.describe('Array Media Picker Targeting', () => {
+test.describe('Array Media Picker Targeting @content @media', () => {
   let uploadedMediaA: UploadedMedia | null = null
   let uploadedMediaB: UploadedMedia | null = null
 
@@ -177,7 +177,7 @@ test.describe('Array Media Picker Targeting', () => {
     expect(secondSelectedValue).not.toBe(firstSelectedValue)
     await expect(firstHiddenInput).toHaveValue(firstSelectedValue)
 
-    await page.click('button[name="action"][value="save_and_publish"]')
+    await page.click('button[name="action"][value="save"]')
     await page.waitForURL(/\/admin\/content\/[^/]+\/edit|\/admin\/content\?/, { timeout: 15000 })
 
     try {

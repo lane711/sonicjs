@@ -1,10 +1,70 @@
 import { D1Database } from '@cloudflare/workers-types'
 import type { QueryableField } from '../schemas/document'
+import { settlesWithin } from '../utils/shared-promise'
 
 // Identifiers and JSON paths are interpolated into DDL (they cannot be bound), so
 // they are format-guarded here. Source is trusted code config, not user input —
 // this is defense-in-depth, mirroring document-repository.ts.
 const SAFE_IDENTIFIER = /^[a-z_][a-z0-9_]*$/
+
+// Per-isolate caches: eliminate repeated PRAGMA + CREATE INDEX round-trips across
+// multiple ensureScalarSchema() calls during bootstrap. Reset is intentionally
+// absent in production — isolate lifetime matches cache validity. Tests must call
+// resetScalarSchemaCache() when creating a new DB instance.
+let _columnCache: Set<string> | null = null
+let _indexCache: Set<string> | null = null
+// Single shared promise so parallel callers don't each fire their own PRAGMA batch.
+let _cacheInitPromise: Promise<{ columns: Set<string>; indexes: Set<string> }> | null = null
+
+/**
+ * How long a later caller will wait on a shared init promise before firing its own PRAGMA batch.
+ *
+ * The promise is a module global, so it is shared with requests that did not create it — and a
+ * creator whose request is cancelled mid-`batch` leaves it pending forever. See
+ * utils/shared-promise. Two PRAGMA statements are cheap enough that re-doing them beats any risk
+ * of inheriting a promise nobody will resolve.
+ */
+const CACHE_INIT_DEADLINE_MS = 5_000
+
+/** Reset the module-level column/index caches. Tests that swap the underlying DB between runs must call this. */
+export function resetScalarSchemaCache(): void {
+  _columnCache = null
+  _indexCache = null
+  _cacheInitPromise = null
+}
+
+/** Fetch (and cache) column names + existing index names on `documents` in one batch. */
+async function ensureDocumentsCaches(db: D1Database): Promise<{ columns: Set<string>; indexes: Set<string> }> {
+  if (_columnCache !== null && _indexCache !== null) {
+    return { columns: _columnCache, indexes: _indexCache }
+  }
+  const load = async () => {
+    try {
+      const [colInfo, idxInfo] = await db.batch([
+        db.prepare("SELECT name FROM pragma_table_xinfo('documents')"),
+        db.prepare("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='documents'"),
+      ])
+      _columnCache = new Set((colInfo?.results ?? []).map((r: any) => r.name as string))
+      _indexCache = new Set((idxInfo?.results ?? []).map((r: any) => r.name as string))
+    } catch {
+      _columnCache = new Set()
+      _indexCache = new Set()
+    }
+    return { columns: _columnCache!, indexes: _indexCache! }
+  }
+  if (!_cacheInitPromise) {
+    _cacheInitPromise = load()
+    return _cacheInitPromise
+  }
+  // Somebody else is already loading. Join them, but not past the deadline — the promise may
+  // belong to a request that has since been cancelled, in which case it will never settle.
+  const shared = _cacheInitPromise
+  if (await settlesWithin(shared, CACHE_INIT_DEADLINE_MS)) {
+    return shared
+  }
+  _cacheInitPromise = load()
+  return _cacheInitPromise
+}
 
 /** Map a queryable field's logical type to a SQLite column affinity. */
 function affinity(type?: QueryableField['type']): 'TEXT' | 'INTEGER' | 'REAL' {
@@ -46,14 +106,8 @@ export async function ensureScalarSchema(
   const scalars = fields.filter((f) => f.kind === 'scalar')
   if (scalars.length === 0) return []
 
-  // pragma_table_info does NOT list VIRTUAL generated columns — use table_xinfo, which does.
-  let existing = new Set<string>()
-  try {
-    const info = await db.prepare("SELECT name FROM pragma_table_xinfo('documents')").all()
-    existing = new Set((info?.results ?? []).map((r: any) => r.name))
-  } catch {
-    // table_xinfo unavailable — fall back to attempting every ALTER (duplicate errors swallowed).
-  }
+  // Single batch PRAGMA per isolate — subsequent calls use cached Sets.
+  const { columns: existing, indexes: knownIndexes } = await ensureDocumentsCaches(db)
 
   const added: string[] = []
   for (const f of scalars) {
@@ -74,27 +128,40 @@ export async function ensureScalarSchema(
           .prepare(`ALTER TABLE documents ADD COLUMN ${col} ${affinity(f.type)} AS (json_extract(data, '${path}')) VIRTUAL`)
           .run()
         added.push(col)
+        existing.add(col)
         console.log(`[scalar-schema] added documents.${col} for type '${typeId}'`)
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error)
-        if (!msg.includes('duplicate column name')) {
+        if (msg.includes('duplicate column name')) {
+          existing.add(col)
+        } else {
           console.error(`[scalar-schema] failed to add documents.${col}:`, msg)
           continue
         }
       }
     }
 
-    // One general index per column: the leading (tenant_id, type_id, col) prefix
-    // serves every equality filter the repository builds; the trailing
-    // (updated_at DESC, id DESC) matches the default keyset sort/cursor. Non-partial
-    // so a single index covers both draft and published lists.
-    try {
-      await db
-        .prepare(`CREATE INDEX IF NOT EXISTS idx_${col} ON documents(tenant_id, type_id, ${col}, updated_at DESC, id DESC)`)
-        .run()
-    } catch (error) {
-      console.error(`[scalar-schema] failed to create idx_${col}:`, error instanceof Error ? error.message : String(error))
+    // One general index per column. Skip if already known to exist — avoids a D1
+    // round-trip per column on every cold start.
+    const idxName = `idx_${col}`
+    if (!knownIndexes.has(idxName)) {
+      try {
+        await db
+          .prepare(`CREATE INDEX IF NOT EXISTS ${idxName} ON documents(tenant_id, type_id, ${col}, updated_at DESC, id DESC)`)
+          .run()
+        knownIndexes.add(idxName)
+      } catch (error) {
+        console.error(`[scalar-schema] failed to create ${idxName}:`, error instanceof Error ? error.message : String(error))
+      }
     }
   }
   return added
+}
+
+/** Reset module-level caches. Test-only: call after closing each in-memory DB so the
+ *  next createTestD1() gets a fresh schema probe rather than stale column names. */
+export function resetDocumentScalarSchemaCache(): void {
+  _columnCache = null
+  _indexCache = null
+  _cacheInitPromise = null
 }

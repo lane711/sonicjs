@@ -134,6 +134,10 @@ export interface Variables {
   tenantId?: string
   /** The authed user's role IN the resolved tenant (per-tenant RBAC); global role for 'default'. */
   tenantRole?: string
+  /** Authentication method used for this request ('session' | 'api-key'). */
+  authMethod?: 'session' | 'api-key'
+  /** Active plugin slugs resolved by pluginMenuMiddleware. */
+  activePluginSlugs?: Set<string>
 }
 
 export interface SonicJSConfig {

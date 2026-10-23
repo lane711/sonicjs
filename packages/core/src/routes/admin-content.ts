@@ -1,5 +1,6 @@
 import type { D1Database } from '@cloudflare/workers-types'
 import { Hono } from 'hono'
+import type { Context } from 'hono'
 import { html } from 'hono/html'
 import type { Bindings, Variables } from '../app'
 import { requireAuth, requireRole } from '../middleware'
@@ -19,6 +20,8 @@ import type { QueryableField } from '../schemas/document'
 import { loadCollectionConfigs, getVisibleCollections } from '../services/collection-loader'
 
 const adminContentRoutes = new Hono<{ Bindings: Bindings; Variables: Variables }>()
+
+type ContentRouteContext<P extends string = string> = Context<{ Bindings: Bindings; Variables: Variables }, P>
 
 // Field definition type for form processing
 interface FieldDefinition {
@@ -443,7 +446,10 @@ adminContentRoutes.get('/', async (c) => {
     // Get query parameters
     const page = parseInt(url.searchParams.get('page') || '1')
     const limit = parseInt(url.searchParams.get('limit') || '20')
-    const modelName = url.searchParams.get('model') || 'all'
+    // The filter dropdown posts `model`, but the content form's cancel link and the
+    // post-save redirects below send `collection` instead. Accept both, or saving an item
+    // drops the user on an unfiltered list rather than the collection they were editing.
+    const modelName = url.searchParams.get('model') || url.searchParams.get('collection') || 'all'
     const status = url.searchParams.get('status') || 'all'
     const search = url.searchParams.get('search') || ''
     const offset = (page - 1) * limit
@@ -511,6 +517,16 @@ adminContentRoutes.get('/', async (c) => {
       docParams.push(limit, offset)
       const { results: docRows } = await db.prepare(docSql).bind(...docParams).all()
 
+      // Resolve created_by UUIDs to human-readable emails. Chunk to stay under D1's 100-param limit.
+      const docUserIds = [...new Set((docRows ?? []).map((r: any) => r.created_by).filter(Boolean))]
+      const docAuthorMap: Record<string, string> = {}
+      for (let i = 0; i < docUserIds.length; i += 99) {
+        const chunk = docUserIds.slice(i, i + 99)
+        const ph = chunk.map(() => '?').join(',')
+        const { results: uRows } = await db.prepare(`SELECT id, email FROM auth_user WHERE id IN (${ph})`).bind(...chunk).all()
+        for (const u of uRows ?? []) docAuthorMap[(u as any).id] = (u as any).email
+      }
+
       const statusBadgeCss = {
         published: 'bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20 dark:ring-green-500/20',
         draft: 'bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700 dark:text-zinc-400 ring-1 ring-inset ring-zinc-600/20 dark:ring-zinc-500/20',
@@ -527,7 +543,7 @@ adminContentRoutes.get('/', async (c) => {
           slug: row.slug || '',
           modelName: docType?.displayName ?? typeId,
           statusBadge: `<span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${css}">${label}</span>`,
-          authorName: row.created_by || 'System',
+          authorName: (row.created_by ? (docAuthorMap[row.created_by] ?? row.created_by) : null) || 'System',
           // Document timestamps are stored in SECONDS (documents.ts), unlike legacy content rows which
           // store MILLISECONDS — hence the *1000 here (D23).
           formattedDate: new Date((row.updated_at ?? 0) * 1000).toLocaleDateString(),
@@ -572,8 +588,8 @@ adminContentRoutes.get('/', async (c) => {
         SELECT d.root_id AS id, d.title AS title, d.slug AS slug,
                CASE WHEN d.is_published = 1 THEN 'published' ELSE 'draft' END AS status,
                d.updated_at * 1000 AS updated_at,
-               dt.display_name AS cdisplay, COALESCE(d.created_by, 'System') AS author_label
-        FROM documents d JOIN document_types dt ON dt.id = d.type_id
+               dt.display_name AS cdisplay, COALESCE(u.email, d.created_by, 'System') AS author_label
+        FROM documents d JOIN document_types dt ON dt.id = d.type_id LEFT JOIN auth_user u ON u.id = d.created_by
         WHERE ${docConds.join(' AND ')}
         ORDER BY updated_at DESC LIMIT ? OFFSET ?`
       const { results: unionRows } = await db.prepare(unionSql).bind(...docParams, limit, offset).all()
@@ -881,6 +897,9 @@ adminContentRoutes.get('/new', async (c) => {
     // Use the RESOLVED collection id (the ?collection= param may have been a name).
     const fields = await getCollectionFields(db, collection.id)
 
+    // Resolve document-backing type to expose versioning flag to the template.
+    const newDocType = await getDocBackingType(db, collection.name ?? collection.id)
+
     // Check if workflow plugin is active
     const workflowEnabled = await isPluginActive(db, 'workflow')
 
@@ -931,6 +950,7 @@ adminContentRoutes.get('/new', async (c) => {
       collection,
       fields,
       isEdit: false,
+      versioningEnabled: newDocType?.settings?.versioning === true,
       workflowEnabled,
       tinymceEnabled,
       tinymceSettings,
@@ -985,6 +1005,17 @@ adminContentRoutes.get('/:id/edit', async (c) => {
       if (docType && dcoll) {
         const fields = await getCollectionFields(db, dcoll.id)
         const flags = await loadContentEditorFlags(db)
+        let authorName: string | undefined
+        if (docRow.created_by) {
+          const authorRow = await db
+            .prepare("SELECT name, first_name, last_name, email FROM auth_user WHERE id = ?")
+            .bind(docRow.created_by).first() as any
+          if (authorRow) {
+            authorName = authorRow.name ||
+              [authorRow.first_name, authorRow.last_name].filter(Boolean).join(' ') ||
+              authorRow.email
+          }
+        }
         const formData: ContentFormData = {
           id: docRow.root_id,
           title: docRow.title,
@@ -999,6 +1030,7 @@ adminContentRoutes.get('/:id/edit', async (c) => {
           isEdit: true,
           referrerParams,
           versioningEnabled: docType?.settings?.versioning === true,
+          author_name: authorName,
           user: user ? { name: user.email, email: user.email, role: user.role } : undefined,
           version: c.get('appVersion'),
           ...flags,
@@ -1184,8 +1216,33 @@ adminContentRoutes.post('/', async (c) => {
     // Extract and validate field data
     const { data, errors } = extractFieldData(fields, formData)
 
+    // Title may not be in schema — read from formData, then derive from common data fields
+    if (data.title === undefined) {
+      const formTitle = (formData.get('title') as string || '').trim()
+      data.title = formTitle || data.name || undefined
+    }
+    if (data.slug === undefined) data.slug = (formData.get('slug') as string || '').trim() || undefined
+
+    // Title is required — check formData and derived sources
+    if (!data.title && !errors['title']) {
+      errors['title'] = ['Title is required']
+    }
+
     // Check for validation errors
     if (Object.keys(errors).length > 0) {
+      if (c.req.header('HX-Request') === 'true') {
+        // Return bare error alert — HTMX swaps innerHTML into #form-messages (hx-target on the form).
+        // Avoids HX-Retarget/outerHTML nesting issues with HTMX 2.x.
+        return c.html(html`<div class="p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-300 text-sm" role="alert">
+          <strong>Please fix the validation errors below.</strong>
+          <ul class="mt-1 list-disc list-inside text-xs">
+            ${Object.entries(errors).map(([field, msgs]) =>
+              `<li>${field}: ${(msgs as string[]).join(', ')}</li>`
+            ).join('')}
+          </ul>
+        </div>`)
+      }
+      const flags = await loadContentEditorFlags(db)
       const formDataWithErrors: ContentFormData = {
         collection,
         fields,
@@ -1196,12 +1253,8 @@ adminContentRoutes.post('/', async (c) => {
           name: user.email,
           email: user.email,
           role: user.role
-        } : undefined
-      }
-      if (c.req.header('HX-Request') === 'true') {
-        c.header('HX-Retarget', '#content-form-page')
-        c.header('HX-Reswap', 'outerHTML')
-        return c.html(renderContentFormPage(formDataWithErrors, { partialOnly: true }))
+        } : undefined,
+        ...flags,
       }
       return c.html(renderContentFormPage(formDataWithErrors))
     }
@@ -1238,6 +1291,9 @@ adminContentRoutes.post('/', async (c) => {
       }), user?.userId)
       const cache = getCacheService(CACHE_CONFIGS.content!)
       await cache.invalidate(`content:list:${collectionId}:*`)
+      const apiCacheCreate = getCacheService(CACHE_CONFIGS.api!)
+      await apiCacheCreate.invalidate('api:content-filtered:*')
+      await apiCacheCreate.invalidate(`api:collection-content-filtered:${createDocType.id}:*`)
       const redirectUrl = `/admin/content/${doc.rootId}/edit?success=Content created successfully!`
       return c.req.header('HX-Request') === 'true'
         ? c.text('', 200, { 'HX-Redirect': redirectUrl })
@@ -1340,8 +1396,13 @@ adminContentRoutes.post('/', async (c) => {
   }
 })
 
-// Update content
-adminContentRoutes.put('/:id', async (c) => {
+// Update content.
+//
+// Registered for PUT here and for POST at the bottom of this file (after the static POST
+// paths, so /preview, /duplicate and /bulk-action still win): a plain <form> can only GET
+// or POST, so without the POST alias an edit submitted before htmx has booted falls back to
+// a native GET and the user's changes are silently dropped.
+const handleContentUpdate = async (c: ContentRouteContext<'/:id'>) => {
   try {
     const id = c.req.param('id')
     const user = c.get('user')
@@ -1353,7 +1414,7 @@ adminContentRoutes.put('/:id', async (c) => {
     // ── Option B: if :id is a document-backed root, save a new draft + sync publish state ──
     const tenantId = reqTenant(c)
     const docRowU = await db
-      .prepare("SELECT id, type_id FROM documents WHERE root_id = ? AND is_current_draft = 1 AND tenant_id = ?")
+      .prepare("SELECT id, type_id, title, slug FROM documents WHERE root_id = ? AND is_current_draft = 1 AND tenant_id = ?")
       .bind(id, tenantId).first() as any
     if (docRowU) {
       const docType = await getDocBackingType(db, docRowU.type_id)
@@ -1361,6 +1422,13 @@ adminContentRoutes.put('/:id', async (c) => {
       if (docType && dcoll) {
         const fields = await getCollectionFields(db, dcoll.id)
         const { data, errors } = extractFieldData(fields, formData)
+        // Title/slug may live outside schema fields — read from formData, then fall back to existing DB values,
+        // then derive from common data fields (e.g. collections with 'name' but no 'title' property)
+        if (data.title === undefined) {
+          const formTitle = (formData.get('title') as string || '').trim()
+          data.title = formTitle || docRowU.title || data.name || undefined
+        }
+        if (data.slug === undefined) data.slug = (formData.get('slug') as string || '').trim() || docRowU.slug || undefined
         if (Object.keys(errors).length > 0) {
           const flags = await loadContentEditorFlags(db)
           const errFormData = {
@@ -1381,17 +1449,43 @@ adminContentRoutes.put('/:id', async (c) => {
         if (action === 'save_and_publish') status = 'published'
 
         const svc = makeDocService(db, docType, tenantId)
-        const newDraft = await svc.saveDraft(id, { title: data.title ?? null, slug, data }, user?.userId)
+        const newDraft = await svc.saveDraft(id, { title: data.title || slug || null, slug, data }, user?.userId)
         // saveDraft always returns an unpublished draft; sync against the root's published row.
         const pub = await db.prepare("SELECT id FROM documents WHERE root_id = ? AND is_published = 1 AND tenant_id = ?").bind(id, tenantId).first() as any
         if (status === 'published') await svc.publish(newDraft.id, user?.userId)
         else if (pub) await svc.unpublish(pub.id)
 
         await getCacheService(CACHE_CONFIGS.content!).invalidate(`content:list:*`)
+        const apiCacheEdit = getCacheService(CACHE_CONFIGS.api!)
+        await apiCacheEdit.invalidate('api:content-filtered:*')
+        await apiCacheEdit.invalidate(`api:collection-content-filtered:${docRowU.type_id}:*`)
+
+        const isHTMX = c.req.header('HX-Request') === 'true'
+        const referrerParams = formData.get('referrer_params') as string | null
+        const listUrl = referrerParams
+          ? `/admin/content?${referrerParams}`
+          : `/admin/content?collection=${dcoll.id}`
+
+        if (action === 'save_and_close') {
+          return isHTMX
+            ? c.text('', 200, { 'HX-Redirect': listUrl })
+            : c.redirect(listUrl)
+        }
+
+        // save / save_and_publish: stay on page, return inline success banner
+        if (isHTMX) {
+          const label = status === 'published' ? 'Content published successfully!' : 'Content saved successfully!'
+          return c.html(html`<div id="form-messages">
+            <div class="rounded-lg bg-green-50 dark:bg-green-900/20 p-4 mb-4 flex items-center gap-3 border border-green-200 dark:border-green-800">
+              <svg class="h-5 w-5 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span class="text-sm font-medium text-green-800 dark:text-green-200">${label}</span>
+            </div>
+          </div>`)
+        }
         const redirectUrl = `/admin/content/${id}/edit?success=Content updated successfully!`
-        return c.req.header('HX-Request') === 'true'
-          ? c.text('', 200, { 'HX-Redirect': redirectUrl })
-          : c.redirect(redirectUrl)
+        return c.redirect(redirectUrl)
       }
     }
 
@@ -1426,8 +1520,15 @@ adminContentRoutes.put('/:id', async (c) => {
 
     // Extract and validate field data
     const { data, errors } = extractFieldData(fields, formData)
+    // Title/slug may live outside schema fields — read from formData, then fall back to existing DB values
+    if (data.title === undefined) {
+      const formTitle = (formData.get('title') as string || '').trim()
+      data.title = formTitle || existingContent.title || data.name || undefined
+    }
+    if (data.slug === undefined) data.slug = (formData.get('slug') as string || '').trim() || existingContent.slug || undefined
 
     if (Object.keys(errors).length > 0) {
+      const flags = await loadContentEditorFlags(db)
       const formDataWithErrors: ContentFormData = {
         id,
         collection: collection!,
@@ -1440,7 +1541,8 @@ adminContentRoutes.put('/:id', async (c) => {
           name: user!.email,
           email: user!.email,
           role: user!.role
-        } : undefined
+        } : undefined,
+        ...flags,
       }
       if (c.req.header('HX-Request') === 'true') {
         c.header('HX-Retarget', '#content-form-page')
@@ -1559,7 +1661,9 @@ adminContentRoutes.put('/:id', async (c) => {
       </div>
     `)
   }
-})
+}
+
+adminContentRoutes.put('/:id', handleContentUpdate)
 
 // Content preview
 adminContentRoutes.post('/preview', requireRole(['admin', 'editor', 'author']), async (c) => {
@@ -1578,6 +1682,7 @@ adminContentRoutes.post('/preview', requireRole(['admin', 'editor', 'author']), 
 
     // Extract field data for preview (skip validation)
     const { data } = extractFieldData(fields, formData, { skipValidation: true })
+    if (data.title === undefined) data.title = (formData.get('title') as string || '').trim() || data.name || undefined
 
     // Sanitize user-controlled values before rendering
     const safeTitle = escapeHtml(data.title || 'Untitled')
@@ -1878,8 +1983,8 @@ adminContentRoutes.post('/bulk-action', async (c) => {
     }
     await cache.invalidate('content:list:*')
     const apiCache = getCacheService(CACHE_CONFIGS.api!)
-    await apiCache.invalidate('content-filtered:*')
-    await apiCache.invalidate('collection-content-filtered:*')
+    await apiCache.invalidate('api:content-filtered:*')
+    await apiCache.invalidate('api:collection-content-filtered:*')
 
     return c.json({ success: true, count: ids.length })
   } catch (error) {
@@ -1904,6 +2009,9 @@ adminContentRoutes.delete('/:id', async (c) => {
       const now = Math.floor(Date.now() / 1000)
       await db.prepare("UPDATE documents SET deleted_at = ?, updated_at = ? WHERE root_id = ? AND tenant_id = ?").bind(now, now, id, tenantId).run()
       await getCacheService(CACHE_CONFIGS.content!).invalidate('content:list:*')
+      const apiCacheDel = getCacheService(CACHE_CONFIGS.api!)
+      await apiCacheDel.invalidate('api:content-filtered:*')
+      await apiCacheDel.invalidate(`api:collection-content-filtered:${docDel.type_id}:*`)
       return c.html(`
         <div id="content-list" hx-get="/admin/content?model=${docDel.type_id}" hx-trigger="load" hx-swap="outerHTML">
           <div class="flex items-center justify-center p-8"><span class="text-zinc-500">Deleting…</span></div>
@@ -2233,7 +2341,7 @@ adminContentRoutes.get('/documents/:typeId/:rootId/versions', async (c) => {
   const docType = await registry.findById(typeId)
   if (!docType) return c.html('<div>Unknown type.</div>', 404)
   const result = await db.prepare(
-    'SELECT id, version_number, is_current_draft, is_published, status, updated_at, created_by FROM documents WHERE root_id = ? AND tenant_id = ? ORDER BY version_number DESC LIMIT 50'
+    'SELECT d.id, d.version_number, d.is_current_draft, d.is_published, d.status, d.updated_at, COALESCE(u.email, d.created_by) AS created_by FROM documents d LEFT JOIN auth_user u ON u.id = d.created_by WHERE d.root_id = ? AND d.tenant_id = ? ORDER BY d.version_number DESC LIMIT 50'
   ).bind(rootId, reqTenant(c)).all()
   const versions = (result.results ?? []).map((r: any) => ({
     id: r.id, versionNumber: r.version_number, isCurrentDraft: r.is_current_draft === 1,
@@ -2245,5 +2353,10 @@ adminContentRoutes.get('/documents/:typeId/:rootId/versions', async (c) => {
 // The content list sets item.id = "documents/:typeId/:rootId", so the rendered edit link is
 // /admin/content/documents/:typeId/:rootId/edit — served by the GET handler above. No catch-all is
 // needed here (removed a stale comment that promised one but defined nothing — D14).
+
+// POST alias for the update handler. It has to sit below every static POST path above,
+// because the router runs matching handlers in registration order and '/:id' would
+// otherwise swallow /preview, /duplicate and /bulk-action.
+adminContentRoutes.post('/:id', handleContentUpdate)
 
 export default adminContentRoutes

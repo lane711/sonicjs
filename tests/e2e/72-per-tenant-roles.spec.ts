@@ -1,8 +1,5 @@
-import { test, expect, type Page } from '@playwright/test'
-import { execFileSync } from 'node:child_process'
-import { fileURLToPath } from 'node:url'
-import { dirname, resolve } from 'node:path'
-import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers'
+import { test, expect, type Page } from './fixtures'
+import { loginAsAdmin, ensureAdminUserExists, isFeatureAvailable, IS_REMOTE_DEPLOYMENT, d1Exec } from './utils/test-helpers'
 
 // Per-tenant roles (G1): a user's effective document role is their role IN the active tenant, not
 // their global role. The shared admin is GLOBALLY 'admin' but is seeded as a 'viewer' of tenant
@@ -16,22 +13,21 @@ const TENANT_HEADER = 'X-Tenant-Id'
 const RUN = Date.now()
 const VT = `vt${RUN}`            // tenant where the admin is only a 'viewer'
 
-const APP_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../../my-sonicjs-app')
-
-function d1Exec(sql: string) {
-  execFileSync('npx', ['wrangler', 'd1', 'execute', 'DB', '--local', '--command', sql], {
-    cwd: APP_DIR,
-    stdio: 'pipe',
-  })
-}
 
 async function setPluginState(page: Page, action: 'activate' | 'deactivate') {
   await page.request.post(`${BASE_URL}/admin/plugins/install`, { data: { name: PLUGIN_ID } }).catch(() => {})
   await page.request.post(`${BASE_URL}/admin/plugins/${PLUGIN_ID}/${action}`).catch(() => {})
 }
 
-test.describe.serial('Per-tenant roles', () => {
+test.describe.serial('Per-tenant roles @auth @lock-plugin-multi-tenant', () => {
+  let featureAvailable = false
+  test.beforeAll(async ({ request }) => {
+    featureAvailable = !IS_REMOTE_DEPLOYMENT && await isFeatureAvailable(request, '/admin/tenants')
+  })
+  test.beforeEach(() => { test.skip(!featureAvailable, 'Plugin/feature not available in this deployment') })
+
   test.beforeAll(() => {
+    if (!featureAvailable) return
     // Tenant vt + the admin enrolled there as a 'viewer' (downgraded from their global admin role).
     d1Exec(
       `INSERT INTO auth_tenant (id, name, slug, status, notes, metadata, created_at, updated_at)
@@ -44,6 +40,7 @@ test.describe.serial('Per-tenant roles', () => {
   })
 
   test.afterAll(() => {
+    if (!featureAvailable) return
     d1Exec(`DELETE FROM auth_tenant_member WHERE id = 'm-${VT}'`)
     d1Exec(`DELETE FROM auth_tenant WHERE slug = '${VT}'`)
   })

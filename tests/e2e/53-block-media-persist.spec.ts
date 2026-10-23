@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers';
 
-test.describe('Block Media Persistence', () => {
+test.describe('Block Media Persistence @content', () => {
   let uploadedFileId: string | undefined;
 
   test.beforeEach(async ({ page, context }) => {
@@ -58,10 +58,7 @@ test.describe('Block Media Persistence', () => {
     await page.goto('/admin/content/new');
     const e2eTestLink = page.locator('a[href^="/admin/content/new?collection="]').filter({ hasText: 'E2E Test' });
     const hasE2eTest = await e2eTestLink.isVisible().catch(() => false);
-    if (!hasE2eTest) {
-      test.skip(true, 'E2E Test collection not available');
-      return;
-    }
+    expect(hasE2eTest, 'E2E Test collection must be available').toBe(true);
 
     await e2eTestLink.click();
     await page.waitForLoadState('networkidle');

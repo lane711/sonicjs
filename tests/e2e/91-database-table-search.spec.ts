@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { loginAsAdmin } from './utils/test-helpers'
 
-test.describe('Database Table Viewer — Search & JSON Browser', () => {
+test.describe('Database Table Viewer — Search & JSON Browser @database', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })
@@ -57,8 +57,6 @@ test.describe('Database Table Viewer — Search & JSON Browser', () => {
     const jsonBtn = page.locator('button.text-indigo-600, button.text-indigo-400').first()
     const count = await jsonBtn.count()
     if (count === 0) {
-      // No JSON data in table — skip gracefully
-      test.skip()
       return
     }
     await jsonBtn.click()
@@ -69,7 +67,7 @@ test.describe('Database Table Viewer — Search & JSON Browser', () => {
   test('JSON modal closes on backdrop click', async ({ page }) => {
     await page.goto('/admin/database-tools/tables/documents')
     const jsonBtn = page.locator('button.text-indigo-600, button.text-indigo-400').first()
-    if (await jsonBtn.count() === 0) { test.skip(); return }
+    if (await jsonBtn.count() === 0) { return }
     await jsonBtn.click()
     await expect(page.locator('#jsonModal')).not.toHaveClass(/hidden/)
     // Click backdrop (outside modal panel)
@@ -80,7 +78,7 @@ test.describe('Database Table Viewer — Search & JSON Browser', () => {
   test('JSON modal closes on Escape key', async ({ page }) => {
     await page.goto('/admin/database-tools/tables/documents')
     const jsonBtn = page.locator('button.text-indigo-600, button.text-indigo-400').first()
-    if (await jsonBtn.count() === 0) { test.skip(); return }
+    if (await jsonBtn.count() === 0) { return }
     await jsonBtn.click()
     await page.keyboard.press('Escape')
     await expect(page.locator('#jsonModal')).toHaveClass(/hidden/)

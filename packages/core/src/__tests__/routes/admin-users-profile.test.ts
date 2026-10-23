@@ -252,6 +252,58 @@ describe('Admin Users - Profile on Edit Page', () => {
       expect(data.type).toBe('error')
       expect(data.message).toContain('Failed to load user')
     })
+
+    it('self-heals a missing two_factor_required column instead of 500ing the page', async () => {
+      // The 0007 ALTER is applied by two callers that are both skippable — bootstrap is behind a
+      // 24h KV marker, and the plugin's onBoot does not run under `plugins.disableAll`. SQLite
+      // rejects the WHOLE statement over one unknown column, so naming it turns a missed migration
+      // into a dead user-edit page.
+      let columnExists = false
+      const statements: string[] = []
+      mockDb = {
+        prepare: vi.fn().mockImplementation((sql: string) => {
+          statements.push(sql)
+          const isUserSelect = sql.includes('FROM auth_user') && sql.includes('WHERE id = ?')
+          const terminals = {
+            first: vi.fn().mockImplementation(async () => {
+              if (isUserSelect && sql.includes('two_factor_required') && !columnExists) {
+                throw new Error('D1_ERROR: no such column: two_factor_required')
+              }
+              if (isUserSelect) return { ...mockUserRecord, two_factor_required: 0 }
+              // sqlite_master probe inside ensureTwoFactorRequiredColumn.
+              if (sql.includes('sqlite_master')) return { name: 'auth_user' }
+              return null
+            }),
+            run: vi.fn().mockImplementation(async () => {
+              if (sql.startsWith('ALTER TABLE auth_user')) columnExists = true
+              return { success: true }
+            }),
+            all: vi.fn().mockImplementation(async () =>
+              // table_xinfo without the column — that is what makes the ALTER fire.
+              sql.startsWith('PRAGMA table_xinfo')
+                ? { results: [{ name: 'id' }, { name: 'email' }] }
+                : { results: [] },
+            ),
+          }
+          return { bind: vi.fn().mockReturnValue(terminals), ...terminals }
+        }),
+      }
+
+      app = createApp(mockDb)
+
+      const res = await app.request('/admin/users/user-123/edit', {}, {
+        DB: mockDb,
+        KV: {},
+        CACHE_KV: {}
+      })
+
+      expect(res.status).toBe(200)
+      expect(columnExists).toBe(true)
+      expect(statements.some((s) => s.startsWith('ALTER TABLE auth_user'))).toBe(true)
+
+      const data = JSON.parse(await res.text())
+      expect(data.userToEdit.id).toBe('user-123')
+    })
   })
 
   describe('PUT /admin/users/:id', () => {
@@ -313,8 +365,9 @@ describe('Admin Users - Profile on Edit Page', () => {
     it('should skip the profile write when no profile fields are submitted', async () => {
       const { writeProfileData } = await import('../../plugins/core-plugins/user-profiles')
       mockDb = createOrderedMockDb([
-        { first: null },                // call 0: uniqueness check, no conflict
-        { run: { success: true } }      // call 1: UPDATE users SET ...
+        { all: { results: [] } },       // call 0: RbacService.getRoles() — no custom roles
+        { first: null },                // call 1: uniqueness check, no conflict
+        { run: { success: true } }      // call 2: UPDATE users SET ...
       ])
 
       app = createApp(mockDb)
@@ -340,8 +393,8 @@ describe('Admin Users - Profile on Edit Page', () => {
 
       // No profile fields + no custom config → profile write skipped entirely.
       expect(writeProfileData).not.toHaveBeenCalled()
-      // Only 2 prepare calls: uniqueness check + user update.
-      expect(mockDb.prepare.mock.calls.length).toBe(2)
+      // Only 3 prepare calls: getRoles (role validation) + uniqueness check + user update.
+      expect(mockDb.prepare.mock.calls.length).toBe(3)
     })
 
     it('should write custom profile data even when no standard profile fields are set (issue #768)', async () => {

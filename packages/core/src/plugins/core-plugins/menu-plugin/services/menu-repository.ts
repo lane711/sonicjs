@@ -229,6 +229,81 @@ export async function upsertSystemItem(
     .run()
 }
 
+export async function seedSystemMenuItems(
+  db: D1Database,
+  items: Array<{ slug: string; data: MenuItemData; sortOrder: number }>
+): Promise<void> {
+  if (items.length === 0) return
+  const now = Math.floor(Date.now() / 1000)
+
+  const slugs = items.map(i => i.slug)
+  const placeholders = slugs.map(() => '?').join(',')
+  const existing = await db
+    .prepare(
+      `SELECT slug FROM documents WHERE slug IN (${placeholders}) AND type_id = 'menu_item' AND tenant_id = 'default' AND is_current_draft = 1 AND deleted_at IS NULL`
+    )
+    .bind(...slugs)
+    .all<{ slug: string }>()
+
+  const existingSlugs = new Set((existing.results ?? []).map(r => r.slug))
+  const missing = items.filter(i => !existingSlugs.has(i.slug))
+  if (missing.length === 0) return
+
+  await db.batch(
+    missing.map(item => {
+      const id = nanoid()
+      return db.prepare(
+        `INSERT INTO documents (
+          id, root_id, type_id, type_version, version_of_id, version_number,
+          is_current_draft, is_published, status, parent_root_id,
+          slug, path, title, zone, sort_order, visible,
+          published_at, scheduled_at, expires_at, deleted_at,
+          tenant_id, locale, translation_group_id,
+          data, metadata, owner_id, created_by, updated_by, created_at, updated_at
+        ) VALUES (
+          ?, ?, ?, ?, ?, ?,
+          ?, ?, ?, ?,
+          ?, ?, ?, ?, ?, ?,
+          ?, ?, ?, ?,
+          ?, ?, ?,
+          ?, ?, ?, ?, ?, ?, ?
+        )`
+      ).bind(
+        id,
+        id,
+        'menu_item',
+        1,
+        null,
+        1,
+        1,
+        1,
+        'published',
+        '',
+        item.slug,
+        null,
+        item.data.label,
+        null,
+        item.sortOrder,
+        item.data.visible ? 1 : 0,
+        now,
+        null,
+        null,
+        null,
+        'default',
+        'default',
+        '',
+        JSON.stringify(item.data),
+        '{}',
+        null,
+        'system',
+        'system',
+        now,
+        now,
+      )
+    })
+  )
+}
+
 export async function upsertPluginItem(
   db: D1Database,
   slug: string,

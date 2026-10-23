@@ -13,7 +13,7 @@ import { loginAsAdmin } from './utils/test-helpers'
 
 const BASE = process.env.BASE_URL || 'http://localhost:8787'
 
-test.describe('Plugin system', () => {
+test.describe('Plugin system @plugins', () => {
   test('hello-world plugin route accessible after login', async ({ page }) => {
     await loginAsAdmin(page)
     const res = await page.goto('/admin/hello-world')
@@ -52,10 +52,8 @@ test.describe('Plugin system', () => {
     const body = await signIn.json()
     const token = body?.token as string | undefined
 
-    if (!token) {
-      test.skip()
-      return
-    }
+    expect(token, 'sign-in must return a token').toBeTruthy()
+    if (!token) return
 
     // Attempt document creation (triggers content:after:create hook if type exists)
     // 400/404/422 = type not registered or bad payload; app still didn't crash

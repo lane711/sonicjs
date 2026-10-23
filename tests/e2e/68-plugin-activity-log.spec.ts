@@ -1,18 +1,20 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { loginAsAdmin } from './utils/test-helpers'
 
-test.describe('Plugin Activity Log', () => {
+test.describe('Plugin Activity Log @plugins @lock-plugin-hello-world', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })
 
   test('activity tab shows content for an active plugin', async ({ page }) => {
-    // Navigate to a plugin settings page — 'email' is a core plugin that's always present
-    await page.goto('/admin/plugins/email/settings')
+    // Navigate to a plugin detail page — 'email' is a core plugin that's always present.
+    // (The settings/info/activity tabs all live on /admin/plugins/:id; there is no
+    // /admin/plugins/:id/settings GET route.)
+    await page.goto('/admin/plugins/email')
     await expect(page).not.toHaveURL(/error/)
 
-    // Click the Activity tab
-    const activityTab = page.getByRole('button', { name: /activity/i })
+    // Click the Activity tab (rendered as a tab link, not a button)
+    const activityTab = page.locator('#activity-tab')
     await activityTab.click()
 
     // Activity content panel should be visible
@@ -26,26 +28,35 @@ test.describe('Plugin Activity Log', () => {
   })
 
   test('activity tab shows entries after toggling a plugin', async ({ page }) => {
-    // Use a non-core plugin that can be toggled — turnstile is safe
-    const pluginId = 'turnstile'
-    await page.goto(`/admin/plugins/${pluginId}/settings`)
+    // Use a non-core plugin that can be toggled. Core plugins (turnstile, email, …)
+    // render a "Core Plugin" label instead of an activate/deactivate button.
+    const pluginId = 'hello-world'
+    await page.goto(`/admin/plugins/${pluginId}`)
 
-    // Determine current status
-    const statusBadge = page.locator('[data-plugin-status], .plugin-status, [class*="status"]').first()
-    const pageText = await page.locator('body').innerText()
-    const isActive = pageText.includes('Active') && !pageText.includes('Inactive')
+    const deactivateBtn = page.getByRole('button', { name: 'Deactivate', exact: true })
+    const activateBtn = page.getByRole('button', { name: 'Activate', exact: true })
 
-    // Toggle the plugin to generate activity
-    const toggleBtn = page.getByRole('button', { name: isActive ? /deactivate/i : /activate/i })
-    if (await toggleBtn.isVisible()) {
-      await toggleBtn.click()
-      // Wait for response
-      await page.waitForTimeout(1500)
+    // Determine current status from the header badge
+    const isActive = (await deactivateBtn.count()) > 0
+
+    // Toggle the plugin to generate activity, then toggle it straight back so the
+    // rest of the suite still sees this plugin in its original state. The page
+    // reloads ~1s after a successful toggle.
+    if (isActive) {
+      await deactivateBtn.click()
+      await expect(activateBtn).toBeVisible({ timeout: 20000 })
+      await activateBtn.click()
+      await expect(deactivateBtn).toBeVisible({ timeout: 20000 })
+    } else {
+      await activateBtn.click()
+      await expect(deactivateBtn).toBeVisible({ timeout: 20000 })
+      await deactivateBtn.click()
+      await expect(activateBtn).toBeVisible({ timeout: 20000 })
     }
 
     // Reload and check activity tab
-    await page.goto(`/admin/plugins/${pluginId}/settings`)
-    const activityTab = page.getByRole('button', { name: /activity/i })
+    await page.goto(`/admin/plugins/${pluginId}`)
+    const activityTab = page.locator('#activity-tab')
     await activityTab.click()
 
     const activityPanel = page.locator('#activity-content')

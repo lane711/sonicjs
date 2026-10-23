@@ -34,7 +34,7 @@ describe('Public content API status policy (documents-backed)', () => {
     vi.restoreAllMocks()
     testUser = undefined
     db = createTestD1()
-    getCollectionRegistry().register([{ name: 'pages', displayName: 'Pages', schema: {} }])
+    getCollectionRegistry().register([{ name: 'pages', displayName: 'Pages', schema: {}, access: { public: ['read'] } }])
     const svc = new DocumentsService(db, { tenantId: 'default', queryableFields: [] })
     await svc.create({ typeId: 'pages', tenantId: 'default', title: 'Published', slug: 'published', data: {}, publishOnCreate: true })
     await svc.create({ typeId: 'pages', tenantId: 'default', title: 'Draft', slug: 'draft', data: {} })
@@ -71,8 +71,8 @@ describe('Public content API status policy (documents-backed)', () => {
     expect(slugs(await res.json())).toEqual(['published'])
   })
 
-  it('forces published filtering for authenticated author requests', async () => {
-    authAs('author')
+  it('forces published filtering for authenticated viewer requests (custom unknown roles denied by default)', async () => {
+    authAs('viewer')
     const res = await app.request('/api/content?collection=pages&status=archived', { headers: { Cookie: 'auth_token=valid' } })
     expect(slugs(await res.json())).toEqual(['published'])
   })

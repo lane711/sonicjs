@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test'
-import { loginAsAdmin } from './utils/test-helpers'
+import { test, expect } from './fixtures'
+import { loginAsAdmin, ensureAdminUserExists, gotoMediaLibrary, submitAndWaitForXhr } from './utils/test-helpers'
 
 const minimalJpeg = Buffer.from([
   0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01,
@@ -18,7 +18,12 @@ const minimalJpeg = Buffer.from([
   0x03, 0x01, 0x00, 0x02, 0x11, 0x03, 0x11, 0x00, 0x3F, 0x00, 0x80, 0xFF, 0xD9,
 ])
 
-test.describe('Media — document model (slice 3)', () => {
+test.describe('Media — document model (slice 3) @media', () => {
+  test.beforeEach(async ({ page }) => {
+    await ensureAdminUserExists(page)
+    await loginAsAdmin(page, false)
+  })
+
   test('API upload returns document rootId and file is listed from documents', async ({ context }) => {
     const fd = new FormData()
     fd.append('file', new Blob([minimalJpeg], { type: 'image/jpeg' }), 'doc-model-test.jpg')
@@ -77,16 +82,14 @@ test.describe('Media — document model (slice 3)', () => {
   })
 
   test('Admin media library page loads without error', async ({ page }) => {
-    await loginAsAdmin(page)
-    await page.goto('/admin/media')
-    await page.waitForLoadState('networkidle')
+    await loginAsAdmin(page, false)
+    await gotoMediaLibrary(page)
     await expect(page.locator('h1')).toContainText('Media Library')
   })
 
   test('Admin upload creates document-backed file visible in media library', async ({ page, context }) => {
-    await loginAsAdmin(page)
-    await page.goto('/admin/media')
-    await page.waitForLoadState('networkidle')
+    await loginAsAdmin(page, false)
+    await gotoMediaLibrary(page)
 
     const uniqueName = `e2e-doc-${Date.now()}.jpg`
 
@@ -99,12 +102,19 @@ test.describe('Media — document model (slice 3)', () => {
       buffer: minimalJpeg,
     })
 
-    await page.locator('#upload-modal button[type="submit"]').click()
+    // The upload is an htmx POST to /admin/media/upload that writes to R2 and inserts a
+    // document; #upload-results stays empty until it answers. Asserting straight after the click
+    // spends an assertion budget on a server round trip — that is how this flaked in CI with the
+    // locator resolving 24x to an empty <div id="upload-results">. Wait for the response first.
+    await submitAndWaitForXhr(page, 'POST', '/admin/media/upload', () =>
+      page.locator('#upload-modal button[type="submit"]').click()
+    )
     await expect(page.locator('#upload-results')).toContainText('Successfully uploaded', { timeout: 10000 })
 
-    // Page auto-redirects; wait for media library to reload
-    await page.waitForURL(/\/admin\/media/, { timeout: 8000 })
-    await page.waitForLoadState('networkidle', { timeout: 10000 })
+    // Page auto-redirects; wait for media library to reload. The `?t=` matters: the upload runs
+    // on /admin/media itself, so a bare /\/admin\/media/ matches the page it was started from and
+    // the grid assertion below races the reload that is about to destroy its execution context.
+    await page.waitForURL(/\/admin\/media\?t=/, { timeout: 20000, waitUntil: 'domcontentloaded' })
 
     // File should appear in the grid (sourced from documents now)
     await expect(page.locator('#media-grid')).toContainText(uniqueName, { timeout: 10000 })

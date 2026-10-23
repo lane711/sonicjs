@@ -3,6 +3,7 @@ import { getTinyMCEInitScript, getTinyMCEScript } from '../../plugins/available/
 import { getQuillCDN, getQuillInitScript } from '../../plugins/core-plugins/quill-editor'
 import { getLexicalImportMap, getLexicalLoaderScript, getLexicalInitScript, getLexicalStyles } from '../../plugins/core-plugins/lexical-editor'
 import { renderAlert } from '../alert.template'
+import { escapeHtml } from '../../utils/sanitize'
 import { FieldDefinition, renderDynamicField, renderFieldGroup } from '../components/dynamic-field.template'
 import { getConfirmationDialogScript, renderConfirmationDialog } from '../confirmation-dialog.template'
 import { AdminLayoutCatalystData, renderAdminLayoutCatalyst } from '../layouts/admin-layout-catalyst.template'
@@ -71,6 +72,7 @@ export interface ContentFormData {
     role: string
   }
   version?: string
+  author_name?: string
 }
 
 export function renderContentFormPage(data: ContentFormData, opts?: { partialOnly?: boolean }): string {
@@ -186,8 +188,12 @@ export function renderContentFormPage(data: ContentFormData, opts?: { partialOnl
             ${isEdit ? `hx-put="/admin/content/${data.id}"` : `hx-post="/admin/content"`}
             hx-target="#form-messages"
             hx-encoding="multipart/form-data"
+            method="post"
+            action="${isEdit ? `/admin/content/${data.id}` : '/admin/content'}"
+            enctype="multipart/form-data"
             data-has-validation-errors="${hasValidationErrors ? 'true' : 'false'}"
             class="space-y-6"
+            novalidate
           >
             <input type="hidden" name="collection_id" value="${data.collection.id}">
             ${isEdit ? `<input type="hidden" name="id" value="${data.id}">` : ''}
@@ -288,20 +294,20 @@ export function renderContentFormPage(data: ContentFormData, opts?: { partialOnl
               <dl class="space-y-3 text-sm">
                 <div>
                   <dt class="text-zinc-500 dark:text-zinc-400">Created</dt>
-                  <dd class="mt-1 text-zinc-950 dark:text-white">${data.created_at ? new Date(data.created_at).toLocaleDateString() : 'Unknown'}</dd>
+                  <dd class="mt-1 text-zinc-950 dark:text-white">${data.created_at ? new Date(data.created_at * 1000).toLocaleDateString() : 'Unknown'}</dd>
                 </div>
                 <div>
                   <dt class="text-zinc-500 dark:text-zinc-400">Last Modified</dt>
-                  <dd class="mt-1 text-zinc-950 dark:text-white">${data.updated_at ? new Date(data.updated_at).toLocaleDateString() : 'Unknown'}</dd>
+                  <dd class="mt-1 text-zinc-950 dark:text-white">${data.updated_at ? new Date(data.updated_at * 1000).toLocaleDateString() : 'Unknown'}</dd>
                 </div>
                 <div>
                   <dt class="text-zinc-500 dark:text-zinc-400">Author</dt>
-                  <dd class="mt-1 text-zinc-950 dark:text-white">${data.data?.author || 'Unknown'}</dd>
+                  <dd class="mt-1 text-zinc-950 dark:text-white">${escapeHtml(String(data.data?.author || data.author_name || 'Unknown'))}</dd>
                 </div>
                 ${data.published_at ? `
                   <div>
                     <dt class="text-zinc-500 dark:text-zinc-400">Published</dt>
-                    <dd class="mt-1 text-zinc-950 dark:text-white">${new Date(data.published_at).toLocaleDateString()}</dd>
+                    <dd class="mt-1 text-zinc-950 dark:text-white">${new Date(data.published_at * 1000).toLocaleDateString()}</dd>
                   </div>
                 ` : ''}
               </dl>
@@ -375,33 +381,44 @@ export function renderContentFormPage(data: ContentFormData, opts?: { partialOnl
           </a>
 
           <div class="flex items-center gap-x-3">
-            ${data.versioningEnabled ? `
-              <button
-                type="submit"
-                form="content-form"
-                name="action"
-                value="save"
-                class="inline-flex items-center justify-center gap-x-1.5 rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
-              >
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                </svg>
-                ${isEdit ? 'Update' : 'Save'}
-              </button>
-            ` : ''}
+            <button
+              type="submit"
+              form="content-form"
+              name="action"
+              value="save"
+              class="inline-flex items-center justify-center gap-x-1.5 rounded-lg bg-zinc-950 dark:bg-white px-3.5 py-2.5 text-sm font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
+            >
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+              Save
+            </button>
 
-            ${data.user?.role !== 'viewer' ? `
+            <button
+              type="submit"
+              form="content-form"
+              name="action"
+              value="save_and_close"
+              class="inline-flex items-center justify-center gap-x-1.5 rounded-lg bg-white dark:bg-zinc-800 px-3.5 py-2.5 text-sm font-semibold text-zinc-950 dark:text-white ring-1 ring-inset ring-zinc-950/10 dark:ring-white/10 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
+            >
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+              Save & close
+            </button>
+
+            ${data.user?.role !== 'viewer' && data.versioningEnabled ? `
               <button
                 type="submit"
                 form="content-form"
                 name="action"
                 value="save_and_publish"
-                class="inline-flex items-center justify-center gap-x-1.5 rounded-lg ${data.versioningEnabled ? 'bg-lime-600 dark:bg-lime-500 hover:bg-lime-700 dark:hover:bg-lime-600' : 'bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-950'} px-3.5 py-2.5 text-sm font-semibold text-white transition-colors shadow-sm"
+                class="inline-flex items-center justify-center gap-x-1.5 rounded-lg bg-lime-600 dark:bg-lime-500 hover:bg-lime-700 dark:hover:bg-lime-600 px-3.5 py-2.5 text-sm font-semibold text-white transition-colors shadow-sm"
               >
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                ${data.versioningEnabled ? `${isEdit ? 'Update' : 'Save'} & Publish` : (isEdit ? 'Update' : 'Save')}
+                Publish
               </button>
             ` : ''}
           </div>
@@ -1488,34 +1505,21 @@ export function renderContentFormPage(data: ContentFormData, opts?: { partialOnl
         });
       }
 
-      // Auto-save functionality
-      let autoSaveTimeout;
-      function scheduleAutoSave() {
-        clearTimeout(autoSaveTimeout);
-        autoSaveTimeout = setTimeout(() => {
-          const form = document.getElementById('content-form');
-          const formData = new FormData(form);
-          formData.append('action', 'autosave');
-          
-          fetch(form.action, {
-            method: 'POST',
-            body: formData
-          })
-          .then(response => {
-            if (response.ok) {
-              console.log('Auto-saved');
-            }
-          })
-          .catch(error => console.error('Auto-save failed:', error));
-        }, 30000); // Auto-save every 30 seconds
-      }
-
-      // Bind auto-save to form changes
-      document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('content-form');
-        form.addEventListener('input', scheduleAutoSave);
-        form.addEventListener('change', scheduleAutoSave);
-      });
+      // There was an "auto-save" here. It never saved anything, and it could not have: the
+      // request went to form.action, and HTMLFormElement is [LegacyOverrideBuiltIns], so a
+      // control named "action" -- this form has two, the save_draft and save_and_publish buttons
+      // -- shadows the built-in action property. form.action was the RadioNodeList of those
+      // buttons, not the URL, so every attempt went to /admin/content/[object RadioNodeList]
+      // relative to the current page. One of those turned up in a CI trace, which is how this
+      // was found.
+      //
+      // Repairing the URL would have been worse than leaving it broken: nothing server-side
+      // handles action=autosave (grep says the string exists only here), so the request would
+      // have fallen through to the ordinary create/update path and written a new document every
+      // thirty seconds of typing. The timer was also re-armed on every keystroke and outlived
+      // the page that set it, firing into whatever had navigated there since.
+      //
+      // Removed rather than fixed. Reinstating it means a real server-side endpoint first.
 
       ${data.tinymceEnabled ? getTinyMCEInitScript({
     skin: data.tinymceSettings?.skin,

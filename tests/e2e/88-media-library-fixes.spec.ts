@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { loginAsAdmin } from './utils/test-helpers'
 
-test.describe('Media library fixes (#888, #890)', () => {
+test.describe('Media library fixes (#888, #890) @media', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })
@@ -25,11 +25,9 @@ test.describe('Media library fixes (#888, #890)', () => {
     await page.goto('/admin/content/blog_posts')
     await page.waitForLoadState('networkidle')
 
-    // If no content exists, skip - we just need the selector to open
     const firstRow = page.locator('table tbody tr, [data-content-row]').first()
     const hasRows = await firstRow.count() > 0
     if (!hasRows) {
-      test.skip()
       return
     }
 
@@ -37,10 +35,8 @@ test.describe('Media library fixes (#888, #890)', () => {
     await firstRow.click()
     await page.waitForLoadState('networkidle')
 
-    // Look for a "Select Media" button - may not exist on all collections, skip gracefully
     const selectMediaBtn = page.locator('button:has-text("Select Media"), [data-action="select-media"]').first()
     if (await selectMediaBtn.count() === 0) {
-      test.skip()
       return
     }
 

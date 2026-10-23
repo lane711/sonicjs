@@ -9,10 +9,10 @@
  * The reliable assertions use the JSON API contracts (stable); the admin list check guards the
  * route wiring. Run locally: `npm run e2e` (needs the dev server + seeded admin + migrations 043/044).
  */
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { loginAsAdmin, waitForHTMX } from './utils/test-helpers'
 
-test.describe('Blog posts on the document model (Option B)', () => {
+test.describe('Blog posts on the document model (Option B) @smoke @content', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })

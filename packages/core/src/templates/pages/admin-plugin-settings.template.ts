@@ -67,7 +67,8 @@ export function renderPluginSettingsPage(data: PluginSettingsPageData): string {
   // (_-prefixed keys are internal metadata, not settings the user can edit)
   const pluginDef = getPluginDefinition(plugin.id || plugin.name)
   const hasUserSettings = pluginDef?.settingsTabContent != null ||
-    Object.keys(plugin.settings || {}).some(k => !k.startsWith('_'))
+    Object.keys(plugin.settings || {}).some(k => !k.startsWith('_')) ||
+    plugin.id === 'user-profiles' || plugin.name === 'user-profiles'
   const defaultTab = hasUserSettings ? 'settings' : 'info'
 
 
@@ -410,6 +411,34 @@ function renderSettingsTab(plugin: any, settingsTabData?: any): string {
         </div>
       </div>
     `
+  }
+
+  // user-profiles plugin: show a documentation panel with defineUserProfile() config status
+  if (plugin.id === 'user-profiles' || plugin.name === 'user-profiles') {
+    const profileConfig = plugin.profileConfig
+    const fieldsHtml = profileConfig
+      ? profileConfig.fields.length > 0
+        ? `
+          <div class="mt-4">
+            <h4 class="text-sm font-semibold text-zinc-200 mb-2">Configured Fields</h4>
+            <ul class="space-y-1">
+              ${profileConfig.fields.map((f: { name: string; type: string; required?: boolean }) => `<li class="text-sm text-zinc-400">${f.name} (${f.type}${f.required ? ', required' : ''})</li>`).join('')}
+            </ul>
+          </div>`
+        : '<p class="text-sm text-zinc-400 mt-2">No fields configured.</p>'
+      : '<p class="text-sm text-zinc-400 mt-2">No profile fields defined yet</p>'
+
+    return `
+      <div class="space-y-4">
+        <div class="backdrop-blur-md bg-black/20 rounded-xl border border-white/10 p-6">
+          <h3 class="text-lg font-semibold text-white mb-2">Profile Field Configuration</h3>
+          <p class="text-sm text-zinc-400">
+            Define custom user profile fields by calling <code class="text-cyan-400">defineUserProfile()</code>
+            in your app entry point (<code class="text-cyan-400">my-sonicjs-app/src/index.ts</code>).
+          </p>
+          ${fieldsHtml}
+        </div>
+      </div>`
   }
 
   const isAuthPlugin = plugin.id === 'core-auth' || plugin.name === 'core-auth'

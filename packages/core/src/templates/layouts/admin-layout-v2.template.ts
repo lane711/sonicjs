@@ -257,8 +257,8 @@ export function adminLayoutV2(data: AdminLayoutData): string {
   <!-- Scripts -->
   <script src="https://unpkg.com/htmx.org@2.0.3"></script>
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  
+  <!-- No Chart.js here: only the dashboards chart, and they ask for it via the scripts option. -->
+
   ${data.styles ? data.styles.map((style) => `<link rel="stylesheet" href="${style}">`).join("\n  ") : ""}
   ${data.scripts ? data.scripts.map((script) => `<script src="${script}"></script>`).join("\n  ") : ""}
 </head>
@@ -508,6 +508,13 @@ function renderSidebar(
     icon: string;
   }>
 ): string {
+  const userRole: string = user?.role ?? 'viewer';
+  const isAdmin = userRole === 'admin';
+  const isEditor = userRole === 'editor';
+  const canManageUsers = isAdmin;
+  const canAccessSettings = isAdmin || isEditor;
+  const canAccessPlugins = isAdmin;
+
   const baseMenuItems = [
     {
       label: "Content",
@@ -589,8 +596,19 @@ function renderSidebar(
     },
   ];
 
+  // Filter based on role: viewers see content/collections/media only
+  const filteredBaseItems = baseMenuItems.filter(item => {
+    if (item.path === '/admin/users') return canManageUsers;
+    if (item.path === '/admin/plugins') return canAccessPlugins;
+    if (item.path === '/admin/settings') return canAccessSettings;
+    if (item.path === '/admin/cache') return canAccessSettings;
+    if (item.path === '/admin/logs') return canAccessSettings;
+    if (item.path === '/admin/field-types') return canAccessSettings;
+    return true;
+  });
+
   // Combine base menu items with dynamic menu items from active plugins
-  const allMenuItems = [...baseMenuItems];
+  const allMenuItems = [...filteredBaseItems];
 
   // Insert dynamic menu items after "Users"
   if (dynamicMenuItems && dynamicMenuItems.length > 0) {

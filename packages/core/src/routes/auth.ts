@@ -301,6 +301,15 @@ authRoutes.post('/login',
       await setCsrfCookie(c)
 
       const baBody = await baRes.json() as any
+
+      if (baBody.twoFactorRedirect) {
+        return c.json({
+          twoFactorRequired: true,
+          twoFactorMethods: baBody.twoFactorMethods,
+          redirectTo: '/auth/two-factor',
+        })
+      }
+
       const user = baBody.user ?? {}
 
       // Mint a JWT so API callers can use Bearer token auth (same as /register)
@@ -677,8 +686,32 @@ authRoutes.post('/login/form',
 
     await setCsrfCookie(c)
 
+    const baFormBody = await baRes.json() as any
+
+    if (baFormBody.twoFactorRedirect) {
+      if (c.req.header('HX-Request')) {
+        c.header('HX-Redirect', '/auth/two-factor')
+        return c.html('<div></div>')
+      }
+      return c.html(html`
+        <div id="form-response">
+          <div class="rounded-lg bg-blue-100 dark:bg-blue-900/20 p-4 ring-1 ring-blue-400 dark:ring-blue-500/20">
+            <p class="text-sm font-medium text-blue-700 dark:text-blue-300">Two-step verification required. Redirecting...</p>
+            <script>
+              window.location.href = '/auth/two-factor';
+            </script>
+          </div>
+        </div>
+      `)
+    }
+
     const rawRedirect = c.req.query('redirect')
     const redirectUrl = rawRedirect && rawRedirect.startsWith('/') ? rawRedirect : '/admin/content'
+
+    if (c.req.header('HX-Request')) {
+      c.header('HX-Redirect', redirectUrl)
+      return c.html('<div></div>')
+    }
 
     return c.html(html`
       <div id="form-response">

@@ -10,7 +10,57 @@ import { DocumentTypeRegistry } from '../services/document-type-registry'
 import { dispatchHookEvent } from '../plugins/hooks/dispatch-event'
 import type { HookActor } from '../plugins/hooks/catalog'
 import { createDocumentSchema } from '../schemas/document'
+import type { PrincipalRef } from '../schemas/document'
 import { getCoreVersion } from '../utils/version'
+import { getDocumentRequestContext } from '../services/document-request-context'
+import { DocumentRepository } from '../services/document-repository'
+import { DocumentPermissionsService } from '../services/document-permissions'
+import { RbacService } from '../services/rbac'
+import { recordCatalogRequest, scheduleKvWrite } from '../plugins/cache/services/catalog'
+import { getAndConsumeStale } from '../plugins/cache/services/swr'
+
+// Anonymous principal = unauthenticated request. Authenticated users (even with role 'public')
+// must pass isAllowed so the document ACL is enforced — not just is_published.
+function isAnonPrincipal(principalSet: PrincipalRef[]): boolean {
+  return principalSet.length === 1 && principalSet[0]?.type === 'public'
+}
+
+// Checks document ACL baseGrants first, then falls back to RBAC dynamic role grants.
+// Both systems must be consulted: baseGrants is set at registration time (in code), while
+// RBAC grants are set at runtime via the RBAC matrix UI and stored in the document store.
+// When the document_types row is absent (e.g. bootstrap not yet run in tests), fall back to the
+// CollectionRegistry's access config, which autoRegisterCollectionDocumentTypes would use to seed it.
+function resolveTypeSettings(docType: { settings?: any } | null | undefined, typeName: string): any {
+  if (docType?.settings) return docType.settings
+  const col = getCollectionRegistry().getByName(typeName)
+  if (!col) return {}
+  const defaultGrants: Record<string, string[]> = {
+    admin: ['read', 'create', 'update', 'delete', 'publish', 'manage'],
+    editor: ['read', 'create', 'update', 'publish'],
+    viewer: ['read'],
+  }
+  return { baseGrants: col.access ? { ...defaultGrants, ...col.access } : defaultGrants }
+}
+
+async function typeReadAllowed(
+  db: any,
+  principalSet: PrincipalRef[],
+  docType: { settings?: any } | null | undefined,
+  typeName: string,
+): Promise<boolean> {
+  const perms = new DocumentPermissionsService(db)
+  if (perms.isAllowedSync(principalSet, [], 'read', resolveTypeSettings(docType, typeName))) return true
+  const rbac = new RbacService(db)
+  let anyRbacRoleFound = false
+  for (const p of principalSet) {
+    if (p.type !== 'role') continue
+    if (!(await rbac.hasRbacRole(p.id))) continue  // role not in RBAC → skip (legacy roles default to allow)
+    anyRbacRoleFound = true
+    if (await rbac.isGrantedForRole(p.id, `document_type:${typeName}`, 'read')) return true
+  }
+  // No recognized role grant found → deny (unknown/legacy roles do not implicitly get read access)
+  return false
+}
 
 // Document columns the public list is allowed to ORDER BY. The legacy `content` table exposed
 // collection_id; on documents that maps to type_id. Anything else (incl. nonexistent columns like a
@@ -45,12 +95,21 @@ function stripFields(group: { and?: any[]; or?: any[] } | undefined, fields: Set
 
 // D31/D44: translate `collection_id` sort → `type_id` and drop sort fields that aren't real document
 // columns (a raw `collection_id` sort 500s). JSON-path sorts pass through unchanged.
-function sanitizeDocSort(sort?: QueryFilter['sort']): QueryFilter['sort'] | undefined {
-  if (!sort) return undefined
+// Leaving a list query without an ORDER BY lets SQLite hand back rows in storage order, so
+// `?limit=N` quietly drops the newest documents once a collection grows past N and two reads of
+// the same page can disagree. Default to the keyset order the rest of the document layer
+// paginates on: newest first, id as the tie-break.
+const DEFAULT_DOC_SORT: NonNullable<QueryFilter['sort']> = [
+  { field: 'updated_at', order: 'desc' },
+  { field: 'id', order: 'desc' },
+]
+
+function sanitizeDocSort(sort?: QueryFilter['sort']): NonNullable<QueryFilter['sort']> {
+  if (!sort) return DEFAULT_DOC_SORT
   const out = sort
     .map(s => ({ field: s.field === 'collection_id' ? 'type_id' : s.field, order: s.order }))
     .filter(s => s.field.includes('.') || DOC_SORTABLE_COLUMNS.has(s.field))
-  return out.length ? out : undefined
+  return out.length ? out : DEFAULT_DOC_SORT
 }
 
 // ─── Public content reads are document-backed (legacy `content` decommission, step 2) ────────────
@@ -119,6 +178,42 @@ function mapDocRowToContent(row: any, collectionId: string | null) {
     updated_at: documentSecondsToMs(row.updated_at),
   }
 }
+
+/**
+ * Project a content item to only the requested fields.
+ * Supports top-level fields (e.g. "title", "slug") and data sub-fields
+ * via dot notation (e.g. "data.excerpt", "data.body").
+ * Requesting "data" (no dot) returns the entire data object.
+ * Returns the original item unchanged when fields is empty.
+ */
+function projectFields(item: any, fields: string[]): any {
+  if (fields.length === 0) return item
+  const result: any = {}
+  const dataSubFields: string[] = []
+  for (const f of fields) {
+    if (f === 'data') {
+      result.data = item.data
+    } else if (f.startsWith('data.')) {
+      dataSubFields.push(f.slice(5))
+    } else if (Object.prototype.hasOwnProperty.call(item, f)) {
+      result[f] = item[f]
+    }
+  }
+  if (dataSubFields.length > 0 && !result.data) {
+    result.data = {}
+    for (const sub of dataSubFields) {
+      if (item.data && Object.prototype.hasOwnProperty.call(item.data, sub)) {
+        result.data[sub] = item.data[sub]
+      }
+    }
+  }
+  return result
+}
+
+function parseFieldsParam(raw: string | undefined): string[] {
+  if (!raw) return []
+  return raw.split(',').map(s => s.trim()).filter(Boolean)
+}
 import apiContentCrudRoutes, { resolveDocBacking, slugify } from './api-content-crud'
 import type { Bindings, Variables as AppVariables } from '../app'
 
@@ -139,9 +234,10 @@ apiRoutes.use('*', async (c, next) => {
   c.header('X-Response-Time', `${totalTime}ms`)
 })
 
-// Check if cache plugin is active
+// Check if cache plugin is active; honour Cache-Control: no-cache bypass
 apiRoutes.use('*', async (c, next) => {
-  const cacheEnabled = await isPluginActive(c.env.DB, 'core-cache')
+  const bypass = c.req.header('Cache-Control') === 'no-cache'
+  const cacheEnabled = !bypass && await isPluginActive(c.env.DB, 'core-cache')
   c.set('cacheEnabled', cacheEnabled)
   await next()
 })
@@ -651,7 +747,16 @@ apiRoutes.get('/content', optionalAuth(), async (c) => {
     const db = c.env.DB
     const queryParams = c.req.query()
 
+    // ?fields= projection — strip before filter parsing to avoid SQL errors
+    const projFields = parseFieldsParam(queryParams.fields)
+    if (queryParams.fields) delete queryParams.fields
+
     const role = c.get('user')?.role
+    const { tenantId: cTenantId, principalSet: cPrincipalSet } = getDocumentRequestContext(c)
+    const cAnon = isAnonPrincipal(cPrincipalSet)
+    // Admin/editor have unconditional access — ACL gates non-privileged authenticated callers only.
+    // Anonymous callers are handled by the type-level check below (D5).
+    const cNeedsAcl = !cAnon && !canReadNonPublicContent(role)
 
     // Resolve collection scoping to document type ids (== collection name). Build a name→collectionId
     // map so the response keeps a stable collectionId field.
@@ -694,6 +799,38 @@ apiRoutes.get('/content', optionalAuth(), async (c) => {
     if (!normalizedFilter.limit) normalizedFilter.limit = 50
     normalizedFilter.limit = Math.min(normalizedFilter.limit, 1000) // Max 1000
 
+    // D5: anonymous callers must pass the type-level access check.
+    // Load the actual document_type settings from DB so baseGrants are authoritative.
+    if (cAnon) {
+      const perms = new DocumentPermissionsService(db)
+      const anonPrincipal: PrincipalRef[] = [{ type: 'public', id: '*' }]
+      if (typeId) {
+        const anonDocType = await new DocumentTypeRegistry(db).findById(typeId)
+        if (!perms.isAllowedSync(anonPrincipal, [], 'read', resolveTypeSettings(anonDocType, typeId))) {
+          return c.json({ data: [], meta: addTimingMeta(c, { count: 0, timestamp: new Date().toISOString() }, executionStart) })
+        }
+      } else if (typeIds) {
+        // Batch-load all types and filter to those allowing public reads.
+        // Internal types are already excluded by the registry.listActive() filter above.
+        const typeReg = new DocumentTypeRegistry(db)
+        await typeReg.preloadAll()
+        const allowed: string[] = []
+        for (const tid of typeIds) {
+          const dt = await typeReg.findById(tid)
+          if (perms.isAllowedSync(anonPrincipal, [], 'read', resolveTypeSettings(dt, tid))) {
+            allowed.push(tid)
+          }
+        }
+        typeIds = allowed
+        if (typeIds.length === 0) {
+          return c.json({ data: [], meta: addTimingMeta(c, { count: 0, timestamp: new Date().toISOString() }, executionStart) })
+        }
+        // Re-augment filter with the filtered typeIds
+        const refiltered = augmentFilterForDocuments(filter, { typeIds, role })
+        Object.assign(normalizedFilter, refiltered)
+      }
+    }
+
     // Build SQL query from filter
     const builder = new QueryFilterBuilder()
     const queryResult = builder.build('documents', normalizedFilter)
@@ -706,8 +843,8 @@ apiRoutes.get('/content', optionalAuth(), async (c) => {
       }, 400)
     }
 
-    // Only use cache if cache plugin is active
-    const cacheEnabled = c.get('cacheEnabled')
+    // Non-anonymous / non-privileged users get per-request ACL filtering — skip cache.
+    const cacheEnabled = c.get('cacheEnabled') && !cNeedsAcl && projFields.length === 0
     const cache = getCacheService(CACHE_CONFIGS.api!)
     const cacheKey = cache.generateKey('content-filtered', JSON.stringify({ filter: normalizedFilter, query: queryResult.sql }))
 
@@ -734,8 +871,23 @@ apiRoutes.get('/content', optionalAuth(), async (c) => {
           }, executionStart)
         }
 
+        recordCatalogRequest({ cacheKey, collection: typeId ?? null, path: c.req.path, queryString: c.req.raw.url.split('?')[1] ?? '', source: cacheResult.source as 'memory' | 'kv' })
+scheduleKvWrite(cacheKey, () => c.executionCtx)
         return c.json(dataWithMeta)
       }
+
+      // SWR: serve stale value during revalidation window
+      const swrData = getAndConsumeStale(cacheKey)
+      if (swrData) {
+        c.header('X-Cache-Status', 'STALE')
+        c.header('X-Cache-Source', 'swr')
+        recordCatalogRequest({ cacheKey, collection: typeId ?? null, path: c.req.path, queryString: c.req.raw.url.split('?')[1] ?? '', source: 'swr' })
+scheduleKvWrite(cacheKey, () => c.executionCtx)
+        return c.json({ ...(swrData as any), meta: addTimingMeta(c, { ...(swrData as any).meta, cache: { hit: true, source: 'swr', stale: true } }, executionStart) })
+      }
+
+      recordCatalogRequest({ cacheKey, collection: typeId ?? null, path: c.req.path, queryString: c.req.raw.url.split('?')[1] ?? '', source: 'miss' })
+scheduleKvWrite(cacheKey, () => c.executionCtx)
     }
 
     // Cache miss - fetch from database
@@ -750,13 +902,44 @@ apiRoutes.get('/content', optionalAuth(), async (c) => {
 
     const { results } = await boundStmt.all()
 
+    // Non-privileged authenticated users must pass the document ACL per row.
+    // Two systems: baseGrants (code-time) + RBAC grants (runtime). Per-doc deny overrides
+    // only apply when baseGrants granted access; RBAC-only grants pass all rows.
+    let aclResults = results
+    if (cNeedsAcl) {
+      const typeReg = new DocumentTypeRegistry(db)
+      const repo = new DocumentRepository(db, cTenantId)
+      const uniqueTypeIds = [...new Set((results as any[]).map((r: any) => r.type_id as string))]
+      const typeSettingsMap = new Map<string, any>()
+      const typeRbacOnlyMap = new Map<string, boolean>()
+      const typeDeniedMap = new Map<string, boolean>()
+      const perms = new DocumentPermissionsService(db)
+      await Promise.all(uniqueTypeIds.map(async (tid) => {
+        const dt = await typeReg.findById(tid)
+        const settings = resolveTypeSettings(dt, tid)
+        typeSettingsMap.set(tid, settings)
+        const allowed = await typeReadAllowed(db, cPrincipalSet, dt, tid)
+        if (!allowed) { typeDeniedMap.set(tid, true); return }
+        typeRbacOnlyMap.set(tid, !perms.isAllowedSync(cPrincipalSet, [], 'read', settings))
+      }))
+      const allowed = await Promise.all(
+        (results as any[]).map((row: any) => {
+          const tid = row.type_id as string
+          if (typeDeniedMap.get(tid)) return Promise.resolve(false)
+          if (typeRbacOnlyMap.get(tid)) return Promise.resolve(true)
+          return repo.isAllowed(cPrincipalSet, row.root_id, 'read', typeSettingsMap.get(tid) ?? {})
+        })
+      )
+      aclResults = (results as any[]).filter((_: any, i: number) => allowed[i])
+    }
+
     // Transform document rows to the public content shape (id == document root id).
-    const transformedResults = results.map((row: any) => mapDocRowToContent(row, collIdByName.get(row.type_id) ?? null))
+    const transformedResults = aclResults.map((row: any) => mapDocRowToContent(row, collIdByName.get(row.type_id) ?? null))
 
     const responseData = {
-      data: transformedResults,
+      data: projFields.length ? transformedResults.map(item => projectFields(item, projFields)) : transformedResults,
       meta: addTimingMeta(c, {
-        count: results.length,
+        count: aclResults.length,
         timestamp: new Date().toISOString(),
         // D44: echo the caller's filter with the access policy applied (status=published forced for
         // anonymous callers — the visible enforcement proof), NOT the internal doc-augmented where-tree.
@@ -768,8 +951,8 @@ apiRoutes.get('/content', optionalAuth(), async (c) => {
       }, executionStart)
     }
 
-    // Cache the response only if cache is enabled
-    if (cacheEnabled) {
+    // Cache the response only if cache is enabled (skip when field projection active)
+    if (cacheEnabled && projFields.length === 0) {
       await cache.set(cacheKey, responseData)
     }
 
@@ -804,6 +987,26 @@ apiRoutes.get('/collections/:collection/content', optionalAuth(), async (c) => {
     // Parse the user filter, re-target to documents scoped to this collection's type + visibility.
     // type_id == the collection name; one row per root via is_published / is_current_draft.
     const role = c.get('user')?.role
+    const { tenantId: ccTenantId, principalSet: ccPrincipalSet } = getDocumentRequestContext(c)
+    const ccAnon = isAnonPrincipal(ccPrincipalSet)
+    const ccNeedsAcl = !ccAnon && !canReadNonPublicContent(role)
+
+    // Non-privileged authenticated users with no type-level read grant get 403 immediately.
+    // Anonymous callers get an early 403 if the type denies public reads (D5).
+    let ccDocType: Awaited<ReturnType<DocumentTypeRegistry['findById']>> | undefined
+    if (ccAnon) {
+      const anonPerms = new DocumentPermissionsService(db)
+      const ccAnonDocType = await new DocumentTypeRegistry(db).findById(record.name)
+      if (!anonPerms.isAllowedSync([{ type: 'public', id: '*' }], [], 'read', resolveTypeSettings(ccAnonDocType, record.name))) {
+        return c.json({ error: 'Forbidden' }, 403)
+      }
+    } else if (ccNeedsAcl) {
+      ccDocType = await new DocumentTypeRegistry(db).findById(record.name)
+      if (!(await typeReadAllowed(db, ccPrincipalSet, ccDocType, record.name))) {
+        return c.json({ error: 'Forbidden' }, 403)
+      }
+    }
+
     const filter: QueryFilter = QueryFilterBuilder.parseFromQuery(queryParams)
     const normalizedFilter = augmentFilterForDocuments(filter, { typeId: collection, role })
 
@@ -825,7 +1028,8 @@ apiRoutes.get('/collections/:collection/content', optionalAuth(), async (c) => {
     }
 
     // Generate cache key
-    const cacheEnabled = c.get('cacheEnabled')
+    // Non-privileged authenticated users get per-request ACL filtering — skip cache.
+    const cacheEnabled = c.get('cacheEnabled') && !ccNeedsAcl
     const cache = getCacheService(CACHE_CONFIGS.api!)
     const includeCollection = queryParams.include?.split(',').map(s => s.trim()).includes('collection')
     const cacheKey = cache.generateKey('collection-content-filtered', `${collection}:${JSON.stringify({ filter: normalizedFilter, query: queryResult.sql, includeCollection })}`)
@@ -854,8 +1058,23 @@ apiRoutes.get('/collections/:collection/content', optionalAuth(), async (c) => {
           }, executionStart)
         }
 
+        recordCatalogRequest({ cacheKey, collection: collection ?? null, path: c.req.path, queryString: c.req.raw.url.split('?')[1] ?? '', source: cacheResult.source as 'memory' | 'kv' })
+scheduleKvWrite(cacheKey, () => c.executionCtx)
         return c.json(dataWithMeta)
       }
+
+      // SWR: serve stale value during revalidation window
+      const swrData = getAndConsumeStale(cacheKey)
+      if (swrData) {
+        c.header('X-Cache-Status', 'STALE')
+        c.header('X-Cache-Source', 'swr')
+        recordCatalogRequest({ cacheKey, collection: collection ?? null, path: c.req.path, queryString: c.req.raw.url.split('?')[1] ?? '', source: 'swr' })
+scheduleKvWrite(cacheKey, () => c.executionCtx)
+        return c.json({ ...(swrData as any), meta: addTimingMeta(c, { ...(swrData as any).meta, cache: { hit: true, source: 'swr', stale: true } }, executionStart) })
+      }
+
+      recordCatalogRequest({ cacheKey, collection: collection ?? null, path: c.req.path, queryString: c.req.raw.url.split('?')[1] ?? '', source: 'miss' })
+scheduleKvWrite(cacheKey, () => c.executionCtx)
     }
 
     // Cache miss - fetch from database
@@ -870,14 +1089,30 @@ apiRoutes.get('/collections/:collection/content', optionalAuth(), async (c) => {
 
     const { results } = await boundStmt.all()
 
+    // Non-privileged authenticated users must pass the document ACL.
+    let ccAclResults = results
+    if (ccNeedsAcl) {
+      // ccDocType was fetched above for the 403 guard — reuse it here.
+      const ccPerms = new DocumentPermissionsService(db)
+      const ccBaseGrantsPass = ccPerms.isAllowedSync(ccPrincipalSet, [], 'read', ccDocType?.settings ?? {})
+      if (ccBaseGrantsPass) {
+        const repo = new DocumentRepository(db, ccTenantId)
+        const allowed = await Promise.all(
+          (results as any[]).map((row: any) => repo.isAllowed(ccPrincipalSet, row.root_id, 'read', ccDocType?.settings ?? {}))
+        )
+        ccAclResults = (results as any[]).filter((_: any, i: number) => allowed[i])
+      }
+      // else: RBAC granted type-level read — all rows pass
+    }
+
     // Transform document rows to the public content shape (id == document root id).
-    const transformedResults = results.map((row: any) => mapDocRowToContent(row, collIdByName.get(row.type_id) ?? null))
+    const transformedResults = ccAclResults.map((row: any) => mapDocRowToContent(row, collIdByName.get(row.type_id) ?? null))
 
     const responseData = {
       data: transformedResults,
       meta: addTimingMeta(c, {
         ...(includeCollection ? { collection: collectionRecordToRow(record) } : {}),
-        count: results.length,
+        count: ccAclResults.length,
         timestamp: new Date().toISOString(),
         // D44: echo the caller's filter with the access policy applied (status=published forced for
         // anonymous callers — the visible enforcement proof), NOT the internal doc-augmented where-tree.
@@ -919,6 +1154,10 @@ apiRoutes.get('/:collection', optionalAuth(), async (c) => {
     const db = c.env.DB
     const queryParams = c.req.query()
 
+    // ?fields= projection — strip before filter parsing
+    const projFields = parseFieldsParam(queryParams.fields)
+    if (queryParams.fields) delete queryParams.fields
+
     const record = getCollectionRegistry().getBySlugOrName(collection!)
     if (!record || record.isActive === false) {
       return c.json({ error: 'Collection not found' }, 404)
@@ -928,6 +1167,26 @@ apiRoutes.get('/:collection', optionalAuth(), async (c) => {
     collIdByName.set(record.name, record.id)
 
     const role = c.get('user')?.role
+    const { tenantId, principalSet } = getDocumentRequestContext(c)
+    const anon = isAnonPrincipal(principalSet)
+    const needsAcl = !anon && !canReadNonPublicContent(role)
+
+    // Non-privileged authenticated users with no type-level read grant get 403 immediately.
+    // Anonymous callers get an early 403 if the type denies public reads (D5).
+    let docTypeForCheck: Awaited<ReturnType<DocumentTypeRegistry['findById']>> | undefined
+    if (anon) {
+      const anonPerms = new DocumentPermissionsService(db)
+      const anonDocType = await new DocumentTypeRegistry(db).findById(record.name)
+      if (!anonPerms.isAllowedSync([{ type: 'public', id: '*' }], [], 'read', resolveTypeSettings(anonDocType, record.name))) {
+        return c.json({ error: 'Forbidden' }, 403)
+      }
+    } else if (needsAcl) {
+      docTypeForCheck = await new DocumentTypeRegistry(db).findById(record.name)
+      if (!(await typeReadAllowed(db, principalSet, docTypeForCheck, record.name))) {
+        return c.json({ error: 'Forbidden' }, 403)
+      }
+    }
+
     const filter: QueryFilter = QueryFilterBuilder.parseFromQuery(queryParams)
     const normalizedFilter = augmentFilterForDocuments(filter, { typeId: record.name, role })
     if (!normalizedFilter.limit) normalizedFilter.limit = 50
@@ -943,7 +1202,10 @@ apiRoutes.get('/:collection', optionalAuth(), async (c) => {
     // Per-collection cache override — collection config can disable caching or set a custom TTL.
     const collectionCache = (record as any).cache as { enabled?: boolean; ttl?: number } | undefined
     const collectionCacheDisabled = collectionCache?.enabled === false
-    const cacheEnabled = c.get('cacheEnabled') && !collectionCacheDisabled
+    // Cache for anonymous AND privileged authenticated users (admin/editor) — both see the same
+    // published data on the public API. Only skip cache for non-privileged authed users who need
+    // per-principal ACL filtering (needsAcl=true), since their result set may differ.
+    const cacheEnabled = c.get('cacheEnabled') && !collectionCacheDisabled && projFields.length === 0 && !needsAcl
     const cache = getCacheService(CACHE_CONFIGS.api!)
     const includeCollection = queryParams.include?.split(',').map(s => s.trim()).includes('collection')
     const cacheKey = cache.generateKey('collection-content-filtered', `${collection}:${JSON.stringify({ filter: normalizedFilter, query: queryResult.sql, includeCollection })}`)
@@ -954,8 +1216,23 @@ apiRoutes.get('/:collection', optionalAuth(), async (c) => {
         c.header('X-Cache-Status', 'HIT')
         c.header('X-Cache-Source', cacheResult.source)
         if (cacheResult.ttl) c.header('X-Cache-TTL', Math.floor(cacheResult.ttl).toString())
+        recordCatalogRequest({ cacheKey, collection: collection ?? null, path: c.req.path, queryString: c.req.raw.url.split('?')[1] ?? '', source: cacheResult.source as 'memory' | 'kv' })
+scheduleKvWrite(cacheKey, () => c.executionCtx)
         return c.json({ ...cacheResult.data, meta: addTimingMeta(c, { ...cacheResult.data.meta, cache: { hit: true, source: cacheResult.source, ttl: cacheResult.ttl ? Math.floor(cacheResult.ttl) : undefined } }, executionStart) })
       }
+
+      // SWR: serve stale value during revalidation window
+      const swrData = getAndConsumeStale(cacheKey)
+      if (swrData) {
+        c.header('X-Cache-Status', 'STALE')
+        c.header('X-Cache-Source', 'swr')
+        recordCatalogRequest({ cacheKey, collection: collection ?? null, path: c.req.path, queryString: c.req.raw.url.split('?')[1] ?? '', source: 'swr' })
+scheduleKvWrite(cacheKey, () => c.executionCtx)
+        return c.json({ ...(swrData as any), meta: addTimingMeta(c, { ...(swrData as any).meta, cache: { hit: true, source: 'swr', stale: true } }, executionStart) })
+      }
+
+      recordCatalogRequest({ cacheKey, collection: collection ?? null, path: c.req.path, queryString: c.req.raw.url.split('?')[1] ?? '', source: 'miss' })
+scheduleKvWrite(cacheKey, () => c.executionCtx)
     }
 
     c.header('X-Cache-Status', 'MISS')
@@ -965,12 +1242,33 @@ apiRoutes.get('/:collection', optionalAuth(), async (c) => {
     const boundStmt = queryResult.params.length > 0 ? stmt.bind(...queryResult.params) : stmt
     const { results } = await boundStmt.all()
 
-    const transformedResults = results.map((row: any) => mapDocRowToContent(row, collIdByName.get(row.type_id) ?? null))
+    // Non-privileged authenticated users must pass the document ACL.
+    // Anonymous and privileged (admin/editor) requests are unchanged.
+    let aclResults = results
+    if (needsAcl) {
+      // docTypeForCheck was fetched above for the 403 guard — reuse it here.
+      // If RBAC grants type-level read, all rows pass (baseGrants alone can't see the RBAC grant).
+      // Otherwise fall through to per-row isAllowed which checks baseGrants + per-doc overrides.
+      const perms = new DocumentPermissionsService(db)
+      const baseGrantsPass = perms.isAllowedSync(principalSet, [], 'read', docTypeForCheck?.settings ?? {})
+      if (!baseGrantsPass) {
+        // RBAC granted it at type level (we passed the 403 guard) — all rows pass.
+        // Per-doc deny overrides are intentionally not applied here; use /api/documents for that.
+      } else {
+        const repo = new DocumentRepository(db, tenantId)
+        const allowed = await Promise.all(
+          (results as any[]).map((row: any) => repo.isAllowed(principalSet, row.root_id, 'read', docTypeForCheck?.settings ?? {}))
+        )
+        aclResults = (results as any[]).filter((_: any, i: number) => allowed[i])
+      }
+    }
+
+    const transformedResults = aclResults.map((row: any) => mapDocRowToContent(row, collIdByName.get(row.type_id) ?? null))
     const responseData = {
-      data: transformedResults,
+      data: projFields.length ? transformedResults.map(item => projectFields(item, projFields)) : transformedResults,
       meta: addTimingMeta(c, {
         ...(includeCollection ? { collection: collectionRecordToRow(record) } : {}),
-        count: results.length,
+        count: aclResults.length,
         timestamp: new Date().toISOString(),
         filter: normalizePublicContentFilter(filter, role),
         cache: { hit: false, source: 'database' },
@@ -1013,6 +1311,35 @@ apiRoutes.get('/:collection/:id', optionalAuth(), async (c) => {
 
     if (!docRow) return c.json({ error: 'Content not found' }, 404)
 
+    // Authenticated non-anonymous users must pass the document ACL.
+    const colRole = c.get('user')?.role
+    const { tenantId: colTenantId, principalSet: colPrincipalSet } = getDocumentRequestContext(c)
+    const colAnon = isAnonPrincipal(colPrincipalSet)
+    const colNeedsAcl = !colAnon && !canReadNonPublicContent(colRole)
+    if (colAnon) {
+      const anonPerms = new DocumentPermissionsService(db)
+      const colAnonDocType = await new DocumentTypeRegistry(db).findById(record.name)
+      if (!anonPerms.isAllowedSync([{ type: 'public', id: '*' }], [], 'read', resolveTypeSettings(colAnonDocType, record.name))) {
+        return c.json({ error: 'Content not found' }, 404)
+      }
+    } else if (colNeedsAcl) {
+      const docType = await new DocumentTypeRegistry(db).findById(record.name)
+      // Check both baseGrants and RBAC grants (same two-system approach as the list routes).
+      if (!(await typeReadAllowed(db, colPrincipalSet, docType, record.name))) {
+        return c.json({ error: 'Content not found' }, 404)
+      }
+      // If baseGrants granted it, also honour per-doc deny overrides.
+      const perms = new DocumentPermissionsService(db)
+      if (perms.isAllowedSync(colPrincipalSet, [], 'read', docType?.settings ?? {})) {
+        const repo = new DocumentRepository(db, colTenantId)
+        if (!(await repo.isAllowed(colPrincipalSet, docRow.root_id, 'read', docType?.settings ?? {}))) {
+          return c.json({ error: 'Content not found' }, 404)
+        }
+      }
+      // else: RBAC granted type-level read — item passes (per-doc deny not applied on RBAC path)
+    }
+
+    const projFields = parseFieldsParam(c.req.query('fields'))
     const coll = getCollectionRegistry().getByName(docRow.type_id)
     const transformedContent = {
       id: docRow.root_id,
@@ -1026,7 +1353,7 @@ apiRoutes.get('/:collection/:id', optionalAuth(), async (c) => {
     }
 
     dispatchHookEvent(c, 'content:read', { collection: docRow.type_id, id: docRow.root_id, data: transformedContent.data }, 'fire-and-forget')
-    return c.json({ data: transformedContent })
+    return c.json({ data: projFields.length ? projectFields(transformedContent, projFields) : transformedContent })
   } catch (error) {
     console.error('Error fetching content:', error)
     return c.json({ error: 'Failed to fetch content', details: error instanceof Error ? error.message : String(error) }, 500)
@@ -1068,8 +1395,10 @@ apiRoutes.post('/:collection', requireAuth(), requireRole(['admin', 'editor', 'a
     const doc = await svc.create(createDocumentSchema.parse({ typeId: backing.coll.name, tenantId: 'default', locale: 'default', title, slug: finalSlug, data: hookData, publishOnCreate: (status || 'draft') === 'published' }), user?.userId)
 
     const cache = getCacheService(CACHE_CONFIGS.api!)
-    await cache.invalidate('content-filtered:*')
-    await cache.invalidate('collection-content-filtered:*')
+    // Deliberately no SWR stash here — `getAndConsumeStale` would hand the value this write
+    // just retired to the next reader, with no revalidation behind it. See services/swr.ts.
+    await cache.invalidate('api:content-filtered:*')
+    await cache.invalidate(`api:collection-content-filtered:${backing.coll.name}:*`)
     dispatchHookEvent(c, 'content:after:create', { collection: backing.coll.name, id: doc.rootId, data: doc.data ?? {}, user: actor }, 'fire-and-forget')
 
     return c.json({ data: { id: doc.rootId, title: doc.title, slug: doc.slug, status: doc.status, collectionId: backing.coll.id, data: doc.data, created_at: documentSecondsToMs(doc.createdAt), updated_at: documentSecondsToMs(doc.updatedAt) } }, 201)
@@ -1122,8 +1451,10 @@ apiRoutes.put('/:collection/:id', requireAuth(), requireRole(['admin', 'editor',
     }
 
     const cache = getCacheService(CACHE_CONFIGS.api!)
-    await cache.invalidate('content-filtered:*')
-    await cache.invalidate('collection-content-filtered:*')
+    // Deliberately no SWR stash here — `getAndConsumeStale` would hand the value this write
+    // just retired to the next reader, with no revalidation behind it. See services/swr.ts.
+    await cache.invalidate('api:content-filtered:*')
+    await cache.invalidate(`api:collection-content-filtered:${docRow.type_id}:*`)
     const coll = getCollectionRegistry().getByName(docRow.type_id)
     const saved = await db.prepare('SELECT * FROM documents WHERE id = ?').bind(newDraft.id).first() as any
     const savedData = saved?.data ? JSON.parse(saved.data) : {}
@@ -1162,8 +1493,10 @@ apiRoutes.delete('/:collection/:id', requireAuth(), requireRole(['admin', 'edito
     const now = Math.floor(Date.now() / 1000)
     await db.prepare("UPDATE documents SET deleted_at = ?, updated_at = ? WHERE root_id = ? AND tenant_id = 'default'").bind(now, now, id).run()
     const cache = getCacheService(CACHE_CONFIGS.api!)
-    await cache.invalidate('content-filtered:*')
-    await cache.invalidate('collection-content-filtered:*')
+    // Deliberately no SWR stash here — `getAndConsumeStale` would hand the value this write
+    // just retired to the next reader, with no revalidation behind it. See services/swr.ts.
+    await cache.invalidate('api:content-filtered:*')
+    await cache.invalidate(`api:collection-content-filtered:${docRow.type_id}:*`)
     dispatchHookEvent(c, 'content:after:delete', { collection: docRow.type_id, id, data: {}, user: actor }, 'fire-and-forget')
 
     return c.json({ success: true })

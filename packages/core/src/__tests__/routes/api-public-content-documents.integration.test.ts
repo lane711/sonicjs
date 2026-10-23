@@ -38,7 +38,7 @@ describe('public content API → documents (decommission step 2)', () => {
     h.user = undefined
     db = createTestD1()
     // Collections are code-only now (no DB table) — register in the in-memory registry.
-    getCollectionRegistry().register([{ name: 'news', displayName: 'News', schema: {} }])
+    getCollectionRegistry().register([{ name: 'news', displayName: 'News', schema: {}, access: { public: ['read'] } }])
     const svc = new DocumentsService(db, { tenantId: 'default', queryableFields: [] })
     await svc.create({ typeId: 'news', tenantId: 'default', title: 'Published News', slug: 'pub-news', data: { category: 'tech' }, publishOnCreate: true })
     await svc.create({ typeId: 'news', tenantId: 'default', title: 'Draft News', slug: 'draft-news', data: { category: 'tech' } }) // not published

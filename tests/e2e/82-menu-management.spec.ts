@@ -3,7 +3,7 @@ import { loginAsAdmin, ensureAdminUserExists } from './utils/test-helpers'
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8787'
 
-test.describe('Menu Management', () => {
+test.describe('Menu Management @plugins', () => {
   test.beforeEach(async ({ page }) => {
     await ensureAdminUserExists(page)
     await loginAsAdmin(page)

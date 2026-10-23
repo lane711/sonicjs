@@ -1,9 +1,9 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { loginAsAdmin } from './utils/test-helpers'
 
 const BASE = process.env.BASE_URL || 'http://localhost:8787'
 
-test.describe('per-collection base routes', () => {
+test.describe('per-collection base routes @collections', () => {
   test('GET /api/:collection returns list of published items', async ({ request }) => {
     const response = await request.get(`${BASE}/api/blog_post`)
     expect(response.ok()).toBeTruthy()

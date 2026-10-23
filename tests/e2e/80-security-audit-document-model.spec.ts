@@ -1,7 +1,7 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { loginAsAdmin } from './utils/test-helpers'
 
-test.describe('Security Audit Plugin — document model', () => {
+test.describe('Security Audit Plugin — document model @smoke @content @lock-auth-login', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page)
   })

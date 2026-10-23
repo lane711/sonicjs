@@ -46,6 +46,7 @@ describe('GET /api/:collection — per-collection cache TTL', () => {
         isActive: true,
         managed: true,
         cache: { enabled: true, ttl: 600 },
+        access: { public: ['read'] },
       },
       {
         name: 'no_cache_thing',
@@ -55,6 +56,7 @@ describe('GET /api/:collection — per-collection cache TTL', () => {
         isActive: true,
         managed: true,
         cache: { enabled: false },
+        access: { public: ['read'] },
       },
     ])
 

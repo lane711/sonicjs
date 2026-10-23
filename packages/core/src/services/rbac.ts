@@ -16,6 +16,7 @@
  * The public API is unchanged from the relational implementation, so callers
  * (admin-rbac routes, permission checks) need no changes.
  */
+import type { D1Database, KVNamespace } from '@cloudflare/workers-types'
 import { DocumentsService } from './documents'
 
 export interface RbacRole {
@@ -234,6 +235,24 @@ export class RbacService {
       }
     }
     return out
+  }
+
+  /**
+   * Does the role (matched by document slug OR data.name) have a grant for resource+verb?
+   * Matches the role principal id from the request context, which can be either the RBAC slug
+   * (e.g. 'role-public') or the legacy role name (e.g. 'public').
+   */
+  async isGrantedForRole(roleNameOrSlug: string, resource: string, verb: string): Promise<boolean> {
+    const roles = await this.listDocs<RoleData>(T_ROLE)
+    const role = roles.find((r) => r.slug === roleNameOrSlug || r.data.name === roleNameOrSlug)
+    if (!role) return false
+    return (role.data.grants ?? []).some((g) => this.grantMatches(g, resource, verb))
+  }
+
+  /** True if a role document exists for this id or name. Use to distinguish "no RBAC role → default allow" from "role exists but no grant → deny". */
+  async hasRbacRole(idOrName: string): Promise<boolean> {
+    const roles = await this.listDocs<RoleData>(T_ROLE)
+    return roles.some((r) => r.slug === idOrName || r.data.name === idOrName)
   }
 
   /** Does a single grant row satisfy the requested (resource, verb)? */
@@ -490,6 +509,19 @@ export class RbacService {
       { id: 'verb-manage', name: 'manage', description: 'Full control (implies all verbs)', isSystem: true, sortOrder: 50 },
     ]
 
+    // Fast path: one COUNT query — if all expected roles+verbs already exist, skip.
+    const expectedCount = roles.length + verbs.length
+    const countRes = await this.db
+      .prepare(
+        `SELECT COUNT(*) AS cnt FROM documents
+         WHERE type_id IN ('${T_ROLE}','${T_VERB}') AND tenant_id = ?
+         AND is_current_draft = 1 AND deleted_at IS NULL`,
+      )
+      .bind(TENANT)
+      .first<{ cnt: number }>()
+    if ((countRes?.cnt ?? 0) >= expectedCount) return
+
+    // Full seeding path (first boot or partial state).
     for (const r of roles) {
       if (await this.getDoc(T_ROLE, r.id)) continue
       const { id, ...data } = r

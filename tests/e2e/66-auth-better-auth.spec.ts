@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { ADMIN_CREDENTIALS, loginAsAdmin, logout } from './utils/test-helpers';
+import { test, expect } from './fixtures';
+import { ADMIN_CREDENTIALS, loginAsAdmin, logout, seedAdminPastRateLimit, TEST_ORIGIN } from './utils/test-helpers';
 
 /**
  * Better Auth integration E2E tests.
@@ -10,7 +10,7 @@ import { ADMIN_CREDENTIALS, loginAsAdmin, logout } from './utils/test-helpers';
  * Numbered 66+ per document-model-poc-plan.md R11.
  */
 
-test.describe('Better Auth — sign in / sign out', () => {
+test.describe('Better Auth — sign in / sign out @smoke @auth', () => {
   test('POST /auth/sign-in/email returns user + token with valid credentials', async ({ request }) => {
     await request.post('/auth/seed-admin');
 
@@ -69,21 +69,17 @@ test.describe('Better Auth — sign in / sign out', () => {
 
   test('POST /auth/sign-out invalidates session', async ({ page }) => {
     await page.request.post('/auth/seed-admin');
+    // Sign in so page.request cookie jar holds the BA session cookie.
     const signIn = await page.request.post('/auth/sign-in/email', {
       data: { email: ADMIN_CREDENTIALS.email, password: ADMIN_CREDENTIALS.password },
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Origin': TEST_ORIGIN },
     });
-    const signInBody = await signIn.json();
-    // BA returns token in body; use it as Bearer for sign-out (cookie transport may be blocked by SameSite)
-    const token = signInBody.token ?? signInBody.session?.token ?? '';
+    expect(signIn.ok()).toBeTruthy();
 
+    // Sign out using session cookies (page.request shares the same cookie jar).
     const signOutRes = await page.request.post('/auth/sign-out', {
       data: {},
-      headers: {
-        'Content-Type': 'application/json',
-        'Origin': 'http://localhost:8787',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers: { 'Content-Type': 'application/json', 'Origin': TEST_ORIGIN },
     });
     // Sign-out should succeed (2xx)
     expect(signOutRes.status()).toBeLessThan(400);
@@ -101,7 +97,7 @@ test.describe('Better Auth — sign in / sign out', () => {
   });
 });
 
-test.describe('Better Auth — protected routes', () => {
+test.describe('Better Auth — protected routes @auth', () => {
   test('unauthenticated GET /admin redirects to login', async ({ page }) => {
     await page.context().clearCookies();
 
@@ -122,10 +118,14 @@ test.describe('Better Auth — protected routes', () => {
   });
 });
 
-test.describe('Better Auth — seed-admin creates credentials', () => {
+test.describe('Better Auth — seed-admin creates credentials @auth', () => {
   test('seed-admin creates user and login works', async ({ request }) => {
-    const res = await request.post('/auth/seed-admin');
-    expect(res.ok()).toBeTruthy();
+    // Headroom for the rate-limit poll above: the default 60s timeout is shorter than the
+    // limiter's own 60s window, so a test that starts on an exhausted window cannot outlast it.
+    test.setTimeout(150_000);
+
+    const res = await seedAdminPastRateLimit(request);
+    expect(res.ok(), `seed-admin never got past the rate limiter: ${res.status()}`).toBeTruthy();
     const body = await res.json();
     expect(body.message).toBe('Seed complete');
     const adminEntry = (body.users ?? []).find((u: any) => u.email === ADMIN_CREDENTIALS.email);

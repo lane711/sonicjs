@@ -232,15 +232,6 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
             </div>
 
             <div class="flex items-center gap-3 w-full sm:w-auto">
-              <select id="sort-filter" onchange="filterAndSortPlugins()" class="block w-full sm:w-auto h-9 rounded-md border-0 py-1.5 pl-3 pr-8 text-zinc-900 ring-1 ring-inset ring-zinc-300 focus:ring-2 focus:ring-inset focus:ring-zinc-600 dark:bg-zinc-900 dark:text-white dark:ring-zinc-700 dark:focus:ring-zinc-500 sm:text-sm sm:leading-6">
-                <option value="name-asc">Name (A-Z)</option>
-                <option value="name-desc">Name (Z-A)</option>
-                <option value="newest">Newest Installed</option>
-                <option value="updated">Recently Updated</option>
-                <option value="popular">Popularity</option>
-                <option value="rating">Highest Rated</option>
-              </select>
-
               <button
                 onclick="location.reload()"
                 class="inline-flex items-center gap-x-1.5 rounded-md bg-white dark:bg-zinc-900 px-3 py-1.5 h-9 text-sm font-semibold text-zinc-900 dark:text-white shadow-sm ring-1 ring-inset ring-zinc-300 dark:ring-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
@@ -284,6 +275,11 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
             const statusBadge = card.querySelector('.status-badge');
             const knob = button.querySelector('.toggle-knob');
 
+            // The category/status filter reads data-status off the card, so leaving it at
+            // the server-rendered value meant a plugin you had just switched off still
+            // filtered as active until the next full page load.
+            card.setAttribute('data-status', action === 'activate' ? 'active' : 'inactive');
+
             if (action === 'activate') {
               // Update status badge
               statusBadge.className = 'status-badge inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ring-1 ring-inset bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 ring-emerald-600/20';
@@ -292,7 +288,10 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
               // Update button state to Active
               button.className = 'bg-emerald-600 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 toggle-button';
               button.setAttribute('aria-checked', 'true');
-              button.onclick = (event) => togglePlugin(pluginId, 'deactivate', event);
+              // Keep stopPropagation(): the markup's inline onclick has it, and without it
+              // here the second click on the switch bubbles to the card, whose own onclick
+              // navigates to the plugin settings page.
+              button.onclick = (event) => { event.stopPropagation(); togglePlugin(pluginId, 'deactivate', event); };
               
               // Update knob position
               if (knob) {
@@ -306,7 +305,7 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
               // Update button state to Inactive
               button.className = 'bg-zinc-200 dark:bg-zinc-700 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 toggle-button';
               button.setAttribute('aria-checked', 'false');
-              button.onclick = (event) => togglePlugin(pluginId, 'activate', event);
+              button.onclick = (event) => { event.stopPropagation(); togglePlugin(pluginId, 'activate', event); };
               
               // Update knob position
               if (knob) {
@@ -404,8 +403,6 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
           .forEach(cb => params.append('status', cb.value));
         const search = document.getElementById('search-input').value;
         if (search) params.set('search', search);
-        const sort = document.getElementById('sort-filter').value;
-        if (sort && sort !== 'name-asc') params.set('sort', sort);
         const url = new URL(window.location.href);
         url.search = params.toString();
         history.replaceState(null, '', url.toString());
@@ -423,8 +420,6 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
         });
         const search = params.get('search');
         if (search) document.getElementById('search-input').value = search;
-        const sort = params.get('sort');
-        if (sort) document.getElementById('sort-filter').value = sort;
         if (params.toString()) filterAndSortPlugins();
       }
 
@@ -440,7 +435,6 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
           .map(cb => cb.value.toLowerCase());
 
         const searchInput = document.getElementById('search-input').value.toLowerCase();
-        const sortValue = document.getElementById('sort-filter').value;
 
         const pluginsGrid = document.getElementById('plugins-grid');
         const pluginCards = Array.from(pluginsGrid.querySelectorAll('.plugin-card'));
@@ -462,30 +456,6 @@ export function renderPluginsListPage(data: PluginsListPageData): string {
           if (searchInput && !name.includes(searchInput) && !description.includes(searchInput)) return false;
           
           return true;
-        });
-
-        // Sort
-        visibleCards.sort((a, b) => {
-          const aName = a.getAttribute('data-name') || '';
-          const bName = b.getAttribute('data-name') || '';
-          const aInstalled = parseInt(a.getAttribute('data-installed') || '0');
-          const bInstalled = parseInt(b.getAttribute('data-installed') || '0');
-          const aUpdated = parseInt(a.getAttribute('data-updated') || '0');
-          const bUpdated = parseInt(b.getAttribute('data-updated') || '0');
-          const aDownloads = parseInt(a.getAttribute('data-downloads') || '0');
-          const bDownloads = parseInt(b.getAttribute('data-downloads') || '0');
-          const aRating = parseFloat(a.getAttribute('data-rating') || '0');
-          const bRating = parseFloat(b.getAttribute('data-rating') || '0');
-
-          switch (sortValue) {
-            case 'name-desc': return bName.localeCompare(aName);
-            case 'newest': return bInstalled - aInstalled;
-            case 'updated': return bUpdated - aUpdated;
-            case 'popular': return bDownloads - aDownloads;
-            case 'rating': return bRating - aRating;
-            case 'name-asc':
-            default: return aName.localeCompare(bName);
-          }
         });
 
         // Re-append
